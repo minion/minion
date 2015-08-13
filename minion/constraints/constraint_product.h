@@ -45,7 +45,9 @@ positive numbers.
 /// var1 * var2 = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3>
 struct ProductConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "product"; }
+  virtual string constraint_name() {
+    return "product";
+  }
 
   VarRef1 var1;
   VarRef2 var2;
@@ -92,16 +94,16 @@ struct ProductConstraint : public AbstractConstraint {
   }
 
   DomainInt round_up_div(DomainInt x, DomainInt y) {
-    if (y == 0)
+    if(y == 0)
       return 0;
     DomainInt ret = x / y;
-    if (x % y != 0)
+    if(x % y != 0)
       ret++;
     return ret;
   }
 
   DomainInt round_down_div(DomainInt x, DomainInt y) {
-    if (y == 0)
+    if(y == 0)
       return DomainInt_Max;
     return x / y;
   }
@@ -115,7 +117,7 @@ struct ProductConstraint : public AbstractConstraint {
     DomainInt var3_min = var3.getMin();
     DomainInt var3_max = var3.getMax();
 
-    if ((var1_min >= 0) && (var2_min >= 0)) {
+    if((var1_min >= 0) && (var2_min >= 0)) {
       // We don't have to deal with negative numbers. yay!
 
       var3_min = max(var3_min, var1_min * var2_min);
@@ -136,9 +138,9 @@ struct ProductConstraint : public AbstractConstraint {
     } else {
       var3.setMax(mult_max(var1_min, var1_max, var2_min, var2_max));
       var3.setMin(mult_min(var1_min, var1_max, var2_min, var2_max));
-      if (var1.isAssigned()) {
+      if(var1.isAssigned()) {
         DomainInt val1 = var1.getAssignedValue();
-        if (val1 > 0) {
+        if(val1 > 0) {
           var3.setMin(var2.getMin() * val1);
           var3.setMax(var2.getMax() * val1);
         } else {
@@ -147,9 +149,9 @@ struct ProductConstraint : public AbstractConstraint {
         }
       }
 
-      if (var2.isAssigned()) {
+      if(var2.isAssigned()) {
         DomainInt val2 = var2.getAssignedValue();
-        if (val2 > 0) {
+        if(val2 > 0) {
           var3.setMin(var1.getMin() * val2);
           var3.setMax(var1.getMax() * val2);
         } else {
@@ -165,7 +167,7 @@ struct ProductConstraint : public AbstractConstraint {
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     return (v[0] * v[1]) == v[2];
   }
@@ -178,11 +180,11 @@ struct ProductConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    for (DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
-      if (var1.inDomain(v1)) {
-        for (DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
-          if (var2.inDomain(v2) && var3.inDomain(v1 * v2)) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+      if(var1.inDomain(v1)) {
+        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
+          if(var2.inDomain(v2) && var3.inDomain(v1 * v2)) {
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));
             assignment.push_back(make_pair(2, v1 * v2));
@@ -195,21 +197,23 @@ struct ProductConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 };
 
 #include "constraint_and.h"
 
-inline AbstractConstraint *BuildCT_PRODUCT2(const vector<BoolVarRef> &vars,
-                                            const vector<BoolVarRef> &var2, ConstraintBlob &) {
+inline AbstractConstraint* BuildCT_PRODUCT2(const vector<BoolVarRef>& vars,
+                                            const vector<BoolVarRef>& var2, ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return AndCon(vars[0], vars[1], var2[0]);
 }
 
 template <typename VarRef1, typename VarRef2>
-AbstractConstraint *BuildCT_PRODUCT2(const vector<VarRef1> &vars, const vector<VarRef2> &var2,
-                                     ConstraintBlob &) {
+AbstractConstraint* BuildCT_PRODUCT2(const vector<VarRef1>& vars, const vector<VarRef2>& var2,
+                                     ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   return new ProductConstraint<VarRef1, VarRef1, VarRef2>(vars[0], vars[1], var2[0]);

@@ -2,17 +2,29 @@
 #define TIME_KEEPING_HFDAFAD
 
 #ifdef NO_SYSTEM
-inline long double init_start_wall_time(int = 0) { return 0; }
+inline long double init_start_wall_time(int = 0) {
+  return 0;
+}
 
-inline long double get_wall_time() { return 0; }
+inline long double get_wall_time() {
+  return 0;
+}
 
-inline long double get_raw_wall_time() { return 0; }
+inline long double get_raw_wall_time() {
+  return 0;
+}
 
-inline long double get_cpu_time() { return 0; }
+inline long double get_cpu_time() {
+  return 0;
+}
 
-inline long double get_sys_time() { return 0; }
+inline long double get_sys_time() {
+  return 0;
+}
 
-inline long get_max_rss() { return 0; }
+inline long get_max_rss() {
+  return 0;
+}
 #else
 
 #ifdef _WIN32
@@ -21,13 +33,17 @@ inline long get_max_rss() { return 0; }
 
 #define ULL unsigned __int64
 
-inline long double get_wall_time() { return (long double)(clock()) / CLOCKS_PER_SEC; }
+inline long double get_wall_time() {
+  return (long double)(clock()) / CLOCKS_PER_SEC;
+}
 
-inline long double get_raw_wall_time() { return get_wall_time(); }
+inline long double get_raw_wall_time() {
+  return get_wall_time();
+}
 
 inline long double get_cpu_time() {
   FILETIME creat_t, exit_t, kernel_t, user_t;
-  if (GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
+  if(GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
     return ((long double)(((ULL)user_t.dwHighDateTime << 32) + (ULL)user_t.dwLowDateTime)) / 10000 /
            1000;
   else
@@ -36,7 +52,7 @@ inline long double get_cpu_time() {
 
 inline long double get_sys_time() {
   FILETIME creat_t, exit_t, kernel_t, user_t;
-  if (GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
+  if(GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
     return ((long double)(((ULL)kernel_t.dwHighDateTime << 32) + (ULL)kernel_t.dwLowDateTime)) /
            10000 / 1000;
   else
@@ -63,7 +79,7 @@ inline long get_max_rss() {
 
 inline long double init_start_wall_time(int special_check = 0) {
   static long double start_time = 0;
-  if (special_check == 0) {
+  if(special_check == 0) {
     assert(start_time == 0);
     timeval t;
     gettimeofday(&t, NULL);

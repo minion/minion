@@ -1,7 +1,7 @@
 #include "minlib/tries.hpp"
 
 template <typename Tuples>
-void test_tuples(const Tuples &tuples) {
+void test_tuples(const Tuples& tuples) {
   auto ptr = build_trie(tuples);
   auto vec = unroll_trie(ptr);
   D_ASSERT(tuples == vec);

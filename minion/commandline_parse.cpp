@@ -78,18 +78,18 @@ extern bool in_cspcomp_for_failexit;
 #define INCREMENT_i(flag)                                                                          \
   {                                                                                                \
     ++i;                                                                                           \
-    if (i == argc || argv[i][0] == '-') {                                                          \
+    if(i == argc || argv[i][0] == '-') {                                                           \
       cerr << #flag << " requires a value\n";                                                      \
       exit(1);                                                                                     \
     }                                                                                              \
   }
 
-void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
-  for (SysInt i = 1; i < argc; ++i) {
+void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
+  for(SysInt i = 1; i < argc; ++i) {
     const string command(argv[i]);
-    if (command == string("-findallsols")) {
+    if(command == string("-findallsols")) {
       getOptions().findAllSolutions();
-    } else if (command == string("-crash")) {
+    } else if(command == string("-crash")) {
       debug_crash = true;
     }
     /** @help switches;-quiet Description
@@ -99,18 +99,18 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-quiet References
     help switches -verbose
     */
-    else if (command == string("-quiet")) {
+    else if(command == string("-quiet")) {
       getOptions().parser_verbose = false;
     }
 
-    else if (command == string("-redump")) {
+    else if(command == string("-redump")) {
       getOptions().redump = true;
     }
     /** @help switches;-outputCompressedDomains Description
     Try to rduce the initial domains of variables, and output them.
     This is in general not useful for users, but is provided for other systems.
     */
-    else if (command == string("-outputCompressedDomains")) {
+    else if(command == string("-outputCompressedDomains")) {
       getOptions().outputCompressedDomains = true;
     }
     /** @help switches;-outputCompressed Description
@@ -124,42 +124,42 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
 
        minion infile.minion -outputCompressed smaller.minion
     */
-    else if (command == string("-outputCompressed")) {
+    else if(command == string("-outputCompressed")) {
       INCREMENT_i(-outputCompressed);
       getOptions().outputCompressed = argv[i];
-    } else if (command == string("-instancestats")) {
+    } else if(command == string("-instancestats")) {
       getOptions().instance_stats = true;
-    } else if (command == string("-Xgraph")) {
+    } else if(command == string("-Xgraph")) {
       getOptions().graph = true;
       getOptions().silent = true;
-    } 
+    }
     /** @help switches;-printsols Description
     Print solutions (default).
     */
-    else if (command == string("-printsols")) {
+    else if(command == string("-printsols")) {
       getOptions().print_solution = true;
     }
     /** @help switches;-noprintsols Description
     Do not print solutions.
     */
-    else if (command == string("-noprintsols")) {
+    else if(command == string("-noprintsols")) {
       getOptions().print_solution = false;
-    } else if (command == string("-notimers")) {
+    } else if(command == string("-notimers")) {
       getOptions().noTimers = true;
     }
     /** @help switches;-printsolsonly Description
     Print only solutions and a summary at the end.
     */
-    else if (command == string("-printsolsonly")) {
+    else if(command == string("-printsolsonly")) {
       getOptions().silent = true;
     }
     /** @help switches;-printonlyoptimal Description
     In optimisation problems, only print the optimal value, and
     not intermediate values.
     */
-    else if (command == string("-printonlyoptimal")) {
+    else if(command == string("-printonlyoptimal")) {
       getOptions().printonlyoptimal = true;
-    } else if (command == string("-cspcomp")) {
+    } else if(command == string("-cspcomp")) {
       getOptions().silent = true;
       getOptions().cspcomp = true;
       in_cspcomp_for_failexit = true;
@@ -171,7 +171,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-verbose References
     help switches -quiet
     */
-    else if (command == string("-verbose")) {
+    else if(command == string("-verbose")) {
       getOptions().parser_verbose = true;
     }
     /** @help switches;-prop-node Description
@@ -191,11 +191,11 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-prop-node References
     help switches -preprocess
     */
-    else if (command == string("-prop-node") || command == string("-X-prop-node")) {
+    else if(command == string("-prop-node") || command == string("-X-prop-node")) {
       INCREMENT_i(-X - prop - node);
       string prop_mode(argv[i]);
       args.prop_method = GetPropMethodFromString(prop_mode);
-      if (args.prop_method == PropLevel_None) {
+      if(args.prop_method == PropLevel_None) {
         output_fatal_error("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
@@ -212,16 +212,16 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     keeplong : Make a 'short tuple list' with no short tuples (only for
     benchmarking)
     */
-    else if (command == string("-map-long-short")) {
+    else if(command == string("-map-long-short")) {
       INCREMENT_i(-X - prop - node);
       string prop_mode(argv[i]);
-      if (prop_mode == "none")
+      if(prop_mode == "none")
         getOptions().map_long_short = MLTTS_NoMap;
-      else if (prop_mode == "keeplong")
+      else if(prop_mode == "keeplong")
         getOptions().map_long_short = MLTTS_KeepLong;
-      else if (prop_mode == "eager")
+      else if(prop_mode == "eager")
         getOptions().map_long_short = MLTTS_Eager;
-      else if (prop_mode == "lazy")
+      else if(prop_mode == "lazy")
         getOptions().map_long_short = MLTTS_Lazy;
       else {
         output_fatal_error(" -X-map-long-short <none|keeplong|eager|lazy>");
@@ -276,7 +276,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-preprocess References
     help switches -prop-node
     */
-    else if (command == string("-preprocess")) {
+    else if(command == string("-preprocess")) {
       INCREMENT_i(-preprocess);
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
@@ -288,7 +288,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-nocheck Notes
     This option is the default on non-DEBUG executables.
     */
-    else if (command == string("-nocheck")) {
+    else if(command == string("-nocheck")) {
       getOptions().nocheck = true;
     }
     /** @help switches;-check Description
@@ -298,13 +298,13 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-check Notes
     This option is the default for DEBUG executables.
     */
-    else if (command == string("-check")) {
+    else if(command == string("-check")) {
       getOptions().nocheck = false;
     }
     /** @help switches;-dumptree Description
     Print out the branching decisions and variable states at each node.
     */
-    else if (command == string("-dumptree")) {
+    else if(command == string("-dumptree")) {
       getOptions().dumptree = true;
     }
     /** @help switches;-nodelimit Description
@@ -318,13 +318,13 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     help switches -timelimit
     help switches -sollimit
     */
-    else if (command == string("-nodelimit")) {
+    else if(command == string("-nodelimit")) {
       INCREMENT_i(-nodelimit);
       try {
         getOptions().nodelimit = fromstring<long long int>(argv[i]);
-        if (getOptions().nodelimit < 0)
+        if(getOptions().nodelimit < 0)
           throw "Invalid lower bound";
-      } catch (...) {
+      } catch(...) {
         cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
         exit(1);
       }
@@ -340,13 +340,13 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     help switches -nodelimit
     help switches -timelimit
     */
-    else if (command == string("-sollimit")) {
+    else if(command == string("-sollimit")) {
       INCREMENT_i(-sollimit);
       try {
         getOptions().sollimit = fromstring<SysInt>(argv[i]);
-        if (getOptions().sollimit <= 0)
+        if(getOptions().sollimit <= 0)
           throw "Invalid lower bound";
-      } catch (...) {
+      } catch(...) {
         cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
         exit(1);
       }
@@ -362,9 +362,9 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     help switches -nodelimit
     help switches -sollimit
     */
-    else if (command == string("-timelimit")) {
+    else if(command == string("-timelimit")) {
       INCREMENT_i(-timelimit);
-      if (getOptions().timeout_active) {
+      if(getOptions().timeout_active) {
         cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
         exit(1);
       }
@@ -372,7 +372,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
       try {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
         getOptions().time_limit_is_CPU_time = false;
-      } catch (...) {
+      } catch(...) {
         cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
         exit(1);
       }
@@ -390,7 +390,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     it will not speed up search (except when the speed up is due to producing
     garbage of course!)
     */
-    else if (command == string("-skipautoaux")) {
+    else if(command == string("-skipautoaux")) {
       cout << "# WARNING: -skipautoaux can lead to incorrect solutions being "
               "produced\n";
       cout << "# WARNING: This is by design, but use this option with extreme "
@@ -408,9 +408,9 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     help switches -nodelimit
     help switches -sollimit
     */
-    else if (command == string("-cpulimit")) {
+    else if(command == string("-cpulimit")) {
       INCREMENT_i(-cpulimit);
-      if (getOptions().timeout_active) {
+      if(getOptions().timeout_active) {
         cout << "Only one '-cpulimit', or '-timelimit' per instance" << endl;
         exit(1);
       }
@@ -418,50 +418,50 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
       try {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
         getOptions().time_limit_is_CPU_time = true;
-      } catch (...) {
+      } catch(...) {
         cout << "Did not understand the parameter to cpulimit:" << argv[i] << endl;
         exit(1);
       }
     } // TODO : Should remove -varorder for beta orderings.
-    else if (command == string("-varorder")) {
+    else if(command == string("-varorder")) {
       INCREMENT_i(-varorder);
 
       string order(argv[i]);
 
-      if (order == "static")
+      if(order == "static")
         args.order = ORDER_STATIC;
-      else if (order == "srf")
+      else if(order == "srf")
         args.order = ORDER_SRF;
-      else if (order == "staticlimited") {
+      else if(order == "staticlimited") {
         args.order = ORDER_STATIC_LIMITED;
         INCREMENT_i(staticlimited);
         // Parse an integer for the limit.
         unsigned int tmp;
         std::istringstream iss(argv[i]);
-        if (!(iss >> tmp)) {
+        if(!(iss >> tmp)) {
           output_fatal_error("-varorder staticlimited requires a positive integer value");
         }
         args.limit = tmp;
-      } else if (order == "srf-random") {
+      } else if(order == "srf-random") {
         args.order = ORDER_SRF;
         getOptions().randomise_valvarorder = true;
-      } else if (order == "sdf")
+      } else if(order == "sdf")
         args.order = ORDER_SDF;
-      else if (order == "sdf-random") {
+      else if(order == "sdf-random") {
         args.order = ORDER_SDF;
         getOptions().randomise_valvarorder = true;
-      } else if (order == "ldf")
+      } else if(order == "ldf")
         args.order = ORDER_LDF;
-      else if (order == "ldf-random") {
+      else if(order == "ldf-random") {
         args.order = ORDER_LDF;
         getOptions().randomise_valvarorder = true;
-      } else if (order == "random")
+      } else if(order == "random")
         getOptions().randomise_valvarorder = true;
-      else if (order == "conflict")
+      else if(order == "conflict")
         args.order = ORDER_CONFLICT;
-      else if (order == "wdeg") {
+      else if(order == "wdeg") {
         args.order = ORDER_WDEG;
-      } else if (order == "domoverwdeg") {
+      } else if(order == "domoverwdeg") {
         args.order = ORDER_DOMOVERWDEG;
       } else {
         ostringstream oss;
@@ -476,14 +476,14 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     ordering is
     specified a random permutation of all the variables is used.
     */
-    else if (command == string("-randomiseorder")) {
+    else if(command == string("-randomiseorder")) {
       getOptions().randomise_valvarorder = true;
     }
     /** @help switches;-randomseed Description
     Set the pseudorandom seed to N. This allows 'random' behaviour to be
     repeated in different runs of minion.
     */
-    else if (command == string("-randomseed")) {
+    else if(command == string("-randomseed")) {
       INCREMENT_i(-randomseed);
       args.random_seed = atoi(argv[i]);
     }
@@ -499,7 +499,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
 
        minion -tableout mystats.txt myproblem.minion
     */
-    else if (command == string("-tableout") || command == string("-tableout0")) {
+    else if(command == string("-tableout") || command == string("-tableout0")) {
       getOptions().tableout = true;
       INCREMENT_i(-tableout);
       getTableOut().set_filename(argv[i]);
@@ -514,11 +514,11 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
 
        minion -solsout mysols.txt myproblem.minion
     */
-    else if (command == string("-solsout") || command == string("-solsout0")) {
+    else if(command == string("-solsout") || command == string("-solsout0")) {
       getOptions().solsoutWrite = true;
       INCREMENT_i(-solsout);
       solsoutFile.open(argv[i], ios::app);
-      if (!solsoutFile) {
+      if(!solsoutFile) {
         ostringstream oss;
         oss << "Cannot open '" << argv[i] << "' for writing.";
         output_fatal_error(oss.str());
@@ -527,19 +527,19 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     /** @help switches;-makeresume Description
     Write a resume file on timeout or being killed.
     */
-    else if (command == string("-makeresume")) {
+    else if(command == string("-makeresume")) {
       getOptions().noresumefile = false;
     }
     /** @help switches;-noresume Description
     Do not write a resume file on timeout or being killed. (default)
     */
-    else if (command == string("-noresume")) {
+    else if(command == string("-noresume")) {
       getOptions().noresumefile = true;
     }
     /** @help switches;-gap Description
     Give name of gap executable (defaults to gap.sh)
     */
-    else if (command == string("-gap")) {
+    else if(command == string("-gap")) {
       INCREMENT_i(-gap);
       getOptions().gapname = argv[i];
     }
@@ -579,7 +579,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
 
     Implies -makeresume.
     */
-    else if (command == string("-split")) {
+    else if(command == string("-split")) {
       getOptions().split = true;
       getOptions().noresumefile = false;
       getOptions().splitstderr = false;
@@ -591,15 +591,15 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
 
     See documentation for -split.
     */
-    else if (command == string("-split-stderr")) {
+    else if(command == string("-split-stderr")) {
       getOptions().split = true;
       getOptions().noresumefile = false;
       getOptions().splitstderr = true;
-    } else if (command[0] == '-' && command != string("--")) {
+    } else if(command[0] == '-' && command != string("--")) {
       cout << "I don't understand '" << command << "'. Sorry. " << endl;
       exit(1);
     } else {
-      if (getOptions().instance_name == "")
+      if(getOptions().instance_name == "")
         getOptions().instance_name = command;
       else {
         cout << "I was confused by '" << command << "'. Sorry." << endl;
@@ -610,8 +610,8 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
   }
   // bundle all options together and store
   string s = string("");
-  for (SysInt i = 1; i < argc; ++i) {
-    if (i < argc - 1)
+  for(SysInt i = 1; i < argc; ++i) {
+    if(i < argc - 1)
       s = s + argv[i] + ",";
     else
       s = s + argv[i];

@@ -28,9 +28,9 @@
 namespace Controller {
 
 template <typename T>
-void inline maybe_print_search_assignment(T &var, DomainInt val, BOOL equal, bool force = false) {
-  if (getOptions().dumptree) {
-    if (force)
+void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal, bool force = false) {
+  if(getOptions().dumptree) {
+    if(force)
       cout << "ForceAssign: " << var << (equal ? " = " : " != ") << val << endl;
     else
       cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
@@ -71,8 +71,8 @@ struct SearchManager {
     // it only has to happen at most the log of the maximum search depth.
     branches.reserve(var_array.size());
     hasauxvars = _order.back().find_one_assignment;
-    if (hasauxvars) {
-      for (SysInt i = 0; i < (SysInt)_order.size() - 1; i++) {
+    if(hasauxvars) {
+      for(SysInt i = 0; i < (SysInt)_order.size() - 1; i++) {
         topauxvar += _order[i].var_order.size();
       }
     }
@@ -91,9 +91,13 @@ struct SearchManager {
 
   // this is weird: what if we just started search, or only have right-branches
   // above?
-  inline bool finished_search() { return depth == 0; }
+  inline bool finished_search() {
+    return depth == 0;
+  }
 
-  SysInt search_depth() { return depth; }
+  SysInt search_depth() {
+    return depth;
+  }
 
   // returns false if left branch not possible.
   inline void branch_left(pair<SysInt, DomainInt> picked) {
@@ -108,12 +112,12 @@ struct SearchManager {
   }
 
   inline bool branch_right() {
-    while (!branches.empty() && !branches.back().isLeft) { // pop off all the
-                                                           // RBs
+    while(!branches.empty() && !branches.back().isLeft) { // pop off all the
+                                                          // RBs
       branches.pop_back();
     }
 
-    if (branches.empty()) {
+    if(branches.empty()) {
       return false;
     }
 
@@ -129,9 +133,9 @@ struct SearchManager {
 
     // special case the upper and lower bounds to make it work for bound
     // variables
-    if (var_array[var].getMin() == val) {
+    if(var_array[var].getMin() == val) {
       var_array[var].setMin(val + 1);
-    } else if (var_array[var].getMax() == val) {
+    } else if(var_array[var].getMax() == val) {
       var_array[var].setMax(val - 1);
     } else {
       var_array[var].removeFromDomain(val);
@@ -142,8 +146,8 @@ struct SearchManager {
   }
 
   inline void jump_out_aux_vars() {
-    while (!branches.empty() && branches.back().var >= topauxvar) {
-      if (branches.back().isLeft) {
+    while(!branches.empty() && branches.back().var >= topauxvar) {
+      if(branches.back().isLeft) {
         world_pop();
         depth--;
       }
@@ -155,8 +159,8 @@ struct SearchManager {
   option<std::vector<Controller::triple>>
   steal_work() { // steal the topmost left branch from this search.
 
-    for (UnsignedSysInt newceil = 0; newceil < branches.size(); ++newceil) {
-      if (branches[newceil].isLeft) {
+    for(UnsignedSysInt newceil = 0; newceil < branches.size(); ++newceil) {
+      if(branches[newceil].isLeft) {
         std::vector<Controller::triple> work(branches.begin(), branches.begin() + newceil + 1);
         work.back().isLeft = false;
         branches[newceil].isLeft = false;
@@ -171,7 +175,7 @@ struct SearchManager {
   // Most basic search procedure
   virtual void search() {
     maybe_print_search_state("Node: ", var_array);
-    while (true) {
+    while(true) {
       D_ASSERT(getQueue().isQueuesEmpty());
 
       getState().incrementNodeCount();
@@ -180,9 +184,9 @@ struct SearchManager {
 
       pair<SysInt, DomainInt> varval = var_order->pickVarVal();
 
-      if (varval.first == -1) {
+      if(varval.first == -1) {
         deal_with_solution();
-        if (hasauxvars) { // There are AUX vars at the end of the var ordering.
+        if(hasauxvars) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.
           jump_out_aux_vars();
         }
@@ -196,15 +200,15 @@ struct SearchManager {
       }
 
       // loop to
-      while (getState().isFailed()) {
+      while(getState().isFailed()) {
         getState().setFailed(false);
-        if (finished_search()) { // what does this do?
+        if(finished_search()) { // what does this do?
           return;
         }
 
         maybe_print_search_action("bt");
         bool flag = branch_right();
-        if (!flag) { // No remaining left branches to branch right.
+        if(!flag) { // No remaining left branches to branch right.
           return;
         }
         set_optimise_and_propagate_queue(*prop, var_array);

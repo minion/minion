@@ -40,26 +40,30 @@ public:
   /// This function shouldn't be called directly. This object should be passed
   /// to a variables, which will do any "massaging" which
   /// is required.
-  DomainInt XXX_get_domain_diff() { return domain_change; }
+  DomainInt XXX_get_domain_diff() {
+    return domain_change;
+  }
 
   DomainDelta(DomainInt i) : domain_change(i) {}
 
-  static DomainDelta empty() { return DomainDelta(0); }
+  static DomainDelta empty() {
+    return DomainDelta(0);
+  }
 };
 
 /// The classes which are used to build the queue.
 class Trigger {
 public:
   /// The constraint to be propagated.
-  AbstractConstraint *constraint;
+  AbstractConstraint* constraint;
   /// The first value to be passed to the propagate function.
   DomainInt info;
 
   template <typename T>
-  Trigger(T *_sc, DomainInt _info)
+  Trigger(T* _sc, DomainInt _info)
       : constraint(_sc), info(_info) {}
 
-  Trigger(const Trigger &t) : constraint(t.constraint), info(t.info) {}
+  Trigger(const Trigger& t) : constraint(t.constraint), info(t.info) {}
 
   Trigger() : constraint(NULL) {}
 
@@ -71,21 +75,25 @@ public:
 /// Container for a range of triggers
 class TriggerRange {
   /// Start of triggers
-  Trigger *start;
+  Trigger* start;
   /// End of triggers
-  Trigger *finish;
+  Trigger* finish;
 
 public:
-  Trigger *begin() const { return start; }
+  Trigger* begin() const {
+    return start;
+  }
 
-  Trigger *end() const { return finish; }
+  Trigger* end() const {
+    return finish;
+  }
 
   /// The domain delta from the domain change.
   /** This may not contain the actual delta, but contains data from which a
    variable can
    construct it, by passing it to getDomainChange. */
   DomainInt data;
-  TriggerRange(Trigger *s, Trigger *e, DomainInt _data) : start(s), finish(e), data(_data) {
+  TriggerRange(Trigger* s, Trigger* e, DomainInt _data) : start(s), finish(e), data(_data) {
     D_ASSERT(data >= DomainInt_Min);
     D_ASSERT(data <= DomainInt_Max);
   }
@@ -107,17 +115,19 @@ struct AbstractTriggerCreator {
  */
 template <typename VarRef>
 struct TriggerCreator : public AbstractTriggerCreator {
-  VarRef *ref;
-  TriggerCreator(VarRef &v, Trigger t, TrigType _type)
+  VarRef* ref;
+  TriggerCreator(VarRef& v, Trigger t, TrigType _type)
       : AbstractTriggerCreator(t, _type), ref(&v) {}
 
-  virtual void post_trigger() { ref->addTrigger(trigger, type); }
+  virtual void post_trigger() {
+    ref->addTrigger(trigger, type);
+  }
 
   virtual ~TriggerCreator() {}
 };
 
 template <typename VarRef>
-inline shared_ptr<AbstractTriggerCreator> make_trigger(VarRef &v, Trigger t,
+inline shared_ptr<AbstractTriggerCreator> make_trigger(VarRef& v, Trigger t,
                                                        TrigType trigger_type) {
   return shared_ptr<AbstractTriggerCreator>(new TriggerCreator<VarRef>(v, t, trigger_type));
 }

@@ -41,16 +41,18 @@ class Queues {
   // normal queue is empty. This list is at the moment only used
   // by reified constraints when they want to start propagation.
   // I don't like it, but it is necesasary.
-  QueueCon<AbstractConstraint *> special_triggers;
+  QueueCon<AbstractConstraint*> special_triggers;
 
   TriggerBacktrackQueue tbq;
 
 public:
-  TriggerBacktrackQueue &getTbq() { return tbq; }
+  TriggerBacktrackQueue& getTbq() {
+    return tbq;
+  }
 
   Queues() {}
 
-  void pushSpecialTrigger(AbstractConstraint *trigger) {
+  void pushSpecialTrigger(AbstractConstraint* trigger) {
     CON_INFO_ADDONE(AddSpecialToQueue);
     special_triggers.push_back(trigger);
   }
@@ -69,9 +71,9 @@ public:
     propagate_trigger_list.clear();
     dynamic_trigger_list.clear();
 
-    if (!special_triggers.empty()) {
+    if(!special_triggers.empty()) {
       SysInt size = special_triggers.size();
-      for (SysInt i = 0; i < size; ++i)
+      for(SysInt i = 0; i < size; ++i)
         special_triggers[i]->special_unlock();
       special_triggers.clear();
     }
@@ -89,27 +91,27 @@ public:
 
   template <bool is_root_node>
   bool propagateDynamicTriggerLists() {
-    bool *fail_ptr = getState().getFailedPtr();
-    while (!dynamic_trigger_list.empty()) {
+    bool* fail_ptr = getState().getFailedPtr();
+    while(!dynamic_trigger_list.empty()) {
       DynamicTriggerEvent dte = dynamic_trigger_list.queueTop();
       dynamic_trigger_list.queuePop();
 
-      DynamicTriggerList &dtl = *(dte.event());
+      DynamicTriggerList& dtl = *(dte.event());
       DomainDelta delta = dte.data;
       SysInt pos = 0;
 
-      while (pos < dtl.size()) {
-        if (*fail_ptr) {
+      while(pos < dtl.size()) {
+        if(*fail_ptr) {
           clearQueues();
           return true;
         }
 
-        if (!dtl[pos].empty() && (!is_root_node || dtl[pos].con->full_propagate_done)) {
+        if(!dtl[pos].empty() && (!is_root_node || dtl[pos].con->full_propagate_done)) {
           dtl[pos].propagate(delta);
         }
 
 #ifdef WDEG
-        if (*fail_ptr)
+        if(*fail_ptr)
           dtl[pos].constraint()->incWdeg();
 #endif
 
@@ -122,25 +124,25 @@ public:
 
   template <bool is_root_node>
   bool propagateStaticTriggerLists() {
-    bool *fail_ptr = getState().getFailedPtr();
-    while (!propagate_trigger_list.empty()) {
+    bool* fail_ptr = getState().getFailedPtr();
+    while(!propagate_trigger_list.empty()) {
       TriggerRange t = propagate_trigger_list.queueTop();
       DomainInt data_val = t.data;
       propagate_trigger_list.queuePop();
 
-      for (Trigger *it = t.begin(); it != t.end(); it++) {
-        if (*fail_ptr) {
+      for(Trigger* it = t.begin(); it != t.end(); it++) {
+        if(*fail_ptr) {
           clearQueues();
           return true;
         }
 
-        if (!is_root_node || it->constraint->full_propagate_done) {
+        if(!is_root_node || it->constraint->full_propagate_done) {
           CON_INFO_ADDONE(StaticTrigger);
           it->propagateStatic(DomainDelta(data_val));
         }
 
 #ifdef WDEG
-        if (*fail_ptr)
+        if(*fail_ptr)
           it->constraint->incWdeg();
 #endif
       }
@@ -151,30 +153,30 @@ public:
 
   template <bool is_root_node>
   inline void propagateQueueImpl() {
-    while (true) {
-      while (!propagate_trigger_list.empty() || !dynamic_trigger_list.empty()) {
-        if (propagateDynamicTriggerLists<is_root_node>())
+    while(true) {
+      while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty()) {
+        if(propagateDynamicTriggerLists<is_root_node>())
           return;
 
         /* Don't like code duplication here but a slight efficiency gain */
-        if (propagateStaticTriggerLists<is_root_node>())
+        if(propagateStaticTriggerLists<is_root_node>())
           return;
       }
 
-      if (special_triggers.empty())
+      if(special_triggers.empty())
         return;
 
-      AbstractConstraint *trig = special_triggers.queueTop();
+      AbstractConstraint* trig = special_triggers.queueTop();
       special_triggers.queuePop();
 
       CON_INFO_ADDONE(SpecialTrigger);
       trig->special_check();
 #ifdef WDEG
-      if (getState().isFailed())
+      if(getState().isFailed())
         trig->incWdeg();
 #endif
 
-      if (getState().isFailed()) {
+      if(getState().isFailed()) {
         clearQueues();
         return;
       }
@@ -182,9 +184,13 @@ public:
 
   } // end Function
 
-  inline void propagateQueueRoot() { return propagateQueueImpl<true>(); }
+  inline void propagateQueueRoot() {
+    return propagateQueueImpl<true>();
+  }
 
-  inline void propagateQueue() { return propagateQueueImpl<false>(); }
+  inline void propagateQueue() {
+    return propagateQueueImpl<false>();
+  }
 };
 
 #endif

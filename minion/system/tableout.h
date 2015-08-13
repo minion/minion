@@ -41,7 +41,7 @@ private:
   string filename;
 
   // Don't allow copying!
-  TableOut(const TableOut &t);
+  TableOut(const TableOut& t);
 
 public:
   TableOut() {}
@@ -55,7 +55,7 @@ public:
   void debug_printall() {
     std::map<string, string>::iterator it;
 
-    for (it = data.begin(); it != data.end(); it++) {
+    for(it = data.begin(); it != data.end(); it++) {
       cout << (*it).first << "," << (*it).second << endl;
     }
   }
@@ -72,7 +72,7 @@ public:
     // least different orders?
 
     ofstream f;
-    if (filename == "-") {
+    if(filename == "-") {
       f.copyfmt(std::cout);
       f.clear(std::cout.rdstate());
       f.basic_ios<char>::rdbuf(std::cout.rdbuf());
@@ -80,17 +80,17 @@ public:
       f.open(filename.c_str(), ios::app | ios::out); // Open with append mode.
     }
 
-    if (!f) {
+    if(!f) {
       cerr << "tableout.cpp: failed to open file to output table." << endl;
     }
 
     // if file position is the beginning of the file, then output the column
     // headers.
-    if (filename == "-" || f.tellp() == streampos(0)) {
+    if(filename == "-" || f.tellp() == streampos(0)) {
       f << "#";
 
       map<string, string>::iterator it;
-      for (it = data.begin(); it != data.end(); it++) {
+      for(it = data.begin(); it != data.end(); it++) {
         f << "\"" << (*it).first << "\" ";
       }
       f << endl;
@@ -99,7 +99,7 @@ public:
     // This doesn't work with strings that have spaces in them.
 
     map<string, string>::iterator it;
-    for (it = data.begin(); it != data.end(); it++) {
+    for(it = data.begin(); it != data.end(); it++) {
       f << (*it).second << " ";
     }
     f << endl;
@@ -107,11 +107,13 @@ public:
     f.close();
   }
 
-  void set_filename(string file) { filename = file; }
+  void set_filename(string file) {
+    filename = file;
+  }
 };
 
 // Provide a global singleton of the above class. Not threadsafe!
-inline TableOut &getTableOut() {
+inline TableOut& getTableOut() {
   static TableOut t;
   return t;
 }

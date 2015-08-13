@@ -36,56 +36,92 @@ struct VarNeg {
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 
-  AnyVarRef popOneMapper() const { return data; }
+  AnyVarRef popOneMapper() const {
+    return data;
+  }
 
-  BOOL isBound() const { return data.isBound(); }
+  BOOL isBound() const {
+    return data.isBound();
+  }
 
   VarNeg(VarT _data) : data(_data) {}
 
   VarNeg() : data() {}
 
-  VarNeg(const VarNeg &b) : data(b.data) {}
+  VarNeg(const VarNeg& b) : data(b.data) {}
 
-  BOOL isAssigned() const { return data.isAssigned(); }
+  BOOL isAssigned() const {
+    return data.isAssigned();
+  }
 
-  DomainInt getAssignedValue() const { return -data.getAssignedValue(); }
+  DomainInt getAssignedValue() const {
+    return -data.getAssignedValue();
+  }
 
   BOOL isAssignedValue(DomainInt i) const {
     return data.isAssigned() && data.getAssignedValue() == -i;
   }
 
-  BOOL inDomain(DomainInt b) const { return data.inDomain(-b); }
+  BOOL inDomain(DomainInt b) const {
+    return data.inDomain(-b);
+  }
 
-  BOOL inDomain_noBoundCheck(DomainInt b) const { return data.inDomain(-b); }
+  BOOL inDomain_noBoundCheck(DomainInt b) const {
+    return data.inDomain(-b);
+  }
 
-  DomainInt getDomSize() const { return data.getDomSize(); }
+  DomainInt getDomSize() const {
+    return data.getDomSize();
+  }
 
-  DomainInt getMax() const { return -data.getMin(); }
+  DomainInt getMax() const {
+    return -data.getMin();
+  }
 
-  DomainInt getMin() const { return -data.getMax(); }
+  DomainInt getMin() const {
+    return -data.getMax();
+  }
 
-  DomainInt getInitialMax() const { return -data.getInitialMin(); }
+  DomainInt getInitialMax() const {
+    return -data.getInitialMin();
+  }
 
-  DomainInt getInitialMin() const { return -data.getInitialMax(); }
+  DomainInt getInitialMin() const {
+    return -data.getInitialMax();
+  }
 
-  void setMax(DomainInt i) { data.setMin(-i); }
+  void setMax(DomainInt i) {
+    data.setMin(-i);
+  }
 
-  void setMin(DomainInt i) { data.setMax(-i); }
+  void setMin(DomainInt i) {
+    data.setMax(-i);
+  }
 
-  void uncheckedAssign(DomainInt b) { data.uncheckedAssign(-b); }
+  void uncheckedAssign(DomainInt b) {
+    data.uncheckedAssign(-b);
+  }
 
-  void propagateAssign(DomainInt b) { data.propagateAssign(-b); }
+  void propagateAssign(DomainInt b) {
+    data.propagateAssign(-b);
+  }
 
-  void decisionAssign(DomainInt b) { data.decisionAssign(-b); }
+  void decisionAssign(DomainInt b) {
+    data.decisionAssign(-b);
+  }
 
-  void removeFromDomain(DomainInt b) { data.removeFromDomain(-b); }
+  void removeFromDomain(DomainInt b) {
+    data.removeFromDomain(-b);
+  }
 
   /// There isn't a minus sign here as domain changes from both the top and
   /// bottom of the domain are positive numbers.
-  DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d) {
+    return data.getDomainChange(d);
+  }
 
   void addTrigger(Trigger t, TrigType type) {
-    switch (type) {
+    switch(type) {
     case UpperBound: data.addTrigger(t, LowerBound); break;
     case LowerBound: data.addTrigger(t, UpperBound); break;
     case Assigned:
@@ -94,13 +130,13 @@ struct VarNeg {
     }
   }
 
-  friend std::ostream &operator<<(std::ostream &o, const VarNeg &n) {
+  friend std::ostream& operator<<(std::ostream& o, const VarNeg& n) {
     return o << "Neg " << n.data;
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
-    switch (type) {
+    switch(type) {
     case UpperBound: data.addDynamicTrigger(t, LowerBound, pos, op); break;
     case LowerBound: data.addDynamicTrigger(t, UpperBound, pos, op); break;
     case Assigned:
@@ -110,13 +146,21 @@ struct VarNeg {
     }
   }
 
-  vector<AbstractConstraint *> *getConstraints() { return data.getConstraints(); }
+  vector<AbstractConstraint*>* getConstraints() {
+    return data.getConstraints();
+  }
 
-  void addConstraint(AbstractConstraint *c) { data.addConstraint(c); }
+  void addConstraint(AbstractConstraint* c) {
+    data.addConstraint(c);
+  }
 
-  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(-v); }
+  DomainInt getBaseVal(DomainInt v) const {
+    return data.getBaseVal(-v);
+  }
 
-  Var getBaseVar() const { return data.getBaseVar(); }
+  Var getBaseVar() const {
+    return data.getBaseVar();
+  }
 
   vector<Mapper> getMapperStack() const {
     vector<Mapper> v = data.getMapperStack();
@@ -125,9 +169,13 @@ struct VarNeg {
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg() { return data.getBaseWdeg(); }
+  DomainInt getBaseWdeg() {
+    return data.getBaseWdeg();
+  }
 
-  void incWdeg() { data.incWdeg(); }
+  void incWdeg() {
+    data.incWdeg();
+  }
 #endif
 };
 
@@ -153,28 +201,28 @@ struct NegType<VarNeg<T>> {
 };
 
 template <typename VRef>
-typename NegType<VRef>::type VarNegRef(const VRef &var_ref) {
+typename NegType<VRef>::type VarNegRef(const VRef& var_ref) {
   return VarNeg<VRef>(var_ref);
 }
 
 template <typename VRef>
-VRef VarNegRef(const VarNeg<VRef> &var_ref) {
+VRef VarNegRef(const VarNeg<VRef>& var_ref) {
   return var_ref.data;
 }
 
 template <typename VarRef>
-vector<typename NegType<VarRef>::type> VarNegRef(const vector<VarRef> &var_array) {
+vector<typename NegType<VarRef>::type> VarNegRef(const vector<VarRef>& var_array) {
   vector<typename NegType<VarRef>::type> neg_array;
   neg_array.reserve(var_array.size());
-  for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     neg_array.push_back(VarNegRef(var_array[i]));
   return neg_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<typename NegType<VarRef>::type, i> VarNegRef(const std::array<VarRef, i> &var_array) {
+std::array<typename NegType<VarRef>::type, i> VarNegRef(const std::array<VarRef, i>& var_array) {
   std::array<typename NegType<VarRef>::type, i> neg_array;
-  for (UnsignedSysInt l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = VarNegRef(var_array[l]);
   return neg_array;
 }

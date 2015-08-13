@@ -73,7 +73,7 @@ private:
   var_type vars;
 
 public:
-  SlowModConstraint(const T1 &v1, const T2 &v2, const T3 &v3) {
+  SlowModConstraint(const T1& v1, const T2& v2, const T3& v3) {
     vars[0] = v1;
     vars[1] = v2;
     vars[2] = v3;
@@ -91,7 +91,7 @@ public:
                                        "developers!");
   }
   string constraint_name() const {
-    if (undef_zero)
+    if(undef_zero)
       return "modulo_undefzero";
     else
       return "modulo";
@@ -99,12 +99,14 @@ public:
 
   CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
 
-  var_type &get_vars() { return vars; }
+  var_type& get_vars() {
+    return vars;
+  }
 
-  virtual bool check_assignment(DomainInt *v, SysInt v_size) {
+  virtual bool check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
-    if (v[1] == 0) {
-      if (undef_zero)
+    if(v[1] == 0) {
+      if(undef_zero)
         return (v[2] == 0);
       else
         return false;
@@ -112,9 +114,9 @@ public:
     // There might well be a slightly better way to do this, but I can't be
     // bothered to figure it out.
     DomainInt r = v[0] % abs(v[1]);
-    if (r < 0)
+    if(r < 0)
       r += abs(v[1]);
-    if (v[1] < 0 && r > 0)
+    if(v[1] < 0 && r > 0)
       r -= abs(v[1]);
     return r == v[2];
   }
@@ -124,12 +126,12 @@ public:
 #include "forward_checking.h"
 
 template <typename V1, typename V2>
-inline AbstractConstraint *BuildCT_MODULO(const V1 &vars, const V2 &var2, ConstraintBlob &) {
+inline AbstractConstraint* BuildCT_MODULO(const V1& vars, const V2& var2, ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   typedef SlowModConstraint<typename V1::value_type, typename V1::value_type,
                             typename V2::value_type, false> ModCon;
-  AbstractConstraint *modct =
+  AbstractConstraint* modct =
       new CheckAssignConstraint<ModCon, false>(ModCon(vars[0], vars[1], var2[0]));
   return forwardCheckingCon(modct);
 }
@@ -143,15 +145,15 @@ inline AbstractConstraint *BuildCT_MODULO(const V1 &vars, const V2 &var2, Constr
 */
 
 template <typename V1, typename V2>
-inline AbstractConstraint *BuildCT_MODULO_UNDEFZERO(const V1 &vars, const V2 &var2,
-                                                    ConstraintBlob &) {
+inline AbstractConstraint* BuildCT_MODULO_UNDEFZERO(const V1& vars, const V2& var2,
+                                                    ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   // Do FC. Same as CT_MODULO except for last template parameter of
   // SlowModConstraint
   typedef SlowModConstraint<typename V1::value_type, typename V1::value_type,
                             typename V2::value_type, true> ModCon;
-  AbstractConstraint *modct =
+  AbstractConstraint* modct =
       new CheckAssignConstraint<ModCon, false>(ModCon(vars[0], vars[1], var2[0]));
   return forwardCheckingCon(modct);
 }

@@ -28,21 +28,21 @@ void lock() {
   getVars().lock();
 
   SysInt size = getState().getConstraintList().size();
-  for (SysInt i = 0; i < size; i++)
+  for(SysInt i = 0; i < size; i++)
     getState().getConstraintList()[i]->setup();
 
   getMemory().monotonicSet().lock();
 
   // No longer AC1, thank goodness.
-  for (SysInt i = 0; i < size; ++i) {
-    if (getState().isFailed())
+  for(SysInt i = 0; i < size; ++i) {
+    if(getState().isFailed())
       return;
     getState().getConstraintList()[i]->full_propagate();
     getState().getConstraintList()[i]->full_propagate_done = true;
-    if (getState().isFailed())
+    if(getState().isFailed())
       return;
     // If queues not empty, more work to do.
-    if (!getQueue().isQueuesEmpty()) {
+    if(!getQueue().isQueuesEmpty()) {
       getQueue().propagateQueueRoot();
     }
   }

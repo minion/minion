@@ -16,16 +16,16 @@
 
 #define DEFINE_DEFAULT_CONSTRUCTORS_AND_OPERATOR_EQ(X)                                             \
   X() = default;                                                                                   \
-  X(const X &) = default;                                                                          \
-  X(X &&) = default;                                                                               \
-  X &operator=(const X &) = default;                                                               \
-  X &operator=(X &&) = default;
+  X(const X&) = default;                                                                           \
+  X(X&&) = default;                                                                                \
+  X& operator=(const X&) = default;                                                                \
+  X& operator=(X&&) = default;
 
 #define DEFINE_DEFAULT_COPY_MOVE_AND_OPERATOR_EQ(X)                                                \
-  X(const X &) = default;                                                                          \
-  X(X &&) = default;                                                                               \
-  X &operator=(const X &) = default;                                                               \
-  X &operator=(X &&) = default;
+  X(const X&) = default;                                                                           \
+  X(X&&) = default;                                                                                \
+  X& operator=(const X&) = default;                                                                \
+  X& operator=(X&&) = default;
 
 #define STRINGIFY(x) #x
 #define FUNCTION_AND_LINE(a, b) std::string(a) + ":" + std::string(STRINGIFY(b))
@@ -44,18 +44,18 @@
   }
 
 #define D_CATCH_FATAL_ERROR(x)                                                                     \
-  catch (std::exception & r) {                                                                     \
+  catch(std::exception & r) {                                                                      \
     std::cerr << r.what() << std::endl;                                                            \
     D_FATAL_ERROR(x);                                                                              \
   }                                                                                                \
-  catch (...) {                                                                                    \
+  catch(...) {                                                                                     \
     std::cerr << "Unknown error\n";                                                                \
     D_FATAL_ERROR(x);                                                                              \
   }
 
 #define D_CHECK(x)                                                                                 \
   {                                                                                                \
-    if (!(x)) {                                                                                    \
+    if(!(x)) {                                                                                     \
       std::cerr << "Assert Failure:" << STRINGIFY(x) << " at "                                     \
                 << FUNCTION_AND_LINE(__FUNCTION__, __LINE__) << std::endl;                         \
       abort();                                                                                     \
@@ -64,7 +64,7 @@
 
 #define D_CHECK_EXPLAIN(x, y)                                                                      \
   {                                                                                                \
-    if (!(x)) {                                                                                    \
+    if(!(x)) {                                                                                     \
       std::cerr << "Assert Failure:" << STRINGIFY(x) << " at "                                     \
                 << FUNCTION_AND_LINE(__FUNCTION__, __LINE__) << std::endl                          \
                 << y << std::endl;                                                                 \
@@ -84,8 +84,8 @@
     bool throw_b = false;                                                                          \
     try {                                                                                          \
       x;                                                                                           \
-    } catch (...) { throw_b = true; }                                                              \
-    if (!throw_b) {                                                                                \
+    } catch(...) { throw_b = true; }                                                               \
+    if(!throw_b) {                                                                                 \
       std::cerr << "Failure to throw:" << STRINGIFY(x) << " at "                                   \
                 << FUNCTION_AND_LINE(__FUNCTION__, __LINE__) << std::endl;                         \
       abort();                                                                                     \

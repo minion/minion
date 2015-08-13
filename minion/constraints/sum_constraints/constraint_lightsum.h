@@ -27,7 +27,9 @@
 /// V1 + ... Vn <= X
 template <typename VarRef, std::size_t size, typename VarSum, BOOL is_reversed = false>
 struct LightLessEqualSumConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "Light<=Sum"; }
+  virtual string constraint_name() {
+    return "Light<=Sum";
+  }
 
   CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2("weighted", "sumleq", "sumgeq", var_array, var_sum);
 
@@ -35,10 +37,10 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
 
   std::array<VarRef, size> var_array;
   VarSum var_sum;
-  LightLessEqualSumConstraint(const std::array<VarRef, size> &_var_array, const VarSum &_var_sum)
+  LightLessEqualSumConstraint(const std::array<VarRef, size>& _var_array, const VarSum& _var_sum)
       : var_array(_var_array), var_sum(_var_sum) {
     BigInt accumulator = 0;
-    for (SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       accumulator += checked_cast<SysInt>(
           max(abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin())));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
@@ -48,8 +50,8 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
 
     no_negatives = true;
-    for (SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if (var_array[i].getInitialMin() < 0) {
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
+      if(var_array[i].getInitialMin() < 0) {
         no_negatives = false;
         return;
       }
@@ -61,31 +63,31 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    for (SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       moveTriggerInt(var_array[i], i, LowerBound);
     }
     moveTriggerInt(var_sum, var_array.size(), UpperBound);
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt sum_value = 0;
     SysInt v_size = var_array.size();
 
-    if (no_negatives) {
+    if(no_negatives) {
       DomainInt max_sum = var_sum.getMax();
       assignment.push_back(make_pair(v_size, max_sum));
-      for (SysInt i = 0; i < v_size && sum_value <= max_sum; ++i) {
+      for(SysInt i = 0; i < v_size && sum_value <= max_sum; ++i) {
         DomainInt min_val = var_array[i].getMin();
         assignment.push_back(make_pair(i, min_val));
         sum_value += min_val;
       }
       return (sum_value <= max_sum);
     } else {
-      for (SysInt i = 0; i < v_size; ++i) {
+      for(SysInt i = 0; i < v_size; ++i) {
         assignment.push_back(make_pair(i, var_array[i].getMin()));
         sum_value += var_array[i].getMin();
       }
-      if (sum_value > var_sum.getMax())
+      if(sum_value > var_sum.getMax())
         return false;
       else
         assignment.push_back(make_pair(v_size, var_sum.getMax()));
@@ -96,15 +98,15 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
-    for (UnsignedSysInt i = 0; i < size; ++i)
+    for(UnsignedSysInt i = 0; i < size; ++i)
       min_sum += var_array[i].getMin();
 
-    if (prop_val != var_array.size()) {
+    if(prop_val != var_array.size()) {
       var_sum.setMin(min_sum);
     }
 
     DomainInt slack = var_sum.getMax() - min_sum;
-    for (UnsignedSysInt i = 0; i < size; ++i)
+    for(UnsignedSysInt i = 0; i < size; ++i)
       var_array[i].setMax(var_array[i].getMin() + slack);
   }
 
@@ -114,10 +116,10 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt sum = 0;
-    for (SysInt i = 0; i < v_size - 1; i++)
+    for(SysInt i = 0; i < v_size - 1; i++)
       sum += v[i];
     return sum <= *(v + v_size - 1);
   }
@@ -125,19 +127,21 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> array_copy;
     array_copy.reserve(var_array.size() + 1);
-    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       array_copy.push_back(var_array[i]);
     array_copy.push_back(var_sum);
     return array_copy;
   }
 
-  virtual AbstractConstraint *reverse_constraint() { return rev_implement<is_reversed>(); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return rev_implement<is_reversed>();
+  }
 
   template <bool b>
-  typename std::enable_if<!b, AbstractConstraint *>::type rev_implement() {
+  typename std::enable_if<!b, AbstractConstraint*>::type rev_implement() {
     typedef std::array<typename NegType<VarRef>::type, size> VarArray;
     VarArray new_var_array;
-    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
     typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1>>::type
@@ -149,10 +153,10 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   }
 
   template <bool b>
-  typename std::enable_if<b, AbstractConstraint *>::type rev_implement() {
+  typename std::enable_if<b, AbstractConstraint*>::type rev_implement() {
     typedef std::array<AnyVarRef, size> VarArray;
     VarArray new_var_array;
-    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
     typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1>>::type
@@ -165,14 +169,14 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
 };
 
 template <typename VarRef, std::size_t size, typename VarSum>
-AbstractConstraint *LightLessEqualSumCon(const std::array<VarRef, size> &_var_array,
-                                         const VarSum &_var_sum) {
+AbstractConstraint* LightLessEqualSumCon(const std::array<VarRef, size>& _var_array,
+                                         const VarSum& _var_sum) {
   return (new LightLessEqualSumConstraint<VarRef, size, VarSum>(_var_array, _var_sum));
 }
 
 template <typename VarRef, std::size_t size, typename VarSum>
-AbstractConstraint *LightGreaterEqualSumCon(const std::array<VarRef, size> &_var_array,
-                                            const VarSum &_var_sum) {
+AbstractConstraint* LightGreaterEqualSumCon(const std::array<VarRef, size>& _var_array,
+                                            const VarSum& _var_sum) {
   return (new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size,
                                           typename NegType<VarSum>::type>(VarNegRef(_var_array),
                                                                           VarNegRef(_var_sum)));

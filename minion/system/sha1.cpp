@@ -93,9 +93,9 @@ typedef struct {
 
 #define SHA1_DIGEST_SIZE 20
 
-void SHA1_Init(SHA1_CTX *context);
-void SHA1_Update(SHA1_CTX *context, const uint8_t *data, const size_t len);
-void SHA1_Final(SHA1_CTX *context, uint8_t digest[SHA1_DIGEST_SIZE]);
+void SHA1_Init(SHA1_CTX* context);
+void SHA1_Update(SHA1_CTX* context, const uint8_t* data, const size_t len);
+void SHA1_Final(SHA1_CTX* context, uint8_t digest[SHA1_DIGEST_SIZE]);
 
 void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
 
@@ -133,7 +133,7 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]);
   w = rol(w, 30);
 
 #ifdef VERBOSE /* SAK */
-void SHAPrintContext(SHA1_CTX *context, char *msg) {
+void SHAPrintContext(SHA1_CTX* context, char* msg) {
   printf("%s (%d,%d) %x %x %x %x %x\n", msg, context->count[0], context->count[1],
          context->state[0], context->state[1], context->state[2], context->state[3],
          context->state[4]);
@@ -147,14 +147,14 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]) {
     uint8_t c[64];
     uint32_t l[16];
   } CHAR64LONG16;
-  CHAR64LONG16 *block;
+  CHAR64LONG16* block;
 
 #ifdef SHA1HANDSOFF
   static uint8_t workspace[64];
-  block = (CHAR64LONG16 *)workspace;
+  block = (CHAR64LONG16*)workspace;
   memcpy(block, buffer, 64);
 #else
-  block = (CHAR64LONG16 *)buffer;
+  block = (CHAR64LONG16*)buffer;
 #endif
 
   /* Copy context->state[] to working vars */
@@ -258,7 +258,7 @@ void SHA1_Transform(uint32_t state[5], const uint8_t buffer[64]) {
 }
 
 /* SHA1Init - Initialize new context */
-void SHA1_Init(SHA1_CTX *context) {
+void SHA1_Init(SHA1_CTX* context) {
   /* SHA1 initialization constants */
   context->state[0] = 0x67452301;
   context->state[1] = 0xEFCDAB89;
@@ -269,7 +269,7 @@ void SHA1_Init(SHA1_CTX *context) {
 }
 
 /* Run your data through this. */
-void SHA1_Update(SHA1_CTX *context, const uint8_t *data, const size_t len) {
+void SHA1_Update(SHA1_CTX* context, const uint8_t* data, const size_t len) {
   size_t i, j;
 
 #ifdef VERBOSE
@@ -277,13 +277,13 @@ void SHA1_Update(SHA1_CTX *context, const uint8_t *data, const size_t len) {
 #endif
 
   j = (context->count[0] >> 3) & 63;
-  if ((context->count[0] += len << 3) < (len << 3))
+  if((context->count[0] += len << 3) < (len << 3))
     context->count[1]++;
   context->count[1] += (len >> 29);
-  if ((j + len) > 63) {
+  if((j + len) > 63) {
     memcpy(&context->buffer[j], data, (i = 64 - j));
     SHA1_Transform(context->state, context->buffer);
-    for (; i + 63 < len; i += 64) {
+    for(; i + 63 < len; i += 64) {
       SHA1_Transform(context->state, data + i);
     }
     j = 0;
@@ -297,20 +297,20 @@ void SHA1_Update(SHA1_CTX *context, const uint8_t *data, const size_t len) {
 }
 
 /* Add padding and return the message digest. */
-void SHA1_Final(SHA1_CTX *context, uint8_t digest[SHA1_DIGEST_SIZE]) {
+void SHA1_Final(SHA1_CTX* context, uint8_t digest[SHA1_DIGEST_SIZE]) {
   uint32_t i;
   uint8_t finalcount[8];
 
-  for (i = 0; i < 8; i++) {
+  for(i = 0; i < 8; i++) {
     finalcount[i] = (unsigned char)((context->count[(i >= 4 ? 0 : 1)] >> ((3 - (i & 3)) * 8)) &
                                     255); /* Endian independent */
   }
-  SHA1_Update(context, (uint8_t *)"\200", 1);
-  while ((context->count[0] & 504) != 448) {
-    SHA1_Update(context, (uint8_t *)"\0", 1);
+  SHA1_Update(context, (uint8_t*)"\200", 1);
+  while((context->count[0] & 504) != 448) {
+    SHA1_Update(context, (uint8_t*)"\0", 1);
   }
   SHA1_Update(context, finalcount, 8); /* Should cause a SHA1_Transform() */
-  for (i = 0; i < SHA1_DIGEST_SIZE; i++) {
+  for(i = 0; i < SHA1_DIGEST_SIZE; i++) {
     digest[i] = (uint8_t)((context->state[i >> 2] >> ((3 - (i & 3)) * 8)) & 255);
   }
 
@@ -328,13 +328,13 @@ void SHA1_Final(SHA1_CTX *context, uint8_t digest[SHA1_DIGEST_SIZE]) {
 
 /*************************************************************/
 
-void digest_to_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char *output) {
+void digest_to_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char* output) {
   int i, j;
 
-  char *c = output;
+  char* c = output;
 
-  for (i = 0; i < SHA1_DIGEST_SIZE / 4; i++) {
-    for (j = 0; j < 4; j++) {
+  for(i = 0; i < SHA1_DIGEST_SIZE / 4; i++) {
+    for(j = 0; j < 4; j++) {
       sprintf(c, "%02X", digest[i * 4 + j]);
       c += 2;
     }
@@ -342,12 +342,12 @@ void digest_to_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char *output) {
   *c = '\0';
 }
 
-std::string sha1_hash(const std::string &s) {
+std::string sha1_hash(const std::string& s) {
   unsigned char digest[SHA1_DIGEST_SIZE];
   char output[80];
   SHA1_CTX context;
   SHA1_Init(&context);
-  SHA1_Update(&context, (const uint8_t *)s.c_str(), s.size());
+  SHA1_Update(&context, (const uint8_t*)s.c_str(), s.size());
   SHA1_Final(&context, digest);
   digest_to_hex(digest, output);
   return output;

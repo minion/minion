@@ -34,35 +34,41 @@
 //#define P(x) cout << x << endl
 
 class CheapStream {
-  const char *stream_start;
-  const char *stream_end;
-  const char *stream_pos;
+  const char* stream_start;
+  const char* stream_end;
+  const char* stream_pos;
 
   std::string s;
 
 public:
   bool fail_flag;
 
-  SysInt get_raw_pos() { return stream_pos - stream_start; }
+  SysInt get_raw_pos() {
+    return stream_pos - stream_start;
+  }
 
-  const std::string &get_raw_string() { return s; }
+  const std::string& get_raw_string() {
+    return s;
+  }
 
   void reset_stream() {
     stream_pos = stream_start;
     fail_flag = false;
   }
 
-  CheapStream(const char *_stream_start, const char *_stream_end)
-      : stream_start(_stream_start), stream_end(_stream_end), stream_pos(_stream_start),
+  CheapStream(const char* _stream_start, const char* _stream_end)
+      : stream_start(_stream_start),
+        stream_end(_stream_end),
+        stream_pos(_stream_start),
         fail_flag(false) {}
 
   template <typename IStream>
-  CheapStream(IStream &i, const char *filename = "")
+  CheapStream(IStream& i, const char* filename = "")
       : fail_flag(false) {
     std::ostringstream iss;
     iss << i.rdbuf();
     s = iss.str();
-    if (!s.empty()) {
+    if(!s.empty()) {
       stream_start = &*s.begin();
       stream_end = &*s.begin() + s.length();
       stream_pos = stream_start;
@@ -71,9 +77,13 @@ public:
     }
   }
 
-  bool fail() { return fail_flag; }
+  bool fail() {
+    return fail_flag;
+  }
 
-  bool operator!() { return stream_pos == NULL; }
+  bool operator!() {
+    return stream_pos == NULL;
+  }
 
   char get() {
     char x = *stream_pos;
@@ -82,16 +92,22 @@ public:
     return x;
   }
 
-  char peek() { return *stream_pos; }
+  char peek() {
+    return *stream_pos;
+  }
 
-  void putback(char c) { stream_pos--; }
+  void putback(char c) {
+    stream_pos--;
+  }
 
-  bool eof() { return stream_pos == stream_end; }
+  bool eof() {
+    return stream_pos == stream_end;
+  }
 
   string getline(char deliminator = '\n') {
     std::vector<char> output;
-    while (stream_pos != stream_end) {
-      if (*stream_pos == deliminator) {
+    while(stream_pos != stream_end) {
+      if(*stream_pos == deliminator) {
         stream_pos++;
         return string(output.begin(), output.end());
       } else {
@@ -105,31 +121,31 @@ public:
 };
 
 template <typename T>
-void get_num(CheapStream &cs, T &ret) {
+void get_num(CheapStream& cs, T& ret) {
   SysInt neg_flag = 1;
 
   long long i = 1;
   long long limit = std::numeric_limits<SysInt>::max() / 2;
 
-  while (isspace(cs.peek()))
+  while(isspace(cs.peek()))
     cs.get();
 
-  if (cs.peek() == '-') {
+  if(cs.peek() == '-') {
     cs.get();
     neg_flag = -1;
   }
 
-  if (cs.peek() >= '0' && cs.peek() <= '9') {
+  if(cs.peek() >= '0' && cs.peek() <= '9') {
     i *= (cs.get() - '0');
   } else {
     cs.fail_flag = true;
     return;
   }
 
-  while (cs.peek() >= '0' && cs.peek() <= '9') {
+  while(cs.peek() >= '0' && cs.peek() <= '9') {
     char c = cs.get();
     i = i * 10 + c - '0';
-    if (i > limit) {
+    if(i > limit) {
       std::cerr << "Magnitude of number too large!\n";
       cs.fail_flag = true;
       return;
@@ -143,30 +159,30 @@ void get_num(CheapStream &cs, T &ret) {
   return;
 }
 
-inline CheapStream &operator>>(CheapStream &cs, SysInt &si) {
+inline CheapStream& operator>>(CheapStream& cs, SysInt& si) {
   get_num(cs, si);
   return cs;
 }
 
 template <typename T>
-CheapStream &operator>>(CheapStream &cs, Wrapper<T> &ret) {
+CheapStream& operator>>(CheapStream& cs, Wrapper<T>& ret) {
   T t = 0;
   cs >> t;
   ret = Wrapper<T>(t);
   return cs;
 }
 
-inline CheapStream &operator>>(CheapStream &cs, char &c) {
-  while (isspace(cs.peek()))
+inline CheapStream& operator>>(CheapStream& cs, char& c) {
+  while(isspace(cs.peek()))
     cs.get();
   c = cs.get();
   return cs;
 }
 
-inline CheapStream &operator>>(CheapStream &cs, std::string &s) {
-  while (!cs.eof() && isspace(cs.peek()))
+inline CheapStream& operator>>(CheapStream& cs, std::string& s) {
+  while(!cs.eof() && isspace(cs.peek()))
     cs.get();
-  while (!cs.eof() && !isspace(cs.peek())) {
+  while(!cs.eof() && !isspace(cs.peek())) {
     s += cs.get();
   }
   return cs;

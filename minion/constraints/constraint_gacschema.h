@@ -43,24 +43,26 @@ help input haggisgac
 template <typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable {
 
-  virtual string constraint_name() { return "gacschema"; }
+  virtual string constraint_name() {
+    return "gacschema";
+  }
 
   CONSTRAINT_ARG_LIST2(vars, data);
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
     const SysInt length = checked_cast<SysInt>(data->size());
-    DomainInt *tuple_data = data->getPointer();
+    DomainInt* tuple_data = data->getPointer();
 
-    for (SysInt i = 0; i < length; ++i) {
-      DomainInt *tuple_start = tuple_data + i * tuple_size;
+    for(SysInt i = 0; i < length; ++i) {
+      DomainInt* tuple_start = tuple_data + i * tuple_size;
       bool success = true;
-      for (SysInt j = 0; j < tuple_size && success; ++j) {
-        if (!vars[j].inDomain(tuple_start[j]))
+      for(SysInt j = 0; j < tuple_size && success; ++j) {
+        if(!vars[j].inDomain(tuple_start[j]))
           success = false;
       }
-      if (success) {
-        for (SysInt i = 0; i < tuple_size; ++i)
+      if(success) {
+        for(SysInt i = 0; i < tuple_size; ++i)
           assignment.push_back(make_pair(i, tuple_start[i]));
         return true;
       }
@@ -68,11 +70,13 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 
   struct Support {
-    vector<Support *> prev; // Size r -- some entries null.
-    vector<Support *> next;
+    vector<Support*> prev; // Size r -- some entries null.
+    vector<Support*> next;
 
     SysInt id;
 
@@ -89,7 +93,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     // Blank one for use as list header. Must resize next before use.
     Support() {}
 
-    friend std::ostream &operator<<(std::ostream &o, const Support &sp) {
+    friend std::ostream& operator<<(std::ostream& o, const Support& sp) {
       o << "Support: " << sp.id << " " << sp.literals;
       return o;
     }
@@ -109,37 +113,37 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   vector<vector<pair<SysInt, DomainInt>>> litsPerSupport; // The structure S from paper.
   // Maps a support (number) to the values that it is the current support for.
 
-  Support *supportFreeList; // singly-linked list of spare Support objects.
+  Support* supportFreeList; // singly-linked list of spare Support objects.
 
   // Stuff to do with tuples.
-  TupleList *data;
-  vector<vector<vector<vector<DomainInt> *>>> tuple_lists;
-  vector<UnsignedSysInt *> tuple_list_pos; // indexed by var, val.
+  TupleList* data;
+  vector<vector<vector<vector<DomainInt>*>>> tuple_lists;
+  vector<UnsignedSysInt*> tuple_list_pos; // indexed by var, val.
 
   ////////////////////////////////////////////////////////////////////////////
   // Ctor
 
-  GACSchema(const VarArray &_var_array, TupleList *_data)
+  GACSchema(const VarArray& _var_array, TupleList* _data)
       : vars(_var_array), supportFreeList(0), data(_data) {
     // Register this with the backtracker.
     getState().getGenericBacktracker().add(this);
 
-    if (vars.size() > 0) {
+    if(vars.size() > 0) {
       dom_max = vars[0].getInitialMax();
       dom_min = vars[0].getInitialMin();
-      for (SysInt i = 1; i < (SysInt)vars.size(); i++) {
-        if (vars[i].getInitialMin() < dom_min)
+      for(SysInt i = 1; i < (SysInt)vars.size(); i++) {
+        if(vars[i].getInitialMin() < dom_min)
           dom_min = vars[i].getInitialMin();
-        if (vars[i].getInitialMax() > dom_max)
+        if(vars[i].getInitialMax() > dom_max)
           dom_max = vars[i].getInitialMax();
       }
       numvals = checked_cast<SysInt>(dom_max - dom_min + 1);
     }
 
     supportListPerLit.resize(vars.size());
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       supportListPerLit[i].resize(numvals); // blank Support objects.
-      for (SysInt j = 0; j < numvals; j++)
+      for(SysInt j = 0; j < numvals; j++)
         supportListPerLit[i][j].next.resize(vars.size());
     }
 
@@ -148,24 +152,24 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
     // populate tuple_lists
     tuple_lists.resize(vars.size());
-    for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
+    for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
       const SysInt domsize =
           checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
       tuple_list_pos[var] = getMemory().backTrack().template requestArray<UnsignedSysInt>(domsize);
-      for (SysInt validx = 0; validx < domsize; validx++) {
+      for(SysInt validx = 0; validx < domsize; validx++) {
         tuple_list_pos[var][validx] = 0;
       }
       tuple_lists[var].resize(domsize);
     }
 
     DomainInt numtuples = data->size();
-    DomainInt *tupdata = data->getPointer();
-    for (DomainInt i = 0; i < numtuples; i++) {
-      vector<DomainInt> *tup = new vector<DomainInt>(tupdata, tupdata + vars.size());
+    DomainInt* tupdata = data->getPointer();
+    for(DomainInt i = 0; i < numtuples; i++) {
+      vector<DomainInt>* tup = new vector<DomainInt>(tupdata, tupdata + vars.size());
 
-      for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
+      for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
         DomainInt val = (*tup)[var];
-        if (val >= vars[var].getInitialMin() && val <= vars[var].getInitialMax()) {
+        if(val >= vars[var].getInitialMin() && val <= vars[var].getInitialMax()) {
           tuple_lists[var][checked_cast<SysInt>(val - vars[var].getInitialMin())].push_back(tup);
         }
       }
@@ -179,52 +183,52 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
   virtual ~GACSchema() {
     // printStructures();
-    set<Support *> myset;
+    set<Support*> myset;
 
     // Go through supportFreeList
-    for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
-      for (DomainInt val = dom_min; val <= dom_max; val++) {
-        Support *sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
-        while (sup != 0) {
-          vector<Support *> &prev = sup->prev;
-          vector<Support *> &next = sup->next;
-          vector<pair<SysInt, DomainInt>> &litlist = sup->literals;
+    for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
+      for(DomainInt val = dom_min; val <= dom_max; val++) {
+        Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
+        while(sup != 0) {
+          vector<Support*>& prev = sup->prev;
+          vector<Support*>& next = sup->next;
+          vector<pair<SysInt, DomainInt>>& litlist = sup->literals;
           // Unstitch supList from all lists it is in.
-          for (SysInt i = 0; i < (SysInt)litlist.size(); i++) {
+          for(SysInt i = 0; i < (SysInt)litlist.size(); i++) {
             SysInt var = litlist[i].first;
             // D_ASSERT(prev[var]!=0);  // Only for igac. Here it might not be
             // in the list.
-            if (prev[var] != 0) {
+            if(prev[var] != 0) {
               prev[var]->next[var] = next[var];
               // prev[var]=0;
             }
-            if (next[var] != 0) {
+            if(next[var] != 0) {
               next[var]->prev[var] = prev[var];
               // next[var]=0;
             }
           }
 
-          Support *temp = sup;
+          Support* temp = sup;
           sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
           myset.insert(temp);
         }
       }
     }
 
-    while (supportFreeList != 0) {
-      Support *sup = supportFreeList;
+    while(supportFreeList != 0) {
+      Support* sup = supportFreeList;
       supportFreeList = sup->next[0];
       myset.insert(sup);
     }
 
-    for (SysInt i = 0; i < (SysInt)backtrack_stack.size(); i++) {
-      if (backtrack_stack[i].typ == 1) {
+    for(SysInt i = 0; i < (SysInt)backtrack_stack.size(); i++) {
+      if(backtrack_stack[i].typ == 1) {
         myset.insert(backtrack_stack[i].sup);
       }
     }
 
-    typename set<Support *>::iterator it;
-    for (it = myset.begin(); it != myset.end(); it++) {
+    typename set<Support*>::iterator it;
+    for(it = myset.begin(); it != myset.end(); it++) {
       delete *it;
     }
   }
@@ -240,12 +244,12 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     // 2: addition of lit to litsPerSupport
     // 3: removal of lit from litsPerSupport
 
-    Support *sup;
+    Support* sup;
     SysInt var; // The literal, for when it's a removal.
     DomainInt val;
 
-    friend std::ostream &operator<<(std::ostream &o, const BTRecord &rec) {
-      if (rec.sup == 0)
+    friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec) {
+      if(rec.sup == 0)
         return o << "ZeroMarker";
       o << "BTRecord:" << rec.typ << ",";
       o << rec.sup->literals;
@@ -263,27 +267,27 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   void pop() {
     // cout << "BACKTRACKING:" << endl;
     // cout << backtrack_stack <<endl;
-    while (backtrack_stack.back().sup != 0) {
+    while(backtrack_stack.back().sup != 0) {
       BTRecord temp = backtrack_stack.back();
       backtrack_stack.pop_back();
-      if (temp.typ == 1) {
+      if(temp.typ == 1) {
         // The thing was removed from one list, re-insert it into that list.
         addSupportInternal(temp.sup, temp.var, temp.val);
-      } else if (temp.typ == 0) {
+      } else if(temp.typ == 0) {
         deleteSupportInternal(temp.sup, true);
-      } else if (temp.typ == 2) {
+      } else if(temp.typ == 2) {
         // var,val was added to litsPerSupport for sup.
         SysInt id = temp.sup->id;
         // D_ASSERT(litsPerSupport[id].back().first==temp.var &&
         // litsPerSupport[id].back().second==temp.val);
-        if (!(litsPerSupport[id].back().first == temp.var &&
-              litsPerSupport[id].back().second == temp.val)) {
+        if(!(litsPerSupport[id].back().first == temp.var &&
+             litsPerSupport[id].back().second == temp.val)) {
           cout << "Can't pop pair " << temp.var << "," << temp.val << "from litsPerSupport " << id
                << " " << litsPerSupport[id] << endl;
           abort();
         }
         litsPerSupport[id].pop_back();
-      } else if (temp.typ == 3) {
+      } else if(temp.typ == 3) {
         SysInt id = temp.sup->id;
         litsPerSupport[id].push_back(make_pair(temp.var, temp.val));
       }
@@ -293,14 +297,14 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     // cout << "END OF BACKTRACKING." << endl;
   }
 
-  inline void addToLitsPerSupport(Support *sp, SysInt var, DomainInt val) {
+  inline void addToLitsPerSupport(Support* sp, SysInt var, DomainInt val) {
     litsPerSupport[sp->id].push_back(make_pair(var, val));
     // Add bt record
     struct BTRecord temp = {2, sp, var, val};
     backtrack_stack.push_back(temp);
   }
 
-  inline void deleteFromLitsPerSupport(Support *sp, SysInt var, DomainInt val) {
+  inline void deleteFromLitsPerSupport(Support* sp, SysInt var, DomainInt val) {
     D_ASSERT(litsPerSupport[sp->id].back().first == var &&
              litsPerSupport[sp->id].back().second == val);
     litsPerSupport[sp->id].pop_back();
@@ -312,9 +316,9 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   ////////////////////////////////////////////////////////////////////////////
   // Add and delete support
 
-  Support *addSupport(box<pair<SysInt, DomainInt>> *litlist) {
+  Support* addSupport(box<pair<SysInt, DomainInt>>* litlist) {
     D_ASSERT(litlist->size() == vars.size());
-    Support *newsup = addSupportInternal(litlist, 0);
+    Support* newsup = addSupportInternal(litlist, 0);
     struct BTRecord temp;
     temp.typ = 0;
     temp.sup = newsup;
@@ -323,33 +327,33 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   }
 
   // For use by the backtracker.
-  inline void addSupportInternal(Support *sup, SysInt var, DomainInt val) {
+  inline void addSupportInternal(Support* sup, SysInt var, DomainInt val) {
     // Adds sup to the list for var, val only.
     const SysInt validx = checked_cast<SysInt>(val - dom_min);
 
     sup->prev[var] = &(supportListPerLit[var][validx]);
     sup->next[var] = supportListPerLit[var][validx].next[var];
     supportListPerLit[var][validx].next[var] = sup;
-    if (sup->next[var] != 0)
+    if(sup->next[var] != 0)
       sup->next[var]->prev[var] = sup;
   }
 
   // Can take either a box or a support object (for use when backtracking).
-  Support *addSupportInternal(box<pair<SysInt, DomainInt>> *litbox, Support *sup) {
+  Support* addSupportInternal(box<pair<SysInt, DomainInt>>* litbox, Support* sup) {
     // add a new support given as a vector of literals.
-    Support *sup_internal;
+    Support* sup_internal;
 
-    if (litbox != 0) {
+    if(litbox != 0) {
       // copy.
       sup_internal = getFreeSupport();
       sup_internal->literals.clear();
-      for (SysInt i = 0; i < (SysInt)litbox->size(); i++) {
+      for(SysInt i = 0; i < (SysInt)litbox->size(); i++) {
         sup_internal->literals.push_back((*litbox)[i]);
       }
     } else {
       sup_internal = sup;
     }
-    vector<pair<SysInt, DomainInt>> &litlist_internal = sup_internal->literals;
+    vector<pair<SysInt, DomainInt>>& litlist_internal = sup_internal->literals;
 
     // cout << "Adding support (internal) :" << litlist_internal << endl;
     D_ASSERT(litlist_internal.size() > 0); // It should be possible to deal with
@@ -358,7 +362,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     // cause a memory leak.
 
     SysInt litsize = litlist_internal.size();
-    for (SysInt i = 0; i < litsize; i++) {
+    for(SysInt i = 0; i < litsize; i++) {
       pair<SysInt, DomainInt> temp = litlist_internal[i];
       SysInt var = temp.first;
       const SysInt val = checked_cast<SysInt>(temp.second - dom_min);
@@ -367,13 +371,13 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
       sup_internal->prev[var] = &(supportListPerLit[var][val]);
       sup_internal->next[var] = supportListPerLit[var][val].next[var];
       supportListPerLit[var][val].next[var] = sup_internal;
-      if (sup_internal->next[var] != 0)
+      if(sup_internal->next[var] != 0)
         sup_internal->next[var]->prev[var] = sup_internal;
     }
     return sup_internal;
   }
 
-  void deleteSupport(Support *sup) {
+  void deleteSupport(Support* sup) {
     struct BTRecord temp;
     temp.is_removal = true;
     temp.sup = sup;
@@ -382,27 +386,27 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     deleteSupportInternal(sup, false);
   }
 
-  void deleteSupportInternal(Support *sup, bool Backtracking) {
+  void deleteSupportInternal(Support* sup, bool Backtracking) {
     D_ASSERT(sup != 0);
 
     // Remove sup from supportListPerLit
-    vector<Support *> &prev = sup->prev;
-    vector<Support *> &next = sup->next;
-    vector<pair<SysInt, DomainInt>> &litlist = sup->literals;
+    vector<Support*>& prev = sup->prev;
+    vector<Support*>& next = sup->next;
+    vector<pair<SysInt, DomainInt>>& litlist = sup->literals;
     // cout << "Removing support (internal) :" << litlist << endl;
 
-    for (SysInt i = 0; i < (SysInt)litlist.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)litlist.size(); i++) {
       SysInt var = litlist[i].first;
       D_ASSERT(prev[var] != 0);
       prev[var]->next[var] = next[var];
-      if (next[var] != 0) {
+      if(next[var] != 0) {
         next[var]->prev[var] = prev[var];
       }
       prev[var] = 0;
       next[var] = 0;
     }
 
-    if (Backtracking) {
+    if(Backtracking) {
       // Can re-use the support when it is removed by BT.
       // Stick it on the free list using next[0] as the next ptr.
       sup->next[0] = supportFreeList;
@@ -411,7 +415,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     // else can't re-use it because a ptr to it is on the BT stack.
   }
 
-  void deleteSupport(Support *sup, SysInt var, DomainInt val) {
+  void deleteSupport(Support* sup, SysInt var, DomainInt val) {
     // Deletes sup from the list for var, val only.
     // cout << "DeleteSupport " << *sup << " var,val : "<< var <<","<< val
     // <<endl;
@@ -422,11 +426,11 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     temp.val = val;
     backtrack_stack.push_back(temp);
 
-    vector<Support *> &prev = sup->prev;
-    vector<Support *> &next = sup->next;
+    vector<Support*>& prev = sup->prev;
+    vector<Support*>& next = sup->next;
 
     prev[var]->next[var] = next[var];
-    if (next[var] != 0) {
+    if(next[var] != 0) {
       next[var]->prev[var] = prev[var];
     }
     prev[var] = 0;
@@ -439,17 +443,17 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     cout << "PRINTING ALL DATA STRUCTURES" << endl;
 
     cout << "Supports for each literal:" << endl;
-    for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
+    for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
       cout << "Variable: " << var << endl;
-      for (DomainInt val = dom_min; val <= dom_max; val++) {
-        if (vars[var].inDomain(val)) {
+      for(DomainInt val = dom_min; val <= dom_max; val++) {
+        if(vars[var].inDomain(val)) {
           cout << "Value: " << val << endl;
-          Support *sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
-          while (sup != 0) {
+          Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
+          while(sup != 0) {
             cout << *(sup) << endl;
             bool contains_varval = false;
-            for (SysInt i = 0; i < (SysInt)sup->literals.size(); i++) {
-              if (sup->literals[i].first == var && sup->literals[i].second == val)
+            for(SysInt i = 0; i < (SysInt)sup->literals.size(); i++) {
+              if(sup->literals[i].first == var && sup->literals[i].second == val)
                 contains_varval = true;
             }
             D_ASSERT(contains_varval);
@@ -462,12 +466,14 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     }
 
     cout << "Literals for each Support:" << endl;
-    for (SysInt i = 0; i < (SysInt)litsPerSupport.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)litsPerSupport.size(); i++) {
       cout << i << ", " << litsPerSupport[i] << endl;
     }
   }
 
-  SysInt dynamic_trigger_count() { return vars.size() * numvals; }
+  SysInt dynamic_trigger_count() {
+    return vars.size() * numvals;
+  }
 
   inline void attach_trigger(SysInt var, DomainInt val) {
     // P("Attach Trigger: " << i);
@@ -484,37 +490,37 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     // cout << "Entered propagate."<<endl;
     // printStructures();
 
-    while (supportListPerLit[var][validx].next[var] != 0) {
-      Support *tau = supportListPerLit[var][validx].next[var];
+    while(supportListPerLit[var][validx].next[var] != 0) {
+      Support* tau = supportListPerLit[var][validx].next[var];
       // cout << "In main loop for support: "<< *(tau) << ", " << "var:"<< var
       // << " val:"<<val <<endl;
 
       D_ASSERT(tau->prev[var] == &(supportListPerLit[var][validx]));
       // Delete tau from all lists it is in.  NOT THE SAME AS THE PAPER, WHICH
       // HAS A BUG AT THIS POINT.
-      for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+      for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
         pair<SysInt, DomainInt> lit = tau->literals[i];
-        if (tau->prev[lit.first] != 0) { // If in list it has a prev ptr.
+        if(tau->prev[lit.first] != 0) { // If in list it has a prev ptr.
           deleteSupport(tau, lit.first, lit.second);
         }
       }
       // printStructures();
       D_ASSERT(supportListPerLit[var][validx].next[var] != tau);
 
-      while (litsPerSupport[tau->id].size() > 0) {
+      while(litsPerSupport[tau->id].size() > 0) {
         pair<SysInt, DomainInt> lit = litsPerSupport[tau->id].back();
         deleteFromLitsPerSupport(tau, lit.first, lit.second);
 
-        if (vars[lit.first].inDomain(lit.second)) {
-          Support *sigma = seekInferableSupport(lit.first, lit.second);
-          if (sigma != 0) {
+        if(vars[lit.first].inDomain(lit.second)) {
+          Support* sigma = seekInferableSupport(lit.first, lit.second);
+          if(sigma != 0) {
             addToLitsPerSupport(sigma, lit.first, lit.second);
           } else {
             typedef pair<SysInt, DomainInt> temptype;
             MAKE_STACK_BOX(newsupportbox, temptype, vars.size());
             bool foundsupport = findNewSupportList(newsupportbox, lit.first, lit.second);
-            if (foundsupport) {
-              Support *sp = addSupport(&newsupportbox);
+            if(foundsupport) {
+              Support* sp = addSupport(&newsupportbox);
               addToLitsPerSupport(sp, lit.first, lit.second);
             } else {
               vars[lit.first].removeFromDomain(lit.second);
@@ -529,34 +535,34 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 // variable vartopad
 // Intended to pad out an assignment to a full-length support.
 #define PADOUT(vartopad)                                                                           \
-  if (var == vartopad)                                                                             \
+  if(var == vartopad)                                                                              \
     assignment.push_back(make_pair(var, val));                                                     \
   else                                                                                             \
     assignment.push_back(make_pair(vartopad, vars[vartopad].getMin()));
 
 #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var, val));
 
-  bool findNewSupportList(box<pair<SysInt, DomainInt>> &assignment, SysInt var, DomainInt val) {
+  bool findNewSupportList(box<pair<SysInt, DomainInt>>& assignment, SysInt var, DomainInt val) {
     D_ASSERT(vars[var].inDomain(val));
 
-    vector<vector<DomainInt> *> &tups =
+    vector<vector<DomainInt>*>& tups =
         tuple_lists[var][checked_cast<SysInt>(val - vars[var].getInitialMin())];
 
     SysInt cur = tuple_list_pos[var][checked_cast<SysInt>(val - vars[var].getInitialMin())];
     SysInt numtups = tups.size();
     SysInt numvars = vars.size();
-    for (; cur < numtups; cur++) {
-      vector<DomainInt> &tup = *(tups[cur]);
+    for(; cur < numtups; cur++) {
+      vector<DomainInt>& tup = *(tups[cur]);
       bool valid = true;
-      for (SysInt i = 0; i < numvars; i++) {
-        if (!vars[i].inDomain(tup[i])) {
+      for(SysInt i = 0; i < numvars; i++) {
+        if(!vars[i].inDomain(tup[i])) {
           valid = false;
           break;
         }
       }
-      if (valid) {
+      if(valid) {
         // Copy into the box
-        for (SysInt i = 0; i < numvars; i++) {
+        for(SysInt i = 0; i < numvars; i++) {
           assignment.push_back(make_pair(i, tup[i]));
         }
         tuple_list_pos[var][checked_cast<SysInt>(val - vars[var].getInitialMin())] = cur;
@@ -566,9 +572,9 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     return false;
   }
 
-  virtual bool check_assignment(DomainInt *v, SysInt array_size) {
-    for (SysInt i = 0; i < checked_cast<SysInt>(data->size()); ++i) {
-      if (std::equal(v, v + array_size, data->get_tupleptr(i)))
+  virtual bool check_assignment(DomainInt* v, SysInt array_size) {
+    for(SysInt i = 0; i < checked_cast<SysInt>(data->size()); ++i) {
+      if(std::equal(v, v + array_size, data->get_tupleptr(i)))
         return true;
     }
     return false;
@@ -577,16 +583,16 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   ////////////////////////////////////////////////////////////////////////////
   // Memory management.
 
-  Support *getFreeSupport() {
+  Support* getFreeSupport() {
     // Either get a Support off the free list or make one.
-    if (supportFreeList == 0) {
-      Support *sp = new Support(vars.size());
+    if(supportFreeList == 0) {
+      Support* sp = new Support(vars.size());
       sp->id = litsPerSupport.size();
       vector<pair<SysInt, DomainInt>> temp;
       litsPerSupport.push_back(temp);
       return sp;
     } else {
-      Support *temp = supportFreeList;
+      Support* temp = supportFreeList;
       supportFreeList = supportFreeList->next[0];
       D_ASSERT(litsPerSupport[temp->id].size() == 0); // Should be emptied by backtracking.
       // litsPerSupport[temp.id].clear();
@@ -596,26 +602,26 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
   virtual void full_propagate() {
     // D_ASSERT(backtrack_stack.size()==0);
-    if (data->size() == 0) {
+    if(data->size() == 0) {
       getState().setFailed(true);
       return;
     }
 
     // For each literal, find a support for it or delete it.
-    for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
-      for (DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
-        if (vars[var].inDomain(val)) {
+    for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
+      for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+        if(vars[var].inDomain(val)) {
 
           // From here is cut-and-paste from propagate.
-          Support *sigma = seekInferableSupport(var, val);
-          if (sigma != 0) {
+          Support* sigma = seekInferableSupport(var, val);
+          if(sigma != 0) {
             addToLitsPerSupport(sigma, var, val);
           } else {
             typedef pair<SysInt, DomainInt> temptype;
             MAKE_STACK_BOX(newsupportbox, temptype, vars.size());
             bool foundsupport = findNewSupportList(newsupportbox, var, val);
-            if (foundsupport) {
-              Support *sp = addSupport(&newsupportbox);
+            if(foundsupport) {
+              Support* sp = addSupport(&newsupportbox);
               addToLitsPerSupport(sp, var, val);
             } else {
               vars[var].removeFromDomain(val);
@@ -625,10 +631,10 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
         // This is because when the domain of a constant variable is emptied,
         // we still have 'inDomain' return true.
-        if (getState().isFailed())
+        if(getState().isFailed())
           return;
 
-        if (vars[var].inDomain(val)) {
+        if(vars[var].inDomain(val)) {
           // If the value is still there, Put trigger on.
           attach_trigger(var, val);
           D_ASSERT(supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var] != 0);
@@ -640,25 +646,25 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
-    for (unsigned i = 0; i < vars.size(); ++i)
+    for(unsigned i = 0; i < vars.size(); ++i)
       ret.push_back(vars[i]);
     return ret;
   }
 
-  Support *seekInferableSupport(SysInt var, DomainInt val) {
+  Support* seekInferableSupport(SysInt var, DomainInt val) {
     const SysInt validx = checked_cast<SysInt>(val - dom_min);
-    while (supportListPerLit[var][validx].next[var] != 0) {
-      Support *temp = supportListPerLit[var][validx].next[var];
-      vector<pair<SysInt, DomainInt>> &literals = temp->literals;
+    while(supportListPerLit[var][validx].next[var] != 0) {
+      Support* temp = supportListPerLit[var][validx].next[var];
+      vector<pair<SysInt, DomainInt>>& literals = temp->literals;
       bool lost = false;
-      for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+      for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
         pair<SysInt, DomainInt> lit = literals[i];
-        if (!vars[lit.first].inDomain(lit.second)) {
+        if(!vars[lit.first].inDomain(lit.second)) {
           lost = true;
           break;
         }
       }
-      if (lost) {
+      if(lost) {
         deleteSupport(temp, var, val);
       } else {
         return temp;
@@ -670,7 +676,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 }; // end of class
 
 template <typename VarArray>
-AbstractConstraint *BuildCT_GACSCHEMA(const VarArray &var_array, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_GACSCHEMA(const VarArray& var_array, ConstraintBlob& b) {
   return new GACSchema<VarArray>(var_array, b.tuples);
 }
 

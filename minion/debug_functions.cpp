@@ -59,8 +59,8 @@ void D_FATAL_ERROR2(string s, string file, string line) {
 }
 
 void DOM_NORETURN FAIL_EXIT(string s) {
-  if (in_cspcomp_for_failexit) {
-    if (s != "")
+  if(in_cspcomp_for_failexit) {
+    if(s != "")
       cout << "c " << s << endl;
     cout << "s UNKNOWN" << endl;
     exit(1);
@@ -69,8 +69,8 @@ void DOM_NORETURN FAIL_EXIT(string s) {
   cerr << "Unrecoverable error. Exiting." << endl;
   cerr << s << endl;
   cerr.flush();
-  if (debug_crash) {
-    SysInt *i = NULL;
+  if(debug_crash) {
+    SysInt* i = NULL;
     *i = 0;
   }
   throw 9;

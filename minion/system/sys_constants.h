@@ -62,12 +62,12 @@ const DomainInt DomainInt_Min = std::numeric_limits<SysInt>::min() / 2 + 1;
 static const DomainInt DomainInt_Skip = std::numeric_limits<SysInt>::max();
 
 template <typename To, typename From>
-To checked_cast(const From &t) {
+To checked_cast(const From& t) {
   return static_cast<To>(t);
 }
 
 template <typename To, typename From>
-To checked_cast(const Wrapper<From> &t) {
+To checked_cast(const Wrapper<From>& t) {
   return static_cast<To>(t.t);
 }
 
@@ -93,7 +93,7 @@ inline compiletime_val<T, (T)0 - i> const_neg(compiletime_val<T, i>) {
 
 template <typename T>
 inline T mymin(T t1, T t2) {
-  if (t1 <= t2)
+  if(t1 <= t2)
     return t1;
   else
     return t2;
@@ -101,7 +101,7 @@ inline T mymin(T t1, T t2) {
 
 template <typename T>
 inline T mymax(T t1, T t2) {
-  if (t1 <= t2)
+  if(t1 <= t2)
     return t2;
   else
     return t1;

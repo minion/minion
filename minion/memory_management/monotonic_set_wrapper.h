@@ -27,7 +27,7 @@
 
 class ReversibleMonotonicSet {
 private:
-  MonotonicSet &MS;
+  MonotonicSet& MS;
   DomainInt offset;
 
   D_DATA(DomainInt size);
@@ -63,7 +63,7 @@ public:
 
 class ReversibleMonotonicBoolean {
 private:
-  MonotonicSet &MS;
+  MonotonicSet& MS;
   DomainInt offset;
 
 public:
@@ -75,9 +75,15 @@ public:
 #endif
   }
 
-  inline bool isMember() { return MS.isMember(offset); }
+  inline bool isMember() {
+    return MS.isMember(offset);
+  }
 
-  inline void remove() { MS.ifMember_remove(offset); }
+  inline void remove() {
+    MS.ifMember_remove(offset);
+  }
 
-  inline void unchecked_remove() { MS.unchecked_remove(offset); }
+  inline void unchecked_remove() {
+    MS.unchecked_remove(offset);
+  }
 };

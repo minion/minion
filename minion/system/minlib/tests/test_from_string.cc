@@ -15,7 +15,7 @@ int main(void) {
 
   try {
     fromstring<int>("1x");
-  } catch (...) { caught = true; }
+  } catch(...) { caught = true; }
 
   D_ASSERT(caught);
   D_ASSERT(!is_fromstring<int>("1x"));
@@ -24,7 +24,7 @@ int main(void) {
 
   try {
     fromstring<int>("x0");
-  } catch (...) { caught = true; }
+  } catch(...) { caught = true; }
 
   D_ASSERT(caught);
   D_ASSERT(!is_fromstring<int>("x0"));
@@ -32,7 +32,7 @@ int main(void) {
 
   try {
     fromstring<int>("!");
-  } catch (...) { caught = true; }
+  } catch(...) { caught = true; }
 
   D_ASSERT(caught);
   D_ASSERT(!is_fromstring<int>("!"));

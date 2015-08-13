@@ -35,24 +35,28 @@
  */
 template <typename Type>
 class Reversible {
-  void *backtrack_ptr;
+  void* backtrack_ptr;
 
 public:
   /// Automatic conversion to the type.
   operator Type() const {
-    Type *ptr = (Type *)(backtrack_ptr);
+    Type* ptr = (Type*)(backtrack_ptr);
     return *ptr;
   }
 
   /// Assignment operator.
-  void operator=(const Type &newval) {
-    Type *ptr = (Type *)(backtrack_ptr);
+  void operator=(const Type& newval) {
+    Type* ptr = (Type*)(backtrack_ptr);
     *ptr = newval;
   }
 
-  void operator++() { *this = *this + 1; }
+  void operator++() {
+    *this = *this + 1;
+  }
 
-  void operator--() { *this = *this - 1; }
+  void operator--() {
+    *this = *this - 1;
+  }
 
   Reversible() {
     backtrack_ptr = getMemory().backTrack().request_bytes(sizeof(Type));
@@ -67,24 +71,26 @@ public:
   }
 
   /// Provide output.
-  friend std::ostream &operator<<(std::ostream &o, const Reversible &v) { return o << Type(v); }
+  friend std::ostream& operator<<(std::ostream& o, const Reversible& v) {
+    return o << Type(v);
+  }
 };
 
 class BoolContainer {
 
-  void *backtrack_ptr;
+  void* backtrack_ptr;
   SysInt offset;
 
 public:
   BoolContainer() : offset(sizeof(SysInt) * 8) {}
 
-  pair<void *, UnsignedSysInt> returnBacktrackBool() {
-    if (offset == sizeof(SysInt) * 8) {
+  pair<void*, UnsignedSysInt> returnBacktrackBool() {
+    if(offset == sizeof(SysInt) * 8) {
       offset = 0;
       backtrack_ptr = getMemory().backTrack().request_bytes(sizeof(SysInt));
     }
 
-    pair<void *, UnsignedSysInt> ret(backtrack_ptr, ((UnsignedSysInt)1) << offset);
+    pair<void*, UnsignedSysInt> ret(backtrack_ptr, ((UnsignedSysInt)1) << offset);
     offset++;
     return ret;
   }
@@ -92,34 +98,34 @@ public:
 
 template <>
 class Reversible<bool> {
-  void *backtrack_ptr;
+  void* backtrack_ptr;
   UnsignedSysInt mask;
 
 public:
   /// Automatic conversion to the type.
   operator bool() const {
-    UnsignedSysInt *ptr = (UnsignedSysInt *)(backtrack_ptr);
+    UnsignedSysInt* ptr = (UnsignedSysInt*)(backtrack_ptr);
     return (*ptr & mask);
   }
 
   /// Assignment operator.
-  void operator=(const bool &newval) {
-    UnsignedSysInt *ptr = (UnsignedSysInt *)(backtrack_ptr);
-    if (newval)
+  void operator=(const bool& newval) {
+    UnsignedSysInt* ptr = (UnsignedSysInt*)(backtrack_ptr);
+    if(newval)
       *ptr |= mask;
     else
       *ptr &= ~mask;
   }
 
   Reversible() {
-    pair<void *, UnsignedSysInt> state = getBools().returnBacktrackBool();
+    pair<void*, UnsignedSysInt> state = getBools().returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
   }
 
   /// Constructs and assigns in one step.
   Reversible(bool b) {
-    pair<void *, UnsignedSysInt> state = getBools().returnBacktrackBool();
+    pair<void*, UnsignedSysInt> state = getBools().returnBacktrackBool();
     backtrack_ptr = state.first;
     mask = state.second;
     (*this) = b;

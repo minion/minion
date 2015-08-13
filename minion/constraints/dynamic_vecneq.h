@@ -48,32 +48,38 @@ struct NeqIterated; // because it is used in EqIterated before it is defn
 
 // for the reverse of the hamming constraint:
 struct EqIterated {
-  static string constraint_name() { return "not-hamming"; }
+  static string constraint_name() {
+    return "not-hamming";
+  }
 
-  static SysInt dynamic_trigger_count() { return 4; }
+  static SysInt dynamic_trigger_count() {
+    return 4;
+  }
 
-  static bool check_assignment(DomainInt i, DomainInt j) { return i == j; }
+  static bool check_assignment(DomainInt i, DomainInt j) {
+    return i == j;
+  }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1 &var1, VarType2 &var2) {
+  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
     return var1.getMin() > var2.getMax() || var1.getMax() < var2.getMin();
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var1(VarType1 &var1, VarType2 &var2) {
+  static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     // just do bounds for the time being
     var2.setMin(var1.getMin());
     var2.setMax(var1.getMax());
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var2(VarType1 &var1, VarType2 &var2) {
+  static void propagate_from_var2(VarType1& var1, VarType2& var2) {
     var1.setMin(var2.getMin());
     var1.setMax(var2.getMax());
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint *ac, VarType1 &var1, VarType2 &var2, DomainInt dt) {
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, LowerBound);
     ac->moveTriggerInt(var1, dt + 1, UpperBound);
     ac->moveTriggerInt(var2, dt + 2, LowerBound);
@@ -81,16 +87,16 @@ struct EqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1 &var1, const Var2 &var2,
-                                        pair<DomainInt, DomainInt> &assign) {
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+                                        pair<DomainInt, DomainInt>& assign) {
     DomainInt min = var1.getMin();
-    if (var2.getMin() > min)
+    if(var2.getMin() > min)
       min = var2.getMin();
     DomainInt max = var1.getMax();
-    if (var2.getMax() < max)
+    if(var2.getMax() < max)
       max = var2.getMax();
-    for (DomainInt i = min; i <= max; i++) {
-      if (var1.inDomain(i) && var2.inDomain(i)) {
+    for(DomainInt i = min; i <= max; i++) {
+      if(var1.inDomain(i) && var2.inDomain(i)) {
         assign = make_pair(i, i);
         return true;
       }
@@ -99,51 +105,57 @@ struct EqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint *reverse_constraint(const Var1 &var1, const Var2 &var2) {
-    NeqConstraintBinary<Var1, Var2> *t = new NeqConstraintBinary<Var1, Var2>(var1, var2);
-    return (AbstractConstraint *)t;
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+    NeqConstraintBinary<Var1, Var2>* t = new NeqConstraintBinary<Var1, Var2>(var1, var2);
+    return (AbstractConstraint*)t;
   }
 
   typedef NeqIterated reverse_operator;
 };
 
 struct NeqIterated {
-  static string constraint_name() { return "hamming"; }
+  static string constraint_name() {
+    return "hamming";
+  }
 
-  static SysInt dynamic_trigger_count() { return 2; }
+  static SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
-  static bool check_assignment(DomainInt i, DomainInt j) { return i != j; }
+  static bool check_assignment(DomainInt i, DomainInt j) {
+    return i != j;
+  }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1 &var1, VarType2 &var2) {
+  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
     return var1.isAssigned() && var2.isAssigned() &&
            var1.getAssignedValue() == var2.getAssignedValue();
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var1(VarType1 &var1, VarType2 &var2) {
-    if (var1.isAssigned())
+  static void propagate_from_var1(VarType1& var1, VarType2& var2) {
+    if(var1.isAssigned())
       remove_value(var1.getAssignedValue(), var2);
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var2(VarType1 &var1, VarType2 &var2) {
-    if (var2.isAssigned())
+  static void propagate_from_var2(VarType1& var1, VarType2& var2) {
+    if(var2.isAssigned())
       remove_value(var2.getAssignedValue(), var1);
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint *ac, VarType1 &var1, VarType2 &var2, DomainInt dt) {
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, Assigned);
     ac->moveTriggerInt(var2, dt + 1, Assigned);
   }
 
   template <typename Var>
-  static void remove_value(DomainInt val, Var &var) {
-    if (var.isBound()) {
-      if (var.getMin() == val)
+  static void remove_value(DomainInt val, Var& var) {
+    if(var.isBound()) {
+      if(var.getMin() == val)
         var.setMin(val + 1);
-      else if (var.getMax() == val)
+      else if(var.getMax() == val)
         var.setMax(val - 1);
     } else {
       var.removeFromDomain(val);
@@ -151,19 +163,18 @@ struct NeqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1 &var1, const Var2 &var2,
-                                        pair<DomainInt, DomainInt> &assign) {
-    if (var1.isAssigned() && var2.isAssigned() &&
-        var1.getAssignedValue() == var2.getAssignedValue())
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+                                        pair<DomainInt, DomainInt>& assign) {
+    if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
       return false;
 
-    if (var1.isAssigned()) {
-      if (var2.getMin() != var1.getAssignedValue())
+    if(var1.isAssigned()) {
+      if(var2.getMin() != var1.getAssignedValue())
         assign = make_pair(var1.getAssignedValue(), var2.getMin());
       else
         assign = make_pair(var1.getAssignedValue(), var2.getMax());
     } else {
-      if (var1.getMin() != var2.getMin())
+      if(var1.getMin() != var2.getMin())
         assign = make_pair(var1.getMin(), var2.getMin());
       else
         assign = make_pair(var1.getMax(), var2.getMin());
@@ -172,44 +183,48 @@ struct NeqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint *reverse_constraint(const Var1 &var1, const Var2 &var2) {
-    EqualConstraint<Var1, Var2> *t = new EqualConstraint<Var1, Var2>(var1, var2);
-    return (AbstractConstraint *)t;
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+    EqualConstraint<Var1, Var2>* t = new EqualConstraint<Var1, Var2>(var1, var2);
+    return (AbstractConstraint*)t;
   }
 
   typedef EqIterated reverse_operator;
 };
 
 struct LessIterated {
-  static bool check_assignment(DomainInt i, DomainInt j) { return i < j; }
+  static bool check_assignment(DomainInt i, DomainInt j) {
+    return i < j;
+  }
 
-  static SysInt dynamic_trigger_count() { return 2; }
+  static SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1 &var1, VarType2 &var2) {
+  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
     return var1.getMin() >= var2.getMax();
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var1(VarType1 &var1, VarType2 &var2) {
+  static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     var2.setMin(var1.getMin() + 1);
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var2(VarType1 &var1, VarType2 &var2) {
+  static void propagate_from_var2(VarType1& var1, VarType2& var2) {
     var1.setMax(var2.getMax() - 1);
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint *ac, VarType1 &var1, VarType2 &var2, DomainInt dt) {
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, LowerBound);
     ac->moveTriggerInt(var2, dt + 1, UpperBound);
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1 &var1, const Var2 &var2,
-                                        pair<DomainInt, DomainInt> &assign) {
-    if (var1.getMin() < var2.getMax()) {
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+                                        pair<DomainInt, DomainInt>& assign) {
+    if(var1.getMin() < var2.getMax()) {
       assign = make_pair(var1.getMin(), var2.getMax());
       return true;
     } else
@@ -217,44 +232,48 @@ struct LessIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint *reverse_constraint(const Var1 &var1, const Var2 &var2) {
-    LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>> *t =
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+    LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>>* t =
         new LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>>(var2, var1,
                                                                   compiletime_val<SysInt, 0>());
-    return (AbstractConstraint *)t;
+    return (AbstractConstraint*)t;
   }
 };
 
 struct BothNonZeroIterated {
-  static bool check_assignment(DomainInt i, DomainInt j) { return i > 0 && j > 0; }
+  static bool check_assignment(DomainInt i, DomainInt j) {
+    return i > 0 && j > 0;
+  }
 
-  static SysInt dynamic_trigger_count() { return 2; }
+  static SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1 &var1, VarType2 &var2) {
+  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
     return var1.getMax() <= 0 || var2.getMax() <= 0;
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var1(VarType1 &var1, VarType2 &var2) {
+  static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     var2.setMin(1);
   }
 
   template <typename VarType1, typename VarType2>
-  static void propagate_from_var2(VarType1 &var1, VarType2 &var2) {
+  static void propagate_from_var2(VarType1& var1, VarType2& var2) {
     var1.setMin(1);
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint *ac, VarType1 &var1, VarType2 &var2, DomainInt dt) {
+  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, UpperBound);
     ac->moveTriggerInt(var2, dt + 1, UpperBound);
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1 &var1, const Var2 &var2,
-                                        pair<DomainInt, DomainInt> &assign) {
-    if (var1.getMax() > 0 && var2.getMax() > 0) {
+  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+                                        pair<DomainInt, DomainInt>& assign) {
+    if(var1.getMax() > 0 && var2.getMax() > 0) {
       assign = make_pair(var1.getMax(), var2.getMax());
       return true;
     } else
@@ -262,10 +281,10 @@ struct BothNonZeroIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint *reverse_constraint(const Var1 &var1, const Var2 &var2) {
-    ProductConstraint<Var1, Var2, ConstantVar> *t =
+  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+    ProductConstraint<Var1, Var2, ConstantVar>* t =
         new ProductConstraint<Var1, Var2, ConstantVar>(var1, var2, ConstantVar(0));
-    return (AbstractConstraint *)t;
+    return (AbstractConstraint*)t;
   }
 };
 
@@ -275,7 +294,9 @@ struct BothNonZeroIterated {
 */
 template <typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
 struct VecNeqDynamic : public AbstractConstraint {
-  virtual string constraint_name() { return "watchvecneq"; }
+  virtual string constraint_name() {
+    return "watchvecneq";
+  }
 
   CONSTRAINT_ARG_LIST2(var_array1, var_array2);
 
@@ -291,12 +312,14 @@ struct VecNeqDynamic : public AbstractConstraint {
   Reversible<bool> propagate_mode;
   SysInt index_to_propagate;
 
-  VecNeqDynamic(const VarArray1 &_array1, const VarArray2 &_array2)
+  VecNeqDynamic(const VarArray1& _array1, const VarArray2& _array2)
       : var_array1(_array1), var_array2(_array2), propagate_mode(false) {
     D_ASSERT(var_array1.size() == var_array2.size());
   }
 
-  virtual SysInt dynamic_trigger_count() { return Operator::dynamic_trigger_count() * 2; }
+  virtual SysInt dynamic_trigger_count() {
+    return Operator::dynamic_trigger_count() * 2;
+  }
 
   bool no_support_for_index(SysInt index) {
     return Operator::no_support_for_pair(var_array1[index], var_array2[index]);
@@ -312,11 +335,11 @@ struct VecNeqDynamic : public AbstractConstraint {
     SysInt index = 0;
 
     // Find first pair we could watch.
-    while (index < size && no_support_for_index(index))
+    while(index < size && no_support_for_index(index))
       ++index;
 
     // Vectors are assigned and equal.
-    if (index == size) {
+    if(index == size) {
       getState().setFailed(true);
       return;
     }
@@ -326,11 +349,11 @@ struct VecNeqDynamic : public AbstractConstraint {
     ++index;
 
     // Now, is there another fine pair?
-    while (index < size && no_support_for_index(index))
+    while(index < size && no_support_for_index(index))
       ++index;
 
     // There is only one possible pair allowed...
-    if (index == size) {
+    if(index == size) {
       propagate_from_var1(watched_index0);
       propagate_from_var2(watched_index0);
       propagate_mode = true;
@@ -357,7 +380,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     PROP_INFO_ADDONE(DynVecNeq);
     P("VecNeq prop");
 
-    if (propagate_mode) {
+    if(propagate_mode) {
       P("Propagating: " << index_to_propagate);
     } else {
       P("Watching " << watched_index0 << "," << watched_index1);
@@ -372,7 +395,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     SysInt original_index;
     SysInt other_index;
 
-    if (triggerpair == 0) {
+    if(triggerpair == 0) {
       original_index = watched_index0;
       other_index = watched_index1;
     } else {
@@ -380,12 +403,12 @@ struct VecNeqDynamic : public AbstractConstraint {
       other_index = watched_index0;
     }
 
-    if (propagate_mode) {
+    if(propagate_mode) {
       // If this is true, the other index got assigned.
-      if (index_to_propagate != original_index)
+      if(index_to_propagate != original_index)
         return;
 
-      if (triggerarray == 1) {
+      if(triggerarray == 1) {
         propagate_from_var1(index_to_propagate);
       } else {
         propagate_from_var2(index_to_propagate);
@@ -394,22 +417,22 @@ struct VecNeqDynamic : public AbstractConstraint {
     }
 
     // Check if propagation has caused a loss of support.
-    if (!no_support_for_index(original_index))
+    if(!no_support_for_index(original_index))
       return;
 
     SysInt index = original_index + 1;
 
     SysInt size = var_array1.size();
 
-    while ((index < size && no_support_for_index(index)) || index == other_index)
+    while((index < size && no_support_for_index(index)) || index == other_index)
       ++index;
 
-    if (index == size) {
+    if(index == size) {
       index = 0;
-      while ((index < original_index && no_support_for_index(index)) || index == other_index)
+      while((index < original_index && no_support_for_index(index)) || index == other_index)
         ++index;
 
-      if (index == original_index) {
+      if(index == original_index) {
         // This is the only possible non-equal index.
         P("Entering propagate mode for index " << index_to_propagate);
         propagate_mode = true;
@@ -420,7 +443,7 @@ struct VecNeqDynamic : public AbstractConstraint {
       }
     }
 
-    if (triggerpair == 0)
+    if(triggerpair == 0)
       watched_index0 = index;
     else
       watched_index1 = index;
@@ -429,10 +452,10 @@ struct VecNeqDynamic : public AbstractConstraint {
     add_triggers(index, triggerpair * 2);
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     SysInt v_size1 = var_array1.size();
-    for (SysInt i = 0; i < v_size1; ++i)
-      if (Operator::check_assignment(v[i], v[i + v_size1]))
+    for(SysInt i = 0; i < v_size1; ++i)
+      if(Operator::check_assignment(v[i], v[i + v_size1]))
         return true;
     return false;
   }
@@ -440,17 +463,17 @@ struct VecNeqDynamic : public AbstractConstraint {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
-    for (UnsignedSysInt i = 0; i < var_array1.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
       vars.push_back(AnyVarRef(var_array1[i]));
-    for (UnsignedSysInt i = 0; i < var_array2.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
       vars.push_back(AnyVarRef(var_array2[i]));
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     pair<DomainInt, DomainInt> assign;
-    for (SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
-      if (Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign)) {
+    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
+      if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign)) {
         D_ASSERT(var_array1[i].inDomain(assign.first));
         D_ASSERT(var_array2[i].inDomain(assign.second));
         D_ASSERT(Operator::check_assignment(assign.first, assign.second));
@@ -462,9 +485,9 @@ struct VecNeqDynamic : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
-    vector<AbstractConstraint *> con;
-    for (SysInt i = 0; i < (SysInt)var_array1.size(); i++) {
+  virtual AbstractConstraint* reverse_constraint() {
+    vector<AbstractConstraint*> con;
+    for(SysInt i = 0; i < (SysInt)var_array1.size(); i++) {
       con.push_back(Operator::reverse_constraint(var_array1[i], var_array2[i]));
     }
     return new Dynamic_AND(con);
@@ -476,21 +499,21 @@ struct VecNeqDynamic : public AbstractConstraint {
 };
 
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint *BuildCT_WATCHED_VECNEQ(const VarArray1 &varray1, const VarArray2 &varray2,
-                                           ConstraintBlob &) {
+AbstractConstraint* BuildCT_WATCHED_VECNEQ(const VarArray1& varray1, const VarArray2& varray2,
+                                           ConstraintBlob&) {
   return new VecNeqDynamic<VarArray1, VarArray2>(varray1, varray2);
 }
 
 // these two don't seem to be used anywhere
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint *BuildCT_WATCHED_VEC_OR_LESS(const VarArray1 &varray1, const VarArray2 &varray2,
-                                                ConstraintBlob &) {
+AbstractConstraint* BuildCT_WATCHED_VEC_OR_LESS(const VarArray1& varray1, const VarArray2& varray2,
+                                                ConstraintBlob&) {
   return new VecNeqDynamic<VarArray1, VarArray2, LessIterated>(varray1, varray2);
 }
 
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint *BuildCT_WATCHED_VEC_OR_AND(const VarArray1 &varray1, const VarArray2 &varray2,
-                                               ConstraintBlob &) {
+AbstractConstraint* BuildCT_WATCHED_VEC_OR_AND(const VarArray1& varray1, const VarArray2& varray2,
+                                               ConstraintBlob&) {
   return new VecNeqDynamic<VarArray1, VarArray2, BothNonZeroIterated>(varray1, varray2);
 }
 

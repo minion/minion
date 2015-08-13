@@ -36,7 +36,9 @@
 // Checks if a variable is equal to a value.
 template <typename Var>
 struct WatchLiteralConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "w-literal"; }
+  virtual string constraint_name() {
+    return "w-literal";
+  }
 
   CONSTRAINT_ARG_LIST2(var, val);
   Var var;
@@ -44,19 +46,23 @@ struct WatchLiteralConstraint : public AbstractConstraint {
   DomainInt val;
 
   template <typename T>
-  WatchLiteralConstraint(const Var &_var, const T &_val)
+  WatchLiteralConstraint(const Var& _var, const T& _val)
       : var(_var), val(_val) {}
 
-  virtual SysInt dynamic_trigger_count() { return 0; }
+  virtual SysInt dynamic_trigger_count() {
+    return 0;
+  }
 
-  virtual void full_propagate() { var.propagateAssign(val); }
+  virtual void full_propagate() {
+    var.propagateAssign(val);
+  }
 
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInRange);
     var.propagateAssign(val);
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] == val);
   }
@@ -68,31 +74,31 @@ struct WatchLiteralConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    if (var.inDomain(val)) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    if(var.inDomain(val)) {
       assignment.push_back(make_pair(0, val));
       return true;
     } else
       return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     return new WatchNotLiteralConstraint<Var>(var, val);
   }
 };
 
 // From dynamic_notliteral.h
 template <typename Var>
-AbstractConstraint *WatchNotLiteralConstraint<Var>::reverse_constraint() {
+AbstractConstraint* WatchNotLiteralConstraint<Var>::reverse_constraint() {
   return new WatchLiteralConstraint<Var>(var, val);
 }
 
-inline AbstractConstraint *WatchNotLiteralBoolConstraint::reverse_constraint() {
+inline AbstractConstraint* WatchNotLiteralBoolConstraint::reverse_constraint() {
   return new WatchLiteralConstraint<BoolVarRef>(var, val);
 }
 
 template <typename VarArray1>
-AbstractConstraint *BuildCT_WATCHED_LIT(const VarArray1 &_var_array_1, const ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_LIT(const VarArray1& _var_array_1, const ConstraintBlob& b) {
   return new WatchLiteralConstraint<typename VarArray1::value_type>(_var_array_1[0],
                                                                     b.constants[0][0]);
 }

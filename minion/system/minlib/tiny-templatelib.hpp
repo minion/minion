@@ -11,22 +11,28 @@ struct EmptyType {};
 
 struct AnyGrab {
   template <typename T>
-  AnyGrab(const T &);
+  AnyGrab(const T&);
 };
 
 /// A constant chosen at compile time.
 /// Create with the notation compiletime_val<6>().
 template <typename T, T i>
 struct compiletime_val {
-  operator T() const { return i; }
+  operator T() const {
+    return i;
+  }
 
-  compiletime_val<T, (T)(-1) - i> negminusone() const { return compiletime_val<T, (T)(-1) - i>(); }
+  compiletime_val<T, (T)(-1) - i> negminusone() const {
+    return compiletime_val<T, (T)(-1) - i>();
+  }
 
-  friend std::ostream &operator<<(std::ostream &o, const compiletime_val &) {
+  friend std::ostream& operator<<(std::ostream& o, const compiletime_val&) {
     return o << "CompiletimeConst:" << i;
   }
 
-  compiletime_val<T, (T)0 - i> operator-() const { return compiletime_val<T, (T)0 - i>(); }
+  compiletime_val<T, (T)0 - i> operator-() const {
+    return compiletime_val<T, (T)0 - i>();
+  }
 };
 
 template <typename T, T i, T j>

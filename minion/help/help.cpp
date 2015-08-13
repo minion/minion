@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 void help(string request) {
-  if ("" == request) {
+  if("" == request) {
     cout << "To use this help feature run the minion executable followed by "
             "help followed by the"
          << endl;
@@ -15,7 +15,7 @@ void help(string request) {
             "looking at the 'subentries'"
          << endl;
     cout << "section at the end of an entry." << endl << endl;
-  } else if ("switches" == request) {
+  } else if("switches" == request) {
     cout << "Help entry: "
          << "switches" << endl
          << endl;
@@ -35,7 +35,7 @@ void help(string request) {
          << "replacing 'minion' by the name of the executable you're using." << endl
          << endl
          << endl;
-  } else if ("switches -redump" == request) {
+  } else if("switches -redump" == request) {
     cout << "Help entry: "
          << "switches -redump" << endl
          << endl;
@@ -47,7 +47,7 @@ void help(string request) {
          << "carried out when this switch is used." << endl
          << endl
          << endl;
-  } else if ("switches -findallsols" == request) {
+  } else if("switches -findallsols" == request) {
     cout << "Help entry: "
          << "switches -findallsols" << endl
          << endl;
@@ -59,7 +59,7 @@ void help(string request) {
          << "problem contains any minimising or maximising objective." << endl
          << endl
          << endl;
-  } else if ("switches -varorder" == request) {
+  } else if("switches -varorder" == request) {
     cout << "Help entry: "
          << "switches -varorder" << endl
          << endl;
@@ -95,7 +95,7 @@ void help(string request) {
          << "- static - lexicographical ordering" << endl
          << endl
          << endl;
-  } else if ("switches -quiet" == request) {
+  } else if("switches -quiet" == request) {
     cout << "Help entry: "
          << "switches -quiet" << endl
          << endl;
@@ -109,7 +109,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help switches -verbose" << endl << endl << endl;
-  } else if ("switches -outputCompressedDomains" == request) {
+  } else if("switches -outputCompressedDomains" == request) {
     cout << "Help entry: "
          << "switches -outputCompressedDomains" << endl
          << endl;
@@ -123,7 +123,7 @@ void help(string request) {
          << endl
          << endl
          << endl;
-  } else if ("switches -outputCompressed" == request) {
+  } else if("switches -outputCompressed" == request) {
     cout << "Help entry: "
          << "switches -outputCompressed" << endl
          << endl;
@@ -145,7 +145,7 @@ void help(string request) {
          << " minion infile.minion -outputCompressed smaller.minion" << endl
          << endl
          << endl;
-  } else if ("switches -printsols" == request) {
+  } else if("switches -printsols" == request) {
     cout << "Help entry: "
          << "switches -printsols" << endl
          << endl;
@@ -154,7 +154,7 @@ void help(string request) {
             "---"
          << endl;
     cout << "Print solutions (default)." << endl << endl << endl;
-  } else if ("switches -noprintsols" == request) {
+  } else if("switches -noprintsols" == request) {
     cout << "Help entry: "
          << "switches -noprintsols" << endl
          << endl;
@@ -163,7 +163,7 @@ void help(string request) {
             "---"
          << endl;
     cout << "Do not print solutions." << endl << endl << endl;
-  } else if ("switches -printsolsonly" == request) {
+  } else if("switches -printsolsonly" == request) {
     cout << "Help entry: "
          << "switches -printsolsonly" << endl
          << endl;
@@ -172,7 +172,7 @@ void help(string request) {
             "---"
          << endl;
     cout << "Print only solutions and a summary at the end." << endl << endl << endl;
-  } else if ("switches -printonlyoptimal" == request) {
+  } else if("switches -printonlyoptimal" == request) {
     cout << "Help entry: "
          << "switches -printonlyoptimal" << endl
          << endl;
@@ -184,7 +184,7 @@ void help(string request) {
          << "not intermediate values." << endl
          << endl
          << endl;
-  } else if ("switches -verbose" == request) {
+  } else if("switches -verbose" == request) {
     cout << "Help entry: "
          << "switches -verbose" << endl
          << endl;
@@ -198,7 +198,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help switches -quiet" << endl << endl << endl;
-  } else if ("switches -prop-node" == request) {
+  } else if("switches -prop-node" == request) {
     cout << "Help entry: "
          << "switches -prop-node" << endl
          << endl;
@@ -227,7 +227,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help switches -preprocess" << endl << endl << endl;
-  } else if ("switches -map-long-short" == request) {
+  } else if("switches -map-long-short" == request) {
     cout << "Help entry: "
          << "switches -map-long-short" << endl
          << endl;
@@ -253,7 +253,7 @@ void help(string request) {
          << endl
          << endl
          << endl;
-  } else if ("switches -preprocess" == request) {
+  } else if("switches -preprocess" == request) {
     cout << "Help entry: "
          << "switches -preprocess" << endl
          << endl;
@@ -324,7 +324,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help switches -prop-node" << endl << endl << endl;
-  } else if ("switches -fullprop" == request) {
+  } else if("switches -fullprop" == request) {
     cout << "Help entry: "
          << "switches -fullprop" << endl
          << endl;
@@ -338,7 +338,7 @@ void help(string request) {
          << "search tree. Only available in a DEBUG executable." << endl
          << endl
          << endl;
-  } else if ("switches -nocheck" == request) {
+  } else if("switches -nocheck" == request) {
     cout << "Help entry: "
          << "switches -nocheck" << endl
          << endl;
@@ -354,7 +354,7 @@ void help(string request) {
             "---------"
          << endl;
     cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
-  } else if ("switches -check" == request) {
+  } else if("switches -check" == request) {
     cout << "Help entry: "
          << "switches -check" << endl
          << endl;
@@ -368,7 +368,7 @@ void help(string request) {
             "---------"
          << endl;
     cout << "This option is the default for DEBUG executables." << endl << endl << endl;
-  } else if ("switches -dumptree" == request) {
+  } else if("switches -dumptree" == request) {
     cout << "Help entry: "
          << "switches -dumptree" << endl
          << endl;
@@ -379,7 +379,7 @@ void help(string request) {
     cout << "Print out the branching decisions and variable states at each node." << endl
          << endl
          << endl;
-  } else if ("switches -nodelimit" == request) {
+  } else if("switches -nodelimit" == request) {
     cout << "Help entry: "
          << "switches -nodelimit" << endl
          << endl;
@@ -401,7 +401,7 @@ void help(string request) {
          << "help switches -sollimit" << endl
          << endl
          << endl;
-  } else if ("switches -sollimit" == request) {
+  } else if("switches -sollimit" == request) {
     cout << "Help entry: "
          << "switches -sollimit" << endl
          << endl;
@@ -423,7 +423,7 @@ void help(string request) {
          << "help switches -timelimit" << endl
          << endl
          << endl;
-  } else if ("switches -timelimit" == request) {
+  } else if("switches -timelimit" == request) {
     cout << "Help entry: "
          << "switches -timelimit" << endl
          << endl;
@@ -445,7 +445,7 @@ void help(string request) {
          << "help switches -sollimit" << endl
          << endl
          << endl;
-  } else if ("switches -skipautoaux" == request) {
+  } else if("switches -skipautoaux" == request) {
     cout << "Help entry: "
          << "switches -skipautoaux" << endl
          << endl;
@@ -473,7 +473,7 @@ void help(string request) {
          << endl
          << endl
          << endl;
-  } else if ("switches -cpulimit" == request) {
+  } else if("switches -cpulimit" == request) {
     cout << "Help entry: "
          << "switches -cpulimit" << endl
          << endl;
@@ -495,7 +495,7 @@ void help(string request) {
          << "help switches -sollimit" << endl
          << endl
          << endl;
-  } else if ("switches -randomiseorder" == request) {
+  } else if("switches -randomiseorder" == request) {
     cout << "Help entry: "
          << "switches -randomiseorder" << endl
          << endl;
@@ -512,7 +512,7 @@ void help(string request) {
          << "specified a random permutation of all the variables is used." << endl
          << endl
          << endl;
-  } else if ("switches -randomseed" == request) {
+  } else if("switches -randomseed" == request) {
     cout << "Help entry: "
          << "switches -randomseed" << endl
          << endl;
@@ -526,7 +526,7 @@ void help(string request) {
          << "repeated in different runs of minion." << endl
          << endl
          << endl;
-  } else if ("switches -tableout" == request) {
+  } else if("switches -tableout" == request) {
     cout << "Help entry: "
          << "switches -tableout" << endl
          << endl;
@@ -553,7 +553,7 @@ void help(string request) {
          << " minion -tableout mystats.txt myproblem.minion" << endl
          << endl
          << endl;
-  } else if ("switches -solsout" == request) {
+  } else if("switches -solsout" == request) {
     cout << "Help entry: "
          << "switches -solsout" << endl
          << endl;
@@ -574,7 +574,7 @@ void help(string request) {
          << " minion -solsout mysols.txt myproblem.minion" << endl
          << endl
          << endl;
-  } else if ("switches -makeresume" == request) {
+  } else if("switches -makeresume" == request) {
     cout << "Help entry: "
          << "switches -makeresume" << endl
          << endl;
@@ -583,7 +583,7 @@ void help(string request) {
             "---"
          << endl;
     cout << "Write a resume file on timeout or being killed." << endl << endl << endl;
-  } else if ("switches -noresume" == request) {
+  } else if("switches -noresume" == request) {
     cout << "Help entry: "
          << "switches -noresume" << endl
          << endl;
@@ -594,7 +594,7 @@ void help(string request) {
     cout << "Do not write a resume file on timeout or being killed. (default)" << endl
          << endl
          << endl;
-  } else if ("switches -gap" == request) {
+  } else if("switches -gap" == request) {
     cout << "Help entry: "
          << "switches -gap" << endl
          << endl;
@@ -603,7 +603,7 @@ void help(string request) {
             "---"
          << endl;
     cout << "Give name of gap executable (defaults to gap.sh)" << endl << endl << endl;
-  } else if ("switches -split" == request) {
+  } else if("switches -split" == request) {
     cout << "Help entry: "
          << "switches -split" << endl
          << endl;
@@ -667,7 +667,7 @@ void help(string request) {
          << "Implies -makeresume." << endl
          << endl
          << endl;
-  } else if ("switches -split-stderr" == request) {
+  } else if("switches -split-stderr" == request) {
     cout << "Help entry: "
          << "switches -split-stderr" << endl
          << endl;
@@ -685,7 +685,7 @@ void help(string request) {
          << "See documentation for -split." << endl
          << endl
          << endl;
-  } else if ("constraints abs" == request) {
+  } else if("constraints abs" == request) {
     cout << "Help entry: "
          << "constraints abs" << endl
          << endl;
@@ -705,7 +705,7 @@ void help(string request) {
             "-----"
          << endl;
     cout << "help constraints abs" << endl << endl << endl;
-  } else if ("constraints" == request) {
+  } else if("constraints" == request) {
     cout << "Help entry: "
          << "constraints" << endl
          << endl;
@@ -736,7 +736,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help variables" << endl << endl << endl;
-  } else if ("constraints alldiffmatrix" == request) {
+  } else if("constraints alldiffmatrix" == request) {
     cout << "Help entry: "
          << "constraints alldiffmatrix" << endl
          << endl;
@@ -771,7 +771,7 @@ void help(string request) {
          << "on the rows and columns." << endl
          << endl
          << endl;
-  } else if ("constraints difference" == request) {
+  } else if("constraints difference" == request) {
     cout << "Help entry: "
          << "constraints difference" << endl
          << endl;
@@ -799,7 +799,7 @@ void help(string request) {
          << "consistency." << endl
          << endl
          << endl;
-  } else if ("constraints div" == request) {
+  } else if("constraints div" == request) {
     cout << "Help entry: "
          << "constraints div" << endl
          << endl;
@@ -832,7 +832,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help constraints modulo" << endl << endl << endl;
-  } else if ("constraints div_undefzero" == request) {
+  } else if("constraints div_undefzero" == request) {
     cout << "Help entry: "
          << "constraints div_undefzero" << endl
          << endl;
@@ -858,7 +858,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help constraints div" << endl << endl << endl;
-  } else if ("constraints element_one" == request) {
+  } else if("constraints element_one" == request) {
     cout << "Help entry: "
          << "constraints element_one" << endl
          << endl;
@@ -884,7 +884,7 @@ void help(string request) {
          << "one." << endl
          << endl
          << endl;
-  } else if ("constraints element" == request) {
+  } else if("constraints element" == request) {
     cout << "Help entry: "
          << "constraints element" << endl
          << endl;
@@ -984,7 +984,7 @@ void help(string request) {
          << "consistency." << endl
          << endl
          << endl;
-  } else if ("constraints eq" == request) {
+  } else if("constraints eq" == request) {
     cout << "Help entry: "
          << "constraints eq" << endl
          << endl;
@@ -1008,7 +1008,7 @@ void help(string request) {
             "-----"
          << endl;
     cout << "help constraints minuseq" << endl << endl << endl;
-  } else if ("constraints minuseq" == request) {
+  } else if("constraints minuseq" == request) {
     cout << "Help entry: "
          << "constraints minuseq" << endl
          << endl;
@@ -1028,7 +1028,7 @@ void help(string request) {
             "-----"
          << endl;
     cout << "help constraints eq" << endl << endl << endl;
-  } else if ("constraints diseq" == request) {
+  } else if("constraints diseq" == request) {
     cout << "Help entry: "
          << "constraints diseq" << endl
          << endl;
@@ -1047,7 +1047,7 @@ void help(string request) {
             "-------"
          << endl;
     cout << "diseq(v0,v1)" << endl << endl << endl;
-  } else if ("constraints watchelement_one" == request) {
+  } else if("constraints watchelement_one" == request) {
     cout << "Help entry: "
          << "constraints watchelement_one" << endl
          << endl;
@@ -1070,7 +1070,7 @@ void help(string request) {
          << " for details of watchelement which watchelement_one is based on." << endl
          << endl
          << endl;
-  } else if ("constraints watchelement" == request) {
+  } else if("constraints watchelement" == request) {
     cout << "Help entry: "
          << "constraints watchelement" << endl
          << endl;
@@ -1105,7 +1105,7 @@ void help(string request) {
          << " consistency." << endl
          << endl
          << endl;
-  } else if ("constraints gacalldiff" == request) {
+  } else if("constraints gacalldiff" == request) {
     cout << "Help entry: "
          << "constraints gacalldiff" << endl
          << endl;
@@ -1135,7 +1135,7 @@ void help(string request) {
             "---------"
          << endl;
     cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
-  } else if ("constraints eq" == request) {
+  } else if("constraints eq" == request) {
     cout << "Help entry: "
          << "constraints eq" << endl
          << endl;
@@ -1159,7 +1159,7 @@ void help(string request) {
             "-----"
          << endl;
     cout << "help constraints minuseq" << endl << endl << endl;
-  } else if ("constraints minuseq" == request) {
+  } else if("constraints minuseq" == request) {
     cout << "Help entry: "
          << "constraints minuseq" << endl
          << endl;
@@ -1179,7 +1179,7 @@ void help(string request) {
             "-----"
          << endl;
     cout << "help constraints eq" << endl << endl << endl;
-  } else if ("constraints diseq" == request) {
+  } else if("constraints diseq" == request) {
     cout << "Help entry: "
          << "constraints diseq" << endl
          << endl;
@@ -1198,7 +1198,7 @@ void help(string request) {
             "-------"
          << endl;
     cout << "diseq(v0,v1)" << endl << endl << endl;
-  } else if ("constraints lexleq[rv]" == request) {
+  } else if("constraints lexleq[rv]" == request) {
     cout << "Help entry: "
          << "constraints lexleq[rv]" << endl
          << endl;
@@ -1243,7 +1243,7 @@ void help(string request) {
          << " propagation." << endl
          << endl
          << endl;
-  } else if ("constraints gacschema" == request) {
+  } else if("constraints gacschema" == request) {
     cout << "Help entry: "
          << "constraints gacschema" << endl
          << endl;
@@ -1263,7 +1263,7 @@ void help(string request) {
          << "for any particular problem." << endl
          << endl
          << endl;
-  } else if ("constraints table" == request) {
+  } else if("constraints table" == request) {
     cout << "Help entry: "
          << "constraints table" << endl
          << endl;
@@ -1336,7 +1336,7 @@ void help(string request) {
          << "help input haggisgac" << endl
          << endl
          << endl;
-  } else if ("constraints negativetable" == request) {
+  } else if("constraints negativetable" == request) {
     cout << "Help entry: "
          << "constraints negativetable" << endl
          << endl;
@@ -1366,7 +1366,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help input table" << endl << "help input tuplelist" << endl << endl << endl;
-  } else if ("constraints gcc" == request) {
+  } else if("constraints gcc" == request) {
     cout << "Help entry: "
          << "constraints gcc" << endl
          << endl;
@@ -1450,7 +1450,7 @@ void help(string request) {
          << "gccweak constraint." << endl
          << endl
          << endl;
-  } else if ("constraints gccweak" == request) {
+  } else if("constraints gccweak" == request) {
     cout << "Help entry: "
          << "constraints gccweak" << endl
          << endl;
@@ -1531,7 +1531,7 @@ void help(string request) {
          << "hence the name gccweak." << endl
          << endl
          << endl;
-  } else if ("constraints haggisgac-stable" == request) {
+  } else if("constraints haggisgac-stable" == request) {
     cout << "Help entry: "
          << "constraints haggisgac-stable" << endl
          << endl;
@@ -1550,7 +1550,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help constraints haggisgac" << endl << endl << endl;
-  } else if ("constraints haggisgac" == request) {
+  } else if("constraints haggisgac" == request) {
     cout << "Help entry: "
          << "constraints haggisgac" << endl
          << endl;
@@ -1651,7 +1651,7 @@ void help(string request) {
          << "help constraints shortstr2" << endl
          << endl
          << endl;
-  } else if ("constraints ineq" == request) {
+  } else if("constraints ineq" == request) {
     cout << "Help entry: "
          << "constraints ineq" << endl
          << endl;
@@ -1682,7 +1682,7 @@ void help(string request) {
          << " ineq(x, y, -1)" << endl
          << endl
          << endl;
-  } else if ("constraints lexless" == request) {
+  } else if("constraints lexless" == request) {
     cout << "Help entry: "
          << "constraints lexless" << endl
          << endl;
@@ -1714,7 +1714,7 @@ void help(string request) {
          << "for a similar constraint with non-strict lexicographic inequality." << endl
          << endl
          << endl;
-  } else if ("constraints lexleq" == request) {
+  } else if("constraints lexleq" == request) {
     cout << "Help entry: "
          << "constraints lexleq" << endl
          << endl;
@@ -1748,7 +1748,7 @@ void help(string request) {
          << "for a similar constraint with strict lexicographic inequality." << endl
          << endl
          << endl;
-  } else if ("constraints lighttable" == request) {
+  } else if("constraints lighttable" == request) {
     cout << "Help entry: "
          << "constraints lighttable" << endl
          << endl;
@@ -1764,7 +1764,7 @@ void help(string request) {
          << "For full documentation, see the help for the table constraint." << endl
          << endl
          << endl;
-  } else if ("constraints mddc" == request) {
+  } else if("constraints mddc" == request) {
     cout << "Help entry: "
          << "constraints mddc" << endl
          << endl;
@@ -1796,7 +1796,7 @@ void help(string request) {
             "---------"
          << endl;
     cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
-  } else if ("constraints negativemddc" == request) {
+  } else if("constraints negativemddc" == request) {
     cout << "Help entry: "
          << "constraints negativemddc" << endl
          << endl;
@@ -1825,7 +1825,7 @@ void help(string request) {
             "---------"
          << endl;
     cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
-  } else if ("constraints max" == request) {
+  } else if("constraints max" == request) {
     cout << "Help entry: "
          << "constraints max" << endl
          << endl;
@@ -1853,7 +1853,7 @@ void help(string request) {
          << "for the opposite constraint." << endl
          << endl
          << endl;
-  } else if ("constraints min" == request) {
+  } else if("constraints min" == request) {
     cout << "Help entry: "
          << "constraints min" << endl
          << endl;
@@ -1881,7 +1881,7 @@ void help(string request) {
          << "for the opposite constraint." << endl
          << endl
          << endl;
-  } else if ("constraints modulo" == request) {
+  } else if("constraints modulo" == request) {
     cout << "Help entry: "
          << "constraints modulo" << endl
          << endl;
@@ -1911,7 +1911,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help constraints div" << endl << endl << endl;
-  } else if ("constraints mod_undefzero" == request) {
+  } else if("constraints mod_undefzero" == request) {
     cout << "Help entry: "
          << "constraints mod_undefzero" << endl
          << endl;
@@ -1936,7 +1936,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help constraints mod" << endl << endl << endl;
-  } else if ("constraints alldiff" == request) {
+  } else if("constraints alldiff" == request) {
     cout << "Help entry: "
          << "constraints alldiff" << endl
          << endl;
@@ -1980,7 +1980,7 @@ void help(string request) {
          << "for the same constraint that enforces GAC." << endl
          << endl
          << endl;
-  } else if ("constraints nvalueleq" == request) {
+  } else if("constraints nvalueleq" == request) {
     cout << "Help entry: "
          << "constraints nvalueleq" << endl
          << endl;
@@ -1997,7 +1997,7 @@ void help(string request) {
          << endl
          << endl
          << endl;
-  } else if ("constraints nvaluegeq" == request) {
+  } else if("constraints nvaluegeq" == request) {
     cout << "Help entry: "
          << "constraints nvaluegeq" << endl
          << endl;
@@ -2014,7 +2014,7 @@ void help(string request) {
          << endl
          << endl
          << endl;
-  } else if ("constraints occurrence" == request) {
+  } else if("constraints occurrence" == request) {
     cout << "Help entry: "
          << "constraints occurrence" << endl
          << endl;
@@ -2043,7 +2043,7 @@ void help(string request) {
          << "help constraints occurrencegeq" << endl
          << endl
          << endl;
-  } else if ("constraints occurrenceleq" == request) {
+  } else if("constraints occurrenceleq" == request) {
     cout << "Help entry: "
          << "constraints occurrenceleq" << endl
          << endl;
@@ -2074,7 +2074,7 @@ void help(string request) {
          << "help constraints occurrencegeq" << endl
          << endl
          << endl;
-  } else if ("constraints occurrencegeq" == request) {
+  } else if("constraints occurrencegeq" == request) {
     cout << "Help entry: "
          << "constraints occurrencegeq" << endl
          << endl;
@@ -2105,7 +2105,7 @@ void help(string request) {
          << "help constraints occurrenceleq" << endl
          << endl
          << endl;
-  } else if ("constraints pow" == request) {
+  } else if("constraints pow" == request) {
     cout << "Help entry: "
          << "constraints pow" << endl
          << endl;
@@ -2127,7 +2127,7 @@ void help(string request) {
     cout << "This constraint is only available for positive domains x, y and z." << endl
          << endl
          << endl;
-  } else if ("constraints product" == request) {
+  } else if("constraints product" == request) {
     cout << "Help entry: "
          << "constraints product" << endl
          << endl;
@@ -2160,7 +2160,7 @@ void help(string request) {
          << "positive numbers." << endl
          << endl
          << endl;
-  } else if ("constraints shortstr2" == request) {
+  } else if("constraints shortstr2" == request) {
     cout << "Help entry: "
          << "constraints shortstr2" << endl
          << endl;
@@ -2216,7 +2216,7 @@ void help(string request) {
          << "help constraints haggisgac-stable" << endl
          << endl
          << endl;
-  } else if ("constraints str2plus" == request) {
+  } else if("constraints str2plus" == request) {
     cout << "Help entry: "
          << "constraints str2plus" << endl
          << endl;
@@ -2242,7 +2242,7 @@ void help(string request) {
          << "str2plus([x,y,z], {<1,2,3>, <1,3,2>})" << endl
          << endl
          << endl;
-  } else if ("constraints shortstr2" == request) {
+  } else if("constraints shortstr2" == request) {
     cout << "Help entry: "
          << "constraints shortstr2" << endl
          << endl;
@@ -2251,7 +2251,7 @@ void help(string request) {
             "---------"
          << endl;
     cout << "This constraint enforces generalized arc consistency." << endl << endl << endl;
-  } else if ("constraints reify" == request) {
+  } else if("constraints reify" == request) {
     cout << "Help entry: "
          << "constraints reify" << endl
          << endl;
@@ -2260,7 +2260,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "See" << endl << " help constraints reification" << endl << endl << endl;
-  } else if ("constraints reifyimply" == request) {
+  } else if("constraints reifyimply" == request) {
     cout << "Help entry: "
          << "constraints reifyimply" << endl
          << endl;
@@ -2269,7 +2269,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "See" << endl << " help constraints reification" << endl << endl << endl;
-  } else if ("constraints reification" == request) {
+  } else if("constraints reification" == request) {
     cout << "Help entry: "
          << "constraints reification" << endl
          << endl;
@@ -2318,7 +2318,7 @@ void help(string request) {
          << "ALL constraints are reifyimplyable." << endl
          << endl
          << endl;
-  } else if ("constraints sumleq" == request) {
+  } else if("constraints sumleq" == request) {
     cout << "Help entry: "
          << "constraints sumleq" << endl
          << endl;
@@ -2333,7 +2333,7 @@ void help(string request) {
          << "ensures that sum(vec) <= c." << endl
          << endl
          << endl;
-  } else if ("constraints sumgeq" == request) {
+  } else if("constraints sumgeq" == request) {
     cout << "Help entry: "
          << "constraints sumgeq" << endl
          << endl;
@@ -2348,7 +2348,7 @@ void help(string request) {
          << "ensures that sum(vec) >= c." << endl
          << endl
          << endl;
-  } else if ("constraints weightedsumleq" == request) {
+  } else if("constraints weightedsumleq" == request) {
     cout << "Help entry: "
          << "constraints weightedsumleq" << endl
          << endl;
@@ -2375,7 +2375,7 @@ void help(string request) {
          << "help constraints sumgeq" << endl
          << endl
          << endl;
-  } else if ("constraints weightedsumgeq" == request) {
+  } else if("constraints weightedsumgeq" == request) {
     cout << "Help entry: "
          << "constraints weightedsumgeq" << endl
          << endl;
@@ -2402,7 +2402,7 @@ void help(string request) {
          << "help constraints sumgeq" << endl
          << endl
          << endl;
-  } else if ("constraints watchelement_one" == request) {
+  } else if("constraints watchelement_one" == request) {
     cout << "Help entry: "
          << "constraints watchelement_one" << endl
          << endl;
@@ -2425,7 +2425,7 @@ void help(string request) {
          << "for details of watchelement which watchelement_one is based on." << endl
          << endl
          << endl;
-  } else if ("constraints watchelement" == request) {
+  } else if("constraints watchelement" == request) {
     cout << "Help entry: "
          << "constraints watchelement" << endl
          << endl;
@@ -2460,7 +2460,7 @@ void help(string request) {
          << "consistency." << endl
          << endl
          << endl;
-  } else if ("constraints watchelement_undefzero" == request) {
+  } else if("constraints watchelement_undefzero" == request) {
     cout << "Help entry: "
          << "constraints watchelement_undefzero" << endl
          << endl;
@@ -2500,7 +2500,7 @@ void help(string request) {
          << "when the array value is out of bounds." << endl
          << endl
          << endl;
-  } else if ("constraints watchless" == request) {
+  } else if("constraints watchless" == request) {
     cout << "Help entry: "
          << "constraints watchless" << endl
          << endl;
@@ -2514,7 +2514,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "See also" << endl << "" << endl << " help constraints ineq" << endl << endl << endl;
-  } else if ("constraints litsumgeq" == request) {
+  } else if("constraints litsumgeq" == request) {
     cout << "Help entry: "
          << "constraints litsumgeq" << endl
          << endl;
@@ -2557,7 +2557,7 @@ void help(string request) {
          << " help constraints watchsumgeq" << endl
          << endl
          << endl;
-  } else if ("constraints watched-and" == request) {
+  } else if("constraints watched-and" == request) {
     cout << "Help entry: "
          << "constraints watched-and" << endl
          << endl;
@@ -2596,7 +2596,7 @@ void help(string request) {
          << " help constraints watched-or" << endl
          << endl
          << endl;
-  } else if ("constraints watched-or" == request) {
+  } else if("constraints watched-or" == request) {
     cout << "Help entry: "
          << "constraints watched-or" << endl
          << endl;
@@ -2620,7 +2620,7 @@ void help(string request) {
          << " help constraints watched-and" << endl
          << endl
          << endl;
-  } else if ("constraints watchsumgeq" == request) {
+  } else if("constraints watchsumgeq" == request) {
     cout << "Help entry: "
          << "constraints watchsumgeq" << endl
          << endl;
@@ -2657,7 +2657,7 @@ void help(string request) {
          << " help constraints litsumgeq" << endl
          << endl
          << endl;
-  } else if ("constraints watchsumleq" == request) {
+  } else if("constraints watchsumleq" == request) {
     cout << "Help entry: "
          << "constraints watchsumleq" << endl
          << endl;
@@ -2691,7 +2691,7 @@ void help(string request) {
          << " help constraints litsumgeq" << endl
          << endl
          << endl;
-  } else if ("constraints hamming" == request) {
+  } else if("constraints hamming" == request) {
     cout << "Help entry: "
          << "constraints hamming" << endl
          << endl;
@@ -2711,7 +2711,7 @@ void help(string request) {
          << endl
          << endl
          << endl;
-  } else if ("constraints watchvecneq" == request) {
+  } else if("constraints watchvecneq" == request) {
     cout << "Help entry: "
          << "constraints watchvecneq" << endl
          << endl;
@@ -2729,7 +2729,7 @@ void help(string request) {
          << "such that A[i] != B[i]." << endl
          << endl
          << endl;
-  } else if ("constraints w-inintervalset" == request) {
+  } else if("constraints w-inintervalset" == request) {
     cout << "Help entry: "
          << "constraints w-inintervalset" << endl
          << endl;
@@ -2746,7 +2746,7 @@ void help(string request) {
          << "intervals must be given in numerical order." << endl
          << endl
          << endl;
-  } else if ("constraints w-inrange" == request) {
+  } else if("constraints w-inrange" == request) {
     cout << "Help entry: "
          << "constraints w-inrange" << endl
          << endl;
@@ -2764,7 +2764,7 @@ void help(string request) {
          << " help constraints w-notinrange" << endl
          << endl
          << endl;
-  } else if ("constraints w-inset" == request) {
+  } else if("constraints w-inset" == request) {
     cout << "Help entry: "
          << "constraints w-inset" << endl
          << endl;
@@ -2787,7 +2787,7 @@ void help(string request) {
          << " help constraints w-notinset" << endl
          << endl
          << endl;
-  } else if ("constraints w-literal" == request) {
+  } else if("constraints w-literal" == request) {
     cout << "Help entry: "
          << "constraints w-literal" << endl
          << endl;
@@ -2805,7 +2805,7 @@ void help(string request) {
          << " help constraints w-notliteral" << endl
          << endl
          << endl;
-  } else if ("constraints w-notinrange" == request) {
+  } else if("constraints w-notinrange" == request) {
     cout << "Help entry: "
          << "constraints w-notinrange" << endl
          << endl;
@@ -2825,7 +2825,7 @@ void help(string request) {
          << " help constraints w-inrange" << endl
          << endl
          << endl;
-  } else if ("constraints w-notinset" == request) {
+  } else if("constraints w-notinset" == request) {
     cout << "Help entry: "
          << "constraints w-notinset" << endl
          << endl;
@@ -2844,7 +2844,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "See also" << endl << "" << endl << " help constraints w-inset" << endl << endl << endl;
-  } else if ("constraints w-notliteral" == request) {
+  } else if("constraints w-notliteral" == request) {
     cout << "Help entry: "
          << "constraints w-notliteral" << endl
          << endl;
@@ -2862,7 +2862,7 @@ void help(string request) {
          << " help constraints w-literal" << endl
          << endl
          << endl;
-  } else if ("input" == request) {
+  } else if("input" == request) {
     cout << "Help entry: "
          << "input" << endl
          << endl;
@@ -2915,7 +2915,7 @@ void help(string request) {
          << " gunzip -c myinput.minion.gz | minion" << endl
          << endl
          << endl;
-  } else if ("input variables" == request) {
+  } else if("input variables" == request) {
     cout << "Help entry: "
          << "input variables" << endl
          << endl;
@@ -2955,7 +2955,7 @@ void help(string request) {
          << "for detailed information on variable declarations." << endl
          << endl
          << endl;
-  } else if ("input constraints" == request) {
+  } else if("input constraints" == request) {
     cout << "Help entry: "
          << "input constraints" << endl
          << endl;
@@ -2991,7 +2991,7 @@ void help(string request) {
          << "for details on constraint declarations." << endl
          << endl
          << endl;
-  } else if ("input tuplelist" == request) {
+  } else if("input tuplelist" == request) {
     cout << "Help entry: "
          << "input tuplelist" << endl
          << endl;
@@ -3029,7 +3029,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "help constraints table" << endl << "help input shorttuplelist" << endl << endl << endl;
-  } else if ("input shorttuplelist" == request) {
+  } else if("input shorttuplelist" == request) {
     cout << "Help entry: "
          << "input shorttuplelist" << endl
          << endl;
@@ -3111,7 +3111,7 @@ void help(string request) {
          << "help input tuplelist" << endl
          << endl
          << endl;
-  } else if ("input search" == request) {
+  } else if("input search" == request) {
     cout << "Help entry: "
          << "input search" << endl
          << endl;
@@ -3211,7 +3211,7 @@ void help(string request) {
             "----"
          << endl;
     cout << "See also" << endl << "" << endl << " switches -varorder" << endl << endl << endl;
-  } else if ("input example" == request) {
+  } else if("input example" == request) {
     cout << "Help entry: "
          << "input example" << endl
          << endl;
@@ -3377,7 +3377,7 @@ void help(string request) {
          << "nothing at all...)" << endl
          << endl
          << endl;
-  } else if ("variables" == request) {
+  } else if("variables" == request) {
     cout << "Help entry: "
          << "variables" << endl
          << endl;
@@ -3420,7 +3420,7 @@ void help(string request) {
          << "convenience." << endl
          << endl
          << endl;
-  } else if ("variables constants" == request) {
+  } else if("variables constants" == request) {
     cout << "Help entry: "
          << "variables constants" << endl
          << endl;
@@ -3450,7 +3450,7 @@ void help(string request) {
          << " element([10,9,8,7,6,5,4,3,2,1],idx,e)" << endl
          << endl
          << endl;
-  } else if ("variables vectors" == request) {
+  } else if("variables vectors" == request) {
     cout << "Help entry: "
          << "variables vectors" << endl
          << endl;
@@ -3545,7 +3545,7 @@ void help(string request) {
          << "files." << endl
          << endl
          << endl;
-  } else if ("variables alias" == request) {
+  } else if("variables alias" == request) {
     cout << "Help entry: "
          << "variables alias" << endl
          << endl;
@@ -3564,7 +3564,7 @@ void help(string request) {
          << "ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]" << endl
          << endl
          << endl;
-  } else if ("variables 01" == request) {
+  } else if("variables 01" == request) {
     cout << "Help entry: "
          << "variables 01" << endl
          << endl;
@@ -3597,7 +3597,7 @@ void help(string request) {
          << "eq(bool, 0) #variable bool equals 0" << endl
          << endl
          << endl;
-  } else if ("variables bounds" == request) {
+  } else if("variables bounds" == request) {
     cout << "Help entry: "
          << "variables bounds" << endl
          << endl;
@@ -3627,7 +3627,7 @@ void help(string request) {
          << "eq(myvar, 4) #variable myvar equals 4" << endl
          << endl
          << endl;
-  } else if ("variables discrete" == request) {
+  } else if("variables discrete" == request) {
     cout << "Help entry: "
          << "variables discrete" << endl
          << endl;
@@ -3659,7 +3659,7 @@ void help(string request) {
          << "eq(x, 2) #variable x equals 2" << endl
          << endl
          << endl;
-  } else if ("variables sparsebounds" == request) {
+  } else if("variables sparsebounds" == request) {
     cout << "Help entry: "
          << "variables sparsebounds" << endl
          << endl;
@@ -3696,13 +3696,13 @@ void help(string request) {
          << endl;
   } else
     cout << "Unknown entry, please try again." << endl;
-  if ("" == request) {
+  if("" == request) {
     cout << "Available subentries:" << endl;
     cout << "help constraints" << endl;
     cout << "help input" << endl;
     cout << "help switches" << endl;
     cout << "help variables" << endl;
-  } else if ("constraints" == request) {
+  } else if("constraints" == request) {
     cout << "Available subentries:" << endl;
     cout << "help constraints abs" << endl;
     cout << "help constraints alldiff" << endl;
@@ -3768,7 +3768,7 @@ void help(string request) {
     cout << "help constraints watchvecneq" << endl;
     cout << "help constraints weightedsumgeq" << endl;
     cout << "help constraints weightedsumleq" << endl;
-  } else if ("input" == request) {
+  } else if("input" == request) {
     cout << "Available subentries:" << endl;
     cout << "help input constraints" << endl;
     cout << "help input example" << endl;
@@ -3776,7 +3776,7 @@ void help(string request) {
     cout << "help input shorttuplelist" << endl;
     cout << "help input tuplelist" << endl;
     cout << "help input variables" << endl;
-  } else if ("switches" == request) {
+  } else if("switches" == request) {
     cout << "Available subentries:" << endl;
     cout << "help switches -check" << endl;
     cout << "help switches -cpulimit" << endl;
@@ -3810,7 +3810,7 @@ void help(string request) {
     cout << "help switches -timelimit" << endl;
     cout << "help switches -varorder" << endl;
     cout << "help switches -verbose" << endl;
-  } else if ("variables" == request) {
+  } else if("variables" == request) {
     cout << "Available subentries:" << endl;
     cout << "help variables 01" << endl;
     cout << "help variables alias" << endl;

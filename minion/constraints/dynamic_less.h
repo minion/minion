@@ -34,16 +34,20 @@ The constraint watchless(x,y) ensures that x is less than y.
 // var1 < var2
 template <typename Var1, typename Var2, bool Negated = false>
 struct WatchLessConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "watchless"; }
+  virtual string constraint_name() {
+    return "watchless";
+  }
 
   Var1 var1;
   Var2 var2;
 
   CONSTRAINT_ARG_LIST2(var1, var2);
 
-  WatchLessConstraint(const Var1 &_var1, const Var2 &_var2) : var1(_var1), var2(_var2) {}
+  WatchLessConstraint(const Var1& _var1, const Var2& _var2) : var1(_var1), var2(_var2) {}
 
-  virtual SysInt dynamic_trigger_count() { return 2; }
+  virtual SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   virtual void full_propagate() {
     moveTriggerInt(var1, 0, LowerBound);
@@ -58,14 +62,14 @@ struct WatchLessConstraint : public AbstractConstraint {
 
     D_ASSERT(dt == 0 || dt == 1);
 
-    if (dt == 0) {
+    if(dt == 0) {
       var2.setMin(var1.getMin() + 1);
     } else {
       var1.setMax(var2.getMax() - 1);
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return v[0] < v[1];
   }
@@ -78,8 +82,8 @@ struct WatchLessConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    if (var1.getMin() < var2.getMax()) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    if(var1.getMin() < var2.getMax()) {
       assignment.push_back(make_pair(0, var1.getMin()));
       assignment.push_back(make_pair(1, var2.getMax()));
       return true;
@@ -88,29 +92,31 @@ struct WatchLessConstraint : public AbstractConstraint {
   }
 
   template <bool b, typename T>
-  typename std::enable_if<b, AbstractConstraint *>::type
-  rev_implement(const ShiftVar<T, compiletime_val<SysInt, 1>> &var2) {
+  typename std::enable_if<b, AbstractConstraint*>::type
+  rev_implement(const ShiftVar<T, compiletime_val<SysInt, 1>>& var2) {
     return new WatchLessConstraint<T, Var1, false>(var2.data, var1);
   }
 
   template <bool b, typename T>
-  typename std::enable_if<b, AbstractConstraint *>::type rev_implement(const T &var2) {
+  typename std::enable_if<b, AbstractConstraint*>::type rev_implement(const T& var2) {
     return new WatchLessConstraint<AnyVarRef, AnyVarRef, true>(
         var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>(var1, compiletime_val<SysInt, 1>()));
   }
 
   template <bool b, typename T>
-  typename std::enable_if<!b, AbstractConstraint *>::type rev_implement(const T &var2) {
+  typename std::enable_if<!b, AbstractConstraint*>::type rev_implement(const T& var2) {
     return new WatchLessConstraint<Var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>, true>(
         var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>(var1, compiletime_val<SysInt, 1>()));
   }
 
-  virtual AbstractConstraint *reverse_constraint() { return rev_implement<Negated>(var2); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return rev_implement<Negated>(var2);
+  }
 };
 
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint *BuildCT_WATCHED_LESS(const VarArray1 &_var_array_1,
-                                         const VarArray2 &_var_array_2, ConstraintBlob &) {
+AbstractConstraint* BuildCT_WATCHED_LESS(const VarArray1& _var_array_1,
+                                         const VarArray2& _var_array_2, ConstraintBlob&) {
   return new WatchLessConstraint<typename VarArray1::value_type, typename VarArray2::value_type>(
       _var_array_1[0], _var_array_2[0]);
 }

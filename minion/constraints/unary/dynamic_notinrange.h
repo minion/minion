@@ -36,7 +36,9 @@
 // Checks if a variable is in a fixed Range.
 template <typename Var>
 struct WatchNotInRangeConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "w-notinrange"; }
+  virtual string constraint_name() {
+    return "w-notinrange";
+  }
 
   CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
   Var var;
@@ -45,9 +47,9 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
   DomainInt range_max;
 
   template <typename T>
-  WatchNotInRangeConstraint(const Var &_var, const T &_vals)
+  WatchNotInRangeConstraint(const Var& _var, const T& _vals)
       : var(_var) {
-    if (_vals.size() != 2) {
+    if(_vals.size() != 2) {
       cerr << "The range of an 'NotInRange' constraint must contain 2 values!" << endl;
       abort();
     }
@@ -56,28 +58,30 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     range_max = _vals[1];
   }
 
-  virtual SysInt dynamic_trigger_count() { return 2; }
+  virtual SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   virtual void full_propagate() {
     // Ignore empty ranges
-    if (range_min > range_max)
+    if(range_min > range_max)
       return;
 
-    if (var.getMax() <= range_max) {
+    if(var.getMax() <= range_max) {
       var.setMax(range_min - 1);
       return;
     }
 
-    if (var.getMin() >= range_min) {
+    if(var.getMin() >= range_min) {
       var.setMin(range_max + 1);
       return;
     }
 
-    if (var.isBound()) {
+    if(var.isBound()) {
       moveTriggerInt(var, 0, DomainChanged);
       propagateDynInt(0, DomainDelta::empty());
     } else {
-      for (DomainInt i = range_min; i <= range_max; ++i)
+      for(DomainInt i = range_min; i <= range_max; ++i)
         var.removeFromDomain(i);
     }
   }
@@ -86,18 +90,18 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     PROP_INFO_ADDONE(WatchNotInRange);
     D_ASSERT(var.isBound());
 
-    if (var.getMax() <= range_max) {
+    if(var.getMax() <= range_max) {
       var.setMax(range_min - 1);
       return;
     }
 
-    if (var.getMin() >= range_min) {
+    if(var.getMin() >= range_min) {
       var.setMin(range_max + 1);
       return;
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] < range_min || v[0] > range_max);
   }
@@ -109,21 +113,21 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    if (var.getMin() < range_min || var.getMin() > range_max) {
+    if(var.getMin() < range_min || var.getMin() > range_max) {
       assignment.push_back(make_pair(0, var.getMin()));
       return true;
     }
 
-    if (var.getMax() < range_min || var.getMax() > range_max) {
+    if(var.getMax() < range_min || var.getMax() > range_max) {
       assignment.push_back(make_pair(0, var.getMax()));
       return true;
     }
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     std::array<DomainInt, 2> a = {{range_min, range_max}};
     return new WatchInRangeConstraint<Var>(var, a);
   }
@@ -131,14 +135,14 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 
 // From dynamic_inrange.h
 template <typename Var>
-AbstractConstraint *WatchInRangeConstraint<Var>::reverse_constraint() {
+AbstractConstraint* WatchInRangeConstraint<Var>::reverse_constraint() {
   std::array<DomainInt, 2> a = {{range_min, range_max}};
   return new WatchNotInRangeConstraint<Var>(var, a);
 }
 
 template <typename VarArray1>
-AbstractConstraint *BuildCT_WATCHED_NOT_INRANGE(const VarArray1 &_var_array_1,
-                                                const ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_NOT_INRANGE(const VarArray1& _var_array_1,
+                                                const ConstraintBlob& b) {
   return new WatchNotInRangeConstraint<typename VarArray1::value_type>(_var_array_1[0],
                                                                        b.constants[0]);
 }

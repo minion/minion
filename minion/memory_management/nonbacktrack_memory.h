@@ -33,8 +33,12 @@ class Memory {
   MonotonicSet monotonic_set;
 
 public:
-  BackTrackMemory &backTrack() { return backtrack_memory; }
-  MonotonicSet &monotonicSet() { return monotonic_set; }
+  BackTrackMemory& backTrack() {
+    return backtrack_memory;
+  }
+  MonotonicSet& monotonicSet() {
+    return monotonic_set;
+  }
 };
 
 // @}

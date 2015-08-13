@@ -35,11 +35,13 @@
 
 struct TriggerBacktrackQueue {
 
-  typedef vector<pair<DynamicTriggerList *, Trig_ConRef>> TriggerList;
+  typedef vector<pair<DynamicTriggerList*, Trig_ConRef>> TriggerList;
 
   vector<TriggerList> queue;
 
-  TriggerBacktrackQueue() { queue.resize(1); }
+  TriggerBacktrackQueue() {
+    queue.resize(1);
+  }
 
   void restoreTriggerOnBacktrack(Trig_ConRef t) {
     Con_TrigRef conref = t.con->_getTrigRef(t.conListPos);
@@ -59,9 +61,9 @@ struct TriggerBacktrackQueue {
 
   void world_pop() {
     P("TBQ: World_pop");
-    TriggerList &tl = queue.back();
-    for (SysInt i = (SysInt)tl.size() - 1; i >= 0; --i) {
-      if (tl[i].first == NULL) {
+    TriggerList& tl = queue.back();
+    for(SysInt i = (SysInt)tl.size() - 1; i >= 0; --i) {
+      if(tl[i].first == NULL) {
         P("TBQ: Release " << tl[i].second);
         releaseMergedTrigger(tl[i].second);
       } else {

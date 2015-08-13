@@ -4,7 +4,7 @@
 #include "mini_stream.h"
 
 template <typename Index, typename Result>
-void readLettingStatements(SimpleMap<std::string, MultiDimCon<Index, Result>> &conmap,
+void readLettingStatements(SimpleMap<std::string, MultiDimCon<Index, Result>>& conmap,
                            std::string fname) {
   MiniStream ms = MiniStream(fname, conmap);
 }

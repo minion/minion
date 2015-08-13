@@ -8,10 +8,10 @@
  */
 
 template <typename T>
-void VariadicForEach(T &) {}
+void VariadicForEach(T&) {}
 
 template <typename T, typename Arg, typename... Args>
-void VariadicForEach(T &t, Arg &&arg, Args &&... args) {
+void VariadicForEach(T& t, Arg&& arg, Args&&... args) {
   t(arg);
   VariadicForEach(t, args...);
 }
@@ -68,7 +68,7 @@ struct drop_ref {
 
 template <typename T>
 struct addPointer {
-  typedef T *type;
+  typedef T* type;
 };
 
 template <typename T>
@@ -104,7 +104,7 @@ struct TemplateStackConstructor {
   };
 
   template <typename... Args>
-  typename Type<Args...>::type operator()(const Args &... args) {
+  typename Type<Args...>::type operator()(const Args&... args) {
     return typename Type<Args...>::type(args...);
   }
 };
@@ -124,7 +124,7 @@ struct TemplateStackConstructorAllArgs {
   };
 
   template <typename... Args>
-  typename Type<Args...>::type operator()(const Args &... args) {
+  typename Type<Args...>::type operator()(const Args&... args) {
     return typename Type<Args...>::type(args...);
   }
 };
@@ -153,11 +153,11 @@ struct TemplateHeapConstructor {
 
   template <typename... Args>
   struct Type {
-    typedef typename NoPtrType<Args...>::type *type;
+    typedef typename NoPtrType<Args...>::type* type;
   };
 
   template <typename... Args>
-  typename Type<Args...>::type operator()(const Args &... args) {
+  typename Type<Args...>::type operator()(const Args&... args) {
     typedef typename TemplateHeapConstructor::template NoPtrType<Args...>::type type;
     return new type(args...);
   }
@@ -177,11 +177,11 @@ struct TemplateHeapConstructorAllArgs {
   };
   template <typename... Args>
   struct Type {
-    typedef typename NoPtrType<Args...>::type *type;
+    typedef typename NoPtrType<Args...>::type* type;
   };
 
   template <typename... Args>
-  typename Type<Args...>::type operator()(const Args &... args) {
+  typename Type<Args...>::type operator()(const Args&... args) {
     typedef typename TemplateHeapConstructorAllArgs::template NoPtrType<Args...>::type type;
     return new type(args...);
   }
@@ -209,19 +209,19 @@ class GenericFactory {
   std::tuple<Args...> t;
 
 public:
-  GenericFactory(const Args &... args) : t(std::make_tuple(args...)) {}
+  GenericFactory(const Args&... args) : t(std::make_tuple(args...)) {}
 
 private:
   template <typename... CArgs, int... Val>
   typename Constructor::template Type<Args..., CArgs...>::type impl(IntTuple<Val...>,
-                                                                    const CArgs &... cargs) {
+                                                                    const CArgs&... cargs) {
     Constructor c;
     return c(std::get<Val>(t)..., cargs...);
   }
 
 public:
   template <typename... CArgs>
-  typename Constructor::template Type<Args..., CArgs...>::type operator()(const CArgs &... cargs) {
+  typename Constructor::template Type<Args..., CArgs...>::type operator()(const CArgs&... cargs) {
     return impl(typename MakeIntList<SizeOf<Args...>::size>::type(), cargs...);
   }
 };

@@ -38,7 +38,9 @@ help constraints abs
 // X = abs(Y)
 template <typename AbsVarRef1, typename AbsVarRef2>
 struct AbsConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "abs"; }
+  virtual string constraint_name() {
+    return "abs";
+  }
 
   CONSTRAINT_ARG_LIST2(var1, var2);
 
@@ -60,16 +62,16 @@ struct AbsConstraint : public AbstractConstraint {
   virtual void full_propagate() {
     trigger_setup();
     var1.setMin(0);
-    for (SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
+    for(SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
       propagateDynInt(i, DomainDelta::empty());
   }
 
   // Assume values passed in in order.
   DomainInt absmax(DomainInt x, DomainInt y) {
     D_ASSERT(x <= y);
-    if (x < 0)
+    if(x < 0)
       x *= -1;
-    if (y < 0)
+    if(y < 0)
       y *= -1;
     return max(x, y);
   }
@@ -77,8 +79,8 @@ struct AbsConstraint : public AbstractConstraint {
   // Assume values passed in in order.
   DomainInt absmin(DomainInt x, DomainInt y) {
     D_ASSERT(x <= y);
-    if (x <= 0) {
-      if (y >= 0)
+    if(x <= 0) {
+      if(y >= 0)
         return 0;
       else {
         return -y;
@@ -92,15 +94,15 @@ struct AbsConstraint : public AbstractConstraint {
     D_ASSERT(var1.getMin() >= 0);
 
     PROP_INFO_ADDONE(Abs);
-    switch (i) {
+    switch(i) {
     case 0: // var1 upper
       var2.setMax(var1.getMax());
       var2.setMin(-var1.getMax());
       return;
     case 1: // var1 lower
-      if (var2.getMax() < var1.getMin())
+      if(var2.getMax() < var1.getMin())
         var2.setMax(-var1.getMin());
-      if (var2.getMin() > -var1.getMin())
+      if(var2.getMin() > -var1.getMin())
         var2.setMin(var1.getMin());
       else
         var2.setMin(-var1.getMax());
@@ -109,33 +111,33 @@ struct AbsConstraint : public AbstractConstraint {
     case 3: // var 2 lower
       var1.setMax(absmax(var2.getMin(), var2.getMax()));
       var1.setMin(absmin(var2.getMin(), var2.getMax()));
-      if (var2.getMin() > -var1.getMin())
+      if(var2.getMin() > -var1.getMin())
         var2.setMin(var1.getMin());
       return;
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
-    if (v[1] >= 0)
+    if(v[1] >= 0)
       return v[0] == v[1];
     else
       return v[0] == -v[1];
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt x_dom_max = var1.getMax();
     DomainInt y_dom_max = max(abs(var2.getMin()), abs(var2.getMax()));
     DomainInt dom_max = min(x_dom_max, y_dom_max);
     DomainInt dom_min = max(DomainInt(0), max(var1.getMin(), var2.getMin()));
 
-    for (DomainInt i = dom_min; i <= dom_max; ++i) {
-      if (var1.inDomain(i)) {
-        if (var2.inDomain(i)) {
+    for(DomainInt i = dom_min; i <= dom_max; ++i) {
+      if(var1.inDomain(i)) {
+        if(var2.inDomain(i)) {
           assignment.push_back(make_pair(0, i));
           assignment.push_back(make_pair(1, i));
           return true;
-        } else if (var2.inDomain(-i)) {
+        } else if(var2.inDomain(-i)) {
           assignment.push_back(make_pair(0, i));
           assignment.push_back(make_pair(1, -i));
           return true;
@@ -154,17 +156,19 @@ struct AbsConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 };
 
 template <typename EqualVarRef1, typename EqualVarRef2>
-AbstractConstraint *AbsCon(EqualVarRef1 var1, EqualVarRef2 var2) {
+AbstractConstraint* AbsCon(EqualVarRef1 var1, EqualVarRef2 var2) {
   return new AbsConstraint<EqualVarRef1, EqualVarRef2>(var1, var2);
 }
 #endif
 
 template <typename T1, typename T2>
-AbstractConstraint *BuildCT_ABS(const T1 &t1, const T2 &t2, ConstraintBlob &) {
+AbstractConstraint* BuildCT_ABS(const T1& t1, const T2& t2, ConstraintBlob&) {
   return AbsCon(t1[0], t2[0]);
 }
 

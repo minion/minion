@@ -18,6 +18,6 @@
 * USA.
 */
 
-inline void inputPrint(std::ostream &o, const Var &v) {
+inline void inputPrint(std::ostream& o, const Var& v) {
   o << getState().getInstance()->vars.getName(v);
 }

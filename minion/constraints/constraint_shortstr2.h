@@ -113,16 +113,20 @@ struct arrayset {
     minval = low;
     vals_pos.resize(checked_cast<SysInt>(high - low + 1));
     vals.resize(checked_cast<SysInt>(high - low + 1));
-    for (SysInt i = 0; i < checked_cast<SysInt>(high - low + 1); i++) {
+    for(SysInt i = 0; i < checked_cast<SysInt>(high - low + 1); i++) {
       vals[i] = checked_cast<SysInt>(i + low);
       vals_pos[i] = i;
     }
     size = 0;
   }
 
-  void clear() { size = 0; }
+  void clear() {
+    size = 0;
+  }
 
-  bool in(DomainInt val) { return vals_pos[checked_cast<SysInt>(val - minval)] < size; }
+  bool in(DomainInt val) {
+    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+  }
 
   // This method looks a bit messy, due to stupid C++ optimisers not being
   // clever enough to realise various things don't alias, and this method
@@ -144,7 +148,7 @@ struct arrayset {
   }
 
   void insert(DomainInt val) {
-    if (!in(val)) {
+    if(!in(val)) {
       unsafe_insert(val);
     }
   }
@@ -164,12 +168,14 @@ struct arrayset {
   }
 
   void remove(DomainInt val) {
-    if (in(val)) {
+    if(in(val)) {
       unsafe_remove(val);
     }
   }
 
-  void fill() { size = vals.size(); }
+  void fill() {
+    size = vals.size();
+  }
 };
 
 struct ReversibleArrayset {
@@ -187,18 +193,20 @@ struct ReversibleArrayset {
     minval = low;
     vals_pos.resize(high - low + 1);
     vals.resize(high - low + 1);
-    for (SysInt i = 0; i < high - low + 1; i++) {
+    for(SysInt i = 0; i < high - low + 1; i++) {
       vals[i] = i + low;
       vals_pos[i] = i;
     }
     size = vals.size();
   }
 
-  bool in(DomainInt val) { return vals_pos[checked_cast<SysInt>(val - minval)] < size; }
+  bool in(DomainInt val) {
+    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+  }
 
   void remove(DomainInt val) {
     // swap to posiition size-1 then reduce size
-    if (in(val)) {
+    if(in(val)) {
       const SysInt validx = checked_cast<SysInt>(val - minval);
       const SysInt swapval = vals[size - 1];
       vals[vals_pos[validx]] = swapval;
@@ -216,24 +224,24 @@ struct STRData {
   vector<vector<DomainInt>> tuples;
   vector<vector<pair<SysInt, DomainInt>>> compressed_tuples;
 
-  STRData(ShortTupleList *_tuples, size_t varsize) {
+  STRData(ShortTupleList* _tuples, size_t varsize) {
     compressed_tuples = *(_tuples->tuplePtr());
 
-    for (SysInt i = 0; i < (SysInt)compressed_tuples.size(); ++i) {
+    for(SysInt i = 0; i < (SysInt)compressed_tuples.size(); ++i) {
       vector<DomainInt> temp(varsize, DomainInt_Skip);
-      for (SysInt j = 0; j < (SysInt)compressed_tuples[i].size(); ++j) {
+      for(SysInt j = 0; j < (SysInt)compressed_tuples[i].size(); ++j) {
         temp[compressed_tuples[i][j].first] = compressed_tuples[i][j].second;
       }
       tuples.push_back(temp);
     }
   }
 
-  STRData(TupleList *_tuples, size_t varsize) {
+  STRData(TupleList* _tuples, size_t varsize) {
     DomainInt tuple_count = _tuples->size();
-    for (SysInt i = 0; i < tuple_count; ++i) {
+    for(SysInt i = 0; i < tuple_count; ++i) {
       vector<DomainInt> t = _tuples->get_vector(i);
       vector<pair<SysInt, DomainInt>> comp;
-      for (int j = 0; j < (SysInt)t.size(); ++j)
+      for(int j = 0; j < (SysInt)t.size(); ++j)
         comp.push_back(std::make_pair(j, t[j]));
       tuples.push_back(t);
       compressed_tuples.push_back(comp);
@@ -244,7 +252,7 @@ struct STRData {
 template <typename VarArray, bool UseShort>
 struct STR : public AbstractConstraint {
   virtual string constraint_name() {
-    if (UseShort)
+    if(UseShort)
       return "shortstr2";
     else
       return "str2plus";
@@ -253,14 +261,14 @@ struct STR : public AbstractConstraint {
   //    CONSTRAINT_ARG_LIST2(vars, tupleList);
 
   virtual string full_output_name() {
-    if (UseShort)
+    if(UseShort)
       return ConOutput::print_con(constraint_name(), vars, shortTupleList);
     else
       return ConOutput::print_con(constraint_name(), vars, longTupleList);
   }
 
-  ShortTupleList *shortTupleList;
-  TupleList *longTupleList;
+  ShortTupleList* shortTupleList;
+  TupleList* longTupleList;
 
   VarArray vars;
 
@@ -271,16 +279,16 @@ struct STR : public AbstractConstraint {
   ReversibleInt limit; // In tupindices, indices less than limit are not known
                        // to be invalid.
 
-  STRData *sct;
+  STRData* sct;
 
   void init() {
-    if ((SysInt)sct->tuples.size() > 0) {
+    if((SysInt)sct->tuples.size() > 0) {
       CHECK(sct->tuples[0].size() == vars.size(),
             "Cannot use same table for two constraints with different numbers "
             "of variables!");
     }
     tupindices.resize(sct->tuples.size());
-    for (SysInt i = 0; i < (SysInt)sct->tuples.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)sct->tuples.size(); i++) {
       tupindices[i] = i;
     }
 
@@ -290,25 +298,33 @@ struct STR : public AbstractConstraint {
     // ssup_permanent.initialise(0, (SysInt)vars.size()-1);
 
     gacvalues.resize(vars.size());
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
     }
 
     std::random_shuffle(tupindices.begin(), tupindices.end());
   }
 
-  STR(const VarArray &_var_array, ShortTupleList *_tuples)
-      : shortTupleList(_tuples), longTupleList(0), vars(_var_array), constraint_locked(false),
-        limit(), sct(new STRData(_tuples, _var_array.size()))
+  STR(const VarArray& _var_array, ShortTupleList* _tuples)
+      : shortTupleList(_tuples),
+        longTupleList(0),
+        vars(_var_array),
+        constraint_locked(false),
+        limit(),
+        sct(new STRData(_tuples, _var_array.size()))
   //, ssup_permanent()
   {
     CHECK(UseShort, "Internal error in ShortSTR2");
     init();
   }
 
-  STR(const VarArray &_var_array, TupleList *_tuples)
-      : shortTupleList(0), longTupleList(_tuples), vars(_var_array), constraint_locked(false),
-        limit(), sct(new STRData(_tuples, _var_array.size()))
+  STR(const VarArray& _var_array, TupleList* _tuples)
+      : shortTupleList(0),
+        longTupleList(_tuples),
+        vars(_var_array),
+        constraint_locked(false),
+        limit(),
+        sct(new STRData(_tuples, _var_array.size()))
   //, ssup_permanent()
   {
     CHECK(!UseShort, "Internal error in str2plus");
@@ -320,7 +336,7 @@ struct STR : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    for (SysInt i = 0; i < vars.size(); ++i) {
+    for(SysInt i = 0; i < vars.size(); ++i) {
       moveTriggerInt(vars[i], i, DomainChanged);
     }
   }
@@ -330,7 +346,7 @@ struct STR : public AbstractConstraint {
     limit = sct->tuples.size();
 
     // pretend all variables have changed.
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++)
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++)
       sval.insert(i);
 
     do_prop();
@@ -339,52 +355,52 @@ struct STR : public AbstractConstraint {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
-    for (unsigned i = 0; i < vars.size(); ++i)
+    for(unsigned i = 0; i < vars.size(); ++i)
       ret.push_back(vars[i]);
     return ret;
   }
 
-  virtual bool check_assignment(DomainInt *v, SysInt v_size) {
-    if (UseShort) {
-      const vector<set<DomainInt>> &doms = shortTupleList->getInitialDomains();
-      if (doms.size() > 0) {
-        for (SysInt i = 0; i < v_size; ++i) {
-          if (doms[i].count(v[i]) == 0)
+  virtual bool check_assignment(DomainInt* v, SysInt v_size) {
+    if(UseShort) {
+      const vector<set<DomainInt>>& doms = shortTupleList->getInitialDomains();
+      if(doms.size() > 0) {
+        for(SysInt i = 0; i < v_size; ++i) {
+          if(doms[i].count(v[i]) == 0)
             return false;
         }
       }
     }
 
-    for (SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i) {
+    for(SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i) {
       bool sat = true;
-      for (SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j) {
-        if (v[sct->compressed_tuples[i][j].first] != sct->compressed_tuples[i][j].second) {
+      for(SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j) {
+        if(v[sct->compressed_tuples[i][j].first] != sct->compressed_tuples[i][j].second) {
           sat = false;
           break;
         }
       }
 
-      if (sat)
+      if(sat)
         return true;
     }
 
     return false;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
 
-    for (SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i) {
+    for(SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i) {
       bool sat = true;
-      for (SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j) {
-        if (!vars[sct->compressed_tuples[i][j].first].inDomain(
-                sct->compressed_tuples[i][j].second)) {
+      for(SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j) {
+        if(!vars[sct->compressed_tuples[i][j].first].inDomain(
+               sct->compressed_tuples[i][j].second)) {
           sat = false;
           break;
         }
       }
 
-      if (sat) {
-        for (SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j)
+      if(sat) {
+        for(SysInt j = 0; j < (SysInt)sct->compressed_tuples[i].size(); ++j)
           assignment.push_back(sct->compressed_tuples[i][j]);
         return true;
       }
@@ -393,12 +409,14 @@ struct STR : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 
   virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
     sval.insert(prop_var);
 
-    if (!constraint_locked) {
+    if(!constraint_locked) {
       constraint_locked = true;
       getQueue().pushSpecialTrigger(this);
     }
@@ -440,18 +458,18 @@ struct STR : public AbstractConstraint {
 
   bool validTuple(SysInt i) {
     SysInt index = tupindices[i];
-    const vector<DomainInt> &tau = sct->tuples[index];
+    const vector<DomainInt>& tau = sct->tuples[index];
 
-    for (SysInt j = 0; j < sval.size; j++) {
+    for(SysInt j = 0; j < sval.size; j++) {
       const SysInt var = sval.vals[j];
-      if (UseShort) {
+      if(UseShort) {
         const DomainInt tv = tau[var];
-        if ((tv != DomainInt_Skip) && !vars[var].inDomain(tv)) {
+        if((tv != DomainInt_Skip) && !vars[var].inDomain(tv)) {
           return false;
         }
       } else {
         D_ASSERT(tau[var] != DomainInt_Skip);
-        if (!vars[var].inDomain(tau[var])) {
+        if(!vars[var].inDomain(tau[var])) {
           return false;
         }
       }
@@ -477,17 +495,17 @@ struct STR : public AbstractConstraint {
     // for(int j=0; j<ssup_permanent.size; j++)
     // ssup.insert(ssup_permanent.vals[j]);
 
-    if (UseShort) {
+    if(UseShort) {
       ssup.clear();
 
-      while (limit > 0) {
+      while(limit > 0) {
         const SysInt index = tupindices[0];
         // check validity
         bool isvalid = validTuple(0);
 
-        if (isvalid) {
-          const vector<pair<SysInt, DomainInt>> &compressed_tau = sct->compressed_tuples[index];
-          for (SysInt t = 0; t < (SysInt)compressed_tau.size(); ++t) {
+        if(isvalid) {
+          const vector<pair<SysInt, DomainInt>>& compressed_tau = sct->compressed_tuples[index];
+          for(SysInt t = 0; t < (SysInt)compressed_tau.size(); ++t) {
             const SysInt ctf = compressed_tau[t].first;
             ssup.unsafe_insert(ctf);
             gacvalues[ctf].clear();
@@ -499,13 +517,13 @@ struct STR : public AbstractConstraint {
         }
       }
 
-      if (limit == 0) {
+      if(limit == 0) {
         // We found no valid tuples!
         getState().setFailed(true);
         return;
       }
     } else {
-      for (SysInt t = 0; t < numvars; t++)
+      for(SysInt t = 0; t < numvars; t++)
         gacvalues[t].clear();
       ssup.fill();
     }
@@ -515,9 +533,9 @@ struct STR : public AbstractConstraint {
     // We dealt with the first tuple, if we are in 'Short' mode.
     SysInt i = UseShort ? 1 : 0;
 
-    while (i < limit) {
+    while(i < limit) {
       // check validity
-      if (!validTuple(i))
+      if(!validTuple(i))
         removeTuple(i);
       else
         i++;
@@ -525,21 +543,21 @@ struct STR : public AbstractConstraint {
 
     i = 0;
     SysInt lim_cpy = checked_cast<SysInt>(limit);
-    while (i < lim_cpy && ssup.size > 0) {
+    while(i < lim_cpy && ssup.size > 0) {
       const SysInt index = tupindices[i];
-      const vector<DomainInt> &tau = tup_start[index];
+      const vector<DomainInt>& tau = tup_start[index];
       // do stuff
-      for (SysInt j = 0; j < ssup.size; j++) {
+      for(SysInt j = 0; j < ssup.size; j++) {
         const SysInt var = ssup.vals[j];
 
-        if (UseShort && tau[var] == DomainInt_Skip) {
+        if(UseShort && tau[var] == DomainInt_Skip) {
           ssup.unsafe_remove(var);
           j--;
           // if(vars[var].isAssigned()) ssup_permanent.remove(var);
-        } else if (!gacvalues[var].in(tau[var])) {
+        } else if(!gacvalues[var].in(tau[var])) {
           gacvalues[var].unsafe_insert(tau[var]);
 
-          if (gacvalues[var].size == vars[var].getDomSize()) {
+          if(gacvalues[var].size == vars[var].getDomSize()) {
             ssup.unsafe_remove(var);
             j--;
             // if(vars[var].isAssigned()) ssup_permanent.remove(var);
@@ -550,10 +568,10 @@ struct STR : public AbstractConstraint {
     }
 
     // Prune the domains.
-    for (SysInt j = 0; j < ssup.size; j++) {
+    for(SysInt j = 0; j < ssup.size; j++) {
       SysInt var = ssup.vals[j];
-      for (DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
-        if (!gacvalues[var].in(val)) {
+      for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+        if(!gacvalues[var].in(val)) {
           vars[var].removeFromDomain(val);
         }
       }
@@ -573,7 +591,7 @@ struct STR : public AbstractConstraint {
 };
 
 template <typename T>
-AbstractConstraint *BuildCT_SHORTSTR(const T &t1, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_SHORTSTR(const T& t1, ConstraintBlob& b) {
   return new STR<T, true>(t1, b.short_tuples);
 }
 
@@ -586,7 +604,7 @@ AbstractConstraint *BuildCT_SHORTSTR(const T &t1, ConstraintBlob &b) {
   */
 
 template <typename T>
-AbstractConstraint *BuildCT_STR(const T &t1, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_STR(const T& t1, ConstraintBlob& b) {
   return new STR<T, false>(t1, b.tuples);
 }
 

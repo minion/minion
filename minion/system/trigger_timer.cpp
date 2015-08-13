@@ -25,8 +25,8 @@
 
 using namespace std;
 
-volatile bool *trig;
-volatile bool *ctrl_c_press;
+volatile bool* trig;
+volatile bool* ctrl_c_press;
 
 bool check_double_ctrlc;
 
@@ -37,12 +37,16 @@ bool check_double_ctrlc;
 #define _WIN32_WINNT 0x0500
 #include <windows.h>
 
-void CALLBACK TimerProc(void *, BOOLEAN) { *trig = true; }
+void CALLBACK TimerProc(void*, BOOLEAN) {
+  *trig = true;
+}
 
-void CALLBACK ReallyStop(void *, BOOLEAN) { exit(1); }
+void CALLBACK ReallyStop(void*, BOOLEAN) {
+  exit(1);
+}
 
-void activate_trigger(volatile bool *b, bool timeout_active, int timeout, bool CPU_time) {
-  if (CPU_time)
+void activate_trigger(volatile bool* b, bool timeout_active, int timeout, bool CPU_time) {
+  if(CPU_time)
     cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
 
   trig = b;
@@ -50,15 +54,15 @@ void activate_trigger(volatile bool *b, bool timeout_active, int timeout, bool C
 
   HANDLE m_timerHandle;
 
-  if (timeout_active) {
-    if (timeout <= 0)
+  if(timeout_active) {
+    if(timeout <= 0)
       *trig = true;
     BOOL success = ::CreateTimerQueueTimer(&m_timerHandle, NULL, TimerProc, NULL, timeout * 1000, 0,
                                            WT_EXECUTEINTIMERTHREAD);
   }
 }
 
-void install_ctrlc_trigger(volatile bool *) { /* Not implemented on windows */
+void install_ctrlc_trigger(volatile bool*) { /* Not implemented on windows */
 }
 
 #else
@@ -69,9 +73,11 @@ void install_ctrlc_trigger(volatile bool *) { /* Not implemented on windows */
 #include <errno.h>
 #include <unistd.h>
 
-void trigger_function(int /* signum */) { *trig = true; }
+void trigger_function(int /* signum */) {
+  *trig = true;
+}
 
-void activate_trigger(volatile bool *b, bool timeout_active, int timeout,
+void activate_trigger(volatile bool* b, bool timeout_active, int timeout,
                       bool CPU_time) // CPU_time = false -> real time
 {
   // We still set these, as they are how 'ctrlc' checks if we have got started
@@ -81,10 +87,10 @@ void activate_trigger(volatile bool *b, bool timeout_active, int timeout,
 
   signal(SIGXCPU, trigger_function);
   signal(SIGALRM, trigger_function);
-  if (timeout_active) {
-    if (timeout <= 0)
+  if(timeout_active) {
+    if(timeout <= 0)
       *trig = true;
-    if (CPU_time) {
+    if(CPU_time) {
       rlimit lim;
       lim.rlim_cur = timeout;
       lim.rlim_max = timeout + 5;
@@ -95,12 +101,12 @@ void activate_trigger(volatile bool *b, bool timeout_active, int timeout,
 }
 
 void ctrlc_function(int /* signum */) {
-  if (check_double_ctrlc) {
+  if(check_double_ctrlc) {
     cerr << "Ctrl+C pressed twice. Exiting immediately." << endl;
     exit(1);
   }
 
-  if (trig == NULL) {
+  if(trig == NULL) {
     cerr << "Search has not started. Exiting immediately." << endl;
     exit(1);
   }
@@ -113,7 +119,7 @@ void ctrlc_function(int /* signum */) {
   *ctrl_c_press = true;
 }
 
-void install_ctrlc_trigger(volatile bool *ctrl_c_press_) {
+void install_ctrlc_trigger(volatile bool* ctrl_c_press_) {
   check_double_ctrlc = false;
   ctrl_c_press = ctrl_c_press_;
   signal(SIGINT, ctrlc_function);

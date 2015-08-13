@@ -28,7 +28,7 @@ enum TrigType { UpperBound, LowerBound, Assigned, DomainChanged, DomainRemoval }
 enum TrigOp { TO_Default, TO_Store, TO_Backtrack };
 
 static const SysInt NoDomainValue = -98765;
-#define BAD_POINTER (void *)(-1)
+#define BAD_POINTER (void*)(-1)
 
 enum BoundType { Bound_Yes, Bound_No, Bound_Maybe };
 
@@ -42,17 +42,17 @@ enum PropagationLevel {
 };
 
 inline PropagationLevel GetPropMethodFromString(std::string s) {
-  if (s == "None")
+  if(s == "None")
     return PropLevel_None;
-  else if (s == "GAC")
+  else if(s == "GAC")
     return PropLevel_GAC;
-  else if (s == "SAC")
+  else if(s == "SAC")
     return PropLevel_SAC;
-  else if (s == "SSAC")
+  else if(s == "SSAC")
     return PropLevel_SSAC;
-  else if (s == "SACBounds")
+  else if(s == "SACBounds")
     return PropLevel_SACBounds;
-  else if (s == "SSACBounds")
+  else if(s == "SSACBounds")
     return PropLevel_SSACBounds;
   else {
     ostringstream oss;

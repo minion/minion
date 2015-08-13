@@ -1,6 +1,6 @@
 #include <minlib/minlib.hpp>
 
-void testy(const SimpleMap<int, int> &sm) {
+void testy(const SimpleMap<int, int>& sm) {
   // test constness
   assert(sm.begin() != sm.end());
 }

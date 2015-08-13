@@ -93,7 +93,9 @@ struct reify : public ParentConstraint {
     return constraint_name() + ":" + child_constraints[0]->extended_name();
   }
 
-  virtual string constraint_name() { return "reify"; }
+  virtual string constraint_name() {
+    return "reify";
+  }
 
   CONSTRAINT_ARG_LIST2(child_constraints[0], reify_var);
 
@@ -113,9 +115,11 @@ struct reify : public ParentConstraint {
   typedef vector<vector<pair<DomainInt, DomainInt>>> triggerpairstype;
   D_DATA(triggerpairstype triggerpairs);
 
-  reify(AbstractConstraint *_poscon, BoolVar _rar_var)
-      : ParentConstraint({_poscon, _poscon->reverse_constraint()}), reify_var(_rar_var),
-        constraint_locked(false), full_propagate_called(false) {
+  reify(AbstractConstraint* _poscon, BoolVar _rar_var)
+      : ParentConstraint({_poscon, _poscon->reverse_constraint()}),
+        reify_var(_rar_var),
+        constraint_locked(false),
+        full_propagate_called(false) {
     CHECK(reify_var.getInitialMin() >= 0 && reify_var.getInitialMax() <= 1,
           "reify only works on Boolean variables");
 #ifdef NODETRICK
@@ -134,7 +138,7 @@ struct reify : public ParentConstraint {
     D_DATA(triggerpairs.resize(2));
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     // reverse it by swapping the positive and negative constraints.
     // we call 'reverse_constraint' here to force a new copy of the constraint
     return new reify<BoolVar>(child_constraints[0]->reverse_constraint(), reify_var);
@@ -144,19 +148,19 @@ struct reify : public ParentConstraint {
     return dtcount + 1; // *2 for each child constraint.
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    if (reify_var.inDomain(1)) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    if(reify_var.inDomain(1)) {
       bool flag = child_constraints[0]->get_satisfying_assignment(assignment);
-      if (flag) {
+      if(flag) {
         assignment.push_back(make_pair(reify_var_num, 1));
         return true;
       }
     }
     assignment.clear();
-    if (reify_var.inDomain(0)) {
+    if(reify_var.inDomain(0)) {
       bool flag = child_constraints[1]->get_satisfying_assignment(assignment);
-      if (flag) {
-        for (SysInt i = 0; i < (SysInt)assignment.size(); ++i)
+      if(flag) {
+        for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           assignment[i].first += c0vars;
         assignment.push_back(make_pair(reify_var_num, 0));
         return true;
@@ -165,17 +169,16 @@ struct reify : public ParentConstraint {
     return false;
   }
 
-  virtual BOOL check_assignment(DomainInt *vals, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* vals, SysInt v_size) {
     DomainInt back_val = *(vals + v_size - 1);
-    if (back_val == 1) {
+    if(back_val == 1) {
       return child_constraints[0]->check_assignment(vals, c0vars);
-    } else if (back_val == 0) {
+    } else if(back_val == 0) {
       vals += c0vars;
       return child_constraints[1]->check_assignment(vals, (dtcount / 2) - c0vars);
     } else
       return false;
   }
-
 
   virtual vector<AnyVarRef> get_vars() {
     // Push both sets of vars, then reify var.
@@ -183,9 +186,9 @@ struct reify : public ParentConstraint {
     vector<AnyVarRef> vec1 = *child_constraints[1]->get_vars_singleton();
     vector<AnyVarRef> c;
     c.reserve(vec0.size() + vec1.size() + 1);
-    for (SysInt i = 0; i < (SysInt)vec0.size(); i++)
+    for(SysInt i = 0; i < (SysInt)vec0.size(); i++)
       c.push_back(vec0[i]);
-    for (SysInt i = 0; i < (SysInt)vec1.size(); i++)
+    for(SysInt i = 0; i < (SysInt)vec1.size(); i++)
       c.push_back(vec1[i]);
     c.push_back(reify_var);
     return c;
@@ -197,7 +200,7 @@ struct reify : public ParentConstraint {
     constraint_locked = false;
     D_ASSERT(reify_var.isAssigned() &&
              (reify_var.getAssignedValue() == 0 || reify_var.getAssignedValue() == 1));
-    if (reify_var.inDomain(0)) {
+    if(reify_var.inDomain(0)) {
       child_constraints[1]->full_propagate();
     } else {
       child_constraints[0]->full_propagate();
@@ -212,10 +215,10 @@ struct reify : public ParentConstraint {
   }
 
   void reify_var_assigned() {
-    if (!full_propagate_called) {
+    if(!full_propagate_called) {
       P("reifyvar assigned - Do full propagate");
 #ifdef NODETRICK
-      if (reifysetnode == getState().getNodeCount()) {
+      if(reifysetnode == getState().getNodeCount()) {
         numeric_limits<unsigned long long> ull; // I hope the compiler will get rid fo this..
         reifysetnode = ull.max();               // avoid this happening more than once.
         return;
@@ -230,21 +233,21 @@ struct reify : public ParentConstraint {
   virtual void propagateStatic(DomainInt i, DomainDelta domain) {
     PROP_INFO_ADDONE(Reify);
     P("Static propagate start");
-    if (constraint_locked)
+    if(constraint_locked)
       return;
 
-    if (i == -1000000000) {
+    if(i == -1000000000) {
       abort();
       reify_var_assigned();
       return;
     }
 
-    if (full_propagate_called) {
+    if(full_propagate_called) {
       P("Already doing static full propagate");
       D_ASSERT(reify_var.isAssigned());
-      if (reify_var.getAssignedValue() == 1) {
+      if(reify_var.getAssignedValue() == 1) {
         pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-        if (childTrigger.first != 0) {
+        if(childTrigger.first != 0) {
           return;
         }
         P("Passing trigger " << childTrigger.first << "," << childTrigger.second << " on");
@@ -252,7 +255,7 @@ struct reify : public ParentConstraint {
       } else {
         D_ASSERT(reify_var.getAssignedValue() == 0)
         pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-        if (childTrigger.first != 1) {
+        if(childTrigger.first != 1) {
           return;
         }
         P("Passing trigger " << childTrigger.first << "," << childTrigger.second << " on");
@@ -264,14 +267,14 @@ struct reify : public ParentConstraint {
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(Reify);
     P("Dynamic prop start");
-    if (constraint_locked)
+    if(constraint_locked)
       return;
 
     const SysInt _dt = 0;
     // SysInt numtriggers=dynamic_trigger_count();
 
-    if (!full_propagate_called) {
-      if (trig >= _dt && trig < (_dt + (c0vars * 2))) { // Lost assignments for positive constraint.
+    if(!full_propagate_called) {
+      if(trig >= _dt && trig < (_dt + (c0vars * 2))) { // Lost assignments for positive constraint.
         P("Triggered on an assignment watch for the positive child constraint");
 
         bool flag;
@@ -279,7 +282,7 @@ struct reify : public ParentConstraint {
         GET_ASSIGNMENT(assignment, child_constraints[0]);
 
         P("Find new assignment");
-        if (!flag) { // No satisfying assignment to constraint
+        if(!flag) { // No satisfying assignment to constraint
           P("Failed!");
           reify_var.propagateAssign(0);
 
@@ -293,8 +296,8 @@ struct reify : public ParentConstraint {
         watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), 0, c0vars * 2);
 
         return;
-      } else if (trig >= (_dt + (c0vars * 2)) &&
-                 trig < _dt + dtcount) { // Lost assignments for negative constraint.
+      } else if(trig >= (_dt + (c0vars * 2)) &&
+                trig < _dt + dtcount) { // Lost assignments for negative constraint.
         P("Triggered on an assignment watch for the negative child constraint");
 
         bool flag;
@@ -302,7 +305,7 @@ struct reify : public ParentConstraint {
         PROP_INFO_ADDONE(ReifyPropGetAssgNegCon);
 
         P("Find new assignment");
-        if (!flag) { // No satisfying assignment to constraint
+        if(!flag) { // No satisfying assignment to constraint
           P("Failed!");
           reify_var.propagateAssign(1);
 
@@ -316,7 +319,7 @@ struct reify : public ParentConstraint {
         watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), c0vars * 2,
                          dtcount);
         return;
-      } else if (trig == _dt + dtcount) {
+      } else if(trig == _dt + dtcount) {
         reify_var_assigned();
         return;
       } else {
@@ -326,7 +329,7 @@ struct reify : public ParentConstraint {
       }
     } else // full_propagate_called
     {
-      if (trig >= _dt && trig < _dt + dtcount) { // is it a trigger from stage 1 .. if so, ignore.
+      if(trig >= _dt && trig < _dt + dtcount) { // is it a trigger from stage 1 .. if so, ignore.
         P("In stage 2, ignoring trigger from stage 1");
         return;
       }
@@ -334,7 +337,7 @@ struct reify : public ParentConstraint {
       D_ASSERT(reify_var.isAssigned());
 
       SysInt child = getChildDynamicTrigger(trig);
-      if (reify_var.getAssignedValue() == child) {
+      if(reify_var.getAssignedValue() == child) {
         P("Removing leftover trigger from other child constraint");
         releaseTriggerInt(trig);
         return;
@@ -345,19 +348,19 @@ struct reify : public ParentConstraint {
   }
 
   template <typename T, typename Vars>
-  void watch_assignment(const T &assignment, Vars &vars, DomainInt trig, DomainInt endtrig) {
-    for (SysInt i = 0; i < (SysInt)assignment.size(); ++i) {
+  void watch_assignment(const T& assignment, Vars& vars, DomainInt trig, DomainInt endtrig) {
+    for(SysInt i = 0; i < (SysInt)assignment.size(); ++i) {
       const SysInt aif = checked_cast<SysInt>(assignment[i].first);
       D_ASSERT(vars[aif].inDomain(assignment[i].second));
       D_ASSERT(trig + i < endtrig);
-      if (vars[aif].isBound()) {
+      if(vars[aif].isBound()) {
         moveTriggerInt(vars[aif], trig + i, DomainChanged);
       } else {
         moveTriggerInt(vars[aif], trig + i, DomainRemoval, assignment[i].second);
       }
     }
     // clear a contiguous block of used triggers up to (not including) endtrig
-    for (SysInt i = assignment.size(); (trig + i) < endtrig; i++) {
+    for(SysInt i = assignment.size(); (trig + i) < endtrig; i++) {
       /// XXX : This is inefficent, but required for constant variables
       /*  if(!(trig+i)->isAttached())
         {
@@ -375,14 +378,13 @@ struct reify : public ParentConstraint {
 
     D_ASSERT(reify_var.getMin() >= 0);
     D_ASSERT(reify_var.getMax() <= 1);
-    if (getState().isFailed())
+    if(getState().isFailed())
       return;
 
     moveTriggerInt(reify_var, dtcount, Assigned);
 
-
-    if (reify_var.isAssigned()) {
-      if (reify_var.getAssignedValue() == 1) {
+    if(reify_var.isAssigned()) {
+      if(reify_var.getAssignedValue() == 1) {
         child_constraints[0]->full_propagate();
       } else {
         child_constraints[1]->full_propagate();
@@ -392,13 +394,13 @@ struct reify : public ParentConstraint {
     }
 
     // Clean up triggers
-    for (SysInt i = 0; i < dtcount; ++i)
+    for(SysInt i = 0; i < dtcount; ++i)
       releaseTriggerInt(i);
 
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
     PROP_INFO_ADDONE(ReifyFullPropGetAssgPosCon);
-    if (!flag) { // No satisfying assignment to constraint
+    if(!flag) { // No satisfying assignment to constraint
       reify_var.propagateAssign(0);
 
 #ifdef NODETRICK
@@ -409,7 +411,7 @@ struct reify : public ParentConstraint {
     }
     PROP_INFO_ADDONE(ReifyFullPropGetAssgNegCon);
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
-    if (!flag) { // No satisfying assignment to constraint
+    if(!flag) { // No satisfying assignment to constraint
       reify_var.propagateAssign(1);
 #ifdef NODETRICK
       reifysetnode = getState().getNodeCount();
@@ -432,13 +434,13 @@ struct reify : public ParentConstraint {
 // end of ifdef NEWREIFY
 
 template <typename BoolVar>
-reify<BoolVar> *reifyCon(AbstractConstraint *c, BoolVar var) {
+reify<BoolVar>* reifyCon(AbstractConstraint* c, BoolVar var) {
   return new reify<BoolVar>(&*c, var);
 }
 
 template <typename VarArray>
-inline AbstractConstraint *BuildCT_REIFY(const VarArray &vars, ConstraintBlob &bl) {
-  switch (bl.internal_constraints[0].constraint->type) {
+inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& bl) {
+  switch(bl.internal_constraints[0].constraint->type) {
   case CT_EQ: {
     ConstraintBlob blob(bl.internal_constraints[0]);
     blob.vars.push_back(make_vec(bl.vars[0][0]));

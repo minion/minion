@@ -26,14 +26,14 @@
 //#include "../memory_management/reversible_vals.h"
 
 template <typename T>
-DomainInt chooseVal(T &var, ValOrderEnum vo) {
-  switch (vo) {
+DomainInt chooseVal(T& var, ValOrderEnum vo) {
+  switch(vo) {
   case VALORDER_ASCEND: return var.getMin();
   case VALORDER_DESCEND: return var.getMax();
 
   case VALORDER_RANDOM: {
-    if (var.isBound()) {
-      switch (rand() % 2) {
+    if(var.isBound()) {
+      switch(rand() % 2) {
       case 0: return var.getMin();
       case 1: return var.getMax();
       default: abort();
@@ -44,18 +44,18 @@ DomainInt chooseVal(T &var, ValOrderEnum vo) {
     DomainInt val = (rand() % (max_val - min_val + 1)) + min_val;
     D_ASSERT(val >= min_val);
     D_ASSERT(val <= max_val);
-    if (var.inDomain(val))
+    if(var.inDomain(val))
       return val;
-    switch (rand() % 2) {
+    switch(rand() % 2) {
     case 0: {
       val--;
-      while (!var.inDomain(val))
+      while(!var.inDomain(val))
         val--;
       return val;
     }
     case 1: {
       val++;
-      while (!var.inDomain(val))
+      while(!var.inDomain(val))
         val++;
       return val;
     }
@@ -70,7 +70,7 @@ DomainInt chooseVal(T &var, ValOrderEnum vo) {
 struct VariableOrder {
   vector<AnyVarRef> var_order; // can assume this is anyvarref? May need to template
 
-  VariableOrder(const vector<AnyVarRef> &_var_order) : var_order(_var_order) {}
+  VariableOrder(const vector<AnyVarRef>& _var_order) : var_order(_var_order) {}
 
   // returns a pair of variable index, domain value.
   // returning the variable index == -1 means no branch possible.
@@ -89,11 +89,12 @@ struct MultiBranch : public VariableOrder {
 
   MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector)
       : VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
-        vovector(_vovector), pos() {
+        vovector(_vovector),
+        pos() {
     pos = 0;
     variable_offset.resize(vovector.size());
     variable_offset[0] = 0;
-    for (SysInt i = 1; i < (SysInt)vovector.size(); i++) {
+    for(SysInt i = 1; i < (SysInt)vovector.size(); i++) {
       variable_offset[i] = variable_offset[i - 1] + vovector[i - 1]->var_order.size();
     }
   }
@@ -102,9 +103,9 @@ struct MultiBranch : public VariableOrder {
     SysInt pos2 = pos;
 
     pair<SysInt, DomainInt> t = vovector[pos2]->pickVarVal();
-    while (t.first == -1) {
+    while(t.first == -1) {
       pos2++;
-      if (pos2 == (SysInt)vovector.size()) {
+      if(pos2 == (SysInt)vovector.size()) {
         return make_pair(-1, 0);
       }
 
@@ -120,7 +121,7 @@ struct StaticBranch : public VariableOrder {
   vector<ValOrderEnum> val_order;
   Reversible<SysInt> pos;
 
-  StaticBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order), pos() {
     pos = 0;
     D_ASSERT(var_order.size() == val_order.size());
@@ -129,10 +130,10 @@ struct StaticBranch : public VariableOrder {
   pair<SysInt, DomainInt> pickVarVal() {
     SysInt v_size = var_order.size();
 
-    while (pos < v_size && var_order[pos].isAssigned())
+    while(pos < v_size && var_order[pos].isAssigned())
       pos = pos + 1;
 
-    if (pos == v_size)
+    if(pos == v_size)
       return make_pair(-1, 0);
 
     DomainInt val = chooseVal(var_order[pos], val_order[pos]);
@@ -146,7 +147,7 @@ struct StaticBranchLimited : public VariableOrder {
   Reversible<SysInt> pos;
   unsigned int limit;
 
-  StaticBranchLimited(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order,
+  StaticBranchLimited(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order,
                       unsigned int _limit)
       : VariableOrder(_var_order), val_order(_val_order), pos(), limit(_limit) {
     pos = 0;
@@ -156,13 +157,13 @@ struct StaticBranchLimited : public VariableOrder {
   pair<SysInt, DomainInt> pickVarVal() {
     SysInt v_size = var_order.size();
 
-    while (pos < v_size && var_order[pos].isAssigned())
+    while(pos < v_size && var_order[pos].isAssigned())
       pos = pos + 1;
 
-    if (pos >= limit)
+    if(pos >= limit)
       return make_pair(-1, 0); /// This is the difference to StaticBranch.
 
-    if (pos == v_size)
+    if(pos == v_size)
       return make_pair(-1, 0);
 
     DomainInt val = chooseVal(var_order[pos], val_order[pos]);
@@ -174,7 +175,7 @@ struct StaticBranchLimited : public VariableOrder {
 struct SDFBranch : public VariableOrder {
   vector<ValOrderEnum> val_order;
 
-  SDFBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  SDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   // THIS DOES NOT DO SDF -- just an approximation with the bounds.
@@ -185,20 +186,20 @@ struct SDFBranch : public VariableOrder {
     SysInt smallest_dom = -1;
     DomainInt dom_size = DomainInt_Max;
 
-    for (SysInt i = 0; i < length; ++i) {
+    for(SysInt i = 0; i < length; ++i) {
       DomainInt maxval = var_order[i].getMax();
       DomainInt minval = var_order[i].getMin();
 
-      if ((maxval != minval) && ((maxval - minval) < dom_size)) {
+      if((maxval != minval) && ((maxval - minval) < dom_size)) {
         dom_size = maxval - minval;
         smallest_dom = i;
-        if (maxval - minval == 1) { // Binary domain, must be smallest
+        if(maxval - minval == 1) { // Binary domain, must be smallest
           break;
         }
       }
     }
 
-    if (smallest_dom == -1) { // all assigned
+    if(smallest_dom == -1) { // all assigned
       return make_pair(-1, 0);
     }
 
@@ -211,16 +212,16 @@ struct SDFBranch : public VariableOrder {
 struct SlowStaticBranch : public VariableOrder {
   vector<ValOrderEnum> val_order;
 
-  SlowStaticBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
     UnsignedSysInt v_size = var_order.size();
     UnsignedSysInt pos = 0;
-    while (pos < v_size && var_order[pos].isAssigned())
+    while(pos < v_size && var_order[pos].isAssigned())
       ++pos;
 
-    if (pos == v_size)
+    if(pos == v_size)
       return make_pair(-1, 0);
 
     DomainInt val = chooseVal(var_order[pos], val_order[pos]);
@@ -234,54 +235,54 @@ struct SlowStaticBranch : public VariableOrder {
 struct WdegBranch : public VariableOrder {
   vector<ValOrderEnum> val_order;
 
-  WdegBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  WdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
     SysInt best = var_order.size(); // the variable with the best score so far (init to none)
     SysInt best_score = -1;         //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
-    for (size_t i = 0; i < var_order_size; i++) { // we will find the score for each var
+    for(size_t i = 0; i < var_order_size; i++) { // we will find the score for each var
       // cout << "i=" << i << endl;
       // cout << "best=" << best << endl;
       // cout << "best_score=" << best_score << endl;
       AnyVarRef v = var_order[i];
-      if (v.isAssigned()) {
+      if(v.isAssigned()) {
         // cout << "assigned -- stop" << endl;
         continue;
       }
       SysInt base_wdeg = checked_cast<SysInt>(v.getBaseWdeg());
       // cout << "basewdeg=" << base_wdeg << endl;
-      if (base_wdeg <= best_score) {
+      if(base_wdeg <= best_score) {
         // cout << "too low before deductions" << endl;
         continue; // stop if base score is too low before deductions
       }
-      vector<AbstractConstraint *> *constrs = v.getConstraints();
+      vector<AbstractConstraint*>* constrs = v.getConstraints();
       size_t constrs_size = constrs->size();
-      for (size_t j = 0; j < constrs_size; j++) { // find constrs to be deducted from var wdeg
-        AbstractConstraint *c = (*constrs)[j];
+      for(size_t j = 0; j < constrs_size; j++) { // find constrs to be deducted from var wdeg
+        AbstractConstraint* c = (*constrs)[j];
         // cout << "con wdeg=" << c->getWdeg() << endl;
-        vector<AnyVarRef> *c_vars = c->get_vars_singleton();
+        vector<AnyVarRef>* c_vars = c->get_vars_singleton();
         size_t c_vars_size = c_vars->size();
         SysInt uninst = 0;
-        for (size_t k = 0; k < c_vars_size; k++)
-          if (!(*c_vars)[k].isAssigned())
-            if (++uninst > 1) { // when multiple unassigned we needn't deduct
+        for(size_t k = 0; k < c_vars_size; k++)
+          if(!(*c_vars)[k].isAssigned())
+            if(++uninst > 1) { // when multiple unassigned we needn't deduct
               // cout << "don't deduct" << endl;
               break;
             }
-        if (uninst <= 1) {
+        if(uninst <= 1) {
           D_ASSERT(uninst == 1);
           // cout << "deduct" << endl;
           base_wdeg -= c->getWdeg();
-          if (base_wdeg <= best_score) {
+          if(base_wdeg <= best_score) {
             // cout << "too low during deductions" << endl;
             break;
           }
         }
       }
       // cout << "basewdeg=" << base_wdeg << endl;
-      if (best_score < base_wdeg) {
+      if(best_score < base_wdeg) {
         // cout << "replacing top score" << endl;
         best_score = base_wdeg;
         best = i;
@@ -289,7 +290,7 @@ struct WdegBranch : public VariableOrder {
     }
 
     // new bit. pn
-    if (best == var_order.size())
+    if(best == var_order.size())
       return make_pair(-1, 0);
 
     DomainInt val = chooseVal(var_order[best], val_order[best]);
@@ -300,7 +301,7 @@ struct WdegBranch : public VariableOrder {
 struct DomOverWdegBranch : VariableOrder {
   vector<ValOrderEnum> val_order;
 
-  DomOverWdegBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -309,15 +310,15 @@ struct DomOverWdegBranch : VariableOrder {
     float best_score = FLT_MAX;     //... and its score (all true scores are positive)
     size_t var_order_size = var_order.size();
     bool anyUnassigned = false;
-    for (size_t i = 0; i < var_order_size; i++) { // we will find the score for each var
+    for(size_t i = 0; i < var_order_size; i++) { // we will find the score for each var
       // cout << "i=" << i << endl;
       // cout << "best=" << best << endl;
       // cout << "best_score=" << best_score << endl;
       AnyVarRef v = var_order[i];
-      if (v.isAssigned()) {
+      if(v.isAssigned()) {
         // cout << "assigned -- stop" << endl;
         continue;
-      } else if (!anyUnassigned) {
+      } else if(!anyUnassigned) {
         // always use the first unassigned as a fallback in case later
         // calculations don't find
         // any variables with finite score
@@ -327,29 +328,29 @@ struct DomOverWdegBranch : VariableOrder {
       const SysInt dom_size_approx = checked_cast<SysInt>(v.getMax() - v.getMin() + 1);
       DomainInt base_wdeg = v.getBaseWdeg();
       // cout << "basewdeg=" << base_wdeg << endl;
-      if ((float)dom_size_approx / checked_cast<SysInt>(base_wdeg) >= best_score) {
+      if((float)dom_size_approx / checked_cast<SysInt>(base_wdeg) >= best_score) {
         // cout << "too high before deductions" << endl;
         continue; // stop if base score is too low before deductions
       }
-      vector<AbstractConstraint *> *constrs = v.getConstraints();
+      vector<AbstractConstraint*>* constrs = v.getConstraints();
       size_t constrs_size = constrs->size();
-      for (size_t j = 0; j < constrs_size; j++) { // find constrs to be deducted from var wdeg
-        AbstractConstraint *c = (*constrs)[j];
+      for(size_t j = 0; j < constrs_size; j++) { // find constrs to be deducted from var wdeg
+        AbstractConstraint* c = (*constrs)[j];
         // cout << "con wdeg=" << c->getWdeg() << endl;
-        vector<AnyVarRef> *c_vars = c->get_vars_singleton();
+        vector<AnyVarRef>* c_vars = c->get_vars_singleton();
         size_t c_vars_size = c_vars->size();
         SysInt uninst = 0;
-        for (size_t k = 0; k < c_vars_size; k++)
-          if (!(*c_vars)[k].isAssigned())
-            if (++uninst > 1) { // when multiple unassigned we needn't deduct
+        for(size_t k = 0; k < c_vars_size; k++)
+          if(!(*c_vars)[k].isAssigned())
+            if(++uninst > 1) { // when multiple unassigned we needn't deduct
               // cout << "don't deduct" << endl;
               break;
             }
-        if (uninst <= 1) {
+        if(uninst <= 1) {
           D_ASSERT(uninst == 1);
           // cout << "deduct" << endl;
           base_wdeg -= c->getWdeg();
-          if ((float)dom_size_approx / checked_cast<SysInt>(base_wdeg) >= best_score) {
+          if((float)dom_size_approx / checked_cast<SysInt>(base_wdeg) >= best_score) {
             // cout << "too high during deductions,base_wdeg=" << base_wdeg <<
             // endl;
             break;
@@ -357,7 +358,7 @@ struct DomOverWdegBranch : VariableOrder {
         }
       }
       // cout << "basewdeg=" << base_wdeg << endl;
-      if (best_score > (float)dom_size_approx / checked_cast<SysInt>(base_wdeg)) {
+      if(best_score > (float)dom_size_approx / checked_cast<SysInt>(base_wdeg)) {
         // cout << "replacing top score" << endl;
         best_score = (float)dom_size_approx / checked_cast<SysInt>(base_wdeg);
         best = i;
@@ -367,7 +368,7 @@ struct DomOverWdegBranch : VariableOrder {
     D_ASSERT(!anyUnassigned || best != var_order_size);
 
     // new bit. pn
-    if (best == var_order.size())
+    if(best == var_order.size())
       return make_pair(-1, 0);
 
     DomainInt val = chooseVal(var_order[best], val_order[best]);
@@ -379,7 +380,7 @@ struct DomOverWdegBranch : VariableOrder {
 struct SRFBranch : VariableOrder {
   vector<ValOrderEnum> val_order;
 
-  SRFBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  SRFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -388,7 +389,7 @@ struct SRFBranch : VariableOrder {
 
     float ratio = 2;
 
-    for (SysInt i = 0; i < length; ++i) {
+    for(SysInt i = 0; i < length; ++i) {
       DomainInt maxval = var_order[i].getMax();
       DomainInt minval = var_order[i].getMin();
 
@@ -397,13 +398,13 @@ struct SRFBranch : VariableOrder {
 
       float new_ratio = (checked_cast<float>(maxval - minval) * 1.0) /
                         checked_cast<float>(original_maxval - original_minval);
-      if ((maxval != minval) && (new_ratio < ratio)) {
+      if((maxval != minval) && (new_ratio < ratio)) {
         ratio = new_ratio;
         smallest_dom = i;
       }
     }
 
-    if (smallest_dom == length)
+    if(smallest_dom == length)
       return make_pair(-1, 0);
 
     DomainInt val = chooseVal(var_order[smallest_dom], val_order[smallest_dom]);
@@ -414,16 +415,16 @@ struct SRFBranch : VariableOrder {
 struct LDFBranch : VariableOrder {
   vector<ValOrderEnum> val_order;
 
-  LDFBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order)
+  LDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
     SysInt length = var_order.size();
 
     SysInt pos = 0;
-    while (pos < length && var_order[pos].isAssigned())
+    while(pos < length && var_order[pos].isAssigned())
       ++pos;
-    if (pos == length) {
+    if(pos == length) {
       return make_pair(-1, 0);
     }
 
@@ -432,11 +433,11 @@ struct LDFBranch : VariableOrder {
 
     ++pos;
 
-    for (; pos < length; ++pos) {
+    for(; pos < length; ++pos) {
       DomainInt maxval = var_order[pos].getMax();
       DomainInt minval = var_order[pos].getMin();
 
-      if (maxval - minval > dom_size) {
+      if(maxval - minval > dom_size) {
         dom_size = maxval - minval;
         largest_dom = pos;
       }
@@ -454,12 +455,16 @@ struct ConflictBranch : VariableOrder {
 
   Reversible<SysInt> pos;
 
-  VariableOrder *innervarorder;
+  VariableOrder* innervarorder;
 
-  ConflictBranch(const vector<AnyVarRef> &_var_order, const vector<ValOrderEnum> &_val_order,
-                 VariableOrder *_innervarorder)
-      : VariableOrder(_var_order), val_order(_val_order), pos(), innervarorder(_innervarorder),
-        last_returned_var(-1), in_conflict(false) {
+  ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order,
+                 VariableOrder* _innervarorder)
+      : VariableOrder(_var_order),
+        val_order(_val_order),
+        pos(),
+        innervarorder(_innervarorder),
+        last_returned_var(-1),
+        in_conflict(false) {
     pos = 0;
     pos2 = 0;
   }
@@ -477,16 +482,16 @@ struct ConflictBranch : VariableOrder {
   bool in_conflict;
 
   pair<SysInt, DomainInt> pickVarVal() {
-    if (in_conflict && var_order[last_returned_var].isAssigned()) {
+    if(in_conflict && var_order[last_returned_var].isAssigned()) {
       // If the conflict variable has been successfully assigned, come out
       // of conflict mode.
       in_conflict = false;
     }
 
-    if (pos2 > pos) {
+    if(pos2 > pos) {
       pos2 = pos;
 
-      if (last_returned_var != -1 && !var_order[last_returned_var].isAssigned()) {
+      if(last_returned_var != -1 && !var_order[last_returned_var].isAssigned()) {
         // we backtracked since the last call.
         // Assume the search procedure made a left branch which failed,
         // then backtracked.
@@ -498,7 +503,7 @@ struct ConflictBranch : VariableOrder {
     pos = pos + 1;
     pos2++;
 
-    if (in_conflict) {
+    if(in_conflict) {
 
       DomainInt val = chooseVal(var_order[last_returned_var], val_order[last_returned_var]);
       return make_pair(last_returned_var, val);

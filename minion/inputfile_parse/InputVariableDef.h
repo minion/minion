@@ -40,7 +40,9 @@ public:
     return (m1.type_m == m2.type_m) && (m1.val_m == m2.val_m);
   }
 
-  friend bool operator!=(Mapper m1, Mapper m2) { return !(m1 == m2); }
+  friend bool operator!=(Mapper m1, Mapper m2) {
+    return !(m1 == m2);
+  }
 };
 
 namespace ProbSpec {
@@ -51,23 +53,29 @@ class Var {
   DomainInt pos_m;
 
 public:
-  DomainInt pos() const { return pos_m; }
-  VariableType type() const { return type_m; }
-  void setType(VariableType v) { type_m = v; }
+  DomainInt pos() const {
+    return pos_m;
+  }
+  VariableType type() const {
+    return type_m;
+  }
+  void setType(VariableType v) {
+    type_m = v;
+  }
 
   Var(VariableType _type, DomainInt _pos) : type_m(_type), pos_m(_pos) {}
 
-  Var(const Var &v) : type_m(v.type_m), pos_m(v.pos_m) {}
+  Var(const Var& v) : type_m(v.type_m), pos_m(v.pos_m) {}
 
   Var() : type_m(VAR_INVALID), pos_m(-1) {}
 
-  friend std::ostream &operator<<(std::ostream &o, const Var &v) {
+  friend std::ostream& operator<<(std::ostream& o, const Var& v) {
     return o << "Var. Type:" << v.type_m << " Pos:" << v.pos_m << ".";
   }
 
   string get_name() const {
     ostringstream o;
-    switch (type_m) {
+    switch(type_m) {
     case VAR_BOOL: o << "bool"; break;
     case VAR_NOTBOOL: o << "!bool"; break;
     case VAR_BOUND: o << "bound"; break;
@@ -82,14 +90,18 @@ public:
     return o.str();
   }
 
-  bool operator==(const Var &var) const { return type_m == var.type_m && pos_m == var.pos_m; }
+  bool operator==(const Var& var) const {
+    return type_m == var.type_m && pos_m == var.pos_m;
+  }
 
-  bool operator<(const Var &var) const {
+  bool operator<(const Var& var) const {
     return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m);
   }
 };
 
-size_t inline hash_value(Var v) { return checked_cast<SysInt>(v.pos()) + v.type() * 10000; }
+size_t inline hash_value(Var v) {
+  return checked_cast<SysInt>(v.pos()) + v.type() * 10000;
+}
 }
 
 using namespace ProbSpec;

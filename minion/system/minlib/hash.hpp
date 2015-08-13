@@ -11,12 +11,12 @@ struct minlib_hash_base {
 };
 
 template <typename T>
-size_t getHash(const T &t) {
+size_t getHash(const T& t) {
   return std::hash<T>()(t);
 }
 
 template <typename T, typename U>
-size_t hashCombine(const T &t, const U &u) {
+size_t hashCombine(const T& t, const U& u) {
   return getHash(t) * 443782 + getHash(u) * 30193;
 }
 
@@ -24,7 +24,9 @@ namespace std {
 template <typename T, typename U>
 struct hash<std::pair<T, U>> : minlib_hash_base<std::pair<T, U>> {
 public:
-  size_t operator()(const std::pair<T, U> &p) const { return hashCombine(p.first, p.second); }
+  size_t operator()(const std::pair<T, U>& p) const {
+    return hashCombine(p.first, p.second);
+  }
 };
 }
 

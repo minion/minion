@@ -34,7 +34,9 @@
 // Checks if a variable is in a fixed Range.
 template <typename Var>
 struct WatchInRangeConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "w-inrange"; }
+  virtual string constraint_name() {
+    return "w-inrange";
+  }
 
   CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
   Var var;
@@ -43,9 +45,9 @@ struct WatchInRangeConstraint : public AbstractConstraint {
   DomainInt range_max;
 
   template <typename T>
-  WatchInRangeConstraint(const Var &_var, const T &_vals)
+  WatchInRangeConstraint(const Var& _var, const T& _vals)
       : var(_var) {
-    if (_vals.size() != 2) {
+    if(_vals.size() != 2) {
       output_fatal_error("The range of an 'inrange' constraint must contain 2 values!");
     }
 
@@ -53,7 +55,9 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     range_max = _vals[1];
   }
 
-  virtual SysInt dynamic_trigger_count() { return 2; }
+  virtual SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   virtual void full_propagate() {
     var.setMin(range_min);
@@ -65,7 +69,7 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     D_FATAL_ERROR("Propagation is never called for 'in range'");
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] >= range_min && v[0] <= range_max);
   }
@@ -77,12 +81,12 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
     DomainInt min_val = max(range_min, var.getMin());
     DomainInt max_val = min(range_max, var.getMax());
-    for (DomainInt i = min_val; i <= max_val; ++i) {
-      if (var.inDomain(i)) {
+    for(DomainInt i = min_val; i <= max_val; ++i) {
+      if(var.inDomain(i)) {
         assignment.push_back(make_pair(0, i));
         return true;
       }
@@ -90,15 +94,15 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint();
+  virtual AbstractConstraint* reverse_constraint();
 };
 
 // To get reverse_constraint
 #include "dynamic_notinrange.h"
 
 template <typename VarArray1>
-AbstractConstraint *BuildCT_WATCHED_INRANGE(const VarArray1 &_var_array_1,
-                                            const ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_INRANGE(const VarArray1& _var_array_1,
+                                            const ConstraintBlob& b) {
   return new WatchInRangeConstraint<typename VarArray1::value_type>(_var_array_1[0],
                                                                     b.constants[0]);
 }

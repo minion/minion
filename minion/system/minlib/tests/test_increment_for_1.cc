@@ -4,7 +4,7 @@ using namespace std;
 
 int main(void) {
   vector<vector<int>> vecs;
-  for (auto v : ContainerRange(make_vec(2, 1, 2))) {
+  for(auto v : ContainerRange(make_vec(2, 1, 2))) {
     vecs.push_back(v);
   }
 

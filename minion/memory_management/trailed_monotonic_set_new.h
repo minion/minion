@@ -31,9 +31,13 @@ class TrailedMonotonicSet {
   vector<SysInt> trailstack_marks;
 
 public:
-  TrailedMonotonicSet() { trailstack_marks.push_back(0); }
+  TrailedMonotonicSet() {
+    trailstack_marks.push_back(0);
+  }
 
-  DomainInt size() const { return data.size(); }
+  DomainInt size() const {
+    return data.size();
+  }
 
   void undo() {
     SysInt i = (SysInt)trailstack.size() - 1;
@@ -41,7 +45,7 @@ public:
     SysInt j = trailstack_marks.back();
     trailstack_marks.pop_back();
 
-    for (; i >= j; i--) {
+    for(; i >= j; i--) {
       D_ASSERT(!data[trailstack[i]]);
       data[trailstack[i]] = true;
       trailstack.pop_back();
@@ -51,7 +55,7 @@ public:
 
   bool ifMember_remove(DomainInt index) {
     SysInt i = checked_cast<SysInt>(index);
-    if (data[i]) {
+    if(data[i]) {
       data[i] = false;
       trailstack.push_back(i);
       return true;
@@ -71,7 +75,9 @@ public:
     trailstack.push_back(i);
   }
 
-  void before_branch_left() { trailstack_marks.push_back(trailstack.size()); }
+  void before_branch_left() {
+    trailstack_marks.push_back(trailstack.size());
+  }
 
   void after_branch_left() // nothing to do
   {}

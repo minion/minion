@@ -37,7 +37,9 @@ set {a1,..,an}.
 // Checks if a variable is not in a fixed set.
 template <typename Var>
 struct WatchNotInSetConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "w-notinset"; }
+  virtual string constraint_name() {
+    return "w-notinset";
+  }
 
   CONSTRAINT_ARG_LIST2(var, vals);
 
@@ -46,19 +48,21 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
   vector<DomainInt> vals;
 
   template <typename T>
-  WatchNotInSetConstraint(const Var &_var, const T &_vals)
+  WatchNotInSetConstraint(const Var& _var, const T& _vals)
       : var(_var), vals(_vals.begin(), _vals.end()) {
     stable_sort(vals.begin(), vals.end());
   }
 
-  virtual SysInt dynamic_trigger_count() { return 2; }
+  virtual SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   virtual void full_propagate() {
-    if (var.isBound()) {
+    if(var.isBound()) {
       moveTriggerInt(var, 0, DomainChanged);
       propagateDynInt(0, DomainDelta::empty());
     } else {
-      for (SysInt i = 0; i < (SysInt)vals.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)vals.size(); ++i)
         var.removeFromDomain(vals[i]);
     }
   }
@@ -70,20 +74,20 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     // lower loop
     SysInt lower_index = 0;
 
-    while (lower_index < (SysInt)vals.size() && vals[lower_index] <= var.getMin()) {
+    while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.getMin()) {
       var.setMin(vals[lower_index] + 1);
       lower_index++;
     }
 
     SysInt upper_index = (SysInt)vals.size() - 1;
 
-    while (upper_index > 0 && vals[upper_index] >= var.getMax()) {
+    while(upper_index > 0 && vals[upper_index] >= var.getMax()) {
       var.setMax(vals[upper_index] - 1);
       upper_index--;
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return !binary_search(vals.begin(), vals.end(), v[0]);
   }
@@ -95,10 +99,10 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    for (DomainInt i = var.getMin(); i <= var.getMax(); ++i) {
-      if (var.inDomain(i) && !binary_search(vals.begin(), vals.end(), i)) {
+    for(DomainInt i = var.getMin(); i <= var.getMax(); ++i) {
+      if(var.inDomain(i) && !binary_search(vals.begin(), vals.end(), i)) {
         assignment.push_back(make_pair(0, i));
         return true;
       }
@@ -106,20 +110,20 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     return new WatchInSetConstraint<Var>(var, vals);
   }
 };
 
 // From dynamic_inset.h
 template <typename Var>
-AbstractConstraint *WatchInSetConstraint<Var>::reverse_constraint() {
+AbstractConstraint* WatchInSetConstraint<Var>::reverse_constraint() {
   return new WatchNotInSetConstraint<Var>(var, vals);
 }
 
 template <typename VarArray1>
-AbstractConstraint *BuildCT_WATCHED_NOT_INSET(const VarArray1 &_var_array_1,
-                                              const ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_NOT_INSET(const VarArray1& _var_array_1,
+                                              const ConstraintBlob& b) {
   return new WatchNotInSetConstraint<typename VarArray1::value_type>(_var_array_1[0],
                                                                      b.constants[0]);
 }

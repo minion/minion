@@ -30,35 +30,47 @@ VARDEF(Queues queues_m);
 VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
 
-inline BoolContainer &getBools() { return bools_m; }
-inline SearchOptions &getOptions() { return options_m; }
-inline SearchState &getState() { return state_m; }
-inline Queues &getQueue() { return queues_m; }
-inline Memory &getMemory() { return searchMem_m; }
-inline VariableContainer &getVars() { return varContainer_m; }
+inline BoolContainer& getBools() {
+  return bools_m;
+}
+inline SearchOptions& getOptions() {
+  return options_m;
+}
+inline SearchState& getState() {
+  return state_m;
+}
+inline Queues& getQueue() {
+  return queues_m;
+}
+inline Memory& getMemory() {
+  return searchMem_m;
+}
+inline VariableContainer& getVars() {
+  return varContainer_m;
+}
 
 template <typename DomType>
-inline BoundVarContainer<DomType> &BoundVarRef_internal<DomType>::getCon_Static() {
+inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static() {
   return varContainer_m.boundVarContainer;
 }
 
-inline BoolVarContainer &BoolVarRef_internal::getCon_Static() {
+inline BoolVarContainer& BoolVarRef_internal::getCon_Static() {
   return varContainer_m.boolVarContainer;
 }
 
 template <typename DomType>
-inline SparseBoundVarContainer<DomType> &SparseBoundVarRef_internal<DomType>::getCon_Static() {
+inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static() {
   return varContainer_m.sparseBoundVarContainer;
 }
 
 template <typename d_type>
-inline BigRangeVarContainer<d_type> &BigRangeVarRef_internal_template<d_type>::getCon_Static() {
+inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::getCon_Static() {
   return varContainer_m.bigRangeVarContainer;
 }
 
 // Must be defined later.
 inline SearchState::~SearchState() {
-  for (SysInt i = 0; i < (SysInt)constraints.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)constraints.size(); ++i)
     delete constraints[i];
 }
 

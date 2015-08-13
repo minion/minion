@@ -63,8 +63,10 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   bool constraint_locked;
 
-  AlldiffMatrixConstraint(const VarArrayType &_var_array, const ValueType _value)
-      : var_array(_var_array), constraint_locked(false), value(_value)
+  AlldiffMatrixConstraint(const VarArrayType& _var_array, const ValueType _value)
+      : var_array(_var_array),
+        constraint_locked(false),
+        value(_value)
 
   {
     squaresize = (int)sqrt(var_array.size());
@@ -89,7 +91,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   vector<SysInt> rowcolmatching; // For each row, the matching column.
   vector<SysInt> colrowmatching; // For each column, the matching row.
 
-  virtual string constraint_name() { return "alldiffmatrix"; }
+  virtual string constraint_name() {
+    return "alldiffmatrix";
+  }
 
   CONSTRAINT_ARG_LIST2(var_array, value);
 
@@ -114,39 +118,39 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   typedef typename VarArrayType::value_type VarRef;
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of
     // occurrence
-    vector<AbstractConstraint *> con;
+    vector<AbstractConstraint*> con;
 
     ConstantVar one(1);
-    for (SysInt i = 0; i < squaresize; i++) {
+    for(SysInt i = 0; i < squaresize; i++) {
       std::vector<VarRef> row_var_array;
-      for (SysInt j = 0; j < squaresize; j++)
+      for(SysInt j = 0; j < squaresize; j++)
         row_var_array.push_back(var_array[i * squaresize + j]);
 
-      NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar> *t =
+      NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>* t =
           new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(row_var_array,
                                                                                  value, one);
-      con.push_back((AbstractConstraint *)t);
+      con.push_back((AbstractConstraint*)t);
     }
 
-    for (SysInt j = 0; j < squaresize; j++) {
+    for(SysInt j = 0; j < squaresize; j++) {
       std::vector<VarRef> col_var_array;
-      for (SysInt i = 0; i < squaresize; i++)
+      for(SysInt i = 0; i < squaresize; i++)
         col_var_array.push_back(var_array[i * squaresize + j]);
 
-      NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar> *t =
+      NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>* t =
           new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(col_var_array,
                                                                                  value, one);
-      con.push_back((AbstractConstraint *)t);
+      con.push_back((AbstractConstraint*)t);
     }
 
     return new Dynamic_OR(con);
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
-    if (trig < (SysInt)var_array.size()) {
+    if(trig < (SysInt)var_array.size()) {
       // One of the value has been pruned somewhere
       // Need to propagate.
 
@@ -154,12 +158,12 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
       SysInt row = vidx / squaresize;
       SysInt col = vidx % squaresize;
 
-      if (rowcolmatching[row] == col) {
+      if(rowcolmatching[row] == col) {
         colrowmatching[col] = -1;
         rowcolmatching[row] = -1;
       }
 
-      if (!constraint_locked) {
+      if(!constraint_locked) {
         constraint_locked = true;
         getQueue().pushSpecialTrigger(this);
       }
@@ -168,18 +172,18 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
       // In the second block. Something was assigned.
       SysInt vidx = checked_cast<SysInt>(trig) - (SysInt)var_array.size();
 
-      if (var_array[vidx].getAssignedValue() == value) {
+      if(var_array[vidx].getAssignedValue() == value) {
         SysInt row = vidx / squaresize;
         SysInt col = vidx % squaresize;
 
         bool f = update_matching_assignment(row, col);
-        if (!f) {
+        if(!f) {
           getState().setFailed(true);
           return;
         }
 
         // If it was assigned to value, then we need to propagate.
-        if (!constraint_locked) {
+        if(!constraint_locked) {
           constraint_locked = true;
           getQueue().pushSpecialTrigger(this);
         }
@@ -187,12 +191,14 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void special_unlock() { constraint_locked = false; }
+  virtual void special_unlock() {
+    constraint_locked = false;
+  }
 
   virtual void special_check() {
     constraint_locked = false;
 
-    if (getState().isFailed()) {
+    if(getState().isFailed()) {
       return;
     }
     do_prop();
@@ -200,25 +206,25 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     // Clear the two matching arrays
-    for (int i = 0; i < squaresize; i++) {
+    for(int i = 0; i < squaresize; i++) {
       rowcolmatching[i] = -1;
       colrowmatching[i] = -1;
     }
 
     // Set up triggers.
 
-    for (int i = 0; i < (SysInt)var_array.size(); i++) {
-      if (var_array[i].inDomain(value)) {
+    for(int i = 0; i < (SysInt)var_array.size(); i++) {
+      if(var_array[i].inDomain(value)) {
         moveTriggerInt(var_array[i], i, DomainRemoval, value);
         moveTriggerInt(var_array[i], i + var_array.size(), Assigned);
       }
 
-      if (var_array[i].isAssigned() && var_array[i].getAssignedValue() == value) {
+      if(var_array[i].isAssigned() && var_array[i].getAssignedValue() == value) {
         SysInt row = i / squaresize;
         SysInt col = i % squaresize;
 
         // If two assignments in one row or column...
-        if (rowcolmatching[row] != -1 || colrowmatching[col] != -1) {
+        if(rowcolmatching[row] != -1 || colrowmatching[col] != -1) {
           getState().setFailed(true);
           return;
         } else {
@@ -228,28 +234,28 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
       }
     }
 
-    if (getState().isFailed()) {
+    if(getState().isFailed()) {
       return;
     }
     do_prop();
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt array_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt array_size) {
     D_ASSERT(array_size == (SysInt)var_array.size());
-    for (SysInt i = 0; i < squaresize; i++) {
+    for(SysInt i = 0; i < squaresize; i++) {
       SysInt count = 0;
-      for (SysInt j = 0; j < squaresize; j++)
-        if (v[i * squaresize + j] == value)
+      for(SysInt j = 0; j < squaresize; j++)
+        if(v[i * squaresize + j] == value)
           count++;
 
-      if (count != 1)
+      if(count != 1)
         return false;
 
       count = 0;
-      for (SysInt j = 0; j < squaresize; j++)
-        if (v[j * squaresize + i] == value)
+      for(SysInt j = 0; j < squaresize; j++)
+        if(v[j * squaresize + i] == value)
           count++;
-      if (count != 1)
+      if(count != 1)
         return false;
     }
     return true;
@@ -258,7 +264,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(var_array[i]);
     return vars;
   }
@@ -268,7 +274,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   void do_prop() {
     bool matchok = bfsmatching();
 
-    if (!matchok) {
+    if(!matchok) {
       getState().setFailed(true);
     } else {
       tarjan_recursive();
@@ -285,22 +291,22 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   inline bool update_matching_assignment(int row, int col) {
     D_ASSERT(assignedValue(row, col));
 
-    if (rowcolmatching[row] != col) {
+    if(rowcolmatching[row] != col) {
       // Could be the row or column is already assigned
-      if (rowcolmatching[row] != -1 && assignedValue(row, rowcolmatching[row])) {
+      if(rowcolmatching[row] != -1 && assignedValue(row, rowcolmatching[row])) {
         return false;
       }
 
-      if (colrowmatching[col] != -1 && assignedValue(colrowmatching[col], col)) {
+      if(colrowmatching[col] != -1 && assignedValue(colrowmatching[col], col)) {
         return false;
       }
 
       // First free up row and col.
-      if (rowcolmatching[row] > -1) {
+      if(rowcolmatching[row] > -1) {
         colrowmatching[rowcolmatching[row]] = -1;
         // rowcolmatching[row]=-1;    // not necessary
       }
-      if (colrowmatching[col] > -1) {
+      if(colrowmatching[col] > -1) {
         rowcolmatching[colrowmatching[col]] = -1;
         // colrowmatching[col]=-1;    // not necessary
       }
@@ -317,18 +323,18 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     // and if the variable is assigned to value then the edge is in the
     // matching.
 
-    D_DATA(for (int row = 0; row < squaresize; row++) {
-      for (int col = 0; col < squaresize; col++) {
-        if (rowcolmatching[row] == col) {
+    D_DATA(for(int row = 0; row < squaresize; row++) {
+      for(int col = 0; col < squaresize; col++) {
+        if(rowcolmatching[row] == col) {
           D_ASSERT(colrowmatching[col] == row);
         }
 
-        if (!hasValue(row, col)) {
+        if(!hasValue(row, col)) {
           D_ASSERT(rowcolmatching[row] != col);
           D_ASSERT(colrowmatching[col] != row);
         }
 
-        if (assignedValue(row, col)) {
+        if(assignedValue(row, col)) {
           D_ASSERT(rowcolmatching[row] == col);
           D_ASSERT(colrowmatching[col] == row);
         }
@@ -337,8 +343,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
     // iterate through the matching looking for broken matches.
 
-    for (SysInt initialrow = 0; initialrow < squaresize; initialrow++) {
-      if (rowcolmatching[initialrow] == -1) {
+    for(SysInt initialrow = 0; initialrow < squaresize; initialrow++) {
+      if(rowcolmatching[initialrow] == -1) {
         // starting from a row, find a path to a free column.
 
         // No adjacency lists.
@@ -351,15 +357,15 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         visited.insert(initialrow);
 
         bool finished = false;
-        while (!fifo.empty() && !finished) {
+        while(!fifo.empty() && !finished) {
           SysInt curnode = fifo.front();
           fifo.pop_front();
 
-          if (curnode < squaresize) {
+          if(curnode < squaresize) {
             // It's a row.
             // Iterate through columns connected to this row.
-            for (int col = 0; col < squaresize; col++) {
-              if (!visited.in(col + squaresize) && hasValue(curnode, col)) {
+            for(int col = 0; col < squaresize; col++) {
+              if(!visited.in(col + squaresize) && hasValue(curnode, col)) {
                 // If we got to curnode along a matching edge,
                 // then the
                 visited.insert(col + squaresize);
@@ -371,15 +377,15 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
             // curnode is a column.
             SysInt newnode = colrowmatching[curnode - squaresize];
 
-            if (newnode == -1) {
+            if(newnode == -1) {
               // This column is not matched with anything.
               finished = true;
               apply_augmenting_path(curnode, initialrow);
             } else {
               // If the row/col is assigned to value, then we can't traverse the
               // reverse edge.
-              if (!assignedValue(newnode, curnode - squaresize)) {
-                if (!visited.in(newnode)) {
+              if(!assignedValue(newnode, curnode - squaresize)) {
+                if(!visited.in(newnode)) {
                   visited.insert(newnode);
                   prev[newnode] = curnode;
                   fifo.push_back(newnode);
@@ -389,7 +395,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
           }
         }
 
-        if (!finished)
+        if(!finished)
           return false; // No complete matching
       }
     }
@@ -402,7 +408,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     // Then apply it.
     // Assumes prev contains vertex numbers.
     SysInt curnode = unwindnode;
-    while (curnode != startnode) {
+    while(curnode != startnode) {
       augpath.push_back(curnode);
       curnode = prev[curnode];
     }
@@ -413,9 +419,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     ADMPRINT("Found augmenting path:" << augpath);
 
     // now apply the path.
-    for (SysInt i = 0; i < (SysInt)augpath.size() - 1; i++) {
+    for(SysInt i = 0; i < (SysInt)augpath.size() - 1; i++) {
       curnode = augpath[i];
-      if (curnode < squaresize) {
+      if(curnode < squaresize) {
         // if it's a row:
         // Overwrites existing edges using same row or column.
         rowcolmatching[curnode] =
@@ -473,16 +479,16 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
     // Make sure all rows and columns are visited by Tarjans.
 
-    for (SysInt row = 0; row < squaresize; row++) {
-      if (!visited.in(row)) {
+    for(SysInt row = 0; row < squaresize; row++) {
+      if(!visited.in(row)) {
         ADMPRINT("(Re)starting tarjan's algorithm, at node:" << row);
         visit(row, true);
         ADMPRINT("Returned from tarjan's algorithm.");
       }
     }
 
-    for (SysInt col = 0; col < squaresize; col++) {
-      if (!visited.in(col + squaresize)) {
+    for(SysInt col = 0; col < squaresize; col++) {
+      if(!visited.in(col + squaresize)) {
         ADMPRINT("(Re)starting tarjan's algorithm, at node:" << col + squaresize);
         visit(col + squaresize, true);
         ADMPRINT("Returned from tarjan's algorithm.");
@@ -500,20 +506,20 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     visited.insert(curnode);
     ADMPRINT("Visiting node: " << curnode);
 
-    if (curnode < squaresize) {
+    if(curnode < squaresize) {
       // Not allowed to traverse this edge if it is 'assigned' (i.e.
       // fixed to value 1), because it may be traversed only if it can be
       // reversed.
-      if (!assignedValue(curnode, rowcolmatching[curnode])) {
+      if(!assignedValue(curnode, rowcolmatching[curnode])) {
         SysInt newnode = rowcolmatching[curnode] + squaresize;
-        if (!visited.in(newnode)) {
+        if(!visited.in(newnode)) {
           visit(newnode, false);
-          if (lowlink[newnode] < lowlink[curnode]) {
+          if(lowlink[newnode] < lowlink[curnode]) {
             lowlink[curnode] = lowlink[newnode];
           }
         } else {
           // Already visited newnode
-          if (in_tstack.in(newnode) && dfsnum[newnode] < lowlink[curnode]) {
+          if(in_tstack.in(newnode) && dfsnum[newnode] < lowlink[curnode]) {
             lowlink[curnode] = dfsnum[newnode]; // Why dfsnum not lowlink?
           }
         }
@@ -522,19 +528,19 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
       // curnode is a column
       SysInt col = curnode - squaresize;
 
-      for (SysInt row = 0; row < squaresize; row++) {
-        if (rowcolmatching[row] != col) // if the edge is not in the matching.
+      for(SysInt row = 0; row < squaresize; row++) {
+        if(rowcolmatching[row] != col) // if the edge is not in the matching.
         {
-          if (hasValue(row, col)) // and the value
+          if(hasValue(row, col)) // and the value
           {
-            if (!visited.in(row)) {
+            if(!visited.in(row)) {
               visit(row, false);
-              if (lowlink[row] < lowlink[curnode]) {
+              if(lowlink[row] < lowlink[curnode]) {
                 lowlink[curnode] = lowlink[row];
               }
             } else {
               // Already visited row
-              if (in_tstack.in(row) && dfsnum[row] < lowlink[curnode]) {
+              if(in_tstack.in(row) && dfsnum[row] < lowlink[curnode]) {
                 lowlink[curnode] = dfsnum[row];
               }
             }
@@ -545,36 +551,36 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
     // cout << "On way back up, curnode:" << curnode<< ",
     // lowlink:"<<lowlink[curnode]<< ", dfsnum:"<<dfsnum[curnode]<<endl;
-    if (lowlink[curnode] == dfsnum[curnode]) {
+    if(lowlink[curnode] == dfsnum[curnode]) {
       // At the root of a strongly connected component.
       rowinscc.clear();
 
-      for (vector<SysInt>::iterator tstackit = (tstack.end() - 1);; --tstackit) {
+      for(vector<SysInt>::iterator tstackit = (tstack.end() - 1);; --tstackit) {
         SysInt copynode = (*tstackit);
-        if (copynode < squaresize) // It's a row.
+        if(copynode < squaresize) // It's a row.
         {
           rowinscc.insert(copynode);
         }
 
-        if (copynode == curnode) {
+        if(copynode == curnode) {
           break;
         }
       }
 
-      while (true) {
+      while(true) {
         SysInt copynode = (*(tstack.end() - 1));
 
         tstack.pop_back();
         in_tstack.remove(copynode);
 
-        if (copynode >= squaresize) {
+        if(copynode >= squaresize) {
           // It's a column. Iterate through rows and prune whenever the row is
           // not in same scc as this column.
 
-          for (SysInt row = 0; row < squaresize; row++) {
-            if (!rowinscc.in(row)) {
+          for(SysInt row = 0; row < squaresize; row++) {
+            if(!rowinscc.in(row)) {
 
-              if (rowcolmatching[row] != copynode - squaresize) {
+              if(rowcolmatching[row] != copynode - squaresize) {
                 ADMPRINT("Pruning row: " << row << " column: " << copynode - squaresize
                                          << " removing value.");
                 var_array[row * squaresize + copynode - squaresize].removeFromDomain(value);
@@ -587,27 +593,27 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
           }
         }
 
-        if (copynode == curnode) {
+        if(copynode == curnode) {
           break;
         }
       }
     }
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     // Clean up the matching first.
-    for (int row = 0; row < squaresize; row++) {
-      if (rowcolmatching[row] > -1 && !hasValue(row, rowcolmatching[row])) {
+    for(int row = 0; row < squaresize; row++) {
+      if(rowcolmatching[row] > -1 && !hasValue(row, rowcolmatching[row])) {
         colrowmatching[rowcolmatching[row]] = -1;
         rowcolmatching[row] = -1;
       }
     }
 
-    for (int row = 0; row < squaresize; row++) {
-      for (int col = 0; col < squaresize; col++) {
-        if (assignedValue(row, col)) {
+    for(int row = 0; row < squaresize; row++) {
+      for(int col = 0; col < squaresize; col++) {
+        if(assignedValue(row, col)) {
           bool f = update_matching_assignment(row, col);
-          if (!f)
+          if(!f)
             return false;
         }
       }
@@ -618,15 +624,15 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     ADMPRINT(rowcolmatching);
     ADMPRINT(colrowmatching);
 
-    if (!matchok)
+    if(!matchok)
       return false;
 
-    for (SysInt row = 0; row < squaresize; row++) {
-      for (SysInt col = 0; col < squaresize; col++) {
-        if (rowcolmatching[row] == col) {
+    for(SysInt row = 0; row < squaresize; row++) {
+      for(SysInt col = 0; col < squaresize; col++) {
+        if(rowcolmatching[row] == col) {
           assignment.push_back(make_pair((row * squaresize) + col, value));
         } else {
-          if (var_array[row * squaresize + col].getMax() != value) {
+          if(var_array[row * squaresize + col].getMax() != value) {
             assignment.push_back(
                 make_pair((row * squaresize) + col, var_array[row * squaresize + col].getMax()));
           } else {
@@ -641,7 +647,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray>
-AbstractConstraint *BuildCT_ALLDIFFMATRIX(const VarArray &var_array, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_ALLDIFFMATRIX(const VarArray& var_array, ConstraintBlob& b) {
   return new AlldiffMatrixConstraint<VarArray, decltype(b.constants[0][0])>(var_array,
                                                                             b.constants[0][0]);
 }

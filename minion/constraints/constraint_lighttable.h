@@ -45,18 +45,28 @@ struct Literal {
 
 class BaseTableData {
 protected:
-  TupleList *tuple_data;
+  TupleList* tuple_data;
 
 public:
-  DomainInt getVarCount() { return tuple_data->tuple_size(); }
+  DomainInt getVarCount() {
+    return tuple_data->tuple_size();
+  }
 
-  DomainInt getNumOfTuples() { return tuple_data->size(); }
+  DomainInt getNumOfTuples() {
+    return tuple_data->size();
+  }
 
-  DomainInt getLiteralPos(Literal l) { return tuple_data->get_literal(l.var, l.val); }
+  DomainInt getLiteralPos(Literal l) {
+    return tuple_data->get_literal(l.var, l.val);
+  }
 
-  DomainInt *getPointer() { return tuple_data->getPointer(); }
+  DomainInt* getPointer() {
+    return tuple_data->getPointer();
+  }
 
-  DomainInt getLiteralCount() { return tuple_data->literal_num; }
+  DomainInt getLiteralCount() {
+    return tuple_data->literal_num;
+  }
 
   Literal getLiteralFromPos(SysInt pos) {
     pair<SysInt, DomainInt> lit = tuple_data->get_varval_from_literal(pos);
@@ -68,22 +78,22 @@ public:
                      tuple_data->dom_smallest[var] + tuple_data->dom_size[var]);
   }
 
-  BaseTableData(TupleList *_tuple_data) : tuple_data(_tuple_data) {}
+  BaseTableData(TupleList* _tuple_data) : tuple_data(_tuple_data) {}
 };
 
 class TrieData : public BaseTableData {
 
 public:
-  TupleTrieArray *tupleTrieArrayptr;
+  TupleTrieArray* tupleTrieArrayptr;
 
-  TrieData(TupleList *_tuple_data)
+  TrieData(TupleList* _tuple_data)
       : BaseTableData(_tuple_data), tupleTrieArrayptr(_tuple_data->getTries()) {}
 
   // TODO: Optimise possibly?
-  bool checkTuple(DomainInt *tuple, SysInt tuple_size) {
+  bool checkTuple(DomainInt* tuple, SysInt tuple_size) {
     D_ASSERT(tuple_size == getVarCount());
-    for (SysInt i = 0; i < getNumOfTuples(); ++i) {
-      if (std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
+    for(SysInt i = 0; i < getNumOfTuples(); ++i) {
+      if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
         return true;
     }
     return false;
@@ -95,20 +105,20 @@ public:
 template <typename VarArray, typename TableDataType = TrieData>
 struct LightTableConstraint : public AbstractConstraint {
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     const SysInt tuple_size = checked_cast<SysInt>(data->getVarCount());
     const SysInt length = checked_cast<SysInt>(data->getNumOfTuples());
-    DomainInt *tuple_data = data->getPointer();
+    DomainInt* tuple_data = data->getPointer();
 
-    for (SysInt i = 0; i < length; ++i) {
-      DomainInt *tuple_start = tuple_data + i * tuple_size;
+    for(SysInt i = 0; i < length; ++i) {
+      DomainInt* tuple_start = tuple_data + i * tuple_size;
       bool success = true;
-      for (SysInt j = 0; j < tuple_size && success; ++j) {
-        if (!vars[j].inDomain(tuple_start[j]))
+      for(SysInt j = 0; j < tuple_size && success; ++j) {
+        if(!vars[j].inDomain(tuple_start[j]))
           success = false;
       }
-      if (success) {
-        for (SysInt i = 0; i < tuple_size; ++i)
+      if(success) {
+        for(SysInt i = 0; i < tuple_size; ++i)
           assignment.push_back(make_pair(i, tuple_start[i]));
         return true;
       }
@@ -116,22 +126,26 @@ struct LightTableConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual string constraint_name() { return "lighttable"; }
+  virtual string constraint_name() {
+    return "lighttable";
+  }
 
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 
   CONSTRAINT_ARG_LIST2(vars, tuples);
 
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
-  TupleList *tuples;
-  TableDataType *data; // Assuming this is a TrieData for the time being.
+  TupleList* tuples;
+  TableDataType* data; // Assuming this is a TrieData for the time being.
   // Can this be the thing instead of a *??
 
-  LightTableConstraint(const VarArray &_vars, TupleList *_tuples)
+  LightTableConstraint(const VarArray& _vars, TupleList* _tuples)
       : vars(_vars), tuples(_tuples), data(new TableDataType(_tuples)) {
     CheckNotBound(vars, "table constraints", "");
-    if (_tuples->tuple_size() != (SysInt)_vars.size()) {
+    if(_tuples->tuple_size() != (SysInt)_vars.size()) {
       cout << "Table constraint: Number of variables " << _vars.size()
            << " does not match length of tuples " << _tuples->tuple_size() << "." << endl;
       FAIL_EXIT();
@@ -143,15 +157,15 @@ struct LightTableConstraint : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       moveTriggerInt(vars[i], i, DomainChanged);
     }
   }
 
   virtual void propagateDynInt(SysInt changed_var, DomainDelta) {
     // Propagate to all vars except the one that changed.
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      if (i != changed_var) {
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
+      if(i != changed_var) {
         propagate_var(i);
       }
     }
@@ -160,15 +174,15 @@ struct LightTableConstraint : public AbstractConstraint {
   void propagate_var(SysInt varidx) {
     VarRef var = vars[varidx];
 
-    for (DomainInt val = var.getMin(); val <= var.getMax(); val++) {
-      if (var.inDomain(val)) {
+    for(DomainInt val = var.getMin(); val <= var.getMax(); val++) {
+      if(var.inDomain(val)) {
         // find the right trie first.
 
-        TupleTrie &trie = data->tupleTrieArrayptr->getTrie(varidx);
+        TupleTrie& trie = data->tupleTrieArrayptr->getTrie(varidx);
 
         bool support = trie.search_trie_nostate(val, vars);
 
-        if (!support) {
+        if(!support) {
           var.removeFromDomain(val);
         }
       }
@@ -177,34 +191,36 @@ struct LightTableConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     setup_triggers();
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       propagate_var(i);
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) { return data->checkTuple(v, v_size); }
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+    return data->checkTuple(v, v_size);
+  }
 
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> anyvars;
-    for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);
     return anyvars;
   }
 };
 
-inline TupleTrieArray *TupleList::getTries() {
-  if (triearray == NULL)
+inline TupleTrieArray* TupleList::getTries() {
+  if(triearray == NULL)
     triearray = new TupleTrieArray(this);
   return triearray;
 }
 
 template <typename VarArray>
-AbstractConstraint *GACLightTableCon(const VarArray &vars, TupleList *tuples) {
+AbstractConstraint* GACLightTableCon(const VarArray& vars, TupleList* tuples) {
   return new LightTableConstraint<VarArray>(vars, tuples);
 }
 
 template <typename T>
-AbstractConstraint *BuildCT_LIGHTTABLE(const T &t1, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_LIGHTTABLE(const T& t1, ConstraintBlob& b) {
   return GACLightTableCon(t1, b.tuples);
 }
 

@@ -20,22 +20,22 @@ struct MakeIntTuple<-1, IntTuple<Vals...>> {
 };
 
 template <typename T>
-struct drop_ref<T &> {
+struct drop_ref<T&> {
   typedef T type;
 };
 
 template <typename T>
-struct drop_ref<const T &> {
+struct drop_ref<const T&> {
   typedef T type;
 };
 
 template <typename T>
-struct drop_ref<T &&> {
+struct drop_ref<T&&> {
   typedef T type;
 };
 
 template <typename T>
-struct drop_ref<const T &&> {
+struct drop_ref<const T&&> {
   typedef T type;
 };
 
@@ -109,12 +109,12 @@ struct SizeOf<T, Args...> {
 };
 
 template <typename T>
-struct removePointer<T *> {
+struct removePointer<T*> {
   typedef T type;
 };
 
 template <typename T>
-struct removeAllPointers<T *> {
+struct removeAllPointers<T*> {
   typedef typename removeAllPointers<T>::type type;
 };
 
@@ -131,20 +131,20 @@ struct removePointerFromTupleArgs<std::tuple<Args...>> {
 template <typename T>
 struct NoArgHeapConstructor<T, 0> {
   template <typename... Args>
-  T *operator()(const Args &... args) {
+  T* operator()(const Args&... args) {
     return new T(args...);
   }
 
   template <typename... Args>
   struct Type {
-    typedef T *type;
+    typedef T* type;
   };
 };
 
 template <typename T>
 struct NoArgStackConstructor<T, 0> {
   template <typename... Args>
-  T operator()(const Args &... args) {
+  T operator()(const Args&... args) {
     return T(args...);
   }
 

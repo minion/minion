@@ -7,7 +7,7 @@ inline void Trig_ConRef::propagate(DomainDelta d) {
 
 inline void DynamicTriggerList::add(Trig_ConRef t) {
   releaseMergedTrigger(t);
-  if (slack.empty()) {
+  if(slack.empty()) {
     elems.push_back(t);
     TRIGP("LA:" << elems.size() << ":" << t);
     Con_TrigRef ctr{this, (SysInt)(elems.size() - 1)};
@@ -26,9 +26,9 @@ inline void DynamicTriggerList::add(Trig_ConRef t) {
 }
 
 inline bool DynamicTriggerList::sanity_check_list() {
-  for (size_t i = 0; i < elems.size(); ++i) {
+  for(size_t i = 0; i < elems.size(); ++i) {
     Trig_ConRef trig = elems[i];
-    if (!trig.empty()) {
+    if(!trig.empty()) {
       Con_TrigRef con = trig.con->_getTrigRef(trig.conListPos);
       D_CHECK(con.dtl == this);
       D_CHECK(con.triggerListPos == i);
@@ -41,8 +41,8 @@ inline void DynamicTriggerList::verify_slack() const {
 // Note: In non-debug mode, this does nothing
 #ifdef MINION_DEBUG
   size_t slack_debug_count = 0;
-  for (int i = 0; i < elems.size(); ++i) {
-    if (elems[i].empty())
+  for(int i = 0; i < elems.size(); ++i) {
+    if(elems[i].empty())
       slack_debug_count++;
   }
   D_ASSERT(slack.size() == slack_debug_count);
@@ -120,14 +120,14 @@ inline void DynamicTriggerList::
 
 inline void releaseMergedTrigger(Con_TrigRef t, TrigOp op) {
   TRIGP("CTR_Release:" << t);
-  if (t.empty()) {
+  if(t.empty()) {
     TRIGP("Empty");
     return;
   }
 
   Trig_ConRef tcr = t.dtl->_getConRef(t.triggerListPos);
 
-  if (op == TO_Backtrack) {
+  if(op == TO_Backtrack) {
     getQueue().getTbq().restoreTriggerOnBacktrack(tcr);
   }
 
@@ -147,11 +147,11 @@ inline void releaseMergedTrigger(Trig_ConRef t, TrigOp op) {
 
   Con_TrigRef ctr = t.con->_getTrigRef(t.conListPos);
 
-  if (op == TO_Backtrack) {
+  if(op == TO_Backtrack) {
     getQueue().getTbq().restoreTriggerOnBacktrack(t);
   }
 
-  if (ctr.empty()) {
+  if(ctr.empty()) {
     TRIGP("Empty");
     return;
   }

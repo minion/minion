@@ -2,7 +2,9 @@
 
 struct Thing {};
 
-bool operator==(Thing, Thing) { return true; }
+bool operator==(Thing, Thing) {
+  return true;
+}
 
 int main(void) {
   MultiDimCon<int, Thing> m(make_vec(2, 2, 2));

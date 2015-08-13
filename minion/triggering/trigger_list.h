@@ -31,9 +31,9 @@
 
 class TriggerList {
 
-  TriggerList(const TriggerList &);
+  TriggerList(const TriggerList&);
   TriggerList();
-  void operator=(const TriggerList &);
+  void operator=(const TriggerList&);
   bool only_bounds;
 
 public:
@@ -66,23 +66,23 @@ public:
 
     dynamic_triggers_vec.resize(4);
 
-    for (int i = 0; i < 4; ++i)
+    for(int i = 0; i < 4; ++i)
       dynamic_triggers_vec[i].resize(var_count_m);
 
-    if (!only_bounds) {
+    if(!only_bounds) {
       dynamic_triggers_domain_vec.resize(vars_domain_size);
-      for (int i = 0; i < vars_domain_size; ++i)
+      for(int i = 0; i < vars_domain_size; ++i)
         dynamic_triggers_domain_vec[i].resize(var_count_m);
     }
 
     triggers.resize(4);
-    for (UnsignedSysInt i = 0; i < 4; ++i)
+    for(UnsignedSysInt i = 0; i < 4; ++i)
       triggers[i].resize(var_count_m);
   }
 
-  pair<Trigger *, Trigger *> get_trigger_range(DomainInt var_num, TrigType type) {
-    vector<Trigger> &trigs = triggers[type][checked_cast<SysInt>(var_num)];
-    return pair<Trigger *, Trigger *>(trigs.data(), trigs.data() + trigs.size());
+  pair<Trigger*, Trigger*> get_trigger_range(DomainInt var_num, TrigType type) {
+    vector<Trigger>& trigs = triggers[type][checked_cast<SysInt>(var_num)];
+    return pair<Trigger*, Trigger*>(trigs.data(), trigs.data() + trigs.size());
   }
 
   void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt domain_delta,
@@ -90,8 +90,8 @@ public:
     D_ASSERT(val_removed == NoDomainValue ||
              (type == DomainRemoval && val_removed != NoDomainValue));
     D_ASSERT(!only_bounds || type != DomainRemoval);
-    DynamicTriggerList *trig;
-    if (type != DomainRemoval) {
+    DynamicTriggerList* trig;
+    if(type != DomainRemoval) {
       trig = &(dynamic_triggers_vec[type][checked_cast<SysInt>(var_num)]);
     } else {
       D_ASSERT(!only_bounds);
@@ -102,7 +102,7 @@ public:
     }
 
     // This is an optimisation, no need to push empty lists.
-    if (!trig->empty())
+    if(!trig->empty())
       getQueue().pushDynamicTriggers(DynamicTriggerEvent(trig, checked_cast<SysInt>(domain_delta)));
   }
 
@@ -110,8 +110,8 @@ public:
     dynamic_propagate(var_num, UpperBound, upper_delta);
     D_ASSERT(upper_delta > 0 || getState().isFailed());
 
-    pair<Trigger *, Trigger *> range = get_trigger_range(var_num, UpperBound);
-    if (range.first != range.second)
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
+    if(range.first != range.second)
       getQueue().pushTriggers(
           TriggerRange(range.first, range.second, checked_cast<SysInt>(upper_delta)));
   }
@@ -119,24 +119,24 @@ public:
   void push_lower(DomainInt var_num, DomainInt lower_delta) {
     dynamic_propagate(var_num, LowerBound, lower_delta);
     D_ASSERT(lower_delta > 0 || getState().isFailed());
-    pair<Trigger *, Trigger *> range = get_trigger_range(var_num, LowerBound);
-    if (range.first != range.second)
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
+    if(range.first != range.second)
       getQueue().pushTriggers(
           TriggerRange(range.first, range.second, checked_cast<SysInt>(lower_delta)));
   }
 
   void push_assign(DomainInt var_num, DomainInt) {
     dynamic_propagate(var_num, Assigned, -1);
-    pair<Trigger *, Trigger *> range = get_trigger_range(var_num, Assigned);
-    if (range.first != range.second)
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
+    if(range.first != range.second)
       getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
   void push_domain_changed(DomainInt var_num) {
     dynamic_propagate(var_num, DomainChanged, -1);
 
-    pair<Trigger *, Trigger *> range = get_trigger_range(var_num, DomainChanged);
-    if (range.first != range.second)
+    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
+    if(range.first != range.second)
       getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
@@ -160,9 +160,9 @@ public:
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t.con != NULL);
 
-    DynamicTriggerList *queue;
+    DynamicTriggerList* queue;
 
-    if (type != DomainRemoval) {
+    if(type != DomainRemoval) {
       queue = &dynamic_triggers_vec[type][checked_cast<SysInt>(b)];
     } else {
       D_ASSERT(!only_bounds);
@@ -186,7 +186,7 @@ public:
         }
     */
 
-    if (op == TO_Backtrack) {
+    if(op == TO_Backtrack) {
       getQueue().getTbq().restoreTriggerOnBacktrack(t);
     }
 
@@ -196,9 +196,9 @@ public:
 
 inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {
   static DynamicTriggerList dt;
-  DynamicTriggerList *queue = &dt;
+  DynamicTriggerList* queue = &dt;
 
-  if (op == TO_Backtrack) {
+  if(op == TO_Backtrack) {
     getQueue().getTbq().restoreTriggerOnBacktrack(t);
   }
 

@@ -1,6 +1,6 @@
 #include "minlib/minlib.hpp"
 
-void f(char *);
+void f(char*);
 
 int main(void) {
   std::is_same<int, CommonType<int, int>::type> T1;

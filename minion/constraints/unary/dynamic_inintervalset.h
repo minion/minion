@@ -30,7 +30,9 @@ intervals must be given in numerical order.
 // Checks if a variable is in a fixed set.
 template <typename Var>
 struct WatchInIntervalSetConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "w-inintervalset"; }
+  virtual string constraint_name() {
+    return "w-inintervalset";
+  }
 
   CONSTRAINT_ARG_LIST2(var, intervals); // Does redump.
 
@@ -39,13 +41,13 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
   vector<std::pair<DomainInt, DomainInt>> intervals;
 
   template <typename T>
-  WatchInIntervalSetConstraint(const Var &_var, const T &_vals)
+  WatchInIntervalSetConstraint(const Var& _var, const T& _vals)
       : var(_var) {
     CHECK(_vals.size() % 2 == 0, "Second argument of w-inintervalset "
                                  "constraint represents a list of pairs so it "
                                  "must have an even number of values.");
     CHECK(_vals.size() > 0, "w-inintervalset constraint requires at least one interval.");
-    for (int i = 0; i < (SysInt)_vals.size(); i = i + 2) {
+    for(int i = 0; i < (SysInt)_vals.size(); i = i + 2) {
       CHECK(_vals[i] <= _vals[i + 1], "Malformed interval in w-inintervalset constraint.");
       // Allow intervals with just one value.
       intervals.push_back(std::make_pair(_vals[i], _vals[i + 1]));
@@ -53,30 +55,32 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
 
     std::stable_sort(intervals.begin(), intervals.end());
 
-    for (SysInt i = 0; i < (SysInt)intervals.size() - 1; i++) {
+    for(SysInt i = 0; i < (SysInt)intervals.size() - 1; i++) {
       CHECK(intervals[i].second < intervals[i + 1].first - 1,
             "Intervals overlapping or touching in w-inintervalset constraint.");
     }
   }
 
-  virtual SysInt dynamic_trigger_count() { return 1; }
+  virtual SysInt dynamic_trigger_count() {
+    return 1;
+  }
 
   virtual void full_propagate() {
-    if (intervals.empty()) {
+    if(intervals.empty()) {
       getState().setFailed(true);
       return;
     }
     var.setMin(intervals.front().first);
     var.setMax(intervals.back().second);
 
-    if (var.isBound()) {
+    if(var.isBound()) {
       // May as well pass DomainRemoval
       moveTriggerInt(var, 0, DomainChanged);
       propagateDynInt(0, DomainDelta::empty());
     } else {
       // Prune everything between intervals.
-      for (SysInt i = 0; i < (SysInt)intervals.size() - 1; ++i)
-        for (DomainInt pos = intervals[i].second + 1; pos < intervals[i + 1].first; ++pos)
+      for(SysInt i = 0; i < (SysInt)intervals.size() - 1; ++i)
+        for(DomainInt pos = intervals[i].second + 1; pos < intervals[i + 1].first; ++pos)
           var.removeFromDomain(pos);
     }
   }
@@ -88,13 +92,13 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     // This is basically lifted from "sparse SysInt bound vars"
     vector<std::pair<DomainInt, DomainInt>>::iterator it_low = std::lower_bound(
         intervals.begin(), intervals.end(), std::make_pair(var.getMin(), var.getMin()));
-    if (it_low == intervals.end()) {
+    if(it_low == intervals.end()) {
       // we must have reached the lower bound of the last interval, in which
       // case nothing more needs to be done.
       return;
     } else {
       // Check if the lower bound is in the interval below the one found.
-      if (it_low != intervals.begin() && (*(it_low - 1)).second < var.getMin()) {
+      if(it_low != intervals.begin() && (*(it_low - 1)).second < var.getMin()) {
         // Lower bound of var is not in the interval below it_low. Prune it to
         // the bottom of it_low.
         cout << "Pruning lower bound:" << (*it_low).first << endl;
@@ -104,7 +108,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
 
     vector<std::pair<DomainInt, DomainInt>>::iterator it_high = std::lower_bound(
         intervals.begin(), intervals.end(), std::make_pair(var.getMax(), var.getMax()));
-    if (it_high == intervals.end()) {
+    if(it_high == intervals.end()) {
       // var.setMax(*(it_high - 1).second);  // didn't we already do this in
       // full prop?
       return;
@@ -113,7 +117,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     var.setMax((*it_high).second);
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     vector<std::pair<DomainInt, DomainInt>>::iterator it_high =
         std::lower_bound(intervals.begin(), intervals.end(), std::make_pair(v[0], v[0]));
@@ -121,16 +125,16 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     // we could do some much clever reasoning to save two checks, but it's
     // easier
     // and possibly slightly cheaper to just do this.
-    if (it_high != intervals.end() && (v[0] >= (*it_high).first && v[0] <= (*it_high).second))
+    if(it_high != intervals.end() && (v[0] >= (*it_high).first && v[0] <= (*it_high).second))
       return true;
 
     // Step back one if required (watch out for falling off start!)
-    if (it_high != intervals.begin())
+    if(it_high != intervals.begin())
       it_high--;
     else
       return false;
 
-    if (v[0] >= (*it_high).first && v[0] <= (*it_high).second)
+    if(v[0] >= (*it_high).first && v[0] <= (*it_high).second)
       return true;
     return false;
   }
@@ -142,11 +146,11 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    for (SysInt i = 0; i < (SysInt)intervals.size(); ++i) {
-      for (DomainInt d = intervals[i].first; d <= intervals[i].second; d++) {
-        if (var.inDomain(d)) {
+    for(SysInt i = 0; i < (SysInt)intervals.size(); ++i) {
+      for(DomainInt d = intervals[i].first; d <= intervals[i].second; d++) {
+        if(var.inDomain(d)) {
           assignment.push_back(make_pair(0, d));
           return true;
         }
@@ -155,7 +159,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     // It is its own reverse.
     vector<DomainInt> negintervals;
 
@@ -170,7 +174,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     negintervals.push_back(intervals.front().first - 1);
 
     // Make negintervals between intervals.
-    for (int i = 0; i < (SysInt)intervals.size() - 1; i++) {
+    for(int i = 0; i < (SysInt)intervals.size() - 1; i++) {
       negintervals.push_back(intervals[i].second + 1);
       negintervals.push_back(intervals[i + 1].first - 1);
     }
@@ -183,8 +187,8 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray1>
-AbstractConstraint *BuildCT_WATCHED_ININTERVALSET(const VarArray1 &_var_array_1,
-                                                  const ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_ININTERVALSET(const VarArray1& _var_array_1,
+                                                  const ConstraintBlob& b) {
   return new WatchInIntervalSetConstraint<typename VarArray1::value_type>(_var_array_1[0],
                                                                           b.constants[0]);
 }

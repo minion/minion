@@ -1,30 +1,32 @@
-virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+virtual AbstractConstraint* reverse_constraint() {
+  return forward_check_negation(this);
+}
 
 struct Support;
 
 struct SupportCell {
   SysInt literal;
-  Support *sup;
-  SupportCell *next;
-  SupportCell *prev;
+  Support* sup;
+  SupportCell* next;
+  SupportCell* prev;
 };
 
 struct Literal {
   SysInt var;
   DomainInt val;
-  SupportCell *supportCellList;
+  SupportCell* supportCellList;
   //      Literal() { supportCellList = 0 ;}
 };
 
 // Methods common to both haggisgac_bt and haggisgac_stable. To be directly
 // included in both those files.
 
-virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
   D_ASSERT(vars.size() > 0);
-  for (DomainInt i = vars[0].getMin(); i <= vars[0].getMax(); ++i) {
+  for(DomainInt i = vars[0].getMin(); i <= vars[0].getMax(); ++i) {
     literalsScratch.clear();
-    if (findNewSupport<true>(0, i)) {
-      for (SysInt j = 0; j < (SysInt)literalsScratch.size(); ++j)
+    if(findNewSupport<true>(0, i)) {
+      for(SysInt j = 0; j < (SysInt)literalsScratch.size(); ++j)
         assignment.push_back(literalsScratch[j]);
       return true;
     }
@@ -32,31 +34,31 @@ virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment)
   return false;
 }
 
-virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
   D_ASSERT(vars.size() > 0);
-  if (v[0] < vars[0].getInitialMin())
+  if(v[0] < vars[0].getInitialMin())
     return false;
 
-  if (v[0] > vars[0].getInitialMax())
+  if(v[0] > vars[0].getInitialMax())
     return false;
 
   const SysInt val_offset = checked_cast<SysInt>(v[0] - vars[0].getInitialMin());
-  const vector<vector<pair<SysInt, DomainInt>> *> &tuplist = tuple_list->get_tl()[0][val_offset];
+  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->get_tl()[0][val_offset];
 
-  for (SysInt i = 0; i < (SysInt)tuple_list->get_tl()[0][val_offset].size(); i++) {
-    const vector<pair<SysInt, DomainInt>> &tup = *(tuplist[i]);
+  for(SysInt i = 0; i < (SysInt)tuple_list->get_tl()[0][val_offset].size(); i++) {
+    const vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
     bool valid = true;
 
-    for (SysInt j = 0; j < supsize; j++) {
-      if (v[tup[j].first] != tup[j].second) {
+    for(SysInt j = 0; j < supsize; j++) {
+      if(v[tup[j].first] != tup[j].second) {
         valid = false;
         break;
       }
     }
 
-    if (valid)
+    if(valid)
       return true;
   }
 
@@ -65,7 +67,7 @@ virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
 
 virtual ~CLASSNAME() {
   // printStructures();
-  set<Support *> myset;
+  set<Support*> myset;
 
   /*
   for(SysInt i=0; i<(SysInt)vars.size(); i++) {
@@ -80,11 +82,11 @@ virtual ~CLASSNAME() {
   */
 
   // Want to find all active support objects so we can delete them
-  for (SysInt lit = 0; lit < numlits; lit++) {
-    SupportCell *supCell = literalList[lit].supportCellList;
+  for(SysInt lit = 0; lit < numlits; lit++) {
+    SupportCell* supCell = literalList[lit].supportCellList;
 
     // cout << "     destructor 2: sup*= " << sup << endl ;
-    while (supCell != 0) {
+    while(supCell != 0) {
       myset.insert(supCell->sup); // may get inserted multiple times but it's a set.
       supCell = supCell->next;
     }
@@ -92,31 +94,31 @@ virtual ~CLASSNAME() {
 
   // Go through supportFreeList
 
-  while (supportFreeList != 0) {
-    Support *sup = supportFreeList;
+  while(supportFreeList != 0) {
+    Support* sup = supportFreeList;
     supportFreeList = sup->nextFree;
     myset.insert(sup);
   }
 
   // Anything remaining on bracktrack stack
-  for (SysInt i = 0; i < (SysInt)backtrack_stack.size(); i++) {
-    if (backtrack_stack[i].sup != 0) {
+  for(SysInt i = 0; i < (SysInt)backtrack_stack.size(); i++) {
+    if(backtrack_stack[i].sup != 0) {
       myset.insert(backtrack_stack[i].sup);
     }
   }
 
-  typename set<Support *>::iterator it;
-  for (it = myset.begin(); it != myset.end(); it++) {
+  typename set<Support*>::iterator it;
+  for(it = myset.begin(); it != myset.end(); it++) {
     delete *it;
   }
 }
 
-Support *getFreeSupport() {
+Support* getFreeSupport() {
   // Either get a Support off the free list or make one.
-  if (supportFreeList == 0) {
+  if(supportFreeList == 0) {
     return new Support();
   } else {
-    Support *temp = supportFreeList;
+    Support* temp = supportFreeList;
     supportFreeList = supportFreeList->nextFree;
     return temp;
   }
@@ -134,11 +136,11 @@ void full_prop_init() {
     DomainInt litCounter = 0;
     numvals = 0; // only used now by tuple list stuff
 
-    for (SysInt i = 0; i < numvars; i++) {
+    for(SysInt i = 0; i < numvars; i++) {
 
       firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter);
       DomainInt numvals_i = vars[i].getInitialMax() - vars[i].getInitialMin() + 1;
-      if (numvals_i > numvals)
+      if(numvals_i > numvals)
         numvals = checked_cast<SysInt>(numvals_i);
       litCounter += numvals_i;
     }
@@ -147,10 +149,10 @@ void full_prop_init() {
   }
   {
     SysInt litCounter = 0;
-    for (SysInt i = 0; i < numvars; i++) {
+    for(SysInt i = 0; i < numvars; i++) {
       DomainInt thisvalmin = vars[i].getInitialMin();
       DomainInt numvals_i = vars[i].getInitialMax() - thisvalmin + 1;
-      for (DomainInt j = 0; j < numvals_i; j++) {
+      for(DomainInt j = 0; j < numvals_i; j++) {
         literalList[litCounter].var = i;
         literalList[litCounter].val = j + thisvalmin;
         literalList[litCounter].supportCellList = 0;
@@ -162,13 +164,13 @@ void full_prop_init() {
   }
   zeroLits.clear();
   zeroLits.resize(numvars);
-  for (SysInt i = 0; i < numvars; i++) {
+  for(SysInt i = 0; i < numvars; i++) {
     const SysInt numvals_i =
         checked_cast<SysInt>(vars[i].getInitialMax() - vars[i].getInitialMin() + 1);
     zeroLits[i].reserve(numvals_i); // reserve the maximum length.
     zeroLits[i].resize(0);
     SysInt thisvarstart = firstLiteralPerVar[i];
-    for (SysInt j = 0; j < numvals_i; j++)
+    for(SysInt j = 0; j < numvals_i; j++)
       zeroLits[i].push_back(j + thisvarstart);
   }
   inZeroLits.clear();
@@ -186,7 +188,7 @@ void full_prop_init() {
   varsPerSupport.resize(vars.size());
   varsPerSupInv.clear();
   varsPerSupInv.resize(vars.size());
-  for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+  for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
     varsPerSupport[i] = i;
     varsPerSupInv[i] = i;
   }
@@ -195,12 +197,12 @@ void full_prop_init() {
   supportNumPtrs.clear();
   supportNumPtrs.resize(numlits + 1);
   supportNumPtrs[0] = 0;
-  for (SysInt i = 1; i <= numlits; i++)
+  for(SysInt i = 1; i <= numlits; i++)
     supportNumPtrs[i] = vars.size();
 
   tuple_list_pos.clear();
   tuple_list_pos.resize(vars.size());
-  for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
+  for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
     SysInt domsize =
         checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
     tuple_list_pos[var].clear();
@@ -232,11 +234,11 @@ void init() {
     DomainInt litCounter = 0;
     numvals = 0; // only used now by tuple list stuff
 
-    for (SysInt i = 0; i < numvars; i++) {
+    for(SysInt i = 0; i < numvars; i++) {
 
       firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter);
       DomainInt numvals_i = vars[i].getInitialMax() - vars[i].getInitialMin() + 1;
-      if (numvals_i > numvals)
+      if(numvals_i > numvals)
         numvals = checked_cast<SysInt>(numvals_i);
       litCounter += numvals_i;
     }
@@ -245,10 +247,10 @@ void init() {
   }
   {
     SysInt litCounter = 0;
-    for (SysInt i = 0; i < numvars; i++) {
+    for(SysInt i = 0; i < numvars; i++) {
       DomainInt thisvalmin = vars[i].getInitialMin();
       DomainInt numvals_i = vars[i].getInitialMax() - thisvalmin + 1;
-      for (DomainInt j = 0; j < numvals_i; j++) {
+      for(DomainInt j = 0; j < numvals_i; j++) {
         literalList[litCounter].var = i;
         literalList[litCounter].val = j + thisvalmin;
         literalList[litCounter].supportCellList = 0;
@@ -261,13 +263,13 @@ void init() {
 
   zeroLits.clear();
   zeroLits.resize(numvars);
-  for (SysInt i = 0; i < numvars; i++) {
+  for(SysInt i = 0; i < numvars; i++) {
     const SysInt numvals_i =
         checked_cast<SysInt>(vars[i].getInitialMax() - vars[i].getInitialMin() + 1);
     zeroLits[i].reserve(numvals_i); // reserve the maximum length.
     zeroLits[i].resize(0);
     SysInt thisvarstart = firstLiteralPerVar[i];
-    for (SysInt j = 0; j < numvals_i; j++)
+    for(SysInt j = 0; j < numvals_i; j++)
       zeroLits[i].push_back(j + thisvarstart);
   }
   inZeroLits.clear();
@@ -282,7 +284,7 @@ void init() {
   // Partition
   varsPerSupport.resize(vars.size());
   varsPerSupInv.resize(vars.size());
-  for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+  for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
     varsPerSupport[i] = i;
     varsPerSupInv[i] = i;
   }
@@ -290,11 +292,11 @@ void init() {
   // Start with 1 cell in partition, for 0 supports.
   supportNumPtrs.resize(numlits + 1);
   supportNumPtrs[0] = 0;
-  for (SysInt i = 1; i <= numlits; i++)
+  for(SysInt i = 1; i <= numlits; i++)
     supportNumPtrs[i] = vars.size();
 
   tuple_list_pos.resize(vars.size());
-  for (SysInt var = 0; var < (SysInt)vars.size(); var++) {
+  for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
     SysInt domsize =
         checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
     tuple_list_pos[var].resize(domsize, 0);
@@ -308,30 +310,32 @@ void printStructures() {
   cout << "supports:" << supports << endl;
   cout << "supportsPerVar:" << supportsPerVar << endl;
   cout << "partition:" << endl;
-  for (SysInt i = 0; i < (SysInt)supportNumPtrs.size() - 1; i++) {
+  for(SysInt i = 0; i < (SysInt)supportNumPtrs.size() - 1; i++) {
     cout << "supports: " << i << "  vars: ";
-    for (SysInt j = supportNumPtrs[i]; j < supportNumPtrs[i + 1]; j++) {
+    for(SysInt j = supportNumPtrs[i]; j < supportNumPtrs[i + 1]; j++) {
       cout << varsPerSupport[j] << ", ";
     }
     cout << endl;
-    if (supportNumPtrs[i + 1] == vars.size())
+    if(supportNumPtrs[i + 1] == vars.size())
       break;
   }
   cout << "zeroLits:" << zeroLits << endl;
   cout << "inZeroLits:" << inZeroLits << endl;
 }
 
-SysInt dynamic_trigger_count() { return literalList.size(); }
+SysInt dynamic_trigger_count() {
+  return literalList.size();
+}
 
 inline void updateCounters(SysInt lit) {
 
-  SupportCell *supCellList = literalList[lit].supportCellList;
+  SupportCell* supCellList = literalList[lit].supportCellList;
 
   litsWithLostExplicitSupport.resize(0);
   varsWithLostImplicitSupport.resize(0);
 
-  while (supCellList != 0) {
-    SupportCell *next = supCellList->next;
+  while(supCellList != 0) {
+    SupportCell* next = supCellList->next;
     deleteSupport(supCellList->sup);
     supCellList = next;
   }
@@ -364,7 +368,7 @@ BOOL hasNoKnownSupport(SysInt var, SysInt lit) {
 }
 
 void partition_swap(SysInt xi, SysInt xj) {
-  if (xi != xj) {
+  if(xi != xj) {
     varsPerSupport[varsPerSupInv[xj]] = xi;
     varsPerSupport[varsPerSupInv[xi]] = xj;
     SysInt temp = varsPerSupInv[xi];
@@ -385,24 +389,24 @@ template <bool keepassigned>
 bool findNewSupport(SysInt var, DomainInt val) {
   D_ASSERT(tuple_list->get_tl().size() == vars.size());
   const SysInt val_offset = checked_cast<SysInt>(val - vars[var].getInitialMin());
-  const vector<vector<pair<SysInt, DomainInt>> *> &tuplist = tuple_list->get_tl()[var][val_offset];
+  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->get_tl()[var][val_offset];
 
   SysInt listsize = tuplist.size();
-  for (SysInt i = tuple_list_pos[var][val_offset]; i < listsize; i++) {
-    vector<pair<SysInt, DomainInt>> &tup = *(tuplist[i]);
+  for(SysInt i = tuple_list_pos[var][val_offset]; i < listsize; i++) {
+    vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
     bool valid = true;
 
-    for (SysInt j = 0; j < supsize; j++) {
-      if (!vars[tup[j].first].inDomain(tup[j].second)) {
+    for(SysInt j = 0; j < supsize; j++) {
+      if(!vars[tup[j].first].inDomain(tup[j].second)) {
         valid = false;
         break;
       }
     }
 
-    if (valid) {
-      for (SysInt j = 0; j < supsize; j++) {
+    if(valid) {
+      for(SysInt j = 0; j < supsize; j++) {
         ADDTOASSIGNMENT(tup[j].first, tup[j].second); // assignment.push_back(tuplist[i][j]);
       }
       tuple_list_pos[var][val_offset] = i;
@@ -410,21 +414,21 @@ bool findNewSupport(SysInt var, DomainInt val) {
     }
   }
 
-  for (SysInt i = 0; i < tuple_list_pos[var][val_offset]; i++) {
-    vector<pair<SysInt, DomainInt>> &tup = *(tuplist[i]);
+  for(SysInt i = 0; i < tuple_list_pos[var][val_offset]; i++) {
+    vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
     bool valid = true;
 
-    for (SysInt j = 0; j < supsize; j++) {
-      if (!vars[tup[j].first].inDomain(tup[j].second)) {
+    for(SysInt j = 0; j < supsize; j++) {
+      if(!vars[tup[j].first].inDomain(tup[j].second)) {
         valid = false;
         break;
       }
     }
 
-    if (valid) {
-      for (SysInt j = 0; j < supsize; j++) {
+    if(valid) {
+      for(SysInt j = 0; j < supsize; j++) {
         ADDTOASSIGNMENT(tup[j].first, tup[j].second); // assignment.push_back(tuplist[i][j]);
       }
       tuple_list_pos[var][val_offset] = i;

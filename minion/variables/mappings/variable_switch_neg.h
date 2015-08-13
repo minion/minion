@@ -26,9 +26,13 @@ struct SwitchNeg {
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 
-  BOOL isBound() const { return data.isBound(); }
+  BOOL isBound() const {
+    return data.isBound();
+  }
 
-  AnyVarRef popOneMapper() const { return data; }
+  AnyVarRef popOneMapper() const {
+    return data;
+  }
 
   DomainInt multiplier;
   SwitchNeg(VarT _data, DomainInt _multiplier) : data(_data), multiplier(_multiplier) {
@@ -37,82 +41,102 @@ struct SwitchNeg {
 
   SwitchNeg() : data() {}
 
-  SwitchNeg(const SwitchNeg &b) : data(b.data), multiplier(b.multiplier) {}
+  SwitchNeg(const SwitchNeg& b) : data(b.data), multiplier(b.multiplier) {}
 
-  BOOL isAssigned() const { return data.isAssigned(); }
+  BOOL isAssigned() const {
+    return data.isAssigned();
+  }
 
-  DomainInt getAssignedValue() const { return multiplier * data.getAssignedValue(); }
+  DomainInt getAssignedValue() const {
+    return multiplier * data.getAssignedValue();
+  }
 
   BOOL isAssignedValue(DomainInt i) const {
     return data.isAssigned() && data.getAssignedValue() == i * multiplier;
   }
 
-  BOOL inDomain(DomainInt b) const { return data.inDomain(b * multiplier); }
+  BOOL inDomain(DomainInt b) const {
+    return data.inDomain(b * multiplier);
+  }
 
-  BOOL inDomain_noBoundCheck(DomainInt b) const { return data.inDomain(b * multiplier); }
+  BOOL inDomain_noBoundCheck(DomainInt b) const {
+    return data.inDomain(b * multiplier);
+  }
 
-  DomainInt getDomSize() const { return data.getDomSize(); }
+  DomainInt getDomSize() const {
+    return data.getDomSize();
+  }
 
   DomainInt getMax() const {
-    if (multiplier == 1)
+    if(multiplier == 1)
       return data.getMax();
     else
       return -data.getMin();
   }
 
   DomainInt getMin() const {
-    if (multiplier == 1)
+    if(multiplier == 1)
       return data.getMin();
     else
       return -data.getMax();
   }
 
   DomainInt getInitialMax() const {
-    if (multiplier == 1)
+    if(multiplier == 1)
       return data.getInitialMax();
     else
       return -data.getInitialMin();
   }
 
   DomainInt getInitialMin() const {
-    if (multiplier == 1)
+    if(multiplier == 1)
       return data.getInitialMin();
     else
       return -data.getInitialMax();
   }
 
   void setMax(DomainInt i) {
-    if (multiplier == 1)
+    if(multiplier == 1)
       data.setMax(i);
     else
       data.setMin(-i);
   }
 
   void setMin(DomainInt i) {
-    if (multiplier == 1)
+    if(multiplier == 1)
       data.setMin(i);
     else
       data.setMax(-i);
   }
 
-  void uncheckedAssign(DomainInt b) { data.uncheckedAssign(b * multiplier); }
+  void uncheckedAssign(DomainInt b) {
+    data.uncheckedAssign(b * multiplier);
+  }
 
-  void propagateAssign(DomainInt b) { data.propagateAssign(b * multiplier); }
+  void propagateAssign(DomainInt b) {
+    data.propagateAssign(b * multiplier);
+  }
 
-  void decisionAssign(DomainInt b) { data.decisionAssign(b * multiplier); }
+  void decisionAssign(DomainInt b) {
+    data.decisionAssign(b * multiplier);
+  }
 
-  void removeFromDomain(DomainInt b) { data.removeFromDomain(b * multiplier); }
+  void removeFromDomain(DomainInt b) {
+    data.removeFromDomain(b * multiplier);
+  }
 
   /// There isn't a minus sign here as domain changes from both the top and
   /// bottom of the domain are positive numbers.
-  DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d) {
+    return data.getDomainChange(d);
+  }
 
   void addTrigger(Trigger t, TrigType type) {
-    if (multiplier == 1) {
+    if(multiplier == 1) {
       data.addTrigger(t, type);
       return;
     }
-    switch (type) {
+    switch(type) {
     case UpperBound: data.addTrigger(t, LowerBound); break;
     case LowerBound: data.addTrigger(t, UpperBound); break;
     case Assigned:
@@ -121,18 +145,18 @@ struct SwitchNeg {
     }
   }
 
-  friend std::ostream &operator<<(std::ostream &o, const SwitchNeg &v) {
+  friend std::ostream& operator<<(std::ostream& o, const SwitchNeg& v) {
     return o << "SwitchNeg " << v.multiplier << ":" << v.data;
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
-    if (multiplier == 1) {
+    if(multiplier == 1) {
       data.addDynamicTrigger(t, type, pos, op);
       return;
     }
 
-    switch (type) {
+    switch(type) {
     case UpperBound: data.addDynamicTrigger(t, LowerBound, pos, op); break;
     case LowerBound: data.addDynamicTrigger(t, UpperBound, pos, op); break;
     case Assigned:
@@ -142,13 +166,21 @@ struct SwitchNeg {
     }
   }
 
-  vector<AbstractConstraint *> *getConstraints() { return data.getConstraints(); }
+  vector<AbstractConstraint*>* getConstraints() {
+    return data.getConstraints();
+  }
 
-  void addConstraint(AbstractConstraint *c) { data.addConstraint(c); }
+  void addConstraint(AbstractConstraint* c) {
+    data.addConstraint(c);
+  }
 
-  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(v * multiplier); }
+  DomainInt getBaseVal(DomainInt v) const {
+    return data.getBaseVal(v * multiplier);
+  }
 
-  Var getBaseVar() const { return data.getBaseVar(); }
+  Var getBaseVar() const {
+    return data.getBaseVar();
+  }
 
   vector<Mapper> getMapperStack() const {
     vector<Mapper> v = data.getMapperStack();
@@ -157,9 +189,13 @@ struct SwitchNeg {
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg() { return data.getBaseWdeg(); }
+  DomainInt getBaseWdeg() {
+    return data.getBaseWdeg();
+  }
 
-  void incWdeg() { data.incWdeg(); }
+  void incWdeg() {
+    data.incWdeg();
+  }
 #endif
 };
 
@@ -179,23 +215,23 @@ struct SwitchNegType<std::array<T, i>> {
 };
 
 template <typename VRef>
-typename SwitchNegType<VRef>::type SwitchNegRef(const VRef &var_ref) {
+typename SwitchNegType<VRef>::type SwitchNegRef(const VRef& var_ref) {
   return SwitchNeg<VRef>(var_ref);
 }
 
 template <typename VarRef>
-vector<SwitchNeg<VarRef>> SwitchNegRef(const vector<VarRef> &var_array) {
+vector<SwitchNeg<VarRef>> SwitchNegRef(const vector<VarRef>& var_array) {
   vector<SwitchNeg<VarRef>> neg_array;
   neg_array.reserve(var_array.size());
-  for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     neg_array.push_back(SwitchNegRef(var_array[i]));
   return neg_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<SwitchNeg<VarRef>, i> SwitchNegRef(const std::array<VarRef, i> &var_array) {
+std::array<SwitchNeg<VarRef>, i> SwitchNegRef(const std::array<VarRef, i>& var_array) {
   std::array<SwitchNeg<VarRef>, i> neg_array;
-  for (UnsignedSysInt l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = SwitchNegRef(var_array[l]);
   return neg_array;
 }

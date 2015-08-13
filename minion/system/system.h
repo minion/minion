@@ -53,13 +53,13 @@
 #endif
 
 // from sha1.cpp
-std::string sha1_hash(const std::string &s);
+std::string sha1_hash(const std::string& s);
 
-inline void *checked_malloc(size_t size) {
-  if (size == 0)
+inline void* checked_malloc(size_t size) {
+  if(size == 0)
     return 0;
-  void *ptr = calloc(size, 1);
-  if (ptr == 0) {
+  void* ptr = calloc(size, 1);
+  if(ptr == 0) {
     std::cerr << "Fatal: Out of memory";
     abort();
   }

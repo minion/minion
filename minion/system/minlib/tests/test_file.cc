@@ -9,7 +9,7 @@ int main(void) {
   bool catcher = false;
   try {
     std::string s = readFile("fake_text");
-  } catch (...) { catcher = true; }
+  } catch(...) { catcher = true; }
 
   D_ASSERT(catcher);
 }

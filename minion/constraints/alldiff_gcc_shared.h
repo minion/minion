@@ -53,7 +53,9 @@ struct smallset {
     cert = 1;
   }
 
-  inline bool in(SysInt val) { return membership[val] == cert; }
+  inline bool in(SysInt val) {
+    return membership[val] == cert;
+  }
 
   inline void insert(SysInt val) {
     D_ASSERT(membership[val] < cert);
@@ -62,22 +64,26 @@ struct smallset {
     membership[val] = cert;
   }
 
-  inline SysInt size() { return list.size(); }
+  inline SysInt size() {
+    return list.size();
+  }
 
   inline void remove(SysInt val) {
-    if (in(val)) {
+    if(in(val)) {
       membership[val] = 0;
       list.erase(find(list.begin(), list.end(), val));
     }
   }
 
-  inline vector<SysInt> &getlist() { return list; }
+  inline vector<SysInt>& getlist() {
+    return list;
+  }
 
   inline void clear() {
-    if (cert > 2000000000) {
+    if(cert > 2000000000) {
       list.clear();
       cert = 1;
-      for (SysInt i = 0; i < (SysInt)membership.size(); i++) {
+      for(SysInt i = 0; i < (SysInt)membership.size(); i++) {
         membership[i] = 0;
       }
     } else {
@@ -104,7 +110,9 @@ struct smallset_nolist {
     cert = 1;
   }
 
-  inline bool in(DomainInt val) { return membership[checked_cast<SysInt>(val)] == cert; }
+  inline bool in(DomainInt val) {
+    return membership[checked_cast<SysInt>(val)] == cert;
+  }
 
   inline void insert(DomainInt val) {
     D_ASSERT(membership[checked_cast<SysInt>(val)] < cert);
@@ -112,22 +120,24 @@ struct smallset_nolist {
     membership[checked_cast<SysInt>(val)] = cert;
   }
 
-  inline void remove(DomainInt val) { membership[checked_cast<SysInt>(val)] = 0; }
+  inline void remove(DomainInt val) {
+    membership[checked_cast<SysInt>(val)] = 0;
+  }
 
   // Use only in debugging/stats functions
   inline SysInt size() {
     SysInt counter = 0;
-    for (SysInt i = 0; i < (SysInt)membership.size(); i++) {
-      if (in(i))
+    for(SysInt i = 0; i < (SysInt)membership.size(); i++) {
+      if(in(i))
         counter++;
     }
     return counter;
   }
 
   inline void clear() {
-    if (cert > 2000000000) {
+    if(cert > 2000000000) {
       cert = 1;
-      for (SysInt i = 0; i < (SysInt)membership.size(); i++) {
+      for(SysInt i = 0; i < (SysInt)membership.size(); i++) {
         membership[i] = 0;
       }
     } else {
@@ -146,7 +156,7 @@ struct smallset_list_bt {
 
   vector<UnsignedSysInt> membership;
 
-  void *list;
+  void* list;
   SysInt maxsize;
 
   void reserve(SysInt size) {
@@ -154,12 +164,12 @@ struct smallset_list_bt {
     maxsize = size;
     membership.resize(size);
 
-    for (SysInt i = 0; i < size; i++)
+    for(SysInt i = 0; i < size; i++)
       membership[i] = 0;
 
     cert = 1;
     list = getMemory().backTrack().request_bytes((size + 1) * sizeof(short));
-    ((short *)list)[maxsize] = 0; // The count is stored in the last element of the array.
+    ((short*)list)[maxsize] = 0; // The count is stored in the last element of the array.
   }
 
   inline bool in(SysInt val) {
@@ -173,11 +183,11 @@ struct smallset_list_bt {
     // D_DATA(print());
 
     D_DATA(sanitycheck());
-    if (membership[val] == cert) {
+    if(membership[val] == cert) {
       return;
     }
     membership[val] = cert;
-    short *ptr = ((short *)list);
+    short* ptr = ((short*)list);
     SysInt count = ptr[maxsize];
     D_ASSERT(count < maxsize);
     ptr[maxsize] = (short)count + 1;
@@ -190,24 +200,26 @@ struct smallset_list_bt {
     D_DATA(cout << "clearing list " << (list) << endl);
     D_ASSERT(cert < 2000000000);
 
-    if (cert > 2000000000) {
+    if(cert > 2000000000) {
       cert = 1;
-      for (SysInt i = 0; i < (SysInt)membership.size(); i++) {
+      for(SysInt i = 0; i < (SysInt)membership.size(); i++) {
         membership[i] = 0;
       }
     } else {
       cert++;
     }
 
-    ((short *)list)[maxsize] = 0;
+    ((short*)list)[maxsize] = 0;
   }
 
-  SysInt size() { return (SysInt)((short *)list)[maxsize]; }
+  SysInt size() {
+    return (SysInt)((short*)list)[maxsize];
+  }
 
   void sanitycheck() {
-    short *l = (short *)list;
-    for (SysInt i = 0; i < l[maxsize]; i++) {
-      for (SysInt j = i + 1; j < l[maxsize]; j++) {
+    short* l = (short*)list;
+    for(SysInt i = 0; i < l[maxsize]; i++) {
+      for(SysInt j = i + 1; j < l[maxsize]; j++) {
         D_ASSERT(l[i] != l[j]);
       }
       D_ASSERT(membership[l[i]] == cert);
@@ -215,9 +227,9 @@ struct smallset_list_bt {
   }
 
   void print() {
-    short *l = (short *)list;
+    short* l = (short*)list;
     cout << "smallset_list_bt length:" << l[maxsize] << " at location " << (&l[maxsize]) << endl;
-    for (SysInt i = 0; i < maxsize; i++) {
+    for(SysInt i = 0; i < maxsize; i++) {
       cout << "smallset_list_bt item:" << l[i] << " at location " << (&l[i]) << endl;
     }
     cout << "certificate:" << cert << endl;
@@ -229,22 +241,25 @@ template <typename VarArray, bool UseIncGraph>
 struct FlowConstraint : public AbstractConstraint {
 protected:
   // Base class for GAC alldiff and GCC
-  FlowConstraint(const VarArray &_var_array)
-      : numvars(0), numvals(0), dom_min(0), dom_max(0),
+  FlowConstraint(const VarArray& _var_array)
+      : numvars(0),
+        numvals(0),
+        dom_min(0),
+        dom_max(0),
 #ifndef REVERSELIST
         var_array(_var_array),
 #else
         var_array(_var_array.rbegin(), _var_array.rend()),
 #endif
         constraint_locked(false) {
-    if (var_array.size() > 0) {
+    if(var_array.size() > 0) {
       dom_min = checked_cast<SysInt>(var_array[0].getInitialMin());
       dom_max = checked_cast<SysInt>(var_array[0].getInitialMax());
     }
-    for (SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if (var_array[i].getInitialMin() < dom_min)
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
+      if(var_array[i].getInitialMin() < dom_min)
         dom_min = checked_cast<SysInt>(var_array[i].getInitialMin());
-      if (var_array[i].getInitialMax() > dom_max)
+      if(var_array[i].getInitialMax() > dom_max)
         dom_max = checked_cast<SysInt>(var_array[i].getInitialMax());
     }
     numvars = var_array.size(); // number of variables in the constraint
@@ -252,30 +267,30 @@ protected:
 
     // to_process.reserve(var_array.size()); Could this be shared as well??
 
-    if (UseIncGraph) {
+    if(UseIncGraph) {
       // refactor this to use initial upper and lower bounds.
       adjlist.resize(numvars + numvals);
       adjlistpos.resize(numvars + numvals);
-      for (SysInt i = 0; i < numvars; i++) {
+      for(SysInt i = 0; i < numvars; i++) {
         adjlist[i].resize(numvals);
-        for (SysInt j = 0; j < numvals; j++)
+        for(SysInt j = 0; j < numvals; j++)
           adjlist[i][j] = j + dom_min;
         adjlistpos[i].resize(numvals);
-        for (SysInt j = 0; j < numvals; j++)
+        for(SysInt j = 0; j < numvals; j++)
           adjlistpos[i][j] = j;
       }
-      for (SysInt i = numvars; i < numvars + numvals; i++) {
+      for(SysInt i = numvars; i < numvars + numvals; i++) {
         adjlist[i].resize(numvars);
-        for (SysInt j = 0; j < numvars; j++)
+        for(SysInt j = 0; j < numvars; j++)
           adjlist[i][j] = j;
         adjlistpos[i].resize(numvars);
-        for (SysInt j = 0; j < numvars; j++)
+        for(SysInt j = 0; j < numvars; j++)
           adjlistpos[i][j] = j;
       }
       adjlistlength = getMemory().backTrack().template requestArray<SysInt>(numvars + numvals);
-      for (SysInt i = 0; i < numvars; i++)
+      for(SysInt i = 0; i < numvars; i++)
         adjlistlength[i] = numvals;
-      for (SysInt i = numvars; i < numvars + numvals; i++)
+      for(SysInt i = numvars; i < numvars + numvals; i++)
         adjlistlength[i] = numvars;
     }
 
@@ -300,8 +315,8 @@ protected:
   vector<SysInt> valvarmatching; // need to set size somewhere.
 // -1 means unmatched.
 #else
-  SysInt *varvalmatching;
-  SysInt *valvarmatching;
+  SysInt* varvalmatching;
+  SysInt* valvarmatching;
 #endif
 
   // ------------------ Incremental adjacency lists --------------------------
@@ -309,7 +324,7 @@ protected:
   // adjlist[varnum or val-dom_min+numvars] is the vector of vals in the
   // domain of the variable, or variables with val in their domain.
   vector<vector<SysInt>> adjlist;
-  SysInt *adjlistlength;
+  SysInt* adjlistlength;
   vector<vector<SysInt>> adjlistpos; // position of a variable in adjlist.
 
   inline void adjlist_remove(SysInt var, SysInt val) {
@@ -327,7 +342,7 @@ protected:
     SysInt t = adjlist[i][adjlistlength[i] - 1];
     adjlist[i][adjlistlength[i] - 1] = adjlist[i][j];
 
-    if (i < numvars) {
+    if(i < numvars) {
       adjlistpos[i][adjlist[i][j] - dom_min] = adjlistlength[i] - 1;
       adjlistpos[i][t - dom_min] = j;
     } else {
@@ -339,10 +354,10 @@ protected:
   }
 
   void check_adjlists() {
-    for (SysInt i = 0; i < numvars; i++) {
+    for(SysInt i = 0; i < numvars; i++) {
       D_ASSERT(var_array[i].getMin() >= dom_min);
       D_ASSERT(var_array[i].getMax() <= dom_max);
-      for (SysInt j = dom_min; j <= dom_max; j++) {
+      for(SysInt j = dom_min; j <= dom_max; j++) {
         D_DATA(bool in = adjlistpos[i][j - dom_min] < adjlistlength[i]);
         D_DATA(bool in2 =
                    adjlistpos[j - dom_min + numvars][i] < adjlistlength[j - dom_min + numvars]);
@@ -390,7 +405,7 @@ protected:
     uprevious.resize(numvars, -2);
 
     vprevious.resize(numvals);
-    for (SysInt i = 0; i < numvals; ++i) {
+    for(SysInt i = 0; i < numvals; ++i) {
       vprevious[i].reserve(numvars);
     }
     invprevious.reserve(numvals);
@@ -399,7 +414,7 @@ protected:
     unmatched.reserve(numvals);
 
     newlayer.resize(numvals);
-    for (SysInt i = 0; i < numvals; ++i) {
+    for(SysInt i = 0; i < numvals; ++i) {
       newlayer[i].reserve(numvars);
     }
     innewlayer.reserve(numvals);
@@ -407,19 +422,19 @@ protected:
 
   // Hopcroft-Karp which takes start and end indices.
 
-  inline bool hopcroft_wrapper(SysInt sccstart, SysInt sccend, vector<SysInt> &SCCs,
+  inline bool hopcroft_wrapper(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs,
                                bool allowed_to_fail) {
     // Call hopcroft for the whole matching.
-    if (!hopcroft(sccstart, sccend, SCCs)) {
+    if(!hopcroft(sccstart, sccend, SCCs)) {
       // The constraint is unsatisfiable (no matching).
       P("About to fail. Changed varvalmatching: " << varvalmatching);
 
-      for (SysInt j = 0; j < numvars; j++) {
+      for(SysInt j = 0; j < numvars; j++) {
         // Restore valvarmatching because it might be messed up by Hopcroft.
         valvarmatching[varvalmatching[j] - dom_min] = j;
       }
 
-      if (allowed_to_fail)
+      if(allowed_to_fail)
         getState().setFailed(true);
       return false;
     }
@@ -429,8 +444,8 @@ protected:
     // This must not be done when failing, because it might mess
     // up varvalmatching for the next invocation.
     {
-      vector<SysInt> &toiterate = valinlocalmatching.getlist();
-      for (SysInt j = 0; j < (SysInt)toiterate.size(); j++) {
+      vector<SysInt>& toiterate = valinlocalmatching.getlist();
+      for(SysInt j = 0; j < (SysInt)toiterate.size(); j++) {
         SysInt tempval = toiterate[j];
         varvalmatching[valvarmatching[tempval]] = tempval + dom_min;
       }
@@ -438,7 +453,7 @@ protected:
     return true;
   }
 
-  inline bool hopcroft(SysInt sccstart, SysInt sccend, vector<SysInt> &SCCs) {
+  inline bool hopcroft(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs) {
     // Domain value convention:
     // Within hopcroft and recurse,
     // a domain value is represented as val-dom_min always.
@@ -453,9 +468,9 @@ protected:
     // to see it's in the relevant domain.
     valinlocalmatching.clear();
 
-    for (SysInt i = sccstart; i <= sccend; i++) {
+    for(SysInt i = sccstart; i <= sccend; i++) {
       SysInt tempvar = SCCs[i];
-      if (var_array[tempvar].inDomain(varvalmatching[tempvar])) {
+      if(var_array[tempvar].inDomain(varvalmatching[tempvar])) {
         valinlocalmatching.insert(varvalmatching[tempvar] - dom_min);
         // Check the two matching arrays correspond.
         // D_ASSERT(valvarmatching[varvalmatching[tempvar]-dom_min]==tempvar);
@@ -471,7 +486,7 @@ protected:
                 break
     */
 
-    if (valinlocalmatching.size() == localnumvars) {
+    if(valinlocalmatching.size() == localnumvars) {
       return true;
     }
 
@@ -481,7 +496,7 @@ protected:
     // need sets u and v
     // u is easy, v is union of domains[0..numvar-1]
 
-    while (true) {
+    while(true) {
       /*
       preds = {}
       unmatched = []
@@ -502,17 +517,17 @@ protected:
       // and failed.
       varinlocalmatching.clear();
       {
-        vector<SysInt> &toiterate = valinlocalmatching.getlist();
-        for (SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
-          if (!varinlocalmatching.in(valvarmatching[toiterate[i]])) // This should not be
-                                                                    // conditional --BUG
+        vector<SysInt>& toiterate = valinlocalmatching.getlist();
+        for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
+          if(!varinlocalmatching.in(valvarmatching[toiterate[i]])) // This should not be
+                                                                   // conditional --BUG
             varinlocalmatching.insert(valvarmatching[toiterate[i]]);
         }
       }
 
-      for (SysInt i = sccstart; i <= sccend; ++i) {
+      for(SysInt i = sccstart; i <= sccend; ++i) {
         SysInt tempvar = SCCs[i];
-        if (varinlocalmatching.in(tempvar)) // The only use of varinlocalmatching.
+        if(varinlocalmatching.in(tempvar)) // The only use of varinlocalmatching.
         {
           uprevious[tempvar] = -2; // Out of uprevious
         } else {
@@ -534,7 +549,7 @@ protected:
           newLayer = {}
       */
 
-      while (layer.size() != 0 && unmatched.size() == 0) {
+      while(layer.size() != 0 && unmatched.size() == 0) {
         innewlayer.clear();
 
         /*
@@ -544,18 +559,18 @@ protected:
                     newLayer.setdefault(v,[]).append(u)
         */
         {
-          vector<SysInt> &toiterate = layer.getlist();
-          for (SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
+          vector<SysInt>& toiterate = layer.getlist();
+          for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
             // cout<<"Layer item: "<<(*setit)<<endl;
             SysInt tempvar = toiterate[i];
-            for (DomainInt realval = var_array[tempvar].getMin();
-                 realval <= var_array[tempvar].getMax(); realval++) {
-              if (var_array[tempvar].inDomain(realval)) {
+            for(DomainInt realval = var_array[tempvar].getMin();
+                realval <= var_array[tempvar].getMax(); realval++) {
+              if(var_array[tempvar].inDomain(realval)) {
                 SysInt tempval = realval - dom_min;
 
-                if (!invprevious.in(tempval)) // if tempval not found in vprevious
+                if(!invprevious.in(tempval)) // if tempval not found in vprevious
                 {
-                  if (!innewlayer.in(tempval)) {
+                  if(!innewlayer.in(tempval)) {
                     innewlayer.insert(tempval);
                     newlayer[tempval].clear();
                   }
@@ -591,8 +606,8 @@ protected:
         }*/
 
         {
-          vector<SysInt> &toiterate = innewlayer.getlist();
-          for (SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
+          vector<SysInt>& toiterate = innewlayer.getlist();
+          for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
             SysInt tempval = toiterate[i]; // for v in newlayer.
             // cout << "Looping for value "<< tempval <<endl;
 
@@ -607,7 +622,7 @@ protected:
                 vprevious[tempval][x]=newlayer[tempval][x];
             }*/
 
-            if (valinlocalmatching.in(tempval)) {
+            if(valinlocalmatching.in(tempval)) {
               SysInt match = valvarmatching[tempval];
               // cout << "Matched to variable:" << match << endl;
               layer.insert(match);
@@ -635,10 +650,10 @@ protected:
           return (matching,list(pred),list(unlayered))
       */
       // cout << "Unmatched size:" << unmatched.size() << endl;
-      if (unmatched.size() == 0) {
+      if(unmatched.size() == 0) {
         // cout << "Size of matching:" << valinlocalmatching.size() << endl;
 
-        if (valinlocalmatching.size() == localnumvars) {
+        if(valinlocalmatching.size() == localnumvars) {
           return true;
         } else {
           return false;
@@ -649,8 +664,8 @@ protected:
       for v in unmatched: recurse(v)
       */
       {
-        vector<SysInt> &toiterate = unmatched.getlist();
-        for (SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
+        vector<SysInt>& toiterate = unmatched.getlist();
+        for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
           SysInt tempval = toiterate[i];
           // cout<<"unmatched value:"<<tempval<<endl;
           recurse(tempval);
@@ -665,24 +680,24 @@ protected:
     // Again values are val-dom_min in this function.
     // Clearly this should be turned into a loop.
     // cout << "Entering recurse with value " <<val <<endl;
-    if (invprevious.in(val)) {
-      vector<SysInt> &listvars = vprevious[val]; // L
+    if(invprevious.in(val)) {
+      vector<SysInt>& listvars = vprevious[val]; // L
 
       // Remove the value from vprevious.
       invprevious.remove(val);
 
-      for (SysInt i = 0; i < (SysInt)listvars.size(); ++i) // for u in L
+      for(SysInt i = 0; i < (SysInt)listvars.size(); ++i) // for u in L
       {
         SysInt tempvar = listvars[i];
         SysInt pu = uprevious[tempvar];
-        if (pu != -2) // if u in pred:
+        if(pu != -2) // if u in pred:
         {
           uprevious[tempvar] = -2;
           // cout<<"Variable: "<<tempvar<<endl;
-          if (pu == -1 || recurse(pu)) {
+          if(pu == -1 || recurse(pu)) {
             // cout << "Setting "<< tempvar << " to " << val <<endl;
 
-            if (!valinlocalmatching.in(val)) // If we are not replacing a mapping
+            if(!valinlocalmatching.in(val)) // If we are not replacing a mapping
             {
               valinlocalmatching.insert(val);
             }
@@ -714,36 +729,36 @@ protected:
 
   void hopcroft2_setup() {
     edges.resize(numvars + numvals + 1);
-    for (SysInt i = 0; i < numvars; i++) {
+    for(SysInt i = 0; i < numvars; i++) {
       edges.reserve(numvals);
     }
-    for (SysInt i = numvars; i <= numvars + numvals; i++) {
+    for(SysInt i = numvars; i <= numvars + numvals; i++) {
       edges.reserve(numvars);
     }
     varvalused.reserve(numvars + numvals);
     thislayer.reserve(numvars + numvals);
   }
 
-  inline bool hopcroft_wrapper2(vector<SysInt> &vars_in_scc, vector<SysInt> &matching,
-                                vector<SysInt> &upper, vector<SysInt> &usage) {
-    if (!hopcroft2(vars_in_scc, matching, upper, usage)) {
+  inline bool hopcroft_wrapper2(vector<SysInt>& vars_in_scc, vector<SysInt>& matching,
+                                vector<SysInt>& upper, vector<SysInt>& usage) {
+    if(!hopcroft2(vars_in_scc, matching, upper, usage)) {
       getState().setFailed(true);
       return false;
     }
     return true;
   }
 
-  inline bool hopcroft2(vector<SysInt> &vars_in_scc, vector<SysInt> &matching,
-                        vector<SysInt> &upper, vector<SysInt> &usage) {
+  inline bool hopcroft2(vector<SysInt>& vars_in_scc, vector<SysInt>& matching,
+                        vector<SysInt>& upper, vector<SysInt>& usage) {
     // The return value is whether the matching is complete over teh variables
     // in the SCC.
     // Clear any values from matching which are no longer in domain.
     // Clear vals if their usage is larger than the upper bound.
-    for (SysInt i = 0; i < (SysInt)vars_in_scc.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); i++) {
       SysInt var = vars_in_scc[i];
-      if (matching[var] != dom_min - 1) {
+      if(matching[var] != dom_min - 1) {
         SysInt match = matching[var];
-        if (!var_array[var].inDomain(match) || usage[match - dom_min] > upper[match - dom_min]) {
+        if(!var_array[var].inDomain(match) || usage[match - dom_min] > upper[match - dom_min]) {
           usage[match - dom_min]--;
           matching[var] = dom_min - 1;
         }
@@ -758,16 +773,16 @@ protected:
 
     // darn, does the DFS visit nodes it is not supposed to?
 
-    while (true) {
+    while(true) {
       // Find all free variables in current SCC and insert into edges
       edges[numvars + numvals].clear();
       varvalused.clear();
       fifo.clear();
 
       SysInt unmatched = 0;
-      for (SysInt i = 0; i < (SysInt)vars_in_scc.size(); ++i) {
+      for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); ++i) {
         SysInt tempvar = vars_in_scc[i];
-        if (matching[tempvar] == dom_min - 1) {
+        if(matching[tempvar] == dom_min - 1) {
           edges[numvars + numvals].push_back(tempvar);
           edges[tempvar].clear();
           fifo.push_back(tempvar);
@@ -776,34 +791,34 @@ protected:
         }
       }
 
-      if (unmatched == 0) {
+      if(unmatched == 0) {
         return true;
       }
 
       // BFS until we see a free value vertex.
 
       bool foundFreeValNode = false;
-      while (!fifo.empty()) {
+      while(!fifo.empty()) {
         // first process a layer of vars
-        while (!fifo.empty() && fifo.front() < numvars) {
+        while(!fifo.empty() && fifo.front() < numvars) {
           SysInt curnode = fifo.front();
           fifo.pop_front();
           // curnode is a variable.
           // next layer is adjacent values which are not saturated.
-          for (SysInt i = 0; i < adjlistlength[curnode]; i++) {
+          for(SysInt i = 0; i < adjlistlength[curnode]; i++) {
             SysInt realval = adjlist[curnode][i];
             SysInt validx = realval - dom_min + numvars;
-            if (!varvalused.in(validx)) {
+            if(!varvalused.in(validx)) {
               edges[curnode].push_back(validx);
 
-              if (!thislayer.in(validx)) { // have not seen this value before.
+              if(!thislayer.in(validx)) { // have not seen this value before.
                 // add it to the new layer.
                 thislayer.insert(validx);
 
                 fifo.push_back(validx);
                 edges[validx].clear();
               }
-              if (usage[realval - dom_min] < upper[realval - dom_min]) {
+              if(usage[realval - dom_min] < upper[realval - dom_min]) {
                 foundFreeValNode = true;
               }
             }
@@ -811,29 +826,29 @@ protected:
         }
 
         // transfer things from thislayer to varvalused.
-        vector<SysInt> &temp1 = thislayer.getlist();
-        for (SysInt i = 0; i < (SysInt)temp1.size(); i++) {
+        vector<SysInt>& temp1 = thislayer.getlist();
+        for(SysInt i = 0; i < (SysInt)temp1.size(); i++) {
           varvalused.insert(temp1[i]);
         }
         thislayer.clear();
 
-        if (foundFreeValNode) { // we have seen at least one unsaturated value
-                                // vertex and
+        if(foundFreeValNode) { // we have seen at least one unsaturated value
+                               // vertex and
           // must have expanded all variable vertices in the
           // layer above.
           break;
         }
 
-        while (!fifo.empty() && fifo.front() >= numvars) {
+        while(!fifo.empty() && fifo.front() >= numvars) {
           SysInt curnode = fifo.front();
           fifo.pop_front();
           // curnode is a value
           // next layer is variables, following matching edges.
-          for (SysInt i = 0; i < adjlistlength[curnode]; i++) {
+          for(SysInt i = 0; i < adjlistlength[curnode]; i++) {
             SysInt var = adjlist[curnode][i];
-            if (!varvalused.in(var) && matching[var] == curnode + dom_min - numvars) {
+            if(!varvalused.in(var) && matching[var] == curnode + dom_min - numvars) {
               edges[curnode].push_back(var);
-              if (!thislayer.in(var)) { // have not seen this variable before.
+              if(!thislayer.in(var)) { // have not seen this variable before.
                 // add it to the new layer.
                 thislayer.insert(var);
 
@@ -845,20 +860,20 @@ protected:
         }
 
         // transfer things from thislayer to varvalused.
-        vector<SysInt> &temp2 = thislayer.getlist();
-        for (SysInt i = 0; i < (SysInt)temp2.size(); i++) {
+        vector<SysInt>& temp2 = thislayer.getlist();
+        for(SysInt i = 0; i < (SysInt)temp2.size(); i++) {
           varvalused.insert(temp2[i]);
         }
         thislayer.clear();
 
       } // end of BFS loop.
 
-      if (foundFreeValNode) {
+      if(foundFreeValNode) {
         // Find a set of minimal-length augmenting paths using DFS within
         // the edges ds.
         // starting at layer 0.
 
-        for (SysInt i = 0; i < (SysInt)edges[numvars + numvals].size(); i++) {
+        for(SysInt i = 0; i < (SysInt)edges[numvars + numvals].size(); i++) {
           augpath.clear();
           augpath.push_back(edges[numvars + numvals][i]);
           dfs_hopcroft2(augpath, upper, usage, matching, edges);
@@ -877,32 +892,32 @@ protected:
   // return value indicates whether an augmenting path was found.
   // DFS can visit a value vertex multiple times up to upper-usage,
   // but can only use an edge once.
-  bool dfs_hopcroft2(vector<SysInt> &augpath, vector<SysInt> &upper, vector<SysInt> &usage,
-                     vector<SysInt> &matching, vector<vector<SysInt>> &edges) {
+  bool dfs_hopcroft2(vector<SysInt>& augpath, vector<SysInt>& upper, vector<SysInt>& usage,
+                     vector<SysInt>& matching, vector<vector<SysInt>>& edges) {
     SysInt var = augpath.back();
-    vector<SysInt> &outedges = edges[var];
+    vector<SysInt>& outedges = edges[var];
 
-    while (!outedges.empty()) {
+    while(!outedges.empty()) {
       SysInt validx = outedges.back();
       outedges.pop_back();
       D_ASSERT(var_array[var].inDomain(validx - numvars + dom_min));
 
       // does this complete an augmenting path?
-      if (usage[validx - numvars] < upper[validx - numvars]) {
+      if(usage[validx - numvars] < upper[validx - numvars]) {
         augpath.push_back(validx);
         apply_augmenting_path(augpath, matching, usage);
         return true;
       }
 
-      vector<SysInt> &outedges2 = edges[validx];
+      vector<SysInt>& outedges2 = edges[validx];
 
       augpath.push_back(validx);
-      while (!outedges2.empty()) {
+      while(!outedges2.empty()) {
         SysInt var2 = outedges2.back();
         outedges2.pop_back();
 
         augpath.push_back(var2);
-        if (dfs_hopcroft2(augpath, upper, usage, matching, edges)) {
+        if(dfs_hopcroft2(augpath, upper, usage, matching, edges)) {
           return true;
         }
         augpath.pop_back(); // remove var2
@@ -912,13 +927,13 @@ protected:
     return false;
   }
 
-  inline void apply_augmenting_path(vector<SysInt> &augpath, vector<SysInt> &matching,
-                                    vector<SysInt> &usage) {
+  inline void apply_augmenting_path(vector<SysInt>& augpath, vector<SysInt>& matching,
+                                    vector<SysInt>& usage) {
     D_ASSERT((augpath.size() & 1) == 0);
-    for (SysInt i = 0; i < (SysInt)augpath.size(); i = i + 2) {
+    for(SysInt i = 0; i < (SysInt)augpath.size(); i = i + 2) {
       SysInt var = augpath[i];
       SysInt validx = augpath[i + 1];
-      if (matching[var] != dom_min - 1) {
+      if(matching[var] != dom_min - 1) {
         usage[matching[var] - dom_min]--;
       }
       matching[var] = validx - numvars + dom_min;
@@ -935,17 +950,25 @@ struct deque_fixed_size {
   vector<SysInt> list;
   SysInt head, tail;
 
-  deque_fixed_size() { head = tail = 0; }
+  deque_fixed_size() {
+    head = tail = 0;
+  }
 
-  void reserve(SysInt size) { list.resize(size); }
+  void reserve(SysInt size) {
+    list.resize(size);
+  }
 
-  inline void clear() { head = tail = 0; }
+  inline void clear() {
+    head = tail = 0;
+  }
 
-  inline bool empty() { return head == tail; }
+  inline bool empty() {
+    return head == tail;
+  }
 
   inline void push_back(SysInt val) {
     list[tail] = val;
-    if (++tail == (SysInt)list.size()) {
+    if(++tail == (SysInt)list.size()) {
       tail = 0;
     }
   }
@@ -957,7 +980,7 @@ struct deque_fixed_size {
 
   inline void pop_front() {
     D_ASSERT(head != tail);
-    if (++head == (SysInt)list.size()) {
+    if(++head == (SysInt)list.size()) {
       head = 0;
     }
   }
@@ -968,7 +991,7 @@ struct deque_fixed_size {
 // variable.
 template <typename VarArray>
 struct InternalDynamicTriggers {
-  short *watches; // should also template on the type here.
+  short* watches; // should also template on the type here.
 
   // watches contains:
   // [0.. numvars-1]  indices to the start of the list for each variable.
@@ -985,11 +1008,11 @@ struct InternalDynamicTriggers {
     watches = getMemory().backTrack().template requestArray<short>(numvars + 1 + 4 * numvars +
                                                                    2 * numvals);
 
-    for (SysInt i = 0; i < numvars; i++)
+    for(SysInt i = 0; i < numvars; i++)
       watches[i] = -1;
     watches[numvars] = numvars + 1;
-    for (SysInt i = numvars + 2; i < (numvars + 1 + 4 * numvars + 2 * numvals);
-         i = i + 2) { // link up the freelist.
+    for(SysInt i = numvars + 2; i < (numvars + 1 + 4 * numvars + 2 * numvals);
+        i = i + 2) { // link up the freelist.
       watches[i] = i + 1;
     }
     watches[numvars + 1 + 4 * numvars + 2 * numvals - 1] = -1;
@@ -999,12 +1022,12 @@ struct InternalDynamicTriggers {
                                           // trigger propagation on the target
                                           // variables.
     SysInt idx = watches[var];            // start of linked list.
-    if (idx == -1) {                      // must be the first call, because otherwise all variables
+    if(idx == -1) {                       // must be the first call, because otherwise all variables
                                           // would have at least two important values.
       return true;
     }
-    while (idx != -1) {
-      if (!var_array[var].inDomain(watches[idx])) {
+    while(idx != -1) {
+      if(!var_array[var].inDomain(watches[idx])) {
         return true;
       }
       idx = watches[idx + 1]; // go to next.
@@ -1034,7 +1057,7 @@ struct InternalDynamicTriggers {
   void printlist(SysInt var) {
     cout << "Var: " << var << " values: ";
     SysInt idx = watches[var];
-    while (idx != -1) {
+    while(idx != -1) {
       cout << watches[idx] << " ";
       idx = watches[idx + 1];
     }
@@ -1045,11 +1068,11 @@ struct InternalDynamicTriggers {
     // go through and find end of list.
     // cout << "In clearwatches for var: "<<var <<endl;
     SysInt idx = watches[var];
-    if (idx == -1)
+    if(idx == -1)
       return;
 
     // find the end of the list
-    while (watches[idx + 1] != -1) {
+    while(watches[idx + 1] != -1) {
       idx = watches[idx + 1]; // next
     }
     // splice list into freelist.

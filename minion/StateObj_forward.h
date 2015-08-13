@@ -28,11 +28,11 @@ class Queues;
 class Memory;
 class VariableContainer;
 
-inline BoolContainer &getBools();
-inline SearchOptions &getOptions();
-inline SearchState &getState();
-inline Queues &getQueue();
-inline Memory &getMemory();
-inline VariableContainer &getVars();
+inline BoolContainer& getBools();
+inline SearchOptions& getOptions();
+inline SearchState& getState();
+inline Queues& getQueue();
+inline Memory& getMemory();
+inline VariableContainer& getVars();
 
 #endif

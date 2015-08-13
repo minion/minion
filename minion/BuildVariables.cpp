@@ -22,11 +22,11 @@
 
 namespace BuildCon {
 
-vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var> &vec) {
+vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var>& vec) {
   vector<AnyVarRef> ret_vec;
   ret_vec.reserve(vec.size());
 
-  for (SysInt i = 0; i < (SysInt)vec.size(); ++i)
+  for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
     ret_vec.push_back(get_AnyVarRef_from_Var(vec[i]));
 
   return ret_vec;
@@ -34,7 +34,7 @@ vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var> &vec) {
 
 /// Helper function used in a few places.
 AnyVarRef get_AnyVarRef_from_Var(Var v) {
-  switch (v.type()) {
+  switch(v.type()) {
   case VAR_BOOL: return AnyVarRef(getVars().boolVarContainer.get_var_num(v.pos()));
   case VAR_NOTBOOL: return AnyVarRef(VarNotRef(getVars().boolVarContainer.get_var_num(v.pos())));
   case VAR_BOUND: return AnyVarRef(getVars().boundVarContainer.get_var_num(v.pos()));
@@ -47,13 +47,13 @@ AnyVarRef get_AnyVarRef_from_Var(Var v) {
 }
 
 /// Create all the variables used in the CSP.
-void build_variables(const ProbSpec::VarContainer &vars) {
+void build_variables(const ProbSpec::VarContainer& vars) {
   getVars().boolVarContainer.setVarCount(vars.BOOLs);
   getVars().boundVarContainer.addVariables(vars.bound);
   getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound);
   getVars().bigRangeVarContainer.addVariables(vars.discrete);
 
-  for (SysInt i = 0; i < (SysInt)vars.sparse_discrete.size(); ++i) {
+  for(SysInt i = 0; i < (SysInt)vars.sparse_discrete.size(); ++i) {
     INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry.");
   }
 }

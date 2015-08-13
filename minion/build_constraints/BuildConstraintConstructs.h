@@ -28,15 +28,15 @@ namespace BuildCon {
 template <ConstraintType constraint, SysInt size>
 struct BuildConObj {
   template <typename ConData>
-  static AbstractConstraint *build(const ConData &partial_build, ConstraintBlob &b,
+  static AbstractConstraint* build(const ConData& partial_build, ConstraintBlob& b,
                                    SysInt pos) DOM_NOINLINE;
 };
 
 template <ConstraintType constraint, SysInt size>
 template <typename ConData>
-AbstractConstraint *BuildConObj<constraint, size>::build(const ConData &partial_build,
-                                                         ConstraintBlob &b, SysInt pos) {
-  const vector<Var> &vars = b.vars[pos];
+AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_build,
+                                                         ConstraintBlob& b, SysInt pos) {
+  const vector<Var>& vars = b.vars[pos];
 
   // type needs to be something for empty arrays
   SysInt type = VAR_CONSTANT;
@@ -44,45 +44,45 @@ AbstractConstraint *BuildConObj<constraint, size>::build(const ConData &partial_
   // Suppress unused warning
   (void)same_type;
 
-  if (!vars.empty()) {
+  if(!vars.empty()) {
     type = vars[0].type();
-    for (UnsignedSysInt i = 1; i < vars.size(); ++i) {
-      if (vars[i].type() != type) {
+    for(UnsignedSysInt i = 1; i < vars.size(); ++i) {
+      if(vars[i].type() != type) {
         same_type = false;
         break;
       }
     }
   }
 #ifndef QUICK_COMPILE
-  if (same_type) {
-    switch (type) {
+  if(same_type) {
+    switch(type) {
     case VAR_BOOL: {
       vector<BoolVarRef> v(vars.size());
-      for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
         v[i] = getVars().boolVarContainer.get_var_num(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_NOTBOOL: {
       vector<VarNot<BoolVarRef>> v(vars.size());
-      for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
         v[i] = VarNotRef(getVars().boolVarContainer.get_var_num(vars[i].pos()));
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_BOUND: {
       vector<BoundVarRef> v(vars.size());
-      for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
         v[i] = getVars().boundVarContainer.get_var_num(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_SPARSEBOUND: {
       vector<SparseBoundVarRef> v(vars.size());
-      for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
         v[i] = getVars().sparseBoundVarContainer.get_var_num(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_DISCRETE: {
       vector<BigRangeVarRef> v(vars.size());
-      for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
         v[i] = getVars().bigRangeVarContainer.get_var_num(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
@@ -90,7 +90,7 @@ AbstractConstraint *BuildConObj<constraint, size>::build(const ConData &partial_
 
     case VAR_CONSTANT: {
       vector<ConstantVar> v(vars.size());
-      for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
         v[i] = ConstantVar(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
@@ -99,7 +99,7 @@ AbstractConstraint *BuildConObj<constraint, size>::build(const ConData &partial_
 #endif
   {
     vector<AnyVarRef> v(vars.size());
-    for (UnsignedSysInt i = 0; i < vars.size(); ++i)
+    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       v[i] = get_AnyVarRef_from_Var(vars[i]);
 
     return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
@@ -110,4 +110,4 @@ AbstractConstraint *BuildConObj<constraint, size>::build(const ConData &partial_
 }
 }
 
-AbstractConstraint *build_constraint(ProbSpec::ConstraintBlob &b);
+AbstractConstraint* build_constraint(ProbSpec::ConstraintBlob& b);

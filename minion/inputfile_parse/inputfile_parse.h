@@ -23,7 +23,7 @@
 
 #include "CSPSpec.h"
 
-void readInputFromFiles(CSPInstance &inst, vector<string> fnames, bool parser_verbose,
+void readInputFromFiles(CSPInstance& inst, vector<string> fnames, bool parser_verbose,
                         MapLongTuplesToShort mltts, bool ensure_branch_on_all_vars);
 
 #endif

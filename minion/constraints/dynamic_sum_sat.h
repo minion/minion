@@ -23,9 +23,11 @@
 
 template <typename VarArray>
 struct BoolSATConstraintDynamic : public AbstractConstraint {
-  virtual string constraint_name() { return "watchsumgeq"; }
+  virtual string constraint_name() {
+    return "watchsumgeq";
+  }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     return new BoolLessSumConstraintDynamic<VarArray, DomainInt, 1>(var_array, var_array.size());
   }
 
@@ -37,33 +39,37 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
 
   SysInt last;
 
-  BoolSATConstraintDynamic(const VarArray &_var_array) : var_array(_var_array) { last = 0; }
+  BoolSATConstraintDynamic(const VarArray& _var_array) : var_array(_var_array) {
+    last = 0;
+  }
 
-  virtual SysInt dynamic_trigger_count() { return 2; }
+  virtual SysInt dynamic_trigger_count() {
+    return 2;
+  }
 
   virtual void full_propagate() {
     SysInt array_size = var_array.size();
     SysInt trig1, trig2;
     SysInt index = 0;
 
-    while (index < array_size && !var_array[index].inDomain(1))
+    while(index < array_size && !var_array[index].inDomain(1))
       ++index;
 
     trig1 = index;
 
-    if (index == array_size) { // Not enough triggers
+    if(index == array_size) { // Not enough triggers
       getState().setFailed(true);
       return;
     }
 
     ++index;
 
-    while (index < array_size && !var_array[index].inDomain(1))
+    while(index < array_size && !var_array[index].inDomain(1))
       ++index;
 
     trig2 = index;
 
-    if (index >= array_size) { // Only one valid variable.
+    if(index >= array_size) { // Only one valid variable.
       var_array[trig1].propagateAssign(1);
       return;
     }
@@ -83,7 +89,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
 
     SysInt other_propval;
 
-    if (0 == dt)
+    if(0 == dt)
       other_propval = triggerInfo(1);
     else
       other_propval = triggerInfo(0);
@@ -96,24 +102,24 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
 
     SysInt loop = last;
 
-    while (loop < var_size && !found_new_support) {
-      if (loop != other_propval && var_array[loop].inDomain(1))
+    while(loop < var_size && !found_new_support) {
+      if(loop != other_propval && var_array[loop].inDomain(1))
         found_new_support = true;
       else
         ++loop;
     }
 
-    if (!found_new_support) {
+    if(!found_new_support) {
       loop = 0;
 
-      while (loop < last && !found_new_support) {
-        if (loop != other_propval && var_array[loop].inDomain(1))
+      while(loop < last && !found_new_support) {
+        if(loop != other_propval && var_array[loop].inDomain(1))
           found_new_support = true;
         else
           ++loop;
       }
 
-      if (!found_new_support) { // Have to propagate!
+      if(!found_new_support) { // Have to propagate!
         var_array[other_propval].propagateAssign(1);
         return;
       }
@@ -125,10 +131,10 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     moveTriggerInt(var_array[loop], dt, UpperBound);
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     SysInt count = 0;
-    for (SysInt i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < v_size; ++i)
       count += (v[i] == 1);
     return count > 0;
   }
@@ -136,14 +142,14 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
-    for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    for (SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if (var_array[i].inDomain(1)) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
+      if(var_array[i].inDomain(1)) {
         assignment.push_back(make_pair(i, 1));
         return true;
       }
@@ -153,7 +159,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
 };
 
 template <typename VarArray>
-AbstractConstraint *BoolSATConDynamic(const VarArray &_var_array) {
+AbstractConstraint* BoolSATConDynamic(const VarArray& _var_array) {
   return new BoolSATConstraintDynamic<VarArray>(_var_array);
 }
 

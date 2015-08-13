@@ -23,11 +23,11 @@
 template <typename T>
 struct MultiplyHelp {
   static inline DomainInt round_down(DomainInt val, DomainInt divisor) {
-    if (val > 0)
+    if(val > 0)
       return val / divisor;
 
     DomainInt newval = val / divisor;
-    if (newval * divisor == val)
+    if(newval * divisor == val)
       return newval;
 
     return newval - 1;
@@ -35,11 +35,11 @@ struct MultiplyHelp {
 
   static inline DomainInt round_up(DomainInt val, DomainInt divisor) {
     D_ASSERT(divisor > 0);
-    if (val < 0)
+    if(val < 0)
       return val / divisor;
 
     DomainInt newval = val / divisor;
-    if (newval * divisor == val)
+    if(newval * divisor == val)
       return newval;
 
     return newval + 1;
@@ -251,84 +251,96 @@ template <typename VarRef>
 struct MultiplyVar {
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_Yes;
-  BOOL isBound() const { return true; }
+  BOOL isBound() const {
+    return true;
+  }
 
-  AnyVarRef popOneMapper() const { return data; }
+  AnyVarRef popOneMapper() const {
+    return data;
+  }
 
   VarRef data;
   DomainInt Multiply;
-  MultiplyVar(const VarRef &_data, DomainInt _Multiply) : data(_data), Multiply(_Multiply) {
+  MultiplyVar(const VarRef& _data, DomainInt _Multiply) : data(_data), Multiply(_Multiply) {
     DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMax()) * checked_cast<BigInt>(Multiply));
     DOMAIN_CHECK(checked_cast<BigInt>(data.getInitialMin()) * checked_cast<BigInt>(Multiply));
     CHECK(Multiply != 0, "Cannot divide variable by 0");
   }
 
-  MultiplyVar() : data() { Multiply = 0; }
+  MultiplyVar() : data() {
+    Multiply = 0;
+  }
 
-  MultiplyVar(const MultiplyVar &b) : data(b.data), Multiply(b.Multiply) {}
+  MultiplyVar(const MultiplyVar& b) : data(b.data), Multiply(b.Multiply) {}
 
-  BOOL isAssigned() const { return data.isAssigned(); }
+  BOOL isAssigned() const {
+    return data.isAssigned();
+  }
 
-  DomainInt getAssignedValue() const { return data.getAssignedValue() * Multiply; }
+  DomainInt getAssignedValue() const {
+    return data.getAssignedValue() * Multiply;
+  }
 
   BOOL isAssignedValue(DomainInt i) const {
-    if (!data.isAssigned())
+    if(!data.isAssigned())
       return false;
 
     return data.getAssignedValue() == i * Multiply;
   }
 
   BOOL inDomain(DomainInt b) const {
-    if (b % Multiply != 0)
+    if(b % Multiply != 0)
       return false;
     return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const {
-    if (b % Multiply != 0)
+    if(b % Multiply != 0)
       return false;
     return data.inDomain(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
-  DomainInt getDomSize() const { return data.getDomSize(); }
+  DomainInt getDomSize() const {
+    return data.getDomSize();
+  }
 
   DomainInt getMax() const {
-    if (Multiply >= 0)
+    if(Multiply >= 0)
       return data.getMax() * Multiply;
     else
       return data.getMin() * Multiply;
   }
 
   DomainInt getMin() const {
-    if (Multiply >= 0)
+    if(Multiply >= 0)
       return data.getMin() * Multiply;
     else
       return data.getMax() * Multiply;
   }
 
   DomainInt getInitialMax() const {
-    if (Multiply >= 0)
+    if(Multiply >= 0)
       return data.getInitialMax() * Multiply;
     else
       return data.getInitialMin() * Multiply;
   }
 
   DomainInt getInitialMin() const {
-    if (Multiply >= 0)
+    if(Multiply >= 0)
       return data.getInitialMin() * Multiply;
     else
       return data.getInitialMax() * Multiply;
   }
 
   void setMax(DomainInt i) {
-    if (Multiply >= 0)
+    if(Multiply >= 0)
       data.setMax(MultiplyHelp<VarRef>::round_down(i, Multiply));
     else
       data.setMin(MultiplyHelp<VarRef>::round_up(-i, -Multiply));
   }
 
   void setMin(DomainInt i) {
-    if (Multiply >= 0)
+    if(Multiply >= 0)
       data.setMin(MultiplyHelp<VarRef>::round_up(i, Multiply));
     else
       data.setMax(MultiplyHelp<VarRef>::round_down(-i, -Multiply));
@@ -347,18 +359,20 @@ struct MultiplyVar {
     data.decisionAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
-  void removeFromDomain(DomainInt) { FAIL_EXIT(); }
+  void removeFromDomain(DomainInt) {
+    FAIL_EXIT();
+  }
 
   void addTrigger(Trigger t, TrigType type) {
-    switch (type) {
+    switch(type) {
     case UpperBound:
-      if (Multiply >= 0)
+      if(Multiply >= 0)
         data.addTrigger(t, UpperBound);
       else
         data.addTrigger(t, LowerBound);
       break;
     case LowerBound:
-      if (Multiply >= 0)
+      if(Multiply >= 0)
         data.addTrigger(t, LowerBound);
       else
         data.addTrigger(t, UpperBound);
@@ -371,15 +385,15 @@ struct MultiplyVar {
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
-    switch (type) {
+    switch(type) {
     case UpperBound:
-      if (Multiply >= 0)
+      if(Multiply >= 0)
         data.addDynamicTrigger(t, UpperBound, pos, op);
       else
         data.addDynamicTrigger(t, LowerBound, pos, op);
       break;
     case LowerBound:
-      if (Multiply >= 0)
+      if(Multiply >= 0)
         data.addDynamicTrigger(t, LowerBound, pos, op);
       else
         data.addDynamicTrigger(t, UpperBound, pos, op);
@@ -394,7 +408,7 @@ struct MultiplyVar {
     }
   }
 
-  friend std::ostream &operator<<(std::ostream &o, const MultiplyVar &n) {
+  friend std::ostream& operator<<(std::ostream& o, const MultiplyVar& n) {
     return o << "Mult:" << n.data << "*" << n.Multiply;
   }
 
@@ -402,15 +416,21 @@ struct MultiplyVar {
     return abs(checked_cast<SysInt>(Multiply)) * data.getDomainChange(d);
   }
 
-  vector<AbstractConstraint *> *getConstraints() { return data.getConstraints(); }
+  vector<AbstractConstraint*>* getConstraints() {
+    return data.getConstraints();
+  }
 
-  void addConstraint(AbstractConstraint *c) { data.addConstraint(c); }
+  void addConstraint(AbstractConstraint* c) {
+    data.addConstraint(c);
+  }
 
   DomainInt getBaseVal(DomainInt v) const {
     return data.getBaseVal(MultiplyHelp<VarRef>::divide_exact(v, Multiply));
   }
 
-  Var getBaseVar() const { return data.getBaseVar(); }
+  Var getBaseVar() const {
+    return data.getBaseVar();
+  }
 
   vector<Mapper> getMapperStack() const {
     vector<Mapper> v = data.getMapperStack();
@@ -419,9 +439,13 @@ struct MultiplyVar {
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg() { return data.getBaseWdeg(); }
+  DomainInt getBaseWdeg() {
+    return data.getBaseWdeg();
+  }
 
-  void incWdeg() { data.incWdeg(); }
+  void incWdeg() {
+    data.incWdeg();
+  }
 #endif
 };
 
@@ -446,19 +470,19 @@ typename MultiplyType<VRef>::type MultiplyVarRef(VRef var_ref, SysInt i) {
 }
 
 template <typename VarRef>
-vector<MultiplyVar<VarRef>> MultiplyVarRef(const vector<VarRef> &var_array,
-                                           const vector<DomainInt> &multiplies) {
+vector<MultiplyVar<VarRef>> MultiplyVarRef(const vector<VarRef>& var_array,
+                                           const vector<DomainInt>& multiplies) {
   vector<MultiplyVar<VarRef>> Multiply_array(var_array.size());
-  for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
   return Multiply_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<MultiplyVar<VarRef>, i> MultiplyVarRef(const std::array<VarRef, i> &var_array,
-                                                  const std::array<SysInt, i> &multiplies) {
+std::array<MultiplyVar<VarRef>, i> MultiplyVarRef(const std::array<VarRef, i>& var_array,
+                                                  const std::array<SysInt, i>& multiplies) {
   std::array<MultiplyVar<VarRef>, i> Multiply_array;
-  for (UnsignedSysInt l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     Multiply_array[l] = MultiplyVarRef(var_array[l], multiplies[i]);
   return Multiply_array;
 }

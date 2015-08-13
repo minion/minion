@@ -1,9 +1,9 @@
 #include "minlib/minlib.hpp"
 
 template <typename T>
-std::vector<int> enumerate_loop(const T &t) {
+std::vector<int> enumerate_loop(const T& t) {
   std::vector<int> v;
-  for (auto i : t)
+  for(auto i : t)
     v.push_back(i);
   return v;
 }

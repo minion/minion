@@ -30,16 +30,26 @@ struct InfoRefType {
   static const BOOL isBool = WrapType::isBool;
   static const BoundType isBoundConst = WrapType::isBoundConst;
 
-  BOOL isBound() const { return data.isBound(); }
+  BOOL isBound() const {
+    return data.isBound();
+  }
 
   // Here we just pass through, as we don't know if this is the bottom or not.
-  AnyVarRef popOneMapper() const { return data.popOneMapper(); }
+  AnyVarRef popOneMapper() const {
+    return data.popOneMapper();
+  }
 
-  InfoRefType(const WrapType &_data) : data(_data) { VAR_INFO_ADDONE(VAR_TYPE, copy); }
+  InfoRefType(const WrapType& _data) : data(_data) {
+    VAR_INFO_ADDONE(VAR_TYPE, copy);
+  }
 
-  InfoRefType() { VAR_INFO_ADDONE(VAR_TYPE, construct); }
+  InfoRefType() {
+    VAR_INFO_ADDONE(VAR_TYPE, construct);
+  }
 
-  InfoRefType(const InfoRefType &b) : data(b.data) { VAR_INFO_ADDONE(VAR_TYPE, copy); }
+  InfoRefType(const InfoRefType& b) : data(b.data) {
+    VAR_INFO_ADDONE(VAR_TYPE, copy);
+  }
 
   bool isAssigned() const {
     VAR_INFO_ADDONE(VAR_TYPE, isAssigned);
@@ -153,12 +163,12 @@ struct InfoRefType {
     data.addTrigger(t, type);
   }
 
-  vector<AbstractConstraint *> *getConstraints() {
+  vector<AbstractConstraint*>* getConstraints() {
     VAR_INFO_ADDONE(VAR_TYPE, getConstraints);
     return data.getConstraints();
   }
 
-  void addConstraint(AbstractConstraint *c) {
+  void addConstraint(AbstractConstraint* c) {
     VAR_INFO_ADDONE(VAR_TYPE, addConstraint);
     data.addConstraint(c);
   }
@@ -190,7 +200,7 @@ struct InfoRefType {
   }
 #endif
 
-  friend std::ostream &operator<<(std::ostream &o, const InfoRefType &ir) {
+  friend std::ostream& operator<<(std::ostream& o, const InfoRefType& ir) {
     return o << "InfoRef " << ir.data;
   }
 

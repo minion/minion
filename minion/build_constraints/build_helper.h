@@ -31,9 +31,9 @@ using namespace BuildCon;
   template <>                                                                                      \
   struct BuildConObj<CT_NAME, 0> {                                                                 \
     template <typename T1, typename T2, typename T3>                                               \
-    static AbstractConstraint *                                                                    \
-    build(const pair<pair<pair<EmptyType, vector<T1> *>, vector<T2> *>, vector<T3> *> &vars,       \
-          ConstraintBlob &b, SysInt) {                                                             \
+    static AbstractConstraint*                                                                     \
+    build(const pair<pair<pair<EmptyType, vector<T1>*>, vector<T2>*>, vector<T3>*>& vars,          \
+          ConstraintBlob& b, SysInt) {                                                             \
       return Build##CT_NAME(*(vars.first.first.second), *(vars.first.second), *(vars.second), b);  \
     }                                                                                              \
   };                                                                                               \
@@ -44,9 +44,8 @@ using namespace BuildCon;
   template <>                                                                                      \
   struct BuildConObj<CT_NAME, 0> {                                                                 \
     template <typename T1, typename T2>                                                            \
-    static AbstractConstraint *                                                                    \
-    build(const pair<pair<EmptyType, vector<T1> *>, vector<T2> *> &vars, ConstraintBlob &b,        \
-          SysInt) {                                                                                \
+    static AbstractConstraint* build(const pair<pair<EmptyType, vector<T1>*>, vector<T2>*>& vars,  \
+                                     ConstraintBlob& b, SysInt) {                                  \
       return Build##CT_NAME(*(vars.first.second), *(vars.second), b);                              \
     }                                                                                              \
   };                                                                                               \
@@ -57,7 +56,7 @@ using namespace BuildCon;
   template <>                                                                                      \
   struct BuildConObj<CT_NAME, 0> {                                                                 \
     template <typename T1>                                                                         \
-    static AbstractConstraint *build(const pair<EmptyType, vector<T1> *> &vars, ConstraintBlob &b, \
+    static AbstractConstraint* build(const pair<EmptyType, vector<T1>*>& vars, ConstraintBlob& b,  \
                                      SysInt) {                                                     \
       return Build##CT_NAME(*(vars.second), b);                                                    \
     }                                                                                              \
@@ -68,7 +67,7 @@ using namespace BuildCon;
   namespace BuildCon {                                                                             \
   template <>                                                                                      \
   struct BuildConObj<CT_NAME, 0> {                                                                 \
-    static AbstractConstraint *build(const EmptyType &vars, ConstraintBlob &b, SysInt) {           \
+    static AbstractConstraint* build(const EmptyType& vars, ConstraintBlob& b, SysInt) {           \
       return Build##CT_NAME(b);                                                                    \
     }                                                                                              \
   };                                                                                               \

@@ -65,7 +65,9 @@ diseq(v0,v1)
 
 template <typename EqualVarRef1, typename EqualVarRef2>
 struct GACEqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "gaceq"; }
+  virtual string constraint_name() {
+    return "gaceq";
+  }
 
   EqualVarRef1 var1;
   EqualVarRef2 var2;
@@ -91,32 +93,32 @@ struct GACEqualConstraint : public AbstractConstraint {
     var1.setMin(minlim);
     var2.setMin(minlim);
 
-    for (DomainInt val = var1.getMin(); val <= var1.getMax(); val++) {
-      if (!var2.inDomain(val)) {
+    for(DomainInt val = var1.getMin(); val <= var1.getMax(); val++) {
+      if(!var2.inDomain(val)) {
         var1.removeFromDomain(val);
       }
     }
-    for (DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
-      if (!var1.inDomain(val)) {
+    for(DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
+      if(!var1.inDomain(val)) {
         var2.removeFromDomain(val);
       }
     }
 
-    for (DomainInt val = var1.getMin(); val <= var1.getMax(); val++) {
-      if (var1.inDomain(val)) {
+    for(DomainInt val = var1.getMin(); val <= var1.getMax(); val++) {
+      if(var1.inDomain(val)) {
         moveTriggerInt(var1, val - var1.getInitialMin(), DomainRemoval, val);
       }
     }
 
-    for (DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
-      if (var2.inDomain(val)) {
+    for(DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
+      if(var2.inDomain(val)) {
         moveTriggerInt(var2, dvar2 + val - var2.getInitialMin(), DomainRemoval, val);
       }
     }
   }
 
   virtual void propagateDynInt(SysInt pos, DomainDelta) {
-    if (pos < dvar2) {
+    if(pos < dvar2) {
       DomainInt val = pos + var1.getInitialMin();
       D_ASSERT(!var1.inDomain(val));
       var2.removeFromDomain(val);
@@ -127,7 +129,7 @@ struct GACEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return (v[0] == v[1]);
   }
@@ -140,12 +142,12 @@ struct GACEqualConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt min_val = max(var1.getMin(), var2.getMin());
     DomainInt max_val = min(var1.getMax(), var2.getMax());
 
-    for (DomainInt i = min_val; i <= max_val; ++i) {
-      if (var1.inDomain(i) && var2.inDomain(i)) {
+    for(DomainInt i = min_val; i <= max_val; ++i) {
+      if(var1.inDomain(i) && var2.inDomain(i)) {
         assignment.push_back(make_pair(0, i));
         assignment.push_back(make_pair(1, i));
         return true;
@@ -154,13 +156,13 @@ struct GACEqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint *reverse_constraint() {
+  virtual AbstractConstraint* reverse_constraint() {
     return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(var1, var2);
   }
 };
 
 template <typename T1, typename T2>
-AbstractConstraint *BuildCT_GACEQ(const T1 &t1, const T2 &t2, ConstraintBlob &) {
+AbstractConstraint* BuildCT_GACEQ(const T1& t1, const T2& t2, ConstraintBlob&) {
   return new GACEqualConstraint<typename T1::value_type, typename T2::value_type>(t1[0], t2[0]);
 }
 

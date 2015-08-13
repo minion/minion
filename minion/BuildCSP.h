@@ -33,11 +33,13 @@ struct SearchMethod {
   enum PropagationLevel prop_method;
   UnsignedSysInt random_seed;
   SearchMethod()
-      : order(ORDER_NONE), preprocess(PropLevel_None), prop_method(PropLevel_GAC),
+      : order(ORDER_NONE),
+        preprocess(PropLevel_None),
+        prop_method(PropLevel_GAC),
         random_seed((UnsignedSysInt)time(NULL) ^ getpid()) {}
 };
 
-void BuildCSP(ProbSpec::CSPInstance &instance);
-void SolveCSP(ProbSpec::CSPInstance &instance, SearchMethod args);
+void BuildCSP(ProbSpec::CSPInstance& instance);
+void SolveCSP(ProbSpec::CSPInstance& instance, SearchMethod args);
 
 #endif

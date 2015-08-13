@@ -35,8 +35,8 @@
 
 class VariableContainer {
   // Stop copying!
-  VariableContainer(const VariableContainer &);
-  void operator=(const VariableContainer &);
+  VariableContainer(const VariableContainer&);
+  void operator=(const VariableContainer&);
 
 public:
   BoundVarContainer<> boundVarContainer;
@@ -45,8 +45,10 @@ public:
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
   VariableContainer()
-      : boundVarContainer(), boolVarContainer(), bigRangeVarContainer(), sparseBoundVarContainer() {
-  }
+      : boundVarContainer(),
+        boolVarContainer(),
+        bigRangeVarContainer(),
+        sparseBoundVarContainer() {}
 
   inline void lock() {
     boundVarContainer.lock();

@@ -26,12 +26,12 @@
 void output_fatal_error(string s) DOM_NORETURN;
 
 template <typename T>
-inline void CheckNotBound(const T &t, std::string s, std::string s2 = "") {
-  for (SysInt i = 0; i < (SysInt)t.size(); ++i) {
-    if (t[i].isBound()) {
+inline void CheckNotBound(const T& t, std::string s, std::string s2 = "") {
+  for(SysInt i = 0; i < (SysInt)t.size(); ++i) {
+    if(t[i].isBound()) {
       ostringstream oss;
       oss << "Cannot use '" << s << "' with BOUND or SPARSEBOUND variables.\n";
-      if (s2 != "")
+      if(s2 != "")
         oss << "Please use '" << s2 << "' as a replacement or";
       oss << "Please use DISCRETE variables instead.\n";
       output_fatal_error(oss.str());
@@ -40,11 +40,11 @@ inline void CheckNotBound(const T &t, std::string s, std::string s2 = "") {
 }
 
 template <typename T>
-inline void CheckNotBoundSingle(const T &t, std::string s, std::string s2 = "") {
-  if (t.isBound()) {
+inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "") {
+  if(t.isBound()) {
     ostringstream oss;
     oss << "Cannot use " << s << " with BOUND or SPARSEBOUND variables.\n";
-    if (s2 != "")
+    if(s2 != "")
       oss << "Please use " << s2 << " as a replacement or ";
     oss << "Please use DISCRETE variables instead.\n";
     output_fatal_error(oss.str());
@@ -83,7 +83,7 @@ void FATAL_REPORTABLE_ERROR() DOM_NORETURN;
 
 #define CHECK(x, y)                                                                                \
   {                                                                                                \
-    if (!(x)) {                                                                                    \
+    if(!(x)) {                                                                                     \
       user_error_printing_function(y, __FILE__, __LINE__);                                         \
     }                                                                                              \
   }
@@ -132,7 +132,9 @@ enum DebugTypes {
 
 #endif
 
-inline bool DOMAIN_CHECK(BigInt v) { return v < DomainInt_Max && v > DomainInt_Min; }
+inline bool DOMAIN_CHECK(BigInt v) {
+  return v < DomainInt_Max && v > DomainInt_Min;
+}
 
 // These are just to catch cases where the user didn't cast to BigInt
 // themselves, which makes the function useless.

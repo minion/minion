@@ -13,25 +13,27 @@ struct Backtrackable {
 
 struct GenericBacktracker {
 private:
-  vector<Backtrackable *> things;
-  GenericBacktracker(const GenericBacktracker &);
+  vector<Backtrackable*> things;
+  GenericBacktracker(const GenericBacktracker&);
 
 public:
   GenericBacktracker() {}
 
   void world_pop() {
     int size = things.size();
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       things[i]->pop();
     }
   }
 
   void mark() {
     int size = things.size();
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       things[i]->mark();
     }
   }
 
-  void add(Backtrackable *bt_obj) { things.push_back(bt_obj); }
+  void add(Backtrackable* bt_obj) {
+    things.push_back(bt_obj);
+  }
 };

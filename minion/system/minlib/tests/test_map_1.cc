@@ -3,7 +3,9 @@
 using namespace std;
 
 struct MapperObj {
-  std::pair<int, int> operator()(int i) { return make_pair(i, i); }
+  std::pair<int, int> operator()(int i) {
+    return make_pair(i, i);
+  }
 };
 
 int main(void) {

@@ -26,4 +26,6 @@ inline void Trigger::propagateStatic(DomainDelta domain_data) {
   constraint->propagateStatic(info, domain_data);
 }
 
-inline void Trigger::full_propagate() { constraint->full_propagate(); }
+inline void Trigger::full_propagate() {
+  constraint->full_propagate();
+}

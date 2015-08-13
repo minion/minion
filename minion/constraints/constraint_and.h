@@ -27,9 +27,13 @@
 template <typename VarRef1, typename VarRef2, typename VarRef3>
 struct AndConstraint : public AbstractConstraint {
 
-  virtual string extended_name() { return "product: and"; }
+  virtual string extended_name() {
+    return "product: and";
+  }
 
-  virtual string constraint_name() { return "product"; }
+  virtual string constraint_name() {
+    return "product";
+  }
 
   CONSTRAINT_ARG_LIST3(var1, var2, var3);
 
@@ -61,21 +65,21 @@ struct AndConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(And);
-    switch (checked_cast<SysInt>(i)) {
+    switch(checked_cast<SysInt>(i)) {
     case 0:
-      if (var2.isAssignedValue(true))
+      if(var2.isAssignedValue(true))
         var3.propagateAssign(true);
       else {
-        if (var3.isAssignedValue(false))
+        if(var3.isAssignedValue(false))
           var2.propagateAssign(false);
       }
       break;
 
     case 1:
-      if (var1.isAssignedValue(true))
+      if(var1.isAssignedValue(true))
         var3.propagateAssign(true);
       else {
-        if (var3.isAssignedValue(false))
+        if(var3.isAssignedValue(false))
           var1.propagateAssign(false);
       }
       break;
@@ -89,10 +93,10 @@ struct AndConstraint : public AbstractConstraint {
     case 4: var3.propagateAssign(false); break;
 
     case 5:
-      if (var1.isAssignedValue(true))
+      if(var1.isAssignedValue(true))
         var2.propagateAssign(false);
       else {
-        if (var2.isAssignedValue(true))
+        if(var2.isAssignedValue(true))
           var1.propagateAssign(false);
       }
       break;
@@ -101,33 +105,33 @@ struct AndConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     setup_triggers();
-    if (var1.isAssignedValue(false) || var2.isAssignedValue(false))
+    if(var1.isAssignedValue(false) || var2.isAssignedValue(false))
       var3.propagateAssign(false);
 
-    if (var1.isAssignedValue(true) && var2.isAssignedValue(true))
+    if(var1.isAssignedValue(true) && var2.isAssignedValue(true))
       var3.propagateAssign(true);
 
-    if (var3.isAssignedValue(false)) {
-      if (var1.isAssignedValue(true))
+    if(var3.isAssignedValue(false)) {
+      if(var1.isAssignedValue(true))
         var2.propagateAssign(false);
-      if (var2.isAssignedValue(true))
+      if(var2.isAssignedValue(true))
         var1.propagateAssign(false);
     }
 
-    if (var3.isAssignedValue(true)) {
+    if(var3.isAssignedValue(true)) {
       var1.propagateAssign(true);
       var2.propagateAssign(true);
     }
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     return ((v[0] != 0) && (v[1] != 0)) == (v[2] != 0);
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    if (var3.getMax() == 1) {
-      if (var1.getMax() == 1 && var2.getMax() == 1) {
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    if(var3.getMax() == 1) {
+      if(var1.getMax() == 1 && var2.getMax() == 1) {
         assignment.push_back(make_pair(0, 1));
         assignment.push_back(make_pair(1, 1));
         assignment.push_back(make_pair(2, 1));
@@ -135,14 +139,14 @@ struct AndConstraint : public AbstractConstraint {
       }
     }
 
-    if (var3.getMin() == 0) {
-      if (var2.getMin() == 0) {
+    if(var3.getMin() == 0) {
+      if(var2.getMin() == 0) {
         assignment.push_back(make_pair(1, 0));
         assignment.push_back(make_pair(2, 0));
         return true;
       }
 
-      if (var1.getMin() == 0) {
+      if(var1.getMin() == 0) {
         assignment.push_back(make_pair(0, 0));
         assignment.push_back(make_pair(2, 0));
         return true;
@@ -160,11 +164,13 @@ struct AndConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 };
 
 template <typename VarRef1, typename VarRef2, typename VarRef3>
-AbstractConstraint *AndCon(VarRef1 var1, VarRef2 var2, VarRef3 var3) {
+AbstractConstraint* AndCon(VarRef1 var1, VarRef2 var2, VarRef3 var3) {
   return (new AndConstraint<VarRef1, VarRef2, VarRef3>(var1, var2, var3));
 }
 

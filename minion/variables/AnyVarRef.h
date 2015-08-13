@@ -171,8 +171,8 @@ struct AnyVarRef_Abstract {
   virtual void decisionAssign(DomainInt b) = 0;
   virtual void removeFromDomain(DomainInt b) = 0;
   virtual void addTrigger(Trigger t, TrigType type) = 0;
-  virtual vector<AbstractConstraint *> *getConstraints() = 0;
-  virtual void addConstraint(AbstractConstraint *c) = 0;
+  virtual vector<AbstractConstraint*>* getConstraints() = 0;
+  virtual void addConstraint(AbstractConstraint* c) = 0;
   virtual DomainInt getBaseVal(DomainInt) const = 0;
   virtual Var getBaseVar() const = 0;
   virtual vector<Mapper> getMapperStack() const = 0;
@@ -194,71 +194,125 @@ struct AnyVarRef_Abstract {
 template <typename VarRef>
 struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
 
-  virtual BOOL isBound() const { return data.isBound(); }
+  virtual BOOL isBound() const {
+    return data.isBound();
+  }
 
   AnyVarRef popOneMapper() const;
 
   VarRef data;
-  AnyVarRef_Concrete(const VarRef &_data) : data(_data) {}
+  AnyVarRef_Concrete(const VarRef& _data) : data(_data) {}
 
   AnyVarRef_Concrete() {}
 
-  AnyVarRef_Concrete(const AnyVarRef_Concrete &b) : data(b.data) {}
+  AnyVarRef_Concrete(const AnyVarRef_Concrete& b) : data(b.data) {}
 
-  virtual BOOL isAssigned() const { return data.isAssigned(); }
+  virtual BOOL isAssigned() const {
+    return data.isAssigned();
+  }
 
-  virtual DomainInt getAssignedValue() const { return data.getAssignedValue(); }
+  virtual DomainInt getAssignedValue() const {
+    return data.getAssignedValue();
+  }
 
-  virtual BOOL isAssignedValue(DomainInt i) const { return data.isAssignedValue(i); }
+  virtual BOOL isAssignedValue(DomainInt i) const {
+    return data.isAssignedValue(i);
+  }
 
-  virtual BOOL inDomain(DomainInt b) const { return data.inDomain(b); }
+  virtual BOOL inDomain(DomainInt b) const {
+    return data.inDomain(b);
+  }
 
-  virtual BOOL inDomain_noBoundCheck(DomainInt b) const { return data.inDomain_noBoundCheck(b); }
+  virtual BOOL inDomain_noBoundCheck(DomainInt b) const {
+    return data.inDomain_noBoundCheck(b);
+  }
 
-  virtual DomainInt getDomSize() const { return data.getDomSize(); }
+  virtual DomainInt getDomSize() const {
+    return data.getDomSize();
+  }
 
-  virtual DomainInt getMax() const { return data.getMax(); }
+  virtual DomainInt getMax() const {
+    return data.getMax();
+  }
 
-  virtual DomainInt getMin() const { return data.getMin(); }
+  virtual DomainInt getMin() const {
+    return data.getMin();
+  }
 
-  virtual DomainInt getInitialMax() const { return data.getInitialMax(); }
+  virtual DomainInt getInitialMax() const {
+    return data.getInitialMax();
+  }
 
-  virtual DomainInt getInitialMin() const { return data.getInitialMin(); }
+  virtual DomainInt getInitialMin() const {
+    return data.getInitialMin();
+  }
 
-  virtual void setMax(DomainInt i) { data.setMax(i); }
+  virtual void setMax(DomainInt i) {
+    data.setMax(i);
+  }
 
-  virtual void setMin(DomainInt i) { data.setMin(i); }
+  virtual void setMin(DomainInt i) {
+    data.setMin(i);
+  }
 
-  virtual void uncheckedAssign(DomainInt b) { data.uncheckedAssign(b); }
+  virtual void uncheckedAssign(DomainInt b) {
+    data.uncheckedAssign(b);
+  }
 
-  virtual void propagateAssign(DomainInt b) { data.propagateAssign(b); }
+  virtual void propagateAssign(DomainInt b) {
+    data.propagateAssign(b);
+  }
 
-  virtual void decisionAssign(DomainInt b) { data.decisionAssign(b); }
+  virtual void decisionAssign(DomainInt b) {
+    data.decisionAssign(b);
+  }
 
-  virtual void removeFromDomain(DomainInt b) { data.removeFromDomain(b); }
+  virtual void removeFromDomain(DomainInt b) {
+    data.removeFromDomain(b);
+  }
 
-  virtual void addTrigger(Trigger t, TrigType type) { data.addTrigger(t, type); }
+  virtual void addTrigger(Trigger t, TrigType type) {
+    data.addTrigger(t, type);
+  }
 
-  virtual vector<AbstractConstraint *> *getConstraints() { return data.getConstraints(); }
+  virtual vector<AbstractConstraint*>* getConstraints() {
+    return data.getConstraints();
+  }
 
-  virtual void addConstraint(AbstractConstraint *c) { data.addConstraint(c); }
+  virtual void addConstraint(AbstractConstraint* c) {
+    data.addConstraint(c);
+  }
 
-  virtual DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(v); }
+  virtual DomainInt getBaseVal(DomainInt v) const {
+    return data.getBaseVal(v);
+  }
 
-  virtual vector<Mapper> getMapperStack() const { return data.getMapperStack(); }
+  virtual vector<Mapper> getMapperStack() const {
+    return data.getMapperStack();
+  }
 
-  virtual Var getBaseVar() const { return data.getBaseVar(); }
+  virtual Var getBaseVar() const {
+    return data.getBaseVar();
+  }
 
 #ifdef WDEG
-  virtual DomainInt getBaseWdeg() { return data.getBaseWdeg(); }
-  virtual void incWdeg() { data.incWdeg(); }
+  virtual DomainInt getBaseWdeg() {
+    return data.getBaseWdeg();
+  }
+  virtual void incWdeg() {
+    data.incWdeg();
+  }
 #endif
 
-  virtual string virtual_tostring() { return tostring(data); }
+  virtual string virtual_tostring() {
+    return tostring(data);
+  }
 
   virtual ~AnyVarRef_Concrete() {}
 
-  DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d) {
+    return data.getDomainChange(d);
+  }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
@@ -279,76 +333,128 @@ public:
   static const BoundType isBoundConst = Bound_Maybe;
   shared_ptr<AnyVarRef_Abstract> data;
 
-  BOOL isBound() const { return data->isBound(); }
+  BOOL isBound() const {
+    return data->isBound();
+  }
 
-  AnyVarRef popOneMapper() const { return data->popOneMapper(); }
+  AnyVarRef popOneMapper() const {
+    return data->popOneMapper();
+  }
 
   template <typename VarRef>
-  AnyVarRef(const VarRef &_data) {
+  AnyVarRef(const VarRef& _data) {
     data = shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data));
   }
 
   AnyVarRef() {}
 
-  AnyVarRef(const AnyVarRef &b) : data(b.data) {}
+  AnyVarRef(const AnyVarRef& b) : data(b.data) {}
 
-  BOOL isAssigned() const { return data->isAssigned(); }
+  BOOL isAssigned() const {
+    return data->isAssigned();
+  }
 
-  DomainInt getAssignedValue() const { return data->getAssignedValue(); }
+  DomainInt getAssignedValue() const {
+    return data->getAssignedValue();
+  }
 
   BOOL isAssignedValue(DomainInt i) const {
     return data->isAssigned() && data->getAssignedValue() == i;
   }
 
-  BOOL inDomain(DomainInt b) const { return data->inDomain(b); }
+  BOOL inDomain(DomainInt b) const {
+    return data->inDomain(b);
+  }
 
-  BOOL inDomain_noBoundCheck(DomainInt b) const { return data->inDomain_noBoundCheck(b); }
+  BOOL inDomain_noBoundCheck(DomainInt b) const {
+    return data->inDomain_noBoundCheck(b);
+  }
 
-  DomainInt getDomSize() const { return data->getDomSize(); }
+  DomainInt getDomSize() const {
+    return data->getDomSize();
+  }
 
-  DomainInt getMax() const { return data->getMax(); }
+  DomainInt getMax() const {
+    return data->getMax();
+  }
 
-  DomainInt getMin() const { return data->getMin(); }
+  DomainInt getMin() const {
+    return data->getMin();
+  }
 
-  DomainInt getInitialMax() const { return data->getInitialMax(); }
+  DomainInt getInitialMax() const {
+    return data->getInitialMax();
+  }
 
-  DomainInt getInitialMin() const { return data->getInitialMin(); }
+  DomainInt getInitialMin() const {
+    return data->getInitialMin();
+  }
 
-  void setMax(DomainInt i) { data->setMax(i); }
+  void setMax(DomainInt i) {
+    data->setMax(i);
+  }
 
-  void setMin(DomainInt i) { data->setMin(i); }
+  void setMin(DomainInt i) {
+    data->setMin(i);
+  }
 
-  void uncheckedAssign(DomainInt b) { data->uncheckedAssign(b); }
+  void uncheckedAssign(DomainInt b) {
+    data->uncheckedAssign(b);
+  }
 
-  void propagateAssign(DomainInt b) { data->propagateAssign(b); }
+  void propagateAssign(DomainInt b) {
+    data->propagateAssign(b);
+  }
 
-  void decisionAssign(DomainInt b) { data->decisionAssign(b); }
+  void decisionAssign(DomainInt b) {
+    data->decisionAssign(b);
+  }
 
-  void removeFromDomain(DomainInt b) { data->removeFromDomain(b); }
+  void removeFromDomain(DomainInt b) {
+    data->removeFromDomain(b);
+  }
 
-  void addTrigger(Trigger t, TrigType type) { data->addTrigger(t, type); }
+  void addTrigger(Trigger t, TrigType type) {
+    data->addTrigger(t, type);
+  }
 
-  vector<AbstractConstraint *> *getConstraints() { return data->getConstraints(); }
+  vector<AbstractConstraint*>* getConstraints() {
+    return data->getConstraints();
+  }
 
-  void addConstraint(AbstractConstraint *c) { data->addConstraint(c); }
+  void addConstraint(AbstractConstraint* c) {
+    data->addConstraint(c);
+  }
 
-  DomainInt getBaseVal(DomainInt v) const { return data->getBaseVal(v); }
+  DomainInt getBaseVal(DomainInt v) const {
+    return data->getBaseVal(v);
+  }
 
-  Var getBaseVar() const { return data->getBaseVar(); }
+  Var getBaseVar() const {
+    return data->getBaseVar();
+  }
 
-  vector<Mapper> getMapperStack() const { return data->getMapperStack(); }
+  vector<Mapper> getMapperStack() const {
+    return data->getMapperStack();
+  }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg() { return data->getBaseWdeg(); }
+  DomainInt getBaseWdeg() {
+    return data->getBaseWdeg();
+  }
 
-  void incWdeg() { data->incWdeg(); }
+  void incWdeg() {
+    data->incWdeg();
+  }
 #endif
 
-  friend std::ostream &operator<<(std::ostream &o, const AnyVarRef &avr) {
+  friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr) {
     return o << "AnyVarRef:" << avr.data->virtual_tostring();
   }
 
-  DomainInt getDomainChange(DomainDelta d) { return data->getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d) {
+    return data->getDomainChange(d);
+  }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
@@ -406,7 +512,7 @@ make_AnyVarRef(T t)
 template <typename T>
 typename make_AnyVarRef_type<vector<T>>::type make_AnyVarRef(vector<T> t) {
   vector<AnyVarRef> v;
-  for (size_t i = 0; i < t.size(); ++i)
+  for(size_t i = 0; i < t.size(); ++i)
     v.push_back(AnyVarRef(t[i]));
   return v;
 }
@@ -414,7 +520,7 @@ typename make_AnyVarRef_type<vector<T>>::type make_AnyVarRef(vector<T> t) {
 template <typename T, size_t param>
 typename make_AnyVarRef_type<std::array<T, param>>::type make_AnyVarRef(std::array<T, param> t) {
   vector<AnyVarRef> v;
-  for (size_t i = 0; i < t.size(); ++i)
+  for(size_t i = 0; i < t.size(); ++i)
     v.push_back(AnyVarRef(t[i]));
   return v;
 }

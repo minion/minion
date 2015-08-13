@@ -27,40 +27,42 @@ template <typename T>
 struct Wrapper {
   T t;
 
-  Wrapper(const T &_t) : t(_t) {}
+  Wrapper(const T& _t) : t(_t) {}
 
   Wrapper() : t() {}
 
   static void overflow_check(long double d) {
-    if (d >= (long double)std::numeric_limits<T>::max() / 1.2 ||
-        d <= (long double)std::numeric_limits<T>::min() / 1.2)
+    if(d >= (long double)std::numeric_limits<T>::max() / 1.2 ||
+       d <= (long double)std::numeric_limits<T>::min() / 1.2)
       throw std::runtime_error("Numeric over/underflow");
   }
-  Wrapper &operator+=(const Wrapper &w) {
+  Wrapper& operator+=(const Wrapper& w) {
     overflow_check((long double)t + (long double)w.t);
     t += w.t;
     return *this;
   }
 
-  Wrapper &operator*=(const Wrapper &w) {
+  Wrapper& operator*=(const Wrapper& w) {
     overflow_check((long double)t * (long double)w.t);
     t *= w.t;
     return *this;
   }
 
-  Wrapper &operator-=(const Wrapper &w) {
+  Wrapper& operator-=(const Wrapper& w) {
     overflow_check((long double)t - (long double)w.t);
     t -= w.t;
     return *this;
   }
 
-  Wrapper &operator/=(const Wrapper &w) {
+  Wrapper& operator/=(const Wrapper& w) {
     overflow_check((long double)t / (long double)w.t);
     t /= w.t;
     return *this;
   }
 
-  Wrapper operator-() const { return -t; }
+  Wrapper operator-() const {
+    return -t;
+  }
 
   void operator++() {
     overflow_check((long double)(t + 1));
@@ -84,9 +86,13 @@ struct Wrapper {
     return t;
   }
 
-  friend std::ostream &operator<<(std::ostream &o, Wrapper v) { return o << v.t; }
+  friend std::ostream& operator<<(std::ostream& o, Wrapper v) {
+    return o << v.t;
+  }
 
-  friend std::ostream &operator>>(std::ostream &o, Wrapper v) { return o >> v.t; }
+  friend std::ostream& operator>>(std::ostream& o, Wrapper v) {
+    return o >> v.t;
+  }
 };
 
 #ifdef WRAP_BOOL_OPS
@@ -95,17 +101,17 @@ struct Wrapper {
 
 #define WRAP_BOOL_OPS(op)                                                                          \
   template <typename T>                                                                            \
-  bool operator op(const Wrapper<T> &t1, const Wrapper<T> &t2) {                                   \
+  bool operator op(const Wrapper<T>& t1, const Wrapper<T>& t2) {                                   \
     return t1.t op t2.t;                                                                           \
   }                                                                                                \
                                                                                                    \
   template <typename T, typename U>                                                                \
-  bool operator op(const U &t1, const Wrapper<T> &t2) {                                            \
+  bool operator op(const U& t1, const Wrapper<T>& t2) {                                            \
     return t1 op t2.t;                                                                             \
   }                                                                                                \
                                                                                                    \
   template <typename T, typename U>                                                                \
-  bool operator op(const Wrapper<T> &t1, const U &t2) {                                            \
+  bool operator op(const Wrapper<T>& t1, const U& t2) {                                            \
     return t1.t op t2;                                                                             \
   }
 
@@ -122,17 +128,17 @@ WRAP_BOOL_OPS(>= )
 
 #define WRAP_ARITHMETIC_OPS(op)                                                                    \
   template <typename T>                                                                            \
-  Wrapper<T> operator op(const Wrapper<T> &t1, const Wrapper<T> &t2) {                             \
+  Wrapper<T> operator op(const Wrapper<T>& t1, const Wrapper<T>& t2) {                             \
     return t1.t op t2.t;                                                                           \
   }                                                                                                \
                                                                                                    \
   template <typename T, typename U>                                                                \
-  Wrapper<T> operator op(const U &t1, const Wrapper<T> &t2) {                                      \
+  Wrapper<T> operator op(const U& t1, const Wrapper<T>& t2) {                                      \
     return t1 op t2.t;                                                                             \
   }                                                                                                \
                                                                                                    \
   template <typename T, typename U>                                                                \
-  Wrapper<T> operator op(const Wrapper<T> &t1, const U &t2) {                                      \
+  Wrapper<T> operator op(const Wrapper<T>& t1, const U& t2) {                                      \
     return t1.t op t2;                                                                             \
   }
 
@@ -143,7 +149,7 @@ WRAP_ARITHMETIC_OPS(/ )
 WRAP_ARITHMETIC_OPS(% )
 
 template <typename T>
-Wrapper<T> abs(const Wrapper<T> &in) {
+Wrapper<T> abs(const Wrapper<T>& in) {
   return Wrapper<T>(abs(in.t));
 }
 

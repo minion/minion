@@ -48,7 +48,9 @@ This constraint is only available for positive domains x, y and z.
 /// var1 ^ var2 = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3>
 struct PowConstraint : public AbstractConstraint {
-  virtual string constraint_name() { return "pow"; }
+  virtual string constraint_name() {
+    return "pow";
+  }
 
   VarRef1 var1;
   VarRef2 var2;
@@ -75,7 +77,9 @@ struct PowConstraint : public AbstractConstraint {
     //}
   }
 
-  virtual SysInt dynamic_trigger_count() { return 6; }
+  virtual SysInt dynamic_trigger_count() {
+    return 6;
+  }
 
   void setup_triggers() {
     moveTriggerInt(var1, 3, LowerBound);
@@ -89,7 +93,7 @@ struct PowConstraint : public AbstractConstraint {
   inline SysInt roundup(double x) {
     // remember all numbers are non-negative in here, so
     // how are we going to hit the lower limit for ints?
-    if (x < std::numeric_limits<SysInt>::min()) {
+    if(x < std::numeric_limits<SysInt>::min()) {
       return std::numeric_limits<SysInt>::min();
     } else {
       return static_cast<SysInt>(x); // Actually this should round up!
@@ -97,7 +101,7 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   inline SysInt rounddown(double x) {
-    if (x > std::numeric_limits<SysInt>::max()) {
+    if(x > std::numeric_limits<SysInt>::max()) {
       return std::numeric_limits<SysInt>::max();
     } else {
       return checked_cast<SysInt>(x);
@@ -118,12 +122,12 @@ struct PowConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt flag, DomainDelta) {
     PROP_INFO_ADDONE(Pow);
-    switch (checked_cast<SysInt>(flag)) {
+    switch(checked_cast<SysInt>(flag)) {
     case 3: {
       // var3 >= min(var1) ^ min(var2)
       var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
       DomainInt var1_min = var1.getMin();
-      if (var1_min > 1)
+      if(var1_min > 1)
         // var2 <= log base max(var3) of min(var1)
         var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
       break;
@@ -137,7 +141,7 @@ struct PowConstraint : public AbstractConstraint {
     case 5: {
       var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
       DomainInt var1_max = var1.getMax();
-      if (var1_max > 1)
+      if(var1_max > 1)
         var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
       break;
     }
@@ -146,7 +150,7 @@ struct PowConstraint : public AbstractConstraint {
           rounddown(my_pow(var1.getMax(),
                            var2.getMax()))); // wraparound was occurring here, so use rounddown
       DomainInt var1_max = var1.getMax();
-      if (var1_max > 1)
+      if(var1_max > 1)
         var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
       break;
     }
@@ -158,7 +162,7 @@ struct PowConstraint : public AbstractConstraint {
     case 2: {
       var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
       DomainInt var1_min = var1.getMin();
-      if (var1_min > 1)
+      if(var1_min > 1)
         var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
       break;
     }
@@ -167,11 +171,11 @@ struct PowConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     setup_triggers();
-    for (int i = 0; i < 6; ++i)
+    for(int i = 0; i < 6; ++i)
       propagateDynInt(i, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt *v, SysInt v_size) {
+  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     return my_pow(v[0], v[1]) == v[2];
   }
@@ -184,11 +188,11 @@ struct PowConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>> &assignment) {
-    for (DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
-      if (var1.inDomain(v1)) {
-        for (DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
-          if (var2.inDomain(v2) && var3.inDomain(my_pow(v1, v2))) // implicit conversion here causes
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+      if(var1.inDomain(v1)) {
+        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
+          if(var2.inDomain(v2) && var3.inDomain(my_pow(v1, v2))) // implicit conversion here causes
           // a warning -- perh use roundup or
           // rounddown
           {
@@ -204,6 +208,8 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint *reverse_constraint() { return forward_check_negation(this); }
+  virtual AbstractConstraint* reverse_constraint() {
+    return forward_check_negation(this);
+  }
 };
 #endif

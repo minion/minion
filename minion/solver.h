@@ -42,8 +42,8 @@ struct CSPInstance;
 class SearchState {
 
   long long nodes;
-  AnyVarRef *optimise_var;
-  AnyVarRef *raw_optimise_var;
+  AnyVarRef* optimise_var;
+  AnyVarRef* raw_optimise_var;
   DomainInt current_optimise_position;
   bool optimise;
   bool maximise;
@@ -51,16 +51,16 @@ class SearchState {
   // The variables to print when a solution is found.
   vector<vector<AnyVarRef>> print_matrix;
 
-  vector<AbstractConstraint *> constraints;
+  vector<AbstractConstraint*> constraints;
 
-  vector<set<AbstractConstraint *>> constraints_to_propagate;
+  vector<set<AbstractConstraint*>> constraints_to_propagate;
 
   long long int solutions;
 
   bool finished;
   bool failed;
 
-  ProbSpec::CSPInstance *csp_instance;
+  ProbSpec::CSPInstance* csp_instance;
 
   TimerClass oldtimer;
 
@@ -78,63 +78,121 @@ class SearchState {
 public:
   std::string storedSolution;
 
-  vector<vector<AnyVarRef>> &getPrintMatrix() { return print_matrix; }
+  vector<vector<AnyVarRef>>& getPrintMatrix() {
+    return print_matrix;
+  }
 
-  GenericBacktracker &getGenericBacktracker() { return generic_backtracker; }
+  GenericBacktracker& getGenericBacktracker() {
+    return generic_backtracker;
+  }
 
-  ProbSpec::CSPInstance *getInstance() { return csp_instance; }
+  ProbSpec::CSPInstance* getInstance() {
+    return csp_instance;
+  }
 
-  void setInstance(ProbSpec::CSPInstance *_csp) { csp_instance = _csp; }
+  void setInstance(ProbSpec::CSPInstance* _csp) {
+    csp_instance = _csp;
+  }
 
-  vector<set<AbstractConstraint *>> &getConstraintsToPropagate() {
+  vector<set<AbstractConstraint*>>& getConstraintsToPropagate() {
     return constraints_to_propagate;
   }
 
-  long long getNodeCount() { return nodes; }
-  void setNodeCount(long long _nodes) { nodes = _nodes; }
-  void incrementNodeCount() { nodes++; }
+  long long getNodeCount() {
+    return nodes;
+  }
+  void setNodeCount(long long _nodes) {
+    nodes = _nodes;
+  }
+  void incrementNodeCount() {
+    nodes++;
+  }
 
-  AnyVarRef *getOptimiseVar() { return optimise_var; }
-  void setOptimiseVar(AnyVarRef *_var) { optimise_var = _var; }
+  AnyVarRef* getOptimiseVar() {
+    return optimise_var;
+  }
+  void setOptimiseVar(AnyVarRef* _var) {
+    optimise_var = _var;
+  }
 
-  AnyVarRef *getRawOptimiseVar() { return raw_optimise_var; }
-  void setRawOptimiseVar(AnyVarRef *_var) { raw_optimise_var = _var; }
+  AnyVarRef* getRawOptimiseVar() {
+    return raw_optimise_var;
+  }
+  void setRawOptimiseVar(AnyVarRef* _var) {
+    raw_optimise_var = _var;
+  }
 
-  DomainInt getOptimiseValue() { return current_optimise_position; }
-  void setOptimiseValue(DomainInt optimise_pos) { current_optimise_position = optimise_pos; }
+  DomainInt getOptimiseValue() {
+    return current_optimise_position;
+  }
+  void setOptimiseValue(DomainInt optimise_pos) {
+    current_optimise_position = optimise_pos;
+  }
 
-  bool isOptimisationProblem() { return optimise; }
-  void setOptimisationProblem(bool _optimise) { optimise = _optimise; }
+  bool isOptimisationProblem() {
+    return optimise;
+  }
+  void setOptimisationProblem(bool _optimise) {
+    optimise = _optimise;
+  }
 
-  bool isMaximise() { return maximise; }
-  void setMaximise(bool _maximise) { maximise = _maximise; }
+  bool isMaximise() {
+    return maximise;
+  }
+  void setMaximise(bool _maximise) {
+    maximise = _maximise;
+  }
 
-  void addConstraint(AbstractConstraint *c);
-  vector<AbstractConstraint *> &getConstraintList() { return constraints; }
+  void addConstraint(AbstractConstraint* c);
+  vector<AbstractConstraint*>& getConstraintList() {
+    return constraints;
+  }
 
-  void addConstraintMidsearch(AbstractConstraint *c);
-  void redoFullPropagate(AbstractConstraint *c);
+  void addConstraintMidsearch(AbstractConstraint* c);
+  void redoFullPropagate(AbstractConstraint* c);
 
-  long long int getSolutionCount() { return solutions; }
-  void setSolutionCount(long long int _sol) { solutions = _sol; }
-  void incrementSolutionCount() { solutions++; }
+  long long int getSolutionCount() {
+    return solutions;
+  }
+  void setSolutionCount(long long int _sol) {
+    solutions = _sol;
+  }
+  void incrementSolutionCount() {
+    solutions++;
+  }
 
-  bool isFinished() { return finished; }
-  void setFinished(bool b) { finished = b; }
+  bool isFinished() {
+    return finished;
+  }
+  void setFinished(bool b) {
+    finished = b;
+  }
 
-  bool isFailed() { return failed; }
-  void setFailed(bool f) { failed = f; }
+  bool isFailed() {
+    return failed;
+  }
+  void setFailed(bool f) {
+    failed = f;
+  }
   // This function is here because a number of pieces of code want a raw
   // reference to the 'failed' variable.
   // Long term, this may get removed, but it is added for now to minimise
   // changes while removing global
   // variables.
-  bool *getFailedPtr() { return &failed; }
+  bool* getFailedPtr() {
+    return &failed;
+  }
 
-  TimerClass &getOldTimer() { return oldtimer; }
+  TimerClass& getOldTimer() {
+    return oldtimer;
+  }
 
-  TupleListContainer *getTupleListContainer() { return &*tupleListContainer; }
-  ShortTupleListContainer *getShortTupleListContainer() { return &*shortTupleListContainer; }
+  TupleListContainer* getTupleListContainer() {
+    return &*tupleListContainer;
+  }
+  ShortTupleListContainer* getShortTupleListContainer() {
+    return &*shortTupleListContainer;
+  }
 
   void setTupleListContainer(shared_ptr<TupleListContainer> _tupleList) {
     tupleListContainer = _tupleList;
@@ -145,28 +203,49 @@ public:
   }
 
   SearchState()
-      : nodes(0), optimise_var(NULL), raw_optimise_var(NULL), current_optimise_position(0),
-        optimise(false), constraints_to_propagate(1), solutions(0), finished(false), failed(false),
-        is_locked(false), alarm_trigger(false), ctrl_c_pressed(false) {}
+      : nodes(0),
+        optimise_var(NULL),
+        raw_optimise_var(NULL),
+        current_optimise_position(0),
+        optimise(false),
+        constraints_to_propagate(1),
+        solutions(0),
+        finished(false),
+        failed(false),
+        is_locked(false),
+        alarm_trigger(false),
+        ctrl_c_pressed(false) {}
 
   // Must be defined later.
   ~SearchState();
 
-  void markLocked() { is_locked = true; }
+  void markLocked() {
+    is_locked = true;
+  }
 
-  bool isLocked() { return is_locked; }
+  bool isLocked() {
+    return is_locked;
+  }
 
-  bool isAlarmActivated() { return alarm_trigger; }
+  bool isAlarmActivated() {
+    return alarm_trigger;
+  }
 
-  void clearAlarm() { alarm_trigger = false; }
+  void clearAlarm() {
+    alarm_trigger = false;
+  }
 
   void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time) {
     activate_trigger(&alarm_trigger, alarm_active, timeout, CPU_time);
   }
 
-  bool isCtrlcPressed() { return ctrl_c_pressed; }
+  bool isCtrlcPressed() {
+    return ctrl_c_pressed;
+  }
 
-  void setupCtrlc() { install_ctrlc_trigger(&ctrl_c_pressed); }
+  void setupCtrlc() {
+    install_ctrlc_trigger(&ctrl_c_pressed);
+  }
 };
 
 /// Stored all the options related to search. This item should not
@@ -255,30 +334,49 @@ public:
   bool ensure_branch_on_all_vars;
 
   SearchOptions()
-      : cspcomp(false), silent(false), printonlyoptimal(false), dumptree(false), sollimit(1),
+      : cspcomp(false),
+        silent(false),
+        printonlyoptimal(false),
+        dumptree(false),
+        sollimit(1),
 #ifdef NO_DEBUG
         nocheck(true),
 #else
         nocheck(false),
 #endif
-        nodelimit(std::numeric_limits<long long>::max()), tableout(false), solsoutWrite(false),
-        print_solution(true), timeout_active(false), time_limit(0), time_limit_is_CPU_time(false),
-        randomise_valvarorder(false), parser_verbose(false), redump(false), graph(false),
-        instance_stats(false), noresumefile(true), split(false),
-        outputCompressedDomains(false), noTimers(false), gapname("gap.sh"),
-        map_long_short(MLTTS_NoMap), ensure_branch_on_all_vars(true) {
+        nodelimit(std::numeric_limits<long long>::max()),
+        tableout(false),
+        solsoutWrite(false),
+        print_solution(true),
+        timeout_active(false),
+        time_limit(0),
+        time_limit_is_CPU_time(false),
+        randomise_valvarorder(false),
+        parser_verbose(false),
+        redump(false),
+        graph(false),
+        instance_stats(false),
+        noresumefile(true),
+        split(false),
+        outputCompressedDomains(false),
+        noTimers(false),
+        gapname("gap.sh"),
+        map_long_short(MLTTS_NoMap),
+        ensure_branch_on_all_vars(true) {
   }
 
   /// Denotes all solutions should be found, by setting sollimit to -1.
-  void findAllSolutions() { sollimit = -1; }
+  void findAllSolutions() {
+    sollimit = -1;
+  }
 
   void print(string s) {
-    if (!silent)
+    if(!silent)
       cout << s;
   }
 
   void printLine(string s) {
-    if (!silent)
+    if(!silent)
       cout << s << endl;
   }
 };

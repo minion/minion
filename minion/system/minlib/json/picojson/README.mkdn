@@ -1,6 +1,6 @@
 #PicoJSON - a C++ JSON parser / serializer
 
-Copyright &copy;
+Copyright& copy;
 2009 - 2010 Cybozu Labs, Inc.Copyright &copy; 2011 Kazuho Oku
 
 ## Introduction
@@ -21,14 +21,14 @@ There are two ways to use the pull (DOM-like) interface of picojson.  One is to 
           should be read.
 
       <pre>picojson::value v;
-std::cin &gt;
+std::cin& gt;
 &gt;
 v;
 std::string err = picojson::get_last_error();
-if (!err.empty()) {
-  std::cerr &lt;
+if(!err.empty()) {
+  std::cerr& lt;
   &lt;
-  err &lt;
+  err& lt;
   &lt;
   std::endl;
 }
@@ -38,23 +38,23 @@ if (!err.empty()) {
 picojson::value v;
 std::string err;
 input = picojson::parse(v, input, std::istream_iterator(), &err);
-if (!err.empty()) {
-  std::cerr &lt;
+if(!err.empty()) {
+  std::cerr& lt;
   &lt;
-  err &lt;
+  err& lt;
   &lt;
   std::endl;
 }
 </ pre>
 
-    <pre> const char *json = "{\"a\":1}";
+    <pre> const char* json = "{\"a\":1}";
 picojson::value v;
 std::string err;
 picojson::parse(v, json, json + strlen(json), &err);
-if (!err.empty()) {
-  std::cerr &lt;
+if(!err.empty()) {
+  std::cerr& lt;
   &lt;
-  err &lt;
+  err& lt;
   &lt;
   std::endl;
 }
@@ -71,73 +71,73 @@ if (!err.empty()) {
 
         public :
 
-        typedef std::vector &lt;
-    value &gt;
+        typedef std::vector& lt;
+    value& gt;
     array;
-    typedef std::map &lt;
-    std::string, value &gt;
+    typedef std::map& lt;
+    std::string, value& gt;
     object;
 
     value();                              // create a null object
     explicit value(bool b);               // create a boolean object
     explicit value(double n);             // create a number object
-    explicit value(const std::string &s); // create a string object
-    explicit value(const array &a);       // create an array object
-    explicit value(const object &o);      // create an "object"
+    explicit value(const std::string& s); // create a string object
+    explicit value(const array& a);       // create an array object
+    explicit value(const object& o);      // create an "object"
 
-    bool is &lt;
-    picojson::null &gt;
+    bool is& lt;
+    picojson::null& gt;
     () const; // check if the object is "null"
 
-    bool is &lt;
-    bool &gt;
+    bool is& lt;
+    bool& gt;
     () const; // check if the object is a boolean
-    const bool &get &lt;
-    bool &gt;
+    const bool& get& lt;
+    bool& gt;
     () const; // const accessor (usable only if the object is a boolean)
-    bool &get &lt;
-    bool &gt;
+    bool& get& lt;
+    bool& gt;
     (); // non-const accessor (usable only if the object is a boolean)
 
-    bool is &lt;
-    double &gt;
+    bool is& lt;
+    double& gt;
     () const; // check if the object is a number
-    const double &get &lt;
-    double &gt;
+    const double& get& lt;
+    double& gt;
     () const; // const accessor (usable only if the object is a number)
-    double &get &lt;
-    double &gt;
+    double& get& lt;
+    double& gt;
     (); // non-const accessor (usable only if the object is a number)
 
-    bool is &lt;
-    std::string &gt;
+    bool is& lt;
+    std::string& gt;
     () const; // check if the object is a string
-    const std::string &get &lt;
-    std::string &gt;
+    const std::string& get& lt;
+    std::string& gt;
     () const;
     // const accessor (usable only if the object is a string)
-    std::string &get &lt;
-    std::string &gt;
+    std::string& get& lt;
+    std::string& gt;
     (); // non-const accessor (usable only if the object is a string)
 
-    bool is &lt;
-    array &gt;
+    bool is& lt;
+    array& gt;
     () const; // check if the object is an array
-    const array &get &lt;
-    array &gt;
+    const array& get& lt;
+    array& gt;
     () const; // const accessor (usable only if the object is an array)
-    array &get &lt;
-    array &gt;
+    array& get& lt;
+    array& gt;
     (); // non-const accessor (usable only if the object is an array)
 
-    bool is &lt;
-    object &gt;
+    bool is& lt;
+    object& gt;
     () const; // check if the object is an "object"
-    const object &get &lt;
-    object &gt;
+    const object& get& lt;
+    object& gt;
     () const; // const accessor (usable only if the object is an object)
-    object &get &lt;
-    object &gt;
+    object& get& lt;
+    object& gt;
     (); // non-const accessor (usable only if the object is an array)
 
     bool evaluate_as_boolean() const; // evaluates the object as a boolean
@@ -157,22 +157,22 @@ if (!err.empty()) {
     <pre>picojson::value v;
 
 // parse the input
-std::cin &gt;
+std::cin& gt;
 &gt;
 v;
 std::string err = picojson::get_last_error();
-if (!err.empty()) {
-  std::cerr &lt;
+if(!err.empty()) {
+  std::cerr& lt;
   &lt;
-  err &lt;
+  err& lt;
   &lt;
   std::endl;
   exit(1);
 }
 
 // check if the type of the value is "object"
-if (!v.is & lt; picojson::object & gt; ()) {
-  std::cerr &lt;
+if(!v.is & lt; picojson::object & gt; ()) {
+  std::cerr& lt;
   &lt;
   "JSON is not an object" & lt;
   &lt;
@@ -181,14 +181,14 @@ if (!v.is & lt; picojson::object & gt; ()) {
 }
 
 // obtain a const reference to the map, and print the contents
-const picojson::value::object &obj = v.get & lt;
-picojson::object &gt;
+const picojson::value::object& obj = v.get & lt;
+picojson::object& gt;
 ();
-for (picojson::value::object::const_iterator i = obj.begin(); i != obj.end(); ++i) {
-  std::cout &lt;
+for(picojson::value::object::const_iterator i = obj.begin(); i != obj.end(); ++i) {
+  std::cout& lt;
   &lt;
   i - &gt;
-  first &lt;
+  first& lt;
   &lt;
   ': ' & lt;
   &lt;
@@ -202,16 +202,17 @@ for (picojson::value::object::const_iterator i = obj.begin(); i != obj.end(); ++
     Please note that the type check is mandatory;
 do
   not forget to check the type of the object by calling is & lt;
-type &gt;
-() before accessing the value by calling get &lt;
-type &gt;
+type& gt;
+() before accessing the value by calling get& lt;
+type& gt;
 ().
 
     ##Reading JSON using the streaming(event - driven) interface
 
-    Please refer to the implementation of picojson::default_parse_context
-        and picojson::null_parse_context.There is also an example(examples / streaming.cc)
-            .
+    Please refer to the implementation of
+    picojson::default_parse_context and picojson::null_parse_context.There is also an
+    example(examples / streaming.cc)
+        .
 
     ##Serializing to JSON
 
@@ -220,7 +221,7 @@ type &gt;
                                     to an output iterator.
 
                                     <pre>picojson::value v;
-... std::cout &lt;
+... std::cout& lt;
 &lt;
 v;
 </ pre>

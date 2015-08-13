@@ -6,47 +6,47 @@
 #include "macros.hpp"
 
 template <typename T>
-void push_back(T &) {}
+void push_back(T&) {}
 
 template <typename T, typename FirstArg>
-void push_back(T &t, const FirstArg &fa) {
+void push_back(T& t, const FirstArg& fa) {
   t.push_back(fa);
 }
 
 template <typename T, typename FirstArg, typename... Args>
-void push_back(T &t, const FirstArg &fa, const Args &... args) {
+void push_back(T& t, const FirstArg& fa, const Args&... args) {
   t.push_back(fa);
   push_back(t, args...);
 }
 
 template <typename T>
-void do_insert(T &) {}
+void do_insert(T&) {}
 
 template <typename T, typename FirstArg>
-void do_insert(T &t, const FirstArg &fa) {
+void do_insert(T& t, const FirstArg& fa) {
   t.insert(fa);
 }
 
 template <typename T, typename FirstArg, typename... Args>
-void do_insert(T &t, const FirstArg &fa, const Args &... args) {
+void do_insert(T& t, const FirstArg& fa, const Args&... args) {
   t.insert(fa);
   do_insert(t, args...);
 }
 
 template <typename T, typename FirstArg>
-void fill_container(T &t, int pos, const FirstArg &fa) {
+void fill_container(T& t, int pos, const FirstArg& fa) {
   t[pos] = fa;
   D_ASSERT(pos == (int)t.size() - 1);
 }
 
 template <typename T, typename FirstArg, typename... Args>
-void fill_container(T &t, int pos, const FirstArg &fa, const Args &... args) {
+void fill_container(T& t, int pos, const FirstArg& fa, const Args&... args) {
   t[pos] = fa;
   fill_container(t, pos + 1, args...);
 }
 
 template <template <typename...> class T, typename FirstArg, typename... Args>
-T<FirstArg> make(const FirstArg &fa, const Args &... args) {
+T<FirstArg> make(const FirstArg& fa, const Args&... args) {
   T<FirstArg> t;
   t.reserve(SizeOf<Args...>::size);
   push_back(t, fa, args...);
@@ -55,7 +55,7 @@ T<FirstArg> make(const FirstArg &fa, const Args &... args) {
 
 // Needed for windows
 template <typename FirstArg, typename... Args>
-std::vector<FirstArg> make_vector(const FirstArg &fa, const Args &... args) {
+std::vector<FirstArg> make_vector(const FirstArg& fa, const Args&... args) {
   std::vector<FirstArg> t;
   t.reserve(SizeOf<Args...>::size);
   push_back(t, fa, args...);
@@ -63,19 +63,19 @@ std::vector<FirstArg> make_vector(const FirstArg &fa, const Args &... args) {
 }
 
 template <typename FirstArg, typename... Args>
-std::vector<FirstArg> make_vec(const FirstArg &fa, const Args &... args) {
+std::vector<FirstArg> make_vec(const FirstArg& fa, const Args&... args) {
   std::vector<FirstArg> v;
   v = make_vector(fa, args...);
   return v;
 }
 
 template <typename VecArg, typename FirstArg, typename... Args>
-std::vector<VecArg> make_vec_with_type(const FirstArg &fa, const Args &... args) {
+std::vector<VecArg> make_vec_with_type(const FirstArg& fa, const Args&... args) {
   return make_vector(static_cast<VecArg>(fa), args...);
 }
 
 template <typename Arg, typename... Args>
-std::array<Arg, SizeOf<Args...>::size> make_array_with_type(const Args &... args) {
+std::array<Arg, SizeOf<Args...>::size> make_array_with_type(const Args&... args) {
   std::array<Arg, SizeOf<Args...>::size> a;
   fill_container(a, 0, args...);
   return a;
@@ -93,35 +93,35 @@ std::vector<Type> make_vec() {
 
 template <typename Type, typename... Args>
 std::vector<typename CommonType<Type, Args...>::type>
-make_vec_with_common_type(const Args &... args) {
+make_vec_with_common_type(const Args&... args) {
   return make_vec_with_type<typename CommonType<Type, Args...>::type>(args...);
 }
 
 template <typename Type, typename... Args>
 std::array<typename CommonType<Type, Args...>::type, SizeOf<Args...>::size>
-make_array_with_common_type(const Args &... args) {
+make_array_with_common_type(const Args&... args) {
   return make_array_with_type<typename CommonType<Type, Args...>::type>(args...);
 }
 
 template <typename T>
-void container_push_back(T &) {}
+void container_push_back(T&) {}
 
 template <typename T, typename Arg1, typename... Args>
-void container_push_back(T &t, const Arg1 &arg1, const Args &... args) {
-  for (auto it = arg1.begin(); it != arg1.end(); ++it)
+void container_push_back(T& t, const Arg1& arg1, const Args&... args) {
+  for(auto it = arg1.begin(); it != arg1.end(); ++it)
     t.push_back(*it);
   container_push_back(t, args...);
 }
 
 template <typename Con, typename... Args>
-std::vector<typename Con::value_type> join_to_vec(const Con &vec1, const Args &... args) {
+std::vector<typename Con::value_type> join_to_vec(const Con& vec1, const Args&... args) {
   std::vector<typename Con::value_type> vec_out(vec1.begin(), vec1.end());
   container_push_back(vec_out, args...);
   return vec_out;
 }
 
 template <typename FirstArg, typename... Args>
-std::set<FirstArg> make_set(const FirstArg &fa, const Args &... args) {
+std::set<FirstArg> make_set(const FirstArg& fa, const Args&... args) {
   std::set<FirstArg> s;
   do_insert(s, fa, args...);
   return s;
@@ -133,22 +133,22 @@ std::set<Type> make_set() {
 }
 
 template <template <typename...> class OutCon, typename InCon>
-OutCon<typename InCon::value_type> to_container(const InCon &c) {
+OutCon<typename InCon::value_type> to_container(const InCon& c) {
   return OutCon<typename InCon::value_type>(c.begin(), c.end());
 }
 
 template <typename InCon>
-std::vector<typename InCon::value_type> to_vec(const InCon &c) {
+std::vector<typename InCon::value_type> to_vec(const InCon& c) {
   return std::vector<typename InCon::value_type>(c.begin(), c.end());
 }
 
 template <typename InCon>
-std::set<typename InCon::value_type> to_set(const InCon &c) {
+std::set<typename InCon::value_type> to_set(const InCon& c) {
   return std::set<typename InCon::value_type>(c.begin(), c.end());
 }
 
 template <typename Elem>
-std::set<Elem> set_intersect(const std::set<Elem> &s1, const std::set<Elem> &s2) {
+std::set<Elem> set_intersect(const std::set<Elem>& s1, const std::set<Elem>& s2) {
   std::set<Elem> intersect;
 
   std::set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(),
@@ -158,9 +158,9 @@ std::set<Elem> set_intersect(const std::set<Elem> &s1, const std::set<Elem> &s2)
 }
 
 template <typename Con, typename Val>
-bool unordered_contains(const Con &con, const Val &val) {
-  for (auto it = con.begin(); it != con.end(); ++it)
-    if (*it == val)
+bool unordered_contains(const Con& con, const Val& val) {
+  for(auto it = con.begin(); it != con.end(); ++it)
+    if(*it == val)
       return true;
   return false;
 }

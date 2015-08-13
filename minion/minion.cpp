@@ -18,8 +18,6 @@
 * USA.
 */
 
-
-
 #include "minion.h"
 
 #include "BuildVariables.h"
@@ -37,7 +35,7 @@
 
 void help(string request);
 
-void print_default_help(char **argv) {
+void print_default_help(char** argv) {
   cout << "Type '" << argv[0] << " help' for usage." << endl;
   cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
   help("switches");
@@ -52,12 +50,12 @@ void print_default_help(char **argv) {
 }
 
 void worker() {
-  while (1) {
+  while(1) {
     ;
   }
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   // Wrap main in a try/catch just to stop exceptions leaving main,
   // as windows gets really annoyed when that happens.
   try {
@@ -66,16 +64,16 @@ int main(int argc, char **argv) {
 
     getOptions().printLine("# " + std::string(MinionVersion));
 
-    if (argc == 1) {
+    if(argc == 1) {
       print_default_help(argv);
       return EXIT_SUCCESS;
     }
 
-    if (argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") ||
-        argv[1] == string("-h")) {
+    if(argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") ||
+       argv[1] == string("-h")) {
       std::string sect("");
-      if (argc != 2) {
-        for (int i = 2; i < argc - 1; i++)
+      if(argc != 2) {
+        for(int i = 2; i < argc - 1; i++)
           sect.append(argv[i]).append(" ");
         sect.append(argv[argc - 1]);
       }
@@ -89,21 +87,20 @@ int main(int argc, char **argv) {
 
     parse_command_line(args, argc, argv);
 
-
-    if (!getOptions().silent) {
+    if(!getOptions().silent) {
 
       time_t rawtime;
       time(&rawtime);
       cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
       cout << "# Input filename: " << getOptions().instance_name << endl;
       cout << "# Command line: ";
-      for (SysInt i = 0; i < argc; ++i) {
+      for(SysInt i = 0; i < argc; ++i) {
         cout << argv[i] << " ";
       }
       cout << endl;
     }
 
-    if (!getOptions().noTimers) {
+    if(!getOptions().noTimers) {
       getState().setupAlarm(getOptions().timeout_active, getOptions().time_limit,
                             getOptions().time_limit_is_CPU_time);
       getState().setupCtrlc();
@@ -146,7 +143,7 @@ int main(int argc, char **argv) {
           exit(0);
       }
     */
-    if (getOptions().redump) {
+    if(getOptions().redump) {
       MinionInstancePrinter printer(instance);
       printer.build_instance();
       cout << printer.getInstance();
@@ -156,8 +153,8 @@ int main(int argc, char **argv) {
     // Copy args into tableout
     getTableOut().set("RandomSeed", tostring(args.random_seed));
     {
-      const char *b = "";
-      switch (args.preprocess) {
+      const char* b = "";
+      switch(args.preprocess) {
       case PropLevel_None: b = "None"; break;
       case PropLevel_GAC: b = "GAC"; break;
       case PropLevel_SAC: b = "SAC"; break;
@@ -170,15 +167,15 @@ int main(int argc, char **argv) {
     // should be one for varorder as well.
     getTableOut().set("MinionVersion", -1);
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-    getState().getOldTimer().maybePrintTimestepStore(
-        cout, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions().silent);
+    getState().getOldTimer().maybePrintTimestepStore(cout, "Parsing Time: ", "ParsingTime",
+                                                     getTableOut(), !getOptions().silent);
 
     BuildCSP(instance);
     SolveCSP(instance, args);
 
     return 0;
 
-  } catch (...) {
+  } catch(...) {
     cerr << "Minion exited abnormally via an exception." << endl;
     exit(9);
   }

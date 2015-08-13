@@ -66,14 +66,14 @@ struct VarInfo {
   long long int concount[ConEventCount];
   long long int propcount[PropEventCount];
   VarInfo() {
-    for (SysInt i = 0; i < VarTypeCount; ++i)
-      for (SysInt j = 0; j < VarEventCount; ++j)
+    for(SysInt i = 0; i < VarTypeCount; ++i)
+      for(SysInt j = 0; j < VarEventCount; ++j)
         counters[i][j] = 0;
 
-    for (SysInt i = 0; i < ConEventCount; ++i)
+    for(SysInt i = 0; i < ConEventCount; ++i)
       concount[i] = 0;
 
-    for (SysInt i = 0; i < PropEventCount; ++i)
+    for(SysInt i = 0; i < PropEventCount; ++i)
       propcount[i] = 0;
   }
 };
@@ -92,27 +92,33 @@ string pad_start(string s, SysInt length = 12) {
   return output + s;
 }
 
-void VarInfoAddone(Info_VarType type, Info_VarEvent event) { var_info.counters[type][event]++; }
+void VarInfoAddone(Info_VarType type, Info_VarEvent event) {
+  var_info.counters[type][event]++;
+}
 
-void ConInfoAddone(Info_ConEvent type) { var_info.concount[type]++; }
+void ConInfoAddone(Info_ConEvent type) {
+  var_info.concount[type]++;
+}
 
-void PropInfoAddone(Info_PropEvent type) { var_info.propcount[type]++; }
+void PropInfoAddone(Info_PropEvent type) {
+  var_info.propcount[type]++;
+}
 
 void print_search_info() {
   cout << pad("");
-  for (SysInt i = 0; i < VarTypeCount; ++i)
+  for(SysInt i = 0; i < VarTypeCount; ++i)
     cout << pad_start(VarNames[i]);
   cout << pad_start("Total");
   cout << endl;
 
-  for (SysInt j = 0; j < VarEventCount; ++j) {
+  for(SysInt j = 0; j < VarEventCount; ++j) {
     long long int total = 0;
-    for (SysInt i = 0; i < VarTypeCount; ++i)
+    for(SysInt i = 0; i < VarTypeCount; ++i)
       total += var_info.counters[i][j];
 
-    if (total != 0) {
+    if(total != 0) {
       cout << pad(EventNames[j]);
-      for (SysInt i = 0; i < VarTypeCount; ++i) {
+      for(SysInt i = 0; i < VarTypeCount; ++i) {
         cout << setiosflags(ios::right) << setw(12) << var_info.counters[i][j];
       }
       cout << setiosflags(ios::right) << setw(12) << total;
@@ -120,24 +126,24 @@ void print_search_info() {
     }
   }
 
-  for (SysInt check_type = 1; check_type < 3; check_type++) {
+  for(SysInt check_type = 1; check_type < 3; check_type++) {
     long long int total = 0;
-    for (SysInt i = 0; i < VarTypeCount; ++i)
-      for (SysInt j = 0; j < VarEventCount; ++j) {
-        if (EventCategory[j] == check_type)
+    for(SysInt i = 0; i < VarTypeCount; ++i)
+      for(SysInt j = 0; j < VarEventCount; ++j) {
+        if(EventCategory[j] == check_type)
           total += var_info.counters[i][j];
       }
 
-    if (total != 0) {
-      if (check_type == 1)
+    if(total != 0) {
+      if(check_type == 1)
         cout << pad("TotalChecks");
       else
         cout << pad("TotalChanges");
 
-      for (SysInt i = 0; i < VarTypeCount; ++i) {
+      for(SysInt i = 0; i < VarTypeCount; ++i) {
         long long int checks = 0;
-        for (SysInt j = 0; j < VarEventCount; ++j) {
-          if (EventCategory[j] == check_type)
+        for(SysInt j = 0; j < VarEventCount; ++j) {
+          if(EventCategory[j] == check_type)
             checks += var_info.counters[i][j];
         }
         cout << setiosflags(ios::right) << setw(12) << checks;
@@ -148,15 +154,15 @@ void print_search_info() {
   }
 
   cout << "  ** Constraints" << endl;
-  for (SysInt i = 0; i < PropEventCount; ++i) {
-    if (var_info.propcount[i] != 0)
+  for(SysInt i = 0; i < PropEventCount; ++i) {
+    if(var_info.propcount[i] != 0)
       cout << pad(PropEventNames[i]) << setiosflags(ios::right) << setw(12) << var_info.propcount[i]
            << endl;
   }
 
   cout << "  ** Queue Events" << endl;
-  for (SysInt i = 0; i < ConEventCount; ++i) {
-    if (var_info.concount[i] != 0)
+  for(SysInt i = 0; i < ConEventCount; ++i) {
+    if(var_info.concount[i] != 0)
       cout << pad(ConEventNames[i]) << setiosflags(ios::right) << setw(12) << var_info.concount[i]
            << endl;
   }

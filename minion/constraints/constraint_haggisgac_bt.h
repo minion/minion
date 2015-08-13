@@ -129,7 +129,9 @@ help constraints shortstr2
 template <typename VarArray>
 struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
-  virtual string constraint_name() { return "haggisgac"; }
+  virtual string constraint_name() {
+    return "haggisgac";
+  }
 
 #include "constraint_haggisgac_common.h"
 
@@ -142,7 +144,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
                   // SupportCells when arity decreases
                   // or reconstruct existing ones when it increases.
 
-    Support *nextFree; // for when Support is in Free List.
+    Support* nextFree; // for when Support is in Free List.
 
     Support() {
       supportCells.resize(0);
@@ -186,9 +188,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   vector<SysInt> supportNumPtrs; // rd+1 indices into varsPerSupport
                                  // representing the partition
 
-  Support *supportFreeList; // singly-linked list of spare Support objects.
+  Support* supportFreeList; // singly-linked list of spare Support objects.
 
-  HaggisGACTuples *tuple_list;
+  HaggisGACTuples* tuple_list;
 
   vector<vector<SysInt>> tuple_list_pos; // current position in tuple_lists (for
                                          // each var and val). Wraps around.
@@ -196,9 +198,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   ////////////////////////////////////////////////////////////////////////////
   // Ctor
 
-  ShortTupleList *data;
+  ShortTupleList* data;
 
-  HaggisGAC(const VarArray &_var_array, ShortTupleList *tuples)
+  HaggisGAC(const VarArray& _var_array, ShortTupleList* tuples)
       : vars(_var_array), supportFreeList(0), data(tuples) {
     init();
 
@@ -211,10 +213,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
   struct BTRecord {
     bool is_removal; // removal or addition was made.
-    Support *sup;
+    Support* sup;
 
-    friend std::ostream &operator<<(std::ostream &o, const BTRecord &rec) {
-      if (rec.sup == 0)
+    friend std::ostream& operator<<(std::ostream& o, const BTRecord& rec) {
+      if(rec.sup == 0)
         return o << "ZeroMarker";
       o << "BTRecord:" << rec.is_removal << ",";
       // o<< rec.sup->literals;
@@ -232,10 +234,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   void pop() {
     // cout << "BACKTRACKING:" << endl;
     // cout << backtrack_stack <<endl;
-    while (backtrack_stack.back().sup != 0) {
+    while(backtrack_stack.back().sup != 0) {
       BTRecord temp = backtrack_stack.back();
       backtrack_stack.pop_back();
-      if (temp.is_removal) {
+      if(temp.is_removal) {
         addSupportInternal(temp.sup);
       } else {
         deleteSupportInternal(temp.sup, true);
@@ -253,24 +255,24 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   //
   // Support* addSupport(box<pair<SysInt, DomainInt> >* litlist)
   void addSupport() {
-    Support *newsup = getFreeSupport();
-    vector<SupportCell> &supCells = newsup->supportCells;
+    Support* newsup = getFreeSupport();
+    vector<SupportCell>& supCells = newsup->supportCells;
     SysInt oldsize = supCells.size();
     SysInt newsize = literalsScratch.size();
 
     newsup->arity = newsize;
 
-    if (newsize > oldsize) {
+    if(newsize > oldsize) {
       supCells.resize(newsize);
       // make sure pointers to support cell are correct
       // need only be done once as will always point to
       // its own support
-      for (SysInt i = oldsize; i < newsize; i++) {
+      for(SysInt i = oldsize; i < newsize; i++) {
         supCells[i].sup = newsup;
       }
     }
 
-    for (SysInt i = 0; i < newsize; i++) {
+    for(SysInt i = 0; i < newsize; i++) {
       SysInt var = literalsScratch[i].first;
       DomainInt valoriginal = literalsScratch[i].second;
       DomainInt lit = firstLiteralPerVar[var] + valoriginal - vars[var].getInitialMin();
@@ -297,7 +299,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   //                literal correct
   //                sup correct
 
-  void addSupportInternal(Support *sup_internal) {
+  void addSupportInternal(Support* sup_internal) {
     // add a new support given literals but not pointers in place
 
     // cout << "Adding support (internal) :" << litlist_internal << endl;
@@ -306,11 +308,11 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     /// wil
     // cause a memory leak.
 
-    vector<SupportCell> &supCells = sup_internal->supportCells;
+    vector<SupportCell>& supCells = sup_internal->supportCells;
 
     SysInt litsize = sup_internal->arity;
 
-    for (SysInt i = 0; i < litsize; i++) {
+    for(SysInt i = 0; i < litsize; i++) {
 
       SysInt lit = supCells[i].literal;
       SysInt var = literalList[lit].var;
@@ -319,7 +321,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
       supCells[i].prev = 0;
       supCells[i].next = literalList[lit].supportCellList;
-      if (literalList[lit].supportCellList != 0) {
+      if(literalList[lit].supportCellList != 0) {
         literalList[lit].supportCellList->prev = &(supCells[i]);
       } else {
         // Attach trigger if this is the first support containing var,val.
@@ -343,7 +345,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     // return sup_internal;
   }
 
-  void deleteSupport(Support *sup) {
+  void deleteSupport(Support* sup) {
     struct BTRecord temp;
     temp.is_removal = true;
     temp.sup = sup;
@@ -352,10 +354,10 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     deleteSupportInternal(sup, false);
   }
 
-  void deleteSupportInternal(Support *sup, bool Backtracking) {
+  void deleteSupportInternal(Support* sup, bool Backtracking) {
     D_ASSERT(sup != 0);
 
-    vector<SupportCell> &supCells = sup->supportCells;
+    vector<SupportCell>& supCells = sup->supportCells;
     SysInt supArity = sup->arity;
     // cout << "Removing support (internal) :" << litlist << endl;
 
@@ -364,9 +366,9 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
     SysInt oldIndex = supportNumPtrs[supports];
 
-    for (SysInt i = 0; i < supArity; i++) {
+    for(SysInt i = 0; i < supArity; i++) {
 
-      SupportCell &supCell = supCells[i];
+      SupportCell& supCell = supCells[i];
       SysInt lit = supCell.literal;
       SysInt var = literalList[lit].var;
 
@@ -374,11 +376,11 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
       // decrement counters
       supportsPerVar[var]--;
 
-      if (supCell.prev == 0) { // this was the first support in list
+      if(supCell.prev == 0) { // this was the first support in list
 
         literalList[lit].supportCellList = supCell.next;
 
-        if (supCell.next == 0) {
+        if(supCell.next == 0) {
           // We have lost the last support for lit
           //
           // I believe that each literal can only be marked once here in a call
@@ -390,8 +392,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
           // supports later
           // Surely don't need to update lost supports on backtracking in
           // non-backtrack-stable code?
-          if (!Backtracking &&
-              supportsPerVar[var] == (supports - 1)) { // since supports not decremented yet
+          if(!Backtracking &&
+             supportsPerVar[var] == (supports - 1)) { // since supports not decremented yet
             litsWithLostExplicitSupport.push_back(lit);
           }
 #if SupportsGACUseZeroVals
@@ -401,13 +403,13 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
           // be essential that it is in zerovals.  Obviously if an explicit
           // support is
           // found then it will later get deleted from zerovals.
-          if (!inZeroLits[lit]) {
+          if(!inZeroLits[lit]) {
             inZeroLits[lit] = true;
             zeroLits[var].push_back(lit);
           }
 #endif
           // Remove trigger since this is the last support containing var,val.
-          if (SupportsGACUseDT) {
+          if(SupportsGACUseDT) {
             detach_trigger(lit);
           }
         } else {
@@ -415,7 +417,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
         }
       } else {
         supCell.prev->next = supCell.next;
-        if (supCell.next != 0) {
+        if(supCell.next != 0) {
           supCell.next->prev = supCell.prev;
         }
       }
@@ -452,8 +454,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
     //      cout << supportNumPtrs[supports] << " " << oldIndex << endl;
 
-    if (!Backtracking) {
-      for (SysInt i = supportNumPtrs[supports]; i < oldIndex; i++) {
+    if(!Backtracking) {
+      for(SysInt i = supportNumPtrs[supports]; i < oldIndex; i++) {
         varsWithLostImplicitSupport.push_back(varsPerSupport[i]);
       }
     } else {
@@ -474,7 +476,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     // bool foundsupport=findNewSupport(newsupportbox, var, val);
     bool foundsupport = findNewSupport<false>(var, val);
 
-    if (!foundsupport) {
+    if(!foundsupport) {
       vars[var].removeFromDomain(val);
       // note we are not doing this internally,
       // i.e. trying to update counters etc.
@@ -493,7 +495,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     //
     // For each variable where the number of supports is equal to the total...
 
-    for (SysInt i = (SysInt)litsWithLostExplicitSupport.size() - 1; i >= 0; i--) {
+    for(SysInt i = (SysInt)litsWithLostExplicitSupport.size() - 1; i >= 0; i--) {
       SysInt lit = litsWithLostExplicitSupport[i];
       SysInt var = literalList[lit].var;
       DomainInt val = literalList[lit].val;
@@ -501,26 +503,26 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
       litsWithLostExplicitSupport.pop_back(); // actually probably unnecessary -
                                               // will get resized to 0 later
 
-      if (hasNoKnownSupport(var, lit) && vars[var].inDomain(val)) {
+      if(hasNoKnownSupport(var, lit) && vars[var].inDomain(val)) {
         findSupportsIncrementalHelper(var, val);
       }
     }
 
-    for (SysInt i = (SysInt)varsWithLostImplicitSupport.size() - 1; i >= 0; i--) {
+    for(SysInt i = (SysInt)varsWithLostImplicitSupport.size() - 1; i >= 0; i--) {
 
       SysInt var = varsWithLostImplicitSupport[i];
       varsWithLostImplicitSupport.pop_back(); // actually probably unnecessary -
                                               // will get resized to 0 later
 
-      if (supportsPerVar[var] == supports) { // otherwise has found implicit support in the meantime
+      if(supportsPerVar[var] == supports) { // otherwise has found implicit support in the meantime
 #if !SupportsGACUseZeroVals
-        for (DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+        for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
           SysInt lit = firstLiteralPerVar[var] + val - vars[var].getInitialMin();
 #else
-        for (SysInt j = 0; j < (SysInt)zeroLits[var].size() && supportsPerVar[var] == supports;
-             j++) {
+        for(SysInt j = 0; j < (SysInt)zeroLits[var].size() && supportsPerVar[var] == supports;
+            j++) {
           SysInt lit = zeroLits[var][j];
-          if (literalList[lit].supportCellList != 0) {
+          if(literalList[lit].supportCellList != 0) {
             // No longer a zero val. remove from vector.
             zeroLits[var][j] = zeroLits[var][zeroLits[var].size() - 1];
             zeroLits[var].pop_back();
@@ -534,7 +536,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 #if !SupportsGACUseZeroVals
                         if(vars[var].inDomain(val) && (literalList[lit].supportCellList] == 0)){
 #else
-          if (vars[var].inDomain(val)) { // tested literalList  above
+          if(vars[var].inDomain(val)) { // tested literalList  above
 #endif
                           D_ASSERT(hasNoKnownSupport(var, lit));
                           PROP_INFO_ADDONE(CounterA);
@@ -567,7 +569,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     litsWithLostExplicitSupport.resize(0);
     varsWithLostImplicitSupport.resize(0);
 
-    for (SysInt i = 0; i < (SysInt)vars.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       varsWithLostImplicitSupport.push_back(i);
     }
 
@@ -577,14 +579,14 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   virtual vector<AnyVarRef> get_vars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
-    for (unsigned i = 0; i < vars.size(); ++i)
+    for(unsigned i = 0; i < vars.size(); ++i)
       ret.push_back(vars[i]);
     return ret;
   }
 }; // end of class
 
 template <typename T>
-AbstractConstraint *BuildCT_HAGGISGAC(const T &t1, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_HAGGISGAC(const T& t1, ConstraintBlob& b) {
   return new HaggisGAC<T>(t1, b.short_tuples);
 }
 

@@ -18,16 +18,13 @@
 * USA.
 */
 
-
 class TimerClass {
   double _internal_cpu_start_time;
   double _internal_sys_start_time;
   double _last_check_time;
   double start_wallclock;
 
-
 public:
-
   TimerClass() {
     cout.setf(ios::fixed);
     startClock();
@@ -45,31 +42,31 @@ public:
   }
 
   template <typename Stream>
-  void printTimestepWithoutReset(Stream &sout, const char *time_name) {
+  void printTimestepWithoutReset(Stream& sout, const char* time_name) {
     sout << time_name << get_cpu_time() - _last_check_time << endl;
   }
 
   template <typename Stream>
-  void maybePrintTimestepStore(Stream &sout, const char *time_name,
-                               const char *store_name, TableOut &tableout, bool toprint) {
+  void maybePrintTimestepStore(Stream& sout, const char* time_name, const char* store_name,
+                               TableOut& tableout, bool toprint) {
     double temp_time = get_cpu_time();
     double diff = temp_time - _last_check_time;
-    if (toprint)
+    if(toprint)
       sout << time_name << diff << endl;
     _last_check_time = temp_time;
     tableout.set(string(store_name), tostring(diff));
   }
 
   template <typename Stream>
-  void maybePrintFinaltimestepStore(Stream &sout, const char *time_name, const char *store_name,
-                                    TableOut &tableout, bool toprint) {
+  void maybePrintFinaltimestepStore(Stream& sout, const char* time_name, const char* store_name,
+                                    TableOut& tableout, bool toprint) {
     double time_wallclock = get_raw_wall_time() - start_wallclock;
 
     double end_cpu_time = get_cpu_time();
     double end_sys_time = get_sys_time();
 
     maybePrintTimestepStore(sout, time_name, store_name, tableout, toprint);
-    if (toprint) {
+    if(toprint) {
       sout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
       sout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
       sout << "Total Wall Time: " << time_wallclock << endl;

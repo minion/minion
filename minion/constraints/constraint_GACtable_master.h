@@ -26,7 +26,7 @@
 #include "constraint_GACtable_trie.h"
 
 template <typename T>
-AbstractConstraint *BuildCT_WATCHED_TABLE(const T &t1, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_TABLE(const T& t1, ConstraintBlob& b) {
   return GACTableCon(t1, b.tuples);
 }
 
@@ -39,7 +39,7 @@ AbstractConstraint *BuildCT_WATCHED_TABLE(const T &t1, ConstraintBlob &b) {
 */
 
 template <typename T>
-AbstractConstraint *BuildCT_WATCHED_NEGATIVE_TABLE(const T &t1, ConstraintBlob &b) {
+AbstractConstraint* BuildCT_WATCHED_NEGATIVE_TABLE(const T& t1, ConstraintBlob& b) {
   return GACNegativeTableCon(t1, b.tuples);
 }
 

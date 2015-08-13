@@ -26,51 +26,87 @@ struct ShiftVar {
   static const BoundType isBoundConst = VarRef::isBoundConst;
   VarRef data;
 
-  AnyVarRef popOneMapper() const { return data; }
+  AnyVarRef popOneMapper() const {
+    return data;
+  }
 
-  BOOL isBound() const { return data.isBound(); }
+  BOOL isBound() const {
+    return data.isBound();
+  }
 
   ShiftType shift;
-  ShiftVar(const VarRef &_data, ShiftType _shift) : data(_data), shift(_shift) {}
+  ShiftVar(const VarRef& _data, ShiftType _shift) : data(_data), shift(_shift) {}
 
   ShiftVar() : data(), shift() {}
 
-  ShiftVar(const ShiftVar &b) : data(b.data), shift(b.shift) {}
+  ShiftVar(const ShiftVar& b) : data(b.data), shift(b.shift) {}
 
-  BOOL isAssigned() const { return data.isAssigned(); }
+  BOOL isAssigned() const {
+    return data.isAssigned();
+  }
 
-  DomainInt getAssignedValue() const { return data.getAssignedValue() + shift; }
+  DomainInt getAssignedValue() const {
+    return data.getAssignedValue() + shift;
+  }
 
-  BOOL isAssignedValue(DomainInt i) const { return data.getAssignedValue() == i - shift; }
+  BOOL isAssignedValue(DomainInt i) const {
+    return data.getAssignedValue() == i - shift;
+  }
 
-  BOOL inDomain(DomainInt i) const { return data.inDomain(i - shift); }
+  BOOL inDomain(DomainInt i) const {
+    return data.inDomain(i - shift);
+  }
 
-  BOOL inDomain_noBoundCheck(DomainInt i) const { return data.inDomain(i - shift); }
+  BOOL inDomain_noBoundCheck(DomainInt i) const {
+    return data.inDomain(i - shift);
+  }
 
-  DomainInt getDomSize() const { return data.getDomSize(); }
+  DomainInt getDomSize() const {
+    return data.getDomSize();
+  }
 
-  DomainInt getMax() const { return data.getMax() + shift; }
+  DomainInt getMax() const {
+    return data.getMax() + shift;
+  }
 
-  DomainInt getMin() const { return data.getMin() + shift; }
+  DomainInt getMin() const {
+    return data.getMin() + shift;
+  }
 
-  DomainInt getInitialMax() const { return data.getInitialMax() + shift; }
+  DomainInt getInitialMax() const {
+    return data.getInitialMax() + shift;
+  }
 
-  DomainInt getInitialMin() const { return data.getInitialMin() + shift; }
+  DomainInt getInitialMin() const {
+    return data.getInitialMin() + shift;
+  }
 
-  void setMax(DomainInt i) { data.setMax(i - shift); }
+  void setMax(DomainInt i) {
+    data.setMax(i - shift);
+  }
 
-  void setMin(DomainInt i) { data.setMin(i - shift); }
+  void setMin(DomainInt i) {
+    data.setMin(i - shift);
+  }
 
-  void uncheckedAssign(DomainInt b) { data.uncheckedAssign(b - shift); }
+  void uncheckedAssign(DomainInt b) {
+    data.uncheckedAssign(b - shift);
+  }
 
-  void propagateAssign(DomainInt b) { data.propagateAssign(b - shift); }
+  void propagateAssign(DomainInt b) {
+    data.propagateAssign(b - shift);
+  }
 
-  void decisionAssign(DomainInt b) { data.decisionAssign(b - shift); }
+  void decisionAssign(DomainInt b) {
+    data.decisionAssign(b - shift);
+  }
 
-  void removeFromDomain(DomainInt b) { data.removeFromDomain(b - shift); }
+  void removeFromDomain(DomainInt b) {
+    data.removeFromDomain(b - shift);
+  }
 
   void addTrigger(Trigger t, TrigType type) {
-    switch (type) {
+    switch(type) {
     case UpperBound:
     case LowerBound:
     case Assigned:
@@ -81,7 +117,7 @@ struct ShiftVar {
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
-    switch (type) {
+    switch(type) {
     case UpperBound: data.addDynamicTrigger(t, UpperBound, pos, op); break;
     case LowerBound: data.addDynamicTrigger(t, LowerBound, pos, op); break;
     case Assigned:
@@ -91,19 +127,29 @@ struct ShiftVar {
     }
   }
 
-  friend std::ostream &operator<<(std::ostream &o, const ShiftVar &sv) {
+  friend std::ostream& operator<<(std::ostream& o, const ShiftVar& sv) {
     return o << "Shift " << sv.data << "+" << sv.shift;
   }
 
-  DomainInt getDomainChange(DomainDelta d) { return data.getDomainChange(d); }
+  DomainInt getDomainChange(DomainDelta d) {
+    return data.getDomainChange(d);
+  }
 
-  vector<AbstractConstraint *> *getConstraints() { return data.getConstraints(); }
+  vector<AbstractConstraint*>* getConstraints() {
+    return data.getConstraints();
+  }
 
-  void addConstraint(AbstractConstraint *c) { data.addConstraint(c); }
+  void addConstraint(AbstractConstraint* c) {
+    data.addConstraint(c);
+  }
 
-  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(v - shift); }
+  DomainInt getBaseVal(DomainInt v) const {
+    return data.getBaseVal(v - shift);
+  }
 
-  Var getBaseVar() const { return data.getBaseVar(); }
+  Var getBaseVar() const {
+    return data.getBaseVar();
+  }
 
   vector<Mapper> getMapperStack() const {
     vector<Mapper> v = data.getMapperStack();
@@ -112,9 +158,13 @@ struct ShiftVar {
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg() { return data.getBaseWdeg(); }
+  DomainInt getBaseWdeg() {
+    return data.getBaseWdeg();
+  }
 
-  void incWdeg() { data.incWdeg(); }
+  void incWdeg() {
+    data.incWdeg();
+  }
 #endif
 };
 
@@ -139,18 +189,18 @@ typename ShiftType<VRef, Shift>::type ShiftVarRef(VRef var_ref, Shift shift) {
 }
 
 template <typename VarRef, typename Shift>
-vector<ShiftVar<VarRef, Shift>> ShiftVarRef(const vector<VarRef> &var_array, const Shift &shift) {
+vector<ShiftVar<VarRef, Shift>> ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift) {
   vector<ShiftVar<VarRef, Shift>> shift_array(var_array.size());
-  for (UnsignedSysInt i = 0; i < var_array.size(); ++i)
+  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
     shift_array[i] = ShiftVarRef(var_array[i], shift);
   return shift_array;
 }
 
 template <typename VarRef, typename Shift, std::size_t i>
-std::array<ShiftVar<VarRef, Shift>, i> ShiftVarRef(const std::array<VarRef, i> &var_array,
-                                                   const Shift &shift) {
+std::array<ShiftVar<VarRef, Shift>, i> ShiftVarRef(const std::array<VarRef, i>& var_array,
+                                                   const Shift& shift) {
   std::array<ShiftVar<VarRef, Shift>, i> shift_array;
-  for (UnsignedSysInt l = 0; l < i; ++l)
+  for(UnsignedSysInt l = 0; l < i; ++l)
     shift_array[l] = ShiftVarRef(var_array[l], shift);
   return shift_array;
 }

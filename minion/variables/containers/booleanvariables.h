@@ -55,32 +55,48 @@ struct BoolVarContainer;
 struct BoolVarRef_internal {
   static const BOOL isBool = true;
   static const BoundType isBoundConst = Bound_No;
-  static string name() { return "Bool"; }
-  BOOL isBound() const { return false; }
+  static string name() {
+    return "Bool";
+  }
+  BOOL isBound() const {
+    return false;
+  }
 
-  AnyVarRef popOneMapper() const { FATAL_REPORTABLE_ERROR(); }
+  AnyVarRef popOneMapper() const {
+    FATAL_REPORTABLE_ERROR();
+  }
 
   data_type shift_offset;
   SysInt var_num;
-  void *data_position;
-  void *value_position;
+  void* data_position;
+  void* value_position;
 
-  UnsignedSysInt data_offset() const { return var_num / (sizeof(data_type) * 8); }
+  UnsignedSysInt data_offset() const {
+    return var_num / (sizeof(data_type) * 8);
+  }
 
-  static BoolVarContainer &getCon_Static();
-  BoolVarRef_internal(const BoolVarRef_internal &b)
-      : shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
+  static BoolVarContainer& getCon_Static();
+  BoolVarRef_internal(const BoolVarRef_internal& b)
+      : shift_offset(b.shift_offset),
+        var_num(b.var_num),
+        data_position(b.data_position),
         value_position(b.value_position) {}
 
   BoolVarRef_internal() : shift_offset(~1), var_num(~1) {}
 
-  BoolVarRef_internal(DomainInt value, BoolVarContainer *b_con);
+  BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);
 
-  data_type &assign_ptr() const { return *static_cast<data_type *>(data_position); }
+  data_type& assign_ptr() const {
+    return *static_cast<data_type*>(data_position);
+  }
 
-  data_type &value_ptr() const { return *static_cast<data_type *>(value_position); }
+  data_type& value_ptr() const {
+    return *static_cast<data_type*>(value_position);
+  }
 
-  BOOL isAssigned() const { return assign_ptr() & shift_offset; }
+  BOOL isAssigned() const {
+    return assign_ptr() & shift_offset;
+  }
 
   DomainInt getAssignedValue() const {
     D_ASSERT(isAssigned());
@@ -88,7 +104,7 @@ struct BoolVarRef_internal {
   }
 
   BOOL inDomain(DomainInt b) const {
-    if ((checked_cast<SysInt>(b) | 1) != 1)
+    if((checked_cast<SysInt>(b) | 1) != 1)
       return false;
     return (!isAssigned()) || (b == getAssignedValue());
   }
@@ -99,38 +115,46 @@ struct BoolVarRef_internal {
   }
 
   DomainInt getMin() const {
-    if (!isAssigned())
+    if(!isAssigned())
       return 0;
     return getAssignedValue();
   }
 
   DomainInt getDomSize() const {
-    if (isAssigned())
+    if(isAssigned())
       return 1;
     else
       return 2;
   }
 
   DomainInt getMax() const {
-    if (!isAssigned())
+    if(!isAssigned())
       return 1;
     return getAssignedValue();
   }
 
-  DomainInt getInitialMin() const { return 0; }
+  DomainInt getInitialMin() const {
+    return 0;
+  }
 
-  DomainInt getInitialMax() const { return 1; }
+  DomainInt getInitialMax() const {
+    return 1;
+  }
 
   DomainInt getBaseVal(DomainInt v) const {
     D_ASSERT(inDomain(v));
     return v;
   }
 
-  Var getBaseVar() const { return Var(VAR_BOOL, var_num); }
+  Var getBaseVar() const {
+    return Var(VAR_BOOL, var_num);
+  }
 
-  vector<Mapper> getMapperStack() const { return vector<Mapper>(); }
+  vector<Mapper> getMapperStack() const {
+    return vector<Mapper>();
+  }
 
-  friend std::ostream &operator<<(std::ostream &o, const BoolVarRef_internal &b) {
+  friend std::ostream& operator<<(std::ostream& o, const BoolVarRef_internal& b) {
     return o << "Bool:" << b.var_num;
   }
 };
@@ -150,9 +174,9 @@ struct BoolVarContainer {
   BoolVarContainer() : var_count_m(0), trigger_list(false), lock_m(false) {}
 
   static const SysInt width = 7;
-  void *assign_offset;
-  void *values_mem;
-  vector<vector<AbstractConstraint *>> constraints;
+  void* assign_offset;
+  void* values_mem;
+  vector<vector<AbstractConstraint*>> constraints;
 #ifdef WDEG
   vector<DomainInt> wdegs;
 #endif
@@ -162,13 +186,21 @@ struct BoolVarContainer {
   /// created.
   BOOL lock_m;
 
-  data_type *value_ptr() { return static_cast<data_type *>(values_mem); }
+  data_type* value_ptr() {
+    return static_cast<data_type*>(values_mem);
+  }
 
-  const data_type *value_ptr() const { return static_cast<const data_type *>(values_mem); }
+  const data_type* value_ptr() const {
+    return static_cast<const data_type*>(values_mem);
+  }
 
-  data_type *assign_ptr() { return static_cast<data_type *>(assign_offset); }
+  data_type* assign_ptr() {
+    return static_cast<data_type*>(assign_offset);
+  }
 
-  const data_type *assign_ptr() const { return static_cast<const data_type *>(assign_offset); }
+  const data_type* assign_ptr() const {
+    return static_cast<const data_type*>(assign_offset);
+  }
 
   void lock() {
     lock_m = true;
@@ -198,45 +230,47 @@ struct BoolVarContainer {
   /// created.
   BoolVarRef get_var_num(DomainInt i);
 
-  UnsignedSysInt var_count() { return var_count_m; }
+  UnsignedSysInt var_count() {
+    return var_count_m;
+  }
 
-  void setMax(const BoolVarRef_internal &d, DomainInt i) {
-    if (i < 0) {
+  void setMax(const BoolVarRef_internal& d, DomainInt i) {
+    if(i < 0) {
       getState().setFailed(true);
       return;
     }
 
     D_ASSERT(i >= 0);
-    if (i == 0)
+    if(i == 0)
       propagateAssign(d, 0);
   }
 
-  void setMin(const BoolVarRef_internal &d, DomainInt i) {
-    if (i > 1) {
+  void setMin(const BoolVarRef_internal& d, DomainInt i) {
+    if(i > 1) {
       getState().setFailed(true);
       return;
     }
     D_ASSERT(i <= 1);
-    if (i == 1)
+    if(i == 1)
       propagateAssign(d, 1);
   }
 
-  void removeFromDomain(const BoolVarRef_internal &d, DomainInt b) {
+  void removeFromDomain(const BoolVarRef_internal& d, DomainInt b) {
     D_ASSERT(lock_m && d.var_num < (SysInt)var_count_m);
-    if ((checked_cast<SysInt>(b) | 1) != 1)
+    if((checked_cast<SysInt>(b) | 1) != 1)
       return;
 
-    if (d.isAssigned()) {
-      if (b == d.getAssignedValue())
+    if(d.isAssigned()) {
+      if(b == d.getAssignedValue())
         getState().setFailed(true);
     } else
       uncheckedAssign(d, 1 - b);
   }
 
-  void internalAssign(const BoolVarRef_internal &d, DomainInt b) {
+  void internalAssign(const BoolVarRef_internal& d, DomainInt b) {
     D_ASSERT(lock_m && d.var_num < (SysInt)var_count_m);
     D_ASSERT(!d.isAssigned());
-    if ((checked_cast<SysInt>(b) | 1) != 1) {
+    if((checked_cast<SysInt>(b) | 1) != 1) {
       getState().setFailed(true);
       return;
     }
@@ -246,7 +280,7 @@ struct BoolVarContainer {
     trigger_list.push_domain_changed(d.var_num);
     trigger_list.push_domain_removal(d.var_num, 1 - b);
 
-    if (b == 1) {
+    if(b == 1) {
       trigger_list.push_lower(d.var_num, 1);
       value_ptr()[d.data_offset()] |= d.shift_offset;
     } else {
@@ -255,25 +289,29 @@ struct BoolVarContainer {
     }
   }
 
-  void uncheckedAssign(const BoolVarRef_internal &d, DomainInt b) { internalAssign(d, b); }
+  void uncheckedAssign(const BoolVarRef_internal& d, DomainInt b) {
+    internalAssign(d, b);
+  }
 
-  void propagateAssign(const BoolVarRef_internal &d, DomainInt b) {
-    if (!d.isAssigned())
+  void propagateAssign(const BoolVarRef_internal& d, DomainInt b) {
+    if(!d.isAssigned())
       internalAssign(d, b);
     else {
-      if (d.getAssignedValue() != b)
+      if(d.getAssignedValue() != b)
         getState().setFailed(true);
     }
   }
 
-  void decisionAssign(const BoolVarRef_internal &d, DomainInt b) { internalAssign(d, b); }
+  void decisionAssign(const BoolVarRef_internal& d, DomainInt b) {
+    internalAssign(d, b);
+  }
 
-  void addTrigger(BoolVarRef_internal &b, Trigger t, TrigType type) {
+  void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type) {
     D_ASSERT(lock_m);
     trigger_list.add_trigger(b.var_num, t, type);
   }
 
-  void addDynamicTrigger(BoolVarRef_internal &b, Trig_ConRef t, TrigType type,
+  void addDynamicTrigger(BoolVarRef_internal& b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(pos == NoDomainValue || (type == DomainRemoval && pos != NoDomainValue));
     D_ASSERT(lock_m);
@@ -281,11 +319,11 @@ struct BoolVarContainer {
     trigger_list.addDynamicTrigger(b.var_num, t, type, pos, op);
   }
 
-  vector<AbstractConstraint *> *getConstraints(const BoolVarRef_internal &b) {
+  vector<AbstractConstraint*>* getConstraints(const BoolVarRef_internal& b) {
     return &constraints[b.var_num];
   }
 
-  void addConstraint(const BoolVarRef_internal &b, AbstractConstraint *c) {
+  void addConstraint(const BoolVarRef_internal& b, AbstractConstraint* c) {
     constraints[b.var_num].push_back(c);
 #ifdef WDEG
     wdegs[b.var_num] += checked_cast<SysInt>(c->getWdeg()); // add constraint score to base var wdeg
@@ -293,9 +331,13 @@ struct BoolVarContainer {
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg(const BoolVarRef_internal &b) { return wdegs[b.var_num]; }
+  DomainInt getBaseWdeg(const BoolVarRef_internal& b) {
+    return wdegs[b.var_num];
+  }
 
-  void incWdeg(const BoolVarRef_internal &b) { wdegs[b.var_num]++; }
+  void incWdeg(const BoolVarRef_internal& b) {
+    wdegs[b.var_num]++;
+  }
 #endif
 };
 
@@ -304,11 +346,10 @@ inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i) {
   return BoolVarRef(BoolVarRef_internal(i, this));
 }
 
-inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer *b_con)
+inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con)
     : var_num(checked_cast<UnsignedSysInt>(value)),
-      data_position((char *)(b_con->assign_offset) + data_offset() * sizeof(data_type)),
-      value_position((char *)(b_con->values_mem) + data_offset() * sizeof(data_type))
-{
+      data_position((char*)(b_con->assign_offset) + data_offset() * sizeof(data_type)),
+      value_position((char*)(b_con->values_mem) + data_offset() * sizeof(data_type)) {
   shift_offset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type) * 8));
 }
 

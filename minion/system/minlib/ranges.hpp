@@ -11,11 +11,13 @@ class DomainRange_iter {
 public:
   DomainRange_iter(T _begin, T _end, T _step) : begin(_begin), end(_end), step(_step) {}
 
-  T operator*() { return begin; }
+  T operator*() {
+    return begin;
+  }
 
   void operator++() {
     begin += step;
-    if (begin > end)
+    if(begin > end)
       begin = end;
   }
 
@@ -32,37 +34,41 @@ class DomainRange_Impl {
 
 public:
   DomainRange_Impl(T _end) : begin_m(0), end_m(_end), step_m(1) {
-    if (end_m < begin_m)
+    if(end_m < begin_m)
       end_m = begin_m;
   }
 
   DomainRange_Impl(T _begin, T _end) : begin_m(_begin), end_m(_end), step_m(1) {
-    if (end_m < begin_m)
+    if(end_m < begin_m)
       end_m = begin_m;
   }
 
   DomainRange_Impl(T _begin, T _end, T _step) : begin_m(_begin), end_m(_end), step_m(_step) {
-    if (end_m < begin_m)
+    if(end_m < begin_m)
       end_m = begin_m;
   }
 
-  DomainRange_iter<T> begin() const { return DomainRange_iter<T>(begin_m, end_m, step_m); }
+  DomainRange_iter<T> begin() const {
+    return DomainRange_iter<T>(begin_m, end_m, step_m);
+  }
 
-  DomainRange_iter<T> end() const { return DomainRange_iter<T>(end_m, end_m, step_m); }
+  DomainRange_iter<T> end() const {
+    return DomainRange_iter<T>(end_m, end_m, step_m);
+  }
 };
 
 template <typename T>
-DomainRange_Impl<T> Range(const T &e) {
+DomainRange_Impl<T> Range(const T& e) {
   return DomainRange_Impl<T>(e);
 }
 
 template <typename T>
-DomainRange_Impl<T> Range(const T &b, const T &e) {
+DomainRange_Impl<T> Range(const T& b, const T& e) {
   return DomainRange_Impl<T>(b, e);
 }
 
 template <typename T>
-DomainRange_Impl<T> Range(const T &b, const T &e, const T &s) {
+DomainRange_Impl<T> Range(const T& b, const T& e, const T& s) {
   return DomainRange_Impl<T>(b, e, s);
 }
 
@@ -81,13 +87,15 @@ public:
 
     Container_iter(T vec, bool) : max_vec(vec), current_vec(vec) {}
 
-    T operator*() { return current_vec; }
+    T operator*() {
+      return current_vec;
+    }
 
     void operator++() {
       // We are reusing the existing increment vector,
       // which loops around and returns false at the end
       // of the loop
-      if (!increment_vector(current_vec, max_vec))
+      if(!increment_vector(current_vec, max_vec))
         current_vec = max_vec;
     }
 
@@ -96,13 +104,17 @@ public:
     }
   };
 
-  Container_iter begin() const { return Container_iter(max_vec); }
+  Container_iter begin() const {
+    return Container_iter(max_vec);
+  }
 
-  Container_iter end() const { return Container_iter(max_vec, true); }
+  Container_iter end() const {
+    return Container_iter(max_vec, true);
+  }
 };
 
 template <typename T>
-ContainerRange_Impl<T> ContainerRange(const T &e) {
+ContainerRange_Impl<T> ContainerRange(const T& e) {
   return ContainerRange_Impl<T>(e);
 }
 

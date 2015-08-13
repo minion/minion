@@ -18,5 +18,5 @@
 * USA.
 */
 
-void dump_solver(ostream &os, bool just_domains);
+void dump_solver(ostream& os, bool just_domains);
 void dump_solver(std::string filename, bool just_domains);
