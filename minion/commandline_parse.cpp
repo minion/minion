@@ -489,12 +489,6 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     else if (command == string("-randomseed")) {
       INCREMENT_i(-randomseed);
       args.random_seed = atoi(argv[i]);
-    } else if (command == string("-Xvarmunge")) {
-      INCREMENT_i(-Xvarmunge);
-      getOptions().Xvarmunge = atoi(argv[i]);
-    } else if (command == string("-Xsymmunge")) {
-      INCREMENT_i(-Xsymmunge);
-      getOptions().Xsymmunge = atoi(argv[i]);
     }
     /** @help switches;-tableout Description
     Append a line of data about the current run of minion to a named file.

@@ -74,41 +74,6 @@ void worker() {
   }
 }
 
-template <typename Con>
-void munge_container(Con &con, SysInt type) {
-  switch (type) {
-  case 0: return;
-  case 1: std::reverse(con.begin(), con.end()); return;
-  case 2: {
-    Con con2;
-    SysInt size = con.size();
-    if (size % 2 == 1) {
-      size--;
-      con2.push_back(con[size / 2]);
-      size--;
-    } else
-      size -= 2;
-
-    for (SysInt i = size / 2; i >= 0; --i) {
-      con2.push_back(con[i]);
-      con2.push_back(con[(SysInt)con.size() - i - 1]);
-    }
-    D_ASSERT(con2.size() == con.size());
-    con = con2;
-    return;
-  }
-  case 3:
-  case 4:
-  case 5:
-  case 6: {
-    srand(type);
-    std::random_shuffle(con.begin(), con.end());
-    return;
-  }
-  default: abort();
-  }
-}
-
 int main(int argc, char **argv) {
   // Wrap main in a try/catch just to stop exceptions leaving main,
   // as windows gets really annoyed when that happens.
@@ -179,14 +144,6 @@ int main(int argc, char **argv) {
     readInputFromFiles(instance, files, getOptions().parser_verbose, getOptions().map_long_short,
                        getOptions().ensure_branch_on_all_vars);
 
-    if (getOptions().Xvarmunge != -1) {
-      assert(instance.search_order.size() == 1);
-      munge_container(instance.search_order[0].var_order, getOptions().Xvarmunge);
-    }
-
-    if (getOptions().Xsymmunge != -1) {
-      munge_container(instance.sym_order, getOptions().Xsymmunge);
-    }
     /* XXX
       if(getOptions().graph)
       {

@@ -252,9 +252,6 @@ public:
 
   string gapname;
 
-  SysInt Xvarmunge;
-  SysInt Xsymmunge;
-
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
 
@@ -271,8 +268,8 @@ public:
         print_solution(true), timeout_active(false), time_limit(0), time_limit_is_CPU_time(false),
         randomise_valvarorder(false), parser_verbose(false), redump(false), graph(false),
         instance_stats(false), noresumefile(true), split(false), outputType(-1),
-        outputCompressedDomains(false), noTimers(false), gapname("gap.sh"), Xvarmunge(-1),
-        Xsymmunge(-1), map_long_short(MLTTS_NoMap), ensure_branch_on_all_vars(true) {
+        outputCompressedDomains(false), noTimers(false), gapname("gap.sh"),
+        map_long_short(MLTTS_NoMap), ensure_branch_on_all_vars(true) {
   }
 
   /// Denotes all solutions should be found, by setting sollimit to -1.
