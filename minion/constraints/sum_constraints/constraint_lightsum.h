@@ -109,6 +109,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     propagateDynInt(var_array.size(), DomainDelta::empty());
     propagateDynInt(0, DomainDelta::empty());
   }
