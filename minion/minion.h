@@ -19,9 +19,7 @@
  */
 #ifndef MINION_H
 #define MINION_H
-#ifdef REENTER
-#define MANY_VAR_CONTAINERS
-#endif
+
 #include "system/system.h"
 
 // These are just because VC++ sucks.

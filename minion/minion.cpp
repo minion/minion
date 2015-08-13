@@ -89,9 +89,6 @@ int main(int argc, char **argv) {
 
     parse_command_line(args, argc, argv);
 
-    if (getOptions().outputType != -1)
-      getState().getOldTimer().setOutputType(getOptions().outputType);
-
 
     if (!getOptions().silent) {
 
@@ -174,7 +171,7 @@ int main(int argc, char **argv) {
     getTableOut().set("MinionVersion", -1);
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
     getState().getOldTimer().maybePrintTimestepStore(
-        cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions().silent);
+        cout, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions().silent);
 
     BuildCSP(instance);
     SolveCSP(instance, args);

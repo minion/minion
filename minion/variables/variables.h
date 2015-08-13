@@ -18,13 +18,8 @@
 * USA.
 */
 
-#ifdef MANY_VAR_CONTAINERS
-#define GET_CONTAINER() data.getCon()
-#define GET_LOCAL_CON() getCon()
-#else
 #define GET_CONTAINER() InternalRefType::getCon_Static()
 #define GET_LOCAL_CON() getCon_Static()
-#endif
 
 #include "VarRefType.h"
 

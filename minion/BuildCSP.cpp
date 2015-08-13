@@ -60,10 +60,10 @@ void BuildCSP(CSPInstance &instance) {
   }
 
   // Solve!
-  getState().getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Setup Time: ", "SetupTime",
+  getState().getOldTimer().maybePrintTimestepStore(cout, "Setup Time: ", "SetupTime",
                                                    getTableOut(), !getOptions().silent);
   Controller::initalise_search();
-  getState().getOldTimer().maybePrintTimestepStore(cout, Output_Always, "Initial Propagate: ",
+  getState().getOldTimer().maybePrintTimestepStore(cout, "Initial Propagate: ",
                                                    "InitialPropagate", getTableOut(),
                                                    !getOptions().silent);
 }
@@ -113,7 +113,7 @@ void SolveCSP(CSPInstance &instance, SearchMethod args) {
   shared_ptr<Controller::SearchManager> sm =
       Controller::make_search_manager(args.prop_method, instance.search_order);
 
-  getState().getOldTimer().maybePrintTimestepStore(cout, Output_2, "Build Search Ordering Time: ",
+  getState().getOldTimer().maybePrintTimestepStore(cout, "Build Search Ordering Time: ",
                                                    "SearchOrderTime", getTableOut(),
                                                    !getOptions().silent);
   try {
@@ -128,9 +128,7 @@ void SolveCSP(CSPInstance &instance, SearchMethod args) {
     }
 
     getState().getOldTimer().maybePrintTimestepStore(
-        cout, Output_2, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions().silent);
-    getState().getOldTimer().maybePrintTimestepStore(
-        cout, Output_1, "First node time: ", "FirstNodeTime", getTableOut(), !getOptions().silent);
+        cout, "Preprocess Time: ", "PreprocessTime", getTableOut(), !getOptions().silent);
 
     if (getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
       dump_solver(getOptions().outputCompressed, getOptions().outputCompressedDomains);

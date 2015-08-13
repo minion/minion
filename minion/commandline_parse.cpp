@@ -132,10 +132,7 @@ void parse_command_line(SearchMethod &args, SysInt argc, char **argv) {
     } else if (command == string("-Xgraph")) {
       getOptions().graph = true;
       getOptions().silent = true;
-    } else if (command == string("-outputType")) {
-      INCREMENT_i(-outputType);
-      getOptions().outputType = atoi(argv[i]);
-    }
+    } 
     /** @help switches;-printsols Description
     Print solutions (default).
     */

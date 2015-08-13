@@ -18,11 +18,6 @@
 * USA.
 */
 
-enum Output_Type
-
-{ Output_Always,
-  Output_1,
-  Output_2 };
 
 class TimerClass {
   double _internal_cpu_start_time;
@@ -30,20 +25,10 @@ class TimerClass {
   double _last_check_time;
   double start_wallclock;
 
-  Output_Type output;
 
 public:
-  void setOutputType(short version) {
-    switch (version) {
-    case 1: output = Output_1; return;
-    case 2: output = Output_2; return;
-    default:
-      cerr << "This copy of Minion doesn't support output format " + tostring(version);
-      abort();
-    }
-  }
 
-  TimerClass() : output(Output_1) {
+  TimerClass() {
     cout.setf(ios::fixed);
     startClock();
   }
@@ -60,18 +45,13 @@ public:
   }
 
   template <typename Stream>
-  void printTimestepWithoutReset(Stream &sout, Output_Type t, const char *time_name) {
-    if (t != Output_Always && t != output)
-      return;
+  void printTimestepWithoutReset(Stream &sout, const char *time_name) {
     sout << time_name << get_cpu_time() - _last_check_time << endl;
   }
 
   template <typename Stream>
-  void maybePrintTimestepStore(Stream &sout, Output_Type t, const char *time_name,
+  void maybePrintTimestepStore(Stream &sout, const char *time_name,
                                const char *store_name, TableOut &tableout, bool toprint) {
-    if (t != Output_Always && t != output)
-      return;
-
     double temp_time = get_cpu_time();
     double diff = temp_time - _last_check_time;
     if (toprint)
@@ -88,7 +68,7 @@ public:
     double end_cpu_time = get_cpu_time();
     double end_sys_time = get_sys_time();
 
-    maybePrintTimestepStore(sout, Output_Always, time_name, store_name, tableout, toprint);
+    maybePrintTimestepStore(sout, time_name, store_name, tableout, toprint);
     if (toprint) {
       sout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
       sout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;

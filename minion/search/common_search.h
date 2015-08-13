@@ -109,7 +109,7 @@ void print_solution(Stream &sout, const PrintMatrix &print_matrix) {
   // TODO : Make this more easily changable.
   if (!getOptions().silent) {
     sout << "Solution Number: " << getState().getSolutionCount() << endl;
-    getState().getOldTimer().printTimestepWithoutReset(sout, Output_Always, "Time:");
+    getState().getOldTimer().printTimestepWithoutReset(sout, "Time:");
     sout << "Nodes: " << getState().getNodeCount() << endl << endl;
   }
 }
@@ -361,8 +361,6 @@ void inline initalise_search() {
   getState().setNodeCount(0);
 
   lock();
-  if (!getOptions().silent)
-    getState().getOldTimer().printTimestepWithoutReset(cout, Output_1, "First Node Time: ");
   /// Failed initially propagating constraints!
   if (getState().isFailed())
     return;

@@ -50,21 +50,11 @@ struct BigRangeVarRef_internal_template {
 
   SysInt var_num;
 
-#ifdef MANY_VAR_CONTAINERS
-  BigRangeVarContainer<d_type> *rangeCon;
-  BigRangeVarContainer<d_type> &getCon() const { return *rangeCon; }
-
-  BigRangeVarRef_internal_template() : var_num(-1), rangeCon(NULL) {}
-
-  explicit BigRangeVarRef_internal_template(BigRangeVarContainer<d_type> *con, DomainInt i)
-      : var_num(checked_cast<SysInt>(i)), rangeCon(con) {}
-#else
   static BigRangeVarContainer<d_type> &getCon_Static();
   BigRangeVarRef_internal_template() : var_num(-1) {}
 
   explicit BigRangeVarRef_internal_template(BigRangeVarContainer<d_type> *, DomainInt i)
       : var_num(checked_cast<SysInt>(i)) {}
-#endif
 };
 
 #ifdef MORE_SEARCH_INFO

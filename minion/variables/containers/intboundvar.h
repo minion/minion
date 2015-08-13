@@ -57,22 +57,11 @@ struct BoundVarRef_internal {
 
   const DomType &upper_bound() const { return *(static_cast<DomType *>(var_bound_data) + 1); }
 
-#ifdef MANY_VAR_CONTAINERS
-  BoundVarContainer<DomType> *boundCon;
-  BoundVarContainer<DomType> &getCon() const { return *boundCon; }
-
-  BoundVarRef_internal() : var_num(-1), boundCon(NULL) {}
-
-  explicit BoundVarRef_internal(BoundVarContainer<DomType> *con, DomainInt i, DomType *ptr)
-      : var_bound_data(ptr), var_num(i), boundCon(con) {}
-
-#else
   static BoundVarContainer<DomType> &getCon_Static();
   BoundVarRef_internal() : var_num(-1) {}
 
   explicit BoundVarRef_internal(BoundVarContainer<DomType> *, DomainInt i, DomType *ptr)
       : var_bound_data(ptr), var_num(i) {}
-#endif
 
   BOOL isAssigned() const { return lower_bound() == upper_bound(); }
 

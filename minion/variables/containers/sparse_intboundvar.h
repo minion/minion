@@ -53,21 +53,11 @@ struct SparseBoundVarRef_internal {
 
   SysInt var_num;
 
-#ifdef MANY_VAR_CONTAINERS
-  SparseBoundVarContainer<DomType> *sparseCon;
-  SparseBoundVarContainer<DomType> &getCon() const { return *sparseCon; }
-  SparseBoundVarRef_internal() : var_num(-1), sparseCon(NULL) {}
-
-  explicit SparseBoundVarRef_internal(SparseBoundVarContainer<DomType> *con, DomainInt i)
-      : var_num(checked_cast<SysInt>(i)), sparseCon(con) {}
-
-#else
   static SparseBoundVarContainer<DomType> &getCon_Static();
   SparseBoundVarRef_internal() : var_num(-1) {}
 
   explicit SparseBoundVarRef_internal(SparseBoundVarContainer<DomType> *, DomainInt i)
       : var_num(checked_cast<SysInt>(i)) {}
-#endif
 };
 
 #ifdef MORE_SEARCH_INFO

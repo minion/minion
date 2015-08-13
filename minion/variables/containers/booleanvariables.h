@@ -67,23 +67,12 @@ struct BoolVarRef_internal {
 
   UnsignedSysInt data_offset() const { return var_num / (sizeof(data_type) * 8); }
 
-#ifdef MANY_VAR_CONTAINERS
-  BoolVarContainer *boolCon;
-  BoolVarContainer &getCon() const { return *boolCon; }
-
-  BoolVarRef_internal(const BoolVarRef_internal &b)
-      : shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
-        value_position(b.value_position), boolCon(b.boolCon) {}
-
-  BoolVarRef_internal() : shift_offset(~1), var_num(~1), boolCon(NULL) {}
-#else
   static BoolVarContainer &getCon_Static();
   BoolVarRef_internal(const BoolVarRef_internal &b)
       : shift_offset(b.shift_offset), var_num(b.var_num), data_position(b.data_position),
         value_position(b.value_position) {}
 
   BoolVarRef_internal() : shift_offset(~1), var_num(~1) {}
-#endif
 
   BoolVarRef_internal(DomainInt value, BoolVarContainer *b_con);
 
@@ -319,10 +308,6 @@ inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContaine
     : var_num(checked_cast<UnsignedSysInt>(value)),
       data_position((char *)(b_con->assign_offset) + data_offset() * sizeof(data_type)),
       value_position((char *)(b_con->values_mem) + data_offset() * sizeof(data_type))
-#ifdef MANY_VAR_CONTAINERS
-      ,
-      boolCon(b_con)
-#endif
 {
   shift_offset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type) * 8));
 }

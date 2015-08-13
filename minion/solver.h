@@ -238,9 +238,6 @@ public:
 
   bool splitstderr;
 
-  // The format of output used (-1 for default)
-  SysInt outputType;
-
   /// Output a compressed file
   string outputCompressed;
 
@@ -267,7 +264,7 @@ public:
         nodelimit(std::numeric_limits<long long>::max()), tableout(false), solsoutWrite(false),
         print_solution(true), timeout_active(false), time_limit(0), time_limit_is_CPU_time(false),
         randomise_valvarorder(false), parser_verbose(false), redump(false), graph(false),
-        instance_stats(false), noresumefile(true), split(false), outputType(-1),
+        instance_stats(false), noresumefile(true), split(false),
         outputCompressedDomains(false), noTimers(false), gapname("gap.sh"),
         map_long_short(MLTTS_NoMap), ensure_branch_on_all_vars(true) {
   }
