@@ -24,8 +24,12 @@
 #endif
 #include "system/system.h"
 
-#define VERSION "Minion Version 1.8"
-#define REVISION "HG revision $Revision$"
+// These are just because VC++ sucks.
+#define _CRT_SECURE_NO_DEPRECATE 1
+#define _CRT_NONSTDC_NO_DEPRECATE 1
+
+static const char MinionVersion[] = "Minion Version 2";
+
 // above line will work but only gives revision of this file,
 //  not the current global revision
 #include "get_info/get_info.h"

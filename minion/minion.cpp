@@ -18,9 +18,7 @@
 * USA.
 */
 
-// These are just because VC++ sucks.
-#define _CRT_SECURE_NO_DEPRECATE 1
-#define _CRT_NONSTDC_NO_DEPRECATE 1
+
 
 #include "minion.h"
 
@@ -32,21 +30,6 @@
 #include "MILtools/print_CSP.h"
 
 #include "MILtools/sym_output.h"
-
-#ifndef HG_VER
-#define HG_VER "0"
-#endif
-
-#ifndef HG_DATE
-#define HG_DATE Not from a HG checkout
-#endif
-
-// The marvels of the C pre-processor...
-#define CAJ_EXPAND(x) #x
-#define CAJ_STRING(x) CAJ_EXPAND(x)
-
-#define HG_DATE_STRING CAJ_STRING(HG_DATE)
-#define HG_VER_STRING CAJ_STRING(HG_VER)
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Entrance:
@@ -81,9 +64,9 @@ int main(int argc, char **argv) {
 
     getState().getOldTimer().startClock();
 
+    getOptions().printLine("# " + std::string(MinionVersion));
+
     if (argc == 1) {
-      getOptions().printLine("# " + tostring(VERSION));
-      getOptions().printLine("# HG version: " + tostring(HG_VER_STRING));
       print_default_help(argv);
       return EXIT_SUCCESS;
     }
@@ -109,23 +92,12 @@ int main(int argc, char **argv) {
     if (getOptions().outputType != -1)
       getState().getOldTimer().setOutputType(getOptions().outputType);
 
-    getOptions().printLine("# " + tostring(VERSION));
-    getOptions().printLine("# HG version: " + tostring(HG_VER_STRING));
 
     if (!getOptions().silent) {
-
-      getOptions().printLine("# HG last changed date: " + tostring(HG_DATE_STRING));
 
       time_t rawtime;
       time(&rawtime);
       cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
-      cout << "#    http://minion.sourceforge.net" << endl;
-      cout << "# If you have problems with Minion or find any bugs, please "
-              "tell us!"
-           << endl;
-      cout << "# Mailing list at: "
-              "https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug"
-           << endl;
       cout << "# Input filename: " << getOptions().instance_name << endl;
       cout << "# Command line: ";
       for (SysInt i = 0; i < argc; ++i) {
@@ -199,7 +171,7 @@ int main(int argc, char **argv) {
       getTableOut().set("Preprocess", string(b));
     }
     // should be one for varorder as well.
-    getTableOut().set("MinionVersion", HG_VER_STRING);
+    getTableOut().set("MinionVersion", -1);
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
     getState().getOldTimer().maybePrintTimestepStore(
         cout, Output_Always, "Parsing Time: ", "ParsingTime", getTableOut(), !getOptions().silent);
