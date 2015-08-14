@@ -539,11 +539,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
   }
 
   bool findSupportsIncrementalHelper(SysInt var, DomainInt val) {
-
-    typedef pair<SysInt, DomainInt> temptype;
-    // MAKE_STACK_BOX(newsupportbox, temptype, vars.size());
     literalsScratch.clear();
-    // bool foundsupport=findNewSupport(newsupportbox, var, val);
     bool foundsupport = findNewSupport<false>(var, val);
 
     if(!foundsupport) {
@@ -552,7 +548,6 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
       // i.e. trying to update counters etc.
       // So counters won't have changed until we are retriggered on the removal
     } else {
-      // addSupport(&newsupportbox);
       addSupport();
     }
     return foundsupport;

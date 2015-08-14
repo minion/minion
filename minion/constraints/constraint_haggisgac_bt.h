@@ -469,11 +469,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
   }
 
   void findSupportsIncrementalHelper(SysInt var, DomainInt val) {
-
-    typedef pair<SysInt, DomainInt> temptype;
-    // MAKE_STACK_BOX(newsupportbox, temptype, vars.size());
     literalsScratch.clear();
-    // bool foundsupport=findNewSupport(newsupportbox, var, val);
     bool foundsupport = findNewSupport<false>(var, val);
 
     if(!foundsupport) {
