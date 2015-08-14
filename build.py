@@ -180,7 +180,7 @@ verbose_print(1, "Minion base dir: " + scriptdir)
 commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
-for c in ['domains64', 'wdeg', 'quick', 'debug', 'print', 'info']:
+for c in ['domains64', 'wdeg', 'quick', 'debug', 'print', 'info', 'profile']:
     if getattr(arg, c) != None:
         commandargs = commandargs + getattr(arg, c)
 
