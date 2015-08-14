@@ -20,7 +20,6 @@
 
 #include "inputfile_parse.h"
 
-#include "MinionInputReader.hpp"
 #include "MinionThreeInputReader.hpp"
 #include <fstream>
 #include <iostream>
@@ -35,8 +34,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
                         MapLongTuplesToShort mltts, bool ensure_branch_on_all_vars) {
   MinionThreeInputReader<ConcreteFileReader<CheapStream>> readerThree(parser_verbose, mltts,
                                                                       ensure_branch_on_all_vars);
-  MinionInputReader<ConcreteFileReader<CheapStream>> reader(parser_verbose,
-                                                            ensure_branch_on_all_vars);
+
 
   bool needs_finalise_three = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
@@ -75,21 +73,13 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 
         SysInt inputFileVersionNumber = infile.read_int();
 
-        if(inputFileVersionNumber > 3)
-          INPUT_ERROR("This version of Minion only supports formats up to 3");
+        if(inputFileVersionNumber != 3)
+          INPUT_ERROR("This version of Minion only supports format 3");
 
-        if(inputFileVersionNumber == 3) {
-          readerThree.instance = &instance;
-          ReadCSP(readerThree, &infile);
-          // instance = std::move(readerThree.instance);
-          needs_finalise_three = true;
-        } else {
-          reader.instance = &instance;
-          ReadCSP(reader, &infile);
-          // fix variable names in case we want to write a resume file (which is
-          // in Minion 3 format)
-          instance.add_variable_names();
-        }
+        readerThree.instance = &instance;
+        ReadCSP(readerThree, &infile);
+        // instance = std::move(readerThree.instance);
+        needs_finalise_three = true;
       }
     } catch(parse_exception s) {
       cerr << "Error in input!" << endl;

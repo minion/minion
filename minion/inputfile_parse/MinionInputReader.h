@@ -179,47 +179,6 @@ struct ConcreteFileReader {
 };
 
 template <typename FileReader>
-class MinionInputReader {
-  MinionInputReader(MinionInputReader&);
-  void parser_info(string);
-  vector<vector<Var>> Vectors;
-  vector<vector<vector<Var>>> Matrices;
-  vector<vector<vector<vector<Var>>>> Tensors;
-  vector<Var> flatten(char type, SysInt index);
-  vector<Var> getColOfMatrix(vector<vector<Var>>& m, SysInt c);
-  vector<Var> getRowThroughTensor(vector<vector<vector<Var>>>& t, SysInt r, SysInt c);
-  BOOL readConstraint(FileReader* infile, BOOL reified);
-  void readConstraintElement(FileReader* infile, ConstraintDef*);
-  void readConstraintTable(FileReader* infile, ConstraintDef*);
-  Var readIdentifier(FileReader* infile);
-  vector<Var> readPossibleMatrixIdentifier(FileReader* infile);
-  vector<vector<Var>> readLiteralMatrix(FileReader* infile);
-  vector<Var> readLiteralVector(FileReader* infile);
-  vector<DomainInt> readConstantVector(FileReader* infile, char start, char end, bool = false);
-  vector<DomainInt> readRange(FileReader* infile);
-  void readObjective(FileReader* infile);
-  void readTuples(FileReader* infile);
-  void readMatrices(FileReader* infile);
-  void readValOrder(FileReader* infile);
-  void readVarOrder(FileReader* infile);
-  void readPrint(FileReader* infile);
-  void readVars(FileReader* infile);
-  void readSearch(FileReader* infile);
-  vector<Var> readVectorExpression(FileReader* infile);
-
-  void readGeneralConstraint(FileReader*, ConstraintDef*);
-  // FileReader* infile ;
-public:
-  void read(FileReader* infile);
-  ProbSpec::CSPInstance* instance;
-
-  BOOL parser_verbose;
-  bool ensure_branch_on_all_vars;
-  MinionInputReader(bool _parser_verbose, bool _e)
-      : parser_verbose(_parser_verbose), ensure_branch_on_all_vars(_e) {}
-};
-
-template <typename FileReader>
 class MinionThreeInputReader {
   void parser_info(string);
   vector<vector<Var>> Vectors;
