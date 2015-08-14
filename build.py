@@ -13,7 +13,7 @@ try:
 except ImportError:
     import os
     DEVNULL = open(os.devnull, 'wb')
-    
+
 
 ## Output functions
 verbose=1
@@ -37,7 +37,7 @@ def progout(prog):
     (output, err) = process.communicate()
     exit_code = process.wait()
     return (output, err, exit_code)
-    
+
 #Check if prog can be run
 def progexists(prog):
     try:
@@ -136,11 +136,11 @@ parser.add_argument('--info', action='store_const', const=['-DMORE_SEARCH_INFO']
 
 parser.add_argument('--unoptimised', action='store_true',
                     help="Disable optimisation")
-                    
+
 parser.add_argument('--basicopt', action='store_true',
                     help="Enable basic optimisation")
-                    
-parser.add_argument('--profile', action='store_true',
+
+parser.add_argument('--profile', action='store_const', const=['-fno-inline', '-fno-inline-functions','-g'],
                     help='Enable compiler flags for profiling')
 
 parser.add_argument('--extraflags', help="Add extra compiler options")
@@ -167,7 +167,7 @@ if not os.path.exists(outsrcdir):
 
 if not os.path.exists(outsrcdir):
     fatal_error("ERROR: Can't create dir ", outsrcdir)
-    
+
 if not os.path.exists(objdir):
     os.mkdir(objdir)
 
@@ -189,7 +189,7 @@ if arg.extraflags:
 
 if arg.setflags:
     commandargs = arg.setflags.split()
-    
+
 if not arg.unoptimised:
     if arg.basicopt:
         commandargs = commandargs + ["-O2"]
@@ -205,7 +205,7 @@ else:
     compiler = ""
     if progexists('ccache'):
         compiler = "ccache " + compiler
-    
+
     if progexists('c++'):
         compiler = compiler + ' c++'
     elif progexists('g++'):
@@ -214,7 +214,7 @@ else:
         compiler = compiler + ' clang++'
     else:
         fatal_error("Unable to find working C++ compiler.. please use --compiler")
-    
+
 verbose_print(1, "Compiler flags" + str(commandargs))
 
 constraints=[]
@@ -283,7 +283,7 @@ with open(outsrcdir+"BuildStaticStart.cpp", "w") as bss:
     bss.write('#include "minion.h"\n')
     for c in constraints:
         bss.write("AbstractConstraint* build_constraint_" + c["internal_name"] + "(ConstraintBlob&);\n")
-    
+
     bss.write("AbstractConstraint* build_constraint(ConstraintBlob& b) {\n")
     bss.write("  switch(b.constraint->type) {\n")
     for c in constraints:
@@ -314,7 +314,7 @@ with open(outsrcdir+"ConstraintEnum.h", "w") as enum:
 with open(outsrcdir+"BuildDefines.h", "w") as defs:
     defs.write('#define HG_VER "' + gethgVersion() + '"\n')
     defs.write('#define HG_DATE "' + gethgDate() + '"\n')
-    
+
 minionsrclist = ['minion/BuildVariables.cpp',
 'minion/BuildCSP.cpp',
 'minion/commandline_parse.cpp',
@@ -342,7 +342,7 @@ else:
     qw = '"'
     def varsub(x):
         return ' ${' + x + '} '
-    
+
 with open(outname, "w") as out:
     constraintobjlist = [objname(x) for x in constraintsrclist]
     minionobjlist = [objname(x) for x in minionsrclist]
@@ -352,12 +352,12 @@ with open(outname, "w") as out:
     out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
     out.write('MINOBJS=' + qw + ' '.join(minionobjlist)+ qw +'\n')
     out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
-    
+
     if arg.buildsystem == "make":
         out.write('all : minion\n')
-        
+
     if arg.buildsystem == "make":
-        out.write(".PHONY: " + 
+        out.write(".PHONY: " +
         " ".join([objname(i) for i in constraintsrclist] + [objname(i) for i in minionsrclist]) + "\n")
     for i in constraintsrclist:
         if arg.buildsystem == "make":
@@ -365,7 +365,7 @@ with open(outname, "w") as out:
 #            out.write(objname(i) + ": "+i+'\n')
         out.write('\t'+compiler+' '+varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + i +'\n')
-    
+
     for i in minionsrclist:
         if arg.buildsystem == "make":
             out.write(objname(i)+ " :\n")
