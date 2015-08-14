@@ -191,7 +191,9 @@ if arg.setflags:
     commandargs = arg.setflags.split()
 
 if not arg.unoptimised:
-    if arg.basicopt:
+    if arg.profile:
+        commandargs = commandargs + ["-O"]
+    elif arg.basicopt:
         commandargs = commandargs + ["-O2"]
     else:
         if platform.system() == 'Darwin':
