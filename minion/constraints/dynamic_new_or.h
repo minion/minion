@@ -132,23 +132,6 @@ struct Dynamic_OR : public ParentConstraint {
     constraint_locked = false;
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta domain) {
-    // PROP_INFO_ADDONE(WatchedOR);
-    P("Static propagate start");
-    if(constraint_locked)
-      return;
-
-    if(full_propagate_called) {
-      P("Already doing static full propagate");
-      pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-      P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
-      if(childTrigger.first == propagated_constraint) {
-        P("Passing trigger" << childTrigger.second << "on");
-        child_constraints[propagated_constraint]->propagateStatic(childTrigger.second, domain);
-      }
-    }
-  }
-
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     // PROP_INFO_ADDONE(WatchedOr);
     P("Prop");

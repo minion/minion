@@ -195,28 +195,6 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
   void removeFromDomain(DomainInt)
   { FAIL_EXIT(); }
 
-  void addTrigger(Trigger t, TrigType type)
-  {
-    switch(type)
-    {
-      case UpperBound:
-        if(Multiply>=0)
-          data.addTrigger(t, UpperBound);
-        else
-          data.addTrigger(t, LowerBound);
-        break;
-      case LowerBound:
-        if(Multiply>=0)
-          data.addTrigger(t, LowerBound);
-        else
-          data.addTrigger(t, UpperBound);
-        break;
-      case Assigned:
-      case DomainChanged:
-        data.addTrigger(t, type);
-    }
-  }
-
   void addDynamicTrigger(AbstractConstraint* ac, DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue , TrigOp op = TO_Default)
   {  data.addDynamicTrigger(ac, t, type, pos); }
 
@@ -361,26 +339,6 @@ struct MultiplyVar {
 
   void removeFromDomain(DomainInt) {
     FAIL_EXIT();
-  }
-
-  void addTrigger(Trigger t, TrigType type) {
-    switch(type) {
-    case UpperBound:
-      if(Multiply >= 0)
-        data.addTrigger(t, UpperBound);
-      else
-        data.addTrigger(t, LowerBound);
-      break;
-    case LowerBound:
-      if(Multiply >= 0)
-        data.addTrigger(t, LowerBound);
-      else
-        data.addTrigger(t, UpperBound);
-      break;
-    case Assigned:
-    case DomainChanged: data.addTrigger(t, type); break;
-    default: D_FATAL_ERROR("Fatal error in 'stretch' wrapper");
-    }
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,

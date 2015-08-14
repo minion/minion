@@ -142,10 +142,6 @@ struct BoundVarRef_internal {
     GET_LOCAL_CON().removeFromDomain(*this, b);
   }
 
-  void addTrigger(Trigger t, TrigType type) {
-    GET_LOCAL_CON().addTrigger(*this, t, type);
-  }
-
   vector<AbstractConstraint*>* getConstraints() {
     return GET_LOCAL_CON().getConstraints(*this);
   }
@@ -406,11 +402,6 @@ struct BoundVarContainer {
       }
     }
     trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
-  }
-
-  void addTrigger(const BoundVarRef_internal<BoundType>& b, Trigger t, TrigType type) {
-    D_ASSERT(lock_m);
-    trigger_list.add_trigger(b.var_num, t, type);
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b) {

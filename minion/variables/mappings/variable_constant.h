@@ -115,8 +115,6 @@ struct ConstantVar {
       getState().setFailed(true);
   }
 
-  void addTrigger(Trigger, TrigType) {}
-
   void addDynamicTrigger(Trig_ConRef t, TrigType, DomainInt = NoDomainValue,
                          TrigOp op = TO_Default) {
     attachTriggerToNullList(t, op);

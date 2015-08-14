@@ -50,7 +50,7 @@ SysInt EventCategory[] = {
 string VarNames[] = {"Bool", "Bound", "SparseBound", "Range", "BigRange"};
 
 string ConEventNames[] = {
-    "StaticTrigger", "DynamicTrigger", "SpecialTrigger", "DynamicMovePtr", "AddSpecialToQueue",
+    "DynamicTrigger", "SpecialTrigger", "DynamicMovePtr", "AddSpecialToQueue",
     "AddConToQueue", "AddDynToQueue",  "SearchTrie",     "LoopSearchTrie",
 };
 

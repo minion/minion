@@ -170,7 +170,6 @@ struct AnyVarRef_Abstract {
   virtual void propagateAssign(DomainInt b) = 0;
   virtual void decisionAssign(DomainInt b) = 0;
   virtual void removeFromDomain(DomainInt b) = 0;
-  virtual void addTrigger(Trigger t, TrigType type) = 0;
   virtual vector<AbstractConstraint*>* getConstraints() = 0;
   virtual void addConstraint(AbstractConstraint* c) = 0;
   virtual DomainInt getBaseVal(DomainInt) const = 0;
@@ -269,10 +268,6 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
 
   virtual void removeFromDomain(DomainInt b) {
     data.removeFromDomain(b);
-  }
-
-  virtual void addTrigger(Trigger t, TrigType type) {
-    data.addTrigger(t, type);
   }
 
   virtual vector<AbstractConstraint*>* getConstraints() {
@@ -412,10 +407,6 @@ public:
 
   void removeFromDomain(DomainInt b) {
     data->removeFromDomain(b);
-  }
-
-  void addTrigger(Trigger t, TrigType type) {
-    data->addTrigger(t, type);
   }
 
   vector<AbstractConstraint*>* getConstraints() {

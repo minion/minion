@@ -105,16 +105,6 @@ struct ShiftVar {
     data.removeFromDomain(b - shift);
   }
 
-  void addTrigger(Trigger t, TrigType type) {
-    switch(type) {
-    case UpperBound:
-    case LowerBound:
-    case Assigned:
-    case DomainChanged: data.addTrigger(t, type); break;
-    default: D_FATAL_ERROR("Fatal error in 'shift' mapper");
-    }
-  }
-
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
                          TrigOp op = TO_Default) {
     switch(type) {

@@ -157,12 +157,6 @@ struct InfoRefType {
     data.removeFromDomain(b);
   }
 
-  void addTrigger(Trigger t, TrigType type) {
-    VAR_INFO_ADDONE(VAR_TYPE, addTrigger);
-    VAR_INFO_PRINT_0("addTrigger", type);
-    data.addTrigger(t, type);
-  }
-
   vector<AbstractConstraint*>* getConstraints() {
     VAR_INFO_ADDONE(VAR_TYPE, getConstraints);
     return data.getConstraints();

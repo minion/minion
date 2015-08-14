@@ -140,25 +140,6 @@ struct reify_true : public ParentConstraint {
     getQueue().pushSpecialTrigger(this);
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta domain) {
-    PROP_INFO_ADDONE(ReifyTrue);
-    P("Static propagate start");
-    if(constraint_locked)
-      return;
-
-    if(i == -1)
-      abort();
-
-    if(full_propagate_called) {
-      P("Already doing static full propagate");
-      D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
-      pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-      D_ASSERT(childTrigger.first == 0);
-      P("Passing trigger" << childTrigger.second << "on");
-      child_constraints[0]->propagateStatic(childTrigger.second, domain);
-    }
-  }
-
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(ReifyTrue);
 

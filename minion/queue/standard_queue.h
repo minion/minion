@@ -34,7 +34,6 @@
 
 class Queues {
 
-  QueueCon<TriggerRange> propagate_trigger_list;
   QueueCon<DynamicTriggerEvent> dynamic_trigger_list;
 
   // Special triggers are those which can only be run while the
@@ -57,18 +56,12 @@ public:
     special_triggers.push_back(trigger);
   }
 
-  inline void pushTriggers(TriggerRange new_triggers) {
-    CON_INFO_ADDONE(AddConToQueue);
-    propagate_trigger_list.push_back(new_triggers);
-  }
-
   void pushDynamicTriggers(DynamicTriggerEvent new_dynamic_trig_range) {
     CON_INFO_ADDONE(AddDynToQueue);
     dynamic_trigger_list.push_back(new_dynamic_trig_range);
   }
 
   void clearQueues() {
-    propagate_trigger_list.clear();
     dynamic_trigger_list.clear();
 
     if(!special_triggers.empty()) {
@@ -80,7 +73,7 @@ public:
   }
 
   bool isQueuesEmpty() {
-    return propagate_trigger_list.empty() && dynamic_trigger_list.empty() &&
+    return dynamic_trigger_list.empty() &&
            special_triggers.empty();
   }
 
@@ -123,43 +116,10 @@ public:
   }
 
   template <bool is_root_node>
-  bool propagateStaticTriggerLists() {
-    bool* fail_ptr = getState().getFailedPtr();
-    while(!propagate_trigger_list.empty()) {
-      TriggerRange t = propagate_trigger_list.queueTop();
-      DomainInt data_val = t.data;
-      propagate_trigger_list.queuePop();
-
-      for(Trigger* it = t.begin(); it != t.end(); it++) {
-        if(*fail_ptr) {
-          clearQueues();
-          return true;
-        }
-
-        if(!is_root_node || it->constraint->full_propagate_done) {
-          CON_INFO_ADDONE(StaticTrigger);
-          it->propagateStatic(DomainDelta(data_val));
-        }
-
-#ifdef WDEG
-        if(*fail_ptr)
-          it->constraint->incWdeg();
-#endif
-      }
-    }
-
-    return false;
-  }
-
-  template <bool is_root_node>
   inline void propagateQueueImpl() {
     while(true) {
-      while(!propagate_trigger_list.empty() || !dynamic_trigger_list.empty()) {
+      while(!dynamic_trigger_list.empty()) {
         if(propagateDynamicTriggerLists<is_root_node>())
-          return;
-
-        /* Don't like code duplication here but a slight efficiency gain */
-        if(propagateStaticTriggerLists<is_root_node>())
           return;
       }
 

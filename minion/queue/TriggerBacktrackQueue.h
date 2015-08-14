@@ -48,12 +48,7 @@ struct TriggerBacktrackQueue {
     P("TBQ: Restore on backtrack:" << conref.dtl << ":" << t);
     queue.back().push_back(make_pair(conref.dtl, t));
   }
-  /* XXX
-    void addTrigger(DynamicTrigger *trig) {
-      PROP_INFO_ADDONE(Counter3);
-      queue.back().push_back(make_pair(trig, trig->getQueue()));
-    }
-  */
+
   void world_push() {
     P("TBQ: World_push");
     queue.push_back(TriggerList());

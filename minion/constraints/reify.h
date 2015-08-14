@@ -230,40 +230,6 @@ struct reify : public ParentConstraint {
     }
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta domain) {
-    PROP_INFO_ADDONE(Reify);
-    P("Static propagate start");
-    if(constraint_locked)
-      return;
-
-    if(i == -1000000000) {
-      abort();
-      reify_var_assigned();
-      return;
-    }
-
-    if(full_propagate_called) {
-      P("Already doing static full propagate");
-      D_ASSERT(reify_var.isAssigned());
-      if(reify_var.getAssignedValue() == 1) {
-        pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-        if(childTrigger.first != 0) {
-          return;
-        }
-        P("Passing trigger " << childTrigger.first << "," << childTrigger.second << " on");
-        child_constraints[0]->propagateStatic(childTrigger.second, domain);
-      } else {
-        D_ASSERT(reify_var.getAssignedValue() == 0)
-        pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-        if(childTrigger.first != 1) {
-          return;
-        }
-        P("Passing trigger " << childTrigger.first << "," << childTrigger.second << " on");
-        child_constraints[1]->propagateStatic(childTrigger.second, domain);
-      }
-    }
-  }
-
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(Reify);
     P("Dynamic prop start");

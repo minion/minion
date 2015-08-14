@@ -131,20 +131,6 @@ struct SwitchNeg {
     return data.getDomainChange(d);
   }
 
-  void addTrigger(Trigger t, TrigType type) {
-    if(multiplier == 1) {
-      data.addTrigger(t, type);
-      return;
-    }
-    switch(type) {
-    case UpperBound: data.addTrigger(t, LowerBound); break;
-    case LowerBound: data.addTrigger(t, UpperBound); break;
-    case Assigned:
-    case DomainChanged: data.addTrigger(t, type); break;
-    default: D_FATAL_ERROR("Fatal error in 'switch_neg' wrapper");
-    }
-  }
-
   friend std::ostream& operator<<(std::ostream& o, const SwitchNeg& v) {
     return o << "SwitchNeg " << v.multiplier << ":" << v.data;
   }

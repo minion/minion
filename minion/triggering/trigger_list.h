@@ -45,8 +45,6 @@ public:
     vars_domain_size = 0;
   }
 
-  vector<vector<vector<Trigger>>> triggers;
-
   vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
   vector<vector<DynamicTriggerList>> dynamic_triggers_domain_vec;
 
@@ -74,15 +72,6 @@ public:
       for(int i = 0; i < vars_domain_size; ++i)
         dynamic_triggers_domain_vec[i].resize(var_count_m);
     }
-
-    triggers.resize(4);
-    for(UnsignedSysInt i = 0; i < 4; ++i)
-      triggers[i].resize(var_count_m);
-  }
-
-  pair<Trigger*, Trigger*> get_trigger_range(DomainInt var_num, TrigType type) {
-    vector<Trigger>& trigs = triggers[type][checked_cast<SysInt>(var_num)];
-    return pair<Trigger*, Trigger*>(trigs.data(), trigs.data() + trigs.size());
   }
 
   void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt domain_delta,
@@ -107,52 +96,26 @@ public:
   }
 
   void push_upper(DomainInt var_num, DomainInt upper_delta) {
-    dynamic_propagate(var_num, UpperBound, upper_delta);
     D_ASSERT(upper_delta > 0 || getState().isFailed());
-
-    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, UpperBound);
-    if(range.first != range.second)
-      getQueue().pushTriggers(
-          TriggerRange(range.first, range.second, checked_cast<SysInt>(upper_delta)));
+    dynamic_propagate(var_num, UpperBound, upper_delta);
   }
 
   void push_lower(DomainInt var_num, DomainInt lower_delta) {
-    dynamic_propagate(var_num, LowerBound, lower_delta);
     D_ASSERT(lower_delta > 0 || getState().isFailed());
-    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, LowerBound);
-    if(range.first != range.second)
-      getQueue().pushTriggers(
-          TriggerRange(range.first, range.second, checked_cast<SysInt>(lower_delta)));
+    dynamic_propagate(var_num, LowerBound, lower_delta);
   }
 
   void push_assign(DomainInt var_num, DomainInt) {
     dynamic_propagate(var_num, Assigned, -1);
-    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, Assigned);
-    if(range.first != range.second)
-      getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
   void push_domain_changed(DomainInt var_num) {
     dynamic_propagate(var_num, DomainChanged, -1);
-
-    pair<Trigger*, Trigger*> range = get_trigger_range(var_num, DomainChanged);
-    if(range.first != range.second)
-      getQueue().pushTriggers(TriggerRange(range.first, range.second, -1));
   }
 
   void push_domain_removal(DomainInt var_num, DomainInt val_removed) {
     D_ASSERT(!only_bounds);
     dynamic_propagate(var_num, DomainRemoval, -1, val_removed);
-  }
-
-  void add_domain_trigger(DomainInt b, Trigger t) {
-    D_ASSERT(!only_bounds);
-    triggers[DomainChanged][checked_cast<SysInt>(b)].push_back(t);
-  }
-
-  void add_trigger(DomainInt b, Trigger t, TrigType type) {
-    D_ASSERT(type != DomainRemoval);
-    triggers[type][checked_cast<SysInt>(b)].push_back(t);
   }
 
   void addDynamicTrigger(DomainInt b, Trig_ConRef t, TrigType type, DomainInt val,

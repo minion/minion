@@ -51,9 +51,6 @@ class AnyVarRef;
 
 #include "dynamic_trigger.h"
 
-struct AbstractTriggerCreator;
-typedef vector<shared_ptr<AbstractTriggerCreator>> triggerCollection;
-
 #include "constraint_printing.h"
 
 /// Base type from which all constraints are derived.
@@ -143,25 +140,11 @@ public:
     return dynamic_trigger_count();
   }
 
-  /// Gets all the triggers a constraint wants to set up.
-  /** This function shouldn't do any propagation. That is full_propagate's
-   * job.*/
-  virtual triggerCollection setup_internal() {
-    return triggerCollection();
-  }
-
   /// Iterative propagation function.
   /** Can assume full_propagate is always called at least once before propagate
    */
   virtual void propagateDynInt(SysInt, DomainDelta) {
     D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + extended_name());
-  }
-
-  /// Iterative propagation function.
-  /** Can assume full_propagate is always called at least once before propagate
-   */
-  virtual void propagateStatic(DomainInt, DomainDelta) {
-    D_FATAL_ERROR("Fatal error in 'Static Propagate' in " + extended_name());
   }
 
   /// Looks for a valid partial assignment to a constraint.
@@ -205,7 +188,7 @@ public:
   }
 
   /// Performs a full round of propagation and sets up any data needs by
-  /// propagateStatic().
+  /// propagateDynInt().
   /** This function can be called during search if the function is reified */
   virtual void full_propagate() = 0;
 
@@ -258,10 +241,6 @@ public:
 
   virtual void setup_dynamic_trigger_datastructures() {}
 
-  virtual triggerCollection setup_internal_gather_triggers() {
-    return setup_internal();
-  }
-
   /// Actually creates the dynamic triggers. Calls dynamic_trigger_count from
   /// function to get
   /// the number of triggers required.
@@ -272,12 +251,6 @@ public:
     const SysInt trigs = checked_cast<SysInt>(dynamic_trigger_count());
     D_ASSERT(trigs >= 0);
     setup_dynamic_triggers();
-
-    // Static initialisation
-    triggerCollection t = setup_internal_gather_triggers();
-    for(triggerCollection::iterator it = t.begin(); it != t.end(); ++it) {
-      (*it)->post_trigger();
-    }
   }
 
   SysInt getTightnessEstimate() {
@@ -360,17 +333,12 @@ protected:
   // Offset into array
   vector<SysInt> _dynamic_trigger_child_offset;
 
-  // Maps a static trigger to a pair { constraint, trigger for that constraint }
-  vector<pair<DomainInt, DomainInt>> _static_trigger_to_constraint;
   // Maps variables to constraints
   vector<DomainInt> variable_to_constraint;
   // Gets start of each constraint
   vector<DomainInt> start_of_constraint;
 
 public:
-  pair<DomainInt, DomainInt> getChildStaticTrigger(DomainInt i) {
-    return _static_trigger_to_constraint[checked_cast<SysInt>(i)];
-  }
 
   SysInt getChildDynamicTrigger(DomainInt p) {
     return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
@@ -401,33 +369,6 @@ public:
     } else {
       return _getTrigRef(trignum);
     }
-  }
-
-  /// Gets all the triggers a constraint wants to set up.
-  /** This function shouldn't do any propagation. That is full_propagate's
-   * job.*/
-  virtual triggerCollection setup_internal_gather_triggers() {
-    triggerCollection newTriggers;
-
-    for(UnsignedSysInt i = 0; i < child_constraints.size(); i++) {
-      triggerCollection childTrigs = child_constraints[i]->setup_internal_gather_triggers();
-      for(UnsignedSysInt j = 0; j < childTrigs.size(); ++j) {
-        // Record each original trigger value, then add the modified trigger to
-        // the collection.
-        _static_trigger_to_constraint.push_back(make_pair(i, childTrigs[j]->trigger.info));
-        // Need a '-1' on the next line, as C++ containers are indexed from 0!
-        childTrigs[j]->trigger.info = _static_trigger_to_constraint.size() - 1;
-        childTrigs[j]->trigger.constraint = this;
-        newTriggers.push_back(childTrigs[j]);
-      }
-    }
-
-    triggerCollection parentTrigs = setup_internal();
-    for(UnsignedSysInt i = 0; i < parentTrigs.size(); ++i)
-      D_ASSERT(parentTrigs[i]->trigger.info < 0);
-    newTriggers.insert(newTriggers.end(), parentTrigs.begin(), parentTrigs.end());
-
-    return newTriggers;
   }
 
   ParentConstraint(const vector<AbstractConstraint*> _children) : child_constraints(_children) {
@@ -495,12 +436,6 @@ public:
 
     setup_dynamic_triggers();
     setup_dynamic_trigger_datastructures();
-
-    // Static initialisation
-    triggerCollection t = setup_internal_gather_triggers();
-    for(triggerCollection::iterator it = t.begin(); it != t.end(); ++it) {
-      (*it)->post_trigger();
-    }
   }
 
   virtual ~ParentConstraint() {

@@ -144,17 +144,6 @@ struct Dynamic_AND : public ParentConstraint {
     constraint_locked = false;
   }
 
-  virtual void propagateStatic(DomainInt i, DomainDelta domain) {
-    // PROP_INFO_ADDONE(WatchedOR);
-    P("Static propagate start");
-    pair<DomainInt, DomainInt> childTrigger = getChildStaticTrigger(i);
-    P("Got trigger: " << i << ", maps to: " << childTrigger.first << "." << childTrigger.second);
-    P("Passing trigger " << childTrigger.second << " on");
-    if(!constraint_locked || childTrigger.first < propagated_to)
-      child_constraints[checked_cast<SysInt>(childTrigger.first)]->propagateStatic(
-          childTrigger.second, domain);
-  }
-
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     // PROP_INFO_ADDONE(WatchedOr);
     P("Prop");

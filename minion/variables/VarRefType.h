@@ -111,10 +111,6 @@ struct VarRefType {
     GET_CONTAINER().removeFromDomain(data, b);
   }
 
-  void addTrigger(Trigger t, TrigType type) {
-    GET_CONTAINER().addTrigger(data, t, type);
-  }
-
   vector<AbstractConstraint*>* getConstraints() {
     return GET_CONTAINER().getConstraints(data);
   }
@@ -240,10 +236,6 @@ struct QuickVarRefType {
 
   void removeFromDomain(DomainInt b) {
     GET_CONTAINER().removeFromDomain(data, b);
-  }
-
-  void addTrigger(Trigger t, TrigType type) {
-    GET_CONTAINER().addTrigger(data, t, type);
   }
 
   vector<AbstractConstraint*>* getConstraints() {

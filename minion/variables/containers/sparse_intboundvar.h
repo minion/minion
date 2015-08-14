@@ -373,11 +373,6 @@ struct SparseBoundVarContainer {
     return var_count_m;
   }
 
-  void addTrigger(SparseBoundVarRef_internal<BoundType> b, Trigger t, TrigType type) {
-    D_ASSERT(lock_m);
-    trigger_list.add_trigger(b.var_num, t, type);
-  }
-
   vector<AbstractConstraint*>* getConstraints(const SparseBoundVarRef_internal<BoundType>& b) {
     return &constraints[b.var_num];
   }

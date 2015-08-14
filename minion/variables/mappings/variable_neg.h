@@ -120,16 +120,6 @@ struct VarNeg {
     return data.getDomainChange(d);
   }
 
-  void addTrigger(Trigger t, TrigType type) {
-    switch(type) {
-    case UpperBound: data.addTrigger(t, LowerBound); break;
-    case LowerBound: data.addTrigger(t, UpperBound); break;
-    case Assigned:
-    case DomainChanged: data.addTrigger(t, type); break;
-    default: D_FATAL_ERROR("Invalid trigger in 'neg' mapper");
-    }
-  }
-
   friend std::ostream& operator<<(std::ostream& o, const VarNeg& n) {
     return o << "Neg " << n.data;
   }

@@ -67,7 +67,6 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "StateObj.hpp"
 #include "solver.hpp"
-#include "triggering/function_defs.hpp"
 
 #ifndef DOMINION
 #include "inputfile_parse/CSPSpec.hpp"

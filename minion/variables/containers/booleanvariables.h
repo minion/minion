@@ -306,11 +306,6 @@ struct BoolVarContainer {
     internalAssign(d, b);
   }
 
-  void addTrigger(BoolVarRef_internal& b, Trigger t, TrigType type) {
-    D_ASSERT(lock_m);
-    trigger_list.add_trigger(b.var_num, t, type);
-  }
-
   void addDynamicTrigger(BoolVarRef_internal& b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(pos == NoDomainValue || (type == DomainRemoval && pos != NoDomainValue));
