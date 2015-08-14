@@ -1,23 +1,26 @@
-MINION 1
 #TEST SOLCOUNT 3
 #
 #test of watched sum propagator
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:29 2015
 
-
-2
-0
-0
-0
-0
-
-[x0,x1]
-[a,a]
-
-0 
-1
-[ [ x0,x1] ]
-0
-objective none
-print m0
-
-watchsumgeq([x0,x1],1)
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_watchsumgeq_c.minion
+# Command line: minion -redump test_watchsumgeq_c.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+BOOL x1
+**SEARCH**
+VARORDER [x0,x1]
+VALORDER [a,a]
+SYMORDER [x0,x1]
+PRINT[[x0,x1]]
+**TUPLELIST**
+**CONSTRAINTS**
+watchsumgeq([x0,x1], 1)
+**EOF**

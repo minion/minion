@@ -1,19 +1,30 @@
-MINION 1
 #TEST SOLCOUNT 0
-1
-0
-0
-3
-0 1 3
-0
-[x0]
-[a]
-1
-[x0,x1,x2,x3]
-0
-0
-objective none
-print v0
-diseq(x1,x2)
-diseq(x2,x3)
-diseq(x3,x1)
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:27 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_oldsearch_1.minion
+# Command line: minion -redump test_oldsearch_1.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+DISCRETE x1{0..1}
+DISCRETE x2{0..1}
+DISCRETE x3{0..1}
+**SEARCH**
+VARORDER [x0]
+VALORDER [a]
+VARORDER [x1,x2,x3]
+VALORDER [a,a,a]
+SYMORDER [x0,x1,x2,x3]
+PRINT[[x0,x1,x2,x3]]
+**TUPLELIST**
+**CONSTRAINTS**
+diseq(x1, x2)
+diseq(x2, x3)
+diseq(x3, x1)
+**EOF**

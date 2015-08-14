@@ -1,19 +1,28 @@
-MINION 1
 #TEST SOLCOUNT 1024
-0
-0
-0
-6
-1 4 5
-0 5 1
-0
-[x0,x1,x2,x3,x4,x5]
-[a,a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3,x4,x5]]
-0
-objective none
-print m0
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:27 2015
 
-occurrence([x0,x1,x2,x3,x4],2,x5)
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_occurrence_2.minion
+# Command line: minion -redump test_occurrence_2.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{1..4}
+DISCRETE x1{1..4}
+DISCRETE x2{1..4}
+DISCRETE x3{1..4}
+DISCRETE x4{1..4}
+DISCRETE x5{0..5}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5]
+VALORDER [a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5]
+PRINT[[x0,x1,x2,x3,x4,x5]]
+**TUPLELIST**
+**CONSTRAINTS**
+occurrence([x0,x1,x2,x3,x4], 2, x5)
+**EOF**

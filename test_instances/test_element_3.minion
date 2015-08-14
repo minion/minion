@@ -1,22 +1,27 @@
-MINION 1
 #TEST CHECKONESOL 2 0 1 1 0
-0
-0
-0
-5
-2 2 1
-0 0 1
-1 1 1
-0 1 1
-0 1 1
-0
-[x0,x1,x2,x3,x4]
-[a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3,x4]]
-0
-objective none
-print m0
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:25 2015
 
-element([x0,x1,x2],x3,x4)
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_element_3.minion
+# Command line: minion -redump test_element_3.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{2..2}
+DISCRETE x1{0..0}
+DISCRETE x2{1..1}
+DISCRETE x3{0..1}
+DISCRETE x4{0..1}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4]
+VALORDER [a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4]
+PRINT[[x0,x1,x2,x3,x4]]
+**TUPLELIST**
+**CONSTRAINTS**
+element([x0,x1,x2], x3, x4)
+**EOF**
