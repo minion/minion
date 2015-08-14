@@ -15,19 +15,3 @@ inline TupleList* grab_tuplelist(CheapStream& cs) {
 
   return tl;
 }
-
-inline std::vector<TupleList*> tiny_parser(istream& is) {
-  CheapStream cs(is);
-  while(cs.peek() == '#') {
-    std::string s = cs.getline();
-  }
-
-  std::string s = cs.getline();
-  assert(s == "MINION 3");
-  s = cs.getline();
-  assert(s == "**TUPLELIST**");
-  std::vector<TupleList*> tl;
-  tl.push_back(grab_tuplelist(cs));
-  tl.push_back(grab_tuplelist(cs));
-  return tl;
-}
