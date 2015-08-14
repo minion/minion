@@ -160,26 +160,29 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     }
   }
 
-  // only used in dynamic version.
-  SysInt dynamic_trigger_count() {
+  SysInt old_dynamic_triggers()
+  {
     // First an array of watches for the matching, then a 2d array of mixed
     // triggers
     // indexed by [var][count] where count is increased from 0 as the triggers
     // are used.
-    SysInt numtrigs = 0;
-    if(UseIncGraph) {
-      numtrigs += numvars * numvals; // one for each var-val pair so we know when it is removed.
-    }
 
-    return numtrigs;
+    if (UseIncGraph)
+      return numvars * numvals; // one for each var-val pair so we know when it is removed.
+    else
+      return 0;
   }
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
-    SysInt array_size = var_array.size();
-    for(SysInt i = 0; i < array_size; ++i)
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
-    return t;
+  // only used in dynamic version.
+  SysInt dynamic_trigger_count() {
+    return old_dynamic_triggers() + var_array.size();
+  }
+
+  void setup_triggers()
+  {
+    SysInt dom_change_trig_start = old_dynamic_triggers();
+    for(SysInt i = 0; i < var_array.size(); ++i)
+      this->moveTriggerInt(var_array[i], dom_change_trig_start + i, DomainChanged);
   }
 
   typedef typename VarArray::value_type VarRef;
@@ -199,8 +202,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     return new Dynamic_OR(con);
   }
 
-  virtual void propagateStatic(DomainInt prop_var_in, DomainDelta) {
-    const SysInt prop_var = checked_cast<SysInt>(prop_var_in);
+  void propagateDomChanged(SysInt prop_var) {
     D_ASSERT(prop_var >= 0 && prop_var < (SysInt)var_array.size());
 
 // return if all the watches are still in place.
@@ -284,6 +286,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
+    if(trig >= old_dynamic_triggers())
+    {
+      propagateDomChanged(trig - old_dynamic_triggers());
+      return;
+    }
+
 #if UseIncGraph
     if(trig >= 0 && trig < numvars * numvals) // does this trigger belong to incgraph?
     {
@@ -674,6 +682,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
 #if UseIncGraph
     {
       // update the adjacency lists. and place dts
