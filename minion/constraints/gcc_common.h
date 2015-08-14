@@ -241,6 +241,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
 
   virtual void full_propagate() {
+    setup_triggers();
     for(SysInt i = 0; i < (SysInt)capacity_array.size(); i++) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
         capacity_array[i].setMin(0);
@@ -303,7 +304,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   // convert constraint into dynamic.
-  SysInt dynamic_trigger_count() {
+  SysInt old_dynamic_triggers() {
 #if UseIncGraph && !defined(CAPBOUNDSCACHE)
     return numvars * numvals; // one for each var-val pair so we know when it is removed.
 #endif
@@ -319,10 +320,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
   }
 
-  virtual void propagateStatic(DomainInt prop_var_in, DomainDelta) {
-    SysInt prop_var = checked_cast<SysInt>(prop_var_in);
-    D_ASSERT(!UseIncGraph || (prop_var >= numvars && prop_var < numvars + numvals));
+
+  virtual void propagateFixedTriggers(SysInt prop_var) {
+    D_ASSERT(!UseIncGraph || (prop_var >= numvars && prop_var < numvars + (numvals * 2)));
     if(!to_process.in(prop_var)) {
+      // Shift triggers down
+      if(prop_var >= numvars + numvals)
+        prop_var -= numvals;
       to_process.insert(prop_var); // inserts the number attached to the
                                    // trigger. For values this is
                                    // val-dom_min+numvars
@@ -343,6 +347,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
+    if(trig >= old_dynamic_triggers()) {
+      propagateFixedTriggers(trig - old_dynamic_triggers());
+      return;
+    }
+
 #if defined(CAPBOUNDSCACHE) || UseIncGraph
     SysInt dtstart = 0;
 #endif
@@ -1256,26 +1265,39 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   CONSTRAINT_ARG_LIST3(var_array, val_array, capacity_array);
 
-  virtual triggerCollection setup_internal() {
-    triggerCollection t;
+  virtual SysInt dynamic_trigger_count() {
+    SysInt trigs = old_dynamic_triggers();
+
+    // These are only for !UseIncGraph || !defined(ONECALL)
+    // but we define them always for simplicity.
+    trigs += var_array.size();
+
+    trigs += numvals*2;
+
+    return trigs;
+  }
+
+
+
+  void setup_triggers() {
+    SysInt base = old_dynamic_triggers();
     SysInt capacity_size = capacity_array.size();
 
 #if !UseIncGraph || !defined(ONECALL)
     SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i) {
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
+      this->moveTriggerInt(var_array[i], base + i, DomainChanged);
     }
 #endif
 
+    base += var_array.size();
+
     for(SysInt i = 0; i < capacity_size; ++i) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
-        t.push_back(make_trigger(capacity_array[i], Trigger(this, val_array[i] - dom_min + numvars),
-                                 UpperBound));
-        t.push_back(make_trigger(capacity_array[i], Trigger(this, val_array[i] - dom_min + numvars),
-                                 LowerBound));
+        this->moveTriggerInt(capacity_array[i], base + val_array[i] - dom_min, UpperBound);
+        this->moveTriggerInt(capacity_array[i], base + numvals + val_array[i] - dom_min, LowerBound);
       }
     }
-    return t;
   }
 
   virtual vector<AnyVarRef> get_vars() {
