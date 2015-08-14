@@ -249,6 +249,7 @@ public:
     parent = NULL;
     // Dynamic initialisation
     const SysInt trigs = checked_cast<SysInt>(dynamic_trigger_count());
+    (void)trigs;
     D_ASSERT(trigs >= 0);
     setup_dynamic_triggers();
   }
@@ -429,6 +430,7 @@ public:
     _setParent(nullptr, -1);
     // Dynamic initialisation
     const SysInt all_trigs = checked_cast<SysInt>(dynamic_trigger_count_with_children());
+    (void)all_trigs;
 
     D_DATA(DomainInt trigs = dynamic_trigger_count());
     D_ASSERT(trigs >= 0);
