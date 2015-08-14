@@ -323,10 +323,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   virtual void propagateFixedTriggers(SysInt prop_var) {
     D_ASSERT(!UseIncGraph || (prop_var >= numvars && prop_var < numvars + (numvals * 2)));
+    // Shift triggers down
+    if(prop_var >= numvars + numvals)
+      prop_var -= numvals;
     if(!to_process.in(prop_var)) {
-      // Shift triggers down
-      if(prop_var >= numvars + numvals)
-        prop_var -= numvals;
       to_process.insert(prop_var); // inserts the number attached to the
                                    // trigger. For values this is
                                    // val-dom_min+numvars
