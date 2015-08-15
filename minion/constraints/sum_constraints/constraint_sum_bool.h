@@ -108,6 +108,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
+    setup_triggers();
     SysInt occs = 0;
     SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
