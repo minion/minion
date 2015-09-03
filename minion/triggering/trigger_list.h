@@ -40,9 +40,6 @@ public:
   TriggerList(bool _only_bounds) : only_bounds(_only_bounds) {
     var_count_m = 0;
 
-    vars_min_domain_val = 0;
-    vars_max_domain_val = 0;
-    vars_domain_size = 0;
   }
 
   vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
@@ -52,15 +49,16 @@ public:
 
   SysInt var_count_m;
 
-  DomainInt vars_min_domain_val;
-  DomainInt vars_max_domain_val;
-  UnsignedSysInt vars_domain_size;
+  std::vector<std::pair<DomainInt, DomainInt> > vars_domain;
 
   void lock(SysInt size, DomainInt min_domain_val, DomainInt max_domain_val) {
-    var_count_m = size;
-    vars_min_domain_val = min_domain_val;
-    vars_max_domain_val = max_domain_val;
-    vars_domain_size = checked_cast<UnsignedSysInt>(max_domain_val - min_domain_val + 1);
+    std::vector<std::pair<DomainInt, DomainInt> > doms(size, make_pair(min_domain_val, max_domain_val));
+    lock(doms);
+  }
+
+  void lock(const std::vector<pair<DomainInt, DomainInt> >& doms) {
+    var_count_m = doms.size();
+    vars_domain = doms;
 
     dynamic_triggers_vec.resize(4);
 
@@ -70,12 +68,13 @@ public:
     if(!only_bounds) {
       dynamic_triggers_domain_vec.resize(var_count_m);
       for(int i = 0; i < var_count_m; ++i)
-        dynamic_triggers_domain_vec[i].resize(vars_domain_size);
+        dynamic_triggers_domain_vec[i].resize(checked_cast<SysInt>(vars_domain[i].second - vars_domain[i].first + 1));
     }
   }
 
-  void dynamic_propagate(DomainInt var_num, TrigType type, DomainInt domain_delta,
+  void dynamic_propagate(DomainInt _var_num, TrigType type, DomainInt domain_delta,
                          DomainInt val_removed = NoDomainValue) {
+    const SysInt var_num = checked_cast<SysInt>(_var_num);
     D_ASSERT(val_removed == NoDomainValue ||
              (type == DomainRemoval && val_removed != NoDomainValue));
     D_ASSERT(!only_bounds || type != DomainRemoval);
@@ -84,10 +83,10 @@ public:
       trig = &(dynamic_triggers_vec[type][checked_cast<SysInt>(var_num)]);
     } else {
       D_ASSERT(!only_bounds);
-      D_ASSERT(vars_min_domain_val <= val_removed);
-      D_ASSERT(vars_max_domain_val >= val_removed);
-      trig = &(dynamic_triggers_domain_vec[checked_cast<SysInt>(var_num)]
-                  [checked_cast<SysInt>(val_removed - vars_min_domain_val)]);
+      D_ASSERT(vars_domain[var_num].first <= val_removed);
+      D_ASSERT(vars_domain[var_num].second >= val_removed);
+      trig = &(dynamic_triggers_domain_vec[var_num]
+                  [checked_cast<SysInt>(val_removed - vars_domain[var_num].first)]);
     }
 
     // This is an optimisation, no need to push empty lists.
@@ -118,21 +117,22 @@ public:
     dynamic_propagate(var_num, DomainRemoval, -1, val_removed);
   }
 
-  void addDynamicTrigger(DomainInt b, Trig_ConRef t, TrigType type, DomainInt val,
+  void addDynamicTrigger(DomainInt _b, Trig_ConRef t, TrigType type, DomainInt val,
                          TrigOp op = TO_Default) {
+    const SysInt b = checked_cast<SysInt>(_b);
     D_ASSERT(!only_bounds || type != DomainRemoval);
     D_ASSERT(t.con != NULL);
 
     DynamicTriggerList* queue;
 
     if(type != DomainRemoval) {
-      queue = &dynamic_triggers_vec[type][checked_cast<SysInt>(b)];
+      queue = &dynamic_triggers_vec[type][b];
     } else {
       D_ASSERT(!only_bounds);
-      D_ASSERT(vars_min_domain_val <= val);
-      D_ASSERT(vars_max_domain_val >= val);
-      queue = &dynamic_triggers_domain_vec[checked_cast<SysInt>(b)]
-                [checked_cast<SysInt>(val - vars_min_domain_val)];
+      D_ASSERT(vars_domain[b].first <= val);
+      D_ASSERT(vars_domain[b].second >= val);
+      queue = &dynamic_triggers_domain_vec[b]
+                [checked_cast<SysInt>(val - vars_domain[b].first)];
     }
 
     D_ASSERT(queue->sanity_check_list());
