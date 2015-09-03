@@ -219,7 +219,8 @@ struct BigRangeVarContainer {
         max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
     }
-    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
+
+    trigger_list.addVariables(initial_bounds);
   }
 
   BOOL isAssigned(BigRangeVarRef_internal d) const {

@@ -53,12 +53,13 @@ public:
 
   void lock(SysInt size, DomainInt min_domain_val, DomainInt max_domain_val) {
     std::vector<std::pair<DomainInt, DomainInt> > doms(size, make_pair(min_domain_val, max_domain_val));
-    lock(doms);
+    addVariables(doms);
   }
 
-  void lock(const std::vector<pair<DomainInt, DomainInt> >& doms) {
-    var_count_m = doms.size();
-    vars_domain = doms;
+  void addVariables(const std::vector<pair<DomainInt, DomainInt> >& doms) {
+    SysInt old_var_count = var_count_m;
+    var_count_m += doms.size();
+    vars_domain.insert(vars_domain.end(), doms.begin(), doms.end());
 
     dynamic_triggers_vec.resize(4);
 
@@ -67,8 +68,9 @@ public:
 
     if(!only_bounds) {
       dynamic_triggers_domain_vec.resize(var_count_m);
-      for(int i = 0; i < var_count_m; ++i)
-        dynamic_triggers_domain_vec[i].resize(checked_cast<SysInt>(vars_domain[i].second - vars_domain[i].first + 1));
+      for(int i = 0; i < doms.size(); ++i)
+        dynamic_triggers_domain_vec[i + old_var_count].resize(
+          checked_cast<SysInt>(doms[i].second - doms[i].first + 1));
     }
   }
 

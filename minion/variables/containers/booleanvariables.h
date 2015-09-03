@@ -205,7 +205,9 @@ struct BoolVarContainer {
   void lock() {
     lock_m = true;
     // Min domain value = 0, max domain val = 1.
-    trigger_list.lock(var_count_m, 0, 1);
+    std::vector<std::pair<DomainInt, DomainInt> > doms(var_count_m,
+        make_pair(DomainInt(0), DomainInt(1)));
+    trigger_list.addVariables(doms);
   }
 
   /// Returns a new Boolean Variable.
