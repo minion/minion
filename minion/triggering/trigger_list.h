@@ -68,9 +68,9 @@ public:
       dynamic_triggers_vec[i].resize(var_count_m);
 
     if(!only_bounds) {
-      dynamic_triggers_domain_vec.resize(vars_domain_size);
-      for(int i = 0; i < vars_domain_size; ++i)
-        dynamic_triggers_domain_vec[i].resize(var_count_m);
+      dynamic_triggers_domain_vec.resize(var_count_m);
+      for(int i = 0; i < var_count_m; ++i)
+        dynamic_triggers_domain_vec[i].resize(vars_domain_size);
     }
   }
 
@@ -86,8 +86,8 @@ public:
       D_ASSERT(!only_bounds);
       D_ASSERT(vars_min_domain_val <= val_removed);
       D_ASSERT(vars_max_domain_val >= val_removed);
-      trig = &(dynamic_triggers_domain_vec[checked_cast<SysInt>(
-          val_removed - vars_min_domain_val)][checked_cast<SysInt>(var_num)]);
+      trig = &(dynamic_triggers_domain_vec[checked_cast<SysInt>(var_num)]
+                  [checked_cast<SysInt>(val_removed - vars_min_domain_val)]);
     }
 
     // This is an optimisation, no need to push empty lists.
@@ -131,8 +131,8 @@ public:
       D_ASSERT(!only_bounds);
       D_ASSERT(vars_min_domain_val <= val);
       D_ASSERT(vars_max_domain_val >= val);
-      queue = &dynamic_triggers_domain_vec[checked_cast<SysInt>(
-          val - vars_min_domain_val)][checked_cast<SysInt>(b)];
+      queue = &dynamic_triggers_domain_vec[checked_cast<SysInt>(b)]
+                [checked_cast<SysInt>(val - vars_min_domain_val)];
     }
 
     D_ASSERT(queue->sanity_check_list());
