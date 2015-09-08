@@ -174,7 +174,7 @@ struct BoolVarContainer {
   BoolVarContainer() : var_count_m(0), trigger_list(false), lock_m(false) {}
 
   static const SysInt width = 7;
-  void* assign_offset;
+  ExtendableBlock assign_offset;
   void* values_mem;
   vector<vector<AbstractConstraint*>> constraints;
 #ifdef WDEG
@@ -195,11 +195,11 @@ struct BoolVarContainer {
   }
 
   data_type* assign_ptr() {
-    return static_cast<data_type*>(assign_offset);
+    return (data_type*)(assign_offset());
   }
 
   const data_type* assign_ptr() const {
-    return static_cast<const data_type*>(assign_offset);
+    return (const data_type*)(assign_offset());
   }
 
   void lock() {
@@ -220,7 +220,7 @@ struct BoolVarContainer {
     SysInt required_mem = var_count_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
-    assign_offset = getMemory().backTrack().request_bytes(required_mem);
+    assign_offset = getMemory().backTrack().requestBytesExtendable(required_mem);
     values_mem = checked_malloc(required_mem);
     constraints.resize(bool_count);
 #ifdef WDEG
@@ -345,7 +345,7 @@ inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i) {
 
 inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con)
     : var_num(checked_cast<UnsignedSysInt>(value)),
-      data_position((char*)(b_con->assign_offset) + data_offset() * sizeof(data_type)),
+      data_position((char*)(b_con->assign_offset()) + data_offset() * sizeof(data_type)),
       value_position((char*)(b_con->values_mem) + data_offset() * sizeof(data_type)) {
   shift_offset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type) * 8));
 }

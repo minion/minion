@@ -60,6 +60,29 @@
  * or alter particular allocations without deleting the whole class. This may
  * be fixed in future if it is required.
  */
+
+// Small wrapper to represent an extendable block
+class ExtendableBlock {
+  // Pointer to block
+  char* ptr;
+  // Position in NewMemoryBlock of this block
+  SysInt pos;
+public:
+  ExtendableBlock() : ptr(NULL), pos(-1)
+  { }
+
+  ExtendableBlock(char* _ptr, SysInt _pos) : ptr(_ptr), pos(_pos)
+  { }
+
+  ExtendableBlock(const ExtendableBlock&) = default;
+
+  char* operator()() const
+  { return ptr; }
+
+  SysInt getPos() const
+  { return pos; }
+};
+
 class NewMemoryBlock {
   /// Forbid copying.
   NewMemoryBlock(const NewMemoryBlock&);
@@ -74,11 +97,15 @@ class NewMemoryBlock {
   vector<pair<char*, size_t>> stored_blocks;
   size_t total_stored_bytes;
 
+  vector<tuple<char*, size_t, size_t>> extendable_blocks;
+  size_t allocated_extendable_bytes;
+  vector<vector<tuple<SysInt, size_t, size_t>>> block_resizes;
+
+
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE (size_t)(64 * 1024 * 1024)
 #endif
 
-  SET_TYPE<void**> pointers;
 
 public:
   void storeMem(char* store_ptr) {
@@ -93,7 +120,15 @@ public:
 
     P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);
     memcpy(store_ptr + current_offset, current_data, allocated_bytes);
-    D_ASSERT(getDataSize() == current_offset + allocated_bytes);
+
+    current_offset += allocated_bytes;
+
+    for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
+      memcpy(store_ptr + current_offset, get<0>(extendable_blocks[i]), get<1>(extendable_blocks[i]));
+      current_offset += get<1>(extendable_blocks[i]);
+    }
+
+    D_ASSERT(getDataSize() == current_offset);
   }
 
 private:
@@ -121,16 +156,26 @@ public:
       current_offset += stored_blocks[i].second;
     }
     copyMemBlock(current_data, store_ptr, current_offset, allocated_bytes);
-    D_ASSERT(getDataSize() == current_offset + allocated_bytes);
+
+    current_offset += allocated_bytes;
+
+    for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
+      memcpy(get<0>(extendable_blocks[i]), store_ptr.first + current_offset, get<1>(extendable_blocks[i]));
+      current_offset += get<1>(extendable_blocks[i]);
+    }
+
+    D_ASSERT(getDataSize() == current_offset);
   }
 
   /// Returns the size of the allocated memory in bytes.
   UnsignedSysInt getDataSize() {
-    return total_stored_bytes + allocated_bytes;
+    return total_stored_bytes + allocated_bytes + allocated_extendable_bytes;
   }
 
   NewMemoryBlock()
-      : current_data(NULL), allocated_bytes(0), maximum_bytes(0), total_stored_bytes(0) {}
+      : current_data(NULL), allocated_bytes(0), maximum_bytes(0), total_stored_bytes(0),
+      allocated_extendable_bytes(0), block_resizes(1) {
+      }
 
   ~NewMemoryBlock() {
     free(current_data);
@@ -155,6 +200,30 @@ public:
     P("Return val:" << (void*)current_data);
     allocated_bytes += checked_cast<size_t>(byte_count);
     return (void*)return_val;
+  }
+
+  ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size)
+  {
+    const SysInt max_size = 10*1024*1024;
+    char* block = (char*)calloc(max_size, 1);
+    extendable_blocks.push_back(std::make_tuple(block, base_size, max_size));
+    allocated_extendable_bytes += base_size;
+    return ExtendableBlock{block, (SysInt)extendable_blocks.size()};
+  }
+
+  void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size)
+  {
+    UnsignedSysInt old_size = get<1>(extendable_blocks[block.getPos()]);
+    D_ASSERT(block() == get<0>(extendable_blocks[block.getPos()]));
+    D_ASSERT(new_size >= old_size);
+    D_ASSERT(new_size <= get<2>(extendable_blocks[block.getPos()]));
+    D_ASSERT(checkAllZero(block() + old_size, block() + new_size));
+
+    allocated_extendable_bytes += (new_size - old_size);
+
+    get<1>(extendable_blocks[block.getPos()]) = new_size;
+    block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
+
   }
 
   /// Request a \ref MoveableArray.

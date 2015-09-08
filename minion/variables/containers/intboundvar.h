@@ -198,7 +198,7 @@ struct BoundVarContainer {
 
   BoundVarContainer() : trigger_list(true), var_count_m(0), lock_m(0) {}
 
-  void* bound_data;
+  ExtendableBlock bound_data;
   TriggerList trigger_list;
   vector<pair<BoundType, BoundType>> initial_bounds;
   vector<vector<AbstractConstraint*>> constraints;
@@ -209,19 +209,19 @@ struct BoundVarContainer {
   BOOL lock_m;
 
   const BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) const {
-    return static_cast<const BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num * 2)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2)];
   }
 
   const BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) const {
-    return static_cast<const BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num * 2 + 1)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2 + 1)];
   }
 
   BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) {
-    return static_cast<BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num * 2)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2)];
   }
 
   BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) {
-    return static_cast<BoundType*>(bound_data)[checked_cast<SysInt>(i.var_num * 2 + 1)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2 + 1)];
   }
 
   void lock() {
@@ -381,8 +381,8 @@ struct BoundVarContainer {
     wdegs.resize(var_count_m);
 #endif
 
-    bound_data = getMemory().backTrack().request_bytes(var_count_m * 2 * sizeof(BoundType));
-    BoundType* bound_ptr = static_cast<BoundType*>(bound_data);
+    bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    BoundType* bound_ptr = (BoundType*)(bound_data());
     for(UnsignedSysInt i = 0; i < var_count_m; ++i) {
       bound_ptr[2 * i] = initial_bounds[i].first;
       bound_ptr[2 * i + 1] = initial_bounds[i].second;
@@ -469,6 +469,6 @@ inline BoundVarRef BoundVarContainer<T>::get_var_num(DomainInt i) {
   D_ASSERT(i < (DomainInt)var_count_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after
   // lower_bound(i)...
-  return BoundVarRef(BoundVarRef_internal<>(this, i, static_cast<DomainInt*>(bound_data) +
+  return BoundVarRef(BoundVarRef_internal<>(this, i, (DomainInt*)(bound_data()) +
                                                          checked_cast<SysInt>(i) * 2));
 }

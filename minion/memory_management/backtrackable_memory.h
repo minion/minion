@@ -50,6 +50,10 @@ public:
     return new_memory_block.request_bytes(byte_count);
   }
 
+  ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size) {
+    return new_memory_block.requestBytesExtendable(base_size);
+  }
+
   /// Wraps requestArray of the internal \ref NewMemoryBlock.
   template <typename T>
   T* requestArray(UnsignedSysInt size) {

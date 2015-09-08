@@ -24,3 +24,13 @@ struct Bounds {
   DomainInt upper_bound;
   Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper) {}
 };
+
+inline bool checkAllZero(char* begin, char* end)
+{
+  for(char* p = begin; p < end; ++p)
+  {
+    if(*p != 0)
+      return false;
+  }
+  return true;
+}

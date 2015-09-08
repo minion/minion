@@ -81,7 +81,7 @@ struct BigRangeVarContainer {
   }
 
   typedef DomainInt domain_bound_type;
-  void* bound_data;
+  ExtendableBlock bound_data;
   MonotonicSet* bms_array;
   TriggerList trigger_list;
 
@@ -102,15 +102,15 @@ struct BigRangeVarContainer {
 #define BOUND_DATA_SIZE 3
 
   domain_bound_type& lower_bound(BigRangeVarRef_internal i) const {
-    return static_cast<domain_bound_type*>(bound_data)[i.var_num * BOUND_DATA_SIZE];
+    return ((domain_bound_type*)bound_data())[i.var_num * BOUND_DATA_SIZE];
   }
 
   domain_bound_type& upper_bound(BigRangeVarRef_internal i) const {
-    return static_cast<domain_bound_type*>(bound_data)[i.var_num * BOUND_DATA_SIZE + 1];
+    return ((domain_bound_type*)bound_data())[i.var_num * BOUND_DATA_SIZE + 1];
   }
 
   domain_bound_type& dom_size(BigRangeVarRef_internal i) const {
-    return static_cast<domain_bound_type*>(bound_data)[i.var_num * BOUND_DATA_SIZE + 2];
+    return ((domain_bound_type*)bound_data())[i.var_num * BOUND_DATA_SIZE + 2];
   }
 
   void reduce_dom_size(BigRangeVarRef_internal i) {
@@ -190,7 +190,7 @@ struct BigRangeVarContainer {
 #endif
     }
 
-    bound_data = getMemory().backTrack().request_bytes(var_count_m * BOUND_DATA_SIZE *
+    bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * BOUND_DATA_SIZE *
                                                        sizeof(domain_bound_type));
     DomainInt temp1 = bms_array->request_storage(var_offset.back());
 
@@ -204,7 +204,7 @@ struct BigRangeVarContainer {
       var_offset[j] = var_offset[j] - initial_bounds[j].first;
     };
 
-    domain_bound_type* bound_ptr = static_cast<domain_bound_type*>(bound_data);
+    domain_bound_type* bound_ptr = (domain_bound_type*)(bound_data());
 
     DomainInt min_domain_val = 0;
     DomainInt max_domain_val = 0;
