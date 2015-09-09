@@ -81,6 +81,9 @@ public:
 
   SysInt getPos() const
   { return pos; }
+
+  bool empty() const
+  { return ptr == nullptr; }
 };
 
 class NewMemoryBlock {
@@ -208,7 +211,7 @@ public:
     char* block = (char*)calloc(max_size, 1);
     extendable_blocks.push_back(std::make_tuple(block, base_size, max_size));
     allocated_extendable_bytes += base_size;
-    return ExtendableBlock{block, (SysInt)extendable_blocks.size()};
+    return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
   }
 
   void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size)

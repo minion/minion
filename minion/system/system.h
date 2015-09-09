@@ -66,4 +66,13 @@ inline void* checked_malloc(size_t size) {
   return ptr;
 }
 
+inline void* checked_realloc(void* ptr, size_t size) {
+  void* new_ptr = realloc(ptr, size);
+  if(new_ptr == 0) {
+    std::cerr << "Fatal: Out of memory";
+    abort();
+  }
+  return new_ptr;
+}
+
 #endif

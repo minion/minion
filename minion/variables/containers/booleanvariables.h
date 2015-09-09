@@ -171,7 +171,7 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BoolVarContainer {
 
-  BoolVarContainer() : var_count_m(0), trigger_list(false), lock_m(false) {}
+  BoolVarContainer() : var_count_m(0), trigger_list(false), lock_m(false), first_call(true) {}
 
   static const SysInt width = 7;
   ExtendableBlock assign_offset;
@@ -213,18 +213,27 @@ struct BoolVarContainer {
   /// Returns a new Boolean Variable.
   // BoolVarRef get_new_var();
 
-  void setVarCount(SysInt bool_count) {
+  bool first_call;
+
+  void addVariables(SysInt new_bools) {
     D_ASSERT(!lock_m);
-    var_count_m = bool_count;
+    var_count_m += new_bools;
 
     SysInt required_mem = var_count_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
-    assign_offset = getMemory().backTrack().requestBytesExtendable(required_mem);
-    values_mem = checked_malloc(required_mem);
-    constraints.resize(bool_count);
+    if(first_call) {
+      first_call = false;
+      assign_offset = getMemory().backTrack().requestBytesExtendable(required_mem);
+      values_mem = checked_malloc(10*1024*1024);
+      CHECK(required_mem < 10*1024*1024, "Bool mem overflow");
+    }
+    else {
+      getMemory().backTrack().resizeExtendableBlock(assign_offset, required_mem);
+    }
+    constraints.resize(var_count_m);
 #ifdef WDEG
-    wdegs.resize(bool_count);
+    wdegs.resize(var_count_m);
 #endif
   }
 

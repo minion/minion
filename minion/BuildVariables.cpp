@@ -48,7 +48,8 @@ AnyVarRef get_AnyVarRef_from_Var(Var v) {
 
 /// Create all the variables used in the CSP.
 void build_variables(const ProbSpec::VarContainer& vars) {
-  getVars().boolVarContainer.setVarCount(vars.BOOLs);
+  for(int i = 0; i < vars.BOOLs; ++i)
+    getVars().boolVarContainer.addVariables(1);
   getVars().boundVarContainer.addVariables(vars.bound);
   getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound);
   getVars().bigRangeVarContainer.addVariables(vars.discrete);
