@@ -171,7 +171,7 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BoolVarContainer {
 
-  BoolVarContainer() : var_count_m(0), trigger_list(false), lock_m(false), first_call(true) {}
+  BoolVarContainer() : var_count_m(0), trigger_list(false), lock_m(false) {}
 
   static const SysInt width = 7;
   ExtendableBlock assign_offset;
@@ -213,8 +213,6 @@ struct BoolVarContainer {
   /// Returns a new Boolean Variable.
   // BoolVarRef get_new_var();
 
-  bool first_call;
-
   void addVariables(SysInt new_bools) {
     D_ASSERT(!lock_m);
     var_count_m += new_bools;
@@ -222,8 +220,7 @@ struct BoolVarContainer {
     SysInt required_mem = var_count_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
-    if(first_call) {
-      first_call = false;
+    if(assign_offset.empty()) {
       assign_offset = getMemory().backTrack().requestBytesExtendable(required_mem);
       values_mem = checked_malloc(10*1024*1024);
       CHECK(required_mem < 10*1024*1024, "Bool mem overflow");

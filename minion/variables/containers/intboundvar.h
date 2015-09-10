@@ -227,6 +227,7 @@ struct BoundVarContainer {
   void lock() {
     D_ASSERT(!lock_m);
     lock_m = true;
+    trigger_list.addVariables(initial_bounds);
   }
 
   BOOL isAssigned(const BoundVarRef_internal<BoundType>& d) const {
@@ -365,15 +366,16 @@ struct BoundVarContainer {
   //  BoundVarRef get_new_var(SysInt i, SysInt j);
   BoundVarRef get_var_num(DomainInt i);
 
-  void addVariables(const vector<pair<SysInt, Bounds>>& vars) {
+  void addVariables(Bounds bounds, SysInt count = 1) {
     D_ASSERT(!lock_m);
-    for(SysInt i = 0; i < (SysInt)vars.size(); ++i) {
-      D_ASSERT(vars[i].second.lower_bound >= DomainInt_Min);
-      D_ASSERT(vars[i].second.upper_bound <= DomainInt_Max);
-      for(SysInt j = 0; j < vars[i].first; ++j) {
-        var_count_m++;
-        initial_bounds.push_back(make_pair(vars[i].second.lower_bound, vars[i].second.upper_bound));
-      }
+    D_ASSERT(count > 0);
+    SysInt old_var_count = var_count_m;
+
+    D_ASSERT(bounds.lower_bound >= DomainInt_Min);
+    D_ASSERT(bounds.upper_bound <= DomainInt_Max);
+    for(SysInt j = 0; j < count; ++j) {
+      var_count_m++;
+      initial_bounds.push_back(make_pair(bounds.lower_bound, bounds.upper_bound));
     }
 
     constraints.resize(var_count_m);
@@ -381,9 +383,14 @@ struct BoundVarContainer {
     wdegs.resize(var_count_m);
 #endif
 
-    bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    if(bound_data.empty()) {
+      bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    }
+    else {
+      getMemory().backTrack().resizeExtendableBlock(bound_data, var_count_m * 2 * sizeof(BoundType));
+    }
     BoundType* bound_ptr = (BoundType*)(bound_data());
-    for(UnsignedSysInt i = 0; i < var_count_m; ++i) {
+    for(UnsignedSysInt i = old_var_count; i < var_count_m; ++i) {
       bound_ptr[2 * i] = initial_bounds[i].first;
       bound_ptr[2 * i + 1] = initial_bounds[i].second;
     }
@@ -401,8 +408,6 @@ struct BoundVarContainer {
         max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
       }
     }
-
-    trigger_list.addVariables(initial_bounds);
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b) {

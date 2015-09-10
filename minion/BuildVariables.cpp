@@ -50,7 +50,10 @@ AnyVarRef get_AnyVarRef_from_Var(Var v) {
 void build_variables(const ProbSpec::VarContainer& vars) {
   for(int i = 0; i < vars.BOOLs; ++i)
     getVars().boolVarContainer.addVariables(1);
-  getVars().boundVarContainer.addVariables(vars.bound);
+  for(int i = 0; i < vars.bound.size(); ++i)
+    getVars().boundVarContainer.addVariables(vars.bound[i].second, vars.bound[i].first);
+
+
   getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound);
   getVars().bigRangeVarContainer.addVariables(vars.discrete);
 
