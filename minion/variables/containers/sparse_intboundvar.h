@@ -153,36 +153,33 @@ struct SparseBoundVarContainer {
     lock_m = true;
   }
 
-  void addVariables(const vector<pair<SysInt, vector<DomainInt>>>& new_domains) {
+  void addVariables(const vector<DomainInt>& bounds, SysInt count = 1) {
     D_ASSERT(!lock_m);
+    D_ASSERT(count > 0);
 
-    if(new_domains.empty()) {
-      trigger_list.lock(0, 0, 0);
-      return;
-    }
+    SysInt old_count = var_count_m;
 
     DomainInt min_domain_val = DomainInt_Min;
     DomainInt max_domain_val = DomainInt_Max;
 
-    for(SysInt i = 0; i < (SysInt)new_domains.size(); ++i) {
-      D_ASSERT(new_domains[i].second.front() >= DomainInt_Min);
-      D_ASSERT(new_domains[i].second.back() <= DomainInt_Max);
 
-      for(SysInt loop = 0; loop < (SysInt)(new_domains[i].second.size()) - 1; ++loop) {
-        D_ASSERT(new_domains[i].second[loop] < new_domains[i].second[loop + 1]);
-      }
+    D_ASSERT(bounds.front() >= DomainInt_Min);
+    D_ASSERT(bounds.back() <= DomainInt_Max);
 
-      vector<BoundType> t_dom(new_domains[i].second.size());
-      for(UnsignedSysInt j = 0; j < new_domains[i].second.size(); ++j)
-        t_dom[j] = new_domains[i].second[j];
-
-      domains.push_back(t_dom);
-      for(SysInt j = 0; j < new_domains[i].first; ++j)
-        domain_reference.push_back(i);
-
-      min_domain_val = mymin(t_dom.front(), min_domain_val);
-      max_domain_val = mymax(t_dom.back(), max_domain_val);
+    for(SysInt loop = 0; loop < (SysInt)(bounds.size()) - 1; ++loop) {
+      D_ASSERT(bounds[loop] < bounds[loop + 1]);
     }
+
+    vector<BoundType> t_dom(bounds.size());
+    for(UnsignedSysInt j = 0; j < bounds.size(); ++j)
+      t_dom[j] = bounds[j];
+
+    domains.push_back(t_dom);
+    for(SysInt j = 0; j < count; ++j)
+      domain_reference.push_back(domains.size() - 1);
+
+    min_domain_val = mymin(t_dom.front(), min_domain_val);
+    max_domain_val = mymax(t_dom.back(), max_domain_val);
 
     // TODO: Setting var_count_m to avoid changing other code.. long term, do
     // we need it?
@@ -193,14 +190,22 @@ struct SparseBoundVarContainer {
     wdegs.resize(var_count_m);
 #endif
 
-    bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    if(bound_data.empty()) {
+      bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    }
+    else {
+      getMemory().backTrack().resizeExtendableBlock(bound_data, var_count_m * 2 * sizeof(BoundType));
+    }
+
     BoundType* bound_ptr = (BoundType*)(bound_data());
-    for(UnsignedSysInt i = 0; i < var_count_m; ++i) {
+    for(UnsignedSysInt i = old_count; i < var_count_m; ++i) {
       bound_ptr[2 * i] = get_domain_from_int(i).front();
       bound_ptr[2 * i + 1] = get_domain_from_int(i).back();
     }
 
-    trigger_list.lock(var_count_m, min_domain_val, max_domain_val);
+
+    std::vector<std::pair<DomainInt, DomainInt> > trig_bounds(count, make_pair(bounds.front(), bounds.back()));
+    trigger_list.addVariables(trig_bounds);
   }
 
   BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const {

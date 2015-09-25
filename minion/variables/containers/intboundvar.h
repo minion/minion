@@ -400,7 +400,7 @@ struct BoundVarContainer {
     if(!initial_bounds.empty()) {
       min_domain_val = initial_bounds[0].first;
       max_domain_val = initial_bounds[0].second;
-      for(UnsignedSysInt i = 0; i < var_count_m; ++i) {
+      for(UnsignedSysInt i = old_var_count; i < var_count_m; ++i) {
         bound_ptr[2 * i] = initial_bounds[i].first;
         bound_ptr[2 * i + 1] = initial_bounds[i].second;
 

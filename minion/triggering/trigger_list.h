@@ -29,6 +29,8 @@
 #include "memory_management/backtrackable_memory.h"
 #include "memory_management/nonbacktrack_memory.h"
 
+#define MAX_VARS 1000000
+
 class TriggerList {
 
   TriggerList(const TriggerList&);
@@ -39,7 +41,10 @@ class TriggerList {
 public:
   TriggerList(bool _only_bounds) : only_bounds(_only_bounds) {
     var_count_m = 0;
-
+    dynamic_triggers_vec.resize(4);
+    for(int i = 0; i < 4; ++i) {
+            dynamic_triggers_vec[i].reserve(MAX_VARS);
+    }
   }
 
   vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
@@ -59,9 +64,8 @@ public:
   void addVariables(const std::vector<pair<DomainInt, DomainInt> >& doms) {
     SysInt old_var_count = var_count_m;
     var_count_m += doms.size();
+    CHECK(var_count_m < MAX_VARS, "Too many variables... increase MAX_VARS");
     vars_domain.insert(vars_domain.end(), doms.begin(), doms.end());
-
-    dynamic_triggers_vec.resize(4);
 
     for(int i = 0; i < 4; ++i)
       dynamic_triggers_vec[i].resize(var_count_m);
