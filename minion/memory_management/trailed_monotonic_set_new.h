@@ -92,8 +92,6 @@ public:
     data.resize(i + checked_cast<SysInt>(allocsize), true);
     return i;
   }
-
-  void lock() {}
 };
 
 typedef TrailedMonotonicSet MonotonicSet;

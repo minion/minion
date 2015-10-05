@@ -31,8 +31,6 @@ void lock() {
   for(SysInt i = 0; i < size; i++)
     getState().getConstraintList()[i]->setup();
 
-  getMemory().monotonicSet().lock();
-
   // No longer AC1, thank goodness.
   for(SysInt i = 0; i < size; ++i) {
     if(getState().isFailed())
