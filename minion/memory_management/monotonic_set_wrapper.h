@@ -60,30 +60,3 @@ public:
     MS.unchecked_remove(ref + offset);
   }
 };
-
-class ReversibleMonotonicBoolean {
-private:
-  MonotonicSet& MS;
-  DomainInt offset;
-
-public:
-  // The constructor must be called before the monotonicset is locked.
-  ReversibleMonotonicBoolean() : MS(getMemory().monotonicSet()) {
-    offset = MS.request_storage(1);
-#ifndef NO_DEBUG
-    cout << "Set up ReversibleMonotonicSet with size " << 1 << " and offset " << offset << endl;
-#endif
-  }
-
-  inline bool isMember() {
-    return MS.isMember(offset);
-  }
-
-  inline void remove() {
-    MS.ifMember_remove(offset);
-  }
-
-  inline void unchecked_remove() {
-    MS.unchecked_remove(offset);
-  }
-};
