@@ -1,348 +1,460 @@
-MINION 1
 #TEST SOLCOUNT 1
 # Input file for Minion built for Version 0.2
 #    http://sourceforge.net/projects/minion
 # BIBD Instance
 # CSPLib prob028, www.csplib.org
 # Parameters: v, b, r, k, lambda = 7, 7, 3, 3, 1
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:25 2015
 
-0
-
-196
--1 1 196
-0
-0
-0
-[x0,x1,x2,x3,x4,x5,x6,
-x7,x8,x9,x10,x11,x12,x13,
-x14,x15,x16,x17,x18,x19,x20,
-x21,x22,x23,x24,x25,x26,x27,
-x28,x29,x30,x31,x32,x33,x34,
-x35,x36,x37,x38,x39,x40,x41,
-x42,x43,x44,x45,x46,x47,x48
-]
-[a,a,a,a,a,a,a,
-a,a,a,a,a,a,a,
-a,a,a,a,a,a,a,
-a,a,a,a,a,a,a,
-a,a,a,a,a,a,a,
-a,a,a,a,a,a,a,
-a,a,a,a,a,a,a
-]
-21
-[x49, x50, x51, x52, x53, x54, x55]
-[x56, x57, x58, x59, x60, x61, x62]
-[x63, x64, x65, x66, x67, x68, x69]
-[x70, x71, x72, x73, x74, x75, x76]
-[x77, x78, x79, x80, x81, x82, x83]
-[x84, x85, x86, x87, x88, x89, x90]
-[x91, x92, x93, x94, x95, x96, x97]
-[x98, x99, x100, x101, x102, x103, x104]
-[x105, x106, x107, x108, x109, x110, x111]
-[x112, x113, x114, x115, x116, x117, x118]
-[x119, x120, x121, x122, x123, x124, x125]
-[x126, x127, x128, x129, x130, x131, x132]
-[x133, x134, x135, x136, x137, x138, x139]
-[x140, x141, x142, x143, x144, x145, x146]
-[x147, x148, x149, x150, x151, x152, x153]
-[x154, x155, x156, x157, x158, x159, x160]
-[x161, x162, x163, x164, x165, x166, x167]
-[x168, x169, x170, x171, x172, x173, x174]
-[x175, x176, x177, x178, x179, x180, x181]
-[x182, x183, x184, x185, x186, x187, x188]
-[x189, x190, x191, x192, x193, x194, x195]
-
-1
-[[x0, x1, x2, x3, x4, x5, x6],
-[x7, x8, x9, x10, x11, x12, x13],
-[x14, x15, x16, x17, x18, x19, x20],
-[x21, x22, x23, x24, x25, x26, x27],
-[x28, x29, x30, x31, x32, x33, x34],
-[x35, x36, x37, x38, x39, x40, x41],
-[x42, x43, x44, x45, x46, x47, x48]]
-
-0
-
-objective none
-print m0
-
-eq(x0,0)
-eq(x1,0)
-eq(x2,0)
-eq(x3,0)
-eq(x7,0)
-eq(x14,0)
-eq(x21,0)
-sumleq(row(m0, 0), 3)
-sumgeq(row(m0, 0), 3)
-sumleq(row(m0, 1), 3)
-sumgeq(row(m0, 1), 3)
-sumleq(row(m0, 2), 3)
-sumgeq(row(m0, 2), 3)
-sumleq(row(m0, 3), 3)
-sumgeq(row(m0, 3), 3)
-sumleq(row(m0, 4), 3)
-sumgeq(row(m0, 4), 3)
-sumleq(row(m0, 5), 3)
-sumgeq(row(m0, 5), 3)
-sumleq(row(m0, 6), 3)
-sumgeq(row(m0, 6), 3)
-sumleq(col(m0, 0), 3)
-sumgeq(col(m0, 0), 3)
-sumleq(col(m0, 1), 3)
-sumgeq(col(m0, 1), 3)
-sumleq(col(m0, 2), 3)
-sumgeq(col(m0, 2), 3)
-sumleq(col(m0, 3), 3)
-sumgeq(col(m0, 3), 3)
-sumleq(col(m0, 4), 3)
-sumgeq(col(m0, 4), 3)
-sumleq(col(m0, 5), 3)
-sumgeq(col(m0, 5), 3)
-sumleq(col(m0, 6), 3)
-sumgeq(col(m0, 6), 3)
-
-product(x0, x7, x49)
-product(x1, x8, x50)
-product(x2, x9, x51)
-product(x3, x10, x52)
-product(x4, x11, x53)
-product(x5, x12, x54)
-product(x6, x13, x55)
-sumleq(v0, 1)
-
-sumgeq(v0, 1)
-
-product(x0, x14, x56)
-product(x1, x15, x57)
-product(x2, x16, x58)
-product(x3, x17, x59)
-product(x4, x18, x60)
-product(x5, x19, x61)
-product(x6, x20, x62)
-sumleq(v1, 1)
-
-sumgeq(v1, 1)
-
-product(x0, x21, x63)
-product(x1, x22, x64)
-product(x2, x23, x65)
-product(x3, x24, x66)
-product(x4, x25, x67)
-product(x5, x26, x68)
-product(x6, x27, x69)
-sumleq(v2, 1)
-
-sumgeq(v2, 1)
-
-product(x0, x28, x70)
-product(x1, x29, x71)
-product(x2, x30, x72)
-product(x3, x31, x73)
-product(x4, x32, x74)
-product(x5, x33, x75)
-product(x6, x34, x76)
-sumleq(v3, 1)
-
-sumgeq(v3, 1)
-
-product(x0, x35, x77)
-product(x1, x36, x78)
-product(x2, x37, x79)
-product(x3, x38, x80)
-product(x4, x39, x81)
-product(x5, x40, x82)
-product(x6, x41, x83)
-sumleq(v4, 1)
-
-sumgeq(v4, 1)
-
-product(x0, x42, x84)
-product(x1, x43, x85)
-product(x2, x44, x86)
-product(x3, x45, x87)
-product(x4, x46, x88)
-product(x5, x47, x89)
-product(x6, x48, x90)
-sumleq(v5, 1)
-
-sumgeq(v5, 1)
-
-product(x7, x14, x91)
-product(x8, x15, x92)
-product(x9, x16, x93)
-product(x10, x17, x94)
-product(x11, x18, x95)
-product(x12, x19, x96)
-product(x13, x20, x97)
-sumleq(v6, 1)
-
-sumgeq(v6, 1)
-
-product(x7, x21, x98)
-product(x8, x22, x99)
-product(x9, x23, x100)
-product(x10, x24, x101)
-product(x11, x25, x102)
-product(x12, x26, x103)
-product(x13, x27, x104)
-sumleq(v7, 1)
-
-sumgeq(v7, 1)
-
-product(x7, x28, x105)
-product(x8, x29, x106)
-product(x9, x30, x107)
-product(x10, x31, x108)
-product(x11, x32, x109)
-product(x12, x33, x110)
-product(x13, x34, x111)
-sumleq(v8, 1)
-
-sumgeq(v8, 1)
-
-product(x7, x35, x112)
-product(x8, x36, x113)
-product(x9, x37, x114)
-product(x10, x38, x115)
-product(x11, x39, x116)
-product(x12, x40, x117)
-product(x13, x41, x118)
-sumleq(v9, 1)
-
-sumgeq(v9, 1)
-
-product(x7, x42, x119)
-product(x8, x43, x120)
-product(x9, x44, x121)
-product(x10, x45, x122)
-product(x11, x46, x123)
-product(x12, x47, x124)
-product(x13, x48, x125)
-sumleq(v10, 1)
-
-sumgeq(v10, 1)
-
-product(x14, x21, x126)
-product(x15, x22, x127)
-product(x16, x23, x128)
-product(x17, x24, x129)
-product(x18, x25, x130)
-product(x19, x26, x131)
-product(x20, x27, x132)
-sumleq(v11, 1)
-
-sumgeq(v11, 1)
-
-product(x14, x28, x133)
-product(x15, x29, x134)
-product(x16, x30, x135)
-product(x17, x31, x136)
-product(x18, x32, x137)
-product(x19, x33, x138)
-product(x20, x34, x139)
-sumleq(v12, 1)
-
-sumgeq(v12, 1)
-
-product(x14, x35, x140)
-product(x15, x36, x141)
-product(x16, x37, x142)
-product(x17, x38, x143)
-product(x18, x39, x144)
-product(x19, x40, x145)
-product(x20, x41, x146)
-sumleq(v13, 1)
-
-sumgeq(v13, 1)
-
-product(x14, x42, x147)
-product(x15, x43, x148)
-product(x16, x44, x149)
-product(x17, x45, x150)
-product(x18, x46, x151)
-product(x19, x47, x152)
-product(x20, x48, x153)
-sumleq(v14, 1)
-
-sumgeq(v14, 1)
-
-product(x21, x28, x154)
-product(x22, x29, x155)
-product(x23, x30, x156)
-product(x24, x31, x157)
-product(x25, x32, x158)
-product(x26, x33, x159)
-product(x27, x34, x160)
-sumleq(v15, 1)
-
-sumgeq(v15, 1)
-
-product(x21, x35, x161)
-product(x22, x36, x162)
-product(x23, x37, x163)
-product(x24, x38, x164)
-product(x25, x39, x165)
-product(x26, x40, x166)
-product(x27, x41, x167)
-sumleq(v16, 1)
-
-sumgeq(v16, 1)
-
-product(x21, x42, x168)
-product(x22, x43, x169)
-product(x23, x44, x170)
-product(x24, x45, x171)
-product(x25, x46, x172)
-product(x26, x47, x173)
-product(x27, x48, x174)
-sumleq(v17, 1)
-
-sumgeq(v17, 1)
-
-product(x28, x35, x175)
-product(x29, x36, x176)
-product(x30, x37, x177)
-product(x31, x38, x178)
-product(x32, x39, x179)
-product(x33, x40, x180)
-product(x34, x41, x181)
-sumleq(v18, 1)
-
-sumgeq(v18, 1)
-
-product(x28, x42, x182)
-product(x29, x43, x183)
-product(x30, x44, x184)
-product(x31, x45, x185)
-product(x32, x46, x186)
-product(x33, x47, x187)
-product(x34, x48, x188)
-sumleq(v19, 1)
-
-sumgeq(v19, 1)
-
-product(x35, x42, x189)
-product(x36, x43, x190)
-product(x37, x44, x191)
-product(x38, x45, x192)
-product(x39, x46, x193)
-product(x40, x47, x194)
-product(x41, x48, x195)
-sumleq(v20, 1)
-
-sumgeq(v20, 1)
-
-lexleq(row(m0, 0), row(m0, 1))
-lexleq(row(m0, 1), row(m0, 2))
-lexleq(row(m0, 2), row(m0, 3))
-lexleq(row(m0, 3), row(m0, 4))
-lexleq(row(m0, 4), row(m0, 5))
-lexleq(row(m0, 5), row(m0, 6))
-
-lexleq(col(m0, 0), col(m0, 1))
-lexleq(col(m0, 1), col(m0, 2))
-lexleq(col(m0, 2), col(m0, 3))
-lexleq(col(m0, 3), col(m0, 4))
-lexleq(col(m0, 4), col(m0, 5))
-lexleq(col(m0, 5), col(m0, 6))
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_bibd_77331.minion
+# Command line: minion -redump test_bibd_77331.minion 
+MINION 3
+**VARIABLES**
+BOUND x0{-1..1}
+BOUND x1{-1..1}
+BOUND x2{-1..1}
+BOUND x3{-1..1}
+BOUND x4{-1..1}
+BOUND x5{-1..1}
+BOUND x6{-1..1}
+BOUND x7{-1..1}
+BOUND x8{-1..1}
+BOUND x9{-1..1}
+BOUND x10{-1..1}
+BOUND x11{-1..1}
+BOUND x12{-1..1}
+BOUND x13{-1..1}
+BOUND x14{-1..1}
+BOUND x15{-1..1}
+BOUND x16{-1..1}
+BOUND x17{-1..1}
+BOUND x18{-1..1}
+BOUND x19{-1..1}
+BOUND x20{-1..1}
+BOUND x21{-1..1}
+BOUND x22{-1..1}
+BOUND x23{-1..1}
+BOUND x24{-1..1}
+BOUND x25{-1..1}
+BOUND x26{-1..1}
+BOUND x27{-1..1}
+BOUND x28{-1..1}
+BOUND x29{-1..1}
+BOUND x30{-1..1}
+BOUND x31{-1..1}
+BOUND x32{-1..1}
+BOUND x33{-1..1}
+BOUND x34{-1..1}
+BOUND x35{-1..1}
+BOUND x36{-1..1}
+BOUND x37{-1..1}
+BOUND x38{-1..1}
+BOUND x39{-1..1}
+BOUND x40{-1..1}
+BOUND x41{-1..1}
+BOUND x42{-1..1}
+BOUND x43{-1..1}
+BOUND x44{-1..1}
+BOUND x45{-1..1}
+BOUND x46{-1..1}
+BOUND x47{-1..1}
+BOUND x48{-1..1}
+BOUND x49{-1..1}
+BOUND x50{-1..1}
+BOUND x51{-1..1}
+BOUND x52{-1..1}
+BOUND x53{-1..1}
+BOUND x54{-1..1}
+BOUND x55{-1..1}
+BOUND x56{-1..1}
+BOUND x57{-1..1}
+BOUND x58{-1..1}
+BOUND x59{-1..1}
+BOUND x60{-1..1}
+BOUND x61{-1..1}
+BOUND x62{-1..1}
+BOUND x63{-1..1}
+BOUND x64{-1..1}
+BOUND x65{-1..1}
+BOUND x66{-1..1}
+BOUND x67{-1..1}
+BOUND x68{-1..1}
+BOUND x69{-1..1}
+BOUND x70{-1..1}
+BOUND x71{-1..1}
+BOUND x72{-1..1}
+BOUND x73{-1..1}
+BOUND x74{-1..1}
+BOUND x75{-1..1}
+BOUND x76{-1..1}
+BOUND x77{-1..1}
+BOUND x78{-1..1}
+BOUND x79{-1..1}
+BOUND x80{-1..1}
+BOUND x81{-1..1}
+BOUND x82{-1..1}
+BOUND x83{-1..1}
+BOUND x84{-1..1}
+BOUND x85{-1..1}
+BOUND x86{-1..1}
+BOUND x87{-1..1}
+BOUND x88{-1..1}
+BOUND x89{-1..1}
+BOUND x90{-1..1}
+BOUND x91{-1..1}
+BOUND x92{-1..1}
+BOUND x93{-1..1}
+BOUND x94{-1..1}
+BOUND x95{-1..1}
+BOUND x96{-1..1}
+BOUND x97{-1..1}
+BOUND x98{-1..1}
+BOUND x99{-1..1}
+BOUND x100{-1..1}
+BOUND x101{-1..1}
+BOUND x102{-1..1}
+BOUND x103{-1..1}
+BOUND x104{-1..1}
+BOUND x105{-1..1}
+BOUND x106{-1..1}
+BOUND x107{-1..1}
+BOUND x108{-1..1}
+BOUND x109{-1..1}
+BOUND x110{-1..1}
+BOUND x111{-1..1}
+BOUND x112{-1..1}
+BOUND x113{-1..1}
+BOUND x114{-1..1}
+BOUND x115{-1..1}
+BOUND x116{-1..1}
+BOUND x117{-1..1}
+BOUND x118{-1..1}
+BOUND x119{-1..1}
+BOUND x120{-1..1}
+BOUND x121{-1..1}
+BOUND x122{-1..1}
+BOUND x123{-1..1}
+BOUND x124{-1..1}
+BOUND x125{-1..1}
+BOUND x126{-1..1}
+BOUND x127{-1..1}
+BOUND x128{-1..1}
+BOUND x129{-1..1}
+BOUND x130{-1..1}
+BOUND x131{-1..1}
+BOUND x132{-1..1}
+BOUND x133{-1..1}
+BOUND x134{-1..1}
+BOUND x135{-1..1}
+BOUND x136{-1..1}
+BOUND x137{-1..1}
+BOUND x138{-1..1}
+BOUND x139{-1..1}
+BOUND x140{-1..1}
+BOUND x141{-1..1}
+BOUND x142{-1..1}
+BOUND x143{-1..1}
+BOUND x144{-1..1}
+BOUND x145{-1..1}
+BOUND x146{-1..1}
+BOUND x147{-1..1}
+BOUND x148{-1..1}
+BOUND x149{-1..1}
+BOUND x150{-1..1}
+BOUND x151{-1..1}
+BOUND x152{-1..1}
+BOUND x153{-1..1}
+BOUND x154{-1..1}
+BOUND x155{-1..1}
+BOUND x156{-1..1}
+BOUND x157{-1..1}
+BOUND x158{-1..1}
+BOUND x159{-1..1}
+BOUND x160{-1..1}
+BOUND x161{-1..1}
+BOUND x162{-1..1}
+BOUND x163{-1..1}
+BOUND x164{-1..1}
+BOUND x165{-1..1}
+BOUND x166{-1..1}
+BOUND x167{-1..1}
+BOUND x168{-1..1}
+BOUND x169{-1..1}
+BOUND x170{-1..1}
+BOUND x171{-1..1}
+BOUND x172{-1..1}
+BOUND x173{-1..1}
+BOUND x174{-1..1}
+BOUND x175{-1..1}
+BOUND x176{-1..1}
+BOUND x177{-1..1}
+BOUND x178{-1..1}
+BOUND x179{-1..1}
+BOUND x180{-1..1}
+BOUND x181{-1..1}
+BOUND x182{-1..1}
+BOUND x183{-1..1}
+BOUND x184{-1..1}
+BOUND x185{-1..1}
+BOUND x186{-1..1}
+BOUND x187{-1..1}
+BOUND x188{-1..1}
+BOUND x189{-1..1}
+BOUND x190{-1..1}
+BOUND x191{-1..1}
+BOUND x192{-1..1}
+BOUND x193{-1..1}
+BOUND x194{-1..1}
+BOUND x195{-1..1}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+VARORDER [x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127,x128,x129,x130,x131,x132,x133,x134,x135,x136,x137,x138,x139,x140,x141,x142,x143,x144,x145,x146,x147,x148,x149,x150,x151,x152,x153,x154,x155,x156,x157,x158,x159,x160,x161,x162,x163,x164,x165,x166,x167,x168,x169,x170,x171,x172,x173,x174,x175,x176,x177,x178,x179,x180,x181,x182,x183,x184,x185,x186,x187,x188,x189,x190,x191,x192,x193,x194,x195]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127,x128,x129,x130,x131,x132,x133,x134,x135,x136,x137,x138,x139,x140,x141,x142,x143,x144,x145,x146,x147,x148,x149,x150,x151,x152,x153,x154,x155,x156,x157,x158,x159,x160,x161,x162,x163,x164,x165,x166,x167,x168,x169,x170,x171,x172,x173,x174,x175,x176,x177,x178,x179,x180,x181,x182,x183,x184,x185,x186,x187,x188,x189,x190,x191,x192,x193,x194,x195]
+PRINT[[x0,x1,x2,x3,x4,x5,x6],[x7,x8,x9,x10,x11,x12,x13],[x14,x15,x16,x17,x18,x19,x20],[x21,x22,x23,x24,x25,x26,x27],[x28,x29,x30,x31,x32,x33,x34],[x35,x36,x37,x38,x39,x40,x41],[x42,x43,x44,x45,x46,x47,x48]]
+**TUPLELIST**
+**CONSTRAINTS**
+eq(x0, 0)
+eq(x1, 0)
+eq(x2, 0)
+eq(x3, 0)
+eq(x7, 0)
+eq(x14, 0)
+eq(x21, 0)
+sumleq([x0,x1,x2,x3,x4,x5,x6], 3)
+sumgeq([x0,x1,x2,x3,x4,x5,x6], 3)
+sumleq([x7,x8,x9,x10,x11,x12,x13], 3)
+sumgeq([x7,x8,x9,x10,x11,x12,x13], 3)
+sumleq([x14,x15,x16,x17,x18,x19,x20], 3)
+sumgeq([x14,x15,x16,x17,x18,x19,x20], 3)
+sumleq([x21,x22,x23,x24,x25,x26,x27], 3)
+sumgeq([x21,x22,x23,x24,x25,x26,x27], 3)
+sumleq([x28,x29,x30,x31,x32,x33,x34], 3)
+sumgeq([x28,x29,x30,x31,x32,x33,x34], 3)
+sumleq([x35,x36,x37,x38,x39,x40,x41], 3)
+sumgeq([x35,x36,x37,x38,x39,x40,x41], 3)
+sumleq([x42,x43,x44,x45,x46,x47,x48], 3)
+sumgeq([x42,x43,x44,x45,x46,x47,x48], 3)
+sumleq([x0,x7,x14,x21,x28,x35,x42], 3)
+sumgeq([x0,x7,x14,x21,x28,x35,x42], 3)
+sumleq([x1,x8,x15,x22,x29,x36,x43], 3)
+sumgeq([x1,x8,x15,x22,x29,x36,x43], 3)
+sumleq([x2,x9,x16,x23,x30,x37,x44], 3)
+sumgeq([x2,x9,x16,x23,x30,x37,x44], 3)
+sumleq([x3,x10,x17,x24,x31,x38,x45], 3)
+sumgeq([x3,x10,x17,x24,x31,x38,x45], 3)
+sumleq([x4,x11,x18,x25,x32,x39,x46], 3)
+sumgeq([x4,x11,x18,x25,x32,x39,x46], 3)
+sumleq([x5,x12,x19,x26,x33,x40,x47], 3)
+sumgeq([x5,x12,x19,x26,x33,x40,x47], 3)
+sumleq([x6,x13,x20,x27,x34,x41,x48], 3)
+sumgeq([x6,x13,x20,x27,x34,x41,x48], 3)
+product(x0,x7, x49)
+product(x1,x8, x50)
+product(x2,x9, x51)
+product(x3,x10, x52)
+product(x4,x11, x53)
+product(x5,x12, x54)
+product(x6,x13, x55)
+sumleq([x49,x50,x51,x52,x53,x54,x55], 1)
+sumgeq([x49,x50,x51,x52,x53,x54,x55], 1)
+product(x0,x14, x56)
+product(x1,x15, x57)
+product(x2,x16, x58)
+product(x3,x17, x59)
+product(x4,x18, x60)
+product(x5,x19, x61)
+product(x6,x20, x62)
+sumleq([x56,x57,x58,x59,x60,x61,x62], 1)
+sumgeq([x56,x57,x58,x59,x60,x61,x62], 1)
+product(x0,x21, x63)
+product(x1,x22, x64)
+product(x2,x23, x65)
+product(x3,x24, x66)
+product(x4,x25, x67)
+product(x5,x26, x68)
+product(x6,x27, x69)
+sumleq([x63,x64,x65,x66,x67,x68,x69], 1)
+sumgeq([x63,x64,x65,x66,x67,x68,x69], 1)
+product(x0,x28, x70)
+product(x1,x29, x71)
+product(x2,x30, x72)
+product(x3,x31, x73)
+product(x4,x32, x74)
+product(x5,x33, x75)
+product(x6,x34, x76)
+sumleq([x70,x71,x72,x73,x74,x75,x76], 1)
+sumgeq([x70,x71,x72,x73,x74,x75,x76], 1)
+product(x0,x35, x77)
+product(x1,x36, x78)
+product(x2,x37, x79)
+product(x3,x38, x80)
+product(x4,x39, x81)
+product(x5,x40, x82)
+product(x6,x41, x83)
+sumleq([x77,x78,x79,x80,x81,x82,x83], 1)
+sumgeq([x77,x78,x79,x80,x81,x82,x83], 1)
+product(x0,x42, x84)
+product(x1,x43, x85)
+product(x2,x44, x86)
+product(x3,x45, x87)
+product(x4,x46, x88)
+product(x5,x47, x89)
+product(x6,x48, x90)
+sumleq([x84,x85,x86,x87,x88,x89,x90], 1)
+sumgeq([x84,x85,x86,x87,x88,x89,x90], 1)
+product(x7,x14, x91)
+product(x8,x15, x92)
+product(x9,x16, x93)
+product(x10,x17, x94)
+product(x11,x18, x95)
+product(x12,x19, x96)
+product(x13,x20, x97)
+sumleq([x91,x92,x93,x94,x95,x96,x97], 1)
+sumgeq([x91,x92,x93,x94,x95,x96,x97], 1)
+product(x7,x21, x98)
+product(x8,x22, x99)
+product(x9,x23, x100)
+product(x10,x24, x101)
+product(x11,x25, x102)
+product(x12,x26, x103)
+product(x13,x27, x104)
+sumleq([x98,x99,x100,x101,x102,x103,x104], 1)
+sumgeq([x98,x99,x100,x101,x102,x103,x104], 1)
+product(x7,x28, x105)
+product(x8,x29, x106)
+product(x9,x30, x107)
+product(x10,x31, x108)
+product(x11,x32, x109)
+product(x12,x33, x110)
+product(x13,x34, x111)
+sumleq([x105,x106,x107,x108,x109,x110,x111], 1)
+sumgeq([x105,x106,x107,x108,x109,x110,x111], 1)
+product(x7,x35, x112)
+product(x8,x36, x113)
+product(x9,x37, x114)
+product(x10,x38, x115)
+product(x11,x39, x116)
+product(x12,x40, x117)
+product(x13,x41, x118)
+sumleq([x112,x113,x114,x115,x116,x117,x118], 1)
+sumgeq([x112,x113,x114,x115,x116,x117,x118], 1)
+product(x7,x42, x119)
+product(x8,x43, x120)
+product(x9,x44, x121)
+product(x10,x45, x122)
+product(x11,x46, x123)
+product(x12,x47, x124)
+product(x13,x48, x125)
+sumleq([x119,x120,x121,x122,x123,x124,x125], 1)
+sumgeq([x119,x120,x121,x122,x123,x124,x125], 1)
+product(x14,x21, x126)
+product(x15,x22, x127)
+product(x16,x23, x128)
+product(x17,x24, x129)
+product(x18,x25, x130)
+product(x19,x26, x131)
+product(x20,x27, x132)
+sumleq([x126,x127,x128,x129,x130,x131,x132], 1)
+sumgeq([x126,x127,x128,x129,x130,x131,x132], 1)
+product(x14,x28, x133)
+product(x15,x29, x134)
+product(x16,x30, x135)
+product(x17,x31, x136)
+product(x18,x32, x137)
+product(x19,x33, x138)
+product(x20,x34, x139)
+sumleq([x133,x134,x135,x136,x137,x138,x139], 1)
+sumgeq([x133,x134,x135,x136,x137,x138,x139], 1)
+product(x14,x35, x140)
+product(x15,x36, x141)
+product(x16,x37, x142)
+product(x17,x38, x143)
+product(x18,x39, x144)
+product(x19,x40, x145)
+product(x20,x41, x146)
+sumleq([x140,x141,x142,x143,x144,x145,x146], 1)
+sumgeq([x140,x141,x142,x143,x144,x145,x146], 1)
+product(x14,x42, x147)
+product(x15,x43, x148)
+product(x16,x44, x149)
+product(x17,x45, x150)
+product(x18,x46, x151)
+product(x19,x47, x152)
+product(x20,x48, x153)
+sumleq([x147,x148,x149,x150,x151,x152,x153], 1)
+sumgeq([x147,x148,x149,x150,x151,x152,x153], 1)
+product(x21,x28, x154)
+product(x22,x29, x155)
+product(x23,x30, x156)
+product(x24,x31, x157)
+product(x25,x32, x158)
+product(x26,x33, x159)
+product(x27,x34, x160)
+sumleq([x154,x155,x156,x157,x158,x159,x160], 1)
+sumgeq([x154,x155,x156,x157,x158,x159,x160], 1)
+product(x21,x35, x161)
+product(x22,x36, x162)
+product(x23,x37, x163)
+product(x24,x38, x164)
+product(x25,x39, x165)
+product(x26,x40, x166)
+product(x27,x41, x167)
+sumleq([x161,x162,x163,x164,x165,x166,x167], 1)
+sumgeq([x161,x162,x163,x164,x165,x166,x167], 1)
+product(x21,x42, x168)
+product(x22,x43, x169)
+product(x23,x44, x170)
+product(x24,x45, x171)
+product(x25,x46, x172)
+product(x26,x47, x173)
+product(x27,x48, x174)
+sumleq([x168,x169,x170,x171,x172,x173,x174], 1)
+sumgeq([x168,x169,x170,x171,x172,x173,x174], 1)
+product(x28,x35, x175)
+product(x29,x36, x176)
+product(x30,x37, x177)
+product(x31,x38, x178)
+product(x32,x39, x179)
+product(x33,x40, x180)
+product(x34,x41, x181)
+sumleq([x175,x176,x177,x178,x179,x180,x181], 1)
+sumgeq([x175,x176,x177,x178,x179,x180,x181], 1)
+product(x28,x42, x182)
+product(x29,x43, x183)
+product(x30,x44, x184)
+product(x31,x45, x185)
+product(x32,x46, x186)
+product(x33,x47, x187)
+product(x34,x48, x188)
+sumleq([x182,x183,x184,x185,x186,x187,x188], 1)
+sumgeq([x182,x183,x184,x185,x186,x187,x188], 1)
+product(x35,x42, x189)
+product(x36,x43, x190)
+product(x37,x44, x191)
+product(x38,x45, x192)
+product(x39,x46, x193)
+product(x40,x47, x194)
+product(x41,x48, x195)
+sumleq([x189,x190,x191,x192,x193,x194,x195], 1)
+sumgeq([x189,x190,x191,x192,x193,x194,x195], 1)
+lexleq([x0,x1,x2,x3,x4,x5,x6], [x7,x8,x9,x10,x11,x12,x13])
+lexleq([x7,x8,x9,x10,x11,x12,x13], [x14,x15,x16,x17,x18,x19,x20])
+lexleq([x14,x15,x16,x17,x18,x19,x20], [x21,x22,x23,x24,x25,x26,x27])
+lexleq([x21,x22,x23,x24,x25,x26,x27], [x28,x29,x30,x31,x32,x33,x34])
+lexleq([x28,x29,x30,x31,x32,x33,x34], [x35,x36,x37,x38,x39,x40,x41])
+lexleq([x35,x36,x37,x38,x39,x40,x41], [x42,x43,x44,x45,x46,x47,x48])
+lexleq([x0,x7,x14,x21,x28,x35,x42], [x1,x8,x15,x22,x29,x36,x43])
+lexleq([x1,x8,x15,x22,x29,x36,x43], [x2,x9,x16,x23,x30,x37,x44])
+lexleq([x2,x9,x16,x23,x30,x37,x44], [x3,x10,x17,x24,x31,x38,x45])
+lexleq([x3,x10,x17,x24,x31,x38,x45], [x4,x11,x18,x25,x32,x39,x46])
+lexleq([x4,x11,x18,x25,x32,x39,x46], [x5,x12,x19,x26,x33,x40,x47])
+lexleq([x5,x12,x19,x26,x33,x40,x47], [x6,x13,x20,x27,x34,x41,x48])
+**EOF**

@@ -1,2 +1,0 @@
-letting L = 1
-letting Mac = 2

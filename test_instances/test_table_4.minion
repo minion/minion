@@ -1,4 +1,3 @@
-MINION 1
 #TEST CHECKONESOL 0 1 8 9 2 3
 #
 # Derived from ... 
@@ -12,130 +11,138 @@ MINION 1
 #    http://sourceforge.net/projects/minion
 # Instance created using CLisp generator written by Ian Gent
 # Instance created at 14:06 on 12 Apr 2006
-0
-0
-0
-15
-0 900 15
-0
-[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14]
-[a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
-0
-1
-[[x0,x1,x2,x3,x4,x5]
-]
-0
-objective none
-print m0
-alldiff([x5,x4,x3,x2,x1,x0]
-)
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:28 2015
 
-table([x0,x3,x6]
-,{<0,1,1>
-,<0,2,2>
-,<0,3,3>
-,<0,4,4>
-,<0,5,5>
-,<0,6,6>
-,<0,7,7>
-,<0,8,8>
-,<0,9,9>
-,<1,0,1>
-,<1,2,1>
-,<1,3,2>
-,<1,4,3>
-,<1,5,4>
-,<1,6,5>
-,<1,7,6>
-,<1,8,7>
-,<1,9,8>
-,<2,0,2>
-,<2,1,1>
-,<2,3,1>
-,<2,4,2>
-,<2,5,3>
-,<2,6,4>
-,<2,7,5>
-,<2,8,6>
-,<2,9,7>
-,<3,0,3>
-,<3,1,2>
-,<3,2,1>
-,<3,4,1>
-,<3,5,2>
-,<3,6,3>
-,<3,7,4>
-,<3,8,5>
-,<3,9,6>
-,<4,0,4>
-,<4,1,3>
-,<4,2,2>
-,<4,3,1>
-,<4,5,1>
-,<4,6,2>
-,<4,7,3>
-,<4,8,4>
-,<4,9,5>
-,<5,0,5>
-,<5,1,4>
-,<5,2,3>
-,<5,3,2>
-,<5,4,1>
-,<5,6,1>
-,<5,7,2>
-,<5,8,3>
-,<5,9,4>
-,<6,0,6>
-,<6,1,5>
-,<6,2,4>
-,<6,3,3>
-,<6,4,2>
-,<6,5,1>
-,<6,7,1>
-,<6,8,2>
-,<6,9,3>
-,<7,0,7>
-,<7,1,6>
-,<7,2,5>
-,<7,3,4>
-,<7,4,3>
-,<7,5,2>
-,<7,6,1>
-,<7,8,1>
-,<7,9,2>
-,<8,0,8>
-,<8,1,7>
-,<8,2,6>
-,<8,3,5>
-,<8,4,4>
-,<8,5,3>
-,<8,6,2>
-,<8,7,1>
-,<8,9,1>
-,<9,0,9>
-,<9,1,8>
-,<9,2,7>
-,<9,3,6>
-,<9,4,5>
-,<9,5,4>
-,<9,6,3>
-,<9,7,2>
-,<9,8,1>
-}
-)
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_table_4.minion
+# Command line: minion -redump test_table_4.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..900}
+DISCRETE x1{0..900}
+DISCRETE x2{0..900}
+DISCRETE x3{0..900}
+DISCRETE x4{0..900}
+DISCRETE x5{0..900}
+DISCRETE x6{0..900}
+DISCRETE x7{0..900}
+DISCRETE x8{0..900}
+DISCRETE x9{0..900}
+DISCRETE x10{0..900}
+DISCRETE x11{0..900}
+DISCRETE x12{0..900}
+DISCRETE x13{0..900}
+DISCRETE x14{0..900}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14]
+PRINT[[x0,x1,x2,x3,x4,x5]]
+**TUPLELIST**
+_Unnamed__0_ 90 3
+0 1 1 
+0 2 2 
+0 3 3 
+0 4 4 
+0 5 5 
+0 6 6 
+0 7 7 
+0 8 8 
+0 9 9 
+1 0 1 
+1 2 1 
+1 3 2 
+1 4 3 
+1 5 4 
+1 6 5 
+1 7 6 
+1 8 7 
+1 9 8 
+2 0 2 
+2 1 1 
+2 3 1 
+2 4 2 
+2 5 3 
+2 6 4 
+2 7 5 
+2 8 6 
+2 9 7 
+3 0 3 
+3 1 2 
+3 2 1 
+3 4 1 
+3 5 2 
+3 6 3 
+3 7 4 
+3 8 5 
+3 9 6 
+4 0 4 
+4 1 3 
+4 2 2 
+4 3 1 
+4 5 1 
+4 6 2 
+4 7 3 
+4 8 4 
+4 9 5 
+5 0 5 
+5 1 4 
+5 2 3 
+5 3 2 
+5 4 1 
+5 6 1 
+5 7 2 
+5 8 3 
+5 9 4 
+6 0 6 
+6 1 5 
+6 2 4 
+6 3 3 
+6 4 2 
+6 5 1 
+6 7 1 
+6 8 2 
+6 9 3 
+7 0 7 
+7 1 6 
+7 2 5 
+7 3 4 
+7 4 3 
+7 5 2 
+7 6 1 
+7 8 1 
+7 9 2 
+8 0 8 
+8 1 7 
+8 2 6 
+8 3 5 
+8 4 4 
+8 5 3 
+8 6 2 
+8 7 1 
+8 9 1 
+9 0 9 
+9 1 8 
+9 2 7 
+9 3 6 
+9 4 5 
+9 5 4 
+9 6 3 
+9 7 2 
+9 8 1 
 
-alldiff([x14,x13,x12,x11,x10,x9,x8,x7,x6]
-)
-
-eq(x0,0)
-
-occurrence([x1,x2,x3]
-,9,1)
-
-occurrence([x1,x2,x3]
-,8,1)
-
-ineq(x0,x1,-1)
-
-ineq(x1,x2,-1)
-
+**CONSTRAINTS**
+alldiff([x5,x4,x3,x2,x1,x0])
+table([x0,x3,x6], _Unnamed__0_)
+alldiff([x14,x13,x12,x11,x10,x9,x8,x7,x6])
+eq(x0, 0)
+occurrence([x1,x2,x3], 9, 1)
+occurrence([x1,x2,x3], 8, 1)
+ineq(x0, x1, -1)
+ineq(x1, x2, -1)
+**EOF**

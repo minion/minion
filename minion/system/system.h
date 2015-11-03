@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 // This file deals with general C++ things which aren't specific to Minion.
@@ -26,16 +27,14 @@
 #define DOM_ASSERT
 #endif
 
-
-#include "../minlib/minlib.hpp"
+#include "minlib/minlib.hpp"
 
 #include "box-helper.h"
 
 #include "basic_headers.h"
 
-
 #include "wrapper.h"
-#include "../minlib/tostring.hpp"
+#include "minlib/tostring.hpp"
 #include "tableout.h"
 #include "time_keeping.h"
 
@@ -46,7 +45,7 @@
 
 #include "test_functions.h"
 
-#include "../minlib/optional.hpp"
+#include "minlib/optional.hpp"
 
 #include <sys/types.h>
 #ifndef _WIN32
@@ -56,17 +55,24 @@
 // from sha1.cpp
 std::string sha1_hash(const std::string& s);
 
-inline void* checked_malloc(size_t size)
-{
-    if(size == 0)
-        return 0;
-    void* ptr = calloc(size, 1);
-    if(ptr == 0)
-    {
-        std::cerr << "Fatal: Out of memory";
-        abort();
-    }
-    return ptr;
+inline void* checked_malloc(size_t size) {
+  if(size == 0)
+    return 0;
+  void* ptr = calloc(size, 1);
+  if(ptr == 0) {
+    std::cerr << "Fatal: Out of memory";
+    abort();
+  }
+  return ptr;
+}
+
+inline void* checked_realloc(void* ptr, size_t size) {
+  void* new_ptr = realloc(ptr, size);
+  if(new_ptr == 0) {
+    std::cerr << "Fatal: Out of memory";
+    abort();
+  }
+  return new_ptr;
 }
 
 #endif

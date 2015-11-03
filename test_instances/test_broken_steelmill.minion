@@ -1,21 +1,24 @@
-MINION 1
 #TEST SOLCOUNT 1
 #SteelMill Instance - d2Sub3.txt
-1
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:25 2015
 
-0
-
-0
-
-0
-
-0
-
-[]
-[]
-0
-0
-0
-
-objective minimising x0
-print none
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_broken_steelmill.minion
+# Command line: minion -redump test_broken_steelmill.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+**SEARCH**
+MINIMISING x0
+VARORDER [x0]
+VALORDER [a]
+SYMORDER [x0]
+PRINT NONE
+**TUPLELIST**
+**CONSTRAINTS**
+**EOF**

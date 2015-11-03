@@ -1,4 +1,3 @@
-MINION 1
 #TEST CHECKONESOL 0 2 1 2 1 0 1 0 2 
 # Minion Quasigroup Instance
 # Kind: QG3 Size: 3
@@ -15,138 +14,82 @@ MINION 1
 #    http://sourceforge.net/projects/minion
 # Instance created using CLisp generator written by Ian Gent
 # Instance created at 11:13 on 20 Apr 2006
-0
-0
-0
-18
-0 8 9
-0 2 9
-0
-[x17,x14,x11,x9,x10,x12,x13,x15,x16]
-[a,a,a,a,a,a,a,a,a]
-1
-[x9,x10,x11,x12,x13,x14,x15,x16,x17]
-2
-[[x9,x10,x11]
-,[x12,x13,x14]
-,[x15,x16,x17]
-]
-[[x9,x10,x11,x12,x13,x14,x15,x16,x17]]
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:29 2015
 
-0
-objective none
-print m1
-alldiff(col(m0,0))
-
-alldiff(row(m0,0))
-
-alldiff(col(m0,1))
-
-alldiff(row(m0,1))
-
-alldiff(col(m0,2))
-
-alldiff(row(m0,2))
-
-eq(x9,0)
-
-eq(x13,1)
-
-eq(x17,2)
-
-weightedsumleq([3,1]
-,[x9,x9]
-,x0)
-
-weightedsumgeq([3,1]
-,[x9,x9]
-,x0)
-
-watchelement(v0,x0,x9)
-
-weightedsumleq([3,1]
-,[x10,x12]
-,x1)
-
-weightedsumgeq([3,1]
-,[x10,x12]
-,x1)
-
-watchelement(v0,x1,x10)
-
-weightedsumleq([3,1]
-,[x11,x15]
-,x2)
-
-weightedsumgeq([3,1]
-,[x11,x15]
-,x2)
-
-watchelement(v0,x2,x11)
-
-weightedsumleq([3,1]
-,[x12,x10]
-,x3)
-
-weightedsumgeq([3,1]
-,[x12,x10]
-,x3)
-
-watchelement(v0,x3,x12)
-
-weightedsumleq([3,1]
-,[x13,x13]
-,x4)
-
-weightedsumgeq([3,1]
-,[x13,x13]
-,x4)
-
-watchelement(v0,x4,x13)
-
-weightedsumleq([3,1]
-,[x14,x16]
-,x5)
-
-weightedsumgeq([3,1]
-,[x14,x16]
-,x5)
-
-watchelement(v0,x5,x14)
-
-weightedsumleq([3,1]
-,[x15,x11]
-,x6)
-
-weightedsumgeq([3,1]
-,[x15,x11]
-,x6)
-
-watchelement(v0,x6,x15)
-
-weightedsumleq([3,1]
-,[x16,x14]
-,x7)
-
-weightedsumgeq([3,1]
-,[x16,x14]
-,x7)
-
-watchelement(v0,x7,x16)
-
-weightedsumleq([3,1]
-,[x17,x17]
-,x8)
-
-weightedsumgeq([3,1]
-,[x17,x17]
-,x8)
-
-watchelement(v0,x8,x17)
-
-ineq(0,x11,2)
-
-ineq(1,x14,2)
-
-ineq(2,x17,2)
-
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_watchelement_6_qg33.minion
+# Command line: minion -redump test_watchelement_6_qg33.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..8}
+DISCRETE x1{0..8}
+DISCRETE x2{0..8}
+DISCRETE x3{0..8}
+DISCRETE x4{0..8}
+DISCRETE x5{0..8}
+DISCRETE x6{0..8}
+DISCRETE x7{0..8}
+DISCRETE x8{0..8}
+DISCRETE x9{0..2}
+DISCRETE x10{0..2}
+DISCRETE x11{0..2}
+DISCRETE x12{0..2}
+DISCRETE x13{0..2}
+DISCRETE x14{0..2}
+DISCRETE x15{0..2}
+DISCRETE x16{0..2}
+DISCRETE x17{0..2}
+**SEARCH**
+VARORDER [x17,x14,x11,x9,x10,x12,x13,x15,x16]
+VALORDER [a,a,a,a,a,a,a,a,a]
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8]
+VALORDER [a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17]
+PRINT[[x9,x10,x11,x12,x13,x14,x15,x16,x17]]
+**TUPLELIST**
+**CONSTRAINTS**
+alldiff([x9,x12,x15])
+alldiff([x9,x10,x11])
+alldiff([x10,x13,x16])
+alldiff([x12,x13,x14])
+alldiff([x11,x14,x17])
+alldiff([x15,x16,x17])
+eq(x9, 0)
+eq(x13, 1)
+eq(x17, 2)
+weightedsumleq([3,1], [x9,x9], x0)
+weightedsumgeq([3,1], [x9,x9], x0)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x0, x9)
+weightedsumleq([3,1], [x10,x12], x1)
+weightedsumgeq([3,1], [x10,x12], x1)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x1, x10)
+weightedsumleq([3,1], [x11,x15], x2)
+weightedsumgeq([3,1], [x11,x15], x2)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x2, x11)
+weightedsumleq([3,1], [x12,x10], x3)
+weightedsumgeq([3,1], [x12,x10], x3)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x3, x12)
+weightedsumleq([3,1], [x13,x13], x4)
+weightedsumgeq([3,1], [x13,x13], x4)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x4, x13)
+weightedsumleq([3,1], [x14,x16], x5)
+weightedsumgeq([3,1], [x14,x16], x5)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x5, x14)
+weightedsumleq([3,1], [x15,x11], x6)
+weightedsumgeq([3,1], [x15,x11], x6)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x6, x15)
+weightedsumleq([3,1], [x16,x14], x7)
+weightedsumgeq([3,1], [x16,x14], x7)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x7, x16)
+weightedsumleq([3,1], [x17,x17], x8)
+weightedsumgeq([3,1], [x17,x17], x8)
+watchelement([x9,x10,x11,x12,x13,x14,x15,x16,x17], x8, x17)
+ineq(0, x11, 2)
+ineq(1, x14, 2)
+ineq(2, x17, 2)
+**EOF**

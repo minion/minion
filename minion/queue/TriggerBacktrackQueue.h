@@ -14,7 +14,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #ifndef TRIG_BACKTRACK_QUEUE_H
@@ -23,7 +24,7 @@
 // This container stores a list of triggers and queues. On backtrack
 // It puts the triggers back onto the queue they were on previously.
 
-#include "../constraints/constraint_abstract.h"
+#include "../triggering/constraint_abstract.h"
 
 #ifdef P
 #undef P
@@ -32,59 +33,44 @@
 #define P(x)
 //#define P(x) cout << x << endl
 
-struct TriggerBacktrackQueue
-{
-    StateObj* stateObj;
+struct TriggerBacktrackQueue {
 
-    TriggerBacktrackQueue(StateObj* _stateObj) :
-        stateObj(_stateObj)
-    {
+  typedef vector<pair<DynamicTriggerList*, Trig_ConRef>> TriggerList;
+
+  vector<TriggerList> queue;
+
+  TriggerBacktrackQueue() {
+    queue.resize(1);
+  }
+
+  void restoreTriggerOnBacktrack(Trig_ConRef t) {
+    Con_TrigRef conref = t.con->_getTrigRef(t.conListPos);
+    P("TBQ: Restore on backtrack:" << conref.dtl << ":" << t);
+    queue.back().push_back(make_pair(conref.dtl, t));
+  }
+
+  void world_push() {
+    P("TBQ: World_push");
+    queue.push_back(TriggerList());
+  }
+
+  void world_pop() {
+    P("TBQ: World_pop");
+    TriggerList& tl = queue.back();
+    for(SysInt i = (SysInt)tl.size() - 1; i >= 0; --i) {
+      if(tl[i].first == NULL) {
+        P("TBQ: Release " << tl[i].second);
+        releaseMergedTrigger(tl[i].second);
+      } else {
+        P("TBQ: Add " << tl[i].second << " to " << tl[i].first);
+        tl[i].first->add(tl[i].second);
+      }
     }
-
-    typedef vector<pair<DynamicTrigger*, DynamicTrigger*> > TriggerList;
-
-    vector<TriggerList> queue;
-
-    TriggerBacktrackQueue()
-    {
-        queue.resize(1);
-    }
-
-    void addTrigger(DynamicTrigger* trig)
-    {
-        PROP_INFO_ADDONE(Counter3);
-        queue.back().push_back(make_pair(trig, trig->getQueue()));
-    }
-
-    void world_push()
-    {
-        P("TBQ:World_push");
-        queue.push_back(TriggerList());
-    }
-
-    void world_pop()
-    {
-        P("TBQ: World_pop");
-        TriggerList& tl = queue.back();
-        for (SysInt i = (SysInt)tl.size() - 1; i >= 0; --i)
-        {
-            if (tl[i].second == NULL)
-            {
-                P("Release " << tl[i].first);
-                releaseTrigger(stateObj, tl[i].first BT_CALL_STORE);
-            }
-            else
-            {
-                P("Add " << tl[i].first << " to " << tl[i].second);
-                tl[i].first->add_after(tl[i].second);
-                tl[i].first->setQueue(tl[i].second);
-            }
-        }
-        queue.pop_back();
-        // The first layer of the queue consists of things added in full_propagate()
-        // So should never get popped.
-        D_ASSERT(!queue.empty());
-    }
+    queue.pop_back();
+    // The first layer of the queue consists of things added in full_propagate()
+    // So should never get popped.
+    D_ASSERT(!queue.empty());
+  }
 };
 
 #endif

@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef _MEMORYBLOCK_H
@@ -59,8 +60,33 @@
  * or alter particular allocations without deleting the whole class. This may
  * be fixed in future if it is required.
  */
-class NewMemoryBlock
-{
+
+// Small wrapper to represent an extendable block
+class ExtendableBlock {
+  // Pointer to block
+  char* ptr;
+  // Position in NewMemoryBlock of this block
+  SysInt pos;
+public:
+  ExtendableBlock() : ptr(NULL), pos(-1)
+  { }
+
+  ExtendableBlock(char* _ptr, SysInt _pos) : ptr(_ptr), pos(_pos)
+  { }
+
+  ExtendableBlock(const ExtendableBlock&) = default;
+
+  char* operator()() const
+  { return ptr; }
+
+  SysInt getPos() const
+  { return pos; }
+
+  bool empty() const
+  { return ptr == nullptr; }
+};
+
+class NewMemoryBlock {
   /// Forbid copying.
   NewMemoryBlock(const NewMemoryBlock&);
   /// Forbid copying.
@@ -71,78 +97,95 @@ class NewMemoryBlock
   size_t allocated_bytes;
   size_t maximum_bytes;
 
-  vector<pair<char*, size_t> > stored_blocks;
+  vector<pair<char*, size_t>> stored_blocks;
   size_t total_stored_bytes;
 
+  vector<tuple<char*, size_t, size_t>> extendable_blocks;
+  size_t allocated_extendable_bytes;
+  vector<vector<tuple<SysInt, size_t, size_t>>> block_resizes;
+
+
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE (size_t)(64*1024*1024)
+#define BLOCK_SIZE (size_t)(64 * 1024 * 1024)
 #endif
 
-  SET_TYPE<void**> pointers;
-public:
 
-  void storeMem(char* store_ptr)
-  {
+public:
+  void storeMem(char* store_ptr) {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
-    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i)
-    {
-      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " " << stored_blocks[i].second);
+    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
+      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " "
+                                            << stored_blocks[i].second);
       memcpy(store_ptr + current_offset, stored_blocks[i].first, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;
     }
 
     P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);
     memcpy(store_ptr + current_offset, current_data, allocated_bytes);
-    D_ASSERT(getDataSize() == current_offset + allocated_bytes);
+
+    current_offset += allocated_bytes;
+
+    for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
+      memcpy(store_ptr + current_offset, get<0>(extendable_blocks[i]), get<1>(extendable_blocks[i]));
+      current_offset += get<1>(extendable_blocks[i]);
+    }
+
+    D_ASSERT(getDataSize() == current_offset);
   }
 
 private:
-  void copyMemBlock(char* location, pair<char*,size_t> data, size_t copy_start, size_t copy_length)
-  {
-      D_ASSERT(data.second >= copy_start + copy_length);
-      //memcpy(location, data.first + copy_start, copy_length);
+  void copyMemBlock(char* location, pair<char*, size_t> data, size_t copy_start,
+                    size_t copy_length) {
+    D_ASSERT(data.second >= copy_start + copy_length);
+    // memcpy(location, data.first + copy_start, copy_length);
 
-      size_t data_copy = 0;
-      // If these is some data to copy, then we do so. We write the code this way
-      // to avoid UnsignedSysInt underflow.
-      if(copy_start <= data.second)
-          data_copy = std::min(data.second - copy_start, copy_length);
+    size_t data_copy = 0;
+    // If these is some data to copy, then we do so. We write the code this way
+    // to avoid UnsignedSysInt underflow.
+    if(copy_start <= data.second)
+      data_copy = std::min(data.second - copy_start, copy_length);
 
-      memcpy(location, data.first + copy_start, data_copy);
-      memset(location + data_copy, 0, copy_length - data_copy);
+    memcpy(location, data.first + copy_start, data_copy);
+    memset(location + data_copy, 0, copy_length - data_copy);
   }
-public:
 
-  void retrieveMem(pair<char*,size_t> store_ptr)
-  {
+public:
+  void retrieveMem(pair<char*, size_t> store_ptr) {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
-    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i)
-    {
+    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
       copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
       current_offset += stored_blocks[i].second;
     }
     copyMemBlock(current_data, store_ptr, current_offset, allocated_bytes);
-    D_ASSERT(getDataSize() == current_offset + allocated_bytes);
+
+    current_offset += allocated_bytes;
+
+    for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
+      memcpy(get<0>(extendable_blocks[i]), store_ptr.first + current_offset, get<1>(extendable_blocks[i]));
+      current_offset += get<1>(extendable_blocks[i]);
+    }
+
+    D_ASSERT(getDataSize() == current_offset);
   }
 
   /// Returns the size of the allocated memory in bytes.
-  UnsignedSysInt getDataSize()
-    { return total_stored_bytes + allocated_bytes; }
+  UnsignedSysInt getDataSize() {
+    return total_stored_bytes + allocated_bytes + allocated_extendable_bytes;
+  }
 
-  NewMemoryBlock() : current_data(NULL), allocated_bytes(0), maximum_bytes(0),
-                  total_stored_bytes(0)
-  {  }
+  NewMemoryBlock()
+      : current_data(NULL), allocated_bytes(0), maximum_bytes(0), total_stored_bytes(0),
+      allocated_extendable_bytes(0), block_resizes(1) {
+      }
 
-  ~NewMemoryBlock()
-  {
+  ~NewMemoryBlock() {
     free(current_data);
   }
 
   /// Request a new block of memory and returns a \ref void* to it's start.
-  void* request_bytes(DomainInt byte_count)
-  {
+  void* request_bytes(DomainInt byte_count) {
     P("Request: " << (void*)this << " : " << byte_count);
     if(byte_count == 0)
       return NULL;
@@ -151,8 +194,9 @@ public:
     if(byte_count % sizeof(SysInt) != 0)
       byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
-    if((DomainInt)maximum_bytes < (DomainInt)(allocated_bytes) + byte_count)
-    { reallocate(byte_count); }
+    if((DomainInt)maximum_bytes < (DomainInt)(allocated_bytes) + byte_count) {
+      reallocate(byte_count);
+    }
 
     D_ASSERT((DomainInt)maximum_bytes >= allocated_bytes + byte_count);
     char* return_val = current_data + checked_cast<SysInt>(allocated_bytes);
@@ -161,16 +205,38 @@ public:
     return (void*)return_val;
   }
 
-  /// Request a \ref MoveableArray.
-  template<typename T>
-  T* requestArray(DomainInt size)
+  ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size)
   {
+    const SysInt max_size = 10*1024*1024;
+    char* block = (char*)calloc(max_size, 1);
+    extendable_blocks.push_back(std::make_tuple(block, base_size, max_size));
+    allocated_extendable_bytes += base_size;
+    return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
+  }
+
+  void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size)
+  {
+    UnsignedSysInt old_size = get<1>(extendable_blocks[block.getPos()]);
+    D_ASSERT(block() == get<0>(extendable_blocks[block.getPos()]));
+    D_ASSERT(new_size >= old_size);
+    D_ASSERT(new_size <= get<2>(extendable_blocks[block.getPos()]));
+    D_ASSERT(checkAllZero(block() + old_size, block() + new_size));
+
+    allocated_extendable_bytes += (new_size - old_size);
+
+    get<1>(extendable_blocks[block.getPos()]) = new_size;
+    block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
+
+  }
+
+  /// Request a \ref MoveableArray.
+  template <typename T>
+  T* requestArray(DomainInt size) {
     return (T*)request_bytes(size * sizeof(T));
   }
 
 private:
-  void reallocate(DomainInt byte_count_new_request)
-  {
+  void reallocate(DomainInt byte_count_new_request) {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
     D_ASSERT(allocated_bytes + byte_count_new_request > (DomainInt)maximum_bytes);
 
@@ -180,18 +246,15 @@ private:
 
     size_t new_block_size = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
     current_data = (char*)calloc(new_block_size, sizeof(char));
-    if(current_data == NULL)
-    { D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting."); }
+    if(current_data == NULL) {
+      D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting.");
+    }
     P((void*)current_data << " " << new_block_size);
     maximum_bytes = new_block_size;
     allocated_bytes = 0;
   }
-
 };
 
 // @}
-
-
-
 
 #endif

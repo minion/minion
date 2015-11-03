@@ -14,16 +14,23 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
-
-
 /// A simple wrapper for a pair of bounds.
-struct Bounds
-{
+struct Bounds {
   DomainInt lower_bound;
   DomainInt upper_bound;
-  Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper)
-  { }
+  Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper) {}
 };
+
+inline bool checkAllZero(char* begin, char* end)
+{
+  for(char* p = begin; p < end; ++p)
+  {
+    if(*p != 0)
+      return false;
+  }
+  return true;
+}

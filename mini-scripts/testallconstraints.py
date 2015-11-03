@@ -29,14 +29,14 @@ conslist+=["alldiff", "gacalldiff", "alldiffmatrix"]
 conslist+=["gcc", "gccweak", "occurrence", "occurrenceleq", "occurrencegeq"]
 
 #element constraints
-conslist+=["element", "element_undefzero", "gacelement-deprecated", "watchelement", "watchelement_undefzero"]
+conslist+=["element", "element_undefzero", "watchelement", "watchelement_undefzero"]
 
 conslist+=["watchelement_one", "element_one"]
 
 # arithmetic constraints
 conslist+=["modulo", "modulo_undefzero", "pow", "minuseq", "product", "div", "div_undefzero", "abs"]
 
-conslist+=["watchsumleq", "watchsumgeq", "watchvecneq", "staticvecneq", "hamming", "not-hamming"]
+conslist+=["watchsumleq", "watchsumgeq", "watchvecneq",  "hamming", "not-hamming"]
 conslist+=["weightedsumleq", "weightedsumgeq"]
 
 conslist+=["litsumgeq"]  
@@ -62,7 +62,7 @@ conslist+=["w-inset", "w-inintervalset", "w-notinset", "w-inrange", "w-notinrang
 conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
 conslist+=["not-hamming"]
 
-conslist+=["gacschema", "haggisgac", "haggisgac-stable", "str2plus", "shortstr2"]
+conslist+=["gacschema", "haggisgac", "haggisgac-stable", "str2plus", "shortstr2", "mddc"]
 
 conslist+=["nvalueleq", "nvaluegeq"]
 
@@ -137,4 +137,3 @@ if __name__ == '__main__':
         print("Failure")
         exit(1)
     
-

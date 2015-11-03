@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef CONSTRAINT_GACTABLE_MASTER_H_QPQP
@@ -22,17 +23,32 @@
 
 #include "new_table.h"
 
-#ifdef OLDTABLE
-#include "constraint_GACtable.h"
-#else
-#ifdef REGINLHOMME
-#include "constraint_GACtable_reginlhomme.h"
-#else
-#ifdef NIGHTINGALE
-#include "constraint_GACtable_nightingale.h"
-#else
 #include "constraint_GACtable_trie.h"
-#endif 
-#endif
-#endif
+
+template <typename T>
+AbstractConstraint* BuildCT_WATCHED_TABLE(const T& t1, ConstraintBlob& b) {
+  return GACTableCon(t1, b.tuples);
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "table",
+    "internal_name": "CT_WATCHED_TABLE",
+    "args": [ "read_list", "read_tuples" ]
+  }
+*/
+
+template <typename T>
+AbstractConstraint* BuildCT_WATCHED_NEGATIVE_TABLE(const T& t1, ConstraintBlob& b) {
+  return GACNegativeTableCon(t1, b.tuples);
+}
+
+/* JSON
+  { "type": "constraint",
+    "name": "negativetable",
+    "internal_name": "CT_WATCHED_NEGATIVE_TABLE",
+    "args": [ "read_list", "read_tuples" ]
+  }
+*/
+
 #endif

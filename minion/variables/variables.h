@@ -14,16 +14,12 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
-#ifdef MANY_VAR_CONTAINERS
-#define GET_CONTAINER() data.getCon()
-#define GET_LOCAL_CON() getCon()
-#else
 #define GET_CONTAINER() InternalRefType::getCon_Static()
 #define GET_LOCAL_CON() getCon_Static()
-#endif
 
 #include "VarRefType.h"
 
@@ -37,25 +33,23 @@
 #include "containers/intboundvar.h"
 #include "containers/sparse_intboundvar.h"
 
-class VariableContainer
-{
+class VariableContainer {
   // Stop copying!
   VariableContainer(const VariableContainer&);
   void operator=(const VariableContainer&);
+
 public:
   BoundVarContainer<> boundVarContainer;
   BoolVarContainer boolVarContainer;
-  BigRangeVarContainer<BitContainerType> bigRangeVarContainer;
+  BigRangeVarContainer<UnsignedSysInt> bigRangeVarContainer;
   SparseBoundVarContainer<> sparseBoundVarContainer;
 
+  VariableContainer()
+      : boundVarContainer(),
+        boolVarContainer(),
+        bigRangeVarContainer(),
+        sparseBoundVarContainer() {}
 
-  VariableContainer(StateObj* _stateObj) :
-    boundVarContainer(_stateObj),
-    boolVarContainer(_stateObj),
-    bigRangeVarContainer(_stateObj),
-    sparseBoundVarContainer(_stateObj)
-  {}
-  
   inline void lock() {
     boundVarContainer.lock();
     boolVarContainer.lock();
@@ -70,5 +64,3 @@ public:
 #include "mappings/variable_constant.h"
 #include "mappings/variable_not.h"
 #include "mappings/variable_shift.h"
-
-

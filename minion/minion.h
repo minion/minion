@@ -14,27 +14,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 #ifndef MINION_H
 #define MINION_H
-#ifdef REENTER
-#define MANY_VAR_CONTAINERS
-#endif
+
 #include "system/system.h"
-#include "BuildDefines.h"
-// XXX These could possibly be turned off, but it's possible it will require
-// Some small amount of work to make them work.
-#define FULL_DOMAIN_TRIGGERS
-#define DYNAMICTRIGGERS
-#ifndef WATCHEDLITERALS
-#define WATCHEDLITERALS
-#endif
-//#ifdef WATCHEDLITERALS
-//#define DYNAMICTRIGGERS
-//#endif
-#define VERSION "Minion Version 1.8"
-#define REVISION "HG revision $Revision$"
+
+// These are just because VC++ sucks.
+#define _CRT_SECURE_NO_DEPRECATE 1
+#define _CRT_NONSTDC_NO_DEPRECATE 1
+
+static const char MinionVersion[] = "Minion Version 2";
+
 // above line will work but only gives revision of this file,
 //  not the current global revision
 #include "get_info/get_info.h"
@@ -42,7 +35,6 @@
 VARDEF(ofstream solsoutFile);
 
 #include "memory_management/backtrackable_memory.h"
-
 
 #include "memory_management/trailed_monotonic_set_new.h"
 #include "memory_management/nonbacktrack_memory.h"
@@ -52,11 +44,11 @@ VARDEF(ofstream solsoutFile);
 
 typedef TrailedMonotonicSet MonotonicSet;
 
-#include "constraints/constraint_abstract.h"
+#include "triggering/constraint_abstract.h"
 
 #include "queue/standard_queue.h"
 
-#include "trigger_list.h"
+#include "triggering/trigger_list.h"
 
 #include "variables/variables.h"
 
@@ -75,12 +67,12 @@ typedef TrailedMonotonicSet MonotonicSet;
 
 #include "StateObj.hpp"
 #include "solver.hpp"
-#include "constraints/function_defs.hpp"
 
 #ifndef DOMINION
 #include "inputfile_parse/CSPSpec.hpp"
 #else
-inline void inputPrint(std::ostream&, StateObj*, const Var&) {}
+inline void inputPrint(std::ostream&, const Var&) {}
 #endif
 
+#include "triggering/dynamic_trigger.hpp"
 #endif

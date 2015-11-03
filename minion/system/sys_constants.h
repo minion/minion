@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef _SYS_CONSTANTS_H
@@ -47,15 +48,7 @@ typedef int32_t SysInt;
 typedef unsigned int UnsignedSysInt;
 #endif
 
-
-
 #ifdef MINION_DEBUG
-#ifndef BOUNDS_CHECK
-#define BOUNDS_CHECK
-#endif
-#endif
-
-#ifdef BOUNDS_CHECK
 typedef Wrapper<SysInt> DomainInt;
 #else
 typedef SysInt DomainInt;
@@ -68,61 +61,52 @@ const DomainInt DomainInt_Min = std::numeric_limits<SysInt>::min() / 2 + 1;
 /// A big constant, when such a thing is needed.
 static const DomainInt DomainInt_Skip = std::numeric_limits<SysInt>::max();
 
-template<typename To, typename From>
-To checked_cast(const From& t)
-{ return static_cast<To>(t); }
+template <typename To, typename From>
+To checked_cast(const From& t) {
+  return static_cast<To>(t);
+}
 
-template<typename To, typename From>
-To checked_cast(const Wrapper<From>& t)
-{ return static_cast<To>(t.t); }
+template <typename To, typename From>
+To checked_cast(const Wrapper<From>& t) {
+  return static_cast<To>(t.t);
+}
 
+template <typename T>
+T const_negminusone(T t) {
+  return -1 - t;
+}
 
-template<typename T>
-T const_negminusone(T t)
-{ return -1-t; }
+template <typename T, T i>
+inline compiletime_val<T, -1 - i> const_negminusone(compiletime_val<T, i>) {
+  return compiletime_val<T, -1 - i>();
+}
 
+template <typename T>
+T const_neg(T t) {
+  return -t;
+}
 
-template<typename T, T i>
-inline compiletime_val<T,-1-i> const_negminusone(compiletime_val<T,i>)
-{ return compiletime_val<T,-1-i>(); }
+template <typename T, T i>
+inline compiletime_val<T, (T)0 - i> const_neg(compiletime_val<T, i>) {
+  return compiletime_val<T, (T)0 - i>();
+}
 
-template<typename T>
-T const_neg(T t)
-{ return -t; }
-
-template<typename T, T i>
-inline compiletime_val<T,(T)0-i> const_neg(compiletime_val<T,i>)
-{ return compiletime_val<T,(T)0-i>(); }
-
-
-
-template<typename T>
-inline T mymin(T t1, T t2)
-{
+template <typename T>
+inline T mymin(T t1, T t2) {
   if(t1 <= t2)
     return t1;
   else
     return t2;
 }
 
-template<typename T>
-inline T mymax(T t1, T t2)
-{
+template <typename T>
+inline T mymax(T t1, T t2) {
   if(t1 <= t2)
     return t2;
   else
     return t1;
 }
 
-
-enum MapLongTuplesToShort
-{
-  MLTTS_NoMap,
-  MLTTS_KeepLong,
-  MLTTS_Eager,
-  MLTTS_Lazy
-};
-
-
+enum MapLongTuplesToShort { MLTTS_NoMap, MLTTS_KeepLong, MLTTS_Eager, MLTTS_Lazy };
 
 #endif // _SYS_CONSTANTS_H

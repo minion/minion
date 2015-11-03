@@ -14,20 +14,20 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
- 
+
 #ifndef _CONSTRAINT_SETUP_H
-#define _CONSTRAINT_SETUP_H 
+#define _CONSTRAINT_SETUP_H
 
 #include "StateObj_forward.h"
 
-namespace Controller
-{
-    
+namespace Controller {
+
 /// Lists all structures that must be locked before search.
-// @todo This could be done more neatly... 
-  void lock(StateObj*);
+// @todo This could be done more neatly...
+void lock();
 
 } // namespace Controller
 

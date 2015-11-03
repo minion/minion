@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #include "system/system.h"
@@ -25,28 +26,31 @@ bool debug_crash = false;
 
 bool in_cspcomp_for_failexit = false;
 
-void output_fatal_error(string s)
-{
+void output_fatal_error(string s) {
   std::cerr << s << "\n";
   abort();
 }
 
-void FATAL_REPORTABLE_ERROR()
-{
+void FATAL_REPORTABLE_ERROR() {
   ostringstream oss;
   oss << "Minion has had an internal error, due to the instance you are using." << endl;
   oss << "This is (probably) not your fault, but instead a bug in Minion." << endl;
-  oss << "We would appreciate it if you could report this output, and the instance which" << endl;
+  oss << "We would appreciate it if you could report this output, and the "
+         "instance which"
+      << endl;
   oss << "caused the problem to us. Thank you." << endl;
- output_fatal_error(oss.str());
+  output_fatal_error(oss.str());
 }
 
-void D_FATAL_ERROR2(string s, string file, string line)
-{
+void D_FATAL_ERROR2(string s, string file, string line) {
   ostringstream oss;
   oss << "Sorry, there has been some kind of error." << endl;
-  oss << "This could be caused by a misformed input file, or by an internal bug." << endl;
-  oss << "If you can't figure out what is causing the problem, please report it at http://www.sourceforge.net/projects/minion." << endl;
+  oss << "This could be caused by a misformed input file, or by an internal "
+         "bug."
+      << endl;
+  oss << "If you can't figure out what is causing the problem, please report "
+         "it at http://www.sourceforge.net/projects/minion."
+      << endl;
   oss << "Either on the bug tracker, or on the mailing list." << endl;
   oss << endl;
   oss << "The generated error message was: " << s << endl;
@@ -54,10 +58,8 @@ void D_FATAL_ERROR2(string s, string file, string line)
   output_fatal_error(oss.str());
 }
 
-void DOM_NORETURN FAIL_EXIT(string s) 
-{
-  if(in_cspcomp_for_failexit)
-  {
+void DOM_NORETURN FAIL_EXIT(string s) {
+  if(in_cspcomp_for_failexit) {
     if(s != "")
       cout << "c " << s << endl;
     cout << "s UNKNOWN" << endl;
@@ -67,16 +69,14 @@ void DOM_NORETURN FAIL_EXIT(string s)
   cerr << "Unrecoverable error. Exiting." << endl;
   cerr << s << endl;
   cerr.flush();
-  if(debug_crash)
-  {
+  if(debug_crash) {
     SysInt* i = NULL;
     *i = 0;
   }
   throw 9;
 }
 
-void error_printing_function(std::string a, std::string f, SysInt line)
-{
+void error_printing_function(std::string a, std::string f, SysInt line) {
   cerr << "Assert Error!" << endl;
   cerr << "Test '" << a << "' failed." << endl;
   cerr << "In file " << f << ", line " << line << endl;
@@ -87,8 +87,7 @@ void error_printing_function(std::string a, std::string f, SysInt line)
   FAIL_EXIT();
 }
 
-void user_error_printing_function(std::string a, std::string f, SysInt line)
-{
+void user_error_printing_function(std::string a, std::string f, SysInt line) {
   cerr << "An error occurred while solving your instance!" << endl;
   cerr << a << endl;
   cout.flush();

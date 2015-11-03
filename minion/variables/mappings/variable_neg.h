@@ -14,209 +14,194 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef VARIABLE_NEG_H
 #define VARIABLE_NEG_H
 
-#include "../../constraints/constraint_abstract.h"
+#include "../../triggering/constraint_abstract.h"
 
-// This is a temporary fix to get around the fact that 'VarNeg' is defined in some windows header.
+// This is a temporary fix to get around the fact that 'VarNeg' is defined in
+// some windows header.
 // Long term, probably need a better solution.
 #ifdef _WIN32
 #define VarNeg Minion_VarNeg
 #endif
 
-template<typename VarT>
-struct VarNeg
-{
+template <typename VarT>
+struct VarNeg {
   static const BOOL isBool = false;
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
 
-  AnyVarRef popOneMapper() const
-  { return data; }
-
-  BOOL isBound() const
-  { return data.isBound();}
-
-  VarNeg(VarT _data) : data(_data)
-  {}
-
-  VarNeg() : data()
-  {}
-
-  VarNeg(const VarNeg& b) : data(b.data)
-  {}
-
-  BOOL isAssigned() const
-  { return data.isAssigned(); }
-
-  DomainInt getAssignedValue() const
-  { return -data.getAssignedValue(); }
-
-  BOOL isAssignedValue(DomainInt i) const
-  {
-    return data.isAssigned() &&
-    data.getAssignedValue() == -i;
+  AnyVarRef popOneMapper() const {
+    return data;
   }
 
-  BOOL inDomain(DomainInt b) const
-  { return data.inDomain(-b); }
+  BOOL isBound() const {
+    return data.isBound();
+  }
 
-  BOOL inDomain_noBoundCheck(DomainInt b) const
-  { return data.inDomain(-b); }
+  VarNeg(VarT _data) : data(_data) {}
 
-  DomainInt getDomSize() const
-  { return data.getDomSize(); }
+  VarNeg() : data() {}
 
-  DomainInt getMax() const
-  { return -data.getMin(); }
+  VarNeg(const VarNeg& b) : data(b.data) {}
 
-  DomainInt getMin() const
-  { return -data.getMax(); }
+  BOOL isAssigned() const {
+    return data.isAssigned();
+  }
 
-  DomainInt getInitialMax() const
-  { return -data.getInitialMin(); }
+  DomainInt getAssignedValue() const {
+    return -data.getAssignedValue();
+  }
 
-  DomainInt getInitialMin() const
-  { return -data.getInitialMax(); }
+  BOOL isAssignedValue(DomainInt i) const {
+    return data.isAssigned() && data.getAssignedValue() == -i;
+  }
 
-  void setMax(DomainInt i)
-  { data.setMin(-i); }
+  BOOL inDomain(DomainInt b) const {
+    return data.inDomain(-b);
+  }
 
-  void setMin(DomainInt i)
-  { data.setMax(-i); }
+  BOOL inDomain_noBoundCheck(DomainInt b) const {
+    return data.inDomain(-b);
+  }
 
-  void uncheckedAssign(DomainInt b)
-  { data.uncheckedAssign(-b); }
+  DomainInt getDomSize() const {
+    return data.getDomSize();
+  }
 
-  void propagateAssign(DomainInt b)
-  { data.propagateAssign(-b); }
+  DomainInt getMax() const {
+    return -data.getMin();
+  }
 
-  void decisionAssign(DomainInt b)
-  { data.decisionAssign(-b); }
+  DomainInt getMin() const {
+    return -data.getMax();
+  }
 
-  void removeFromDomain(DomainInt b)
-  { data.removeFromDomain(-b); }
+  DomainInt getInitialMax() const {
+    return -data.getInitialMin();
+  }
 
-  /// There isn't a minus sign here as domain changes from both the top and bottom of the domain are positive numbers.
-  DomainInt getDomainChange(DomainDelta d)
-  { return data.getDomainChange(d); }
+  DomainInt getInitialMin() const {
+    return -data.getInitialMax();
+  }
 
- void addTrigger(Trigger t, TrigType type)
-  {
-    switch(type)
-    {
-      case UpperBound:
-        data.addTrigger(t, LowerBound);
-        break;
-      case LowerBound:
-        data.addTrigger(t, UpperBound);
-        break;
-      case Assigned:
-      case DomainChanged:
-        data.addTrigger(t, type);
-      break;
-      default:
-      D_FATAL_ERROR("Invalid trigger in 'neg' mapper");
+  void setMax(DomainInt i) {
+    data.setMin(-i);
+  }
+
+  void setMin(DomainInt i) {
+    data.setMax(-i);
+  }
+
+  void uncheckedAssign(DomainInt b) {
+    data.uncheckedAssign(-b);
+  }
+
+  void propagateAssign(DomainInt b) {
+    data.propagateAssign(-b);
+  }
+
+  void decisionAssign(DomainInt b) {
+    data.decisionAssign(-b);
+  }
+
+  void removeFromDomain(DomainInt b) {
+    data.removeFromDomain(-b);
+  }
+
+  /// There isn't a minus sign here as domain changes from both the top and
+  /// bottom of the domain are positive numbers.
+  DomainInt getDomainChange(DomainDelta d) {
+    return data.getDomainChange(d);
+  }
+
+  friend std::ostream& operator<<(std::ostream& o, const VarNeg& n) {
+    return o << "Neg " << n.data;
+  }
+
+  void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
+                         TrigOp op = TO_Default) {
+    switch(type) {
+    case UpperBound: data.addDynamicTrigger(t, LowerBound, pos, op); break;
+    case LowerBound: data.addDynamicTrigger(t, UpperBound, pos, op); break;
+    case Assigned:
+    case DomainChanged: data.addDynamicTrigger(t, type, pos, op); break;
+    case DomainRemoval: data.addDynamicTrigger(t, DomainRemoval, -pos, op); break;
+    default: D_FATAL_ERROR("Broken dynamic trigger");
     }
   }
 
-  friend std::ostream& operator<<(std::ostream& o, const VarNeg& n)
-  { return o << "Neg " << n.data; }
-
-#ifdef DYNAMICTRIGGERS
-  void addDynamicTrigger(DynamicTrigger* t, TrigType type, DomainInt pos = NoDomainValue BT_FUNDEF)
-  {
-    switch(type)
-    {
-      case UpperBound:
-        data.addDynamicTrigger(t, LowerBound, pos BT_CALL);
-        break;
-      case LowerBound:
-        data.addDynamicTrigger(t, UpperBound, pos BT_CALL);
-        break;
-      case Assigned:
-      case DomainChanged:
-        data.addDynamicTrigger(t, type, pos BT_CALL);
-        break;
-      case DomainRemoval:
-        data.addDynamicTrigger(t, DomainRemoval, -pos BT_CALL);
-        break;
-      default:
-        D_FATAL_ERROR("Broken dynamic trigger");
-    }
+  vector<AbstractConstraint*>* getConstraints() {
+    return data.getConstraints();
   }
-#endif
 
-  vector<AbstractConstraint*>* getConstraints()
-  { return data.getConstraints(); }
+  void addConstraint(AbstractConstraint* c) {
+    data.addConstraint(c);
+  }
 
-  void addConstraint(AbstractConstraint* c)
-  { data.addConstraint(c); }
+  DomainInt getBaseVal(DomainInt v) const {
+    return data.getBaseVal(-v);
+  }
 
-  DomainInt getBaseVal(DomainInt v) const { return data.getBaseVal(-v); }
+  Var getBaseVar() const {
+    return data.getBaseVar();
+  }
 
-  Var getBaseVar() const { return data.getBaseVar(); }
-
-  vector<Mapper> getMapperStack() const
-  {
+  vector<Mapper> getMapperStack() const {
     vector<Mapper> v = data.getMapperStack();
     v.push_back(Mapper(MAP_NEG));
     return v;
   }
 
 #ifdef WDEG
-  DomainInt getBaseWdeg()
-  { return data.getBaseWdeg(); }
+  DomainInt getBaseWdeg() {
+    return data.getBaseWdeg();
+  }
 
-  void incWdeg()
-  { data.incWdeg(); }
+  void incWdeg() {
+    data.incWdeg();
+  }
 #endif
 };
 
+template <typename T>
+struct NegType {
+  typedef VarNeg<T> type;
+};
 
+template <typename T>
+struct NegType<vector<T>> {
+  typedef vector<typename NegType<T>::type> type;
+};
 
-template<typename T>
-struct NegType
-{ typedef VarNeg<T> type; };
-
-
-template<typename T>
-struct NegType<vector<T> >
-{ typedef vector<typename NegType<T>::type> type; };
-
-#ifdef LIGHT_VECTOR
-template<typename T>
-struct NegType<vector<T> >
-{ typedef vector<typename NegType<T>::type> type; };
-#endif
-
-template<typename T, std::size_t i>
-struct NegType<std::array<T, i> >
-{ typedef std::array<typename NegType<T>::type, i> type; };
+template <typename T, std::size_t i>
+struct NegType<std::array<T, i>> {
+  typedef std::array<typename NegType<T>::type, i> type;
+};
 
 // Neg of a neg is the original!
-template<typename T>
-struct NegType<VarNeg<T> >
-{ typedef T type; };
+template <typename T>
+struct NegType<VarNeg<T>> {
+  typedef T type;
+};
 
-template<typename VRef>
-typename NegType<VRef>::type
-VarNegRef(const VRef& var_ref)
-{ return VarNeg<VRef>(var_ref); }
+template <typename VRef>
+typename NegType<VRef>::type VarNegRef(const VRef& var_ref) {
+  return VarNeg<VRef>(var_ref);
+}
 
-template<typename VRef>
-VRef
-VarNegRef(const VarNeg<VRef>& var_ref)
-{ return var_ref.data; }
+template <typename VRef>
+VRef VarNegRef(const VarNeg<VRef>& var_ref) {
+  return var_ref.data;
+}
 
-template<typename VarRef>
-vector<typename NegType<VarRef>::type>
-VarNegRef(const vector<VarRef>& var_array)
-{
+template <typename VarRef>
+vector<typename NegType<VarRef>::type> VarNegRef(const vector<VarRef>& var_array) {
   vector<typename NegType<VarRef>::type> neg_array;
   neg_array.reserve(var_array.size());
   for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -224,22 +209,8 @@ VarNegRef(const vector<VarRef>& var_array)
   return neg_array;
 }
 
-#ifdef LIGHT_VECTOR
-template<typename VarRef>
-vector<typename NegType<VarRef>::type>
-VarNegRef(const vector<VarRef>& var_array)
-{
-  vector<typename NegType<VarRef>::type> neg_array(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    neg_array[i] = VarNegRef(var_array[i]);
-  return neg_array;
-}
-#endif
-
-template<typename VarRef, std::size_t i>
-std::array<typename NegType<VarRef>::type, i>
-VarNegRef(const std::array<VarRef, i>& var_array)
-{
+template <typename VarRef, std::size_t i>
+std::array<typename NegType<VarRef>::type, i> VarNegRef(const std::array<VarRef, i>& var_array) {
   std::array<typename NegType<VarRef>::type, i> neg_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
     neg_array[l] = VarNegRef(var_array[l]);

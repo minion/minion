@@ -14,45 +14,37 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #include "minion.h"
 
-namespace Controller
-{
+namespace Controller {
 /// Lists all structures that must be locked before search.
-// @todo This could be done more neatly... 
+// @todo This could be done more neatly...
 
-void lock(StateObj* stateObj)
-{  
-  getVars(stateObj).lock();
-  
-  SysInt size = getState(stateObj).getConstraintList().size();
-  for(SysInt i = 0 ; i < size;i++)
-  getState(stateObj).getConstraintList()[i]->setup();
-  
-  getMemory(stateObj).monotonicSet().lock(stateObj);
-  
-  getTriggerMem(stateObj).finaliseTriggerLists();
-  
+void lock() {
+  getVars().lock();
+
+  SysInt size = getState().getConstraintList().size();
+  for(SysInt i = 0; i < size; i++)
+    getState().getConstraintList()[i]->setup();
+
   // No longer AC1, thank goodness.
-  for(SysInt i = 0; i < size; ++i)
-  {
-    if(getState(stateObj).isFailed()) 
+  for(SysInt i = 0; i < size; ++i) {
+    if(getState().isFailed())
       return;
-    getState(stateObj).getConstraintList()[i]->full_propagate();
-    getState(stateObj).getConstraintList()[i]->full_propagate_done=true;
-    if(getState(stateObj).isFailed()) 
+    getState().getConstraintList()[i]->full_propagate();
+    getState().getConstraintList()[i]->full_propagate_done = true;
+    if(getState().isFailed())
       return;
     // If queues not empty, more work to do.
-    if(!getQueue(stateObj).isQueuesEmpty())
-    {
-        getQueue(stateObj).propagateQueueRoot();
+    if(!getQueue().isQueuesEmpty()) {
+      getQueue().propagateQueueRoot();
     }
   }
-  
-  getState(stateObj).markLocked();
 
+  getState().markLocked();
 }
 }

@@ -14,7 +14,8 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+* USA.
 */
 
 #ifndef VAR_EVENT
@@ -24,11 +25,10 @@
 #endif
 
 #ifdef VAR_EVENT
-#define PROP_EVENT(x) 
+#define PROP_EVENT(x)
 #else
-#define VAR_EVENT(x,y) 
+#define VAR_EVENT(x, y)
 #endif
-
 
 VAR_EVENT(construct, NULL_EVENT)
 VAR_EVENT(copy, NULL_EVENT)
@@ -48,7 +48,6 @@ VAR_EVENT(uncheckedAssign, WRITE_EVENT)
 VAR_EVENT(propagateAssign, WRITE_EVENT)
 VAR_EVENT(decisionAssign, WRITE_EVENT)
 VAR_EVENT(RemoveFromDomain, WRITE_EVENT)
-VAR_EVENT(addTrigger, WRITE_EVENT)
 VAR_EVENT(addConstraint, NULL_EVENT)
 VAR_EVENT(getConstraints, NULL_EVENT)
 VAR_EVENT(getDomainChange, READ_EVENT)
@@ -71,7 +70,7 @@ PROP_EVENT(GACElement)
 PROP_EVENT(Lex)
 PROP_EVENT(FullSum)
 PROP_EVENT(BoolSum)
-PROP_EVENT(AlldiffGacSlow)
+PROP_EVENT(GacAlldiff)
 PROP_EVENT(GCC)
 PROP_EVENT(GCCWeak)
 PROP_EVENT(LightSum)
