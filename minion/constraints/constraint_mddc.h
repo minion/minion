@@ -233,7 +233,7 @@ struct MDDC : public AbstractConstraint {
   }
 
   virtual string full_output_name() {
-    return ConOutput::print_con(constraint_name(), vars);
+    return ConOutput::print_con(constraint_name(), vars, tuples);
   }
 
   VarArray vars;
@@ -245,6 +245,8 @@ struct MDDC : public AbstractConstraint {
   // gno is the set of removed mdd nodes.
   arrayset_bt gno;
 
+  TupleList* tuples;
+  
   // All nodes of the mdd, used for freeing.
   vector<MDDNode*> mddnodes;
 
@@ -255,10 +257,11 @@ struct MDDC : public AbstractConstraint {
 
   MDDC(const VarArray& _var_array, TupleList* _tuples)
       :
-
+      
         vars(_var_array),
         constraint_locked(false),
-        gno() {
+        gno(),
+        tuples(_tuples) {
     if(isNegative) {
       init_negative(_tuples);
     } else {
