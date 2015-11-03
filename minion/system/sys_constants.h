@@ -21,31 +21,35 @@
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
-//#define DOMAINS64
+// Check windows
+#if _WIN32 || _WIN64
+   #if _WIN64
+     #define ENV64BIT
+  #else
+    #define ENV32BIT
+  #endif
+#endif
+
+// Check GCC
+#if __GNUC__
+  #if __x86_64__ || __ppc64__
+    #define ENV64BIT
+  #else
+    #define ENV32BIT
+  #endif
+#endif
 
 #ifdef DOMAINS64
 
-// work out if we need to use the Wrapper<int64_t>
-#ifdef _WIN32
-// Windows does not have a 128-bit integer
-#define USE_WRAPPER
-#endif
-#ifdef __EMSCRIPTEN__
-// Javascript does not either
-#define USE_WRAPPER
-#endif
-
-#ifdef USE_WRAPPER
 typedef Wrapper<int64_t> BigInt;
-#else
-typedef __int128_t BigInt;
-#endif
 typedef int64_t SysInt;
 typedef uint64_t UnsignedSysInt;
 #else
+
 typedef int64_t BigInt;
 typedef int32_t SysInt;
 typedef unsigned int UnsignedSysInt;
+
 #endif
 
 #ifdef MINION_DEBUG
