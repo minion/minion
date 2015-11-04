@@ -47,19 +47,12 @@ def progexists(prog):
         return False
     return True
 
-def gethgDate():
-    (out, err, code) = progout(["hg", "parent", '--template="{date|isodate}"'])
-    if out == "":
-        return "<missing hg date>"
-    else:
-        return str(out)
-
 def gethgVersion():
-    (out, err, code) = progout(["hg", "parent", '--template="{node|short}"'])
-    if out == "":
-        return "<missing hg version>"
+    (out, err, code) = progout(["hg", "parent", '--template="{node|short} ({date|isodate})"'])
+    if code != 0 and err != "":
+        return "\"<missing hg version>\""
     else:
-        return str(out)
+        return out
 
 # Reads JSON from string 'instr', with a more helpful error message
 # than json.loads. 'outname' should give filename the JSON came from
@@ -314,8 +307,7 @@ with open(outsrcdir+"ConstraintEnum.h", "w") as enum:
 
 
 with open(outsrcdir+"BuildDefines.h", "w") as defs:
-    defs.write('#define HG_VER "' + gethgVersion() + '"\n')
-    defs.write('#define HG_DATE "' + gethgDate() + '"\n')
+    defs.write('#define HG_VER ' + gethgVersion() + '\n')
 
 minionsrclist = ['minion/BuildVariables.cpp',
 'minion/BuildCSP.cpp',
