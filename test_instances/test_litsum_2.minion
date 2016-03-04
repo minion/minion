@@ -1,0 +1,29 @@
+#TEST SOLCOUNT 12
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:26 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_litsum_2.minion
+# Command line: minion -redump test_litsum_2.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+BOOL x1
+BOOL x2
+BOOL x3
+**SEARCH**
+VARORDER [x0,x1,x2,x3]
+VALORDER [a,a,a,a]
+SYMORDER [x0,x1,x2,x3]
+PRINT[[x0,x1,x2,x3]]
+**TUPLELIST**
+**CONSTRAINTS**
+litsumgeq([x0,x1,x2,x3], [0,0,0,0], 1)
+litsumgeq([x0,x1,x2,x3], [1,1,1,1], 1)
+litsumgeq([x0,x1,x2,x3], [0,0,1,1], 1)
+litsumgeq([x0,x1,x2,x3], [1,0,1,0], 1)
+**EOF**

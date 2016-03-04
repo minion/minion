@@ -1,0 +1,1434 @@
+#TEST SOLCOUNT 0
+# Semigroups with 6 elements.
+# 6x6 multiplication table.
+# 36 search vars (all AB combinations).
+# 216 additional vars (all ABC combinations).
+# Element constraints ensure A(BC) = (AB)C.
+# Generated using lexsb-min-sg-gen.ecl
+#Tom Kelsey,  June 06
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:26 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_kelsey_2.minion
+# Command line: minion -redump test_kelsey_2.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+BOOL x1
+BOOL x2
+BOOL x3
+BOOL x4
+BOOL x5
+BOOL x6
+BOOL x7
+BOOL x8
+BOOL x9
+BOOL x10
+BOOL x11
+BOOL x12
+BOOL x13
+BOOL x14
+BOOL x15
+BOOL x16
+BOOL x17
+BOOL x18
+BOOL x19
+BOOL x20
+BOOL x21
+BOOL x22
+BOOL x23
+BOOL x24
+BOOL x25
+BOOL x26
+BOOL x27
+BOOL x28
+BOOL x29
+BOOL x30
+BOOL x31
+BOOL x32
+BOOL x33
+BOOL x34
+BOOL x35
+BOOL x36
+BOOL x37
+BOOL x38
+BOOL x39
+BOOL x40
+BOOL x41
+BOOL x42
+BOOL x43
+BOOL x44
+BOOL x45
+BOOL x46
+BOOL x47
+BOOL x48
+BOOL x49
+BOOL x50
+BOOL x51
+BOOL x52
+BOOL x53
+BOOL x54
+BOOL x55
+BOOL x56
+BOOL x57
+BOOL x58
+BOOL x59
+BOOL x60
+BOOL x61
+BOOL x62
+BOOL x63
+BOOL x64
+BOOL x65
+BOOL x66
+BOOL x67
+BOOL x68
+BOOL x69
+BOOL x70
+BOOL x71
+BOOL x72
+BOOL x73
+BOOL x74
+BOOL x75
+BOOL x76
+BOOL x77
+BOOL x78
+BOOL x79
+BOOL x80
+BOOL x81
+BOOL x82
+BOOL x83
+BOOL x84
+BOOL x85
+BOOL x86
+BOOL x87
+BOOL x88
+BOOL x89
+BOOL x90
+BOOL x91
+BOOL x92
+BOOL x93
+BOOL x94
+BOOL x95
+BOOL x96
+BOOL x97
+BOOL x98
+BOOL x99
+BOOL x100
+BOOL x101
+BOOL x102
+BOOL x103
+BOOL x104
+BOOL x105
+BOOL x106
+BOOL x107
+BOOL x108
+BOOL x109
+BOOL x110
+BOOL x111
+BOOL x112
+BOOL x113
+BOOL x114
+BOOL x115
+BOOL x116
+BOOL x117
+BOOL x118
+BOOL x119
+BOOL x120
+BOOL x121
+BOOL x122
+BOOL x123
+BOOL x124
+BOOL x125
+BOOL x126
+BOOL x127
+BOOL x128
+BOOL x129
+BOOL x130
+BOOL x131
+BOOL x132
+BOOL x133
+BOOL x134
+BOOL x135
+BOOL x136
+BOOL x137
+BOOL x138
+BOOL x139
+BOOL x140
+BOOL x141
+BOOL x142
+BOOL x143
+BOOL x144
+BOOL x145
+BOOL x146
+BOOL x147
+BOOL x148
+BOOL x149
+BOOL x150
+BOOL x151
+BOOL x152
+BOOL x153
+BOOL x154
+BOOL x155
+BOOL x156
+BOOL x157
+BOOL x158
+BOOL x159
+BOOL x160
+BOOL x161
+BOOL x162
+BOOL x163
+BOOL x164
+BOOL x165
+BOOL x166
+BOOL x167
+BOOL x168
+BOOL x169
+BOOL x170
+BOOL x171
+BOOL x172
+BOOL x173
+BOOL x174
+BOOL x175
+BOOL x176
+BOOL x177
+BOOL x178
+BOOL x179
+BOOL x180
+BOOL x181
+BOOL x182
+BOOL x183
+BOOL x184
+BOOL x185
+BOOL x186
+BOOL x187
+BOOL x188
+BOOL x189
+BOOL x190
+BOOL x191
+BOOL x192
+BOOL x193
+BOOL x194
+BOOL x195
+BOOL x196
+BOOL x197
+BOOL x198
+BOOL x199
+BOOL x200
+BOOL x201
+BOOL x202
+BOOL x203
+BOOL x204
+BOOL x205
+BOOL x206
+BOOL x207
+BOOL x208
+BOOL x209
+BOOL x210
+BOOL x211
+BOOL x212
+BOOL x213
+BOOL x214
+BOOL x215
+BOOL x216
+BOOL x217
+BOOL x218
+BOOL x219
+BOOL x220
+BOOL x221
+DISCRETE x222{0..5}
+DISCRETE x223{0..5}
+DISCRETE x224{0..5}
+DISCRETE x225{0..5}
+DISCRETE x226{0..5}
+DISCRETE x227{0..5}
+DISCRETE x228{0..5}
+DISCRETE x229{0..5}
+DISCRETE x230{0..5}
+DISCRETE x231{0..5}
+DISCRETE x232{0..5}
+DISCRETE x233{0..5}
+DISCRETE x234{0..5}
+DISCRETE x235{0..5}
+DISCRETE x236{0..5}
+DISCRETE x237{0..5}
+DISCRETE x238{0..5}
+DISCRETE x239{0..5}
+DISCRETE x240{0..5}
+DISCRETE x241{0..5}
+DISCRETE x242{0..5}
+DISCRETE x243{0..5}
+DISCRETE x244{0..5}
+DISCRETE x245{0..5}
+DISCRETE x246{0..5}
+DISCRETE x247{0..5}
+DISCRETE x248{0..5}
+DISCRETE x249{0..5}
+DISCRETE x250{0..5}
+DISCRETE x251{0..5}
+DISCRETE x252{0..5}
+DISCRETE x253{0..5}
+DISCRETE x254{0..5}
+DISCRETE x255{0..5}
+DISCRETE x256{0..5}
+DISCRETE x257{0..5}
+DISCRETE x258{0..5}
+DISCRETE x259{0..5}
+DISCRETE x260{0..5}
+DISCRETE x261{0..5}
+DISCRETE x262{0..5}
+DISCRETE x263{0..5}
+DISCRETE x264{0..5}
+DISCRETE x265{0..5}
+DISCRETE x266{0..5}
+DISCRETE x267{0..5}
+DISCRETE x268{0..5}
+DISCRETE x269{0..5}
+DISCRETE x270{0..5}
+DISCRETE x271{0..5}
+DISCRETE x272{0..5}
+DISCRETE x273{0..5}
+DISCRETE x274{0..5}
+DISCRETE x275{0..5}
+DISCRETE x276{0..5}
+DISCRETE x277{0..5}
+DISCRETE x278{0..5}
+DISCRETE x279{0..5}
+DISCRETE x280{0..5}
+DISCRETE x281{0..5}
+DISCRETE x282{0..5}
+DISCRETE x283{0..5}
+DISCRETE x284{0..5}
+DISCRETE x285{0..5}
+DISCRETE x286{0..5}
+DISCRETE x287{0..5}
+DISCRETE x288{0..5}
+DISCRETE x289{0..5}
+DISCRETE x290{0..5}
+DISCRETE x291{0..5}
+DISCRETE x292{0..5}
+DISCRETE x293{0..5}
+DISCRETE x294{0..5}
+DISCRETE x295{0..5}
+DISCRETE x296{0..5}
+DISCRETE x297{0..5}
+DISCRETE x298{0..5}
+DISCRETE x299{0..5}
+DISCRETE x300{0..5}
+DISCRETE x301{0..5}
+DISCRETE x302{0..5}
+DISCRETE x303{0..5}
+DISCRETE x304{0..5}
+DISCRETE x305{0..5}
+DISCRETE x306{0..5}
+DISCRETE x307{0..5}
+DISCRETE x308{0..5}
+DISCRETE x309{0..5}
+DISCRETE x310{0..5}
+DISCRETE x311{0..5}
+DISCRETE x312{0..5}
+DISCRETE x313{0..5}
+DISCRETE x314{0..5}
+DISCRETE x315{0..5}
+DISCRETE x316{0..5}
+DISCRETE x317{0..5}
+DISCRETE x318{0..5}
+DISCRETE x319{0..5}
+DISCRETE x320{0..5}
+DISCRETE x321{0..5}
+DISCRETE x322{0..5}
+DISCRETE x323{0..5}
+DISCRETE x324{0..5}
+DISCRETE x325{0..5}
+DISCRETE x326{0..5}
+DISCRETE x327{0..5}
+DISCRETE x328{0..5}
+DISCRETE x329{0..5}
+DISCRETE x330{0..5}
+DISCRETE x331{0..5}
+DISCRETE x332{0..5}
+DISCRETE x333{0..5}
+DISCRETE x334{0..5}
+DISCRETE x335{0..5}
+DISCRETE x336{0..5}
+DISCRETE x337{0..5}
+DISCRETE x338{0..5}
+DISCRETE x339{0..5}
+DISCRETE x340{0..5}
+DISCRETE x341{0..5}
+DISCRETE x342{0..5}
+DISCRETE x343{0..5}
+DISCRETE x344{0..5}
+DISCRETE x345{0..5}
+DISCRETE x346{0..5}
+DISCRETE x347{0..5}
+DISCRETE x348{0..5}
+DISCRETE x349{0..5}
+DISCRETE x350{0..5}
+DISCRETE x351{0..5}
+DISCRETE x352{0..5}
+DISCRETE x353{0..5}
+DISCRETE x354{0..5}
+DISCRETE x355{0..5}
+DISCRETE x356{0..5}
+DISCRETE x357{0..5}
+DISCRETE x358{0..5}
+DISCRETE x359{0..5}
+DISCRETE x360{0..5}
+DISCRETE x361{0..5}
+DISCRETE x362{0..5}
+DISCRETE x363{0..5}
+DISCRETE x364{0..5}
+DISCRETE x365{0..5}
+DISCRETE x366{0..5}
+DISCRETE x367{0..5}
+DISCRETE x368{0..5}
+DISCRETE x369{0..5}
+DISCRETE x370{0..5}
+DISCRETE x371{0..5}
+DISCRETE x372{0..5}
+DISCRETE x373{0..5}
+DISCRETE x374{0..5}
+DISCRETE x375{0..5}
+DISCRETE x376{0..5}
+DISCRETE x377{0..5}
+DISCRETE x378{0..5}
+DISCRETE x379{0..5}
+DISCRETE x380{0..5}
+DISCRETE x381{0..5}
+DISCRETE x382{0..5}
+DISCRETE x383{0..5}
+DISCRETE x384{0..5}
+DISCRETE x385{0..5}
+DISCRETE x386{0..5}
+DISCRETE x387{0..5}
+DISCRETE x388{0..5}
+DISCRETE x389{0..5}
+DISCRETE x390{0..5}
+DISCRETE x391{0..5}
+DISCRETE x392{0..5}
+DISCRETE x393{0..5}
+DISCRETE x394{0..5}
+DISCRETE x395{0..5}
+DISCRETE x396{0..5}
+DISCRETE x397{0..5}
+DISCRETE x398{0..5}
+DISCRETE x399{0..5}
+DISCRETE x400{0..5}
+DISCRETE x401{0..5}
+DISCRETE x402{0..5}
+DISCRETE x403{0..5}
+DISCRETE x404{0..5}
+DISCRETE x405{0..5}
+DISCRETE x406{0..5}
+DISCRETE x407{0..5}
+DISCRETE x408{0..5}
+DISCRETE x409{0..5}
+DISCRETE x410{0..5}
+DISCRETE x411{0..5}
+DISCRETE x412{0..5}
+DISCRETE x413{0..5}
+DISCRETE x414{0..5}
+DISCRETE x415{0..5}
+DISCRETE x416{0..5}
+DISCRETE x417{0..5}
+DISCRETE x418{0..5}
+DISCRETE x419{0..5}
+DISCRETE x420{0..5}
+DISCRETE x421{0..5}
+DISCRETE x422{0..5}
+DISCRETE x423{0..5}
+DISCRETE x424{0..5}
+DISCRETE x425{0..5}
+DISCRETE x426{0..5}
+DISCRETE x427{0..5}
+DISCRETE x428{0..5}
+DISCRETE x429{0..5}
+DISCRETE x430{0..5}
+DISCRETE x431{0..5}
+DISCRETE x432{0..5}
+DISCRETE x433{0..5}
+DISCRETE x434{0..5}
+DISCRETE x435{0..5}
+DISCRETE x436{0..5}
+DISCRETE x437{0..5}
+DISCRETE x438{0..5}
+DISCRETE x439{0..5}
+DISCRETE x440{0..5}
+DISCRETE x441{0..5}
+DISCRETE x442{0..5}
+DISCRETE x443{0..5}
+DISCRETE x444{0..5}
+DISCRETE x445{0..5}
+DISCRETE x446{0..5}
+DISCRETE x447{0..5}
+DISCRETE x448{0..5}
+DISCRETE x449{0..5}
+DISCRETE x450{0..5}
+DISCRETE x451{0..5}
+DISCRETE x452{0..5}
+DISCRETE x453{0..5}
+DISCRETE x454{0..5}
+DISCRETE x455{0..5}
+DISCRETE x456{0..5}
+DISCRETE x457{0..5}
+DISCRETE x458{0..5}
+DISCRETE x459{0..5}
+DISCRETE x460{0..5}
+DISCRETE x461{0..5}
+DISCRETE x462{0..5}
+DISCRETE x463{0..5}
+DISCRETE x464{0..5}
+DISCRETE x465{0..5}
+DISCRETE x466{0..5}
+DISCRETE x467{0..5}
+DISCRETE x468{0..5}
+DISCRETE x469{0..5}
+DISCRETE x470{0..5}
+DISCRETE x471{0..5}
+DISCRETE x472{0..5}
+DISCRETE x473{0..5}
+DISCRETE x474{6..36}
+DISCRETE x475{0..18}
+DISCRETE x476{0..12}
+DISCRETE x477{0..9}
+DISCRETE x478{0..7}
+DISCRETE x479{0..6}
+DISCRETE x480{0..6}
+DISCRETE x481{0..6}
+DISCRETE x482{0..6}
+DISCRETE x483{0..6}
+DISCRETE x484{0..6}
+DISCRETE x485{0..6}
+**SEARCH**
+VARORDER [x222,x223,x224,x225,x226,x227,x228,x229,x230,x231,x232,x233,x234,x235,x236,x237,x238,x239,x240,x241,x242,x243,x244,x245,x246,x247,x248,x249,x250,x251,x252,x253,x254,x255,x256,x257]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127,x128,x129,x130,x131,x132,x133,x134,x135,x136,x137,x138,x139,x140,x141,x142,x143,x144,x145,x146,x147,x148,x149,x150,x151,x152,x153,x154,x155,x156,x157,x158,x159,x160,x161,x162,x163,x164,x165,x166,x167,x168,x169,x170,x171,x172,x173,x174,x175,x176,x177,x178,x179,x180,x181,x182,x183,x184,x185,x186,x187,x188,x189,x190,x191,x192,x193,x194,x195,x196,x197,x198,x199,x200,x201,x202,x203,x204,x205,x206,x207,x208,x209,x210,x211,x212,x213,x214,x215,x216,x217,x218,x219,x220,x221,x258,x259,x260,x261,x262,x263,x264,x265,x266,x267,x268,x269,x270,x271,x272,x273,x274,x275,x276,x277,x278,x279,x280,x281,x282,x283,x284,x285,x286,x287,x288,x289,x290,x291,x292,x293,x294,x295,x296,x297,x298,x299,x300,x301,x302,x303,x304,x305,x306,x307,x308,x309,x310,x311,x312,x313,x314,x315,x316,x317,x318,x319,x320,x321,x322,x323,x324,x325,x326,x327,x328,x329,x330,x331,x332,x333,x334,x335,x336,x337,x338,x339,x340,x341,x342,x343,x344,x345,x346,x347,x348,x349,x350,x351,x352,x353,x354,x355,x356,x357,x358,x359,x360,x361,x362,x363,x364,x365,x366,x367,x368,x369,x370,x371,x372,x373,x374,x375,x376,x377,x378,x379,x380,x381,x382,x383,x384,x385,x386,x387,x388,x389,x390,x391,x392,x393,x394,x395,x396,x397,x398,x399,x400,x401,x402,x403,x404,x405,x406,x407,x408,x409,x410,x411,x412,x413,x414,x415,x416,x417,x418,x419,x420,x421,x422,x423,x424,x425,x426,x427,x428,x429,x430,x431,x432,x433,x434,x435,x436,x437,x438,x439,x440,x441,x442,x443,x444,x445,x446,x447,x448,x449,x450,x451,x452,x453,x454,x455,x456,x457,x458,x459,x460,x461,x462,x463,x464,x465,x466,x467,x468,x469,x470,x471,x472,x473,x474,x475,x476,x477,x478,x479,x480,x481,x482,x483,x484,x485]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127,x128,x129,x130,x131,x132,x133,x134,x135,x136,x137,x138,x139,x140,x141,x142,x143,x144,x145,x146,x147,x148,x149,x150,x151,x152,x153,x154,x155,x156,x157,x158,x159,x160,x161,x162,x163,x164,x165,x166,x167,x168,x169,x170,x171,x172,x173,x174,x175,x176,x177,x178,x179,x180,x181,x182,x183,x184,x185,x186,x187,x188,x189,x190,x191,x192,x193,x194,x195,x196,x197,x198,x199,x200,x201,x202,x203,x204,x205,x206,x207,x208,x209,x210,x211,x212,x213,x214,x215,x216,x217,x218,x219,x220,x221,x222,x223,x224,x225,x226,x227,x228,x229,x230,x231,x232,x233,x234,x235,x236,x237,x238,x239,x240,x241,x242,x243,x244,x245,x246,x247,x248,x249,x250,x251,x252,x253,x254,x255,x256,x257,x258,x259,x260,x261,x262,x263,x264,x265,x266,x267,x268,x269,x270,x271,x272,x273,x274,x275,x276,x277,x278,x279,x280,x281,x282,x283,x284,x285,x286,x287,x288,x289,x290,x291,x292,x293,x294,x295,x296,x297,x298,x299,x300,x301,x302,x303,x304,x305,x306,x307,x308,x309,x310,x311,x312,x313,x314,x315,x316,x317,x318,x319,x320,x321,x322,x323,x324,x325,x326,x327,x328,x329,x330,x331,x332,x333,x334,x335,x336,x337,x338,x339,x340,x341,x342,x343,x344,x345,x346,x347,x348,x349,x350,x351,x352,x353,x354,x355,x356,x357,x358,x359,x360,x361,x362,x363,x364,x365,x366,x367,x368,x369,x370,x371,x372,x373,x374,x375,x376,x377,x378,x379,x380,x381,x382,x383,x384,x385,x386,x387,x388,x389,x390,x391,x392,x393,x394,x395,x396,x397,x398,x399,x400,x401,x402,x403,x404,x405,x406,x407,x408,x409,x410,x411,x412,x413,x414,x415,x416,x417,x418,x419,x420,x421,x422,x423,x424,x425,x426,x427,x428,x429,x430,x431,x432,x433,x434,x435,x436,x437,x438,x439,x440,x441,x442,x443,x444,x445,x446,x447,x448,x449,x450,x451,x452,x453,x454,x455,x456,x457,x458,x459,x460,x461,x462,x463,x464,x465,x466,x467,x468,x469,x470,x471,x472,x473,x474,x475,x476,x477,x478,x479,x480,x481,x482,x483,x484,x485]
+PRINT[[x222,x223,x224,x225,x226,x227],[x228,x229,x230,x231,x232,x233],[x234,x235,x236,x237,x238,x239],[x240,x241,x242,x243,x244,x245],[x246,x247,x248,x249,x250,x251],[x252,x253,x254,x255,x256,x257],[x474,x475,x476,x477,x478,x479]]
+**TUPLELIST**
+**CONSTRAINTS**
+lexleq([x222,x223,x224,x225,x226,x227,x228,x229,x230,x231,x232,x233,x234,x235,x236,x237,x238,x239,x240,x241,x242,x243,x244,x245,x246,x247,x248,x249,x250,x251,x252,x253,x254,x255,x256,x257], [x222,x228,x234,x240,x246,x252,x223,x229,x235,x241,x247,x253,x224,x230,x236,x242,x248,x254,x225,x231,x237,x243,x249,x255,x226,x232,x238,x244,x250,x256,x227,x233,x239,x245,x251,x257])
+sumleq([x222,x223,x224,x225,x226,x227,x228,x229,x230,x231,x232,x233,x234,x235,x236,x237,x238,x239,x240,x241,x242,x243,x244,x245,x246,x247,x248,x249,x250,x251,x252,x253,x254,x255,x256,x257], 90)
+reify(eq(x222, 0)
+, x216)
+reify(eq(x229, 1)
+, x217)
+reify(eq(x236, 2)
+, x218)
+reify(eq(x243, 3)
+, x219)
+reify(eq(x250, 4)
+, x220)
+reify(eq(x257, 5)
+, x221)
+eq(x222, 0)
+eq(x223, 0)
+eq(x224, 0)
+eq(x225, 0)
+eq(x226, 0)
+eq(x227, 0)
+eq(x228, 0)
+eq(x229, 0)
+eq(x230, 0)
+eq(x231, 0)
+eq(x232, 1)
+eq(x233, 0)
+eq(x234, 0)
+eq(x235, 0)
+eq(x236, 1)
+eq(x237, 1)
+eq(x238, 2)
+eq(x239, 0)
+eq(x240, 0)
+eq(x243, 1)
+eq(x249, 2)
+sumgeq([x216,x217,x218,x219,x220,x221], 3)
+sumleq([x216,x217,x218,x219,x220,x221], 3)
+sumleq([x0,x6,x12,x18,x24,x30,x36,x42,x48,x54,x60,x66,x72,x78,x84,x90,x96,x102,x108,x114,x120,x126,x132,x138,x144,x150,x156,x162,x168,x174,x180,x186,x192,x198,x204,x210], x474)
+sumgeq([x0,x6,x12,x18,x24,x30,x36,x42,x48,x54,x60,x66,x72,x78,x84,x90,x96,x102,x108,x114,x120,x126,x132,x138,x144,x150,x156,x162,x168,x174,x180,x186,x192,x198,x204,x210], x474)
+sumleq([x1,x7,x13,x19,x25,x31,x37,x43,x49,x55,x61,x67,x73,x79,x85,x91,x97,x103,x109,x115,x121,x127,x133,x139,x145,x151,x157,x163,x169,x175,x181,x187,x193,x199,x205,x211], x475)
+sumgeq([x1,x7,x13,x19,x25,x31,x37,x43,x49,x55,x61,x67,x73,x79,x85,x91,x97,x103,x109,x115,x121,x127,x133,x139,x145,x151,x157,x163,x169,x175,x181,x187,x193,x199,x205,x211], x475)
+sumleq([x2,x8,x14,x20,x26,x32,x38,x44,x50,x56,x62,x68,x74,x80,x86,x92,x98,x104,x110,x116,x122,x128,x134,x140,x146,x152,x158,x164,x170,x176,x182,x188,x194,x200,x206,x212], x476)
+sumgeq([x2,x8,x14,x20,x26,x32,x38,x44,x50,x56,x62,x68,x74,x80,x86,x92,x98,x104,x110,x116,x122,x128,x134,x140,x146,x152,x158,x164,x170,x176,x182,x188,x194,x200,x206,x212], x476)
+sumleq([x3,x9,x15,x21,x27,x33,x39,x45,x51,x57,x63,x69,x75,x81,x87,x93,x99,x105,x111,x117,x123,x129,x135,x141,x147,x153,x159,x165,x171,x177,x183,x189,x195,x201,x207,x213], x477)
+sumgeq([x3,x9,x15,x21,x27,x33,x39,x45,x51,x57,x63,x69,x75,x81,x87,x93,x99,x105,x111,x117,x123,x129,x135,x141,x147,x153,x159,x165,x171,x177,x183,x189,x195,x201,x207,x213], x477)
+sumleq([x4,x10,x16,x22,x28,x34,x40,x46,x52,x58,x64,x70,x76,x82,x88,x94,x100,x106,x112,x118,x124,x130,x136,x142,x148,x154,x160,x166,x172,x178,x184,x190,x196,x202,x208,x214], x478)
+sumgeq([x4,x10,x16,x22,x28,x34,x40,x46,x52,x58,x64,x70,x76,x82,x88,x94,x100,x106,x112,x118,x124,x130,x136,x142,x148,x154,x160,x166,x172,x178,x184,x190,x196,x202,x208,x214], x478)
+sumleq([x5,x11,x17,x23,x29,x35,x41,x47,x53,x59,x65,x71,x77,x83,x89,x95,x101,x107,x113,x119,x125,x131,x137,x143,x149,x155,x161,x167,x173,x179,x185,x191,x197,x203,x209,x215], x479)
+sumgeq([x5,x11,x17,x23,x29,x35,x41,x47,x53,x59,x65,x71,x77,x83,x89,x95,x101,x107,x113,x119,x125,x131,x137,x143,x149,x155,x161,x167,x173,x179,x185,x191,x197,x203,x209,x215], x479)
+ineq(x475, x474, 0)
+ineq(x476, x475, 0)
+ineq(x477, x476, 0)
+ineq(x478, x477, 0)
+ineq(x479, x478, 0)
+reify(eq(x222, 0)
+, x0)
+reify(eq(x222, 1)
+, x1)
+reify(eq(x222, 2)
+, x2)
+reify(eq(x222, 3)
+, x3)
+reify(eq(x222, 4)
+, x4)
+reify(eq(x222, 5)
+, x5)
+reify(eq(x223, 0)
+, x6)
+reify(eq(x223, 1)
+, x7)
+reify(eq(x223, 2)
+, x8)
+reify(eq(x223, 3)
+, x9)
+reify(eq(x223, 4)
+, x10)
+reify(eq(x223, 5)
+, x11)
+reify(eq(x224, 0)
+, x12)
+reify(eq(x224, 1)
+, x13)
+reify(eq(x224, 2)
+, x14)
+reify(eq(x224, 3)
+, x15)
+reify(eq(x224, 4)
+, x16)
+reify(eq(x224, 5)
+, x17)
+reify(eq(x225, 0)
+, x18)
+reify(eq(x225, 1)
+, x19)
+reify(eq(x225, 2)
+, x20)
+reify(eq(x225, 3)
+, x21)
+reify(eq(x225, 4)
+, x22)
+reify(eq(x225, 5)
+, x23)
+reify(eq(x226, 0)
+, x24)
+reify(eq(x226, 1)
+, x25)
+reify(eq(x226, 2)
+, x26)
+reify(eq(x226, 3)
+, x27)
+reify(eq(x226, 4)
+, x28)
+reify(eq(x226, 5)
+, x29)
+reify(eq(x227, 0)
+, x30)
+reify(eq(x227, 1)
+, x31)
+reify(eq(x227, 2)
+, x32)
+reify(eq(x227, 3)
+, x33)
+reify(eq(x227, 4)
+, x34)
+reify(eq(x227, 5)
+, x35)
+reify(eq(x228, 0)
+, x36)
+reify(eq(x228, 1)
+, x37)
+reify(eq(x228, 2)
+, x38)
+reify(eq(x228, 3)
+, x39)
+reify(eq(x228, 4)
+, x40)
+reify(eq(x228, 5)
+, x41)
+reify(eq(x229, 0)
+, x42)
+reify(eq(x229, 1)
+, x43)
+reify(eq(x229, 2)
+, x44)
+reify(eq(x229, 3)
+, x45)
+reify(eq(x229, 4)
+, x46)
+reify(eq(x229, 5)
+, x47)
+reify(eq(x230, 0)
+, x48)
+reify(eq(x230, 1)
+, x49)
+reify(eq(x230, 2)
+, x50)
+reify(eq(x230, 3)
+, x51)
+reify(eq(x230, 4)
+, x52)
+reify(eq(x230, 5)
+, x53)
+reify(eq(x231, 0)
+, x54)
+reify(eq(x231, 1)
+, x55)
+reify(eq(x231, 2)
+, x56)
+reify(eq(x231, 3)
+, x57)
+reify(eq(x231, 4)
+, x58)
+reify(eq(x231, 5)
+, x59)
+reify(eq(x232, 0)
+, x60)
+reify(eq(x232, 1)
+, x61)
+reify(eq(x232, 2)
+, x62)
+reify(eq(x232, 3)
+, x63)
+reify(eq(x232, 4)
+, x64)
+reify(eq(x232, 5)
+, x65)
+reify(eq(x233, 0)
+, x66)
+reify(eq(x233, 1)
+, x67)
+reify(eq(x233, 2)
+, x68)
+reify(eq(x233, 3)
+, x69)
+reify(eq(x233, 4)
+, x70)
+reify(eq(x233, 5)
+, x71)
+reify(eq(x234, 0)
+, x72)
+reify(eq(x234, 1)
+, x73)
+reify(eq(x234, 2)
+, x74)
+reify(eq(x234, 3)
+, x75)
+reify(eq(x234, 4)
+, x76)
+reify(eq(x234, 5)
+, x77)
+reify(eq(x235, 0)
+, x78)
+reify(eq(x235, 1)
+, x79)
+reify(eq(x235, 2)
+, x80)
+reify(eq(x235, 3)
+, x81)
+reify(eq(x235, 4)
+, x82)
+reify(eq(x235, 5)
+, x83)
+reify(eq(x236, 0)
+, x84)
+reify(eq(x236, 1)
+, x85)
+reify(eq(x236, 2)
+, x86)
+reify(eq(x236, 3)
+, x87)
+reify(eq(x236, 4)
+, x88)
+reify(eq(x236, 5)
+, x89)
+reify(eq(x237, 0)
+, x90)
+reify(eq(x237, 1)
+, x91)
+reify(eq(x237, 2)
+, x92)
+reify(eq(x237, 3)
+, x93)
+reify(eq(x237, 4)
+, x94)
+reify(eq(x237, 5)
+, x95)
+reify(eq(x238, 0)
+, x96)
+reify(eq(x238, 1)
+, x97)
+reify(eq(x238, 2)
+, x98)
+reify(eq(x238, 3)
+, x99)
+reify(eq(x238, 4)
+, x100)
+reify(eq(x238, 5)
+, x101)
+reify(eq(x239, 0)
+, x102)
+reify(eq(x239, 1)
+, x103)
+reify(eq(x239, 2)
+, x104)
+reify(eq(x239, 3)
+, x105)
+reify(eq(x239, 4)
+, x106)
+reify(eq(x239, 5)
+, x107)
+reify(eq(x240, 0)
+, x108)
+reify(eq(x240, 1)
+, x109)
+reify(eq(x240, 2)
+, x110)
+reify(eq(x240, 3)
+, x111)
+reify(eq(x240, 4)
+, x112)
+reify(eq(x240, 5)
+, x113)
+reify(eq(x241, 0)
+, x114)
+reify(eq(x241, 1)
+, x115)
+reify(eq(x241, 2)
+, x116)
+reify(eq(x241, 3)
+, x117)
+reify(eq(x241, 4)
+, x118)
+reify(eq(x241, 5)
+, x119)
+reify(eq(x242, 0)
+, x120)
+reify(eq(x242, 1)
+, x121)
+reify(eq(x242, 2)
+, x122)
+reify(eq(x242, 3)
+, x123)
+reify(eq(x242, 4)
+, x124)
+reify(eq(x242, 5)
+, x125)
+reify(eq(x243, 0)
+, x126)
+reify(eq(x243, 1)
+, x127)
+reify(eq(x243, 2)
+, x128)
+reify(eq(x243, 3)
+, x129)
+reify(eq(x243, 4)
+, x130)
+reify(eq(x243, 5)
+, x131)
+reify(eq(x244, 0)
+, x132)
+reify(eq(x244, 1)
+, x133)
+reify(eq(x244, 2)
+, x134)
+reify(eq(x244, 3)
+, x135)
+reify(eq(x244, 4)
+, x136)
+reify(eq(x244, 5)
+, x137)
+reify(eq(x245, 0)
+, x138)
+reify(eq(x245, 1)
+, x139)
+reify(eq(x245, 2)
+, x140)
+reify(eq(x245, 3)
+, x141)
+reify(eq(x245, 4)
+, x142)
+reify(eq(x245, 5)
+, x143)
+reify(eq(x246, 0)
+, x144)
+reify(eq(x246, 1)
+, x145)
+reify(eq(x246, 2)
+, x146)
+reify(eq(x246, 3)
+, x147)
+reify(eq(x246, 4)
+, x148)
+reify(eq(x246, 5)
+, x149)
+reify(eq(x247, 0)
+, x150)
+reify(eq(x247, 1)
+, x151)
+reify(eq(x247, 2)
+, x152)
+reify(eq(x247, 3)
+, x153)
+reify(eq(x247, 4)
+, x154)
+reify(eq(x247, 5)
+, x155)
+reify(eq(x248, 0)
+, x156)
+reify(eq(x248, 1)
+, x157)
+reify(eq(x248, 2)
+, x158)
+reify(eq(x248, 3)
+, x159)
+reify(eq(x248, 4)
+, x160)
+reify(eq(x248, 5)
+, x161)
+reify(eq(x249, 0)
+, x162)
+reify(eq(x249, 1)
+, x163)
+reify(eq(x249, 2)
+, x164)
+reify(eq(x249, 3)
+, x165)
+reify(eq(x249, 4)
+, x166)
+reify(eq(x249, 5)
+, x167)
+reify(eq(x250, 0)
+, x168)
+reify(eq(x250, 1)
+, x169)
+reify(eq(x250, 2)
+, x170)
+reify(eq(x250, 3)
+, x171)
+reify(eq(x250, 4)
+, x172)
+reify(eq(x250, 5)
+, x173)
+reify(eq(x251, 0)
+, x174)
+reify(eq(x251, 1)
+, x175)
+reify(eq(x251, 2)
+, x176)
+reify(eq(x251, 3)
+, x177)
+reify(eq(x251, 4)
+, x178)
+reify(eq(x251, 5)
+, x179)
+reify(eq(x252, 0)
+, x180)
+reify(eq(x252, 1)
+, x181)
+reify(eq(x252, 2)
+, x182)
+reify(eq(x252, 3)
+, x183)
+reify(eq(x252, 4)
+, x184)
+reify(eq(x252, 5)
+, x185)
+reify(eq(x253, 0)
+, x186)
+reify(eq(x253, 1)
+, x187)
+reify(eq(x253, 2)
+, x188)
+reify(eq(x253, 3)
+, x189)
+reify(eq(x253, 4)
+, x190)
+reify(eq(x253, 5)
+, x191)
+reify(eq(x254, 0)
+, x192)
+reify(eq(x254, 1)
+, x193)
+reify(eq(x254, 2)
+, x194)
+reify(eq(x254, 3)
+, x195)
+reify(eq(x254, 4)
+, x196)
+reify(eq(x254, 5)
+, x197)
+reify(eq(x255, 0)
+, x198)
+reify(eq(x255, 1)
+, x199)
+reify(eq(x255, 2)
+, x200)
+reify(eq(x255, 3)
+, x201)
+reify(eq(x255, 4)
+, x202)
+reify(eq(x255, 5)
+, x203)
+reify(eq(x256, 0)
+, x204)
+reify(eq(x256, 1)
+, x205)
+reify(eq(x256, 2)
+, x206)
+reify(eq(x256, 3)
+, x207)
+reify(eq(x256, 4)
+, x208)
+reify(eq(x256, 5)
+, x209)
+reify(eq(x257, 0)
+, x210)
+reify(eq(x257, 1)
+, x211)
+reify(eq(x257, 2)
+, x212)
+reify(eq(x257, 3)
+, x213)
+reify(eq(x257, 4)
+, x214)
+reify(eq(x257, 5)
+, x215)
+element([x222,x223,x224,x225,x226,x227], x222, x258)
+element([x222,x228,x234,x240,x246,x252,x474], x222, x258)
+element([x222,x223,x224,x225,x226,x227], x223, x259)
+element([x223,x229,x235,x241,x247,x253,x475], x222, x259)
+element([x222,x223,x224,x225,x226,x227], x224, x260)
+element([x224,x230,x236,x242,x248,x254,x476], x222, x260)
+element([x222,x223,x224,x225,x226,x227], x225, x261)
+element([x225,x231,x237,x243,x249,x255,x477], x222, x261)
+element([x222,x223,x224,x225,x226,x227], x226, x262)
+element([x226,x232,x238,x244,x250,x256,x478], x222, x262)
+element([x222,x223,x224,x225,x226,x227], x227, x263)
+element([x227,x233,x239,x245,x251,x257,x479], x222, x263)
+element([x222,x223,x224,x225,x226,x227], x228, x264)
+element([x222,x228,x234,x240,x246,x252,x474], x223, x264)
+element([x222,x223,x224,x225,x226,x227], x229, x265)
+element([x223,x229,x235,x241,x247,x253,x475], x223, x265)
+element([x222,x223,x224,x225,x226,x227], x230, x266)
+element([x224,x230,x236,x242,x248,x254,x476], x223, x266)
+element([x222,x223,x224,x225,x226,x227], x231, x267)
+element([x225,x231,x237,x243,x249,x255,x477], x223, x267)
+element([x222,x223,x224,x225,x226,x227], x232, x268)
+element([x226,x232,x238,x244,x250,x256,x478], x223, x268)
+element([x222,x223,x224,x225,x226,x227], x233, x269)
+element([x227,x233,x239,x245,x251,x257,x479], x223, x269)
+element([x222,x223,x224,x225,x226,x227], x234, x270)
+element([x222,x228,x234,x240,x246,x252,x474], x224, x270)
+element([x222,x223,x224,x225,x226,x227], x235, x271)
+element([x223,x229,x235,x241,x247,x253,x475], x224, x271)
+element([x222,x223,x224,x225,x226,x227], x236, x272)
+element([x224,x230,x236,x242,x248,x254,x476], x224, x272)
+element([x222,x223,x224,x225,x226,x227], x237, x273)
+element([x225,x231,x237,x243,x249,x255,x477], x224, x273)
+element([x222,x223,x224,x225,x226,x227], x238, x274)
+element([x226,x232,x238,x244,x250,x256,x478], x224, x274)
+element([x222,x223,x224,x225,x226,x227], x239, x275)
+element([x227,x233,x239,x245,x251,x257,x479], x224, x275)
+element([x222,x223,x224,x225,x226,x227], x240, x276)
+element([x222,x228,x234,x240,x246,x252,x474], x225, x276)
+element([x222,x223,x224,x225,x226,x227], x241, x277)
+element([x223,x229,x235,x241,x247,x253,x475], x225, x277)
+element([x222,x223,x224,x225,x226,x227], x242, x278)
+element([x224,x230,x236,x242,x248,x254,x476], x225, x278)
+element([x222,x223,x224,x225,x226,x227], x243, x279)
+element([x225,x231,x237,x243,x249,x255,x477], x225, x279)
+element([x222,x223,x224,x225,x226,x227], x244, x280)
+element([x226,x232,x238,x244,x250,x256,x478], x225, x280)
+element([x222,x223,x224,x225,x226,x227], x245, x281)
+element([x227,x233,x239,x245,x251,x257,x479], x225, x281)
+element([x222,x223,x224,x225,x226,x227], x246, x282)
+element([x222,x228,x234,x240,x246,x252,x474], x226, x282)
+element([x222,x223,x224,x225,x226,x227], x247, x283)
+element([x223,x229,x235,x241,x247,x253,x475], x226, x283)
+element([x222,x223,x224,x225,x226,x227], x248, x284)
+element([x224,x230,x236,x242,x248,x254,x476], x226, x284)
+element([x222,x223,x224,x225,x226,x227], x249, x285)
+element([x225,x231,x237,x243,x249,x255,x477], x226, x285)
+element([x222,x223,x224,x225,x226,x227], x250, x286)
+element([x226,x232,x238,x244,x250,x256,x478], x226, x286)
+element([x222,x223,x224,x225,x226,x227], x251, x287)
+element([x227,x233,x239,x245,x251,x257,x479], x226, x287)
+element([x222,x223,x224,x225,x226,x227], x252, x288)
+element([x222,x228,x234,x240,x246,x252,x474], x227, x288)
+element([x222,x223,x224,x225,x226,x227], x253, x289)
+element([x223,x229,x235,x241,x247,x253,x475], x227, x289)
+element([x222,x223,x224,x225,x226,x227], x254, x290)
+element([x224,x230,x236,x242,x248,x254,x476], x227, x290)
+element([x222,x223,x224,x225,x226,x227], x255, x291)
+element([x225,x231,x237,x243,x249,x255,x477], x227, x291)
+element([x222,x223,x224,x225,x226,x227], x256, x292)
+element([x226,x232,x238,x244,x250,x256,x478], x227, x292)
+element([x222,x223,x224,x225,x226,x227], x257, x293)
+element([x227,x233,x239,x245,x251,x257,x479], x227, x293)
+element([x228,x229,x230,x231,x232,x233], x222, x294)
+element([x222,x228,x234,x240,x246,x252,x474], x228, x294)
+element([x228,x229,x230,x231,x232,x233], x223, x295)
+element([x223,x229,x235,x241,x247,x253,x475], x228, x295)
+element([x228,x229,x230,x231,x232,x233], x224, x296)
+element([x224,x230,x236,x242,x248,x254,x476], x228, x296)
+element([x228,x229,x230,x231,x232,x233], x225, x297)
+element([x225,x231,x237,x243,x249,x255,x477], x228, x297)
+element([x228,x229,x230,x231,x232,x233], x226, x298)
+element([x226,x232,x238,x244,x250,x256,x478], x228, x298)
+element([x228,x229,x230,x231,x232,x233], x227, x299)
+element([x227,x233,x239,x245,x251,x257,x479], x228, x299)
+element([x228,x229,x230,x231,x232,x233], x228, x300)
+element([x222,x228,x234,x240,x246,x252,x474], x229, x300)
+element([x228,x229,x230,x231,x232,x233], x229, x301)
+element([x223,x229,x235,x241,x247,x253,x475], x229, x301)
+element([x228,x229,x230,x231,x232,x233], x230, x302)
+element([x224,x230,x236,x242,x248,x254,x476], x229, x302)
+element([x228,x229,x230,x231,x232,x233], x231, x303)
+element([x225,x231,x237,x243,x249,x255,x477], x229, x303)
+element([x228,x229,x230,x231,x232,x233], x232, x304)
+element([x226,x232,x238,x244,x250,x256,x478], x229, x304)
+element([x228,x229,x230,x231,x232,x233], x233, x305)
+element([x227,x233,x239,x245,x251,x257,x479], x229, x305)
+element([x228,x229,x230,x231,x232,x233], x234, x306)
+element([x222,x228,x234,x240,x246,x252,x474], x230, x306)
+element([x228,x229,x230,x231,x232,x233], x235, x307)
+element([x223,x229,x235,x241,x247,x253,x475], x230, x307)
+element([x228,x229,x230,x231,x232,x233], x236, x308)
+element([x224,x230,x236,x242,x248,x254,x476], x230, x308)
+element([x228,x229,x230,x231,x232,x233], x237, x309)
+element([x225,x231,x237,x243,x249,x255,x477], x230, x309)
+element([x228,x229,x230,x231,x232,x233], x238, x310)
+element([x226,x232,x238,x244,x250,x256,x478], x230, x310)
+element([x228,x229,x230,x231,x232,x233], x239, x311)
+element([x227,x233,x239,x245,x251,x257,x479], x230, x311)
+element([x228,x229,x230,x231,x232,x233], x240, x312)
+element([x222,x228,x234,x240,x246,x252,x474], x231, x312)
+element([x228,x229,x230,x231,x232,x233], x241, x313)
+element([x223,x229,x235,x241,x247,x253,x475], x231, x313)
+element([x228,x229,x230,x231,x232,x233], x242, x314)
+element([x224,x230,x236,x242,x248,x254,x476], x231, x314)
+element([x228,x229,x230,x231,x232,x233], x243, x315)
+element([x225,x231,x237,x243,x249,x255,x477], x231, x315)
+element([x228,x229,x230,x231,x232,x233], x244, x316)
+element([x226,x232,x238,x244,x250,x256,x478], x231, x316)
+element([x228,x229,x230,x231,x232,x233], x245, x317)
+element([x227,x233,x239,x245,x251,x257,x479], x231, x317)
+element([x228,x229,x230,x231,x232,x233], x246, x318)
+element([x222,x228,x234,x240,x246,x252,x474], x232, x318)
+element([x228,x229,x230,x231,x232,x233], x247, x319)
+element([x223,x229,x235,x241,x247,x253,x475], x232, x319)
+element([x228,x229,x230,x231,x232,x233], x248, x320)
+element([x224,x230,x236,x242,x248,x254,x476], x232, x320)
+element([x228,x229,x230,x231,x232,x233], x249, x321)
+element([x225,x231,x237,x243,x249,x255,x477], x232, x321)
+element([x228,x229,x230,x231,x232,x233], x250, x322)
+element([x226,x232,x238,x244,x250,x256,x478], x232, x322)
+element([x228,x229,x230,x231,x232,x233], x251, x323)
+element([x227,x233,x239,x245,x251,x257,x479], x232, x323)
+element([x228,x229,x230,x231,x232,x233], x252, x324)
+element([x222,x228,x234,x240,x246,x252,x474], x233, x324)
+element([x228,x229,x230,x231,x232,x233], x253, x325)
+element([x223,x229,x235,x241,x247,x253,x475], x233, x325)
+element([x228,x229,x230,x231,x232,x233], x254, x326)
+element([x224,x230,x236,x242,x248,x254,x476], x233, x326)
+element([x228,x229,x230,x231,x232,x233], x255, x327)
+element([x225,x231,x237,x243,x249,x255,x477], x233, x327)
+element([x228,x229,x230,x231,x232,x233], x256, x328)
+element([x226,x232,x238,x244,x250,x256,x478], x233, x328)
+element([x228,x229,x230,x231,x232,x233], x257, x329)
+element([x227,x233,x239,x245,x251,x257,x479], x233, x329)
+element([x234,x235,x236,x237,x238,x239], x222, x330)
+element([x222,x228,x234,x240,x246,x252,x474], x234, x330)
+element([x234,x235,x236,x237,x238,x239], x223, x331)
+element([x223,x229,x235,x241,x247,x253,x475], x234, x331)
+element([x234,x235,x236,x237,x238,x239], x224, x332)
+element([x224,x230,x236,x242,x248,x254,x476], x234, x332)
+element([x234,x235,x236,x237,x238,x239], x225, x333)
+element([x225,x231,x237,x243,x249,x255,x477], x234, x333)
+element([x234,x235,x236,x237,x238,x239], x226, x334)
+element([x226,x232,x238,x244,x250,x256,x478], x234, x334)
+element([x234,x235,x236,x237,x238,x239], x227, x335)
+element([x227,x233,x239,x245,x251,x257,x479], x234, x335)
+element([x234,x235,x236,x237,x238,x239], x228, x336)
+element([x222,x228,x234,x240,x246,x252,x474], x235, x336)
+element([x234,x235,x236,x237,x238,x239], x229, x337)
+element([x223,x229,x235,x241,x247,x253,x475], x235, x337)
+element([x234,x235,x236,x237,x238,x239], x230, x338)
+element([x224,x230,x236,x242,x248,x254,x476], x235, x338)
+element([x234,x235,x236,x237,x238,x239], x231, x339)
+element([x225,x231,x237,x243,x249,x255,x477], x235, x339)
+element([x234,x235,x236,x237,x238,x239], x232, x340)
+element([x226,x232,x238,x244,x250,x256,x478], x235, x340)
+element([x234,x235,x236,x237,x238,x239], x233, x341)
+element([x227,x233,x239,x245,x251,x257,x479], x235, x341)
+element([x234,x235,x236,x237,x238,x239], x234, x342)
+element([x222,x228,x234,x240,x246,x252,x474], x236, x342)
+element([x234,x235,x236,x237,x238,x239], x235, x343)
+element([x223,x229,x235,x241,x247,x253,x475], x236, x343)
+element([x234,x235,x236,x237,x238,x239], x236, x344)
+element([x224,x230,x236,x242,x248,x254,x476], x236, x344)
+element([x234,x235,x236,x237,x238,x239], x237, x345)
+element([x225,x231,x237,x243,x249,x255,x477], x236, x345)
+element([x234,x235,x236,x237,x238,x239], x238, x346)
+element([x226,x232,x238,x244,x250,x256,x478], x236, x346)
+element([x234,x235,x236,x237,x238,x239], x239, x347)
+element([x227,x233,x239,x245,x251,x257,x479], x236, x347)
+element([x234,x235,x236,x237,x238,x239], x240, x348)
+element([x222,x228,x234,x240,x246,x252,x474], x237, x348)
+element([x234,x235,x236,x237,x238,x239], x241, x349)
+element([x223,x229,x235,x241,x247,x253,x475], x237, x349)
+element([x234,x235,x236,x237,x238,x239], x242, x350)
+element([x224,x230,x236,x242,x248,x254,x476], x237, x350)
+element([x234,x235,x236,x237,x238,x239], x243, x351)
+element([x225,x231,x237,x243,x249,x255,x477], x237, x351)
+element([x234,x235,x236,x237,x238,x239], x244, x352)
+element([x226,x232,x238,x244,x250,x256,x478], x237, x352)
+element([x234,x235,x236,x237,x238,x239], x245, x353)
+element([x227,x233,x239,x245,x251,x257,x479], x237, x353)
+element([x234,x235,x236,x237,x238,x239], x246, x354)
+element([x222,x228,x234,x240,x246,x252,x474], x238, x354)
+element([x234,x235,x236,x237,x238,x239], x247, x355)
+element([x223,x229,x235,x241,x247,x253,x475], x238, x355)
+element([x234,x235,x236,x237,x238,x239], x248, x356)
+element([x224,x230,x236,x242,x248,x254,x476], x238, x356)
+element([x234,x235,x236,x237,x238,x239], x249, x357)
+element([x225,x231,x237,x243,x249,x255,x477], x238, x357)
+element([x234,x235,x236,x237,x238,x239], x250, x358)
+element([x226,x232,x238,x244,x250,x256,x478], x238, x358)
+element([x234,x235,x236,x237,x238,x239], x251, x359)
+element([x227,x233,x239,x245,x251,x257,x479], x238, x359)
+element([x234,x235,x236,x237,x238,x239], x252, x360)
+element([x222,x228,x234,x240,x246,x252,x474], x239, x360)
+element([x234,x235,x236,x237,x238,x239], x253, x361)
+element([x223,x229,x235,x241,x247,x253,x475], x239, x361)
+element([x234,x235,x236,x237,x238,x239], x254, x362)
+element([x224,x230,x236,x242,x248,x254,x476], x239, x362)
+element([x234,x235,x236,x237,x238,x239], x255, x363)
+element([x225,x231,x237,x243,x249,x255,x477], x239, x363)
+element([x234,x235,x236,x237,x238,x239], x256, x364)
+element([x226,x232,x238,x244,x250,x256,x478], x239, x364)
+element([x234,x235,x236,x237,x238,x239], x257, x365)
+element([x227,x233,x239,x245,x251,x257,x479], x239, x365)
+element([x240,x241,x242,x243,x244,x245], x222, x366)
+element([x222,x228,x234,x240,x246,x252,x474], x240, x366)
+element([x240,x241,x242,x243,x244,x245], x223, x367)
+element([x223,x229,x235,x241,x247,x253,x475], x240, x367)
+element([x240,x241,x242,x243,x244,x245], x224, x368)
+element([x224,x230,x236,x242,x248,x254,x476], x240, x368)
+element([x240,x241,x242,x243,x244,x245], x225, x369)
+element([x225,x231,x237,x243,x249,x255,x477], x240, x369)
+element([x240,x241,x242,x243,x244,x245], x226, x370)
+element([x226,x232,x238,x244,x250,x256,x478], x240, x370)
+element([x240,x241,x242,x243,x244,x245], x227, x371)
+element([x227,x233,x239,x245,x251,x257,x479], x240, x371)
+element([x240,x241,x242,x243,x244,x245], x228, x372)
+element([x222,x228,x234,x240,x246,x252,x474], x241, x372)
+element([x240,x241,x242,x243,x244,x245], x229, x373)
+element([x223,x229,x235,x241,x247,x253,x475], x241, x373)
+element([x240,x241,x242,x243,x244,x245], x230, x374)
+element([x224,x230,x236,x242,x248,x254,x476], x241, x374)
+element([x240,x241,x242,x243,x244,x245], x231, x375)
+element([x225,x231,x237,x243,x249,x255,x477], x241, x375)
+element([x240,x241,x242,x243,x244,x245], x232, x376)
+element([x226,x232,x238,x244,x250,x256,x478], x241, x376)
+element([x240,x241,x242,x243,x244,x245], x233, x377)
+element([x227,x233,x239,x245,x251,x257,x479], x241, x377)
+element([x240,x241,x242,x243,x244,x245], x234, x378)
+element([x222,x228,x234,x240,x246,x252,x474], x242, x378)
+element([x240,x241,x242,x243,x244,x245], x235, x379)
+element([x223,x229,x235,x241,x247,x253,x475], x242, x379)
+element([x240,x241,x242,x243,x244,x245], x236, x380)
+element([x224,x230,x236,x242,x248,x254,x476], x242, x380)
+element([x240,x241,x242,x243,x244,x245], x237, x381)
+element([x225,x231,x237,x243,x249,x255,x477], x242, x381)
+element([x240,x241,x242,x243,x244,x245], x238, x382)
+element([x226,x232,x238,x244,x250,x256,x478], x242, x382)
+element([x240,x241,x242,x243,x244,x245], x239, x383)
+element([x227,x233,x239,x245,x251,x257,x479], x242, x383)
+element([x240,x241,x242,x243,x244,x245], x240, x384)
+element([x222,x228,x234,x240,x246,x252,x474], x243, x384)
+element([x240,x241,x242,x243,x244,x245], x241, x385)
+element([x223,x229,x235,x241,x247,x253,x475], x243, x385)
+element([x240,x241,x242,x243,x244,x245], x242, x386)
+element([x224,x230,x236,x242,x248,x254,x476], x243, x386)
+element([x240,x241,x242,x243,x244,x245], x243, x387)
+element([x225,x231,x237,x243,x249,x255,x477], x243, x387)
+element([x240,x241,x242,x243,x244,x245], x244, x388)
+element([x226,x232,x238,x244,x250,x256,x478], x243, x388)
+element([x240,x241,x242,x243,x244,x245], x245, x389)
+element([x227,x233,x239,x245,x251,x257,x479], x243, x389)
+element([x240,x241,x242,x243,x244,x245], x246, x390)
+element([x222,x228,x234,x240,x246,x252,x474], x244, x390)
+element([x240,x241,x242,x243,x244,x245], x247, x391)
+element([x223,x229,x235,x241,x247,x253,x475], x244, x391)
+element([x240,x241,x242,x243,x244,x245], x248, x392)
+element([x224,x230,x236,x242,x248,x254,x476], x244, x392)
+element([x240,x241,x242,x243,x244,x245], x249, x393)
+element([x225,x231,x237,x243,x249,x255,x477], x244, x393)
+element([x240,x241,x242,x243,x244,x245], x250, x394)
+element([x226,x232,x238,x244,x250,x256,x478], x244, x394)
+element([x240,x241,x242,x243,x244,x245], x251, x395)
+element([x227,x233,x239,x245,x251,x257,x479], x244, x395)
+element([x240,x241,x242,x243,x244,x245], x252, x396)
+element([x222,x228,x234,x240,x246,x252,x474], x245, x396)
+element([x240,x241,x242,x243,x244,x245], x253, x397)
+element([x223,x229,x235,x241,x247,x253,x475], x245, x397)
+element([x240,x241,x242,x243,x244,x245], x254, x398)
+element([x224,x230,x236,x242,x248,x254,x476], x245, x398)
+element([x240,x241,x242,x243,x244,x245], x255, x399)
+element([x225,x231,x237,x243,x249,x255,x477], x245, x399)
+element([x240,x241,x242,x243,x244,x245], x256, x400)
+element([x226,x232,x238,x244,x250,x256,x478], x245, x400)
+element([x240,x241,x242,x243,x244,x245], x257, x401)
+element([x227,x233,x239,x245,x251,x257,x479], x245, x401)
+element([x246,x247,x248,x249,x250,x251], x222, x402)
+element([x222,x228,x234,x240,x246,x252,x474], x246, x402)
+element([x246,x247,x248,x249,x250,x251], x223, x403)
+element([x223,x229,x235,x241,x247,x253,x475], x246, x403)
+element([x246,x247,x248,x249,x250,x251], x224, x404)
+element([x224,x230,x236,x242,x248,x254,x476], x246, x404)
+element([x246,x247,x248,x249,x250,x251], x225, x405)
+element([x225,x231,x237,x243,x249,x255,x477], x246, x405)
+element([x246,x247,x248,x249,x250,x251], x226, x406)
+element([x226,x232,x238,x244,x250,x256,x478], x246, x406)
+element([x246,x247,x248,x249,x250,x251], x227, x407)
+element([x227,x233,x239,x245,x251,x257,x479], x246, x407)
+element([x246,x247,x248,x249,x250,x251], x228, x408)
+element([x222,x228,x234,x240,x246,x252,x474], x247, x408)
+element([x246,x247,x248,x249,x250,x251], x229, x409)
+element([x223,x229,x235,x241,x247,x253,x475], x247, x409)
+element([x246,x247,x248,x249,x250,x251], x230, x410)
+element([x224,x230,x236,x242,x248,x254,x476], x247, x410)
+element([x246,x247,x248,x249,x250,x251], x231, x411)
+element([x225,x231,x237,x243,x249,x255,x477], x247, x411)
+element([x246,x247,x248,x249,x250,x251], x232, x412)
+element([x226,x232,x238,x244,x250,x256,x478], x247, x412)
+element([x246,x247,x248,x249,x250,x251], x233, x413)
+element([x227,x233,x239,x245,x251,x257,x479], x247, x413)
+element([x246,x247,x248,x249,x250,x251], x234, x414)
+element([x222,x228,x234,x240,x246,x252,x474], x248, x414)
+element([x246,x247,x248,x249,x250,x251], x235, x415)
+element([x223,x229,x235,x241,x247,x253,x475], x248, x415)
+element([x246,x247,x248,x249,x250,x251], x236, x416)
+element([x224,x230,x236,x242,x248,x254,x476], x248, x416)
+element([x246,x247,x248,x249,x250,x251], x237, x417)
+element([x225,x231,x237,x243,x249,x255,x477], x248, x417)
+element([x246,x247,x248,x249,x250,x251], x238, x418)
+element([x226,x232,x238,x244,x250,x256,x478], x248, x418)
+element([x246,x247,x248,x249,x250,x251], x239, x419)
+element([x227,x233,x239,x245,x251,x257,x479], x248, x419)
+element([x246,x247,x248,x249,x250,x251], x240, x420)
+element([x222,x228,x234,x240,x246,x252,x474], x249, x420)
+element([x246,x247,x248,x249,x250,x251], x241, x421)
+element([x223,x229,x235,x241,x247,x253,x475], x249, x421)
+element([x246,x247,x248,x249,x250,x251], x242, x422)
+element([x224,x230,x236,x242,x248,x254,x476], x249, x422)
+element([x246,x247,x248,x249,x250,x251], x243, x423)
+element([x225,x231,x237,x243,x249,x255,x477], x249, x423)
+element([x246,x247,x248,x249,x250,x251], x244, x424)
+element([x226,x232,x238,x244,x250,x256,x478], x249, x424)
+element([x246,x247,x248,x249,x250,x251], x245, x425)
+element([x227,x233,x239,x245,x251,x257,x479], x249, x425)
+element([x246,x247,x248,x249,x250,x251], x246, x426)
+element([x222,x228,x234,x240,x246,x252,x474], x250, x426)
+element([x246,x247,x248,x249,x250,x251], x247, x427)
+element([x223,x229,x235,x241,x247,x253,x475], x250, x427)
+element([x246,x247,x248,x249,x250,x251], x248, x428)
+element([x224,x230,x236,x242,x248,x254,x476], x250, x428)
+element([x246,x247,x248,x249,x250,x251], x249, x429)
+element([x225,x231,x237,x243,x249,x255,x477], x250, x429)
+element([x246,x247,x248,x249,x250,x251], x250, x430)
+element([x226,x232,x238,x244,x250,x256,x478], x250, x430)
+element([x246,x247,x248,x249,x250,x251], x251, x431)
+element([x227,x233,x239,x245,x251,x257,x479], x250, x431)
+element([x246,x247,x248,x249,x250,x251], x252, x432)
+element([x222,x228,x234,x240,x246,x252,x474], x251, x432)
+element([x246,x247,x248,x249,x250,x251], x253, x433)
+element([x223,x229,x235,x241,x247,x253,x475], x251, x433)
+element([x246,x247,x248,x249,x250,x251], x254, x434)
+element([x224,x230,x236,x242,x248,x254,x476], x251, x434)
+element([x246,x247,x248,x249,x250,x251], x255, x435)
+element([x225,x231,x237,x243,x249,x255,x477], x251, x435)
+element([x246,x247,x248,x249,x250,x251], x256, x436)
+element([x226,x232,x238,x244,x250,x256,x478], x251, x436)
+element([x246,x247,x248,x249,x250,x251], x257, x437)
+element([x227,x233,x239,x245,x251,x257,x479], x251, x437)
+element([x252,x253,x254,x255,x256,x257], x222, x438)
+element([x222,x228,x234,x240,x246,x252,x474], x252, x438)
+element([x252,x253,x254,x255,x256,x257], x223, x439)
+element([x223,x229,x235,x241,x247,x253,x475], x252, x439)
+element([x252,x253,x254,x255,x256,x257], x224, x440)
+element([x224,x230,x236,x242,x248,x254,x476], x252, x440)
+element([x252,x253,x254,x255,x256,x257], x225, x441)
+element([x225,x231,x237,x243,x249,x255,x477], x252, x441)
+element([x252,x253,x254,x255,x256,x257], x226, x442)
+element([x226,x232,x238,x244,x250,x256,x478], x252, x442)
+element([x252,x253,x254,x255,x256,x257], x227, x443)
+element([x227,x233,x239,x245,x251,x257,x479], x252, x443)
+element([x252,x253,x254,x255,x256,x257], x228, x444)
+element([x222,x228,x234,x240,x246,x252,x474], x253, x444)
+element([x252,x253,x254,x255,x256,x257], x229, x445)
+element([x223,x229,x235,x241,x247,x253,x475], x253, x445)
+element([x252,x253,x254,x255,x256,x257], x230, x446)
+element([x224,x230,x236,x242,x248,x254,x476], x253, x446)
+element([x252,x253,x254,x255,x256,x257], x231, x447)
+element([x225,x231,x237,x243,x249,x255,x477], x253, x447)
+element([x252,x253,x254,x255,x256,x257], x232, x448)
+element([x226,x232,x238,x244,x250,x256,x478], x253, x448)
+element([x252,x253,x254,x255,x256,x257], x233, x449)
+element([x227,x233,x239,x245,x251,x257,x479], x253, x449)
+element([x252,x253,x254,x255,x256,x257], x234, x450)
+element([x222,x228,x234,x240,x246,x252,x474], x254, x450)
+element([x252,x253,x254,x255,x256,x257], x235, x451)
+element([x223,x229,x235,x241,x247,x253,x475], x254, x451)
+element([x252,x253,x254,x255,x256,x257], x236, x452)
+element([x224,x230,x236,x242,x248,x254,x476], x254, x452)
+element([x252,x253,x254,x255,x256,x257], x237, x453)
+element([x225,x231,x237,x243,x249,x255,x477], x254, x453)
+element([x252,x253,x254,x255,x256,x257], x238, x454)
+element([x226,x232,x238,x244,x250,x256,x478], x254, x454)
+element([x252,x253,x254,x255,x256,x257], x239, x455)
+element([x227,x233,x239,x245,x251,x257,x479], x254, x455)
+element([x252,x253,x254,x255,x256,x257], x240, x456)
+element([x222,x228,x234,x240,x246,x252,x474], x255, x456)
+element([x252,x253,x254,x255,x256,x257], x241, x457)
+element([x223,x229,x235,x241,x247,x253,x475], x255, x457)
+element([x252,x253,x254,x255,x256,x257], x242, x458)
+element([x224,x230,x236,x242,x248,x254,x476], x255, x458)
+element([x252,x253,x254,x255,x256,x257], x243, x459)
+element([x225,x231,x237,x243,x249,x255,x477], x255, x459)
+element([x252,x253,x254,x255,x256,x257], x244, x460)
+element([x226,x232,x238,x244,x250,x256,x478], x255, x460)
+element([x252,x253,x254,x255,x256,x257], x245, x461)
+element([x227,x233,x239,x245,x251,x257,x479], x255, x461)
+element([x252,x253,x254,x255,x256,x257], x246, x462)
+element([x222,x228,x234,x240,x246,x252,x474], x256, x462)
+element([x252,x253,x254,x255,x256,x257], x247, x463)
+element([x223,x229,x235,x241,x247,x253,x475], x256, x463)
+element([x252,x253,x254,x255,x256,x257], x248, x464)
+element([x224,x230,x236,x242,x248,x254,x476], x256, x464)
+element([x252,x253,x254,x255,x256,x257], x249, x465)
+element([x225,x231,x237,x243,x249,x255,x477], x256, x465)
+element([x252,x253,x254,x255,x256,x257], x250, x466)
+element([x226,x232,x238,x244,x250,x256,x478], x256, x466)
+element([x252,x253,x254,x255,x256,x257], x251, x467)
+element([x227,x233,x239,x245,x251,x257,x479], x256, x467)
+element([x252,x253,x254,x255,x256,x257], x252, x468)
+element([x222,x228,x234,x240,x246,x252,x474], x257, x468)
+element([x252,x253,x254,x255,x256,x257], x253, x469)
+element([x223,x229,x235,x241,x247,x253,x475], x257, x469)
+element([x252,x253,x254,x255,x256,x257], x254, x470)
+element([x224,x230,x236,x242,x248,x254,x476], x257, x470)
+element([x252,x253,x254,x255,x256,x257], x255, x471)
+element([x225,x231,x237,x243,x249,x255,x477], x257, x471)
+element([x252,x253,x254,x255,x256,x257], x256, x472)
+element([x226,x232,x238,x244,x250,x256,x478], x257, x472)
+element([x252,x253,x254,x255,x256,x257], x257, x473)
+element([x227,x233,x239,x245,x251,x257,x479], x257, x473)
+**EOF**

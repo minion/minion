@@ -1,0 +1,134 @@
+#TEST SOLCOUNT 0
+# Minion Quasigroup Instance
+# Kind: QG3 Size: 4
+# Idempotent
+# CSPLib Problem prob003
+#    http://www.csplib.org
+# In main matrix,  Row(a)[b] = c  means  a*b=c
+# Idempotency Constraints
+# In flattened matrix,  V[a*n+b] = c  means  a*b=c
+# Symmetry Breaking Constraints
+# Var ordering should be linked to symmetry constraints
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 11:06 on 20 Apr 2006
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:29 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_watchelement_4_qg34.minion
+# Command line: minion -redump test_watchelement_4_qg34.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..15}
+DISCRETE x1{0..15}
+DISCRETE x2{0..15}
+DISCRETE x3{0..15}
+DISCRETE x4{0..15}
+DISCRETE x5{0..15}
+DISCRETE x6{0..15}
+DISCRETE x7{0..15}
+DISCRETE x8{0..15}
+DISCRETE x9{0..15}
+DISCRETE x10{0..15}
+DISCRETE x11{0..15}
+DISCRETE x12{0..15}
+DISCRETE x13{0..15}
+DISCRETE x14{0..15}
+DISCRETE x15{0..15}
+DISCRETE x16{0..3}
+DISCRETE x17{0..3}
+DISCRETE x18{0..3}
+DISCRETE x19{0..3}
+DISCRETE x20{0..3}
+DISCRETE x21{0..3}
+DISCRETE x22{0..3}
+DISCRETE x23{0..3}
+DISCRETE x24{0..3}
+DISCRETE x25{0..3}
+DISCRETE x26{0..3}
+DISCRETE x27{0..3}
+DISCRETE x28{0..3}
+DISCRETE x29{0..3}
+DISCRETE x30{0..3}
+DISCRETE x31{0..3}
+**SEARCH**
+VARORDER [x31,x27,x23,x19,x16,x17,x18,x20,x21,x22,x24,x25,x26,x28,x29,x30]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31]
+PRINT[[x0]]
+**TUPLELIST**
+**CONSTRAINTS**
+alldiff([x16,x20,x24,x28])
+alldiff([x16,x17,x18,x19])
+alldiff([x17,x21,x25,x29])
+alldiff([x20,x21,x22,x23])
+alldiff([x18,x22,x26,x30])
+alldiff([x24,x25,x26,x27])
+alldiff([x19,x23,x27,x31])
+alldiff([x28,x29,x30,x31])
+eq(x16, 0)
+eq(x21, 1)
+eq(x26, 2)
+eq(x31, 3)
+weightedsumleq([4,1], [x16,x16], x0)
+weightedsumgeq([4,1], [x16,x16], x0)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x0, x16)
+weightedsumleq([4,1], [x17,x20], x1)
+weightedsumgeq([4,1], [x17,x20], x1)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x1, x17)
+weightedsumleq([4,1], [x18,x24], x2)
+weightedsumgeq([4,1], [x18,x24], x2)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x2, x18)
+weightedsumleq([4,1], [x19,x28], x3)
+weightedsumgeq([4,1], [x19,x28], x3)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x3, x19)
+weightedsumleq([4,1], [x20,x17], x4)
+weightedsumgeq([4,1], [x20,x17], x4)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x4, x20)
+weightedsumleq([4,1], [x21,x21], x5)
+weightedsumgeq([4,1], [x21,x21], x5)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x5, x21)
+weightedsumleq([4,1], [x22,x25], x6)
+weightedsumgeq([4,1], [x22,x25], x6)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x6, x22)
+weightedsumleq([4,1], [x23,x29], x7)
+weightedsumgeq([4,1], [x23,x29], x7)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x7, x23)
+weightedsumleq([4,1], [x24,x18], x8)
+weightedsumgeq([4,1], [x24,x18], x8)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x8, x24)
+weightedsumleq([4,1], [x25,x22], x9)
+weightedsumgeq([4,1], [x25,x22], x9)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x9, x25)
+weightedsumleq([4,1], [x26,x26], x10)
+weightedsumgeq([4,1], [x26,x26], x10)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x10, x26)
+weightedsumleq([4,1], [x27,x30], x11)
+weightedsumgeq([4,1], [x27,x30], x11)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x11, x27)
+weightedsumleq([4,1], [x28,x19], x12)
+weightedsumgeq([4,1], [x28,x19], x12)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x12, x28)
+weightedsumleq([4,1], [x29,x23], x13)
+weightedsumgeq([4,1], [x29,x23], x13)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x13, x29)
+weightedsumleq([4,1], [x30,x27], x14)
+weightedsumgeq([4,1], [x30,x27], x14)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x14, x30)
+weightedsumleq([4,1], [x31,x31], x15)
+weightedsumgeq([4,1], [x31,x31], x15)
+watchelement([x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31], x15, x31)
+ineq(0, x19, 2)
+ineq(1, x23, 2)
+ineq(2, x27, 2)
+ineq(3, x31, 2)
+**EOF**

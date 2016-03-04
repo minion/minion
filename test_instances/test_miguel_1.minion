@@ -1,0 +1,81 @@
+#TEST CHECKONESOL 0 6 0
+# Input file for Minion built for Version 0.2
+#    http://sourceforge.net/projects/minion
+# Prime Queens Instance
+# CSPLib prob029, www.csplib.org
+# Parameters: n = 4
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:26 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_miguel_1.minion
+# Command line: minion -redump test_miguel_1.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..6}
+DISCRETE x1{0..6}
+DISCRETE x2{0..6}
+**SEARCH**
+VARORDER [x0,x1,x2]
+VALORDER [a,a,a]
+SYMORDER [x0,x1,x2]
+PRINT[[x0,x1,x2]]
+**TUPLELIST**
+_Unnamed__0_ 48 2
+0 6 
+0 9 
+1 7 
+1 8 
+1 10 
+2 4 
+2 9 
+2 11 
+3 5 
+3 10 
+4 2 
+4 10 
+4 13 
+5 3 
+5 11 
+5 12 
+5 14 
+6 0 
+6 8 
+6 13 
+6 15 
+7 1 
+7 9 
+7 14 
+8 1 
+8 6 
+8 14 
+9 0 
+9 2 
+9 7 
+9 15 
+10 1 
+10 3 
+10 4 
+10 12 
+11 2 
+11 5 
+11 13 
+12 5 
+12 10 
+13 4 
+13 6 
+13 11 
+14 5 
+14 7 
+14 8 
+15 6 
+15 9 
+
+**CONSTRAINTS**
+table([x0,x1], _Unnamed__0_)
+table([x1,x2], _Unnamed__0_)
+**EOF**

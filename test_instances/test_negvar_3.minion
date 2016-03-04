@@ -1,0 +1,25 @@
+#TEST CHECKONESOL -1
+#
+# Fails in debug mode of build at time of writing (r65), works in optimised build
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:27 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_negvar_3.minion
+# Command line: minion -redump test_negvar_3.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{-1..-1}
+**SEARCH**
+VARORDER [x0]
+VALORDER [a]
+SYMORDER [x0]
+PRINT[[x0]]
+**TUPLELIST**
+**CONSTRAINTS**
+sumgeq([x0], x0)
+**EOF**

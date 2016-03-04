@@ -1,0 +1,26 @@
+#TEST SOLCOUNT 64
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:27 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_rangevar_1.minion
+# Command line: minion -redump test_rangevar_1.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..63}
+DISCRETE x1{0..63}
+DISCRETE x2{0..63}
+**SEARCH**
+VARORDER [x0,x1,x2]
+VALORDER [a,a,a]
+SYMORDER [x0,x1,x2]
+PRINT[[x0,x1,x2]]
+**TUPLELIST**
+**CONSTRAINTS**
+eq(x1, 1)
+eq(x2, 1)
+**EOF**

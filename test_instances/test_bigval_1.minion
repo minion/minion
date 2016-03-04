@@ -1,0 +1,29 @@
+#TEST SOLCOUNT 121
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:25 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_bigval_1.minion
+# Command line: minion -redump test_bigval_1.minion 
+MINION 3
+**VARIABLES**
+BOUND x0{-1000..1000}
+BOUND x1{-10000..10000}
+BOUND x2{-100000..100000}
+BOUND x3{-1000000..1000000}
+**SEARCH**
+VARORDER [x0,x1,x2,x3]
+VALORDER [a,a,a,a]
+SYMORDER [x0,x1,x2,x3]
+PRINT[[x0,x1,x2,x3]]
+**TUPLELIST**
+**CONSTRAINTS**
+product(x0,10, x1)
+min([x0,990], 990)
+product(x2,10, x3)
+min([x2,99990], 99990)
+**EOF**

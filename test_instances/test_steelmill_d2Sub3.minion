@@ -1,0 +1,88 @@
+#TEST SOLCOUNT 1
+#SteelMill Instance - d2Sub3.txt
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:28 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_steelmill_d2Sub3.minion
+# Command line: minion -redump test_steelmill_d2Sub3.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+BOOL x1
+BOOL x2
+BOOL x3
+BOOL x4
+BOOL x5
+BOOL x6
+BOOL x7
+BOOL x8
+BOOL x9
+BOOL x10
+BOOL x11
+BOOL x12
+BOOL x13
+BOOL x14
+BOOL x15
+BOOL x16
+BOOL x17
+BOOL x18
+BOOL x19
+BOOL x20
+BOOL x21
+BOOL x22
+BOUND x23{35..47}
+SPARSEBOUND x24{23,24,25,26,27,28,29,30,32,35,39,42,43,44}
+SPARSEBOUND x25{0,12,14,17,18,19,20,23,24,25,26,27,28,29,30,32,35,39,42,43,44}
+SPARSEBOUND x26{0,12,14,17,18,19,20,23,24,25,26,27,28,29,30,32,35,39,42,43,44}
+**SEARCH**
+MINIMISING x23
+VARORDER [x23,x24,x25,x26,x0,x3,x6,x1,x4,x7,x2,x5,x8]
+VALORDER [a,a,a,a,d,d,d,d,d,d,d,d,d]
+VARORDER [x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26]
+PRINT[[x23],[x24,x0,x1,x2],[x25,x3,x4,x5],[x26,x6,x7,x8]]
+**TUPLELIST**
+**CONSTRAINTS**
+ineq(x25, x24, 0)
+ineq(x26, x25, 0)
+sumleq([x24,x25,x26], x23)
+sumgeq([x24,x25,x26], x23)
+sumleq([x0,x3,x6], 1)
+sumgeq([x0,x3,x6], 1)
+sumleq([x1,x4,x7], 1)
+sumgeq([x1,x4,x7], 1)
+sumleq([x2,x5,x8], 1)
+sumgeq([x2,x5,x8], 1)
+weightedsumleq([22,9,4], [x0,x1,x2], x24)
+weightedsumleq([22,9,4], [x3,x4,x5], x25)
+weightedsumleq([22,9,4], [x6,x7,x8], x26)
+reify(eq(x24, x25)
+, x9)
+reifyimply(lexleq([x3,x4,x5], [x0,x1,x2])
+, x9)
+reify(eq(x25, x26)
+, x10)
+reifyimply(lexleq([x6,x7,x8], [x3,x4,x5])
+, x10)
+sumleq([x11,x12,x13,x14], 2)
+sumgeq([x11,x12,x13,x14], 2)
+sumleq([x15,x16,x17,x18], 2)
+sumgeq([x15,x16,x17,x18], 2)
+sumleq([x19,x20,x21,x22], 2)
+sumgeq([x19,x20,x21,x22], 2)
+ineq(x12, x0, 0)
+ineq(x13, x1, 0)
+ineq(x11, x2, 0)
+ineq(x16, x3, 0)
+ineq(x17, x4, 0)
+ineq(x15, x5, 0)
+ineq(x20, x6, 0)
+ineq(x21, x7, 0)
+ineq(x19, x8, 0)
+**EOF**

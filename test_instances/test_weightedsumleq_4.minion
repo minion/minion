@@ -1,0 +1,24 @@
+#TEST CHECKONESOL -1
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:30 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_weightedsumleq_4.minion
+# Command line: minion -redump test_weightedsumleq_4.minion 
+MINION 3
+**VARIABLES**
+SPARSEBOUND x0{-1}
+**SEARCH**
+VARORDER [x0]
+VALORDER [a]
+SYMORDER [x0]
+PRINT[[x0]]
+**TUPLELIST**
+**CONSTRAINTS**
+weightedsumleq([-1], [x0], 1)
+weightedsumgeq([-1], [x0], 1)
+**EOF**

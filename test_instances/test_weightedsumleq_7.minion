@@ -1,0 +1,28 @@
+#TEST SOLCOUNT 5175
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:30 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_weightedsumleq_7.minion
+# Command line: minion -redump test_weightedsumleq_7.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{-2..-2}
+DISCRETE x1{-6..-4}
+DISCRETE x2{-3..2}
+DISCRETE x3{-2..2}
+DISCRETE x4{-8..8}
+DISCRETE x5{-1..3}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5]
+VALORDER [a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5]
+PRINT[[x0,x1,x2,x3,x4,x5]]
+**TUPLELIST**
+**CONSTRAINTS**
+weightedsumleq([1,2,3,4,5], [x0,x1,x2,x3,x4], x5)
+**EOF**

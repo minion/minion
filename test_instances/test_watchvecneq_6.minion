@@ -1,0 +1,30 @@
+#TEST SOLCOUNT 6480
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:29 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_watchvecneq_6.minion
+# Command line: minion -redump test_watchvecneq_6.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{1..3}
+DISCRETE x1{1..3}
+DISCRETE x2{1..3}
+DISCRETE x3{1..3}
+DISCRETE x4{1..3}
+DISCRETE x5{1..3}
+DISCRETE x6{1..3}
+DISCRETE x7{1..3}
+**SEARCH**
+VARORDER [x0,x1,x2,x3,x4,x5,x6,x7]
+VALORDER [a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7]
+PRINT[[x0,x1,x2,x3],[x4,x5,x6,x7]]
+**TUPLELIST**
+**CONSTRAINTS**
+watchvecneq([x0,x1,x2,x3], [x4,x5,x6,x7])
+**EOF**

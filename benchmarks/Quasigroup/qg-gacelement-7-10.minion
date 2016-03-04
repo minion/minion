@@ -1,0 +1,461 @@
+# Minion Version 0.8.1
+# Svn version: 2537
+# Svn last changed date: 2009-04-15 22:05:43 +0100 (Wed, 15 Apr 2009)
+#  Run at: UTC Thu Apr 16 19:55:55 2009
+
+#    http://minion.sourceforge.net
+#  Minion is still very new and in active development.
+#  If you have problems with Minion or find any bugs, please tell us!
+#  Mailing list at: https://mail.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: benchmarks/Quasigroup/qg-gacelement-7-10.minion
+# Command line: ./build/minion -redump benchmarks/Quasigroup/qg-gacelement-7-10.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..9}
+DISCRETE x1{0..9}
+DISCRETE x2{0..9}
+DISCRETE x3{0..9}
+DISCRETE x4{0..9}
+DISCRETE x5{0..9}
+DISCRETE x6{0..9}
+DISCRETE x7{0..9}
+DISCRETE x8{0..9}
+DISCRETE x9{0..9}
+DISCRETE x10{0..9}
+DISCRETE x11{0..9}
+DISCRETE x12{0..9}
+DISCRETE x13{0..9}
+DISCRETE x14{0..9}
+DISCRETE x15{0..9}
+DISCRETE x16{0..9}
+DISCRETE x17{0..9}
+DISCRETE x18{0..9}
+DISCRETE x19{0..9}
+DISCRETE x20{0..9}
+DISCRETE x21{0..9}
+DISCRETE x22{0..9}
+DISCRETE x23{0..9}
+DISCRETE x24{0..9}
+DISCRETE x25{0..9}
+DISCRETE x26{0..9}
+DISCRETE x27{0..9}
+DISCRETE x28{0..9}
+DISCRETE x29{0..9}
+DISCRETE x30{0..9}
+DISCRETE x31{0..9}
+DISCRETE x32{0..9}
+DISCRETE x33{0..9}
+DISCRETE x34{0..9}
+DISCRETE x35{0..9}
+DISCRETE x36{0..9}
+DISCRETE x37{0..9}
+DISCRETE x38{0..9}
+DISCRETE x39{0..9}
+DISCRETE x40{0..9}
+DISCRETE x41{0..9}
+DISCRETE x42{0..9}
+DISCRETE x43{0..9}
+DISCRETE x44{0..9}
+DISCRETE x45{0..9}
+DISCRETE x46{0..9}
+DISCRETE x47{0..9}
+DISCRETE x48{0..9}
+DISCRETE x49{0..9}
+DISCRETE x50{0..9}
+DISCRETE x51{0..9}
+DISCRETE x52{0..9}
+DISCRETE x53{0..9}
+DISCRETE x54{0..9}
+DISCRETE x55{0..9}
+DISCRETE x56{0..9}
+DISCRETE x57{0..9}
+DISCRETE x58{0..9}
+DISCRETE x59{0..9}
+DISCRETE x60{0..9}
+DISCRETE x61{0..9}
+DISCRETE x62{0..9}
+DISCRETE x63{0..9}
+DISCRETE x64{0..9}
+DISCRETE x65{0..9}
+DISCRETE x66{0..9}
+DISCRETE x67{0..9}
+DISCRETE x68{0..9}
+DISCRETE x69{0..9}
+DISCRETE x70{0..9}
+DISCRETE x71{0..9}
+DISCRETE x72{0..9}
+DISCRETE x73{0..9}
+DISCRETE x74{0..9}
+DISCRETE x75{0..9}
+DISCRETE x76{0..9}
+DISCRETE x77{0..9}
+DISCRETE x78{0..9}
+DISCRETE x79{0..9}
+DISCRETE x80{0..9}
+DISCRETE x81{0..9}
+DISCRETE x82{0..9}
+DISCRETE x83{0..9}
+DISCRETE x84{0..9}
+DISCRETE x85{0..9}
+DISCRETE x86{0..9}
+DISCRETE x87{0..9}
+DISCRETE x88{0..9}
+DISCRETE x89{0..9}
+DISCRETE x90{0..9}
+DISCRETE x91{0..9}
+DISCRETE x92{0..9}
+DISCRETE x93{0..9}
+DISCRETE x94{0..9}
+DISCRETE x95{0..9}
+DISCRETE x96{0..9}
+DISCRETE x97{0..9}
+DISCRETE x98{0..9}
+DISCRETE x99{0..9}
+DISCRETE x100{0..9}
+DISCRETE x101{0..9}
+DISCRETE x102{0..9}
+DISCRETE x103{0..9}
+DISCRETE x104{0..9}
+DISCRETE x105{0..9}
+DISCRETE x106{0..9}
+DISCRETE x107{0..9}
+DISCRETE x108{0..9}
+DISCRETE x109{0..9}
+DISCRETE x110{0..9}
+DISCRETE x111{0..9}
+DISCRETE x112{0..9}
+DISCRETE x113{0..9}
+DISCRETE x114{0..9}
+DISCRETE x115{0..9}
+DISCRETE x116{0..9}
+DISCRETE x117{0..9}
+DISCRETE x118{0..9}
+DISCRETE x119{0..9}
+DISCRETE x120{0..9}
+DISCRETE x121{0..9}
+DISCRETE x122{0..9}
+DISCRETE x123{0..9}
+DISCRETE x124{0..9}
+DISCRETE x125{0..9}
+DISCRETE x126{0..9}
+DISCRETE x127{0..9}
+DISCRETE x128{0..9}
+DISCRETE x129{0..9}
+DISCRETE x130{0..9}
+DISCRETE x131{0..9}
+DISCRETE x132{0..9}
+DISCRETE x133{0..9}
+DISCRETE x134{0..9}
+DISCRETE x135{0..9}
+DISCRETE x136{0..9}
+DISCRETE x137{0..9}
+DISCRETE x138{0..9}
+DISCRETE x139{0..9}
+DISCRETE x140{0..9}
+DISCRETE x141{0..9}
+DISCRETE x142{0..9}
+DISCRETE x143{0..9}
+DISCRETE x144{0..9}
+DISCRETE x145{0..9}
+DISCRETE x146{0..9}
+DISCRETE x147{0..9}
+DISCRETE x148{0..9}
+DISCRETE x149{0..9}
+DISCRETE x150{0..9}
+DISCRETE x151{0..9}
+DISCRETE x152{0..9}
+DISCRETE x153{0..9}
+DISCRETE x154{0..9}
+DISCRETE x155{0..9}
+DISCRETE x156{0..9}
+DISCRETE x157{0..9}
+DISCRETE x158{0..9}
+DISCRETE x159{0..9}
+DISCRETE x160{0..9}
+DISCRETE x161{0..9}
+DISCRETE x162{0..9}
+DISCRETE x163{0..9}
+DISCRETE x164{0..9}
+DISCRETE x165{0..9}
+DISCRETE x166{0..9}
+DISCRETE x167{0..9}
+DISCRETE x168{0..9}
+DISCRETE x169{0..9}
+DISCRETE x170{0..9}
+DISCRETE x171{0..9}
+DISCRETE x172{0..9}
+DISCRETE x173{0..9}
+DISCRETE x174{0..9}
+DISCRETE x175{0..9}
+DISCRETE x176{0..9}
+DISCRETE x177{0..9}
+DISCRETE x178{0..9}
+DISCRETE x179{0..9}
+DISCRETE x180{0..9}
+DISCRETE x181{0..9}
+DISCRETE x182{0..9}
+DISCRETE x183{0..9}
+DISCRETE x184{0..9}
+DISCRETE x185{0..9}
+DISCRETE x186{0..9}
+DISCRETE x187{0..9}
+DISCRETE x188{0..9}
+DISCRETE x189{0..9}
+DISCRETE x190{0..9}
+DISCRETE x191{0..9}
+DISCRETE x192{0..9}
+DISCRETE x193{0..9}
+DISCRETE x194{0..9}
+DISCRETE x195{0..9}
+DISCRETE x196{0..9}
+DISCRETE x197{0..9}
+DISCRETE x198{0..9}
+DISCRETE x199{0..9}
+**SEARCH**
+VARORDER [x99,x89,x79,x69,x59,x49,x39,x29,x19,x9,x0,x1,x2,x3,x4,x5,x6,x7,x8,x10,x11,x12,x13,x14,x15,x16,x17,x18,x20,x21,x22,x23,x24,x25,x26,x27,x28,x30,x31,x32,x33,x34,x35,x36,x37,x38,x40,x41,x42,x43,x44,x45,x46,x47,x48,x50,x51,x52,x53,x54,x55,x56,x57,x58,x60,x61,x62,x63,x64,x65,x66,x67,x68,x70,x71,x72,x73,x74,x75,x76,x77,x78,x80,x81,x82,x83,x84,x85,x86,x87,x88,x90,x91,x92,x93,x94,x95,x96,x97,x98]
+VALORDER [a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a,a]
+SYMORDER [x0,x1,x2,x3,x4,x5,x6,x7,x8,x9,x10,x11,x12,x13,x14,x15,x16,x17,x18,x19,x20,x21,x22,x23,x24,x25,x26,x27,x28,x29,x30,x31,x32,x33,x34,x35,x36,x37,x38,x39,x40,x41,x42,x43,x44,x45,x46,x47,x48,x49,x50,x51,x52,x53,x54,x55,x56,x57,x58,x59,x60,x61,x62,x63,x64,x65,x66,x67,x68,x69,x70,x71,x72,x73,x74,x75,x76,x77,x78,x79,x80,x81,x82,x83,x84,x85,x86,x87,x88,x89,x90,x91,x92,x93,x94,x95,x96,x97,x98,x99,x100,x101,x102,x103,x104,x105,x106,x107,x108,x109,x110,x111,x112,x113,x114,x115,x116,x117,x118,x119,x120,x121,x122,x123,x124,x125,x126,x127,x128,x129,x130,x131,x132,x133,x134,x135,x136,x137,x138,x139,x140,x141,x142,x143,x144,x145,x146,x147,x148,x149,x150,x151,x152,x153,x154,x155,x156,x157,x158,x159,x160,x161,x162,x163,x164,x165,x166,x167,x168,x169,x170,x171,x172,x173,x174,x175,x176,x177,x178,x179,x180,x181,x182,x183,x184,x185,x186,x187,x188,x189,x190,x191,x192,x193,x194,x195,x196,x197,x198,x199]
+PRINT[[x0,x1,x2,x3,x4,x5,x6,x7,x8,x9],[x10,x11,x12,x13,x14,x15,x16,x17,x18,x19],[x20,x21,x22,x23,x24,x25,x26,x27,x28,x29],[x30,x31,x32,x33,x34,x35,x36,x37,x38,x39],[x40,x41,x42,x43,x44,x45,x46,x47,x48,x49],[x50,x51,x52,x53,x54,x55,x56,x57,x58,x59],[x60,x61,x62,x63,x64,x65,x66,x67,x68,x69],[x70,x71,x72,x73,x74,x75,x76,x77,x78,x79],[x80,x81,x82,x83,x84,x85,x86,x87,x88,x89],[x90,x91,x92,x93,x94,x95,x96,x97,x98,x99]]
+**TUPLELIST**
+**CONSTRAINTS**
+alldiff([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90])
+alldiff([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9])
+alldiff([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91])
+alldiff([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19])
+alldiff([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92])
+alldiff([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29])
+alldiff([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93])
+alldiff([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39])
+alldiff([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94])
+alldiff([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49])
+alldiff([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95])
+alldiff([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59])
+alldiff([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96])
+alldiff([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69])
+alldiff([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97])
+alldiff([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79])
+alldiff([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98])
+alldiff([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89])
+alldiff([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99])
+alldiff([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99])
+eq(x0, 0)
+eq(x11, 1)
+eq(x22, 2)
+eq(x33, 3)
+eq(x44, 4)
+eq(x55, 5)
+eq(x66, 6)
+eq(x77, 7)
+eq(x88, 8)
+eq(x99, 9)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x0, x100)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x0, x100)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x10, x101)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x10, x101)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x20, x102)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x20, x102)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x30, x103)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x30, x103)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x40, x104)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x40, x104)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x50, x105)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x50, x105)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x60, x106)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x60, x106)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x70, x107)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x70, x107)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x80, x108)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x80, x108)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x90, x109)
+gacelement-deprecated([x0,x1,x2,x3,x4,x5,x6,x7,x8,x9], x90, x109)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x1, x110)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x1, x110)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x11, x111)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x11, x111)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x21, x112)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x21, x112)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x31, x113)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x31, x113)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x41, x114)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x41, x114)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x51, x115)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x51, x115)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x61, x116)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x61, x116)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x71, x117)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x71, x117)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x81, x118)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x81, x118)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x91, x119)
+gacelement-deprecated([x10,x11,x12,x13,x14,x15,x16,x17,x18,x19], x91, x119)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x2, x120)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x2, x120)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x12, x121)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x12, x121)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x22, x122)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x22, x122)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x32, x123)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x32, x123)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x42, x124)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x42, x124)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x52, x125)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x52, x125)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x62, x126)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x62, x126)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x72, x127)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x72, x127)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x82, x128)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x82, x128)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x92, x129)
+gacelement-deprecated([x20,x21,x22,x23,x24,x25,x26,x27,x28,x29], x92, x129)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x3, x130)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x3, x130)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x13, x131)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x13, x131)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x23, x132)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x23, x132)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x33, x133)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x33, x133)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x43, x134)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x43, x134)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x53, x135)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x53, x135)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x63, x136)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x63, x136)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x73, x137)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x73, x137)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x83, x138)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x83, x138)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x93, x139)
+gacelement-deprecated([x30,x31,x32,x33,x34,x35,x36,x37,x38,x39], x93, x139)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x4, x140)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x4, x140)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x14, x141)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x14, x141)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x24, x142)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x24, x142)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x34, x143)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x34, x143)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x44, x144)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x44, x144)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x54, x145)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x54, x145)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x64, x146)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x64, x146)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x74, x147)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x74, x147)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x84, x148)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x84, x148)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x94, x149)
+gacelement-deprecated([x40,x41,x42,x43,x44,x45,x46,x47,x48,x49], x94, x149)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x5, x150)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x5, x150)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x15, x151)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x15, x151)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x25, x152)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x25, x152)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x35, x153)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x35, x153)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x45, x154)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x45, x154)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x55, x155)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x55, x155)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x65, x156)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x65, x156)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x75, x157)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x75, x157)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x85, x158)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x85, x158)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x95, x159)
+gacelement-deprecated([x50,x51,x52,x53,x54,x55,x56,x57,x58,x59], x95, x159)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x6, x160)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x6, x160)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x16, x161)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x16, x161)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x26, x162)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x26, x162)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x36, x163)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x36, x163)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x46, x164)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x46, x164)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x56, x165)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x56, x165)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x66, x166)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x66, x166)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x76, x167)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x76, x167)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x86, x168)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x86, x168)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x96, x169)
+gacelement-deprecated([x60,x61,x62,x63,x64,x65,x66,x67,x68,x69], x96, x169)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x7, x170)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x7, x170)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x17, x171)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x17, x171)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x27, x172)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x27, x172)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x37, x173)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x37, x173)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x47, x174)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x47, x174)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x57, x175)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x57, x175)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x67, x176)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x67, x176)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x77, x177)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x77, x177)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x87, x178)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x87, x178)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x97, x179)
+gacelement-deprecated([x70,x71,x72,x73,x74,x75,x76,x77,x78,x79], x97, x179)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x8, x180)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x8, x180)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x18, x181)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x18, x181)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x28, x182)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x28, x182)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x38, x183)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x38, x183)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x48, x184)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x48, x184)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x58, x185)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x58, x185)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x68, x186)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x68, x186)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x78, x187)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x78, x187)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x88, x188)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x88, x188)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x98, x189)
+gacelement-deprecated([x80,x81,x82,x83,x84,x85,x86,x87,x88,x89], x98, x189)
+gacelement-deprecated([x0,x10,x20,x30,x40,x50,x60,x70,x80,x90], x9, x190)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x9, x190)
+gacelement-deprecated([x1,x11,x21,x31,x41,x51,x61,x71,x81,x91], x19, x191)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x19, x191)
+gacelement-deprecated([x2,x12,x22,x32,x42,x52,x62,x72,x82,x92], x29, x192)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x29, x192)
+gacelement-deprecated([x3,x13,x23,x33,x43,x53,x63,x73,x83,x93], x39, x193)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x39, x193)
+gacelement-deprecated([x4,x14,x24,x34,x44,x54,x64,x74,x84,x94], x49, x194)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x49, x194)
+gacelement-deprecated([x5,x15,x25,x35,x45,x55,x65,x75,x85,x95], x59, x195)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x59, x195)
+gacelement-deprecated([x6,x16,x26,x36,x46,x56,x66,x76,x86,x96], x69, x196)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x69, x196)
+gacelement-deprecated([x7,x17,x27,x37,x47,x57,x67,x77,x87,x97], x79, x197)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x79, x197)
+gacelement-deprecated([x8,x18,x28,x38,x48,x58,x68,x78,x88,x98], x89, x198)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x89, x198)
+gacelement-deprecated([x9,x19,x29,x39,x49,x59,x69,x79,x89,x99], x99, x199)
+gacelement-deprecated([x90,x91,x92,x93,x94,x95,x96,x97,x98,x99], x99, x199)
+ineq(0, x9, 2)
+ineq(1, x19, 2)
+ineq(2, x29, 2)
+ineq(3, x39, 2)
+ineq(4, x49, 2)
+ineq(5, x59, 2)
+ineq(6, x69, 2)
+ineq(7, x79, 2)
+ineq(8, x89, 2)
+ineq(9, x99, 2)
+**EOF**

@@ -1,0 +1,13 @@
+#TEST SOLCOUNT 0
+#
+#FAIL
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:29 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_table_fail_1.minion
+# Command line: minion -redump test_table_fail_1.minion 

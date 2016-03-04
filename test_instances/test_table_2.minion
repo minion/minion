@@ -1,0 +1,42 @@
+#TEST CHECKONESOL 2 4 5
+# Minion Graceful Graph Instance
+#   Version with alldiff from -Q to Q
+# K3 x P2
+#
+# Minion Constraint Solver Input
+#    http://sourceforge.net/projects/minion
+# Instance created using CLisp generator written by Ian Gent
+# Instance created at 14:06 on 12 Apr 2006
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:28 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_table_2.minion
+# Command line: minion -redump test_table_2.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..9}
+DISCRETE x1{0..9}
+DISCRETE x2{0..9}
+**SEARCH**
+VARORDER [x0,x1,x2]
+VALORDER [a,a,a]
+SYMORDER [x0,x1,x2]
+PRINT[[x0,x1,x2]]
+**TUPLELIST**
+_Unnamed__0_ 2 3
+1 2 3 
+2 4 5 
+
+_Unnamed__1_ 2 2
+3 4 
+4 5 
+
+**CONSTRAINTS**
+table([x0,x1,x2], _Unnamed__0_)
+table([x1,x2], _Unnamed__1_)
+**EOF**

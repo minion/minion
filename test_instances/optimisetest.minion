@@ -1,0 +1,28 @@
+#TEST SOLCOUNT 7
+# Input file for Minion built for Version 0.2
+#    http://sourceforge.net/projects/minion
+# Prime Queens Instance
+# CSPLib prob029, www.csplib.org
+# Parameters: n = 4
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:25 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: optimisetest.minion
+# Command line: minion -redump optimisetest.minion 
+MINION 3
+**VARIABLES**
+BOUND x0{0..6}
+**SEARCH**
+MAXIMISING x0
+VARORDER [x0]
+VALORDER [a]
+SYMORDER [x0]
+PRINT NONE
+**TUPLELIST**
+**CONSTRAINTS**
+**EOF**

@@ -1,0 +1,36 @@
+#TEST SOLCOUNT 1  
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:27 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_reify_sumgeq_1.minion
+# Command line: minion -redump test_reify_sumgeq_1.minion 
+MINION 3
+**VARIABLES**
+BOOL x0
+BOOL x1
+BOOL x2
+BOOL x3
+BOOL x4
+BOOL x5
+**SEARCH**
+VARORDER [x1,x0,x4,x2,x5,x3]
+VALORDER [a,a,d,a,d,a]
+SYMORDER [x0,x1,x2,x3,x4,x5]
+PRINT[[x0,x1,x2,x3,x4,x5]]
+**TUPLELIST**
+**CONSTRAINTS**
+reify(sumgeq([x5,x2], 1)
+, x0)
+reify(sumgeq([x4,x3,x2], 1)
+, x5)
+reify(sumgeq([x5,x4], 1)
+, x1)
+sumgeq([x0,x3], 1)
+sumleq([x5,x2], 1)
+sumleq([x5,x4], 1)
+**EOF**

@@ -1,0 +1,27 @@
+#TEST SOLCOUNT 9
+#
+# Test for max.
+# Minion Version 1.8
+# HG version: "a54d2c66612b"
+# HG last changed date: "2015-06-12 14:48 +0100"
+#  Run at: UTC Fri Aug 14 19:35:26 2015
+
+#    http://minion.sourceforge.net
+# If you have problems with Minion or find any bugs, please tell us!
+# Mailing list at: https://mailman.cs.st-andrews.ac.uk/mailman/listinfo/mug
+# Input filename: test_min_max_2.minion
+# Command line: minion -redump test_min_max_2.minion 
+MINION 3
+**VARIABLES**
+DISCRETE x0{0..2}
+DISCRETE x1{0..2}
+DISCRETE x2{0..2}
+**SEARCH**
+VARORDER [x2,x1,x0]
+VALORDER [a,d,a]
+SYMORDER [x0,x1,x2]
+PRINT[[x0,x1,x2]]
+**TUPLELIST**
+**CONSTRAINTS**
+max([x0,x1], x2)
+**EOF**
