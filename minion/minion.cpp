@@ -63,6 +63,7 @@ int main(int argc, char** argv) {
     getState().getOldTimer().startClock();
 
     getOptions().printLine("# " + std::string(MinionVersion));
+    getOptions().printLine("# HG version: \"" + tostring(HG_VER) + "\"");
 
     if(argc == 1) {
       print_default_help(argv);

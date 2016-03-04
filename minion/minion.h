@@ -21,6 +21,7 @@
 #define MINION_H
 
 #include "system/system.h"
+#include "BuildDefines.h"
 
 // These are just because VC++ sucks.
 #define _CRT_SECURE_NO_DEPRECATE 1
