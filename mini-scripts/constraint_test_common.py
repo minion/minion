@@ -743,7 +743,7 @@ class testshortstr2:
         options['tabletype'] = "shorttable"
         return runtestgeneral("shortstr2", False, options, [4], ["smallnum"], self, not options['reify'])
 
-class testshortstr2ctuple:
+class testshortctuplestr2:
     def printtable(self, domains):
         cross=[]
         crossprod(domains, [], cross)
@@ -751,7 +751,7 @@ class testshortstr2ctuple:
 
     def runtest(self, options=dict()):
         options['tabletype'] = "shortctuple"
-        return runtestgeneral("shortstr2ctuple", False, options, [4], ["smallnum"], self, not options['reify'])
+        return runtestgeneral("shortctuplestr2", False, options, [4], ["smallnum"], self, not options['reify'])
 
 
 class testmddc:

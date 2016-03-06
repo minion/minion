@@ -7,7 +7,7 @@
 <h1>Help on <tt>constraints gccweak</tt></h1>
 <h3>Description</h3>
 <pre>
-The Generalized Cardinality Constraint (GCC) (weak variant) constrains the 
+The Generalized Cardinality Constraint (GCC) (weak variant) constrains the
 number of each value that a set of variables can take.
 
 gccweak([primary variables], [values of interest], [capacity variables])
@@ -17,7 +17,7 @@ the number of occurrences of the value in the primary variables.
 
 This constraint only restricts the number of occurrences of the values in
 the value list. There is no restriction on the occurrences of other values.
-Therefore the semantics of gccweak are identical to a set of occurrence 
+Therefore the semantics of gccweak are identical to a set of occurrence
 constraints:
 
 occurrence([primary variables], val1, cap1)
@@ -44,7 +44,7 @@ capacity variables, then enforces GAC over the primary variables only.  Then the
 bounds of the capacity variables are updated by counting values in the domains
 of the primary variables.
 
-The consistency over the capacity variables is weaker than the gcc constraint, 
+The consistency over the capacity variables is weaker than the gcc constraint,
 hence the name gccweak.
 </pre>
 <p><a href="index.html">Home</a></p>

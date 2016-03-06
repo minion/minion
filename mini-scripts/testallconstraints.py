@@ -62,7 +62,7 @@ conslist+=["w-inset", "w-inintervalset", "w-notinset", "w-inrange", "w-notinrang
 conslist+=["watchsumgeq", "litsumgeq", "watchneq", "watchless", "not-hamming"]
 conslist+=["not-hamming"]
 
-conslist+=["gacschema", "haggisgac", "haggisgac-stable", "str2plus", "shortstr2", "shortstr2ctuple", "mddc"]
+conslist+=["gacschema", "haggisgac", "haggisgac-stable", "str2plus", "shortstr2", "shortctuplestr2", "mddc"]
 
 conslist+=["nvalueleq", "nvaluegeq"]
 

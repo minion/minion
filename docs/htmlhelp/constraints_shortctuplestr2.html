@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>constraints shortctuplestr2</title>
+</head>
+<body>
+<h1>Help on <tt>constraints shortctuplestr2</tt></h1>
+<h3>Description</h3>
+<pre>
+
+This constraint extends the ShortSTR2 algorithm to support short c-tuples
+(that is, short tuples which contain can contain more than one domain value
+per constraint).
+</pre>
+<h3>Example</h3>
+<pre>
+
+Input format is similar to that used by other short tuple constraints,
+such as haggisgac or shortstr2. Refer to the haggisgac and
+shorttuplelist pages for more information.
+
+The important change is that more than one literal may be given for each
+variable. Variables which are not mentioned are assumed to be allowed
+to take any value
+
+Example:
+
+**SHORTTUPLELIST**
+mycon 4
+[(0,0),(0,1),(3,0)]
+[(1,0),(1,2),(3,0)]
+[(2,0),(3,0),(3,1)]
+[(0,1),(1,1),(2,1),(3,1)]
+
+**CONSTRAINTS**
+shortctuplestr2([x1,x2,x3,x4], mycon)
+</pre>
+<h3>References</h3>
+<pre>
+help input shorttuplelist
+help constraints table
+help constraints negativetable
+help constraints haggisgac
+help constraints haggisgac-stable
+help constraints shortstr2
+</pre>
+<p><a href="index.html">Home</a></p>
+</body>
+</html>

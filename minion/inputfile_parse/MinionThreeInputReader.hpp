@@ -128,8 +128,9 @@ help input shorttuplelist
 */
 
 /** @help input;shorttuplelist Description
-A shorttuplelist section lists of allowed tuples for haggisgac
-and other constraints which accept short tuple lists.
+A shorttuplelist section lists of allowed tuples for haggisgac,
+shortstr2, shortctuplestr2 and other constraints which accept
+short tuple lists.
 
 The required format is
 
@@ -173,6 +174,13 @@ variable. For example:
 Represents 'If the variable at index 0 is 0, and the variable at index
 3 is 0, then the constraint is true'.
 
+Some constraints (currently just shortctuplestr2) allow more than
+one literal per variable for example:
+
+[(0,0),(0,1),(3,0)]
+
+Represents 'If the variable at index 0 is 0 or 1, and the variable at index
+3 is 0, then the constraint is true'.
 
 Note that some tuples are double-represented in the example 'mycon'.
 The first 3 short tuples all allow the assignment '0 0 0 0'. This is fine.

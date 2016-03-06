@@ -18,60 +18,51 @@
 * USA.
 */
 
-/** @help constraints;shortstr2 Description
-ShortSTR2 is the algorithm described in the IJCAI 2013 paper by Jefferson and
-Nightingale. It is an extension of STR2+ by Christophe Lecoutre, adapted for
-short supports.
+/** @help constraints;shortctuplestr2 Description
+
+This constraint extends the ShortSTR2 algorithm to support short c-tuples
+(that is, short tuples which contain can contain more than one domain value
+per constraint).
 
 */
 
-/** @help constraints;shortstr2 Example
+/** @help constraints;shortctuplestr2 Example
 
-Input format is exactly the same as haggisgac. Refer to the haggisgac and
+Input format is similar to that used by other short tuple constraints,
+such as haggisgac or shortstr2. Refer to the haggisgac and
 shorttuplelist pages for more information.
+
+The important change is that more than one literal may be given for each
+variable. Variables which are not mentioned are assumed to be allowed
+to take any value
 
 Example:
 
 **SHORTTUPLELIST**
 mycon 4
-[(0,0),(3,0)]
-[(1,0),(3,0)]
-[(2,0),(3,0)]
+[(0,0),(0,1),(3,0)]
+[(1,0),(1,2),(3,0)]
+[(2,0),(3,0),(3,1)]
 [(0,1),(1,1),(2,1),(3,1)]
 
 **CONSTRAINTS**
-shortstr2([x1,x2,x3,x4], mycon)
+shortctuplestr2([x1,x2,x3,x4], mycon)
 
 */
 
-/** @help constraints;shortstr2 Notes
+/** @help constraints;shortcuplestr2 Notes
 This constraint enforces generalized arc consistency.
 */
 
-/** @help constraints;shortstr2 References
+/** @help constraints;shortctuplestr2 References
 help input shorttuplelist
 help constraints table
 help constraints negativetable
 help constraints haggisgac
 help constraints haggisgac-stable
+help constraints shortstr2
 */
 
-/** @help constraints;str2plus Description
-str2plus is an implementation of the STR2+ algorithm by Christophe Lecoutre.
-*/
-
-/** @help constraints;str2plus Example
-
-str2plus is invoked in the same way as all other table constraints, such
-as table and mddc.
-
-str2plus([x,y,z], {<1,2,3>, <1,3,2>})
-
-*/
-
-/** @help constraints;shortstr2 Notes
-This constraint enforces generalized arc consistency.
-*/
 
 #ifndef CONSTRAINT_CTUPLESTR2_H
 #define CONSTRAINT_CTUPLESTR2_H
@@ -262,7 +253,7 @@ struct CTupleSTRData {
 template <typename VarArray, bool UseShort>
 struct CTupleSTR : public AbstractConstraint {
   virtual string constraint_name() {
-      return "shortstr2ctuple";
+      return "shortctuplestr2";
   }
 
   //    CONSTRAINT_ARG_LIST2(vars, tupleList);
@@ -615,7 +606,7 @@ AbstractConstraint* BuildCT_SHORTSTR_CTUPLE(const T& t1, ConstraintBlob& b) {
 
 /* JSON
   { "type": "constraint",
-    "name": "shortstr2ctuple",
+    "name": "shortctuplestr2",
     "internal_name": "CT_SHORTSTR_CTUPLE",
     "args": [ "read_list", "read_short_tuples" ]
   }
