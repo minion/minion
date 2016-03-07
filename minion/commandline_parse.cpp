@@ -92,11 +92,11 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     } else if(command == string("-crash")) {
       debug_crash = true;
     }
-    /** @help switches;-quiet Description
+/** @help switches;-quiet Description
     Do not print parser progress (default)
     */
 
-    /** @help switches;-quiet References
+/** @help switches;-quiet References
     help switches -verbose
     */
     else if(command == string("-quiet")) {
@@ -106,20 +106,20 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-redump")) {
       getOptions().redump = true;
     }
-    /** @help switches;-outputCompressedDomains Description
+/** @help switches;-outputCompressedDomains Description
     Try to rduce the initial domains of variables, and output them.
     This is in general not useful for users, but is provided for other systems.
     */
     else if(command == string("-outputCompressedDomains")) {
       getOptions().outputCompressedDomains = true;
     }
-    /** @help switches;-outputCompressed Description
+/** @help switches;-outputCompressed Description
     Output a Minion instance with some basic reasoning performed to
     reduce the size of the file. This file should produce identical
     output the original instance but may solve faster.
     */
 
-    /** @help switches;-outputCompressed Example
+/** @help switches;-outputCompressed Example
     To compress a file 'infile.minion' to a file 'smaller.minion'
 
        minion infile.minion -outputCompressed smaller.minion
@@ -133,13 +133,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().graph = true;
       getOptions().silent = true;
     }
-    /** @help switches;-printsols Description
+/** @help switches;-printsols Description
     Print solutions (default).
     */
     else if(command == string("-printsols")) {
       getOptions().print_solution = true;
     }
-    /** @help switches;-noprintsols Description
+/** @help switches;-noprintsols Description
     Do not print solutions.
     */
     else if(command == string("-noprintsols")) {
@@ -147,13 +147,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     } else if(command == string("-notimers")) {
       getOptions().noTimers = true;
     }
-    /** @help switches;-printsolsonly Description
+/** @help switches;-printsolsonly Description
     Print only solutions and a summary at the end.
     */
     else if(command == string("-printsolsonly")) {
       getOptions().silent = true;
     }
-    /** @help switches;-printonlyoptimal Description
+/** @help switches;-printonlyoptimal Description
     In optimisation problems, only print the optimal value, and
     not intermediate values.
     */
@@ -164,17 +164,17 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().cspcomp = true;
       in_cspcomp_for_failexit = true;
     }
-    /** @help switches;-verbose Description
+/** @help switches;-verbose Description
     Print parser progress.
     */
 
-    /** @help switches;-verbose References
+/** @help switches;-verbose References
     help switches -quiet
     */
     else if(command == string("-verbose")) {
       getOptions().parser_verbose = true;
     }
-    /** @help switches;-prop-node Description
+/** @help switches;-prop-node Description
     Allows the user to choose the level of consistency to be enforced
     during search.
 
@@ -182,13 +182,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     levels of consistency.
     */
 
-    /** @help switches;-prop-node Example
+/** @help switches;-prop-node Example
     To enforce SSAC during search:
 
        minion -prop-node SSAC input.minion
     */
 
-    /** @help switches;-prop-node References
+/** @help switches;-prop-node References
     help switches -preprocess
     */
     else if(command == string("-prop-node") || command == string("-X-prop-node")) {
@@ -199,7 +199,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         output_fatal_error("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
-    /** @help switches;-map-long-short Description
+/** @help switches;-map-long-short Description
     Automatically generate a short tuple list from each long tuple list.
 
     The methods of compression are:
@@ -227,7 +227,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         output_fatal_error(" -X-map-long-short <none|keeplong|eager|lazy>");
       }
     }
-    /** @help switches;-preprocess
+/** @help switches;-preprocess
 
     This switch allows the user to choose what level of preprocess is
     applied to their model before search commences.
@@ -267,13 +267,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     time enough to justify the cost.
     */
 
-    /** @help switches;-preprocess Example
+/** @help switches;-preprocess Example
     To enforce SAC before search:
 
        minion -preprocess SAC myinputfile.minion
     */
 
-    /** @help switches;-preprocess References
+/** @help switches;-preprocess References
     help switches -prop-node
     */
     else if(command == string("-preprocess")) {
@@ -281,39 +281,39 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
     }
-    /** @help switches;-nocheck Description
+/** @help switches;-nocheck Description
     Do not check solutions for correctness before printing them out.
     */
 
-    /** @help switches;-nocheck Notes
+/** @help switches;-nocheck Notes
     This option is the default on non-DEBUG executables.
     */
     else if(command == string("-nocheck")) {
       getOptions().nocheck = true;
     }
-    /** @help switches;-check Description
+/** @help switches;-check Description
     Check solutions for correctness before printing them out.
     */
 
-    /** @help switches;-check Notes
+/** @help switches;-check Notes
     This option is the default for DEBUG executables.
     */
     else if(command == string("-check")) {
       getOptions().nocheck = false;
     }
-    /** @help switches;-dumptree Description
+/** @help switches;-dumptree Description
     Print out the branching decisions and variable states at each node.
     */
     else if(command == string("-dumptree")) {
       getOptions().dumptree = true;
     }
-    /** @help switches;-nodelimit Description
+/** @help switches;-nodelimit Description
     To stop search after N nodes, do
 
        minion -nodelimit N myinput.minion
     */
 
-    /** @help switches;-nodelimit References
+/** @help switches;-nodelimit References
     help switches -cpulimit
     help switches -timelimit
     help switches -sollimit
@@ -329,13 +329,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         exit(1);
       }
     }
-    /** @help switches;-sollimit Description
+/** @help switches;-sollimit Description
     To stop search after N solutions have been found, do
 
        minion -sollimit N myinput.minion
     */
 
-    /** @help switches;-sollimit References
+/** @help switches;-sollimit References
     help switches -cpulimit
     help switches -nodelimit
     help switches -timelimit
@@ -351,13 +351,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         exit(1);
       }
     }
-    /** @help switches;-timelimit Description
+/** @help switches;-timelimit Description
     To stop search after N seconds (real time), do
 
        minion -timelimit N myinput.minion
     */
 
-    /** @help switches;-timelimit References
+/** @help switches;-timelimit References
     help switches -cpulimit
     help switches -nodelimit
     help switches -sollimit
@@ -377,7 +377,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         exit(1);
       }
     }
-    /** @help switches;-skipautoaux Description
+/** @help switches;-skipautoaux Description
     By default Minion adds all variables to the varorder, to ensure that all
     variables
     are branched assigned before a solution is outputted. This option disables
@@ -397,13 +397,13 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
               "care\n";
       getOptions().ensure_branch_on_all_vars = false;
     }
-    /** @help switches;-cpulimit Description
+/** @help switches;-cpulimit Description
     To stop search after N seconds (CPU time), do
 
        minion -cpulimit N myinput.minion
     */
 
-    /** @help switches;-cpulimit References
+/** @help switches;-cpulimit References
     help switches -timelimit
     help switches -nodelimit
     help switches -sollimit
@@ -470,7 +470,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       }
     }
 
-    /** @help switches;-randomiseorder Description
+/** @help switches;-randomiseorder Description
     Randomises the ordering of the decision variables, and the value ordering.
     If the input file specifies as ordering it will randomly permute this. If no
     ordering is
@@ -479,7 +479,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-randomiseorder")) {
       getOptions().randomise_valvarorder = true;
     }
-    /** @help switches;-randomseed Description
+/** @help switches;-randomseed Description
     Set the pseudorandom seed to N. This allows 'random' behaviour to be
     repeated in different runs of minion.
     */
@@ -487,14 +487,14 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-randomseed);
       args.random_seed = atoi(argv[i]);
     }
-    /** @help switches;-tableout Description
+/** @help switches;-tableout Description
     Append a line of data about the current run of minion to a named file.
     This data includes minion version information, arguments to the
     executable, build and solve time statistics, etc. See the file itself
     for a precise schema of the supplied information.
     */
 
-    /** @help switches;-tableout Example
+/** @help switches;-tableout Example
     To add statistics about solving myproblem.minion to mystats.txt do
 
        minion -tableout mystats.txt myproblem.minion
@@ -504,12 +504,12 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-tableout);
       getTableOut().set_filename(argv[i]);
     }
-    /** @help switches;-solsout Description
+/** @help switches;-solsout Description
     Append all solutionsto a named file.
     Each solution is placed on a line, with no extra formatting.
     */
 
-    /** @help switches;-solsout Example
+/** @help switches;-solsout Example
     To add the solutions of myproblem.minion to mysols.txt do
 
        minion -solsout mysols.txt myproblem.minion
@@ -524,26 +524,26 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         output_fatal_error(oss.str());
       }
     }
-    /** @help switches;-makeresume Description
+/** @help switches;-makeresume Description
     Write a resume file on timeout or being killed.
     */
     else if(command == string("-makeresume")) {
       getOptions().noresumefile = false;
     }
-    /** @help switches;-noresume Description
+/** @help switches;-noresume Description
     Do not write a resume file on timeout or being killed. (default)
     */
     else if(command == string("-noresume")) {
       getOptions().noresumefile = true;
     }
-    /** @help switches;-gap Description
+/** @help switches;-gap Description
     Give name of gap executable (defaults to gap.sh)
     */
     else if(command == string("-gap")) {
       INCREMENT_i(-gap);
       getOptions().gapname = argv[i];
     }
-    /** @help switches;-split Description
+/** @help switches;-split Description
     When Minion is terminated before the end of search, write out two new input
     files that split the remaining search space in half. Each of the files will
     have
@@ -584,7 +584,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().noresumefile = false;
       getOptions().splitstderr = false;
     }
-    /** @help switches;-split-stderr Description
+/** @help switches;-split-stderr Description
     The flag -split-stderr has the same function as the flag -split, however the
     two new Minion input files are sent to standard error rather than written to
     files.

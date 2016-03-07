@@ -128,7 +128,7 @@ public:
   }
 
   /// The domain delta from the domain change.
-  /** This may not contain the actual delta, but contains data from which a
+/** This may not contain the actual delta, but contains data from which a
    variable can
    construct it, by passing it to getDomainChange. */
   DomainInt data;

@@ -141,14 +141,14 @@ public:
   }
 
   /// Iterative propagation function.
-  /** Can assume full_propagate is always called at least once before propagate
+/** Can assume full_propagate is always called at least once before propagate
    */
   virtual void propagateDynInt(SysInt, DomainDelta) {
     D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + extended_name());
   }
 
   /// Looks for a valid partial assignment to a constraint.
-  /** The return value (in the box) is pairs of <varnum, domain value>, where
+/** The return value (in the box) is pairs of <varnum, domain value>, where
   * varnum is in the same position
   *  as returned by get_vars.
    */
@@ -161,7 +161,7 @@ public:
   }
 
   /// Returns the reverse of the current constraint
-  /** Used by rarification */
+/** Used by rarification */
   virtual AbstractConstraint* reverse_constraint() {
     ostringstream oss;
     oss << "Negation is not supported by the " << extended_name() << " constraint. Sorry" << endl;
@@ -189,7 +189,7 @@ public:
 
   /// Performs a full round of propagation and sets up any data needs by
   /// propagateDynInt().
-  /** This function can be called during search if the function is reified */
+/** This function can be called during search if the function is reified */
   virtual void full_propagate() = 0;
 
   // Returns the variables of the constraint
@@ -229,7 +229,7 @@ public:
   }
 
   /// Checks if an assignment is satisfied.
-  /** This takes the variable order returned by, and is mainly only used by,
+/** This takes the variable order returned by, and is mainly only used by,
    * get_table_constraint() */
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size) = 0;
 
