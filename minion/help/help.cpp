@@ -60,49 +60,76 @@ cout << "" << endl
 << "" << endl
 << "- static - lexicographical ordering" << endl << endl << endl;
 } else
-if("/Library" == request) {
-cout << "Help entry: " << "/Library" << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+if("switches -quiet" == request) {
+cout << "Help entry: " << "switches -quiet" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Do not print parser progress (default)" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -verbose" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -outputCompressedDomains" == request) {
+cout << "Help entry: " << "switches -outputCompressedDomains" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Try to rduce the initial domains of variables, and output them." << endl
 << " This is in general not useful for users, but is provided for other systems." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -outputCompressed" == request) {
+cout << "Help entry: " << "switches -outputCompressed" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Output a Minion instance with some basic reasoning performed to" << endl
 << " reduce the size of the file. This file should produce identical" << endl
 << " output the original instance but may solve faster." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To compress a file 'infile.minion' to a file 'smaller.minion'" << endl
 << "" << endl
 << " minion infile.minion -outputCompressed smaller.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -printsols" == request) {
+cout << "Help entry: " << "switches -printsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print solutions (default)." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -noprintsols" == request) {
+cout << "Help entry: " << "switches -noprintsols" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Do not print solutions." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -printsolsonly" == request) {
+cout << "Help entry: " << "switches -printsolsonly" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print only solutions and a summary at the end." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -printonlyoptimal" == request) {
+cout << "Help entry: " << "switches -printonlyoptimal" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "In optimisation problems, only print the optimal value, and" << endl
 << " not intermediate values." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -verbose" == request) {
+cout << "Help entry: " << "switches -verbose" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print parser progress." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -quiet" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -prop-node" == request) {
+cout << "Help entry: " << "switches -prop-node" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Allows the user to choose the level of consistency to be enforced" << endl
 << " during search." << endl
 << "" << endl
 << " See entry 'help switches -preprocess' for details of the available" << endl
 << " levels of consistency." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To enforce SSAC during search:" << endl
 << "" << endl
 << " minion -prop-node SSAC input.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -preprocess" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -map-long-short" == request) {
+cout << "Help entry: " << "switches -map-long-short" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Automatically generate a short tuple list from each long tuple list." << endl
 << "" << endl
 << " The methods of compression are:" << endl
@@ -114,7 +141,10 @@ cout << "Automatically generate a short tuple list from each long tuple list." <
 << " list" << endl
 << " keeplong : Make a 'short tuple list' with no short tuples (only for" << endl
 << " benchmarking)" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -preprocess" == request) {
+cout << "Help entry: " << "switches -preprocess" << endl << endl;
+cout << "" << "--------------------------------------------------------------------------------" << endl;
 cout << "" << endl
 << " This switch allows the user to choose what level of preprocess is" << endl
 << " applied to their model before search commences." << endl
@@ -152,47 +182,68 @@ cout << "" << endl
 << " success of higher levels of preprocessing is problem specific; SAC" << endl
 << " preprocesses may take a long time to complete, but may reduce search" << endl
 << " time enough to justify the cost." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To enforce SAC before search:" << endl
 << "" << endl
 << " minion -preprocess SAC myinputfile.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -prop-node" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -nocheck" == request) {
+cout << "Help entry: " << "switches -nocheck" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Do not check solutions for correctness before printing them out." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This option is the default on non-DEBUG executables." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -check" == request) {
+cout << "Help entry: " << "switches -check" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Check solutions for correctness before printing them out." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
 cout << "This option is the default for DEBUG executables." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -dumptree" == request) {
+cout << "Help entry: " << "switches -dumptree" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -nodelimit" == request) {
+cout << "Help entry: " << "switches -nodelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "To stop search after N nodes, do" << endl
 << "" << endl
 << " minion -nodelimit N myinput.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << " help switches -timelimit" << endl
 << " help switches -sollimit" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -sollimit" == request) {
+cout << "Help entry: " << "switches -sollimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "To stop search after N solutions have been found, do" << endl
 << "" << endl
 << " minion -sollimit N myinput.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << " help switches -nodelimit" << endl
 << " help switches -timelimit" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -timelimit" == request) {
+cout << "Help entry: " << "switches -timelimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "To stop search after N seconds (real time), do" << endl
 << "" << endl
 << " minion -timelimit N myinput.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << " help switches -nodelimit" << endl
 << " help switches -sollimit" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -skipautoaux" == request) {
+cout << "Help entry: " << "switches -skipautoaux" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "By default Minion adds all variables to the varorder, to ensure that all" << endl
 << " variables" << endl
 << " are branched assigned before a solution is outputted. This option disables" << endl
@@ -204,45 +255,72 @@ cout << "By default Minion adds all variables to the varorder, to ensure that al
 << " In particular," << endl
 << " it will not speed up search (except when the speed up is due to producing" << endl
 << " garbage of course!)" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -cpulimit" == request) {
+cout << "Help entry: " << "switches -cpulimit" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "To stop search after N seconds (CPU time), do" << endl
 << "" << endl
 << " minion -cpulimit N myinput.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -timelimit" << endl
 << " help switches -nodelimit" << endl
 << " help switches -sollimit" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -randomiseorder" == request) {
+cout << "Help entry: " << "switches -randomiseorder" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Randomises the ordering of the decision variables, and the value ordering." << endl
 << " If the input file specifies as ordering it will randomly permute this. If no" << endl
 << " ordering is" << endl
 << " specified a random permutation of all the variables is used." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -randomseed" == request) {
+cout << "Help entry: " << "switches -randomseed" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Set the pseudorandom seed to N. This allows 'random' behaviour to be" << endl
 << " repeated in different runs of minion." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -tableout" == request) {
+cout << "Help entry: " << "switches -tableout" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Append a line of data about the current run of minion to a named file." << endl
 << " This data includes minion version information, arguments to the" << endl
 << " executable, build and solve time statistics, etc. See the file itself" << endl
 << " for a precise schema of the supplied information." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To add statistics about solving myproblem.minion to mystats.txt do" << endl
 << "" << endl
 << " minion -tableout mystats.txt myproblem.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -solsout" == request) {
+cout << "Help entry: " << "switches -solsout" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Append all solutionsto a named file." << endl
 << " Each solution is placed on a line, with no extra formatting." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To add the solutions of myproblem.minion to mysols.txt do" << endl
 << "" << endl
 << " minion -solsout mysols.txt myproblem.minion" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -makeresume" == request) {
+cout << "Help entry: " << "switches -makeresume" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Write a resume file on timeout or being killed." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -noresume" == request) {
+cout << "Help entry: " << "switches -noresume" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Do not write a resume file on timeout or being killed. (default)" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -gap" == request) {
+cout << "Help entry: " << "switches -gap" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Give name of gap executable (defaults to gap.sh)" << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -split" == request) {
+cout << "Help entry: " << "switches -split" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "When Minion is terminated before the end of search, write out two new input" << endl
 << " files that split the remaining search space in half. Each of the files will" << endl
 << " have" << endl
@@ -277,7 +355,10 @@ cout << "When Minion is terminated before the end of search, write out two new i
 << " runs (such as -varorder) may have unintended consequences." << endl
 << "" << endl
 << " Implies -makeresume." << endl << endl << endl;
-cout << "/Network" << "------------------------------------------------------------------------" << endl;
+} else
+if("switches -split-stderr" == request) {
+cout << "Help entry: " << "switches -split-stderr" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "The flag -split-stderr has the same function as the flag -split, however the" << endl
 << " two new Minion input files are sent to standard error rather than written to" << endl
 << " files." << endl
@@ -2009,7 +2090,6 @@ cout << "Declaration of a sparse bounds variable called myvar containing values"
 cout << "Unknown entry, please try again." << endl;
 if("" == request) {
 cout << "Available subentries:" << endl;
-cout << "help /Library" << endl;
 cout << "help constraints" << endl;
 cout << "help input" << endl;
 cout << "help switches" << endl;
@@ -2096,9 +2176,37 @@ cout << "help input variables" << endl;
 } else
 if("switches" == request) {
 cout << "Available subentries:" << endl;
+cout << "help switches -check" << endl;
+cout << "help switches -cpulimit" << endl;
+cout << "help switches -dumptree" << endl;
 cout << "help switches -findallsols" << endl;
+cout << "help switches -gap" << endl;
+cout << "help switches -makeresume" << endl;
+cout << "help switches -map-long-short" << endl;
+cout << "help switches -nocheck" << endl;
+cout << "help switches -nodelimit" << endl;
+cout << "help switches -noprintsols" << endl;
+cout << "help switches -noresume" << endl;
+cout << "help switches -outputCompressed" << endl;
+cout << "help switches -outputCompressedDomains" << endl;
+cout << "help switches -preprocess" << endl;
+cout << "help switches -printonlyoptimal" << endl;
+cout << "help switches -printsols" << endl;
+cout << "help switches -printsolsonly" << endl;
+cout << "help switches -prop-node" << endl;
+cout << "help switches -quiet" << endl;
+cout << "help switches -randomiseorder" << endl;
+cout << "help switches -randomseed" << endl;
 cout << "help switches -redump" << endl;
+cout << "help switches -skipautoaux" << endl;
+cout << "help switches -sollimit" << endl;
+cout << "help switches -solsout" << endl;
+cout << "help switches -split" << endl;
+cout << "help switches -split-stderr" << endl;
+cout << "help switches -tableout" << endl;
+cout << "help switches -timelimit" << endl;
 cout << "help switches -varorder" << endl;
+cout << "help switches -verbose" << endl;
 } else
 if("variables" == request) {
 cout << "Available subentries:" << endl;

@@ -1,397 +1,3 @@
-\section{/Library}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Do not print parser progress (default)
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -verbose
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Try to rduce the initial domains of variables, and output them.
-    This is in general not useful for users, but is provided for other systems.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Output a Minion instance with some basic reasoning performed to
-    reduce the size of the file. This file should produce identical
-    output the original instance but may solve faster.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To compress a file 'infile.minion' to a file 'smaller.minion'
-
-       minion infile.minion -outputCompressed smaller.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Print solutions (default).
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Do not print solutions.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Print only solutions and a summary at the end.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    In optimisation problems, only print the optimal value, and
-    not intermediate values.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Print parser progress.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -quiet
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Allows the user to choose the level of consistency to be enforced
-    during search.
-
-    See entry 'help switches -preprocess' for details of the available
-    levels of consistency.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To enforce SSAC during search:
-
-       minion -prop-node SSAC input.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -preprocess
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Automatically generate a short tuple list from each long tuple list.
-
-    The methods of compression are:
-
-    none : No short tuple list generated (default)
-    eager : Use a fast algorithm to produce a reasonable short tuple list (best
-    as first choice)
-    lazy : Work harder (possibly exponentially) to produce a shorter short tuple
-    list
-    keeplong : Make a 'short tuple list' with no short tuples (only for
-    benchmarking)
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-
-    This switch allows the user to choose what level of preprocess is
-    applied to their model before search commences.
-
-    The choices are:
-
-    - GAC
-    - generalised arc consistency (default)
-    - all propagators are run to a fixed point
-    - if some propagators enforce less than GAC then the model will
-    not necessarily be fully GAC at the outset
-
-    - SACBounds
-    - singleton arc consistency on the bounds of each variable
-    - AC can be achieved when any variable lower or upper bound is a
-    singleton in its own domain
-
-    - SAC
-    - singleton arc consistency
-    - AC can be achieved in the model if any value is a singleton in
-    its own domain
-
-    - SSACBounds
-    - singleton singleton bounds arc consistency
-    - SAC can be achieved in the model when domains are replaced by either
-    the singleton containing their upper bound, or the singleton containing
-    their lower bound
-
-    - SSAC
-    - singleton singleton arc consistency
-    - SAC can be achieved when any value is a singleton in its own domain
-
-    These are listed in order of roughly how long they take to
-    achieve. Preprocessing is a one off cost at the start of search. The
-    success of higher levels of preprocessing is problem specific; SAC
-    preprocesses may take a long time to complete, but may reduce search
-    time enough to justify the cost.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To enforce SAC before search:
-
-       minion -preprocess SAC myinputfile.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -prop-node
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Do not check solutions for correctness before printing them out.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    This option is the default on non-DEBUG executables.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Check solutions for correctness before printing them out.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    This option is the default for DEBUG executables.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Print out the branching decisions and variable states at each node.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To stop search after N nodes, do
-
-       minion -nodelimit N myinput.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -cpulimit
-    help switches -timelimit
-    help switches -sollimit
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To stop search after N solutions have been found, do
-
-       minion -sollimit N myinput.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -cpulimit
-    help switches -nodelimit
-    help switches -timelimit
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To stop search after N seconds (real time), do
-
-       minion -timelimit N myinput.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -cpulimit
-    help switches -nodelimit
-    help switches -sollimit
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    By default Minion adds all variables to the varorder, to ensure that all
-    variables
-    are branched assigned before a solution is outputted. This option disables
-    that
-    behaviour. This means minion Minion may output solutions incorrectly, or
-    incorrect
-    numbers of solutions. This flag is provided because some users require this
-    low-level control over the search, but is in general useless and dangerous.
-    In particular,
-    it will not speed up search (except when the speed up is due to producing
-    garbage of course!)
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To stop search after N seconds (CPU time), do
-
-       minion -cpulimit N myinput.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    help switches -timelimit
-    help switches -nodelimit
-    help switches -sollimit
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Randomises the ordering of the decision variables, and the value ordering.
-    If the input file specifies as ordering it will randomly permute this. If no
-    ordering is
-    specified a random permutation of all the variables is used.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Set the pseudorandom seed to N. This allows 'random' behaviour to be
-    repeated in different runs of minion.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Append a line of data about the current run of minion to a named file.
-    This data includes minion version information, arguments to the
-    executable, build and solve time statistics, etc. See the file itself
-    for a precise schema of the supplied information.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To add statistics about solving myproblem.minion to mystats.txt do
-
-       minion -tableout mystats.txt myproblem.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Append all solutionsto a named file.
-    Each solution is placed on a line, with no extra formatting.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    To add the solutions of myproblem.minion to mysols.txt do
-
-       minion -solsout mysols.txt myproblem.minion
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Write a resume file on timeout or being killed.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Do not write a resume file on timeout or being killed. (default)
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    Give name of gap executable (defaults to gap.sh)
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    When Minion is terminated before the end of search, write out two new input
-    files that split the remaining search space in half. Each of the files will
-    have
-    all the variables and constraints of the original file plus constraints that
-    rule out the search already done. In addition, the domain of the variable
-    under
-    consideration when Minion was stopped is split in half with each of the new
-    input files considering a different half.
-
-    This feature is experimental and intended to facilitate parallelisation --
-    to
-    parallelise the solving of a single constraint problem, stop and split
-    repeatedly. Please note that large-scale testing of this feature was limited
-    to
-    Linux systems and it might not work on others (especially Windows).
-
-    The name of the new input files is composed of the name of the original
-    instance, the string 'resume', a timestamp, the process ID of Minion, the
-    name
-    of the variable whose domain is being split and 0 or 1. Each of the new
-    input
-    files has a comment identifying the name of the input file which it was
-    split
-    from. Similarly, Minion's output identifies the new input files it writes
-    when
-    splitting.
-
-    The new input files can be run without any special flags.
-
-    This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
-    or -cpulimit flags. Please note that changing other flags between
-    runs (such as -varorder) may have unintended consequences.
-
-    Implies -makeresume.
-\end{verbatim}
-}
-\paragraph{/Network}
-{\footnotesize
-\begin{verbatim}
-    The flag -split-stderr has the same function as the flag -split, however the
-    two new Minion input files are sent to standard error rather than written to
-    files.
-
-    See documentation for -split.
-\end{verbatim}
-}
 \section{constraints}
 \paragraph{Description}
 {\footnotesize
@@ -2511,6 +2117,43 @@ below contains all available switches. For example to see help on
 replacing 'minion' by the name of the executable you're using.
 \end{verbatim}
 }
+\section{switches -check}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Check solutions for correctness before printing them out.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+    This option is the default for DEBUG executables.
+\end{verbatim}
+}
+\section{switches -cpulimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    To stop search after N seconds (CPU time), do
+
+       minion -cpulimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -timelimit
+    help switches -nodelimit
+    help switches -sollimit
+\end{verbatim}
+}
+\section{switches -dumptree}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Print out the branching decisions and variable states at each node.
+\end{verbatim}
+}
 \section{switches -findallsols}
 \paragraph{Description}
 {\footnotesize
@@ -2519,12 +2162,383 @@ Find all solutions and count them. This option is ignored if the
 problem contains any minimising or maximising objective.
 \end{verbatim}
 }
+\section{switches -gap}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Give name of gap executable (defaults to gap.sh)
+\end{verbatim}
+}
+\section{switches -makeresume}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Write a resume file on timeout or being killed.
+\end{verbatim}
+}
+\section{switches -map-long-short}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Automatically generate a short tuple list from each long tuple list.
+
+    The methods of compression are:
+
+    none : No short tuple list generated (default)
+    eager : Use a fast algorithm to produce a reasonable short tuple list (best
+    as first choice)
+    lazy : Work harder (possibly exponentially) to produce a shorter short tuple
+    list
+    keeplong : Make a 'short tuple list' with no short tuples (only for
+    benchmarking)
+\end{verbatim}
+}
+\section{switches -nocheck}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Do not check solutions for correctness before printing them out.
+\end{verbatim}
+}
+\paragraph{Notes}
+{\footnotesize
+\begin{verbatim}
+    This option is the default on non-DEBUG executables.
+\end{verbatim}
+}
+\section{switches -nodelimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    To stop search after N nodes, do
+
+       minion -nodelimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -cpulimit
+    help switches -timelimit
+    help switches -sollimit
+\end{verbatim}
+}
+\section{switches -noprintsols}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Do not print solutions.
+\end{verbatim}
+}
+\section{switches -noresume}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Do not write a resume file on timeout or being killed. (default)
+\end{verbatim}
+}
+\section{switches -outputCompressed}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Output a Minion instance with some basic reasoning performed to
+    reduce the size of the file. This file should produce identical
+    output the original instance but may solve faster.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+    To compress a file 'infile.minion' to a file 'smaller.minion'
+
+       minion infile.minion -outputCompressed smaller.minion
+\end{verbatim}
+}
+\section{switches -outputCompressedDomains}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Try to rduce the initial domains of variables, and output them.
+    This is in general not useful for users, but is provided for other systems.
+\end{verbatim}
+}
+\section{switches -preprocess}
+\paragraph{}
+{\footnotesize
+\begin{verbatim}
+
+    This switch allows the user to choose what level of preprocess is
+    applied to their model before search commences.
+
+    The choices are:
+
+    - GAC
+    - generalised arc consistency (default)
+    - all propagators are run to a fixed point
+    - if some propagators enforce less than GAC then the model will
+    not necessarily be fully GAC at the outset
+
+    - SACBounds
+    - singleton arc consistency on the bounds of each variable
+    - AC can be achieved when any variable lower or upper bound is a
+    singleton in its own domain
+
+    - SAC
+    - singleton arc consistency
+    - AC can be achieved in the model if any value is a singleton in
+    its own domain
+
+    - SSACBounds
+    - singleton singleton bounds arc consistency
+    - SAC can be achieved in the model when domains are replaced by either
+    the singleton containing their upper bound, or the singleton containing
+    their lower bound
+
+    - SSAC
+    - singleton singleton arc consistency
+    - SAC can be achieved when any value is a singleton in its own domain
+
+    These are listed in order of roughly how long they take to
+    achieve. Preprocessing is a one off cost at the start of search. The
+    success of higher levels of preprocessing is problem specific; SAC
+    preprocesses may take a long time to complete, but may reduce search
+    time enough to justify the cost.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+    To enforce SAC before search:
+
+       minion -preprocess SAC myinputfile.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -prop-node
+\end{verbatim}
+}
+\section{switches -printonlyoptimal}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    In optimisation problems, only print the optimal value, and
+    not intermediate values.
+\end{verbatim}
+}
+\section{switches -printsols}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Print solutions (default).
+\end{verbatim}
+}
+\section{switches -printsolsonly}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Print only solutions and a summary at the end.
+\end{verbatim}
+}
+\section{switches -prop-node}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Allows the user to choose the level of consistency to be enforced
+    during search.
+
+    See entry 'help switches -preprocess' for details of the available
+    levels of consistency.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+    To enforce SSAC during search:
+
+       minion -prop-node SSAC input.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -preprocess
+\end{verbatim}
+}
+\section{switches -quiet}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Do not print parser progress (default)
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -verbose
+\end{verbatim}
+}
+\section{switches -randomiseorder}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Randomises the ordering of the decision variables, and the value ordering.
+    If the input file specifies as ordering it will randomly permute this. If no
+    ordering is
+    specified a random permutation of all the variables is used.
+\end{verbatim}
+}
+\section{switches -randomseed}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Set the pseudorandom seed to N. This allows 'random' behaviour to be
+    repeated in different runs of minion.
+\end{verbatim}
+}
 \section{switches -redump}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
 Print the minion input instance file to standard out. No search is
 carried out when this switch is used.
+\end{verbatim}
+}
+\section{switches -skipautoaux}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    By default Minion adds all variables to the varorder, to ensure that all
+    variables
+    are branched assigned before a solution is outputted. This option disables
+    that
+    behaviour. This means minion Minion may output solutions incorrectly, or
+    incorrect
+    numbers of solutions. This flag is provided because some users require this
+    low-level control over the search, but is in general useless and dangerous.
+    In particular,
+    it will not speed up search (except when the speed up is due to producing
+    garbage of course!)
+\end{verbatim}
+}
+\section{switches -sollimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    To stop search after N solutions have been found, do
+
+       minion -sollimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -cpulimit
+    help switches -nodelimit
+    help switches -timelimit
+\end{verbatim}
+}
+\section{switches -solsout}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Append all solutionsto a named file.
+    Each solution is placed on a line, with no extra formatting.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+    To add the solutions of myproblem.minion to mysols.txt do
+
+       minion -solsout mysols.txt myproblem.minion
+\end{verbatim}
+}
+\section{switches -split}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    When Minion is terminated before the end of search, write out two new input
+    files that split the remaining search space in half. Each of the files will
+    have
+    all the variables and constraints of the original file plus constraints that
+    rule out the search already done. In addition, the domain of the variable
+    under
+    consideration when Minion was stopped is split in half with each of the new
+    input files considering a different half.
+
+    This feature is experimental and intended to facilitate parallelisation --
+    to
+    parallelise the solving of a single constraint problem, stop and split
+    repeatedly. Please note that large-scale testing of this feature was limited
+    to
+    Linux systems and it might not work on others (especially Windows).
+
+    The name of the new input files is composed of the name of the original
+    instance, the string 'resume', a timestamp, the process ID of Minion, the
+    name
+    of the variable whose domain is being split and 0 or 1. Each of the new
+    input
+    files has a comment identifying the name of the input file which it was
+    split
+    from. Similarly, Minion's output identifies the new input files it writes
+    when
+    splitting.
+
+    The new input files can be run without any special flags.
+
+    This flag is intended to be used with the -timelimit, -sollimit, -nodelimit
+    or -cpulimit flags. Please note that changing other flags between
+    runs (such as -varorder) may have unintended consequences.
+
+    Implies -makeresume.
+\end{verbatim}
+}
+\section{switches -split-stderr}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    The flag -split-stderr has the same function as the flag -split, however the
+    two new Minion input files are sent to standard error rather than written to
+    files.
+
+    See documentation for -split.
+\end{verbatim}
+}
+\section{switches -tableout}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Append a line of data about the current run of minion to a named file.
+    This data includes minion version information, arguments to the
+    executable, build and solve time statistics, etc. See the file itself
+    for a precise schema of the supplied information.
+\end{verbatim}
+}
+\paragraph{Example}
+{\footnotesize
+\begin{verbatim}
+    To add statistics about solving myproblem.minion to mystats.txt do
+
+       minion -tableout mystats.txt myproblem.minion
+\end{verbatim}
+}
+\section{switches -timelimit}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    To stop search after N seconds (real time), do
+
+       minion -timelimit N myinput.minion
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -cpulimit
+    help switches -nodelimit
+    help switches -sollimit
 \end{verbatim}
 }
 \section{switches -varorder}
@@ -2553,6 +2567,19 @@ The available orders are:
 - random - random variable ordering
 
 - static - lexicographical ordering
+\end{verbatim}
+}
+\section{switches -verbose}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Print parser progress.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+    help switches -quiet
 \end{verbatim}
 }
 \section{variables}
