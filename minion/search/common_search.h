@@ -299,9 +299,9 @@ inline void do_checks(VarArray& var_array, BranchList& branches) {
 }
 
 template <typename T>
-void inline maybe_print_search_state(const char* name, T& vars) {
+void inline maybe_print_node(T& vars) {
   if(getOptions().dumptree)
-    cout << name << getState().getNodeCount() << "," << get_dom_as_string(vars) << endl;
+    cout << "Node: " << getState().getNodeCount() << "," << get_dom_as_string(vars) << endl;
 }
 
 void inline maybe_print_backtrack() {

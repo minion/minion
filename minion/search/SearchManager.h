@@ -28,12 +28,9 @@
 namespace Controller {
 
 template <typename T>
-void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal, bool force = false) {
+void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
   if(getOptions().dumptree) {
-    if(force)
-      cout << "ForceAssign: " << var << (equal ? " = " : " != ") << val << endl;
-    else
-      cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
+    cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
   }
 }
 
@@ -174,7 +171,7 @@ struct SearchManager {
 
   // Most basic search procedure
   virtual void search() {
-    maybe_print_search_state("Node: ", var_array);
+    maybe_print_node(var_array);
     while(true) {
       D_ASSERT(getQueue().isQueuesEmpty());
 
@@ -194,7 +191,7 @@ struct SearchManager {
         // If we are not finished, then go into the loop below.
         getState().setFailed(true);
       } else {
-        maybe_print_search_state("Node: ", var_array);
+        maybe_print_node(var_array);
         branch_left(varval);
         prop->prop(var_array);
       }
