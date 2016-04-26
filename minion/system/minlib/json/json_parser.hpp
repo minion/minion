@@ -2,11 +2,11 @@
 #define _GRASPJSON_PARSE_HPP_CAPQLCN
 
 #include "picojson/picojson.h"
-#include "minlib/optional.hpp"
-#include "minlib/SimpleMap.hpp"
-#include "minlib/optional.hpp"
-#include "minlib/immutable_string.hpp"
-#include "minlib/string_ops.hpp"
+#include "../optional.hpp"
+#include "../SimpleMap.hpp"
+#include "../optional.hpp"
+#include "../immutable_string.hpp"
+#include "../string_ops.hpp"
 
 // This allows us to assume missing booleans are false
 void inline try_json_fill(bool& ret, const picojson::object& o, const std::string& val) {

@@ -25,4 +25,5 @@
 #include "map.hpp"
 #include "time_keeping.hpp"
 #include "ranges.hpp"
+#include "json/json_printer.hpp"
 #endif
