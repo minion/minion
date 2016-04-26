@@ -52,14 +52,6 @@ public:
     data[propname] = tostring(value);
   }
 
-  void debug_printall() {
-    std::map<string, string>::iterator it;
-
-    for(it = data.begin(); it != data.end(); it++) {
-      cout << (*it).first << "," << (*it).second << endl;
-    }
-  }
-
   void print_line() {
     // First version: this checks if we are at the top of a file. If so, prints
     // column headers.
