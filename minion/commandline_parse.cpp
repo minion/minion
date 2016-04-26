@@ -73,8 +73,6 @@ the available orderings) do:
 
 #include "commandline_parse.h"
 
-extern bool in_cspcomp_for_failexit;
-
 #define INCREMENT_i(flag)                                                                          \
   {                                                                                                \
     ++i;                                                                                           \
@@ -159,10 +157,6 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     */
     else if(command == string("-printonlyoptimal")) {
       getOptions().printonlyoptimal = true;
-    } else if(command == string("-cspcomp")) {
-      getOptions().silent = true;
-      getOptions().cspcomp = true;
-      in_cspcomp_for_failexit = true;
     }
 /** @help switches;-verbose Description
     Print parser progress.

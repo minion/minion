@@ -252,9 +252,6 @@ public:
 /// be changed during search.
 class SearchOptions {
 public:
-  /// Denotes if we should output in a compatable way to the solver competition.
-  bool cspcomp;
-
   /// Denotes if minion should print no output, other than that explicitally
   /// requested
   bool silent;
@@ -334,8 +331,7 @@ public:
   bool ensure_branch_on_all_vars;
 
   SearchOptions()
-      : cspcomp(false),
-        silent(false),
+      : silent(false),
         printonlyoptimal(false),
         dumptree(false),
         sollimit(1),

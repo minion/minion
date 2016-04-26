@@ -146,12 +146,6 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   getOptions().printLine(string("Problem solvable?: ") +
                          (getState().getSolutionCount() == 0 ? "no" : "yes"));
 
-  if(getOptions().cspcomp) {
-    if(getState().getSolutionCount() != 0)
-      cout << "s SATISFIABLE" << endl;
-    else
-      cout << "s UNSATISFIABLE" << endl;
-  }
 
   getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
 

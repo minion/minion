@@ -84,13 +84,7 @@ void check_constraint(T* con) {
 
 template <typename Stream, typename PrintMatrix>
 void print_solution(Stream& sout, const PrintMatrix& print_matrix) {
-  if(getOptions().cspcomp) {
-    sout << "v ";
-    for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
-      for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j)
-        sout << print_matrix[i][j].getAssignedValue() << " ";
-    sout << endl;
-  } else if(!print_matrix.empty()) {
+  if(!print_matrix.empty()) {
     for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i) {
       if(!getOptions().silent)
         sout << "Sol: ";
@@ -297,10 +291,6 @@ inline void do_checks(VarArray& var_array, BranchList& branches) {
       throw EndOfSearch();
     }
 
-    if(getOptions().cspcomp) {
-      FAIL_EXIT("Time out");
-    }
-
     getOptions().printLine("Time out.");
     getTableOut().set("TimeOut", 1);
 
@@ -314,10 +304,10 @@ void inline maybe_print_search_state(const char* name, T& vars) {
     cout << name << getState().getNodeCount() << "," << get_dom_as_string(vars) << endl;
 }
 
-void inline maybe_print_search_action(const char* action) {
+void inline maybe_print_backtrack() {
   // used to print "bt" usually
   if(getOptions().dumptree)
-    cout << "SearchAction:" << action << endl;
+    cout << "SearchAction: bt" << endl;
 }
 
 void inline deal_with_solution() {

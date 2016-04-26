@@ -206,7 +206,7 @@ struct SearchManager {
           return;
         }
 
-        maybe_print_search_action("bt");
+        maybe_print_backtrack();
         bool flag = branch_right();
         if(!flag) { // No remaining left branches to branch right.
           return;

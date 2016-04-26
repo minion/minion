@@ -24,8 +24,6 @@ using namespace std;
 
 bool debug_crash = false;
 
-bool in_cspcomp_for_failexit = false;
-
 void output_fatal_error(string s) {
   std::cerr << s << "\n";
   abort();
@@ -59,13 +57,6 @@ void D_FATAL_ERROR2(string s, string file, string line) {
 }
 
 void DOM_NORETURN FAIL_EXIT(string s) {
-  if(in_cspcomp_for_failexit) {
-    if(s != "")
-      cout << "c " << s << endl;
-    cout << "s UNKNOWN" << endl;
-    exit(1);
-  }
-
   cerr << "Unrecoverable error. Exiting." << endl;
   cerr << s << endl;
   cerr.flush();
