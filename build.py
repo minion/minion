@@ -140,7 +140,7 @@ parser.add_argument('--extraflags', help="Add extra compiler options")
 
 parser.add_argument('--setflags', help="Override all other compiler flags (experts only!)")
 
-parser.add_argument('--buildsystem', help="Set build system. Current options: make (default), sh", default="make")
+parser.add_argument('--buildsystem', help="Set build system. Current options: make (default), sh, tup", default="make")
 
 arg = parser.parse_args()
 
@@ -261,10 +261,13 @@ if arg.constraints:
     constraints = newcon
 
 constraintsrclist = []
+constraintsrclistshort = []
 
 for c in constraints:
     varcount = sum([ m in ["read_list", "read_var", "read_2_vars"] for m in c["args"]])
-    srcname = outsrcdir+"build_"+c["internal_name"]+".cpp"
+    srcname = "build_"+c["internal_name"]+".cpp"
+    constraintsrclistshort.append("src/"+srcname)
+    srcname = outsrcdir+srcname
     constraintsrclist.append(srcname)
     with open(srcname, "w") as conout:
         conout.write('#include "minion.h"\n')
@@ -331,11 +334,19 @@ if arg.buildsystem == "make":
     qw = ''
     def varsub(x):
         return ' $(' + x + ') '
-else:
+elif arg.buildsystem == "sh":
     outname = currentdir + "/build.sh"
     qw = '"'
     def varsub(x):
         return ' ${' + x + '} '
+elif arg.buildsystem == "tup":
+    outname = currentdir + "/Tupfile"
+    qw = ''
+    def varsub(x):
+        return ' $(' + x + ') '
+else:
+    print("Build system not supported")
+    sys.exit(1)
 
 with open(outname, "w") as out:
     constraintobjlist = [objname(x) for x in constraintsrclist]
@@ -346,7 +357,16 @@ with open(outname, "w") as out:
     out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
     out.write('MINOBJS=' + qw + ' '.join(minionobjlist)+ qw +'\n')
     out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
-
+    
+    if arg.buildsystem == "tup":
+        out.write(": foreach ")
+        out.write(" ".join(constraintsrclistshort + ["src/BuildStaticStart.cpp"] + [ "../"+i for i in minionsrclist]))
+        out.write(" |> ")
+        out.write(compiler + ' ' + varsub('FLAGS') + ' -c %f -o %o |> bin/%B.o\n')
+        out.write(': bin/*.o |> ' + compiler + ' ' + varsub('FLAGS') + '%f -o %o |> minion\n')
+        sys.exit(0)
+        
+    
     if arg.buildsystem == "make":
         out.write('all : minion\n')
 
