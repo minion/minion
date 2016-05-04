@@ -153,4 +153,9 @@ Wrapper<T> abs(const Wrapper<T>& in) {
   return Wrapper<T>(abs(in.t));
 }
 
+template<typename T>
+std::ostream& json_dump(const Wrapper<T>& t, std::ostream& o) {
+  return json_dump(t.t, o);
+}
+
 #endif // _WRAPPER_H

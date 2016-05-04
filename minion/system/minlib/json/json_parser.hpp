@@ -8,6 +8,15 @@
 #include "../immutable_string.hpp"
 #include "../string_ops.hpp"
 
+// This class just provides a wrapper which lets a string pass through
+// json_dump without being escaped.
+class raw_json {
+public:
+  std::string str;
+  raw_json(std::string s) : str(s)
+  { }
+};
+  
 // This allows us to assume missing booleans are false
 void inline try_json_fill(bool& ret, const picojson::object& o, const std::string& val) {
   if(o.count(val)) {
@@ -15,6 +24,10 @@ void inline try_json_fill(bool& ret, const picojson::object& o, const std::strin
     ret = v.get<bool>();
   } else
     ret = false;
+}
+
+inline std::ostream& json_dump(const raw_json& r, std::ostream& o) {
+  return o << r.str;
 }
 
 inline std::ostream& json_dump(const bool& b, std::ostream& o) {
@@ -26,6 +39,14 @@ inline void json_fill(int& i, const picojson::value& v) {
 }
 
 inline std::ostream& json_dump(const int& i, std::ostream& o) {
+  return o << i;
+}
+
+inline std::ostream& json_dump(const long long& i, std::ostream& o) {
+  return o << i;
+}
+
+inline std::ostream& json_dump(const unsigned long long& i, std::ostream& o) {
   return o << i;
 }
 

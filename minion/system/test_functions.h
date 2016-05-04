@@ -27,6 +27,53 @@
 #include <vector>
 
 template <typename Var>
+void add_var_dom_to_json(Var& v, std::ostream& s) {
+  if(v.isAssigned() || v.isBound()) {
+    s << "[ [" << v.getMin() << "," << v.getMax() << "] ]";
+  } else {
+      s << "[ ";
+      DomainInt lower_range = v.getMin();
+      bool in_range = true;
+      for(DomainInt i = v.getMin() + 1; i < v.getMax(); ++i) {
+        if(in_range) {
+          if(!v.inDomain(i)) {
+            s << "[" << lower_range << "," << i-1 << "],";
+            in_range = false;
+          }
+        }
+        else {
+          if(v.inDomain(i)) {
+            lower_range = i;
+            in_range = true;
+          }
+        }
+      }
+      
+      if(in_range) {
+        s << "[" << lower_range << "," << v.getMax() << "] ]";
+      }
+      else {
+        s << "[" << v.getMax() << "," << v.getMax() << "] ]";
+      }
+  }
+}
+
+template <typename T>
+raw_json get_dom_as_json(vector<T>& vec) {
+  std::ostringstream s;
+  s << "[";
+  if(!vec.empty()) {
+    add_var_dom_to_json(vec[0], s);
+    for(UnsignedSysInt i = 1; i < vec.size(); ++i) {
+      s << ", ";
+      add_var_dom_to_json(vec[i], s);
+    }
+  }
+  s << "]";
+  return raw_json(s.str());
+}
+
+template <typename Var>
 string get_dom_as_string(Var& v) {
   ostringstream s;
   if(v.isAssigned()) {

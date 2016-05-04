@@ -27,7 +27,6 @@
 #include <utility>
 #include <string>
 #include <fstream>
-#include <sstream>
 
 using namespace std;
 
@@ -38,8 +37,9 @@ class TableOut {
 private:
   // All the data for this run is kept in the map
   map<string, string> data;
-  string filename;
-
+  string tablefilename;
+  string jsonfilename;
+  
   // Don't allow copying!
   TableOut(const TableOut& t);
 
@@ -51,8 +51,36 @@ public:
     // create a new, or overwrite the, entry with name propname
     data[propname] = tostring(value);
   }
-
+  
   void print_line() {
+    if(tablefilename != "") {
+      print_table_line();
+    }
+    if(jsonfilename != "") {
+      print_table_json();
+    }
+  }
+  
+  void print_table_json() {
+    ofstream f;
+    if(jsonfilename == "-") {
+      f.copyfmt(std::cout);
+      f.clear(std::cout.rdstate());
+      f.basic_ios<char>::rdbuf(std::cout.rdbuf());
+    } else {
+      f.open(jsonfilename.c_str(), ios::app | ios::out); // Open with append mode.
+    }
+    
+    JSONStreamer json(&f);
+    
+    map<string, string>::iterator it;
+    for(it = data.begin(); it != data.end(); it++) {
+      json.mapElement(it->first, it->second);
+    }
+  }
+
+  
+  void print_table_line() {
     // First version: this checks if we are at the top of a file. If so, prints
     // column headers.
     // Then
@@ -64,12 +92,12 @@ public:
     // least different orders?
 
     ofstream f;
-    if(filename == "-") {
+    if(tablefilename == "-") {
       f.copyfmt(std::cout);
       f.clear(std::cout.rdstate());
       f.basic_ios<char>::rdbuf(std::cout.rdbuf());
     } else {
-      f.open(filename.c_str(), ios::app | ios::out); // Open with append mode.
+      f.open(tablefilename.c_str(), ios::app | ios::out); // Open with append mode.
     }
 
     if(!f) {
@@ -78,7 +106,7 @@ public:
 
     // if file position is the beginning of the file, then output the column
     // headers.
-    if(filename == "-" || f.tellp() == streampos(0)) {
+    if(tablefilename == "-" || f.tellp() == streampos(0)) {
       f << "#";
 
       map<string, string>::iterator it;
@@ -99,8 +127,18 @@ public:
     f.close();
   }
 
-  void set_filename(string file) {
-    filename = file;
+  void set_table_filename(string file) {
+    if(tablefilename != "") {
+      output_fatal_error("Can only set table output filename once");
+    }
+    tablefilename = file;
+  }
+  
+  void set_json_filename(string file) {
+    if(jsonfilename != "") {
+      output_fatal_error("Can only set JSON output filename once");
+    }
+    jsonfilename = file;
   }
 };
 

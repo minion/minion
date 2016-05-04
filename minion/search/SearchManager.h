@@ -32,6 +32,16 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
   if(getOptions().dumptree) {
     cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
   }
+  if(getOptions().dumpjsontree.isActive()) {
+    if(equal) {
+      getOptions().dumpjsontree.mapElement("branchVar", tostring(var));
+      getOptions().dumpjsontree.mapElement("branchVal", val);
+      getOptions().dumpjsontree.openMapWithKey("left");
+    }
+    else {
+          getOptions().dumpjsontree.openMapWithKey("right");
+    }
+  }
 }
 
 // instead of carrying around the pos everywhere, the VariableOrder object has
@@ -111,6 +121,7 @@ struct SearchManager {
   inline bool branch_right() {
     while(!branches.empty() && !branches.back().isLeft) { // pop off all the
                                                           // RBs
+      maybe_print_right_backtrack();
       branches.pop_back();
     }
 
@@ -146,6 +157,7 @@ struct SearchManager {
     while(!branches.empty() && branches.back().var >= topauxvar) {
       if(branches.back().isLeft) {
         world_pop();
+        maybe_print_right_backtrack();
         depth--;
       }
 

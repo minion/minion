@@ -33,13 +33,15 @@
 
 #include "basic_headers.h"
 
+
 #include "wrapper.h"
+#include "sys_constants.h"
+
+#include "debug.h"
 #include "minlib/tostring.hpp"
 #include "tableout.h"
 #include "time_keeping.h"
 
-#include "sys_constants.h"
-#include "debug.h"
 #include "array_functions.h"
 #include "trigger_timer.h"
 

@@ -301,7 +301,21 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-dumptree")) {
       getOptions().dumptree = true;
     }
-/** @help switches;-nodelimit Description
+/** @help switches;-dumpjsontree Description
+    Print out the branching decisions and variable states at each node.
+    Accepts filename to output tree to
+    */
+    else if(command == string("-dumpjsontree")) {
+      INCREMENT_i(-dumptree);
+      if(getOptions().dumpjsontree.isActive()) {
+        output_fatal_error("Only pass -dumpjsontree at most once!");
+      }
+      std::ostream* outfile = new std::ofstream(argv[i]);
+      if(!outfile || !(*outfile) ) {
+        output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
+      }        
+      getOptions().dumpjsontree = JSONStreamer(outfile);
+    }/** @help switches;-nodelimit Description
     To stop search after N nodes, do
 
        minion -nodelimit N myinput.minion
@@ -496,7 +510,12 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-tableout") || command == string("-tableout0")) {
       getOptions().tableout = true;
       INCREMENT_i(-tableout);
-      getTableOut().set_filename(argv[i]);
+      getTableOut().set_table_filename(argv[i]);
+    }
+    else if(command == string("-jsontableout")) {
+      getOptions().tableout = true;
+      INCREMENT_i(-jsontableout);
+      getTableOut().set_json_filename(argv[i]);
     }
 /** @help switches;-solsout Description
     Append all solutionsto a named file.
