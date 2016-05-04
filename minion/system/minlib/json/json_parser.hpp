@@ -42,6 +42,18 @@ inline std::ostream& json_dump(const int& i, std::ostream& o) {
   return o << i;
 }
 
+inline std::ostream& json_dump(const unsigned int& i, std::ostream& o) {
+  return o << i;
+}
+
+inline std::ostream& json_dump(const long& i, std::ostream& o) {
+  return o << i;
+}
+
+inline std::ostream& json_dump(const unsigned long& i, std::ostream& o) {
+  return o << i;
+}
+
 inline std::ostream& json_dump(const long long& i, std::ostream& o) {
   return o << i;
 }
