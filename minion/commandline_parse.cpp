@@ -62,6 +62,10 @@ The available orders are:
 - random - random variable ordering
 
 - static - lexicographical ordering
+
+In copies of minion with wdeg support, there is also
+'wdeg' and 'domoverwdeg'
+
 */
 
 /* @help switches;-varorder Example

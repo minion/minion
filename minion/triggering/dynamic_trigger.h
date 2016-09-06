@@ -63,6 +63,12 @@ struct Trig_ConRef {
     return con == nullptr;
   }
 
+  AbstractConstraint* constraint()
+  { 
+    D_ASSERT(con);
+    return con; 
+  }
+
   friend bool operator==(Trig_ConRef lhs, Trig_ConRef rhs) {
     return lhs.con == rhs.con && lhs.conListPos == rhs.conListPos;
   }
@@ -70,6 +76,7 @@ struct Trig_ConRef {
   friend std::ostream& operator<<(std::ostream& o, Trig_ConRef tcr) {
     return o << "tcr:(" << tcr.con << ":" << tcr.conListPos << ")";
   }
+
 };
 
 // forward declaration

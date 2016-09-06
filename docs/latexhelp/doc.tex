@@ -1,3 +1,12 @@
+\section{@help}
+\paragraph{switches;-nodelimit}
+{\footnotesize
+\begin{verbatim}
+    To stop search after N nodes, do
+
+       minion -nodelimit N myinput.minion
+\end{verbatim}
+}
 \section{constraints}
 \paragraph{Description}
 {\footnotesize
@@ -2147,6 +2156,14 @@ replacing 'minion' by the name of the executable you're using.
     help switches -sollimit
 \end{verbatim}
 }
+\section{switches -dumpjsontree}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+    Print out the branching decisions and variable states at each node.
+    Accepts filename to output tree to
+\end{verbatim}
+}
 \section{switches -dumptree}
 \paragraph{Description}
 {\footnotesize
@@ -2207,14 +2224,6 @@ problem contains any minimising or maximising objective.
 \end{verbatim}
 }
 \section{switches -nodelimit}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-    To stop search after N nodes, do
-
-       minion -nodelimit N myinput.minion
-\end{verbatim}
-}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
@@ -2567,6 +2576,9 @@ The available orders are:
 - random - random variable ordering
 
 - static - lexicographical ordering
+
+In copies of minion with wdeg support, there is also
+'wdeg' and 'domoverwdeg'
 \end{verbatim}
 }
 \section{switches -verbose}

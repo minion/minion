@@ -43,10 +43,17 @@ void print_default_help(char** argv) {
   cout << "This version of Minion was built with internal checking "
        <<
 #ifdef NO_DEBUG
-      "off" << endl;
+      "off";
 #else
-      "on" << endl;
+      "on";
 #endif
+
+#ifdef WDEG
+  cout << " and wdeg on";
+#endif
+
+  cout << endl;
+
 }
 
 void worker() {

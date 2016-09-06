@@ -99,13 +99,14 @@ public:
           return true;
         }
 
-        if(!dtl[pos].empty() && (!is_root_node || dtl[pos].con->full_propagate_done)) {
-          dtl[pos].propagate(delta);
+        Trig_ConRef ref = dtl[pos];
+        if(!ref.empty() && (!is_root_node || ref.con->full_propagate_done)) {
+          ref.propagate(delta);
         }
 
 #ifdef WDEG
         if(*fail_ptr)
-          dtl[pos].constraint()->incWdeg();
+          ref.constraint()->incWdeg();
 #endif
 
         pos++;

@@ -58,7 +58,10 @@ cout << "" << endl
 << "" << endl
 << "- random - random variable ordering" << endl
 << "" << endl
-<< "- static - lexicographical ordering" << endl << endl << endl;
+<< "- static - lexicographical ordering" << endl
+<< "" << endl
+<< "In copies of minion with wdeg support, there is also" << endl
+<< "'wdeg' and 'domoverwdeg'" << endl << endl << endl;
 } else
 if("switches -quiet" == request) {
 cout << "Help entry: " << "switches -quiet" << endl << endl;
@@ -208,12 +211,21 @@ cout << "Help entry: " << "switches -dumptree" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
 } else
-if("switches -nodelimit" == request) {
-cout << "Help entry: " << "switches -nodelimit" << endl << endl;
+if("switches -dumpjsontree" == request) {
+cout << "Help entry: " << "switches -dumpjsontree" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Print out the branching decisions and variable states at each node." << endl
+<< " Accepts filename to output tree to" << endl << endl << endl;
+} else
+if("@help" == request) {
+cout << "Help entry: " << "@help" << endl << endl;
+cout << "switches;-nodelimit" << "-------------------------------------------------------------" << endl;
 cout << "To stop search after N nodes, do" << endl
 << "" << endl
 << " minion -nodelimit N myinput.minion" << endl << endl << endl;
+} else
+if("switches -nodelimit" == request) {
+cout << "Help entry: " << "switches -nodelimit" << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help switches -cpulimit" << endl
 << " help switches -timelimit" << endl
@@ -2090,6 +2102,7 @@ cout << "Declaration of a sparse bounds variable called myvar containing values"
 cout << "Unknown entry, please try again." << endl;
 if("" == request) {
 cout << "Available subentries:" << endl;
+cout << "help @help" << endl;
 cout << "help constraints" << endl;
 cout << "help input" << endl;
 cout << "help switches" << endl;
@@ -2178,6 +2191,7 @@ if("switches" == request) {
 cout << "Available subentries:" << endl;
 cout << "help switches -check" << endl;
 cout << "help switches -cpulimit" << endl;
+cout << "help switches -dumpjsontree" << endl;
 cout << "help switches -dumptree" << endl;
 cout << "help switches -findallsols" << endl;
 cout << "help switches -gap" << endl;
