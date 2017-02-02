@@ -111,8 +111,6 @@ void print_solution(Stream& sout, const PrintMatrix& print_matrix) {
 /// All operations to be performed when a solution is found.
 /// This function checks the solution is correct, and prints it if required.
 inline void check_sol_is_correct() {
-  if(getOptions().solCallBack)
-    getOptions().solCallBack();
 
   getState().incrementSolutionCount();
 

@@ -279,9 +279,6 @@ public:
   /// Denotes if solutions should be printed to a seperate file.
   bool solsoutWrite;
 
-  /// A callback function for when a solution is found.
-  std::function<void()> solCallBack;
-
   /// Denotes if solutions should be printed.
   /// Initialised to true.
   bool print_solution;
