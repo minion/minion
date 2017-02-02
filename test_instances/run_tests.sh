@@ -43,7 +43,7 @@ echo Testing $exec with options .$*.
   failed=$(($failed + $?))
   ./do_random_tests.sh 3 $exec $* -varorder ldf-random
   failed=$(($failed + $?))
-if ../build/minion | grep wdeg > /dev/null; then
+if $exec | grep "wdeg on" > /dev/null; then
   ./do_random_tests.sh 3 $exec $* -varorder wdeg
   failed=$(($failed + $?))
   ./do_random_tests.sh 3 $exec $* -varorder domoverwdeg
