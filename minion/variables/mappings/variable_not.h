@@ -120,8 +120,8 @@ struct VarNot {
     data.uncheckedAssign(swap(b));
   }
 
-  void propagateAssign(DomainInt b) {
-    data.propagateAssign(swap(b));
+  void assign(DomainInt b) {
+    data.assign(swap(b));
   }
 
   void removeFromDomain(DomainInt b) {

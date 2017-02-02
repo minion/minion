@@ -271,7 +271,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
       }
     } else {
       if(occ == val_count.getAssignedValue()) { // need another occurrence of the value
-        var_array[unassigned].propagateAssign(value);
+        var_array[unassigned].assign(value);
       } else if(occ + 1 == val_count.getAssignedValue()) { // not allowed to
                                                            // have another
                                                            // value.
@@ -403,7 +403,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
         if(it->getAssignedValue() != (DomainInt)value)
           ++occs;
       } else {
-        it->propagateAssign(value);
+        it->assign(value);
       }
     }
     if(val_count_min > static_cast<SysInt>(var_array.size()) - occs)
@@ -599,7 +599,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
         if(it->getAssignedValue() != value)
           ++occs;
       } else {
-        it->propagateAssign(value);
+        it->assign(value);
       }
     }
     val_count.setMax(static_cast<SysInt>(var_array.size()) - occs);

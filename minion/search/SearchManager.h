@@ -112,7 +112,7 @@ struct SearchManager {
     D_ASSERT(!var_array[picked.first].isAssigned());
 
     world_push();
-    var_array[picked.first].propagateAssign(picked.second);
+    var_array[picked.first].assign(picked.second);
     maybe_print_search_assignment(var_array[picked.first], picked.second, true);
     branches.push_back(Controller::triple(true, picked.first, picked.second));
     depth++;

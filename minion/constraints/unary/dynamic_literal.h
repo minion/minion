@@ -54,12 +54,12 @@ struct WatchLiteralConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
-    var.propagateAssign(val);
+    var.assign(val);
   }
 
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInRange);
-    var.propagateAssign(val);
+    var.assign(val);
   }
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {

@@ -126,7 +126,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     {                               // We never even set up triggers
       for(SysInt i = 0; i < array_size; ++i) {
         if(var_array[i].inDomain(value_array[i])) {
-          var_array[i].propagateAssign(value_array[i]);
+          var_array[i].assign(value_array[i]);
         }
       }
     } else // Now set up triggers
@@ -214,7 +214,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     for(SysInt z = 0; z < var_sum + 1; ++z) {
       if(dt != dt2) // that one has just been set the other way
       {
-        var_array[triggerInfo(dt2)].propagateAssign(value_array[triggerInfo(dt2)]);
+        var_array[triggerInfo(dt2)].assign(value_array[triggerInfo(dt2)]);
       }
       dt2++;
     }

@@ -152,7 +152,7 @@ struct ElementConstraint : public AbstractConstraint {
           getState().setFailed(true);
           return;
         } else {
-          resultvar.propagateAssign(0);
+          resultvar.assign(0);
           return;
         }
       }

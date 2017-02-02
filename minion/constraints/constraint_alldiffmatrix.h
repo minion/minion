@@ -587,7 +587,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
               } else {
                 ADMPRINT("Setting row: " << row << " column: " << copynode - squaresize
                                          << " to value.");
-                var_array[row * squaresize + copynode - squaresize].propagateAssign(value);
+                var_array[row * squaresize + copynode - squaresize].assign(value);
               }
             }
           }

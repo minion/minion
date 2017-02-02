@@ -102,8 +102,8 @@ struct VarNeg {
     data.uncheckedAssign(-b);
   }
 
-  void propagateAssign(DomainInt b) {
-    data.propagateAssign(-b);
+  void assign(DomainInt b) {
+    data.assign(-b);
   }
 
   void removeFromDomain(DomainInt b) {

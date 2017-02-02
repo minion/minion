@@ -139,10 +139,10 @@ struct InfoRefType {
     data.uncheckedAssign(b);
   }
 
-  void propagateAssign(DomainInt b) {
-    VAR_INFO_ADDONE(VAR_TYPE, propagateAssign);
-    VAR_INFO_PRINT_0("propagateAssign", b);
-    data.propagateAssign(b);
+  void assign(DomainInt b) {
+    VAR_INFO_ADDONE(VAR_TYPE, assign);
+    VAR_INFO_PRINT_0("assign", b);
+    data.assign(b);
   }
 
   void removeFromDomain(DomainInt b) {

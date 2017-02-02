@@ -169,7 +169,7 @@ struct reify_true : public ParentConstraint {
         P("Find new assignment");
         if(!flag) { // No satisfying assignment to constraint
           P("Failed!");
-          rar_var.propagateAssign(0);
+          rar_var.assign(0);
           return;
         }
         P("Found new assignment");
@@ -230,7 +230,7 @@ struct reify_true : public ParentConstraint {
       PROP_INFO_ADDONE(ReifyImplyGetSatAssg);
       if(!flag) { // No satisfying assignment to constraint
         P("Assigning reifyvar to 0");
-        rar_var.propagateAssign(0);
+        rar_var.assign(0);
         return;
       }
       watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt);

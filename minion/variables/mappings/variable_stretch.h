@@ -189,8 +189,8 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
     data.uncheckedAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
-  void propagateAssign(DomainInt b)
-  { data.propagateAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
+  void assign(DomainInt b)
+  { data.assign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
 
   void removeFromDomain(DomainInt)
   { FAIL_EXIT(); }
@@ -329,8 +329,8 @@ struct MultiplyVar {
     data.uncheckedAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
-  void propagateAssign(DomainInt b) {
-    data.propagateAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
+  void assign(DomainInt b) {
+    data.assign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
   void removeFromDomain(DomainInt) {

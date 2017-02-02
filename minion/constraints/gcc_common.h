@@ -247,7 +247,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
         capacity_array[i].setMin(0);
         capacity_array[i].setMax(numvars);
       } else { // value can't occur.
-        capacity_array[i].propagateAssign(0);
+        capacity_array[i].assign(0);
       }
     }
 #if UseIncGraph

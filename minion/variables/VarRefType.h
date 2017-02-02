@@ -99,8 +99,8 @@ struct VarRefType {
     GET_CONTAINER().uncheckedAssign(data, b);
   }
 
-  void propagateAssign(DomainInt b) {
-    GET_CONTAINER().propagateAssign(data, b);
+  void assign(DomainInt b) {
+    GET_CONTAINER().assign(data, b);
   }
 
   void removeFromDomain(DomainInt b) {
@@ -222,8 +222,8 @@ struct QuickVarRefType {
     GET_CONTAINER().uncheckedAssign(data, b);
   }
 
-  void propagateAssign(DomainInt b) {
-    GET_CONTAINER().propagateAssign(data, b);
+  void assign(DomainInt b) {
+    GET_CONTAINER().assign(data, b);
   }
 
   void removeFromDomain(DomainInt b) {

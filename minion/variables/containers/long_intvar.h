@@ -352,7 +352,7 @@ struct BigRangeVarContainer {
     return true;
   }
 
-  void propagateAssign(BigRangeVarRef_internal d, DomainInt offset) {
+  void assign(BigRangeVarRef_internal d, DomainInt offset) {
     DomainInt lower = lower_bound(d);
     DomainInt upper = upper_bound(d);
     if(!validAssignment(d, offset, lower, upper))
@@ -367,7 +367,7 @@ struct BigRangeVarContainer {
   }
 
 private:
-  // This function just unifies part of propagateAssign and uncheckedAssign
+  // This function just unifies part of assign and uncheckedAssign
   void commonAssign(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper) {
     // TODO : Optimise this function to only check values in domain.
     DomainInt domainOffset = var_offset[d.var_num] /*- initial_bounds[d.var_num].first*/;

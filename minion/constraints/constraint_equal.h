@@ -232,11 +232,11 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
 
   inline void check() { // var1 or var2 has changed, so check
     if(var1.getMax() < var2.getMin() || var1.getMin() > var2.getMax()) { // not equal
-      var3.propagateAssign(false_value());
+      var3.assign(false_value());
     }
     if(var1.isAssigned() && var2.isAssigned() &&
        var1.getAssignedValue() == var2.getAssignedValue()) { // equal
-      var3.propagateAssign(true_value());
+      var3.assign(true_value());
     }
   }
 

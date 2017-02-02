@@ -70,7 +70,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     trig2 = index;
 
     if(index >= array_size) { // Only one valid variable.
-      var_array[trig1].propagateAssign(1);
+      var_array[trig1].assign(1);
       return;
     }
 
@@ -120,7 +120,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
       }
 
       if(!found_new_support) { // Have to propagate!
-        var_array[other_propval].propagateAssign(1);
+        var_array[other_propval].assign(1);
         return;
       }
     }

@@ -68,36 +68,36 @@ struct AndConstraint : public AbstractConstraint {
     switch(checked_cast<SysInt>(i)) {
     case 0:
       if(var2.isAssignedValue(true))
-        var3.propagateAssign(true);
+        var3.assign(true);
       else {
         if(var3.isAssignedValue(false))
-          var2.propagateAssign(false);
+          var2.assign(false);
       }
       break;
 
     case 1:
       if(var1.isAssignedValue(true))
-        var3.propagateAssign(true);
+        var3.assign(true);
       else {
         if(var3.isAssignedValue(false))
-          var1.propagateAssign(false);
+          var1.assign(false);
       }
       break;
 
     case 2:
-      var1.propagateAssign(true);
-      var2.propagateAssign(true);
+      var1.assign(true);
+      var2.assign(true);
       break;
 
     case 3:
-    case 4: var3.propagateAssign(false); break;
+    case 4: var3.assign(false); break;
 
     case 5:
       if(var1.isAssignedValue(true))
-        var2.propagateAssign(false);
+        var2.assign(false);
       else {
         if(var2.isAssignedValue(true))
-          var1.propagateAssign(false);
+          var1.assign(false);
       }
       break;
     }
@@ -106,21 +106,21 @@ struct AndConstraint : public AbstractConstraint {
   virtual void full_propagate() {
     setup_triggers();
     if(var1.isAssignedValue(false) || var2.isAssignedValue(false))
-      var3.propagateAssign(false);
+      var3.assign(false);
 
     if(var1.isAssignedValue(true) && var2.isAssignedValue(true))
-      var3.propagateAssign(true);
+      var3.assign(true);
 
     if(var3.isAssignedValue(false)) {
       if(var1.isAssignedValue(true))
-        var2.propagateAssign(false);
+        var2.assign(false);
       if(var2.isAssignedValue(true))
-        var1.propagateAssign(false);
+        var1.assign(false);
     }
 
     if(var3.isAssignedValue(true)) {
-      var1.propagateAssign(true);
-      var2.propagateAssign(true);
+      var1.assign(true);
+      var2.assign(true);
     }
   }
 

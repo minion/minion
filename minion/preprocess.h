@@ -26,7 +26,7 @@
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   Controller::world_push();
-  var.propagateAssign(val);
+  var.assign(val);
   prop(vars);
 
   bool check_failed = getState().isFailed();

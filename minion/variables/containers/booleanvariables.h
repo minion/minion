@@ -250,7 +250,7 @@ struct BoolVarContainer {
 
     D_ASSERT(i >= 0);
     if(i == 0)
-      propagateAssign(d, 0);
+      assign(d, 0);
   }
 
   void setMin(const BoolVarRef_internal& d, DomainInt i) {
@@ -260,7 +260,7 @@ struct BoolVarContainer {
     }
     D_ASSERT(i <= 1);
     if(i == 1)
-      propagateAssign(d, 1);
+      assign(d, 1);
   }
 
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b) {
@@ -301,7 +301,7 @@ struct BoolVarContainer {
     internalAssign(d, b);
   }
 
-  void propagateAssign(const BoolVarRef_internal& d, DomainInt b) {
+  void assign(const BoolVarRef_internal& d, DomainInt b) {
     if(!d.isAssigned())
       internalAssign(d, b);
     else {

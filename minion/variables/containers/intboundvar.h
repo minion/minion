@@ -130,8 +130,8 @@ struct BoundVarRef_internal {
     GET_LOCAL_CON().uncheckedAssign(*this, b);
   }
 
-  void propagateAssign(DomainInt b) {
-    GET_LOCAL_CON().propagateAssign(*this, b);
+  void assign(DomainInt b) {
+    GET_LOCAL_CON().assign(*this, b);
   }
 
   void removeFromDomain(DomainInt b) {
@@ -302,7 +302,7 @@ struct BoundVarContainer {
     lower_bound(d) = i;
   }
 
-  void propagateAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i) {
+  void assign(const BoundVarRef_internal<BoundType>& d, DomainInt i) {
     internalAssign(d, i);
   }
 

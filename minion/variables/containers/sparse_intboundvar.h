@@ -304,7 +304,7 @@ struct SparseBoundVarContainer {
     lower_bound(d) = i;
   }
 
-  void propagateAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
+  void assign(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
     internalAssign(d, i);
   }
 

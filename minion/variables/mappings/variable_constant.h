@@ -101,7 +101,7 @@ struct ConstantVar {
     FAIL_EXIT();
   }
 
-  void propagateAssign(DomainInt b) {
+  void assign(DomainInt b) {
     if(b != val)
       getState().setFailed(true);
   }

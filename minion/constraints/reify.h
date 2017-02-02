@@ -250,7 +250,7 @@ struct reify : public ParentConstraint {
         P("Find new assignment");
         if(!flag) { // No satisfying assignment to constraint
           P("Failed!");
-          reify_var.propagateAssign(0);
+          reify_var.assign(0);
 
 #ifdef NODETRICK
           reifysetnode = getState().getNodeCount();
@@ -273,7 +273,7 @@ struct reify : public ParentConstraint {
         P("Find new assignment");
         if(!flag) { // No satisfying assignment to constraint
           P("Failed!");
-          reify_var.propagateAssign(1);
+          reify_var.assign(1);
 
 #ifdef NODETRICK
           reifysetnode = getState().getNodeCount();
@@ -367,7 +367,7 @@ struct reify : public ParentConstraint {
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
     PROP_INFO_ADDONE(ReifyFullPropGetAssgPosCon);
     if(!flag) { // No satisfying assignment to constraint
-      reify_var.propagateAssign(0);
+      reify_var.assign(0);
 
 #ifdef NODETRICK
       reifysetnode = getState().getNodeCount();
@@ -378,7 +378,7 @@ struct reify : public ParentConstraint {
     PROP_INFO_ADDONE(ReifyFullPropGetAssgNegCon);
     GET_ASSIGNMENT(assignment1, child_constraints[1]);
     if(!flag) { // No satisfying assignment to constraint
-      reify_var.propagateAssign(1);
+      reify_var.assign(1);
 #ifdef NODETRICK
       reifysetnode = getState().getNodeCount();
 #endif
