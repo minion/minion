@@ -355,14 +355,6 @@ void inline deal_with_solution() {
     throw EndOfSearch();
 }
 
-template <typename Prop, typename Vars>
-void inline set_optimise_and_propagate_queue(Prop& propagator, Vars& vars) {
-  if(getState().isOptimisationProblem())
-    getState().getOptimiseVar()->setMin(getState().getOptimiseValue());
-  propagator.prop(vars);
-  //    getQueue().propagateQueue();
-}
-
 void inline initalise_search() {
   getState().setSolutionCount(0);
   getState().setNodeCount(0);

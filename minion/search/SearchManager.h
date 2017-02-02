@@ -66,16 +66,12 @@ struct SearchManager {
                               // prop->prop(var_array)
 
   vector<Controller::triple> branches; // L & R branches so far (isLeftBranch?,var,value)
-  // vector<DomainInt> first_unassigned_variable;
 
   SysInt depth; // number of left branches
 
   SearchManager(vector<AnyVarRef> _var_array, vector<SearchOrder> _order,
                 shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop)
       : var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0) {
-    // if this isn't enough room, the vector will autoresize. While that can be
-    // slow,
-    // it only has to happen at most the log of the maximum search depth.
     branches.reserve(var_array.size());
     hasauxvars = _order.back().find_one_assignment;
     if(hasauxvars) {
@@ -165,6 +161,7 @@ struct SearchManager {
     }
   }
 
+  // Steal work isn't used, but is left here in case anyone ever wants it.
   option<std::vector<Controller::triple>>
   steal_work() { // steal the topmost left branch from this search.
 
@@ -220,7 +217,11 @@ struct SearchManager {
         if(!flag) { // No remaining left branches to branch right.
           return;
         }
-        set_optimise_and_propagate_queue(*prop, var_array);
+        // Deal with optimisation variables 
+        if(getState().isOptimisationProblem()) {
+          getState().getOptimiseVar()->setMin(getState().getOptimiseValue());
+        }
+        prop->prop(var_array);
       }
     }
   }

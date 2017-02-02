@@ -68,7 +68,7 @@ DomainInt chooseVal(T& var, ValOrderEnum vo) {
 }
 
 struct VariableOrder {
-  vector<AnyVarRef> var_order; // can assume this is anyvarref? May need to template
+  vector<AnyVarRef> var_order;
 
   VariableOrder(const vector<AnyVarRef>& _var_order) : var_order(_var_order) {}
 
@@ -89,8 +89,8 @@ struct MultiBranch : public VariableOrder {
 
   MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector)
       : VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
-        vovector(_vovector),
-        pos() {
+        vovector(_vovector)
+  {
     pos = 0;
     variable_offset.resize(vovector.size());
     variable_offset[0] = 0;
