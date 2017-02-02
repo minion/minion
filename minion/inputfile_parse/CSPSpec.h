@@ -48,6 +48,22 @@ inline string to_var_name(const vector<DomainInt>& params) {
   return s.str();
 }
 
+struct Neighbourhood
+{
+  std::string name;
+  Var activation;
+  Var deviation;
+  std::vector<Var> vars;
+};
+
+struct NeighbourhoodContainer
+{
+  Var soft_violation_count;
+  std::vector<std::vector<Var> > shadow_mapping;
+  Var shadow_disable;
+  std::vector<Neighbourhood> neighbourhoods;
+};
+
 enum ReadTypes {
   read_list,
   read_var,
@@ -497,6 +513,7 @@ struct SearchOrder {
 };
 
 struct CSPInstance {
+  NeighbourhoodContainer neighbourhoodContainer;
   VarContainer vars;
   list<ConstraintBlob> constraints;
   shared_ptr<TupleListContainer> tupleListContainer;

@@ -504,6 +504,8 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
         instance->constraints.push_back(readConstraint(infile, false));
     } else if(s == "**GADGET**") {
       readGadget(infile);
+    } else if(s == "**NEIGHBOURHOOD**") {
+      readNeighbourhood(infile);
     } else if(s == wrong_eof) {
       throw parse_exception("Section terminated with " + wrong_eof + " instead of " + eof);
     } else
@@ -513,6 +515,46 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
   }
 
   MAYBE_PARSER_INFO("Reached end of CSP");
+}
+
+template <typename FileReader>
+void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
+  MAYBE_PARSER_INFO("Entering neighbourhood parsing");
+  string svc = infile->get_string();
+  if(svc != "SOFTVIOLATIONCOUNT")
+    throw parse_exception("Expected SOFTVIOLATIONCOUNT");
+  
+  instance->neighbourhoodContainer.soft_violation_count = readIdentifier(infile);
+
+  string shadowmap = infile->get_string();
+  if(shadowmap != "SHADOWMAPPING")
+    throw parse_exception("Expected SHADOWMAPPING");
+  
+  instance->neighbourhoodContainer.shadow_mapping = read2DMatrix(infile);
+
+  string shadowdisable = infile->get_string();
+  if(shadowdisable != "SHADOWDISABLE")
+    throw parse_exception("Expected SHADOWDISABLE");
+  instance->neighbourhoodContainer.shadow_disable = readIdentifier(infile);
+  
+  while(infile->peek_char() != '*') {
+    string neighbourhood = infile->get_string();
+    if(neighbourhood != "NEIGHBOURHOOD")
+      throw parse_exception("Expected NEIGHBOURHOOD");
+    
+    Neighbourhood nbh;
+    nbh.name = infile->get_string();
+    infile->check_sym('(');
+    nbh.activation = readIdentifier(infile);
+    infile->check_sym(',');
+    nbh.deviation = readIdentifier(infile);
+    infile->check_sym(',');
+    nbh.vars = readLiteralVector(infile);
+    infile->check_sym(')');
+    instance->neighbourhoodContainer.neighbourhoods.push_back(nbh);
+  }
+
+    MAYBE_PARSER_INFO("Exiting neighbourhood parsing");
 }
 
 template <typename FileReader>
