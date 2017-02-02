@@ -106,10 +106,6 @@ struct VarNeg {
     data.propagateAssign(-b);
   }
 
-  void decisionAssign(DomainInt b) {
-    data.decisionAssign(-b);
-  }
-
   void removeFromDomain(DomainInt b) {
     data.removeFromDomain(-b);
   }

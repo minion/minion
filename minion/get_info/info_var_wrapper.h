@@ -145,12 +145,6 @@ struct InfoRefType {
     data.propagateAssign(b);
   }
 
-  void decisionAssign(DomainInt b) {
-    VAR_INFO_ADDONE(VAR_TYPE, decisionAssign);
-    VAR_INFO_PRINT_0("decisionAssign", b);
-    data.decisionAssign(b);
-  }
-
   void removeFromDomain(DomainInt b) {
     VAR_INFO_ADDONE(VAR_TYPE, RemoveFromDomain);
     VAR_INFO_PRINT_0("removeFromDomain", b);

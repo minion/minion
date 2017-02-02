@@ -106,10 +106,6 @@ struct ConstantVar {
       getState().setFailed(true);
   }
 
-  void decisionAssign(DomainInt b) {
-    propagateAssign(b);
-  }
-
   void removeFromDomain(DomainInt b) {
     if(b == val)
       getState().setFailed(true);

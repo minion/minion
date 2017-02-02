@@ -313,10 +313,6 @@ struct SparseBoundVarContainer {
     internalAssign(d, i);
   }
 
-  void decisionAssign(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
-    internalAssign(d, i);
-  }
-
   void setMax(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
     // Note, this just finds a new upper bound, it doesn't set it.
     i = find_upper_bound(d, i);

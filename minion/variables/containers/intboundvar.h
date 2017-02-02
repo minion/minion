@@ -134,10 +134,6 @@ struct BoundVarRef_internal {
     GET_LOCAL_CON().propagateAssign(*this, b);
   }
 
-  void decisionAssign(DomainInt b) {
-    GET_LOCAL_CON().decisionAssign(*this, b);
-  }
-
   void removeFromDomain(DomainInt b) {
     GET_LOCAL_CON().removeFromDomain(*this, b);
   }
@@ -313,10 +309,6 @@ struct BoundVarContainer {
   // TODO : Optimise
   void uncheckedAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i) {
     D_ASSERT(inDomain(d, i));
-    internalAssign(d, i);
-  }
-
-  void decisionAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i) {
     internalAssign(d, i);
   }
 

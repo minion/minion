@@ -366,12 +366,6 @@ struct BigRangeVarContainer {
     commonAssign(d, i, lower_bound(d), upper_bound(d));
   }
 
-  void decisionAssign(BigRangeVarRef_internal d, DomainInt i) {
-    D_ASSERT(inDomain(d, i));
-    D_ASSERT(!isAssigned(d));
-    commonAssign(d, i, lower_bound(d), upper_bound(d));
-  }
-
 private:
   // This function just unifies part of propagateAssign and uncheckedAssign
   void commonAssign(BigRangeVarRef_internal d, DomainInt offset, DomainInt lower, DomainInt upper) {

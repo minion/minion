@@ -310,10 +310,6 @@ struct BoolVarContainer {
     }
   }
 
-  void decisionAssign(const BoolVarRef_internal& d, DomainInt b) {
-    internalAssign(d, b);
-  }
-
   void addDynamicTrigger(BoolVarRef_internal& b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(pos == NoDomainValue || (type == DomainRemoval && pos != NoDomainValue));
