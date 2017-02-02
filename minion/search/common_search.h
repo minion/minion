@@ -362,7 +362,7 @@ void inline initalise_search() {
   if(getState().isFailed())
     return;
   if(getState().isOptimisationProblem())
-    getState().setOptimiseValue(getState().getOptimiseVar()->getMin());
+    getState().setOptimiseValue(DomainInt_Min);
 }
 }
 
