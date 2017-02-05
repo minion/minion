@@ -185,7 +185,7 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
       splits.push_back("");
     } else {
       typedef typename VarArray::value_type VarRef;
-      VarRef& var = var_array[branches.back().var];
+      const VarRef& var = var_array[branches.back().var];
       curvar = getState().getInstance()->vars.getName(var.getBaseVar());
       DomainInt min = var.getMin();
       DomainInt max = var.getMax();
@@ -274,8 +274,8 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
 }
 
 /// Check if timelimit has been exceeded.
-template <typename VarArray, typename BranchList>
-inline void do_checks(VarArray& var_array, BranchList& branches) {
+inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& var_array,
+                                       const vector<Controller::triple>& branches) {
   if(getState().getNodeCount() >= getOptions().nodelimit) {
     generateRestartFile(var_array, branches);
     throw EndOfSearch();
@@ -294,6 +294,31 @@ inline void do_checks(VarArray& var_array, BranchList& branches) {
 
     throw EndOfSearch();
   }
+}
+
+void inline standard_deal_with_solution() {
+  if(getState().isOptimisationProblem()) {
+    if(!getState().getOptimiseVar()->isAssigned()) {
+      cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
+      cerr << "Put it in the variable ordering?" << endl;
+      cerr << "Aborting Search" << endl;
+      exit(1);
+    }
+
+    if(getOptions().printonlyoptimal) {
+      getState().storedSolution += "Solution found with Value: " +
+                                   tostring(getState().getRawOptimiseVar()->getAssignedValue()) +
+                                   "\n";
+    } else {
+      cout << "Solution found with Value: " << getState().getRawOptimiseVar()->getAssignedValue()
+           << endl;
+    }
+
+    getState().setOptimiseValue(getState().getOptimiseVar()->getAssignedValue() + 1);
+  }
+  // Note that sollimit = -1 if all solutions should be found.
+  if(getState().getSolutionCount() == getOptions().sollimit)
+    throw EndOfSearch();
 }
 
 template <typename T>
@@ -323,31 +348,6 @@ void inline maybe_print_right_backtrack() {
   if(getOptions().dumpjsontree.isActive()) {
     getOptions().dumpjsontree.closeMap();
   }
-}
-
-void inline deal_with_solution() {
-  if(getState().isOptimisationProblem()) {
-    if(!getState().getOptimiseVar()->isAssigned()) {
-      cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
-      cerr << "Put it in the variable ordering?" << endl;
-      cerr << "Aborting Search" << endl;
-      exit(1);
-    }
-
-    if(getOptions().printonlyoptimal) {
-      getState().storedSolution += "Solution found with Value: " +
-                                   tostring(getState().getRawOptimiseVar()->getAssignedValue()) +
-                                   "\n";
-    } else {
-      cout << "Solution found with Value: " << getState().getRawOptimiseVar()->getAssignedValue()
-           << endl;
-    }
-
-    getState().setOptimiseValue(getState().getOptimiseVar()->getAssignedValue() + 1);
-  }
-  // Note that sollimit = -1 if all solutions should be found.
-  if(getState().getSolutionCount() == getOptions().sollimit)
-    throw EndOfSearch();
 }
 
 void inline initalise_search() {

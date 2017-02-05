@@ -116,7 +116,9 @@ shared_ptr<SearchManager> make_search_manager(PropagationLevel prop_method,
   }
 
   // need to switch here for different search algorthms. plain, parallel, group
-  shared_ptr<SearchManager> sm(new SearchManager(all_vars, order, vo, p));
+  shared_ptr<SearchManager> sm(new StandardSearchManager(all_vars, order, vo, p,
+                                                         standard_time_ctrlc_checks,
+                                                         standard_deal_with_solution));
 
   return sm;
 }

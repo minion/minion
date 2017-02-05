@@ -88,6 +88,13 @@ public:
     return backtrack_data.size();
   }
 
+  void world_pop_to(SysInt depth) {
+    D_ASSERT(current_depth() >= depth);
+    while(current_depth() > depth)
+      world_pop();
+    D_ASSERT(current_depth() == depth);
+  }
+
   ~BackTrackMemory() {
     for(SysInt i = 0; i < (SysInt)backtrack_data.size(); ++i)
       block_cache.do_free(backtrack_data[i].first);

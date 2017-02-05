@@ -47,11 +47,19 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
 // instead of carrying around the pos everywhere, the VariableOrder object has
 // pos in it as a reversible<SysInt>.
 
-// remove template on branchtype. make virtual.
-
 struct SearchManager {
+ inline virtual ~SearchManager() {}
 
-  virtual ~SearchManager() {}
+ virtual void search() = 0;
+
+};
+
+struct StandardSearchManager : public SearchManager{
+
+  inline virtual ~StandardSearchManager() {}
+
+  std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> check_func;
+  std::function<void(void)> handle_sol_func;
 
   vector<AnyVarRef> var_array;
   shared_ptr<VariableOrder> var_order;
@@ -66,9 +74,13 @@ struct SearchManager {
 
   SysInt depth; // number of left branches
 
-  SearchManager(vector<AnyVarRef> _var_array, vector<SearchOrder> _order,
-                shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop)
-      : var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0) {
+  StandardSearchManager(vector<AnyVarRef> _var_array, vector<SearchOrder> _order,
+                shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
+                std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> _check_func,
+                std::function<void(void)> _handle_sol_func)
+      :
+      check_func(_check_func), handle_sol_func(_handle_sol_func),
+      var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0) {
     branches.reserve(var_array.size());
     hasauxvars = _order.back().find_one_assignment;
     if(hasauxvars) {
@@ -171,14 +183,14 @@ struct SearchManager {
 
       getState().incrementNodeCount();
 
-      do_checks(var_array, branches);
+      check_func(var_array, branches);
 
       pair<SysInt, DomainInt> varval = var_order->pickVarVal();
 
       if(varval.first == -1) {
         // We have found a solution!
         check_sol_is_correct();
-        deal_with_solution();
+        handle_sol_func();
         if(hasauxvars) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.
           jump_out_aux_vars();
