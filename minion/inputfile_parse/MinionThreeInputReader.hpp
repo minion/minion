@@ -542,7 +542,7 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
     if(neighbourhood != "NEIGHBOURHOOD")
       throw parse_exception("Expected NEIGHBOURHOOD");
     
-    Neighbourhood nbh;
+    ParsedNeighbourhood nbh;
     nbh.name = infile->get_string();
     infile->check_sym('(');
     nbh.activation = readIdentifier(infile);

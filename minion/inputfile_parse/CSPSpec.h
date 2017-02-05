@@ -48,7 +48,7 @@ inline string to_var_name(const vector<DomainInt>& params) {
   return s.str();
 }
 
-struct Neighbourhood
+struct ParsedNeighbourhood
 {
   std::string name;
   Var activation;
@@ -56,12 +56,12 @@ struct Neighbourhood
   std::vector<Var> vars;
 };
 
-struct NeighbourhoodContainer
+struct ParsedNeighbourhoodContainer
 {
   Var soft_violation_count;
   std::vector<std::vector<Var> > shadow_mapping;
   Var shadow_disable;
-  std::vector<Neighbourhood> neighbourhoods;
+  std::vector<ParsedNeighbourhood> neighbourhoods;
 };
 
 enum ReadTypes {
@@ -513,7 +513,7 @@ struct SearchOrder {
 };
 
 struct CSPInstance {
-  NeighbourhoodContainer neighbourhoodContainer;
+  ParsedNeighbourhoodContainer neighbourhoodContainer;
   VarContainer vars;
   list<ConstraintBlob> constraints;
   shared_ptr<TupleListContainer> tupleListContainer;
