@@ -24,6 +24,8 @@
 
 #include "search/search_control.h"
 
+#include "search/neighbourhood-search.h"
+
 #include "dump_state.hpp"
 
 using namespace ProbSpec;
