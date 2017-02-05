@@ -53,10 +53,18 @@ class Var {
   DomainInt pos_m;
 
 public:
+
+  bool isValid() const {
+    return type_m != VAR_INVALID;
+  }
+
   DomainInt pos() const {
+    D_ASSERT(isValid());
     return pos_m;
   }
+
   VariableType type() const {
+    D_ASSERT(isValid());
     return type_m;
   }
   void setType(VariableType v) {
