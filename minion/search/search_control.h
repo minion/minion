@@ -66,8 +66,9 @@ shared_ptr<VariableOrder> make_search_order(SearchOrder order) {
   return shared_ptr<VariableOrder>(vo);
 }
 
-shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order) {
+shared_ptr<VariableOrder> make_search_order_multiple(const vector<SearchOrder>& order) {
   shared_ptr<VariableOrder> vo;
+  bool hasAux = false;
 
   if(order.size() == 1) {
     return make_search_order(order[0]);
@@ -75,6 +76,8 @@ shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order) 
     vector<shared_ptr<VariableOrder>> vovector;
     for(SysInt i = 0; i < (SysInt)order.size(); i++) {
       vovector.push_back(make_search_order(order[i]));
+      if(order[i].find_one_assignment)
+        hasAux = true;
       if(order[i].find_one_assignment && i != (SysInt)order.size() - 1) {
         cout << "Only one VARORDER AUX is allowed, and it must be the final "
                 "VARORDER command."
@@ -83,7 +86,7 @@ shared_ptr<VariableOrder> make_search_order_multiple(vector<SearchOrder> order) 
       }
     }
 
-    vo = shared_ptr<VariableOrder>(new MultiBranch(vovector));
+    vo = shared_ptr<VariableOrder>(new MultiBranch(vovector, hasAux));
   }
 
   return vo;
@@ -107,16 +110,8 @@ shared_ptr<SearchManager> make_search_manager(PropagationLevel prop_method,
   default: cout << "Propagation method not found in make_search_manager." << endl; abort();
   }
 
-  vector<AnyVarRef> all_vars;
-
-  for(SysInt i = 0; i < (SysInt)order.size(); i++) {
-    for(SysInt j = 0; j < (SysInt)order[i].var_order.size(); j++) {
-      all_vars.push_back(get_AnyVarRef_from_Var(order[i].var_order[j]));
-    }
-  }
-
   // need to switch here for different search algorthms. plain, parallel, group
-  shared_ptr<SearchManager> sm(new StandardSearchManager(all_vars, order, vo, p,
+  shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p,
                                                          standard_time_ctrlc_checks,
                                                          standard_deal_with_solution));
 

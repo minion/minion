@@ -80,6 +80,12 @@ struct VariableOrder {
   const vector<AnyVarRef>& getVars()
   { return var_order; }
 
+  virtual bool hasAuxVars() const
+  { return false; }
+
+  virtual DomainInt auxVarStart() const
+  { abort(); }
+  
   virtual ~VariableOrder() {}
 };
 
@@ -88,11 +94,22 @@ struct MultiBranch : public VariableOrder {
   vector<shared_ptr<VariableOrder>> vovector;
   Reversible<SysInt> pos;
 
+  bool hasAux;
+
+  virtual bool hasAuxVars() const
+  { return hasAux; }
+
+  virtual DomainInt auxVarStart() const
+  {
+    D_ASSERT(hasAuxVars());
+    return variable_offset.back();
+  }
+
   // need to patch up the returned variable index
   vector<DomainInt> variable_offset;
 
-  MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector)
-      : vovector(_vovector)
+  MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector, bool _hasAux)
+      : vovector(_vovector), hasAux(_hasAux)
   {
     pos = 0;
     variable_offset.resize(vovector.size());

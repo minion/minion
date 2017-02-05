@@ -64,8 +64,6 @@ struct StandardSearchManager : public SearchManager{
   vector<AnyVarRef> var_array;
   shared_ptr<VariableOrder> var_order;
 
-  bool hasauxvars;  // Has a VARORDER AUX
-  SysInt topauxvar; // lowest index of an aux var.
 
   shared_ptr<Propagate> prop; // Propagate is the type of the base class. Method
                               // prop->prop(var_array)
@@ -74,21 +72,14 @@ struct StandardSearchManager : public SearchManager{
 
   SysInt depth; // number of left branches
 
-  StandardSearchManager(vector<AnyVarRef> _var_array, vector<SearchOrder> _order,
-                shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
+  StandardSearchManager(shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
                 std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> _check_func,
                 std::function<void(void)> _handle_sol_func)
       :
       check_func(_check_func), handle_sol_func(_handle_sol_func),
-      var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0) {
+      var_order(_var_order), prop(_prop), depth(0) {
     var_array = var_order->getVars();
     branches.reserve(var_array.size());
-    hasauxvars = _order.back().find_one_assignment;
-    if(hasauxvars) {
-      for(SysInt i = 0; i < (SysInt)_order.size() - 1; i++) {
-        topauxvar += _order[i].var_order.size();
-      }
-    }
   }
 
   void reset() {
@@ -148,7 +139,7 @@ struct StandardSearchManager : public SearchManager{
   }
 
   inline void jump_out_aux_vars() {
-    while(!branches.empty() && branches.back().var >= topauxvar) {
+    while(!branches.empty() && branches.back().var >= var_order->auxVarStart()) {
       if(branches.back().isLeft) {
         world_pop();
         maybe_print_right_backtrack();
@@ -192,7 +183,7 @@ struct StandardSearchManager : public SearchManager{
         // We have found a solution!
         check_sol_is_correct();
         handle_sol_func();
-        if(hasauxvars) { // There are AUX vars at the end of the var ordering.
+        if(var_order->hasAuxVars()) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.
           jump_out_aux_vars();
         }
