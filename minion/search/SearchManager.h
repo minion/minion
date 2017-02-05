@@ -81,6 +81,7 @@ struct StandardSearchManager : public SearchManager{
       :
       check_func(_check_func), handle_sol_func(_handle_sol_func),
       var_array(_var_array), var_order(_var_order), topauxvar(0), prop(_prop), depth(0) {
+    var_array = var_order->getVars();
     branches.reserve(var_array.size());
     hasauxvars = _order.back().find_one_assignment;
     if(hasauxvars) {

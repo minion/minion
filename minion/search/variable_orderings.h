@@ -70,11 +70,15 @@ DomainInt chooseVal(T& var, ValOrderEnum vo) {
 struct VariableOrder {
   vector<AnyVarRef> var_order;
 
+  VariableOrder() {}
   VariableOrder(const vector<AnyVarRef>& _var_order) : var_order(_var_order) {}
 
   // returns a pair of variable index, domain value.
   // returning the variable index == -1 means no branch possible.
   virtual pair<SysInt, DomainInt> pickVarVal() = 0;
+
+  const vector<AnyVarRef>& getVars()
+  { return var_order; }
 
   virtual ~VariableOrder() {}
 };
@@ -88,15 +92,19 @@ struct MultiBranch : public VariableOrder {
   vector<DomainInt> variable_offset;
 
   MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector)
-      : VariableOrder(_vovector[0]->var_order), // It doesn't matter what var_order is set to
-        vovector(_vovector)
+      : vovector(_vovector)
   {
     pos = 0;
     variable_offset.resize(vovector.size());
     variable_offset[0] = 0;
     for(SysInt i = 1; i < (SysInt)vovector.size(); i++) {
-      variable_offset[i] = variable_offset[i - 1] + vovector[i - 1]->var_order.size();
+      const vector<AnyVarRef>& vars = vovector[i - 1]->getVars();
+      variable_offset[i] = variable_offset[i - 1] + vars.size();
+      var_order.insert(var_order.end(), vars.begin(), vars.end());
     }
+
+    const vector<AnyVarRef>& lastvars = vovector.back()->getVars();
+    var_order.insert(var_order.end(), lastvars.begin(), lastvars.end());
   }
 
   pair<SysInt, DomainInt> pickVarVal() {
