@@ -153,7 +153,7 @@ objdir = os.getcwd() + "/bin/"
 if scriptdir == currentdir:
     fatal_error("ERROR: Can't build Minion in it's source directory\n",
                 "Run this script from another directory, for example:\n",
-                "mkdir bin; cd bin; ../build.py")
+                "mkdir bin; cd bin; ../configure.py")
 
 if not os.path.exists(outsrcdir):
     os.mkdir(outsrcdir)

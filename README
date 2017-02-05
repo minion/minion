@@ -17,10 +17,10 @@ mkdir bin
 
 Then change to that directory. Now run CMake to configure Minion:
 
-../build.py
+../configure.py
 
 This assumes that you've created the build directory in the Minion directory;
-Run build.py from Minion's source directory, in your build directory.
+Run configure.py from Minion's source directory, in your build directory.
 
 This will look for the location of your compiler, and a few system libraries.
 
@@ -30,9 +30,9 @@ make minion
 
 which should produce the binary "minion".
 
-If you want to build the debug version, re-run build.py like
+If you want to build the debug version, re-run configure.py like
 
-../build.py --debug
+../configure.py --debug
 
 and then type
 
