@@ -326,9 +326,6 @@ void inline maybe_print_right_backtrack() {
 }
 
 void inline deal_with_solution() {
-  // We have found a solution!
-  check_sol_is_correct();
-
   if(getState().isOptimisationProblem()) {
     if(!getState().getOptimiseVar()->isAssigned()) {
       cerr << "The optimisation variable isn't assigned at a solution node!" << endl;

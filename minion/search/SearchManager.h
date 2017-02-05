@@ -191,6 +191,8 @@ struct SearchManager {
       pair<SysInt, DomainInt> varval = var_order->pickVarVal();
 
       if(varval.first == -1) {
+        // We have found a solution!
+        check_sol_is_correct();
         deal_with_solution();
         if(hasauxvars) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.
