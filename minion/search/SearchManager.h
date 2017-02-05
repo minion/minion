@@ -47,9 +47,6 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
 // instead of carrying around the pos everywhere, the VariableOrder object has
 // pos in it as a reversible<SysInt>.
 
-// replace find_next_unassigned with all_vars_assigned (which maybe uses
-// something like a watch).
-
 // remove template on branchtype. make virtual.
 
 struct SearchManager {
@@ -84,12 +81,6 @@ struct SearchManager {
   void reset() {
     branches.clear();
     depth = 0;
-  }
-
-  // Returns true if all variables assigned
-  inline bool all_vars_assigned() {
-    pair<SysInt, DomainInt> picked = var_order->pickVarVal();
-    return picked.first == -1;
   }
 
   SysInt search_depth() {
