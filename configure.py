@@ -353,10 +353,15 @@ with open(outname, "w") as out:
     minionobjlist = [objname(x) for x in minionsrclist]
     print(minionsrclist)
     print(minionobjlist)
-    out.write('CONSRCS=' + qw + ' '.join(constraintsrclist)+ qw +'\n')
-    out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
-    out.write('MINOBJS=' + qw + ' '.join(minionobjlist)+ qw +'\n')
+    if arg.buildsystem == "sh":
+        out.write("#!/usr/bin/env bash\n")
+
     out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
+    
+    if arg.buildsystem != "tup":
+        out.write('CONSRCS=' + qw + ' '.join(constraintsrclist)+ qw +'\n')
+        out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
+        out.write('MINOBJS=' + qw + ' '.join(minionobjlist)+ qw +'\n')
     
     if arg.buildsystem == "tup":
         out.write(": foreach ")
