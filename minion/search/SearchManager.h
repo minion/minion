@@ -92,12 +92,6 @@ struct SearchManager {
     return picked.first == -1;
   }
 
-  // this is weird: what if we just started search, or only have right-branches
-  // above?
-  inline bool finished_search() {
-    return depth == 0;
-  }
-
   SysInt search_depth() {
     return depth;
   }
@@ -210,7 +204,7 @@ struct SearchManager {
       // loop to
       while(getState().isFailed()) {
         getState().setFailed(false);
-        if(finished_search()) { // what does this do?
+        if(depth == 0) {
           return;
         }
 
