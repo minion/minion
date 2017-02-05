@@ -32,6 +32,16 @@ vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var>& vec) {
   return ret_vec;
 }
 
+vector<vector<AnyVarRef>> get_AnyVarRef_from_Var(const vector<vector<Var>>& vec) {
+  vector<vector<AnyVarRef>> ret_vec;
+  ret_vec.reserve(vec.size());
+
+  for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
+    ret_vec.push_back(get_AnyVarRef_from_Var(vec[i]));
+
+  return ret_vec;
+}
+
 /// Helper function used in a few places.
 AnyVarRef get_AnyVarRef_from_Var(Var v) {
   switch(v.type()) {

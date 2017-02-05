@@ -34,6 +34,8 @@ AnyVarRef get_AnyVarRef_from_Var(Var v);
 /// Helper function used in a few places.
 vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var>& v);
 
+vector<vector<AnyVarRef> > get_AnyVarRef_from_Var(const vector<vector<Var> >& v);
+
 /// Create all the variables used in the CSP.
 void build_variables(const ProbSpec::VarContainer& vars);
 }
