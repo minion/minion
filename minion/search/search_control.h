@@ -110,10 +110,19 @@ shared_ptr<SearchManager> make_search_manager(PropagationLevel prop_method,
   default: cout << "Propagation method not found in make_search_manager." << endl; abort();
   }
 
+  std::function<void(void)> opt_handler;
+  if(getState().isOptimisationProblem()) {
+     opt_handler = [](){getState().getOptimiseVar()->setMin(getState().getOptimiseValue())};
+  }
+  else {
+    opt_handler = [](){};
+  }
+
   // need to switch here for different search algorthms. plain, parallel, group
   shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p,
                                                          standard_time_ctrlc_checks,
-                                                         standard_deal_with_solution));
+                                                         standard_deal_with_solution,
+                                                         opt_handler));
 
   return sm;
 }

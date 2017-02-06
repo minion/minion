@@ -59,7 +59,7 @@ struct StandardSearchManager : public SearchManager{
   inline virtual ~StandardSearchManager() {}
 
   std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> check_func;
-  std::function<void(void)> handle_sol_func;
+  std::function<void(void)> handle_sol_func, handle_opt_func;
 
   vector<AnyVarRef> var_array;
   shared_ptr<VariableOrder> var_order;
@@ -74,9 +74,10 @@ struct StandardSearchManager : public SearchManager{
 
   StandardSearchManager(shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
                 std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> _check_func,
-                std::function<void(void)> _handle_sol_func)
+                std::function<void(void)> _handle_sol_func, std::function<void(void)> _handle_opt_func)
       :
       check_func(_check_func), handle_sol_func(_handle_sol_func),
+      handle_opt_func(_handle_opt_func),
       var_order(_var_order), prop(_prop), depth(0) {
     var_array = var_order->getVars();
     branches.reserve(var_array.size());
@@ -209,9 +210,7 @@ struct StandardSearchManager : public SearchManager{
           return;
         }
         // Deal with optimisation variables 
-        if(getState().isOptimisationProblem()) {
-          getState().getOptimiseVar()->setMin(getState().getOptimiseValue());
-        }
+        handle_opt_func();
         prop->prop(var_array);
       }
     }
