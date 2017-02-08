@@ -30,7 +30,7 @@ def verbose_print(level, *args):
     if level <= verbose:
         print(*args)
 
-## Capture HG options
+## Capture Git options
 def progout(prog):
     process = subprocess.Popen(prog, stdout=subprocess.PIPE,
                                      stderr=DEVNULL)
@@ -47,10 +47,11 @@ def progexists(prog):
         return False
     return True
 
-def gethgVersion():
-    (out, err, code) = progout(["hg", "parent", '--template="{node|short} ({date|isodate})"'])
+def getGitVersion():
+    (out, err, code) = progout(["git", "log -1", '--pretty=format:"%h (%ai)"'])
+
     if code != 0 and err != "":
-        return "\"<missing hg version>\""
+        return "\"<missing git version>\""
     else:
         return out
 
@@ -310,7 +311,7 @@ with open(outsrcdir+"ConstraintEnum.h", "w") as enum:
 
 
 with open(outsrcdir+"BuildDefines.h", "w") as defs:
-    defs.write('#define HG_VER ' + gethgVersion() + '\n')
+    defs.write('#define GIT_VER ' + getGitVersion() + '\n')
 
 minionsrclist = ['minion/BuildVariables.cpp',
 'minion/BuildCSP.cpp',
