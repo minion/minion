@@ -77,7 +77,7 @@ struct VariableOrder {
   // returning the variable index == -1 means no branch possible.
   virtual pair<SysInt, DomainInt> pickVarVal() = 0;
 
-  const vector<AnyVarRef>& getVars()
+  vector<AnyVarRef>& getVars()
   { return var_order; }
 
   virtual bool hasAuxVars() const

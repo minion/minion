@@ -524,18 +524,24 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
   if(svc != "SOFTVIOLATIONCOUNT")
     throw parse_exception("Expected SOFTVIOLATIONCOUNT");
   
-  instance->neighbourhoodContainer.soft_violation_count = readIdentifier(infile);
+  if(instance->neighbourhoodContainer)
+    throw parse_exception("Only one **NEIGHBOURHOOD** section at present");
+
+  instance->neighbourhoodContainer = ParsedNeighbourhoodContainer();
+
+  ParsedNeighbourhoodContainer& nbhc = *(instance->neighbourhoodContainer);
+  nbhc.soft_violation_count = readIdentifier(infile);
 
   string shadowmap = infile->get_string();
   if(shadowmap != "SHADOWMAPPING")
     throw parse_exception("Expected SHADOWMAPPING");
   
-  instance->neighbourhoodContainer.shadow_mapping = read2DMatrix(infile);
+  nbhc.shadow_mapping = read2DMatrix(infile);
 
   string shadowdisable = infile->get_string();
   if(shadowdisable != "SHADOWDISABLE")
     throw parse_exception("Expected SHADOWDISABLE");
-  instance->neighbourhoodContainer.shadow_disable = readIdentifier(infile);
+  nbhc.shadow_disable = readIdentifier(infile);
   
   while(infile->peek_char() != '*') {
     string neighbourhood = infile->get_string();
@@ -551,7 +557,7 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
     infile->check_sym(',');
     nbh.vars = readLiteralVector(infile);
     infile->check_sym(')');
-    instance->neighbourhoodContainer.neighbourhoods.push_back(nbh);
+    nbhc.neighbourhoods.push_back(nbh);
   }
 
     MAYBE_PARSER_INFO("Exiting neighbourhood parsing");

@@ -111,8 +111,12 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
              instance.search_order[i].val_order.size());
   }
 
-  shared_ptr<Controller::SearchManager> sm =
-      Controller::make_search_manager(args.prop_method, instance.search_order);
+  shared_ptr<Controller::SearchManager> sm;
+
+  if(instance.neighbourhoodContainer)
+     sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order, *instance.neighbourhoodContainer);
+  else
+    sm = Controller::make_search_manager(args.prop_method, instance.search_order);
 
   getState().getOldTimer().maybePrintTimestepStore(
       cout, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions().silent);

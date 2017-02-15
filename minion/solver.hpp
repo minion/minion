@@ -37,7 +37,7 @@ inline void world_push() {
 
 /// Pops the state of the whole world.
 inline void world_pop() {
-  D_ASSERT(getQueue().isQueuesEmpty());
+  getQueue().clearQueues();
   getState().getGenericBacktracker().world_pop();
   getMemory().backTrack().world_pop();
   getMemory().monotonicSet().undo();

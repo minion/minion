@@ -513,7 +513,7 @@ struct SearchOrder {
 };
 
 struct CSPInstance {
-  ParsedNeighbourhoodContainer neighbourhoodContainer;
+  option<ParsedNeighbourhoodContainer> neighbourhoodContainer;
   VarContainer vars;
   list<ConstraintBlob> constraints;
   shared_ptr<TupleListContainer> tupleListContainer;
