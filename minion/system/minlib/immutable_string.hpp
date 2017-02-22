@@ -104,7 +104,7 @@ public:
 
 namespace std {
 template <>
-struct hash<ImmutableString> : minlib_hash_base<ImmutableString> {
+struct hash<ImmutableString> {
 public:
   size_t operator()(const ImmutableString& p) const {
     return getHash(p.getStdString());
