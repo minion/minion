@@ -111,9 +111,18 @@ public:
   }
 };
 
-size_t inline hash_value(Var v) {
-  return checked_cast<SysInt>(v.pos()) + v.type() * 10000;
 }
+
+namespace std {
+  template <> struct hash<ProbSpec::Var>
+  {
+    size_t operator()(const ProbSpec::Var & x) const
+    {
+      if(!x.isValid())
+        return 0;
+      return hashCombine(x.pos(), (SysInt)x.type());
+    }
+  };
 }
 
 using namespace ProbSpec;

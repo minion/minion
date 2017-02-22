@@ -153,6 +153,17 @@ Wrapper<T> abs(const Wrapper<T>& in) {
   return Wrapper<T>(abs(in.t));
 }
 
+namespace std {
+
+  template <typename T> struct hash<Wrapper<T>>
+  {
+    size_t operator()(const Wrapper<T> & x) const
+    {
+      return getHash(x.t);
+    }
+  };
+}
+
 template<typename T>
 std::ostream& json_dump(const Wrapper<T>& t, std::ostream& o) {
   return json_dump(t.t, o);

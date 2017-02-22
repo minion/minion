@@ -454,6 +454,16 @@ public:
 
 };
 
+namespace std {
+  template <> struct hash<AnyVarRef>
+  {
+    size_t operator()(const AnyVarRef & avr) const
+    {
+      return getHash(avr.getBaseVar());
+    }
+  };
+}
+
 template <typename VarRef>
 AnyVarRef AnyVarRef_Concrete<VarRef>::popOneMapper() const {
   return data.popOneMapper();
