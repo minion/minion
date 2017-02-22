@@ -442,6 +442,16 @@ public:
                          TrigOp op = TO_Default) {
     data->addDynamicTrigger(t, type, pos, op);
   }
+
+  friend bool operator==(const AnyVarRef& lhs, const AnyVarRef& rhs)
+  { return lhs.getBaseVar() == rhs.getBaseVar(); }
+
+  friend bool operator!=(const AnyVarRef& lhs, const AnyVarRef& rhs)
+  { return lhs.getBaseVar() != rhs.getBaseVar(); }
+
+  friend bool operator<(const AnyVarRef& lhs, const AnyVarRef& rhs)
+  { return lhs.getBaseVar() < rhs.getBaseVar(); }
+
 };
 
 template <typename VarRef>

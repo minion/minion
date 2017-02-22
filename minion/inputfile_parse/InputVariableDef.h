@@ -102,6 +102,10 @@ public:
     return type_m == var.type_m && pos_m == var.pos_m;
   }
 
+  bool operator!=(const Var& var) const {
+    return !(*this == var);
+  }
+
   bool operator<(const Var& var) const {
     return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m);
   }
