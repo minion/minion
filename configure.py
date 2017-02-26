@@ -48,12 +48,11 @@ def progexists(prog):
     return True
 
 def getGitVersion():
-    (out, err, code) = progout(["git", "log -1", '--pretty=format:"%h (%ai)"'])
-
+    (out, err, code) = progout(["git", "log", "-1", '--pretty=format:"%h (%ai)"'])
     if code != 0 and err != "":
         return "\"<missing git version>\""
     else:
-        return out
+        return out.decode("utf-8")
 
 # Reads JSON from string 'instr', with a more helpful error message
 # than json.loads. 'outname' should give filename the JSON came from
