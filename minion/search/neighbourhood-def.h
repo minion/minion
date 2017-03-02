@@ -4,18 +4,27 @@
 #include "../variables/AnyVarRef.h"
 #include "../inputfile_parse/CSPSpec.h"
 
+
+#ifndef MINION_NEIGHBOURHOOD_DEF_H
+#define MINION_NEIGHBOURHOOD_DEF_H
+
+
+
 struct Neighbourhood
 {
   std::string name;
   AnyVarRef activation;
   AnyVarRef deviation;
   std::vector<AnyVarRef> vars;
+  int numberOfRuns;
+  int currentValue;
 
   Neighbourhood(const ParsedNeighbourhood& p)
   : name(p.name),
     activation(get_AnyVarRef_from_Var(p.activation)),
     deviation(get_AnyVarRef_from_Var(p.deviation)),
-    vars(get_AnyVarRef_from_Var(p.vars))
+    vars(get_AnyVarRef_from_Var(p.vars)), numberOfRuns(0),
+    currentValue(0)
     { }
 };
 
@@ -35,3 +44,6 @@ struct NeighbourhoodContainer
         }
     }
 };
+
+
+#endif
