@@ -43,7 +43,7 @@ public:
     }
 
     int random_variable = static_cast<int>(std::rand() % successfulNeighbourhoods.size());
-    return vector<int>(successfulNeighbourhoods[random_variable]);
+    return  {successfulNeighbourhoods[random_variable]};
   }
 };
 
