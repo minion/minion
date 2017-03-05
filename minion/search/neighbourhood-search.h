@@ -174,7 +174,7 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
                                                               NeighbourhoodContainer nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
   return std::make_shared<NeighbourhoodSearchManager<RandomNeighbourhoodChooser>>(
-      prop, base_order, nhc, std::make_shared<RandomNeighbourhoodChooser>());
+      prop, base_order, nhc, std::make_shared<RandomNeighbourhoodChooser>(nhc));
 }
 
 #endif
