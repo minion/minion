@@ -4,12 +4,12 @@
 #include <vector>
 
 struct NeighbourhoodStats {
-  int newMinValue;
+  DomainInt newMinValue;
   u_int64_t timeTaken;
   bool solutionFound;
 
 public:
-  NeighbourhoodStats(int newMinValue, u_int64_t timeTaken, bool solutionFound)
+  NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound)
       : newMinValue(newMinValue), timeTaken(timeTaken), solutionFound(solutionFound) {}
 };
 
@@ -23,8 +23,8 @@ public:
       : neighbourhoodSuccessHistory(neighbourhoodContainer.neighbourhoods.size(), true),
         successfulNeighbourhoods(neighbourhoodContainer.neighbourhoods.size()) {}
 
-  void updateNeighbourhoodStats(vector<int>& activatedNeighbourhoods,
-                                NeighbourhoodStats& neighbourhoodStats) {
+  void updateStats(const vector<int>& activatedNeighbourhoods,
+                   const NeighbourhoodStats& neighbourhoodStats) {
     if(neighbourhoodStats.solutionFound) {
       neighbourhoodSuccessHistory.assign(neighbourhoodSuccessHistory.size(), true);
     } else {
@@ -43,7 +43,7 @@ public:
     }
 
     int random_variable = static_cast<int>(std::rand() % successfulNeighbourhoods.size());
-    return  {successfulNeighbourhoods[random_variable]};
+    return {successfulNeighbourhoods[random_variable]};
   }
 };
 

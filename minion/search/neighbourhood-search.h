@@ -62,7 +62,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     prop->prop(vo->getVars());
     if(getState().isFailed()) {
-      D_FATAL_ERROR("Neighbourhoods Assignment unsatisfiable");
+      if(activatedNeighbourhoods.empty()) {
+        D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
+      } else {
+        Controller::world_pop_to_depth(depth);
+        return;
+      }
     }
 
     auto sm = make_shared<Controller::StandardSearchManager>(
@@ -94,8 +99,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     copyOverIncumbent(solution);
     while(
         !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty()) {
+      solution.clear();
       // Set the lower bound of the optimized variable
-      getState().getOptimiseVar()->setMin(minValue);
+      getState().getOptimiseVar()->setMin(minValue + 1);
       auto startTime = std::chrono::high_resolution_clock::now();
       searchNeighbourhoods(solution, minValue, activatedNeighbourhoods);
       auto endTime = std::chrono::high_resolution_clock::now();
@@ -104,15 +110,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
       if(!solution.empty()) {
         copyOverIncumbent(solution);
-
-        /*
-         * 1. Need to update the neighbourhoods with the stats
-         * 2.
-         */
       }
+      selectionStrategy->updateStats(activatedNeighbourhoods,
+                                    NeighbourhoodStats(minValue, timeTaken, !solution.empty()));
     }
-
-    exit(1);
   }
 
   typedef std::chrono::high_resolution_clock::time_point timePoint;
