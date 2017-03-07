@@ -122,10 +122,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     return std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
   }
 
-  void updateNeighbourhoodStats(vector<int>& activatedNeighbourhoods,
-                                struct NeighbourhoodStats& neighbourhoodStats) {
-    selectionStrategy->updateNeighbourhoodStats(activatedNeighbourhoods, neighbourhoodStats);
-  }
 
   /**
    * Switch on the neighbourhood activation vars
@@ -134,15 +130,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    * @param neighbourHoodIndexes
    */
   void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes) {
-    struct FakeHasherAndEquals {
-      size_t operator()(const AnyVarRef&) const {
-        abort();
-      }
-      bool operator()(const AnyVarRef&, const AnyVarRef&) const {
-        abort();
-      }
-    };
-    std::unordered_set<AnyVarRef, FakeHasherAndEquals, FakeHasherAndEquals> shadowVariables;
+    std::unordered_set<AnyVarRef> shadowVariables;
     for(int i : neighbourHoodIndexes) {
       Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
       neighbourhood.activation.assign(1);
