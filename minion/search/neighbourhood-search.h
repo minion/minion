@@ -57,8 +57,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if(activatedNeighbourhoods.empty()) {
       nhc.shadow_disable.assign(1);
     } else {
-      switchOnNeighbourhoods(activatedNeighbourhoods);
+      switchOnNeighbourhoods(activatedNeighbourhoods, solution);
     }
+    solution.clear();
 
     prop->prop(vo->getVars());
     if(getState().isFailed()) {
@@ -99,7 +100,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     copyOverIncumbent(solution);
     while(
         !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty()) {
-      solution.clear();
+      //solution.clear();
       // Set the lower bound of the optimized variable
       getState().getOptimiseVar()->setMin(minValue + 1);
       auto startTime = std::chrono::high_resolution_clock::now();
@@ -129,7 +130,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    * incumbent solution
    * @param neighbourHoodIndexes
    */
-  void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes) {
+  void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes, const vector<DomainInt> &solution) {
     std::unordered_set<AnyVarRef> shadowVariables;
     for(int i : neighbourHoodIndexes) {
       Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
@@ -144,16 +145,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
      * If the primary variable is not contained in any shadow neighbourhoods, assign its incumbent
      * solution
      */
-    for(auto& var : nhc.shadow_mapping[0]) {
-      if(shadowVariables.count(var) == 0) {
-        var.assign(var.getAssignedValue());
+    for(int i = 0; i < solution.size(); i++){
+      if(shadowVariables.count(nhc.shadow_mapping[0][i]) == 0) {
+        nhc.shadow_mapping[0][i].assign(solution[i]);
       }
     }
   }
 
   void copyOverIncumbent(const vector<DomainInt>& solution) {
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
-      nhc.shadow_mapping[1][i].assign(nhc.shadow_mapping[0][i].getAssignedValue());
+      nhc.shadow_mapping[1][i].assign(solution[i]);
     }
   }
 };
