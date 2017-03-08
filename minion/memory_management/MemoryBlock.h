@@ -102,12 +102,20 @@ class BackTrackMemory {
   // total size of current block
   size_t maximum_bytes;
 
+  // previous, filled blocks
   vector<pair<char*, size_t>> stored_blocks;
+  // byte inside stored_blocks
   size_t total_stored_bytes;
 
-  vector<tuple<char*, size_t, size_t>> extendable_blocks;
+  struct ExtendableBlockDef
+  {
+    char* base;
+    size_t size;
+    size_t capacity;
+  };
+
+  vector<ExtendableBlockDef> extendable_blocks;
   size_t allocated_extendable_bytes;
-  vector<vector<tuple<SysInt, size_t, size_t>>> block_resizes;
 
 
 #ifndef BLOCK_SIZE
@@ -132,8 +140,8 @@ public:
     current_offset += allocated_bytes;
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(store_ptr + current_offset, get<0>(extendable_blocks[i]), get<1>(extendable_blocks[i]));
-      current_offset += get<1>(extendable_blocks[i]);
+      memcpy(store_ptr + current_offset, extendable_blocks[i].base, extendable_blocks[i].size);
+      current_offset += extendable_blocks[i].size;
     }
 
     D_ASSERT(getDataSize() == current_offset);
@@ -168,8 +176,8 @@ public:
     current_offset += allocated_bytes;
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(get<0>(extendable_blocks[i]), store_ptr.first + current_offset, get<1>(extendable_blocks[i]));
-      current_offset += get<1>(extendable_blocks[i]);
+      memcpy(extendable_blocks[i].base, store_ptr.first + current_offset, extendable_blocks[i].size);
+      current_offset += extendable_blocks[i].size;
     }
 
     D_ASSERT(getDataSize() == current_offset);
@@ -184,7 +192,7 @@ public:
       : block_cache(100), 
         current_data(NULL), allocated_bytes(0), maximum_bytes(0),
         total_stored_bytes(0),
-        allocated_extendable_bytes(0), block_resizes(1)
+        allocated_extendable_bytes(0)
       { }
 
   ~BackTrackMemory() {
@@ -250,23 +258,23 @@ public:
   {
     const SysInt max_size = 10*1024*1024;
     char* block = (char*)calloc(max_size, 1);
-    extendable_blocks.push_back(std::make_tuple(block, base_size, max_size));
+    extendable_blocks.push_back(ExtendableBlockDef{block, base_size, max_size});
     allocated_extendable_bytes += base_size;
     return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
   }
 
   void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size)
   {
-    UnsignedSysInt old_size = get<1>(extendable_blocks[block.getPos()]);
-    D_ASSERT(block() == get<0>(extendable_blocks[block.getPos()]));
+    UnsignedSysInt old_size = extendable_blocks[block.getPos()].size;
+    D_ASSERT(block() == extendable_blocks[block.getPos()].base);
     D_ASSERT(new_size >= old_size);
-    D_ASSERT(new_size <= get<2>(extendable_blocks[block.getPos()]));
+    D_ASSERT(new_size <= extendable_blocks[block.getPos()].capacity);
     D_ASSERT(checkAllZero(block() + old_size, block() + new_size));
 
     allocated_extendable_bytes += (new_size - old_size);
 
-    get<1>(extendable_blocks[block.getPos()]) = new_size;
-    block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
+    extendable_blocks[block.getPos()].size = new_size;
+    //block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
 
   }
 
