@@ -94,27 +94,29 @@ class BackTrackMemory {
   BlockCache block_cache;
   vector<pair<char*, UnsignedSysInt>> backtrack_data;
 
-  // The current block we allocate from
-  char* current_data;
-
-  // allocated bytes from current block
-  size_t allocated_bytes;
-  // total size of current block
-  size_t maximum_bytes;
-
-  // previous, filled blocks
-  vector<pair<char*, size_t>> stored_blocks;
-  // byte inside stored_blocks
-  size_t total_stored_bytes;
-
-  struct ExtendableBlockDef
+  struct BlockDef
   {
     char* base;
     size_t size;
     size_t capacity;
+
+    BlockDef() : base(0), size(0), capacity(0)
+    { }
+
+    BlockDef(char* b, size_t s, size_t c)
+    : base(b), size(s), capacity(c)
+    { }
   };
 
-  vector<ExtendableBlockDef> extendable_blocks;
+  BlockDef current;
+
+  // previous, filled blocks
+  vector<BlockDef> stored_blocks;
+  // byte inside stored_blocks
+  size_t total_stored_bytes;
+
+
+  vector<BlockDef> extendable_blocks;
   size_t allocated_extendable_bytes;
 
 
@@ -128,16 +130,16 @@ public:
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].first << " "
-                                            << stored_blocks[i].second);
-      memcpy(store_ptr + current_offset, stored_blocks[i].first, stored_blocks[i].second);
-      current_offset += stored_blocks[i].second;
+      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].base << " "
+                                            << stored_blocks[i].size);
+      memcpy(store_ptr + current_offset, stored_blocks[i].base, stored_blocks[i].size);
+      current_offset += stored_blocks[i].size;
     }
 
-    P((void*)(store_ptr + current_offset) << " " << (void*)current_data << " " << allocated_bytes);
-    memcpy(store_ptr + current_offset, current_data, allocated_bytes);
+    P((void*)(store_ptr + current_offset) << " " << (void*)current.base << " " << current.size);
+    memcpy(store_ptr + current_offset, current.base, current.size);
 
-    current_offset += allocated_bytes;
+    current_offset += current.size;
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
       memcpy(store_ptr + current_offset, extendable_blocks[i].base, extendable_blocks[i].size);
@@ -151,7 +153,7 @@ private:
   void copyMemBlock(char* location, pair<char*, size_t> data, size_t copy_start,
                     size_t copy_length) {
     D_ASSERT(data.second >= copy_start + copy_length);
-    // memcpy(location, data.first + copy_start, copy_length);
+    // memcpy(location, data.base + copy_start, copy_length);
 
     size_t data_copy = 0;
     // If these is some data to copy, then we do so. We write the code this way
@@ -168,12 +170,12 @@ public:
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      copyMemBlock(stored_blocks[i].first, store_ptr, current_offset, stored_blocks[i].second);
-      current_offset += stored_blocks[i].second;
+      copyMemBlock(stored_blocks[i].base, store_ptr, current_offset, stored_blocks[i].size);
+      current_offset += stored_blocks[i].size;
     }
-    copyMemBlock(current_data, store_ptr, current_offset, allocated_bytes);
+    copyMemBlock(current.base, store_ptr, current_offset, current.size);
 
-    current_offset += allocated_bytes;
+    current_offset += current.size;
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
       memcpy(extendable_blocks[i].base, store_ptr.first + current_offset, extendable_blocks[i].size);
@@ -185,18 +187,17 @@ public:
 
   /// Returns the size of the allocated memory in bytes.
   UnsignedSysInt getDataSize() {
-    return total_stored_bytes + allocated_bytes + allocated_extendable_bytes;
+    return total_stored_bytes + current.size + allocated_extendable_bytes;
   }
 
   BackTrackMemory()
       : block_cache(100), 
-        current_data(NULL), allocated_bytes(0), maximum_bytes(0),
         total_stored_bytes(0),
         allocated_extendable_bytes(0)
       { }
 
   ~BackTrackMemory() {
-    free(current_data);
+    free(current.base);
 
     for(SysInt i = 0; i < (SysInt)backtrack_data.size(); ++i)
       block_cache.do_free(backtrack_data[i].first);
@@ -243,14 +244,14 @@ public:
     if(byte_count % sizeof(SysInt) != 0)
       byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
-    if((DomainInt)maximum_bytes < (DomainInt)(allocated_bytes) + byte_count) {
+    if((DomainInt)current.capacity < (DomainInt)(current.size) + byte_count) {
       reallocate(byte_count);
     }
 
-    D_ASSERT((DomainInt)maximum_bytes >= allocated_bytes + byte_count);
-    char* return_val = current_data + checked_cast<SysInt>(allocated_bytes);
-    P("Return val:" << (void*)current_data);
-    allocated_bytes += checked_cast<size_t>(byte_count);
+    D_ASSERT((DomainInt)current.capacity >= current.size + byte_count);
+    char* return_val = current.base + checked_cast<SysInt>(current.size);
+    P("Return val:" << (void*)current.base);
+    current.size += checked_cast<size_t>(byte_count);
     return (void*)return_val;
   }
 
@@ -258,7 +259,7 @@ public:
   {
     const SysInt max_size = 10*1024*1024;
     char* block = (char*)calloc(max_size, 1);
-    extendable_blocks.push_back(ExtendableBlockDef{block, base_size, max_size});
+    extendable_blocks.push_back(BlockDef{block, base_size, max_size});
     allocated_extendable_bytes += base_size;
     return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
   }
@@ -287,20 +288,20 @@ public:
 private:
   void reallocate(DomainInt byte_count_new_request) {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
-    D_ASSERT(allocated_bytes + byte_count_new_request > (DomainInt)maximum_bytes);
+    D_ASSERT(current.size + byte_count_new_request > (DomainInt)current.capacity);
 
-    stored_blocks.push_back(make_pair(current_data, allocated_bytes));
-    P((void*)current_data << ":" << allocated_bytes << " of " << maximum_bytes);
-    total_stored_bytes += allocated_bytes;
+    stored_blocks.push_back(current);
+    P((void*)current.base << ":" << current.size << " of " << current.capacity);
+    total_stored_bytes += current.size;
 
     size_t new_block_size = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
-    current_data = (char*)calloc(new_block_size, sizeof(char));
-    if(current_data == NULL) {
+    current.base = (char*)calloc(new_block_size, sizeof(char));
+    if(current.base == NULL) {
       D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting.");
     }
-    P((void*)current_data << " " << new_block_size);
-    maximum_bytes = new_block_size;
-    allocated_bytes = 0;
+    P((void*)current.base << " " << new_block_size);
+    current.capacity = new_block_size;
+    current.size = 0;
   }
 };
 
