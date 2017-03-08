@@ -22,6 +22,7 @@
 #define _MEMORYBLOCK_H
 
 #include "../system/system.h"
+#include "../system/block_cache.h"
 
 #ifdef P
 #undef P
@@ -53,19 +54,16 @@
  */
 
 /// Looks after all \ref void* to a block of memory, and also the memory itself.
-/** A NewMemoryBlock is basically an extendable, moveable block of memory which
+/** class BackTrackMemory is basically an extendable, moveable block of memory which
  * keeps track of all pointers into it, and moves them when approriate.
  *
- * The main limitation of NewMemoryBlocks is that it is impossible to delete
- * or alter particular allocations without deleting the whole class. This may
- * be fixed in future if it is required.
  */
 
 // Small wrapper to represent an extendable block
 class ExtendableBlock {
   // Pointer to block
   char* ptr;
-  // Position in NewMemoryBlock of this block
+  // Position in BackTrackMemory of this block
   SysInt pos;
 public:
   ExtendableBlock() : ptr(NULL), pos(-1)
@@ -86,15 +84,22 @@ public:
   { return ptr == nullptr; }
 };
 
-class NewMemoryBlock {
+class BackTrackMemory {
   /// Forbid copying.
-  NewMemoryBlock(const NewMemoryBlock&);
+  BackTrackMemory(const BackTrackMemory&);
   /// Forbid copying.
-  void operator=(const NewMemoryBlock&);
+  void operator=(const BackTrackMemory&);
 
+  // Variables for backtracking
+  BlockCache block_cache;
+  vector<pair<char*, UnsignedSysInt>> backtrack_data;
+
+  // The current block we allocate from
   char* current_data;
 
+  // allocated bytes from current block
   size_t allocated_bytes;
+  // total size of current block
   size_t maximum_bytes;
 
   vector<pair<char*, size_t>> stored_blocks;
@@ -111,7 +116,7 @@ class NewMemoryBlock {
 
 
 public:
-  void storeMem(char* store_ptr) {
+  void copyIntoPtr(char* store_ptr) {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
@@ -151,7 +156,7 @@ private:
   }
 
 public:
-  void retrieveMem(pair<char*, size_t> store_ptr) {
+  void retrieveFromPtr(pair<char*, size_t> store_ptr) {
     P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
@@ -175,14 +180,50 @@ public:
     return total_stored_bytes + allocated_bytes + allocated_extendable_bytes;
   }
 
-  NewMemoryBlock()
-      : current_data(NULL), allocated_bytes(0), maximum_bytes(0), total_stored_bytes(0),
-      allocated_extendable_bytes(0), block_resizes(1) {
-      }
+  BackTrackMemory()
+      : block_cache(100), 
+        current_data(NULL), allocated_bytes(0), maximum_bytes(0),
+        total_stored_bytes(0),
+        allocated_extendable_bytes(0), block_resizes(1)
+      { }
 
-  ~NewMemoryBlock() {
+  ~BackTrackMemory() {
     free(current_data);
+
+    for(SysInt i = 0; i < (SysInt)backtrack_data.size(); ++i)
+      block_cache.do_free(backtrack_data[i].first);
   }
+
+  /// Copies the current state of backtrackable memory.
+  void world_push() {
+    UnsignedSysInt data_size = this->getDataSize();
+    char* tmp = (char*)block_cache.do_malloc(data_size); // calloc(data_size, sizeof(char));
+
+    this->copyIntoPtr(tmp);
+    backtrack_data.push_back(std::make_pair(tmp, data_size));
+  }
+
+  /// Restores the state of backtrackable memory to the last stored state.
+  void world_pop() {
+    D_ASSERT(backtrack_data.size() > 0);
+    pair<char*, size_t> tmp = backtrack_data.back();
+    this->retrieveFromPtr(tmp);
+    backtrack_data.pop_back();
+    block_cache.do_free(tmp.first);
+  }
+
+    /// Returns the current number of stored copies of the state.
+  SysInt current_depth() {
+    return backtrack_data.size();
+  }
+
+  void world_pop_to(SysInt depth) {
+    D_ASSERT(current_depth() >= depth);
+    while(current_depth() > depth)
+      world_pop();
+    D_ASSERT(current_depth() == depth);
+  }
+
 
   /// Request a new block of memory and returns a \ref void* to it's start.
   void* request_bytes(DomainInt byte_count) {

@@ -26,7 +26,7 @@
 #include "triggering/triggers.h"
 #include "triggering/constraint_abstract.h"
 
-#include "memory_management/backtrackable_memory.h"
+#include "memory_management/MemoryBlock.h"
 #include "memory_management/nonbacktrack_memory.h"
 
 #define MAX_VARS 1000000

@@ -21,7 +21,7 @@
 #ifndef _NONBACKTRACK_MEMORY_H
 #define _NONBACKTRACK_MEMORY_H
 
-#include "backtrackable_memory.h"
+#include "MemoryBlock.h"
 
 // \addtogroup Memory
 // @{

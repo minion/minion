@@ -35,7 +35,7 @@ static const char MinionVersion[] = "Minion Version 2";
 #include "solver.h"
 VARDEF(ofstream solsoutFile);
 
-#include "memory_management/backtrackable_memory.h"
+#include "memory_management/MemoryBlock.h"
 
 #include "memory_management/trailed_monotonic_set_new.h"
 #include "memory_management/nonbacktrack_memory.h"
