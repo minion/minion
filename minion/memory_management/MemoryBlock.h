@@ -90,9 +90,7 @@ class BackTrackMemory {
   /// Forbid copying.
   void operator=(const BackTrackMemory&);
 
-  // Variables for backtracking
-  BlockCache block_cache;
-  vector<pair<char*, UnsignedSysInt>> backtrack_data;
+
 
   struct BlockDef
   {
@@ -120,6 +118,22 @@ class BackTrackMemory {
   vector<BlockDef> extendable_blocks;
   size_t allocated_extendable_bytes;
 
+  // Store information about backtracking.
+  struct BacktrackData
+  {
+    size_t total_stored_bytes;
+    size_t allocated_extendable_bytes;
+    vector<size_t> extendable_blocks_size;
+    
+    char* data;
+    size_t total_bytes() const
+    { return total_stored_bytes + allocated_extendable_bytes; }
+  };
+
+    // Variables for backtracking
+  BlockCache block_cache;
+  //vector<pair<char*, UnsignedSysInt>> backtrack_data;
+  vector<BacktrackData> backtrack_stack;
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE (size_t)(64 * 1024 * 1024)
@@ -146,24 +160,24 @@ public:
   }
 
 private:
-  void copyMemBlock(char* location, pair<char*, size_t> data, size_t copy_start,
+  void copyMemBlock(char* location, const BacktrackData& data, size_t copy_start,
                     size_t copy_length) {
-    D_ASSERT(data.second >= copy_start + copy_length);
+    D_ASSERT(data.total_bytes() >= copy_start + copy_length);
     // memcpy(location, data.base + copy_start, copy_length);
 
     size_t data_copy = 0;
     // If these is some data to copy, then we do so. We write the code this way
     // to avoid UnsignedSysInt underflow.
-    if(copy_start <= data.second)
-      data_copy = std::min(data.second - copy_start, copy_length);
+    if(copy_start <= data.total_bytes())
+      data_copy = std::min(data.total_bytes() - copy_start, copy_length);
 
-    memcpy(location, data.first + copy_start, data_copy);
+    memcpy(location, data.data + copy_start, data_copy);
     memset(location + data_copy, 0, copy_length - data_copy);
   }
 
 public:
-  void retrieveFromPtr(pair<char*, size_t> store_ptr) {
-    P("RetrieveMem: " << (void*)this << " : " << (void*)store_ptr);
+  void retrieveFromPtr(const BacktrackData& store_ptr) {
+    P("RetrieveMem: ");
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
       copyMemBlock(stored_blocks[i].base, store_ptr, current_offset, stored_blocks[i].size);
@@ -171,7 +185,7 @@ public:
     }
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(extendable_blocks[i].base, store_ptr.first + current_offset, extendable_blocks[i].size);
+      memcpy(extendable_blocks[i].base, store_ptr.data + current_offset, extendable_blocks[i].size);
       current_offset += extendable_blocks[i].size;
     }
 
@@ -184,8 +198,8 @@ public:
   }
 
   BackTrackMemory()
-      : block_cache(100), 
-        total_stored_bytes(0),
+      : total_stored_bytes(0),
+        block_cache(100), 
         allocated_extendable_bytes(0)
       {
         // Force at least one block to exist
@@ -193,31 +207,36 @@ public:
       }
 
   ~BackTrackMemory() {
-    for(SysInt i = 0; i < (SysInt)backtrack_data.size(); ++i)
-      block_cache.do_free(backtrack_data[i].first);
+    for(SysInt i = 0; i < (SysInt)backtrack_stack.size(); ++i)
+      block_cache.do_free(backtrack_stack[i].data);
   }
 
   /// Copies the current state of backtrackable memory.
   void world_push() {
     UnsignedSysInt data_size = this->getDataSize();
     char* tmp = (char*)block_cache.do_malloc(data_size); // calloc(data_size, sizeof(char));
-
     this->copyIntoPtr(tmp);
-    backtrack_data.push_back(std::make_pair(tmp, data_size));
+    vector<size_t> extendable_blocks_size;
+    for(int i = 0; i < extendable_blocks.size(); ++i)
+    { extendable_blocks_size.push_back(extendable_blocks[i].size); }
+
+    BacktrackData bd{total_stored_bytes, allocated_extendable_bytes,
+                     extendable_blocks_size, tmp};
+    backtrack_stack.push_back(bd);
   }
 
   /// Restores the state of backtrackable memory to the last stored state.
   void world_pop() {
-    D_ASSERT(backtrack_data.size() > 0);
-    pair<char*, size_t> tmp = backtrack_data.back();
-    this->retrieveFromPtr(tmp);
-    backtrack_data.pop_back();
-    block_cache.do_free(tmp.first);
+    D_ASSERT(backtrack_stack.size() > 0);
+    BacktrackData bd = backtrack_stack.back();
+    backtrack_stack.pop_back();
+    this->retrieveFromPtr(bd);
+    block_cache.do_free(bd.data);
   }
 
     /// Returns the current number of stored copies of the state.
   SysInt current_depth() {
-    return backtrack_data.size();
+    return backtrack_stack.size();
   }
 
   void world_pop_to(SysInt depth) {
