@@ -106,9 +106,10 @@ class BackTrackMemory {
     BlockDef(char* b, size_t s, size_t c)
     : base(b), size(s), capacity(c)
     { }
-  };
 
-  BlockDef current;
+    size_t remaining_capacity() const
+    { return capacity - size; }
+  };
 
   // previous, filled blocks
   vector<BlockDef> stored_blocks;
@@ -135,11 +136,6 @@ public:
       memcpy(store_ptr + current_offset, stored_blocks[i].base, stored_blocks[i].size);
       current_offset += stored_blocks[i].size;
     }
-
-    P((void*)(store_ptr + current_offset) << " " << (void*)current.base << " " << current.size);
-    memcpy(store_ptr + current_offset, current.base, current.size);
-
-    current_offset += current.size;
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
       memcpy(store_ptr + current_offset, extendable_blocks[i].base, extendable_blocks[i].size);
@@ -173,9 +169,6 @@ public:
       copyMemBlock(stored_blocks[i].base, store_ptr, current_offset, stored_blocks[i].size);
       current_offset += stored_blocks[i].size;
     }
-    copyMemBlock(current.base, store_ptr, current_offset, current.size);
-
-    current_offset += current.size;
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
       memcpy(extendable_blocks[i].base, store_ptr.first + current_offset, extendable_blocks[i].size);
@@ -187,18 +180,19 @@ public:
 
   /// Returns the size of the allocated memory in bytes.
   UnsignedSysInt getDataSize() {
-    return total_stored_bytes + current.size + allocated_extendable_bytes;
+    return total_stored_bytes + allocated_extendable_bytes;
   }
 
   BackTrackMemory()
       : block_cache(100), 
         total_stored_bytes(0),
         allocated_extendable_bytes(0)
-      { }
+      {
+        // Force at least one block to exist
+        reallocate(0);
+      }
 
   ~BackTrackMemory() {
-    free(current.base);
-
     for(SysInt i = 0; i < (SysInt)backtrack_data.size(); ++i)
       block_cache.do_free(backtrack_data[i].first);
   }
@@ -244,15 +238,18 @@ public:
     if(byte_count % sizeof(SysInt) != 0)
       byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
 
-    if((DomainInt)current.capacity < (DomainInt)(current.size) + byte_count) {
+    total_stored_bytes += checked_cast<size_t>(byte_count);
+
+    if(stored_blocks.back().remaining_capacity() < byte_count)
+    {
       reallocate(byte_count);
     }
 
-    D_ASSERT((DomainInt)current.capacity >= current.size + byte_count);
-    char* return_val = current.base + checked_cast<SysInt>(current.size);
-    P("Return val:" << (void*)current.base);
-    current.size += checked_cast<size_t>(byte_count);
-    return (void*)return_val;
+    D_ASSERT(stored_blocks.back().remaining_capacity() >= byte_count);
+    void* return_val = stored_blocks.back().base + stored_blocks.back().size;
+    P("Return val:" << (void*)stored_blocks.back().base);
+    stored_blocks.back().size += checked_cast<size_t>(byte_count);
+    return return_val;
   }
 
   ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size)
@@ -288,20 +285,17 @@ public:
 private:
   void reallocate(DomainInt byte_count_new_request) {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
-    D_ASSERT(current.size + byte_count_new_request > (DomainInt)current.capacity);
+    D_ASSERT(stored_blocks.size() == 0 || \
+             (stored_blocks.back().remaining_capacity() < byte_count_new_request) );
 
-    stored_blocks.push_back(current);
-    P((void*)current.base << ":" << current.size << " of " << current.capacity);
-    total_stored_bytes += current.size;
 
-    size_t new_block_size = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
-    current.base = (char*)calloc(new_block_size, sizeof(char));
-    if(current.base == NULL) {
+    size_t new_block_capacity = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
+    char* base = (char*)calloc(new_block_capacity, sizeof(char));
+    if(base == NULL) {
       D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting.");
     }
-    P((void*)current.base << " " << new_block_size);
-    current.capacity = new_block_size;
-    current.size = 0;
+    BlockDef bd{base, 0, new_block_capacity};
+    stored_blocks.push_back(bd);
   }
 };
 
