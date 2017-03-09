@@ -53,7 +53,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     Controller::world_push();
 
     auto vo = Controller::make_search_order_multiple(base_order);
-
+    // hack
+    Controller::world_push();
     if(activatedNeighbourhoods.empty()) {
       nhc.shadow_disable.assign(1);
     } else {
@@ -66,7 +67,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(activatedNeighbourhoods.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
-        Controller::world_pop_to_depth(depth);
+        Controller::world_pop_to_depth(depth + 1);
         return;
       }
     }
@@ -77,13 +78,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
           for(const auto& var : this->nhc.shadow_mapping[0])
             solution.push_back(var.getAssignedValue());
           minValue = getState().getOptimiseVar()->getMin();
+          cout << "--minValue = " << minValue << endl;
           throw EndOfSearch();
         },
         []() {});
     try {
       sm->search();
     } catch(EndOfSearch&) {}
-    Controller::world_pop_to_depth(depth);
+    cout << "min opt before pop " << getState().getOptimiseVar()->getMin() << endl;
+    Controller::world_pop_to_depth(depth + 1);
+    cout << "min opt after pop " << getState().getOptimiseVar()->getMin() << endl;
   }
 
   virtual void search() {
@@ -99,10 +103,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     copyOverIncumbent(solution);
     while(
-        !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty()) {
-      //solution.clear();
+        !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() &&
+        getState().getOptimiseVar()->getDomSize() > 1) {
       // Set the lower bound of the optimized variable
       getState().getOptimiseVar()->setMin(minValue + 1);
+      std::vector<AnyVarRef> emptyVars;
+      prop->prop(emptyVars);
       auto startTime = std::chrono::high_resolution_clock::now();
       searchNeighbourhoods(solution, minValue, activatedNeighbourhoods);
       auto endTime = std::chrono::high_resolution_clock::now();
