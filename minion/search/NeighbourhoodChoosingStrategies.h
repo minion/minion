@@ -28,8 +28,8 @@ public:
     if(neighbourhoodStats.solutionFound) {
       neighbourhoodSuccessHistory.assign(neighbourhoodSuccessHistory.size(), true);
     } else {
-      for(int i = 0; i < neighbourhoodSuccessHistory.size(); i++) {
-        neighbourhoodSuccessHistory[activatedNeighbourhoods[i]] = false;
+      for(int neighbourhoodIndex : activatedNeighbourhoods) {
+        neighbourhoodSuccessHistory[neighbourhoodIndex] = false;
       }
     }
   }
@@ -41,9 +41,12 @@ public:
       if(neighbourhoodSuccessHistory[i])
         successfulNeighbourhoods.push_back(i);
     }
-
-    int random_variable = static_cast<int>(std::rand() % successfulNeighbourhoods.size());
-    return {successfulNeighbourhoods[random_variable]};
+    if(successfulNeighbourhoods.empty()) {
+      return {};
+    } else {
+      int random_variable = std::rand() % successfulNeighbourhoods.size();
+      return {successfulNeighbourhoods[random_variable]};
+    }
   }
 };
 

@@ -78,16 +78,13 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
           for(const auto& var : this->nhc.shadow_mapping[0])
             solution.push_back(var.getAssignedValue());
           minValue = getState().getOptimiseVar()->getMin();
-          cout << "--minValue = " << minValue << endl;
           throw EndOfSearch();
         },
         []() {});
     try {
       sm->search();
     } catch(EndOfSearch&) {}
-    cout << "min opt before pop " << getState().getOptimiseVar()->getMin() << endl;
     Controller::world_pop_to_depth(depth + 1);
-    cout << "min opt after pop " << getState().getOptimiseVar()->getMin() << endl;
   }
 
   virtual void search() {
@@ -106,6 +103,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() &&
         getState().getOptimiseVar()->getDomSize() > 1) {
       // Set the lower bound of the optimized variable
+      cout << "obtained minValue " << minValue << "\nTrying minValue " << (minValue + 1) << endl;
       getState().getOptimiseVar()->setMin(minValue + 1);
       std::vector<AnyVarRef> emptyVars;
       prop->prop(emptyVars);
@@ -116,7 +114,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       static_cast<void>(timeTaken); // temp remove warning of unused var
 
       if(!solution.empty()) {
+        cout << "solution found " << endl;
         copyOverIncumbent(solution);
+      } else {
+        cout << "solution not found " << endl;
       }
       selectionStrategy->updateStats(activatedNeighbourhoods,
                                     NeighbourhoodStats(minValue, timeTaken, !solution.empty()));
