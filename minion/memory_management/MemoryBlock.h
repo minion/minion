@@ -128,6 +128,16 @@ class BackTrackMemory {
     char* data;
     size_t total_bytes() const
     { return total_stored_bytes + allocated_extendable_bytes; }
+
+    BacktrackData()
+    : total_stored_bytes(0), allocated_extendable_bytes(0),
+      data(0)
+    { }
+
+    BacktrackData(size_t t, size_t a, vector<size_t> v, char* d)
+    : total_stored_bytes(t), allocated_extendable_bytes(a),
+      extendable_blocks_size(v), data(d)
+    { }
   };
 
     // Variables for backtracking
@@ -198,12 +208,13 @@ public:
   }
 
   BackTrackMemory()
-      : total_stored_bytes(0),
-        block_cache(100), 
-        allocated_extendable_bytes(0)
+      : total_stored_bytes(0), 
+        allocated_extendable_bytes(0),
+        block_cache(100)
       {
         // Force at least one block to exist
         reallocate(0);
+        backtrack_stack.push_back(BacktrackData{});
       }
 
   ~BackTrackMemory() {
@@ -230,6 +241,48 @@ public:
     D_ASSERT(backtrack_stack.size() > 0);
     BacktrackData bd = backtrack_stack.back();
     backtrack_stack.pop_back();
+    D_ASSERT(total_stored_bytes >= bd.total_stored_bytes);
+
+    // Clean up stored_blocks
+    if(total_stored_bytes > bd.total_stored_bytes)
+    {
+      while(total_stored_bytes - stored_blocks.back().size > bd.total_stored_bytes)
+      {
+        BlockDef block = stored_blocks.back();
+        stored_blocks.pop_back();
+        free(block.base);
+        total_stored_bytes -= block.size;
+      }
+      if(total_stored_bytes > bd.total_stored_bytes)
+      {
+        D_ASSERT(total_stored_bytes - stored_blocks.back().size <= bd.total_stored_bytes);
+        size_t old_size = stored_blocks.back().size;
+        size_t diff = total_stored_bytes - bd.total_stored_bytes;
+        size_t new_size = old_size - diff;
+        memset(stored_blocks.back().base + new_size, 0, diff);
+        stored_blocks.back().size = new_size;
+        total_stored_bytes -= diff;
+      }
+    }
+
+    D_ASSERT(total_stored_bytes == bd.total_stored_bytes);
+
+    // If you trigger this, ask Chris and we can generalise!
+    D_ASSERT(extendable_blocks.size() == bd.extendable_blocks_size.size());
+    for(int i = 0; i < extendable_blocks.size(); ++i)
+    {
+      if(bd.extendable_blocks_size[i] != extendable_blocks[i].size)
+      {
+        D_ASSERT(bd.extendable_blocks_size[i] < extendable_blocks[i].size);
+        size_t diff = extendable_blocks[i].size - bd.extendable_blocks_size[i];
+        extendable_blocks[i].size = bd.extendable_blocks_size[i];
+        memset(extendable_blocks[i].base + extendable_blocks[i].size, 0, diff);
+        allocated_extendable_bytes -= diff;
+      }
+    }
+
+    D_ASSERT(allocated_extendable_bytes == bd.allocated_extendable_bytes);
+
     this->retrieveFromPtr(bd);
     block_cache.do_free(bd.data);
   }
