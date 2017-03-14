@@ -21,7 +21,7 @@
 #ifndef REVERSIBLE_VALS_H
 #define REVERSIBLE_VALS_H
 
-#include "backtrackable_memory.h"
+#include "MemoryBlock.h"
 #include "nonbacktrack_memory.h"
 
 #include "../solver.h"
