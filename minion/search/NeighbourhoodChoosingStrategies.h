@@ -26,9 +26,11 @@ public:
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
     if(neighbourhoodStats.solutionFound) {
+      cout << "Solution found, assiging all neighbourhoods to true" << endl;
       neighbourhoodSuccessHistory.assign(neighbourhoodSuccessHistory.size(), true);
     } else {
       for(int neighbourhoodIndex : activatedNeighbourhoods) {
+        cout << "Setting neighbourdhood " << neighbourhoodIndex << " to false" << endl;
         neighbourhoodSuccessHistory[neighbourhoodIndex] = false;
       }
     }
@@ -45,6 +47,7 @@ public:
       return {};
     } else {
       int random_variable = std::rand() % successfulNeighbourhoods.size();
+      cout << "Attempting Neighbourhood: " << random_variable << endl;
       return {successfulNeighbourhoods[random_variable]};
     }
   }

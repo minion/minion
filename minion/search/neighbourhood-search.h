@@ -53,8 +53,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     Controller::world_push();
 
     auto vo = Controller::make_search_order_multiple(base_order);
-    // hack
-    Controller::world_push();
     if(activatedNeighbourhoods.empty()) {
       nhc.shadow_disable.assign(1);
     } else {
@@ -67,7 +65,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(activatedNeighbourhoods.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
-        Controller::world_pop_to_depth(depth + 1);
+        Controller::world_pop_to_depth(depth);
         return;
       }
     }
@@ -84,7 +82,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     try {
       sm->search();
     } catch(EndOfSearch&) {}
-    Controller::world_pop_to_depth(depth + 1);
+    Controller::world_pop_to_depth(depth);
   }
 
   virtual void search() {
@@ -97,7 +95,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if(solution.empty()) {
       return;
     }
-
     copyOverIncumbent(solution);
     while(
         !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() &&
@@ -105,19 +102,19 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       // Set the lower bound of the optimized variable
       cout << "obtained minValue " << minValue << "\nTrying minValue " << (minValue + 1) << endl;
       getState().getOptimiseVar()->setMin(minValue + 1);
+
       std::vector<AnyVarRef> emptyVars;
       prop->prop(emptyVars);
       auto startTime = std::chrono::high_resolution_clock::now();
+
+
       searchNeighbourhoods(solution, minValue, activatedNeighbourhoods);
       auto endTime = std::chrono::high_resolution_clock::now();
       u_int64_t timeTaken = getTimeTaken(startTime, endTime);
       static_cast<void>(timeTaken); // temp remove warning of unused var
 
       if(!solution.empty()) {
-        cout << "solution found " << endl;
         copyOverIncumbent(solution);
-      } else {
-        cout << "solution not found " << endl;
       }
       selectionStrategy->updateStats(activatedNeighbourhoods,
                                     NeighbourhoodStats(minValue, timeTaken, !solution.empty()));
@@ -140,6 +137,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes, const vector<DomainInt> &solution) {
     std::unordered_set<AnyVarRef> shadowVariables;
     for(int i : neighbourHoodIndexes) {
+      cout << "Activating neighbourhood " << i << endl;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
       neighbourhood.activation.assign(1);
 
@@ -160,9 +158,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   void copyOverIncumbent(const vector<DomainInt>& solution) {
+    if (Controller::get_world_depth() != 1) {
+      Controller::world_pop();
+    }
+
+    Controller::world_push();
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
       nhc.shadow_mapping[1][i].assign(solution[i]);
     }
+
   }
 };
 
