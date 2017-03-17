@@ -7,31 +7,6 @@
 #include <ctime>
 #include <memory>
 
-void inline get_single_solution() {
-  if(getState().isOptimisationProblem()) {
-    if(!getState().getOptimiseVar()->isAssigned()) {
-      cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
-      cerr << "Put it in the variable ordering?" << endl;
-      cerr << "Aborting Search" << endl;
-      exit(1);
-    }
-
-    if(getOptions().printonlyoptimal) {
-      getState().storedSolution += "Solution found with Value: " +
-                                   tostring(getState().getRawOptimiseVar()->getAssignedValue()) +
-                                   "\n";
-    } else {
-      cout << "Solution found with Value: " << getState().getRawOptimiseVar()->getAssignedValue()
-           << endl;
-    }
-
-    getState().setOptimiseValue(getState().getOptimiseVar()->getAssignedValue() + 1);
-  }
-  // Note that sollimit = -1 if all solutions should be found.
-  if(getState().getSolutionCount() == getOptions().sollimit)
-    throw EndOfSearch();
-}
-
 template <typename NeighbourhoodSelectionStrategy>
 struct NeighbourhoodSearchManager : public Controller::SearchManager {
   shared_ptr<Propagate> prop;
@@ -95,27 +70,23 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if(solution.empty()) {
       return;
     }
-    copyOverIncumbent(solution);
     while(
         !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() &&
-        getState().getOptimiseVar()->getDomSize() > 1) {
-      // Set the lower bound of the optimized variable
-      cout << "obtained minValue " << minValue << "\nTrying minValue " << (minValue + 1) << endl;
-      getState().getOptimiseVar()->setMin(minValue + 1);
+        getState().getOptimiseVar()->getDomSize() > 0) {
+      if(!solution.empty()) {
+        cout << "Found solution with op min " << minValue << "\nTrying minValue " << (minValue + 1)
+             << endl;
+        ;
+        copyOverIncumbent(solution);
+        getState().getOptimiseVar()->setMin(minValue + 1);
+        std::vector<AnyVarRef> emptyVars;
+        prop->prop(emptyVars);
+      }
 
-      std::vector<AnyVarRef> emptyVars;
-      prop->prop(emptyVars);
       auto startTime = std::chrono::high_resolution_clock::now();
-
-
       searchNeighbourhoods(solution, minValue, activatedNeighbourhoods);
       auto endTime = std::chrono::high_resolution_clock::now();
       u_int64_t timeTaken = getTimeTaken(startTime, endTime);
-      static_cast<void>(timeTaken); // temp remove warning of unused var
-
-      if(!solution.empty()) {
-        copyOverIncumbent(solution);
-      }
       selectionStrategy->updateStats(activatedNeighbourhoods,
                                     NeighbourhoodStats(minValue, timeTaken, !solution.empty()));
     }
