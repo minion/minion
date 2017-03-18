@@ -3,26 +3,43 @@
 #define MINION_NEIGHBOURHOOD_SEARCH_H
 #include "NeighbourhoodChoosingStrategies.h"
 #include "neighbourhood-def.h"
+#include <atomic>
 #include <cstdlib>
 #include <ctime>
+#include <exception>
 #include <memory>
+#include <signal.h>
+#include <sys/time.h>
+
+static std::atomic<bool> alarmTriggered(false);
+
+void triggerAlarm(int) {
+  alarmTriggered = true;
+}
+class TimeoutException : public std::exception {};
 
 template <typename NeighbourhoodSelectionStrategy>
 struct NeighbourhoodSearchManager : public Controller::SearchManager {
+  typedef std::chrono::high_resolution_clock::time_point timePoint;
+
   shared_ptr<Propagate> prop;
   vector<SearchOrder> base_order;
   NeighbourhoodContainer nhc;
   shared_ptr<NeighbourhoodSelectionStrategy> selectionStrategy;
+
   NeighbourhoodSearchManager(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
                              NeighbourhoodContainer _nhc,
                              shared_ptr<NeighbourhoodSelectionStrategy> selectionStrategy)
       : prop(std::move(_prop)),
         base_order(_base_order),
         nhc(_nhc),
-        selectionStrategy(std::move(selectionStrategy)) {}
+        selectionStrategy(std::move(selectionStrategy)) {
+    signal(SIGVTALRM, triggerAlarm);
+  }
 
-  void searchNeighbourhoods(vector<DomainInt>& solution, DomainInt& minValue,
-                            vector<int>& activatedNeighbourhoods) {
+  inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
+                                                 vector<int>& activatedNeighbourhoods,
+                                                 int timeoutInMillis = 0) {
     // Save state of the world
     int depth = Controller::get_world_depth();
     Controller::world_push();
@@ -41,61 +58,67 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
         Controller::world_pop_to_depth(depth);
-        return;
+        return NeighbourhoodStats(getState().getOptimiseVar()->getMin(), 0, false, false);
       }
     }
-
     auto sm = make_shared<Controller::StandardSearchManager>(
         vo, prop, Controller::standard_time_ctrlc_checks,
-        [&solution, &minValue, this]() {
-          for(const auto& var : this->nhc.shadow_mapping[0])
+        [&solution, this]() {
+          for(const auto& var : this->nhc.shadow_mapping[0]) {
             solution.push_back(var.getAssignedValue());
-          minValue = getState().getOptimiseVar()->getMin();
+          }
           throw EndOfSearch();
         },
-        []() {});
+        []() {
+          if(alarmTriggered) {
+            throw TimeoutException();
+          }
+        });
+
+    if(timeoutInMillis) {
+      setTimeout(timeoutInMillis);
+    }
+
+    bool timeout = false;
+    auto startTime = std::chrono::high_resolution_clock::now();
     try {
       sm->search();
-    } catch(EndOfSearch&) {}
+    } catch(EndOfSearch&) { clearTimeout(); } catch(TimeoutException&) {
+      timeout = true;
+    }
+
+    NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), getTimeTaken(startTime),
+                             !solution.empty(), timeout);
     Controller::world_pop_to_depth(depth);
+    return stats;
   }
 
   virtual void search() {
+
     vector<DomainInt> solution;
-    DomainInt minValue;
     vector<int> activatedNeighbourhoods;
+    NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
 
-    searchNeighbourhoods(solution, minValue, activatedNeighbourhoods);
-
-    if(solution.empty()) {
+    if(!stats.solutionFound) {
       return;
     }
+
     while(
         !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() &&
         getState().getOptimiseVar()->getDomSize() > 0) {
-      if(!solution.empty()) {
-        cout << "Found solution with op min " << minValue << "\nTrying minValue " << (minValue + 1)
-             << endl;
-        ;
+
+      if(stats.solutionFound) {
+        cout << "Found solution with op min " << stats.newMinValue << "\nTrying op min "
+             << (stats.newMinValue + 1) << endl;
         copyOverIncumbent(solution);
-        getState().getOptimiseVar()->setMin(minValue + 1);
+        getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
         std::vector<AnyVarRef> emptyVars;
         prop->prop(emptyVars);
       }
 
-      auto startTime = std::chrono::high_resolution_clock::now();
-      searchNeighbourhoods(solution, minValue, activatedNeighbourhoods);
-      auto endTime = std::chrono::high_resolution_clock::now();
-      u_int64_t timeTaken = getTimeTaken(startTime, endTime);
-      selectionStrategy->updateStats(activatedNeighbourhoods,
-                                    NeighbourhoodStats(minValue, timeTaken, !solution.empty()));
+      stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
+      selectionStrategy->updateStats(activatedNeighbourhoods, stats);
     }
-  }
-
-  typedef std::chrono::high_resolution_clock::time_point timePoint;
-
-  u_int64_t getTimeTaken(timePoint startTime, timePoint endTime) {
-    return std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
   }
 
 
@@ -138,6 +161,34 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       nhc.shadow_mapping[1][i].assign(solution[i]);
     }
 
+  }
+
+  inline void setTimeout(int numberMillis) {
+    struct itimerval timer;
+    // numberSeconds
+    timer.it_value.tv_sec = numberMillis / 1000;
+    // remaining micro seconds
+    timer.it_value.tv_usec = (numberMillis % 1000) * 1000;
+    // prevent intervals
+    timer.it_interval.tv_sec = 0;
+    timer.it_interval.tv_usec = 0;
+    alarmTriggered = false;
+    setitimer(ITIMER_VIRTUAL, &timer, NULL);
+  }
+
+  inline void clearTimeout() {
+    struct itimerval timer;
+    timer.it_value.tv_sec = 0;
+    timer.it_value.tv_usec = 0;
+    timer.it_interval.tv_sec = 0;
+    timer.it_interval.tv_usec = 0;
+    alarmTriggered = false;
+    setitimer(ITIMER_VIRTUAL, &timer, NULL);
+  }
+
+  inline u_int64_t getTimeTaken(timePoint startTime) {
+    auto endTime = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
   }
 };
 

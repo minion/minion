@@ -7,10 +7,15 @@ struct NeighbourhoodStats {
   DomainInt newMinValue;
   u_int64_t timeTaken;
   bool solutionFound;
+  bool timeoutReached;
 
 public:
-  NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound)
-      : newMinValue(newMinValue), timeTaken(timeTaken), solutionFound(solutionFound) {}
+  NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound,
+                     bool timeoutReached)
+      : newMinValue(newMinValue),
+        timeTaken(timeTaken),
+        solutionFound(solutionFound),
+        timeoutReached(timeoutReached) {}
 };
 
 class RandomNeighbourhoodChooser {
