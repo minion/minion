@@ -42,21 +42,27 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
                                                  int timeoutInMillis = 0) {
     // Save state of the world
     int depth = Controller::get_world_depth();
-    Controller::world_push();
 
+    cout << "---In search function---" << endl;
+    cout << "Depth is: " << depth << endl;
+    Controller::world_push();
     auto vo = Controller::make_search_order_multiple(base_order);
     if(activatedNeighbourhoods.empty()) {
       nhc.shadow_disable.assign(1);
     } else {
       switchOnNeighbourhoods(activatedNeighbourhoods, solution);
     }
+
     solution.clear();
 
     prop->prop(vo->getVars());
+
+    printWorld();
     if(getState().isFailed()) {
       if(activatedNeighbourhoods.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
+        cout << "---No Search was carried out---" << endl;
         Controller::world_pop_to_depth(depth);
         return NeighbourhoodStats(getState().getOptimiseVar()->getMin(), 0, false, false);
       }
@@ -94,7 +100,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   virtual void search() {
-
     vector<DomainInt> solution;
     vector<int> activatedNeighbourhoods;
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
@@ -103,10 +108,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       return;
     }
 
-    while(
-        !(activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() &&
-        getState().getOptimiseVar()->getDomSize() > 0) {
-
+    while(true) {
       if(stats.solutionFound) {
         cout << "Found solution with op min " << stats.newMinValue << "\nTrying op min "
              << (stats.newMinValue + 1) << endl;
@@ -116,11 +118,35 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         prop->prop(emptyVars);
       }
 
-      stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
+      if((activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() ||
+         getState().getOptimiseVar()->getDomSize() == 0)
+        return;
+
+      cout << "----Performing Search here---" << endl;
+      cout << "Depth is " << Controller::get_world_depth() << endl;
+      stats = searchNeighbourhoods(solution, activatedNeighbourhoods, 500);
+      cout << "After -----" << endl;
+      cout << "Depth is " << Controller::get_world_depth() << endl;
+      printWorld();
       selectionStrategy->updateStats(activatedNeighbourhoods, stats);
     }
   }
 
+  void printWorld() {
+    cout << "---------------" << endl;
+    cout << "Optimise Variable bound: " << getState().getOptimiseVar()->getMin() << "->"
+         << getState().getOptimiseVar()->getMax() << endl;
+    for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
+      cout << "Variable:" << nhc.shadow_mapping[0][i].getMin() << "->"
+           << nhc.shadow_mapping[0][i].getMax() << endl;
+    }
+
+    for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
+      cout << "Shadow Variable:" << nhc.shadow_mapping[1][i].getMin() << "->"
+           << nhc.shadow_mapping[0][i].getMax() << endl;
+    }
+    cout << "---------------" << endl;
+  }
 
   /**
    * Switch on the neighbourhood activation vars
@@ -130,8 +156,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    */
   void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes, const vector<DomainInt> &solution) {
     std::unordered_set<AnyVarRef> shadowVariables;
+    cout << "Switiching on neighbourhoods with depth " << Controller::get_world_depth() << endl;
     for(int i : neighbourHoodIndexes) {
-      cout << "Activating neighbourhood " << i << endl;
+      cout << "Switching on neighbourhood " << i << endl;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
       neighbourhood.activation.assign(1);
 
@@ -155,12 +182,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if (Controller::get_world_depth() != 1) {
       Controller::world_pop();
     }
-
     Controller::world_push();
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
       nhc.shadow_mapping[1][i].assign(solution[i]);
     }
-
   }
 
   inline void setTimeout(int numberMillis) {
@@ -196,8 +221,8 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
                                                               vector<SearchOrder> base_order,
                                                               NeighbourhoodContainer nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  return std::make_shared<NeighbourhoodSearchManager<RandomNeighbourhoodChooser>>(
-      prop, base_order, nhc, std::make_shared<RandomNeighbourhoodChooser>(nhc));
+  return std::make_shared<NeighbourhoodSearchManager<UCBNeighborHoodSelection>>(
+      prop, base_order, nhc, std::make_shared<UCBNeighborHoodSelection>(nhc));
 }
 
 #endif
