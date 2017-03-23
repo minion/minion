@@ -58,8 +58,10 @@ public:
 
     successfulNeighbourhoods.clear();
     for(int i = 0; i < neighbourhoodSuccessHistory.size(); i++) {
-      if(neighbourhoodSuccessHistory[i])
+      if(neighbourhoodSuccessHistory[i] &&
+         !neighbourhoodContainer.neighbourhoods[i].activation.isAssigned()) {
         successfulNeighbourhoods.push_back(i);
+      }
     }
     if(successfulNeighbourhoods.empty()) {
       return {};
