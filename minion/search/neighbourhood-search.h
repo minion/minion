@@ -55,10 +55,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
 
     solution.clear();
-
+    //cout << "Before propogation " << endl;
+    //printWorld();
     prop->prop(vo->getVars());
 
-    // printWorld();
+    //cout << "Before checking if state is failed " << endl;
+    //printWorld();
     if(getState().isFailed()) {
       if(activatedNeighbourhoods.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
@@ -79,6 +81,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     };
     auto solutionHandler = [&]() {
+      solution.clear();
       for(const auto& var : this->nhc.shadow_mapping[0]) {
         solution.push_back(var.getAssignedValue());
       }
@@ -130,16 +133,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         std::vector<AnyVarRef> emptyVars;
         prop->prop(emptyVars);
       }
-
+      cout << " here" << endl;
       if((activatedNeighbourhoods = selectionStrategy->getNeighbourHoodsToActivate(nhc)).empty() ||
          getState().getOptimiseVar()->getDomSize() == 0)
         return;
 
-      // cout << "----Performing Search here---" << endl;
-      // cout << "Depth is " << Controller::get_world_depth() << endl;
+       cout << "----Performing Search here---" << endl;
+       cout << "Depth is " << Controller::get_world_depth() << endl;
       stats = searchNeighbourhoods(solution, activatedNeighbourhoods, 500);
-      // cout << "After -----" << endl;
-      // cout << "Depth is " << Controller::get_world_depth() << endl;
+       cout << "After -----" << endl;
+       cout << "Depth is " << Controller::get_world_depth() << endl;
       printWorld();
       selectionStrategy->updateStats(activatedNeighbourhoods, stats);
       numberOfSearches++;
@@ -150,8 +153,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(numberOfSearches == 10)
         break;
     }
-    cout << "Neighbourhood History: " << endl;
-    selectionStrategy->printHistory();
+    //cout << "Neighbourhood History: " << endl;
+   // selectionStrategy->printHistory();
   }
 
   void printWorld() {
@@ -168,6 +171,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
            << nhc.shadow_mapping[1][i].getMin() << "->" << nhc.shadow_mapping[0][i].getMax()
            << endl;
     }
+
+    for(int i = 0; i < nhc.neighbourhoods.size(); i++){
+      cout << "Switching on neighbourhood " << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin()
+           << " -> " << nhc.neighbourhoods[i].activation.getMax() << endl;
+    }
     cout << "---------------" << endl;
   }
 
@@ -180,14 +188,21 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes, const vector<DomainInt> &solution) {
     std::unordered_set<AnyVarRef> shadowVariables;
     cout << "Switiching on neighbourhoods with depth " << Controller::get_world_depth() << endl;
+
     for(int i : neighbourHoodIndexes) {
-      cout << "Switching on neighbourhood " << i << endl;
+      cout << "Switching on neighbourhood " << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin()
+                                                 << " -> " << nhc.neighbourhoods[i].activation.getMax() << endl;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
       neighbourhood.activation.assign(1);
 
       for(auto& n : neighbourhood.vars) {
         shadowVariables.insert(n);
       }
+    }
+
+    for (int i = 0; i < nhc.neighbourhoods.size(); i++){
+      cout << "Neighbourhood " << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin()
+           << " -> " << nhc.neighbourhoods[i].activation.getMax() << endl;
     }
 
     /*
@@ -244,8 +259,8 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
                                                               vector<SearchOrder> base_order,
                                                               NeighbourhoodContainer nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  return std::make_shared<NeighbourhoodSearchManager<UCBNeighborHoodSelection>>(
-      prop, base_order, nhc, std::make_shared<UCBNeighborHoodSelection>(nhc));
+  return std::make_shared<NeighbourhoodSearchManager<InteractiveNeighbourhoodChooser>>(
+      prop, base_order, nhc, std::make_shared<InteractiveNeighbourhoodChooser>(nhc));
 }
 
 #endif
