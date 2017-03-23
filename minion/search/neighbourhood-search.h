@@ -39,7 +39,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
                                                  vector<int>& activatedNeighbourhoods,
-                                                 int timeoutInMillis = 0) {
+                                                 int timeoutInMillis = 0,
+                                                 bool restrictToFirstSolution = true) {
     // Save state of the world
     int depth = Controller::get_world_depth();
 
@@ -67,34 +68,46 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         return NeighbourhoodStats(getState().getOptimiseVar()->getMin(), 0, false, false);
       }
     }
-    auto sm = make_shared<Controller::StandardSearchManager>(
-        vo, prop, Controller::standard_time_ctrlc_checks,
-        [&solution, this]() {
-          for(const auto& var : this->nhc.shadow_mapping[0]) {
-            solution.push_back(var.getAssignedValue());
-          }
-          throw EndOfSearch();
-        },
-        []() {
-          if(alarmTriggered) {
-            throw TimeoutException();
-          }
-        });
+
+    DomainInt optimisationValueCache = getState().getOptimiseVar()->getMin() - 1;
+    // minus 1 is used as the optimisationHandler always sets it to optimisationValueCache +1
+    auto timeoutChecker = [](const vector<AnyVarRef>& var_array,
+                             const vector<Controller::triple>& branches) {
+      Controller::standard_time_ctrlc_checks(var_array, branches);
+      if(alarmTriggered) {
+        throw TimeoutException();
+      }
+    };
+    auto solutionHandler = [&]() {
+      for(const auto& var : this->nhc.shadow_mapping[0]) {
+        solution.push_back(var.getAssignedValue());
+      }
+      optimisationValueCache = getState().getOptimiseVar()->getMin();
+      if(restrictToFirstSolution) {
+        throw EndOfSearch();
+      }
+    };
+    auto optimisationHandler = [&]() {
+      getState().getOptimiseVar()->setMin(optimisationValueCache + 1);
+    };
+    auto sm = make_shared<Controller::StandardSearchManager>(vo, prop, timeoutChecker,
+                                                             solutionHandler, optimisationHandler);
 
     if(timeoutInMillis) {
       setTimeout(timeoutInMillis);
     }
 
-    bool timeout = false;
     auto startTime = std::chrono::high_resolution_clock::now();
+    bool timeout = false;
     try {
       sm->search();
     } catch(EndOfSearch&) { clearTimeout(); } catch(TimeoutException&) {
       timeout = true;
     }
-
-    NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), getTimeTaken(startTime),
-                             !solution.empty(), timeout);
+    bool solutionFound = !solution.empty();
+    DomainInt bestOptimisation =
+        (solutionFound) ? optimisationValueCache : optimisationValueCache + 1;
+    NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout);
     Controller::world_pop_to_depth(depth);
     return stats;
   }
