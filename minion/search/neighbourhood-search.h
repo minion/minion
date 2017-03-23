@@ -57,7 +57,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     prop->prop(vo->getVars());
 
-    printWorld();
+    // printWorld();
     if(getState().isFailed()) {
       if(activatedNeighbourhoods.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
@@ -107,7 +107,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if(!stats.solutionFound) {
       return;
     }
-
+    int numberOfSearches = 0;
     while(true) {
       if(stats.solutionFound) {
         cout << "Found solution with op min " << stats.newMinValue << "\nTrying op min "
@@ -122,14 +122,23 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
          getState().getOptimiseVar()->getDomSize() == 0)
         return;
 
-      cout << "----Performing Search here---" << endl;
-      cout << "Depth is " << Controller::get_world_depth() << endl;
+      // cout << "----Performing Search here---" << endl;
+      // cout << "Depth is " << Controller::get_world_depth() << endl;
       stats = searchNeighbourhoods(solution, activatedNeighbourhoods, 500);
-      cout << "After -----" << endl;
-      cout << "Depth is " << Controller::get_world_depth() << endl;
+      // cout << "After -----" << endl;
+      // cout << "Depth is " << Controller::get_world_depth() << endl;
       printWorld();
       selectionStrategy->updateStats(activatedNeighbourhoods, stats);
+      numberOfSearches++;
+      cout << "Number of searches: " << numberOfSearches << endl;
+      cout << "Optimise Variable bound: " << getState().getOptimiseVar()->getMin() << "->"
+           << getState().getOptimiseVar()->getMax() << endl;
+
+      if(numberOfSearches == 10)
+        break;
     }
+    cout << "Neighbourhood History: " << endl;
+    selectionStrategy->printHistory();
   }
 
   void printWorld() {
@@ -137,13 +146,14 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     cout << "Optimise Variable bound: " << getState().getOptimiseVar()->getMin() << "->"
          << getState().getOptimiseVar()->getMax() << endl;
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
-      cout << "Variable:" << nhc.shadow_mapping[0][i].getMin() << "->"
-           << nhc.shadow_mapping[0][i].getMax() << endl;
+      cout << "Variable " << nhc.shadow_mapping[0][i] << " : " << nhc.shadow_mapping[0][i].getMin()
+           << "->" << nhc.shadow_mapping[0][i].getMax() << endl;
     }
 
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
-      cout << "Shadow Variable:" << nhc.shadow_mapping[1][i].getMin() << "->"
-           << nhc.shadow_mapping[0][i].getMax() << endl;
+      cout << "Shadow Variable " << nhc.shadow_mapping[1][i] << " : "
+           << nhc.shadow_mapping[1][i].getMin() << "->" << nhc.shadow_mapping[0][i].getMax()
+           << endl;
     }
     cout << "---------------" << endl;
   }

@@ -1,6 +1,7 @@
 #ifndef MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #define MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #include "neighbourhood-def.h"
+#include <cassert>
 #include <math.h>
 #include <vector>
 
@@ -77,11 +78,22 @@ public:
   int numberOfVisits;
   u_int64_t totalTimeTaken;
   bool timeOut;
+  double ucbValue;
 
   NeighbourhoodRewards(int id)
-      : id(id), reward(0), numberOfVisits(0), totalTimeTaken(0), timeOut(false) {}
+      : id(id), reward(0), numberOfVisits(0), totalTimeTaken(0), timeOut(false), ucbValue(0) {}
 
   friend std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr);
+};
+
+struct NeighbourhoodHistory {
+
+public:
+  bool activated;
+  double ucbValue;
+
+  NeighbourhoodHistory(bool activated, double ucbValue)
+      : activated(activated), ucbValue(ucbValue) {}
 };
 
 std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
@@ -99,41 +111,98 @@ private:
   double epsilon = 0.0000001;
   const NeighbourhoodContainer nhc;
 
+  std::vector<vector<NeighbourhoodHistory>> neighbourhoodRewardHistory;
+  std::vector<int> neighbourhoodActivationHistory;
+  int timeStep;
   u_int64_t totalTime;
-  double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
+  bool ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
     if(nhc.neighbourhoods[neighbourhoodReward.id].activation.isAssigned()) {
-      return -(std::numeric_limits<double>::max());
+      std::cout << "Neighbourhood " << neighbourhoodReward.id << " is assigned a value of "
+                << nhc.neighbourhoods[neighbourhoodReward.id].activation.getAssignedValue()
+                << std::endl;
+      return false;
     }
-    return neighbourhoodReward.reward +
-           ((2 * std::log(totalTime + epsilon)) / (neighbourhoodReward.totalTimeTaken + epsilon));
+    neighbourhoodReward.ucbValue =
+        neighbourhoodReward.reward +
+        ((2 * std::log(totalTime + epsilon)) / (neighbourhoodReward.totalTimeTaken + epsilon));
+    return true;
   }
 
 public:
   vector<NeighbourhoodRewards> neighbourhoodRewards;
-  UCBNeighborHoodSelection(const NeighbourhoodContainer nhc) : nhc(nhc), totalTime(0) {
+  UCBNeighborHoodSelection(const NeighbourhoodContainer nhc) : nhc(nhc), totalTime(0), timeStep(0) {
+    std::cout << "Number of neighbour hoods is " << nhc.neighbourhoods.size() << std::endl;
     for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
       neighbourhoodRewards.push_back(NeighbourhoodRewards(i));
     }
+    std::cout << "Number of neighbour hoods rewards is " << neighbourhoodRewards.size()
+              << std::endl;
   }
 
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
+    std::cout << neighbourhoodStats << std::endl;
     // Get the activated neighbourhood
     NeighbourhoodRewards& currentNeighbourhood = neighbourhoodRewards[activatedNeighbourhoods[0]];
     currentNeighbourhood.numberOfVisits++;
-    currentNeighbourhood.totalTimeTaken += neighbourhoodStats.timeTaken;
+    currentNeighbourhood.totalTimeTaken +=
+        neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
     currentNeighbourhood.reward += neighbourhoodStats.solutionFound ? 1 : -1;
     currentNeighbourhood.timeOut = neighbourhoodStats.timeoutReached;
+    totalTime += neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
+    ;
   }
 
   vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer) {
-    auto neighbourhoodToActivate =
-        std::max_element(neighbourhoodRewards.begin(), neighbourhoodRewards.end(),
-                         [this](NeighbourhoodRewards& N1, NeighbourhoodRewards& N2) {
-                           return this->ucbValue(N1) < this->ucbValue(N2);
-                         });
+    /* auto neighbourhoodToActivate =
+         std::max_element(neighbourhoodRewards.begin(), neighbourhoodRewards.end(),
+                          [this](NeighbourhoodRewards& N1, NeighbourhoodRewards& N2) {
+                            return this->ucbValue(N1) < this->ucbValue(N2);
+                          });
+                          */
+    neighbourhoodRewardHistory.push_back({});
+    double bestUCTValue = -(std::numeric_limits<double>::max());
+    int index = -1;
+    for(int i = 0; i < neighbourhoodRewards.size(); i++) {
+      if(ucbValue(neighbourhoodRewards[i])) {
+        std::cout << "Neighbourhood " << i << " vale is " << neighbourhoodRewards[i].ucbValue
+                  << std::endl;
+        if(neighbourhoodRewards[i].ucbValue > bestUCTValue) {
+          bestUCTValue = neighbourhoodRewards[i].ucbValue;
+          index = i;
+        }
+        neighbourhoodRewardHistory[timeStep].push_back(
+            NeighbourhoodHistory(true, neighbourhoodRewards[i].ucbValue));
+      } else {
+        neighbourhoodRewardHistory[timeStep].push_back(NeighbourhoodHistory(false, 0));
+      }
+    }
+    timeStep++;
+    neighbourhoodActivationHistory.push_back(index);
+    assert(index >= 0);
+    return {index};
+    // return {1};
+    // return {static_cast<int>(neighbourhoodToActivate - neighbourhoodRewards.begin())};
+  }
 
-    return {static_cast<int>(neighbourhoodToActivate - neighbourhoodRewards.begin())};
+  void printHistory() {
+    int currentTimeStep = 0;
+    for(vector<NeighbourhoodHistory>& timeStepHistory : neighbourhoodRewardHistory) {
+      std::cout << "Current time step: " << currentTimeStep << std::endl;
+      std::cout << "[";
+      for(NeighbourhoodHistory& currentHistory : timeStepHistory) {
+        if(currentHistory.activated)
+          std::cout << currentHistory.ucbValue << ",";
+        else
+          std::cout << "False"
+                    << ",";
+      }
+      std::cout << "]";
+      std::cout << " Activated Neighbourhood -> " << neighbourhoodActivationHistory[currentTimeStep]
+                << ": " << nhc.neighbourhoods[neighbourhoodActivationHistory[currentTimeStep]].name;
+      currentTimeStep++;
+    }
+    std::cout << std::endl;
   }
 };
 
