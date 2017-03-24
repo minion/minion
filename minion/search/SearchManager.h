@@ -199,7 +199,6 @@ struct StandardSearchManager : public SearchManager{
 
       // loop to
       while(getState().isFailed()) {
-        getState().setFailed(false);
         if(depth == 0) {
           return;
         }
