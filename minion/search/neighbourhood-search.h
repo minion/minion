@@ -119,14 +119,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   virtual void search() {
     vector<DomainInt> solution;
     vector<int> activatedNeighbourhoods;
+    double neighbourhoodTimeout = 500;
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
     if(!stats.solutionFound) {
       return;
     }
     int numberOfSearches = 0;
     while(searchStrategy->continueSearch(nhc)) {
-      activatedNeighbourhoods = searchStrategy->getNeighbourHoodsToActivate(nhc);
-      stats = searchNeighbourhoods(solution, activatedNeighbourhoods, 500);
+      activatedNeighbourhoods = searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+      stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout);
       searchStrategy->updateStats(nhc,prop,activatedNeighbourhoods, stats, solution);
 
       cout << "Optimsae Variable Bound " <<  getState().getOptimiseVar()->getMin() << "->"

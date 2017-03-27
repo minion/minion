@@ -18,14 +18,6 @@ void copyOverIncumbent(NeighbourhoodContainer &nhc, const vector<DomainInt>& sol
 }
 
 
-/*
- *
- *
- *
- *
- *
- *
- */
 template<typename SelectionStrategy>
 class HillClimbingSearch{
 
@@ -64,8 +56,8 @@ public:
 
   }
 
-  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer &nhc){
-    return selectionStrategy->getNeighbourHoodsToActivate(nhc);
+  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer &nhc, double &neighbourhoodTimeout){
+    return selectionStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
   }
 
 
@@ -78,20 +70,6 @@ public:
   }
 
 };
-
-
-/*
- * Need to update this so it knows when its exhausted!
- * -> Who is going to keep track of this?
- * -> Need to know when all arms are exhausted?
- *
- *
- */
-
-
-
-
-
 
 
 
