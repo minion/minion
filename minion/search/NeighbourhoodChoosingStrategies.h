@@ -44,11 +44,11 @@ public:
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
     if(neighbourhoodStats.solutionFound) {
-      cout << "Solution found, assiging all neighbourhoods to true" << endl;
+      debug_log("Solution found, assiging all neighbourhoods to true");
       neighbourhoodSuccessHistory.assign(neighbourhoodSuccessHistory.size(), true);
     } else {
       for(int neighbourhoodIndex : activatedNeighbourhoods) {
-        cout << "Setting neighbourdhood " << neighbourhoodIndex << " to false" << endl;
+        debug_log("Setting neighbourdhood " << neighbourhoodIndex << " to false");
         neighbourhoodSuccessHistory[neighbourhoodIndex] = false;
       }
     }
@@ -67,7 +67,7 @@ public:
       return {};
     } else {
       int random_variable = std::rand() % successfulNeighbourhoods.size();
-      cout << "Attempting Neighbourhood: " << random_variable << endl;
+      debug_log("Attempting Neighbourhood: " << random_variable);
       return {successfulNeighbourhoods[random_variable]};
     }
   }
@@ -107,13 +107,19 @@ std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
 }
 
 class UCBNeighborHoodSelection {
-
 private:
-  double epsilon = 0.0000001;
-  const NeighbourhoodContainer nhc;
-
+  /**
+   * Stores the UCB of each neighbourhood for each timestep -> For Debugging
+   */
   std::vector<vector<NeighbourhoodHistory>> neighbourhoodRewardHistory;
+  /**
+   * Stores which neighbourhood was chosen at each timestep
+   */
   std::vector<int> neighbourhoodActivationHistory;
+  /**
+   * The neighbourhoods which have been activated on the current incumbent solution
+   */
+  std::vector<bool> activatedNeighbourhoods;
   int timeStep;
   u_int64_t totalTime;
   int totalNumberOfVisits;
@@ -123,16 +129,18 @@ private:
         std::sqrt((2 * std::log(totalNumberOfVisits)) / (neighbourhoodReward.numberOfVisits ));
   }
 
-  bool isEnabled(NeighbourhoodRewards &neighbourhoodReward){
+  bool isEnabled(const NeighbourhoodContainer &nhc, NeighbourhoodRewards &neighbourhoodReward){
     return !(nhc.neighbourhoods[neighbourhoodReward.id].activation.isAssigned());
-      //std::cout << "Neighbourhood " << neighbourhoodReward.id << " is assigned a value of "
-       //         << nhc.neighbourhoods[neighbourhoodReward.id].activation.getAssignedValue()
-        //        << std::endl;
   }
 
 public:
   vector<NeighbourhoodRewards> neighbourhoodRewards;
-  UCBNeighborHoodSelection(const NeighbourhoodContainer nhc) : nhc(nhc), totalTime(0), timeStep(0), totalNumberOfVisits(0) {
+  UCBNeighborHoodSelection(const NeighbourhoodContainer nhc) :
+    totalTime(0),
+    timeStep(0),
+    totalNumberOfVisits(0)
+    {
+      activatedNeighbourhoods.assign(nhc.neighbourhoods.size(), false);
     std::cout << "Number of neighbour hoods is " << nhc.neighbourhoods.size() << std::endl;
     for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
       neighbourhoodRewards.push_back(NeighbourhoodRewards(i));
@@ -143,7 +151,7 @@ public:
 
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
-    std::cout << neighbourhoodStats << std::endl;
+    debug_log(neighbourhoodStats);
     // Get the activated neighbourhood
     NeighbourhoodRewards& currentNeighbourhood = neighbourhoodRewards[activatedNeighbourhoods[0]];
     currentNeighbourhood.numberOfVisits++;
@@ -153,29 +161,29 @@ public:
     currentNeighbourhood.timeOut = neighbourhoodStats.timeoutReached;
     totalTime += neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
     totalNumberOfVisits++;
+
+    if (neighbourhoodStats.solutionFound) {
+      this->activatedNeighbourhoods.assign(this->activatedNeighbourhoods.size(), false);
+    }
+    else {
+      this->activatedNeighbourhoods[activatedNeighbourhoods[0]] = true;
+    }
+
   }
 
   vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer) {
-    /* auto neighbourhoodToActivate =
-         std::max_element(neighbourhoodRewards.begin(), neighbourhoodRewards.end(),
-                          [this](NeighbourhoodRewards& N1, NeighbourhoodRewards& N2) {
-                            return this->ucbValue(N1) < this->ucbValue(N2);
-                          });
-                         */
-    //return {1};
     neighbourhoodRewardHistory.push_back({});
     double bestUCTValue = -(std::numeric_limits<double>::max());
     int index = -1;
-    for(int i = 0; i < 2; i++) {
-      if(isEnabled(neighbourhoodRewards[i])){
+    for(int i = 0; i < neighbourhoodRewards.size(); i++) {
+      if(isEnabled(neighbourhoodContainer, neighbourhoodRewards[i])){
         if(neighbourhoodRewards[i].numberOfVisits == 0){
           neighbourhoodActivationHistory.push_back(i);
           timeStep++;
           return {i};
         }
         double currentUCBValue= ucbValue(neighbourhoodRewards[i]);
-        std::cout << "Neighbourhood " << i << " vale is " << currentUCBValue
-                  << std::endl;
+        debug_log("Neighbourhood " << i << " vale is " << currentUCBValue);
         if(currentUCBValue> bestUCTValue) {
           bestUCTValue = currentUCBValue;
           index = i;
@@ -187,17 +195,20 @@ public:
       }
     }
 
-
     timeStep++;
     neighbourhoodActivationHistory.push_back(index);
+    if (activatedNeighbourhoods.at(index)){
+      std::cout << "Neighbourhood has already been tried! " << std::endl;
+      D_FATAL_ERROR("CALLING A NEIGHBOURHOOD TWICE on the same solution. Should implement logic to change timeout"
+                      "or something!!");
+    }
+
+    activatedNeighbourhoods[index] = true;
     assert(index >= 0);
     return {index};
-
-    // return {1};
-    // return {static_cast<int>(neighbourhoodToActivate - neighbourhoodRewards.begin())};
   }
 
-  void printHistory() {
+  void printHistory(NeighbourhoodContainer &nhc) {
     int currentTimeStep = 0;
     for(vector<NeighbourhoodHistory>& timeStepHistory : neighbourhoodRewardHistory) {
       std::cout << "Current time step: " << currentTimeStep << std::endl;

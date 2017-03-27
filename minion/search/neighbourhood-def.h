@@ -9,6 +9,14 @@
 #define MINION_NEIGHBOURHOOD_DEF_H
 
 
+#ifdef DEBUG_MODE
+#define debug_log(x) std::cout << x << std::endl;
+#define debug_code(x) x
+#else
+#define debug_log(x) //nothing
+#define debug_code(x) //nothing
+#endif
+
 
 struct Neighbourhood
 {
