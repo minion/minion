@@ -43,7 +43,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
                                                  vector<int>& activatedNeighbourhoods,
                                                  int timeoutInMillis = 0,
-                                                 bool restrictToFirstSolution = true) {
+                                                 bool restrictToFirstSolution = false) {
     // Save state of the world
     int depth = Controller::get_world_depth();
 
