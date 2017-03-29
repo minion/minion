@@ -34,43 +34,46 @@ std::ostream& operator<<(std::ostream& cout, const NeighbourhoodStats& stats) {
 class RandomNeighbourhoodChooser {
 
   std::vector<bool> neighbourhoodSuccessHistory;
-  std::vector<int> successfulNeighbourhoods;
+  std::vector<int> neighbourhoodActivationHistory;
 
 public:
   RandomNeighbourhoodChooser(const NeighbourhoodContainer& neighbourhoodContainer)
-      : neighbourhoodSuccessHistory(neighbourhoodContainer.neighbourhoods.size(), true),
-        successfulNeighbourhoods(neighbourhoodContainer.neighbourhoods.size()) {}
+      : neighbourhoodSuccessHistory(neighbourhoodContainer.neighbourhoods.size(), true)
+  {}
 
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
-    if(neighbourhoodStats.solutionFound) {
-      debug_log("Solution found, assiging all neighbourhoods to true");
-      neighbourhoodSuccessHistory.assign(neighbourhoodSuccessHistory.size(), true);
-    } else {
-      for(int neighbourhoodIndex : activatedNeighbourhoods) {
-        debug_log("Setting neighbourdhood " << neighbourhoodIndex << " to false");
-        neighbourhoodSuccessHistory[neighbourhoodIndex] = false;
+
+  }
+
+
+  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer, double neighbourhoodTimeout) {
+
+    int random = std::rand() % neighbourhoodContainer.neighbourhoods.size();
+    int iterations(0);
+    while(true){
+      if (!neighbourhoodContainer.neighbourhoods[random % neighbourhoodContainer.neighbourhoods.size()].activation.isAssigned()) {
+        neighbourhoodActivationHistory.push_back(random);
+        return {random};
       }
+      random++;
+      if (iterations++ == neighbourhoodContainer.neighbourhoods.size()) {
+        D_FATAL_ERROR("EMPTY NEIGHBOURHOODS!!!");
+        return {};
+      }
+    }
+
+  }
+
+
+
+  void printHistory(NeighbourhoodContainer &nhc){
+    int timeStep(0);
+    for (int &n : neighbourhoodActivationHistory){
+      std::cout << "Time Step: " << timeStep++ << " Neighbourhood Activated-> " << n << std::endl;
     }
   }
 
-  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer) {
-
-    successfulNeighbourhoods.clear();
-    for(int i = 0; i < neighbourhoodSuccessHistory.size(); i++) {
-      if(neighbourhoodSuccessHistory[i] &&
-         !neighbourhoodContainer.neighbourhoods[i].activation.isAssigned()) {
-        successfulNeighbourhoods.push_back(i);
-      }
-    }
-    if(successfulNeighbourhoods.empty()) {
-      return {};
-    } else {
-      int random_variable = std::rand() % successfulNeighbourhoods.size();
-      debug_log("Attempting Neighbourhood: " << random_variable);
-      return {successfulNeighbourhoods[random_variable]};
-    }
-  }
 };
 
 struct NeighbourhoodRewards {
@@ -107,6 +110,7 @@ std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
   return cout;
 }
 
+
 class UCBNeighborHoodSelection {
 private:
   /**
@@ -124,6 +128,7 @@ private:
   int timeStep;
   u_int64_t totalTime;
   int totalNumberOfVisits;
+  DomainInt bestMaxValue;
 
   double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
     return neighbourhoodReward.reward +
@@ -137,6 +142,7 @@ private:
 public:
   vector<NeighbourhoodRewards> neighbourhoodRewards;
   UCBNeighborHoodSelection(const NeighbourhoodContainer nhc) :
+    bestMaxValue(getState().getOptimiseVar()->getMin()),
     totalTime(0),
     timeStep(0),
     totalNumberOfVisits(0)
@@ -152,13 +158,14 @@ public:
 
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
+    bestMaxValue = neighbourhoodStats.newMinValue > bestMaxValue ? neighbourhoodStats.newMinValue : bestMaxValue;
     debug_log(neighbourhoodStats);
     // Get the activated neighbourhood
     NeighbourhoodRewards& currentNeighbourhood = neighbourhoodRewards[activatedNeighbourhoods[0]];
     currentNeighbourhood.numberOfVisits++;
     currentNeighbourhood.totalTimeTaken +=
         neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
-    currentNeighbourhood.reward += neighbourhoodStats.solutionFound ? 1 : -1;
+    currentNeighbourhood.reward += neighbourhoodStats.newMinValue > bestMaxValue  ? 1 : -1;
     currentNeighbourhood.timeOut = neighbourhoodStats.timeoutReached;
     totalTime += neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
     totalNumberOfVisits++;
@@ -228,6 +235,7 @@ public:
       std::cout << " Activated Neighbourhood -> " << neighbourhoodActivationHistory[currentTimeStep]
                 << ": " << nhc.neighbourhoods[neighbourhoodActivationHistory[currentTimeStep]].name;
       currentTimeStep++;
+      std::cout << std::endl;
     }
     std::cout << std::endl;
   }

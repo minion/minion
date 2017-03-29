@@ -119,7 +119,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   virtual void search() {
     vector<DomainInt> solution;
     vector<int> activatedNeighbourhoods;
-    double neighbourhoodTimeout = 500;
+    double neighbourhoodTimeout = 1;
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
     if(!stats.solutionFound) {
       return;
@@ -130,9 +130,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout);
       searchStrategy->updateStats(nhc,prop,activatedNeighbourhoods, stats, solution);
 
-      cout << "Optimsae Variable Bound " <<  getState().getOptimiseVar()->getMin() << "->"
-                                             << getState().getOptimiseVar()->getMax() << endl;
+      if (numberOfSearches++ == 10000)
+        break;
+
     }
+    searchStrategy->printHistory(nhc);
   }
 
   void printWorld() {
@@ -229,8 +231,8 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
                                                               vector<SearchOrder> base_order,
                                                               NeighbourhoodContainer nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<UCBNeighborHoodSelection>>>(
-      prop, base_order, nhc, std::make_shared<HillClimbingSearch<UCBNeighborHoodSelection>>(nhc, std::make_shared<UCBNeighborHoodSelection>(nhc)));
+  return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<RandomNeighbourhoodChooser>>>(
+      prop, base_order, nhc, std::make_shared<SimulatedAnnealing<RandomNeighbourhoodChooser>>(nhc, std::make_shared<RandomNeighbourhoodChooser>(nhc)));
 }
 
 #endif

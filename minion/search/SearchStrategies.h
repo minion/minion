@@ -6,6 +6,7 @@
 #define MINION_SEARCHSTRATEGIES_H
 
 #include "neighbourhood-search.h"
+#include <cmath>
 
 void copyOverIncumbent(NeighbourhoodContainer &nhc, const vector<DomainInt>& solution) {
   if (Controller::get_world_depth() != 1) {
@@ -72,6 +73,67 @@ public:
 };
 
 
+template<typename SelectionStrategy>
+class SimulatedAnnealing {
 
+  double temperature = 100;
+  double coolingParameter = 0.003;
+  DomainInt maxValue;
+  vector<DomainInt> solution;
+  std::shared_ptr<SelectionStrategy> selectionStrategy;
+  double time = 500;
+  double averageTime;
+
+public:
+
+  SimulatedAnnealing(NeighbourhoodContainer &nhc, std::shared_ptr<SelectionStrategy> selectionStrategy):
+    maxValue(getState().getOptimiseVar()->getMin()), selectionStrategy(std::move(selectionStrategy)) {}
+
+
+  double acceptanceProbability(int previousMax, int currentMax){
+    double pr = pow(M_E, (double) ((currentMax - previousMax)/ temperature));
+    std::cout << "Prob is " << pr << std::endl;
+  }
+  void updateStats(NeighbourhoodContainer &nhc, std::shared_ptr<Propagate> prop, std::vector<int> &currentActivatedNeighbourhoods,
+                   NeighbourhoodStats &stats, std::vector<DomainInt> &solution) {
+
+    std::cout << " Min value found is " << stats.newMinValue << std::endl;
+    std::cout << " max value found is " << maxValue << std::endl;
+    if (stats.newMinValue > maxValue){
+      maxValue = stats.newMinValue;
+      copyOverIncumbent(nhc, solution);
+    }
+    else if (stats.solutionFound &&
+      acceptanceProbability(checked_cast<int>(maxValue), checked_cast<int>(stats.newMinValue)) > (std::rand() / RAND_MAX)){
+      std::cout << "Moving to a worse solution "<< std::endl;
+
+      //Save old solution
+      this->solution = solution;
+      copyOverIncumbent(nhc, solution);
+    }
+
+    //Propogate vars
+    std::vector<AnyVarRef> emptyVars;
+    prop->prop(emptyVars);
+    //Update temperature
+    temperature *= 1 - coolingParameter;
+    selectionStrategy->updateStats(currentActivatedNeighbourhoods, stats);
+
+  }
+
+  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer &nhc, double &neighbourhoodTimeout){
+    return selectionStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+  }
+
+
+  bool continueSearch(NeighbourhoodContainer &nhc){
+    return temperature > 1 && (maxValue != getState().getOptimiseVar()->getMax());
+  }
+
+  void printHistory(NeighbourhoodContainer &nhc){
+    selectionStrategy->printHistory(nhc);
+  }
+
+};
 
 #endif //MINION_SEARCHSTRATEGIES_H
