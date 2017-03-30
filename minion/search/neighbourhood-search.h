@@ -13,7 +13,6 @@
 #include <signal.h>
 #include <sys/time.h>
 
-
 static std::atomic<bool> alarmTriggered(false);
 
 void triggerAlarm(int) {
@@ -31,8 +30,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   shared_ptr<SearchStrategy> searchStrategy;
 
   NeighbourhoodSearchManager(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
-                             NeighbourhoodContainer _nhc,
-                             shared_ptr<SearchStrategy> searchStrategy)
+                             NeighbourhoodContainer _nhc, shared_ptr<SearchStrategy> searchStrategy)
       : prop(std::move(_prop)),
         base_order(_base_order),
         nhc(_nhc),
@@ -50,14 +48,17 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     debug_log("---In search function---");
     debug_log("Depth is: " << depth);
     Controller::world_push();
-    auto vo = Controller::make_search_order_multiple(base_order);
+    vector<SearchOrder> searchOrder;
     if(activatedNeighbourhoods.empty()) {
       nhc.shadow_disable.assign(1);
     } else {
       switchOnNeighbourhoods(activatedNeighbourhoods, solution);
+      searchOrder.push_back(makeNeighbourhoodSearchOrder(activatedNeighbourhoods));
     }
-
+    searchOrder.insert(searchOrder.end(), base_order.begin(), base_order.end());
     solution.clear();
+    auto vo = Controller::make_search_order_multiple(searchOrder);
+
     prop->prop(vo->getVars());
 
     if(getState().isFailed()) {
@@ -114,8 +115,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     return stats;
   }
 
-
-
   virtual void search() {
     vector<DomainInt> solution;
     vector<int> activatedNeighbourhoods;
@@ -123,7 +122,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
     if(!stats.solutionFound) {
       return;
-    }else {
+    } else {
       copyOverIncumbent(nhc, solution);
       std::vector<AnyVarRef> emptyVars;
       prop->prop(emptyVars);
@@ -131,11 +130,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     int numberOfSearches = 0;
     while(searchStrategy->continueSearch(nhc)) {
-      activatedNeighbourhoods = searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+      activatedNeighbourhoods =
+          searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
       stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout, false);
-      searchStrategy->updateStats(nhc,prop,activatedNeighbourhoods, stats, solution);
+      searchStrategy->updateStats(nhc, prop, activatedNeighbourhoods, stats, solution);
 
-      if (numberOfSearches++ == 50)
+      if(numberOfSearches++ == 50)
         break;
 
       cout << " Search number: " << numberOfSearches << endl;
@@ -158,26 +158,47 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
            << endl;
     }
 
-    for(int i = 0; i < nhc.neighbourhoods.size(); i++){
+    for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
       cout << "Neighbourhood " << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin()
            << " -> " << nhc.neighbourhoods[i].activation.getMax() << endl;
     }
     cout << "---------------" << endl;
   }
-
+  /**
+   * Create a search order where the first variables to branch on are the activated neighbourhoods
+   * sizes with ascending value ordering.  Followed by the primary variabels referenced by the
+   * activated neighbourhoods with random ordering.
+   */
+  SearchOrder makeNeighbourhoodSearchOrder(const vector<int>& activatedNeighbourhoods) {
+    SearchOrder searchOrder;
+    for(int neighbourhoodIndex : activatedNeighbourhoods) {
+      searchOrder.var_order.push_back(
+          nhc.neighbourhoods[neighbourhoodIndex].deviation.getBaseVar());
+      searchOrder.val_order.push_back(VALORDER_ASCEND);
+    }
+    for(int neighbourhoodIndex : activatedNeighbourhoods) {
+      for(const auto& primaryVar : nhc.neighbourhoods[neighbourhoodIndex].vars) {
+        searchOrder.var_order.push_back(primaryVar.getBaseVar());
+        searchOrder.val_order.push_back(VALORDER_RANDOM);
+      }
+    }
+    return searchOrder;
+  }
   /**
    * Switch on the neighbourhood activation vars
    * Find the set of primary variables not contained in any neighbourhoods and assign them to the
    * incumbent solution
    * @param neighbourHoodIndexes
    */
-  void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes, const vector<DomainInt> &solution) {
+  void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes,
+                              const vector<DomainInt>& solution) {
     std::unordered_set<AnyVarRef> shadowVariables;
     debug_log("Switiching on neighbourhoods with depth " << Controller::get_world_depth());
 
     for(int i : neighbourHoodIndexes) {
-      debug_log("Switching on neighbourhood " << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin()
-                                                 << " -> " << nhc.neighbourhoods[i].activation.getMax());
+      debug_log("Switching on neighbourhood "
+                << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin() << " -> "
+                << nhc.neighbourhoods[i].activation.getMax());
       Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
       neighbourhood.activation.assign(1);
 
@@ -186,8 +207,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     }
 
-
-    debug_code(for (int i = 0; i < nhc.neighbourhoods.size(); i++){
+    debug_code(for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
       cout << "Neighbourhood " << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin()
            << " -> " << nhc.neighbourhoods[i].activation.getMax() << endl;
     });
@@ -196,13 +216,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
      * If the primary variable is not contained in any shadow neighbourhoods, assign its incumbent
      * solution
      */
-    for(int i = 0; i < solution.size(); i++){
+    for(int i = 0; i < solution.size(); i++) {
       if(shadowVariables.count(nhc.shadow_mapping[0][i]) == 0) {
         nhc.shadow_mapping[0][i].assign(solution[i]);
       }
     }
   }
-
 
   inline void setTimeout(int numberMillis) {
     struct itimerval timer;
@@ -238,7 +257,8 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
                                                               NeighbourhoodContainer nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
   return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<UCBNeighborHoodSelection>>>(
-      prop, base_order, nhc, std::make_shared<SimulatedAnnealing<UCBNeighborHoodSelection>>(nhc, std::make_shared<UCBNeighborHoodSelection>(nhc)));
+      prop, base_order, nhc, std::make_shared<SimulatedAnnealing<UCBNeighborHoodSelection>>(
+                                 nhc, std::make_shared<UCBNeighborHoodSelection>(nhc)));
 }
 
 #endif
