@@ -129,6 +129,7 @@ private:
   u_int64_t totalTime;
   int totalNumberOfVisits;
   DomainInt bestMaxValue;
+  std::vector<DomainInt> valuesFound;
 
   double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
     return neighbourhoodReward.reward +
@@ -171,6 +172,7 @@ public:
     totalNumberOfVisits++;
 
     if (neighbourhoodStats.solutionFound) {
+      valuesFound.push_back(neighbourhoodStats.newMinValue);
       currentNeighbourhood.timeOutValue = 500;
       this->activatedNeighbourhoods.assign(this->activatedNeighbourhoods.size(), false);
     }
@@ -234,6 +236,7 @@ public:
       std::cout << "]";
       std::cout << " Activated Neighbourhood -> " << neighbourhoodActivationHistory[currentTimeStep]
                 << ": " << nhc.neighbourhoods[neighbourhoodActivationHistory[currentTimeStep]].name;
+      std::cout << " Value found here is -> " << valuesFound[currentTimeStep];
       currentTimeStep++;
       std::cout << std::endl;
     }
@@ -252,7 +255,8 @@ public:
     std::cout << neighbourhoodStats << std::endl;
   }
 
-  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer) {
+  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer, double &neighbourhoodTimeout) {
+    neighbourhoodTimeout = 500;
     for (int i = 0 ; i< neighbourhoodContainer.neighbourhoods.size(); i++){
       std::cout << "Neighbourhood " << i << " Is assigned? " << neighbourhoodContainer.neighbourhoods[i].activation.isAssigned() << std::endl;
     }
@@ -262,6 +266,9 @@ public:
     return {activatedNeighbourhood};
   }
 
+  void printHistory(NeighbourhoodContainer &nhc){
+
+  }
 
 };
 

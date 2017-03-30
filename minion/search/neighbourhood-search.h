@@ -43,7 +43,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
                                                  vector<int>& activatedNeighbourhoods,
                                                  int timeoutInMillis = 0,
-                                                 bool restrictToFirstSolution = false) {
+                                                 bool restrictToFirstSolution = true) {
     // Save state of the world
     int depth = Controller::get_world_depth();
 
@@ -123,16 +123,22 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
     if(!stats.solutionFound) {
       return;
+    }else {
+      copyOverIncumbent(nhc, solution);
+      std::vector<AnyVarRef> emptyVars;
+      prop->prop(emptyVars);
     }
+
     int numberOfSearches = 0;
     while(searchStrategy->continueSearch(nhc)) {
       activatedNeighbourhoods = searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
-      stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout);
+      stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout, false);
       searchStrategy->updateStats(nhc,prop,activatedNeighbourhoods, stats, solution);
 
-      if (numberOfSearches++ == 10000)
+      if (numberOfSearches++ == 50)
         break;
 
+      cout << " Search number: " << numberOfSearches << endl;
     }
     searchStrategy->printHistory(nhc);
   }
@@ -231,8 +237,8 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
                                                               vector<SearchOrder> base_order,
                                                               NeighbourhoodContainer nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<RandomNeighbourhoodChooser>>>(
-      prop, base_order, nhc, std::make_shared<SimulatedAnnealing<RandomNeighbourhoodChooser>>(nhc, std::make_shared<RandomNeighbourhoodChooser>(nhc)));
+  return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<UCBNeighborHoodSelection>>>(
+      prop, base_order, nhc, std::make_shared<SimulatedAnnealing<UCBNeighborHoodSelection>>(nhc, std::make_shared<UCBNeighborHoodSelection>(nhc)));
 }
 
 #endif
