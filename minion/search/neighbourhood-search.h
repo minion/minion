@@ -116,10 +116,14 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   virtual void search() {
+    NeighbourhoodSearchStats globalStats(
+        nhc.neighbourhoods.size(),
+        make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
     vector<DomainInt> solution;
     vector<int> activatedNeighbourhoods;
     double neighbourhoodTimeout = 1;
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
+    globalStats.setValueOfInitialSolution(stats.newMinValue);
     if(!stats.solutionFound) {
       return;
     } else {
@@ -134,13 +138,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
           searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
       stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout, false);
       searchStrategy->updateStats(nhc, prop, activatedNeighbourhoods, stats, solution);
+      globalStats.reportnewStats(activatedNeighbourhoods, stats);
 
       if(numberOfSearches++ == 50)
         break;
 
-      cout << " Search number: " << numberOfSearches << endl;
+      globalStats.printStats(cout, nhc);
     }
+    cout << "Search History:\n";
     searchStrategy->printHistory(nhc);
+    globalStats.printStats(cout, nhc);
   }
 
   void printWorld() {

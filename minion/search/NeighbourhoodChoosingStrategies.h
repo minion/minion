@@ -1,35 +1,11 @@
 #ifndef MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #define MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #include "neighbourhood-def.h"
+#include "neighbourhoodSearchStats.h"
 #include <cassert>
 #include <math.h>
 #include <vector>
 
-struct NeighbourhoodStats {
-
-public:
-  DomainInt newMinValue;
-  u_int64_t timeTaken;
-  bool solutionFound;
-  bool timeoutReached;
-
-  NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound,
-                     bool timeoutReached)
-      : newMinValue(newMinValue),
-        timeTaken(timeTaken),
-        solutionFound(solutionFound),
-        timeoutReached(timeoutReached) {}
-
-  friend std::ostream& operator<<(std::ostream& cout, const NeighbourhoodStats& stats);
-};
-
-std::ostream& operator<<(std::ostream& cout, const NeighbourhoodStats& stats) {
-  cout << "New Min Value: " << stats.newMinValue << "\n"
-       << "Time Taken: " << stats.timeTaken << "\n"
-       << "Solution Found: " << stats.solutionFound << "\n"
-       << "Timeout Reached: " << stats.timeoutReached << "\n";
-  return cout;
-}
 
 class RandomNeighbourhoodChooser {
 
@@ -269,13 +245,6 @@ public:
   void printHistory(NeighbourhoodContainer &nhc){
 
   }
-
 };
-
-
-
-
-
-
 
 #endif // MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
