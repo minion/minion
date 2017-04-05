@@ -87,6 +87,8 @@ public:
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
       os << indent << "Total time: " << totalTime[i] << "\n";
+      os << indent << "Average time per activation: " << (totalTime[i] / numberActivations[i])
+         << "\n";
       os << indent << "Number positive solutions: " << numberPositiveSolutions[i] << "\n";
       os << indent << "Number negative solutions: " << numberNegativeSolutions[i] << "\n";
       os << indent << "Number no solutions: " << numberNoSolutions[i] << "\n";
