@@ -121,12 +121,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
     vector<DomainInt> solution;
     vector<int> activatedNeighbourhoods;
-    double neighbourhoodTimeout = 1;
+    int neighbourhoodTimeout = 500;
+    cout << "Searching for initial solution:\n";
     NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
-    globalStats.setValueOfInitialSolution(stats.newMinValue);
     if(!stats.solutionFound) {
+      cout << "Initial solution not found\n";
       return;
     } else {
+      globalStats.setValueOfInitialSolution(stats.newMinValue);
+      cout << "Stats on initial solution:\n" << stats << endl;
       copyOverIncumbent(nhc, solution);
       std::vector<AnyVarRef> emptyVars;
       prop->prop(emptyVars);
@@ -136,8 +139,13 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     while(searchStrategy->continueSearch(nhc)) {
       activatedNeighbourhoods =
           searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+      neighbourhoodTimeout = 500;
+      cout << "Searching with activated neighbourhoods: " << activatedNeighbourhoods
+           << " and timeout " << neighbourhoodTimeout << endl;
       stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout, false);
+      cout << "Stats on last search: " << stats << endl;
       searchStrategy->updateStats(nhc, prop, activatedNeighbourhoods, stats, solution);
+      cout << "Global stats:\n";
       globalStats.reportnewStats(activatedNeighbourhoods, stats);
 
       if(numberOfSearches++ == 50)
@@ -145,8 +153,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
       globalStats.printStats(cout, nhc);
     }
-    cout << "Search History:\n";
-    searchStrategy->printHistory(nhc);
     globalStats.printStats(cout, nhc);
   }
 
@@ -255,7 +261,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   inline u_int64_t getTimeTaken(timePoint startTime) {
     auto endTime = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
   }
 };
 

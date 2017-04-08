@@ -38,6 +38,7 @@ class NeighbourhoodSearchStats {
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
   DomainInt lastOptVarValue;
+  DomainInt bestOptVarValue;
 
 public:
   NeighbourhoodSearchStats(int numberNeighbourhoods,
@@ -51,7 +52,8 @@ public:
         numberTimeouts(numberNeighbourhoods, 0),
         initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
-        lastOptVarValue(initialOptVarRange.first) {}
+        lastOptVarValue(initialOptVarRange.first),
+        bestOptVarValue(initialOptVarRange.first) {}
 
   inline void setValueOfInitialSolution(DomainInt valueOfInitialSolution) {
     this->valueOfInitialSolution = valueOfInitialSolution;
@@ -74,6 +76,9 @@ public:
         ++numberNoSolutions[nhIndex];
       }
       lastOptVarValue = stats.newMinValue;
+      if(lastOptVarValue > bestOptVarValue) {
+        bestOptVarValue = lastOptVarValue;
+      }
     }
   }
 
@@ -81,14 +86,15 @@ public:
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
-    os << "Final optimise var value: " << lastOptVarValue << "\n";
+    os << "Most recent optimise var value: " << lastOptVarValue << "\n";
+    os << "Best optimise var value: " << lastOptVarValue << "\n";
 
     for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
+      u_int64_t averageTime = (numberActivations[i] > 0) ? totalTime[i] / numberActivations[i] : 0;
       os << indent << "Total time: " << totalTime[i] << "\n";
-      os << indent << "Average time per activation: " << (totalTime[i] / numberActivations[i])
-         << "\n";
+      os << indent << "Average time per activation: " << averageTime << "\n";
       os << indent << "Number positive solutions: " << numberPositiveSolutions[i] << "\n";
       os << indent << "Number negative solutions: " << numberNegativeSolutions[i] << "\n";
       os << indent << "Number no solutions: " << numberNoSolutions[i] << "\n";

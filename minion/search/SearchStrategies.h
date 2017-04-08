@@ -119,8 +119,7 @@ public:
     selectionStrategy->updateStats(currentActivatedNeighbourhoods, stats);
   }
 
-  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer& nhc,
-                                          double& neighbourhoodTimeout) {
+  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer& nhc, int& neighbourhoodTimeout) {
     return selectionStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
   }
 
