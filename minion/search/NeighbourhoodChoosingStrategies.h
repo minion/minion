@@ -96,11 +96,12 @@ private:
   int timeStep;
   u_int64_t totalTime;
   int totalNumberOfVisits;
-  DomainInt lastMinValue;
-  DomainInt bestMinValue;
+  DomainInt mostRecentMinValue;
+  DomainInt highestMinValue;
+  static const int TIMEOUT_PENALTY_COST = 1000;
 
   double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
-    return neighbourhoodReward.reward +
+    return (neighbourhoodReward.reward/neighbourhoodReward.numberOfVisits) +
            std::sqrt((2 * std::log(totalTime)) / (neighbourhoodReward.totalTimeTaken));
   }
 
@@ -115,31 +116,26 @@ public:
         timeStep(0),
         totalTime(0),
         totalNumberOfVisits(0),
-        lastMinValue(getState().getOptimiseVar()->getMin()),
-        bestMinValue(getState().getOptimiseVar()->getMin()) {}
+        mostRecentMinValue(getState().getOptimiseVar()->getMin()),
+        highestMinValue(getState().getOptimiseVar()->getMin()) {}
 
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
     debug_log(neighbourhoodStats);
-    bestMinValue = neighbourhoodStats.newMinValue > bestMinValue ? neighbourhoodStats.newMinValue
-                                                                 : bestMinValue;
-    totalTime += neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
-
-    if(neighbourhoodStats.solutionFound) {
-      this->activatedNeighbourhoods.assign(this->activatedNeighbourhoods.size(), false);
-    }
+    highestMinValue = neighbourhoodStats.newMinValue > highestMinValue ? neighbourhoodStats.newMinValue
+                                                                 : highestMinValue;
+    totalTime += neighbourhoodStats.timeTaken == 0 ? TIMEOUT_PENALTY_COST : neighbourhoodStats.timeTaken;
+    totalNumberOfVisits++;
     for(int nhIndex : activatedNeighbourhoods) {
       NeighbourhoodRewards& currentNeighbourhood = neighbourhoodRewards[nhIndex];
       currentNeighbourhood.numberOfVisits++;
       currentNeighbourhood.totalTimeTaken +=
-          neighbourhoodStats.timeTaken == 0 ? 1000 : neighbourhoodStats.timeTaken;
+          neighbourhoodStats.timeTaken == 0 ? TIMEOUT_PENALTY_COST : neighbourhoodStats.timeTaken;
       currentNeighbourhood.timeOut = neighbourhoodStats.timeoutReached;
-      totalNumberOfVisits++;
+
       if(neighbourhoodStats.solutionFound) {
-        currentNeighbourhood.reward += (neighbourhoodStats.newMinValue > lastMinValue) ? 1 : -1;
-        currentNeighbourhood.timeOutValue = 500;
+        currentNeighbourhood.reward += (neighbourhoodStats.newMinValue > mostRecentMinValue) ? 1 : -1;
       } else {
-        this->activatedNeighbourhoods[activatedNeighbourhoods[0]] = true;
         currentNeighbourhood.reward--;
       }
     }
