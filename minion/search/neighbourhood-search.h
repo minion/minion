@@ -4,6 +4,7 @@
 #include "NeighbourhoodChoosingStrategies.h"
 #include "SearchManager.h"
 #include "SearchStrategies.h"
+#include "inputfile_parse/CSPSpec.h"
 #include "neighbourhood-def.h"
 #include <atomic>
 #include <cstdlib>
@@ -266,13 +267,37 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 };
 
-shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel prop_method,
-                                                              vector<SearchOrder> base_order,
-                                                              NeighbourhoodContainer nhc) {
+template <typename NhSelectionStrategy>
+shared_ptr<Controller::SearchManager>
+MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method, vector<SearchOrder>& base_order,
+                              NeighbourhoodContainer& nhc,
+                              CSPInstance::NeighbourhoodSearchStrategy searchStrategy) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<UCBNeighborHoodSelection>>>(
-      prop, base_order, nhc, std::make_shared<SimulatedAnnealing<UCBNeighborHoodSelection>>(
-                                 nhc, std::make_shared<UCBNeighborHoodSelection>(nhc)));
+  switch(searchStrategy) {
+  case CSPInstance::NeighbourhoodSearchStrategy::HILL_CLIMBING:
+    return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
+        prop, base_order, nhc, std::make_shared<HillClimbingSearch<NhSelectionStrategy>>(
+                                   nhc, std::make_shared<NhSelectionStrategy>(nhc)));
+  case CSPInstance::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING:
+    return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<NhSelectionStrategy>>>(
+        prop, base_order, nhc, std::make_shared<SimulatedAnnealing<NhSelectionStrategy>>(
+                                   nhc, std::make_shared<NhSelectionStrategy>(nhc)));
+  }
+}
+
+shared_ptr<Controller::SearchManager>
+MakeNeighbourhoodSearch(PropagationLevel prop_method, vector<SearchOrder> base_order,
+                        NeighbourhoodContainer nhc,
+                        CSPInstance::NeighbourhoodSearchStrategy searchStrategy,
+                        CSPInstance::NeighbourhoodSelectionStrategy selectionStrategy) {
+  switch(selectionStrategy) {
+  case CSPInstance::NeighbourhoodSelectionStrategy::RANDOM:
+    return MakeNeighbourhoodSearchHelper<RandomNeighbourhoodChooser>(prop_method, base_order, nhc,
+                                                                     searchStrategy);
+  case CSPInstance::NeighbourhoodSelectionStrategy::UCB:
+    return MakeNeighbourhoodSearchHelper<UCBNeighborHoodSelection>(prop_method, base_order, nhc,
+                                                                   searchStrategy);
+  }
 }
 
 #endif
