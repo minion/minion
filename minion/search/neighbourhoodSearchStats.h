@@ -41,7 +41,7 @@ public:
   DomainInt lastOptVarValue;
   DomainInt bestOptVarValue;
 
-  NeighbourhoodSearchStats(){}
+  NeighbourhoodSearchStats() {}
 
   NeighbourhoodSearchStats(int numberNeighbourhoods,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange)

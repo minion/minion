@@ -275,9 +275,10 @@ MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method, vector<SearchOrder>
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
   switch(searchStrategy) {
   case CSPInstance::NeighbourhoodSearchStrategy::HILL_CLIMBING:
-    return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
-        prop, base_order, nhc, std::make_shared<HillClimbingSearch<NhSelectionStrategy>>(
-                                   nhc, std::make_shared<NhSelectionStrategy>(nhc)));
+    D_FATAL_ERROR("dont instantiate this please");
+  // return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
+  //    prop, base_order, nhc, std::make_shared<HillClimbingSearch<NhSelectionStrategy>>(
+  //                              nhc, std::make_shared<NhSelectionStrategy>(nhc)));
   case CSPInstance::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING:
     return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<NhSelectionStrategy>>>(
         prop, base_order, nhc, std::make_shared<SimulatedAnnealing<NhSelectionStrategy>>(
@@ -290,10 +291,14 @@ MakeNeighbourhoodSearch(PropagationLevel prop_method, vector<SearchOrder> base_o
                         NeighbourhoodContainer nhc,
                         CSPInstance::NeighbourhoodSearchStrategy searchStrategy,
                         CSPInstance::NeighbourhoodSelectionStrategy selectionStrategy) {
+  searchStrategy = CSPInstance::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING;
+  selectionStrategy = CSPInstance::NeighbourhoodSelectionStrategy::UCB;
   switch(selectionStrategy) {
   case CSPInstance::NeighbourhoodSelectionStrategy::RANDOM:
-    return MakeNeighbourhoodSearchHelper<RandomNeighbourhoodChooser>(prop_method, base_order, nhc,
-                                                                     searchStrategy);
+    D_FATAL_ERROR("Dont instantiate this please");
+  //   return MakeNeighbourhoodSearchHelper<RandomNeighbourhoodChooser>(prop_method, base_order,
+  //   nhc,
+  // searchStrategy);
   case CSPInstance::NeighbourhoodSelectionStrategy::UCB:
     return MakeNeighbourhoodSearchHelper<UCBNeighborHoodSelection>(prop_method, base_order, nhc,
                                                                    searchStrategy);
