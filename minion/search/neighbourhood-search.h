@@ -138,7 +138,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     int numberOfSearches = 0;
     while(searchStrategy->continueSearch(nhc)) {
       activatedNeighbourhoods =
-          searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+          searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout, globalStats);
       neighbourhoodTimeout = 500;
       cout << "Searching with activated neighbourhoods: " << activatedNeighbourhoods
            << " and timeout " << neighbourhoodTimeout << endl;
@@ -154,6 +154,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       globalStats.printStats(cout, nhc);
     }
     globalStats.printStats(cout, nhc);
+    searchStrategy->printHistory(nhc);
   }
 
   void printWorld() {

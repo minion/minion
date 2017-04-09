@@ -28,6 +28,7 @@ struct NeighbourhoodStats {
 };
 
 class NeighbourhoodSearchStats {
+public:
   int numberIterations;
   vector<int> numberActivations; // mapping from nh index to number of times activated
   vector<u_int64_t> totalTime;
@@ -40,7 +41,8 @@ class NeighbourhoodSearchStats {
   DomainInt lastOptVarValue;
   DomainInt bestOptVarValue;
 
-public:
+  NeighbourhoodSearchStats(){}
+
   NeighbourhoodSearchStats(int numberNeighbourhoods,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange)
       : numberIterations(0),
@@ -72,10 +74,11 @@ public:
         } else {
           ++numberNegativeSolutions[nhIndex];
         }
+        lastOptVarValue = stats.newMinValue;
       } else {
         ++numberNoSolutions[nhIndex];
       }
-      lastOptVarValue = stats.newMinValue;
+
       if(lastOptVarValue > bestOptVarValue) {
         bestOptVarValue = lastOptVarValue;
       }

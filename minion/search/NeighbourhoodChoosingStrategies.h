@@ -62,11 +62,34 @@ public:
 struct NeighbourhoodHistory {
 
 public:
-  bool activated;
-  double ucbValue;
+  std::vector<std::pair<int, int>> neighbourhoodsActivated;
+  std::vector<double> neighbourhoodValues;
+  NeighbourhoodSearchStats stats;
 
-  NeighbourhoodHistory(bool activated, double ucbValue)
-      : activated(activated), ucbValue(ucbValue) {}
+  NeighbourhoodHistory(const NeighbourhoodContainer &nhc):
+    neighbourhoodValues(nhc.neighbourhoods.size()){}
+
+
+  void addNeighbourhoodUCBValue(double ucbValue, int index){
+    neighbourhoodValues[index] = ucbValue;
+  }
+
+  void addActivatedNeighbourhood(int neighbourhood, int newMinValue){
+    neighbourhoodsActivated.push_back(std::make_pair(neighbourhood, newMinValue));
+  }
+
+  void addStats(NeighbourhoodSearchStats currentStats){
+   // stats = currentStats;
+  }
+  void print(std::ostream &cout, NeighbourhoodContainer &nhc){
+    cout << "Neighbourhood Values " << neighbourhoodValues << std::endl;
+    cout << "Activated Neighbourhoods: " << std::endl;
+    for (int i = 0; i < neighbourhoodsActivated.size(); i++){
+      cout << nhc.neighbourhoods[neighbourhoodsActivated[i].first].name << ": Achieved Min Value -> " << neighbourhoodsActivated[i].second;
+    }
+    cout << std::endl;
+  //  stats.printStats(cout, nhc);
+  }
 };
 
 std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
@@ -82,15 +105,8 @@ private:
   /**
    * Stores the UCB of each neighbourhood for each timestep -> For Debugging
    */
-  std::vector<vector<NeighbourhoodHistory>> neighbourhoodRewardHistory;
-  /**
-   * Stores which neighbourhood was chosen at each timestep
-   */
-  std::vector<int> neighbourhoodActivationHistory;
-  /**
-   * The neighbourhoods which have been activated on the current incumbent solution
-   */
-  std::vector<bool> activatedNeighbourhoods;
+  std::vector<NeighbourhoodHistory> neighbourhoodRewardHistory;
+  //Stores the neighbourhood reward structs
   vector<NeighbourhoodRewards> neighbourhoodRewards;
 
   int timeStep;
@@ -100,19 +116,29 @@ private:
   DomainInt highestMinValue;
   static const int TIMEOUT_PENALTY_COST = 1000;
 
-  double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
-    return (neighbourhoodReward.reward/neighbourhoodReward.numberOfVisits) +
-           std::sqrt((2 * std::log(totalTime)) / (neighbourhoodReward.totalTimeTaken));
+
+  double ucbValue(double reward, int totalActivations, int totalNeighbourhoodVisits){
+    std::cout << "Reward is " << reward << std::endl;
+    std::cout << "Total activations is " << totalActivations << std::endl;
+    std::cout << "total neighbourhood visits " << totalNeighbourhoodVisits << std::endl;
+     return (reward/totalNeighbourhoodVisits) +
+           std::sqrt((2 * std::log(totalActivations)) / (totalNeighbourhoodVisits));
   }
 
+
+
+  /*double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
+    return (neighbourhoodReward.reward/neighbourhoodReward.numberOfVisits) +
+           std::sqrt((2 * std::log(totalNumberOfVisits)) / (neighbourhoodReward.numberOfVisits));
+  }
+*/
   bool isEnabled(const NeighbourhoodContainer& nhc, int nhIndex) {
     return !(nhc.neighbourhoods[nhIndex].activation.isAssigned());
   }
 
 public:
   UCBNeighborHoodSelection(const NeighbourhoodContainer& nhc)
-      : activatedNeighbourhoods(nhc.neighbourhoods.size(), false),
-        neighbourhoodRewards(nhc.neighbourhoods.size()),
+      : neighbourhoodRewards(nhc.neighbourhoods.size()),
         timeStep(0),
         totalTime(0),
         totalNumberOfVisits(0),
@@ -122,7 +148,7 @@ public:
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
     debug_log(neighbourhoodStats);
-    highestMinValue = neighbourhoodStats.newMinValue > highestMinValue ? neighbourhoodStats.newMinValue
+   /* highestMinValue = neighbourhoodStats.newMinValue > highestMinValue ? neighbourhoodStats.newMinValue
                                                                  : highestMinValue;
     totalTime += neighbourhoodStats.timeTaken == 0 ? TIMEOUT_PENALTY_COST : neighbourhoodStats.timeTaken;
     totalNumberOfVisits++;
@@ -138,19 +164,26 @@ public:
       } else {
         currentNeighbourhood.reward--;
       }
+    }*/
+    if (neighbourhoodStats.solutionFound){
+      std::cout << "soltuion found for " << activatedNeighbourhoods[0] << std::endl;
+    }else {
+      std::cout << "solution not found for " << activatedNeighbourhoods[0] << std::endl;
     }
+    neighbourhoodRewardHistory.back().addActivatedNeighbourhood(activatedNeighbourhoods[0],neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
   }
 
-  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
+ /* vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
                                           int& neighbourhoodTimeout) {
-    neighbourhoodRewardHistory.push_back({});
+    NeighbourhoodHistory currentHistory(neighbourhoodContainer);
     double bestUCTValue = -(std::numeric_limits<double>::max());
     int index = -1;
     for(int i = 0; i < neighbourhoodRewards.size(); i++) {
       if(isEnabled(neighbourhoodContainer, i)) {
         if(neighbourhoodRewards[i].numberOfVisits == 0) {
-          neighbourhoodActivationHistory.push_back(i);
-          timeStep++;
+          currentHistory.addNeighbourhoodUCBValue(0, i);
+          currentHistory.addActivatedNeighbourhood(i);
+          neighbourhoodRewardHistory.push_back(currentHistory);
           return {i};
         }
         double currentUCBValue = ucbValue(neighbourhoodRewards[i]);
@@ -159,53 +192,74 @@ public:
           bestUCTValue = currentUCBValue;
           index = i;
         }
-        neighbourhoodRewardHistory[timeStep].push_back(NeighbourhoodHistory(true, currentUCBValue));
+        currentHistory.addNeighbourhoodUCBValue(currentUCBValue, i);
       } else {
-        neighbourhoodRewardHistory[timeStep].push_back(NeighbourhoodHistory(false, 0));
+        currentHistory.addNeighbourhoodUCBValue(0, i);
       }
     }
 
-    timeStep++;
-    neighbourhoodActivationHistory.push_back(index);
-    if(activatedNeighbourhoods[index]) {
+    currentHistory.addActivatedNeighbourhood(index);
+    neighbourhoodRewardHistory.push_back(currentHistory);
+    //if(activatedNeighbourhoods[index]) {
       // neighbourhoodTimeout = neighbourhoodRewards[index].timeOutValue * 2;
       // neighbourhoodRewards[index].timeOutValue *= 2;
       //std::cout << "Neighbourhood  " << index << " has already been tried! " << std::endl;
       // D_FATAL_ERROR("CALLING A NEIGHBOURHOOD TWICE on the same solution. Should implement logic
       // to change timeout"
       //               "or something!!");
-    }
+    //}
 
-    activatedNeighbourhoods[index] = true;
     assert(index >= 0);
     neighbourhoodTimeout = 500;
     return {index};
   }
-  /*
+*/
+
+  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer &nhc, int &neighbourhoodTimeout,
+                                          NeighbourhoodSearchStats &globalStats){
+
+   NeighbourhoodHistory currentHistory(nhc);
+   double bestUCTValue = -(std::numeric_limits<double>::max());
+   int index = -1;
+   for(int i = 0; i < globalStats.numberActivations.size(); i++) {
+     if(isEnabled(nhc, i)) {
+       if(globalStats.numberActivations[i] == 0) {
+         currentHistory.addNeighbourhoodUCBValue(0, i);
+         neighbourhoodRewardHistory.push_back(currentHistory);
+         return {i};
+       }
+       double currentUCBValue = ucbValue(globalStats.numberPositiveSolutions[i] - globalStats.numberNegativeSolutions[i], globalStats.numberIterations,
+       globalStats.numberActivations[i]);
+       // std::cout << "Neighbourhood " << i << " vale is " << currentUCBValue << std::endl;
+       if(currentUCBValue > bestUCTValue) {
+         bestUCTValue = currentUCBValue;
+         index = i;
+       }
+       currentHistory.addNeighbourhoodUCBValue(currentUCBValue, i);
+     } else {
+       currentHistory.addNeighbourhoodUCBValue(0, i);
+     }
+   }
+   currentHistory.addStats(globalStats);
+   neighbourhoodRewardHistory.push_back(currentHistory);
+   neighbourhoodTimeout = 500;
+   return {index};
+
+
+
+ }
+
+
     void printHistory(NeighbourhoodContainer& nhc) {
       int currentTimeStep = 0;
-      for(vector<NeighbourhoodHistory>& timeStepHistory : neighbourhoodRewardHistory) {
-        std::cout << "Current time step: " << currentTimeStep << std::endl;
-        std::cout << "[";
-        for(NeighbourhoodHistory& currentHistory : timeStepHistory) {
-          if(currentHistory.activated)
-            std::cout << currentHistory.ucbValue << ",";
-          else
-            std::cout << "False"
-                      << ",";
-        }
-        std::cout << "]";
-        std::cout << " Activated Neighbourhood -> " <<
-    neighbourhoodActivationHistory[currentTimeStep]
-                  << ": " <<
-    nhc.neighbourhoods[neighbourhoodActivationHistory[currentTimeStep]].name;
-        std::cout << " Value found here is -> " << valuesFound[currentTimeStep];
-        currentTimeStep++;
-        std::cout << std::endl;
+      for (NeighbourhoodHistory &n : neighbourhoodRewardHistory){
+        std::cout << "Time Step: " << currentTimeStep++ << std::endl;
+        std::cout << "--------" << std::endl;
+        n.print(std::cout, nhc);
+        std::cout << "---------" << std::endl;
       }
-      std::cout << std::endl;
     }
-    */
+
 };
 
 class InteractiveNeighbourhoodChooser {
@@ -219,7 +273,9 @@ public:
   }
 
   vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
-                                          double& neighbourhoodTimeout) {
+                                          int& neighbourhoodTimeout, NeighbourhoodSearchStats &globalStats) {
+    std::cout << "Global STats: " << std::endl;
+    globalStats.printStats(std::cout, neighbourhoodContainer);
     neighbourhoodTimeout = 500;
     for(int i = 0; i < neighbourhoodContainer.neighbourhoods.size(); i++) {
       std::cout << "Neighbourhood " << i << " Is assigned? "

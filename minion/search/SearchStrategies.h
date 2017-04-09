@@ -119,8 +119,8 @@ public:
     selectionStrategy->updateStats(currentActivatedNeighbourhoods, stats);
   }
 
-  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer& nhc, int& neighbourhoodTimeout) {
-    return selectionStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer& nhc, int& neighbourhoodTimeout, NeighbourhoodSearchStats &globalStats) {
+    return selectionStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout, globalStats);
   }
 
   bool continueSearch(NeighbourhoodContainer& nhc) {
