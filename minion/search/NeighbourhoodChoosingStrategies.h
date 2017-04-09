@@ -62,7 +62,7 @@ public:
 struct NeighbourhoodHistory {
 
 public:
-  std::vector<std::pair<int, int>> neighbourhoodsActivated;
+  std::vector<std::pair<int, DomainInt>> neighbourhoodsActivated;
   std::vector<double> neighbourhoodValues;
   NeighbourhoodSearchStats stats;
 
@@ -73,7 +73,7 @@ public:
     neighbourhoodValues[index] = ucbValue;
   }
 
-  void addActivatedNeighbourhood(int neighbourhood, int newMinValue) {
+  void addActivatedNeighbourhood(int neighbourhood, DomainInt newMinValue) {
     neighbourhoodsActivated.push_back(std::make_pair(neighbourhood, newMinValue));
   }
 
