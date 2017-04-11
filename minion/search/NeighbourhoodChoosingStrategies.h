@@ -232,7 +232,7 @@ public:
           return {i};
         }
         double currentUCBValue = ucbValue(
-            globalStats.numberPositiveSolutions[i] - globalStats.numberNegativeSolutions[i],
+            globalStats.numberPositiveSolutions[i] - globalStats.numberNegativeSolutions[i] - globalStats.numberNoSolutions[i],
             globalStats.numberIterations, globalStats.numberActivations[i]);
         // std::cout << "Neighbourhood " << i << " vale is " << currentUCBValue << std::endl;
         if(currentUCBValue > bestUCTValue) {
