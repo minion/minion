@@ -134,9 +134,8 @@ private:
   }
 
 public:
-  UCBNeighborHoodSelection(const NeighbourhoodContainer& nhc)
-      : neighbourhoodRewards(nhc.neighbourhoods.size()),
-        timeStep(0),
+  UCBNeighborHoodSelection()
+      : timeStep(0),
         totalTime(0),
         totalNumberOfVisits(0),
         mostRecentMinValue(getState().getOptimiseVar()->getMin()),
