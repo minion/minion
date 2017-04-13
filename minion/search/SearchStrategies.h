@@ -6,7 +6,19 @@
 #define MINION_SEARCHSTRATEGIES_H
 
 #include "neighbourhood-search.h"
+#include <algorithm>
 #include <cmath>
+
+struct SearchParams {
+  std::vector<int> neighbourhoodsToActivate;
+  bool optimiseMode;
+  int timeOut;
+
+  SearchParams(std::vector<int> neighbourhoods, bool optimiseMode = true, int timeOut = 500)
+      : neighbourhoodsToActivate(std::move(neighbourhoods)),
+        optimiseMode(optimiseMode),
+        timeOut(timeOut) {}
+};
 
 void copyOverIncumbent(NeighbourhoodContainer& nhc, const vector<DomainInt>& solution) {
   if(Controller::get_world_depth() != 1) {
@@ -18,94 +30,6 @@ void copyOverIncumbent(NeighbourhoodContainer& nhc, const vector<DomainInt>& sol
   }
 }
 
-template<typename SelectionStrategy>
-class MetaStrategy{
-
-  HillClimbingSearch<SelectionStrategy> hillClimbingSearch;
-  HolePuncher holePuncher;
-  int neighbourhoodSize = 0;
-  DomainInt bestSolutionValue;
-  std::vector<DomainInt> bestSolution;
-  bool betterSolutionFound;
-  enum class PHASE {HILL_CLIMBING, HOLE_PUNCHING, HILL_TESTING};
-  PHASE currentPhase = HILL_CLIMBING;
-
-public:
-  MetaStrategy():
-    hillClimbingSearch(SelectionStrategy()){}
-
-
-  void updateStats(NeighbourhoodContainer &nhc, std::shared_ptr<Propagate> prop,
-                   std::vector<int> &currentActivatedNeighbourhoods, NeighbourhoodStats &stats,
-                   std::vector<DomainInt> & solution) {
-
-      switch{
-        case HILL_CLIMBING:{
-          if (!hillClimbingSearch.finishedPhase()){
-            hillClimbingSearch.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
-          }else {
-            if (stats.newMinValue > bestSolutionFound){
-              bestSolutionFound = stats.newMinValue;
-              bestSolution = solution;
-              betterSolutionFound = true;
-            }
-
-            //This will check whether hole puncher has run out of actie neighbourhoods or if the
-            // new solution is better than the current one we have at that point it should
-            // clear all active neighbourhoods and move to the hole puncher and generate new solutions
-            if (holePuncher.shouldFinishAndCleanup(betterSolutionFound, currentNeighbourhoodSize)){
-              currentPhase = HOLE_PUNCHER;
-            }else {
-              std::vector<DomainInt> randomSolution = holePuncher.getRandomSolution();
-              copyOverIncumbent(nhc, randomSolution);
-            }
-
-          }
-        }
-        case HOLE_PUNCHER:{
-          holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
-          if (holePuncher.finishedPhase()){
-            currentPhase = HILL_CLIMBING;
-          }
-
-
-        }
-
-
-      }
-
-
-  }
-
-
-
-  void startHillTesting(NeighbourhoodContainer &nhc){
-    if (holePuncher.hasNext()){
-      std::vector<DomainInt> randomSolution = holePuncher.getRandomSolution();
-      copyOverIncumbent(nhc, randomSolution);
-    }else {
-
-    }
-  }
-
-
-
-  std::vector<int> getNeighbourhoodsToActivate(NeighbourhoodContainer &nhc,
-                    int &neighbourhoodTimeout){
-    switch PHASE {
-        case HILL_CLIMBING:
-          return hillClimbing.getNeighbourhoodsToActivate(nhc, neighbourhoodTimeout);
-        case HOLE_PUNCHING:
-          return holePuncher.getNeighbourhoodsToActivate(nhc, neighbourhoodTimeout);
-        case HILL_TESTING:
-          return hillClimbing.getNeighbourhoodsToActivate(nhc, neighbourhoodTimeout);
-      }
-  }
-
-};
-
-
-
 
 
 template <typename SelectionStrategy>
@@ -114,6 +38,7 @@ class HillClimbingSearch {
   static const double INITIAL_LOCAL_MAX_PROBABILITY;
   bool searchComplete;
   DomainInt minValue;
+  // The probability that we will enter a random mode of exploration.
   double localMaxProbability = INITIAL_LOCAL_MAX_PROBABILITY;
   double probabilityIncrementConstant = 0.1;
 
@@ -123,6 +48,11 @@ public:
   HillClimbingSearch(std::shared_ptr<SelectionStrategy> selectionStrategy)
       : selectionStrategy(std::move(selectionStrategy)), searchComplete(false) {}
 
+  /*
+   * If a solution is found reset the probability of random exploration and
+   * copy over the incumbent otherwise increase the probability that we will enter random
+   * exploration mode.
+   */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate> prop,
                    std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution) {
@@ -149,17 +79,16 @@ public:
     localMaxProbability = INITIAL_LOCAL_MAX_PROBABILITY;
   }
 
-  vector<int> getNeighbourHoodsToActivate(NeighbourhoodContainer& nhc,
-                                          int& neighbourhoodTimeout) {
-    return selectionStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout);
+  SearchParams getSearchParams(NeighbourhoodContainer& nhc) {
+    return SearchParams(selectionStrategy->getNeighbourhoodsToActivate(nhc));
   }
 
   bool continueSearch(NeighbourhoodContainer& nhc, std::vector<DomainInt> &solution) {
-      return true;
+    return true;
   }
 
-  bool finishedPhase(){
-    return (double std::rand()) / RAND_MAX < localMaxProbability;
+  bool hasFinishedPhase() {
+    return static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability;
   }
 
   void startPhase(){
@@ -181,76 +110,165 @@ class HolePuncher{
   bool finishedPhase = false;
   std::vector<int> activeNeighbourhoods;
 public:
+  int maxNumberOfSolutions = 5;
 
-  int maxNumberOfSolutions;
-
-  void updateStats(NeighbourhoodContainer &nhc, std::shared_ptr<Propagate> prop,
-                std::vector<int> &currentActivatedNeighbourhoods, NeighbourhoodStats &stats,
-                std::vector<DomainInt> & solution){
+  /*
+   * Check if we have run out of neighbourhoods to activate. If so shuffle the solution bag
+   * so that the generated solutions are in a random configuration.
+   */
+  void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate> prop,
+                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
+                   std::vector<DomainInt>& solution) {
     finishedPhase = activeNeighbourhoods.empty();
     if(finishedPhase){
-      std::shuffle(solutionBag.begin(), solutionBag.end());
+      std::random_shuffle(solutionBag.begin(), solutionBag.end());
     }
   }
 
-  vector<int> getNeighbourhoodsToActivate(NeighbourhoodContainer &nhc, int &neighbourhoodTimeout){
+  /**
+   * Pop a neighbourhood from the vector of active neighbourhoods and return it
+   * in the struct SearchParams
+   * @param nhc
+   * @return Struct SearchParams which contains a neighbourhood to activate
+   */
+  SearchParams getSearchParams(NeighbourhoodContainer& nhc) {
+    assert(!activeNeighbourhoods.empty());
     currentNeighbourhoodSolutionsCount = 0;
     int neighbourhood = activeNeighbourhoods.back();
     activeNeighbourhoods.pop_back();
-    return neighbourhood;
+    return SearchParams({neighbourhood});
   }
 
+  /*
+   * Called during Minion Search once a solution has been found. If the number of solutions
+   * found for the currently activated neighbourhood equals the max stop search.
+   */
   bool continueSearch(NeighbourhoodContainer& nhc, std::vector<DomainInt> &solution){
     solutionBag.push_back(solution);
     return ++currentNeighbourhoodSolutionsCount != maxNumberOfSolutions;
   }
 
-  bool finishedPhase(){
+  /*
+   * Finished phase should be set to true when the hole puncher has run out of
+   * neighbourhoods to activate.
+   */
+  bool hasFinishedPhase() {
     return finishedPhase;
   }
 
-  bool shouldFinish(bool betterSolutionFound, int &neighbourhoodSize){
-    if(betterSolutionFound){
-      solutionBag.clear();
-      activeNeighbourhoods.clear();
-      neighbourhoodSize = 1;
-    }else {
-      neighbourhoodSize++;
-    }
-  }
-
-  bool startPhase(NeighbourhoodContainer &nhc, int neighbourhoodSize, int maxNumberOfSolutions, bool betterSolutionFound){
+  /*
+   * Generate the vector of neighbourhoods that can be activated for the inputted size. Can
+   * potentially
+   * crash if no neighbourhood size from inputSize -> maxNeighbourhoodSize can be set.
+   */
+  void startPhase(NeighbourhoodContainer& nhc, int& neighbourhoodSize) {
     activeNeighbourhoods.clear();
-    for (int i = 0; i < nhc.neighbourhoods.size(); i++){
-      if (nhc.neighbourhoods[i].deviation.inDomain(neighbourhoodSize))
-        activeNeighbourhoods.push_back(i);
+    auto maxElement = std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
+                                       [](const Neighbourhood& n1, const Neighbourhood& n2) {
+                                         return n1.deviation.getMax() < n2.deviation.getMax();
+                                       });
+
+    while(++neighbourhoodSize <= maxElement->deviation.getMax()) {
+      for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
+        if(nhc.neighbourhoods[i].deviation.inDomain(neighbourhoodSize))
+          activeNeighbourhoods.push_back(i);
+      }
+      if(!activeNeighbourhoods.empty())
+        break;
     }
 
     if (activeNeighbourhoods.empty())
-      return false;
+      D_FATAL_ERROR("Cannot produce and active neighbourhoods in the hole puncher");
 
     solutionBag.clear();
-    this->neighbourhoodSize = neighbourhoodSize;
-    this->maxNumberOfSolutions = maxNumberOfSolutions;
     finishedPhase = false;
   }
 
-  bool hasNext(){
-    return !solutionBag.empty();
+  std::vector<std::vector<DomainInt>>& getSolutionBag() {
+    return solutionBag;
   }
-
-  std::vector<DomainInt> getRandomSolution(){
-    assert(!solutionBag.empty());
-    std::vector<DomainInt> solution = solutionBag.back();
-    solution.pop_back();
-    return solution;
-  }
-
-
 };
 
+template <typename SelectionStrategy>
+class MetaStrategy {
 
+  HillClimbingSearch<SelectionStrategy> hillClimber;
+  HolePuncher holePuncher;
+  int neighbourhoodSize = 0;
+  DomainInt bestSolutionValue;
+  std::vector<DomainInt> bestSolution;
+  bool betterSolutionFound;
+  enum class Phase { HILL_CLIMBING, HOLE_PUNCHING };
+  Phase currentPhase = Phase::HILL_CLIMBING;
 
+  std::vector<std::vector<DomainInt>> solutionBag;
+  bool searchEnded;
 
+public:
+  MetaStrategy()
+      : hillClimber(SelectionStrategy()),
+        bestSolutionValue(getState().getOptimiseVar()->getMin()) {}
+
+  SearchParams getSearchParams(NeighbourhoodContainer& nhc) {
+    switch(currentPhase) {
+    case Phase::HILL_CLIMBING: return hillClimber.getSearchParams();
+    case Phase::HOLE_PUNCHING: return holePuncher.getSearchParams();
+    }
+  }
+
+  bool continueSearch(NeighbourhoodContainer& nhc) {
+    return true;
+  }
+
+  void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate> prop,
+                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
+                   std::vector<DomainInt>& solution) {
+    std::cout << "METASTRATEGY- UPDATE STATS" << std::endl;
+    switch(currentPhase) {
+    case Phase::HILL_CLIMBING: {
+      std::cout << "IN HILL CLIMBING PHASE " << std::endl;
+      hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
+      if(hillClimber.hasFinishedPhase()) {
+        if(stats.newMinValue > bestSolutionValue) {
+          bestSolutionValue = stats.newMinValue;
+          bestSolution = solution;
+          betterSolutionFound = true;
+        }
+
+        /*
+         * If a better solution has been found we want to punch random holes around this solution
+         * space
+         */
+        if(betterSolutionFound) {
+          solutionBag.clear();
+          currentPhase = Phase::HOLE_PUNCHER;
+          neighbourhoodSize = 0;
+          holePuncher.startPhase(nhc, neighbourhoodSize);
+        } // If there are no solutions left want to generate new random solutions for a larger
+          // neighbourhood size
+        else if(solutionBag.empty()) {
+          currentPhase = Phase::HOLE_PUNCHER;
+          neighbourhoodSize++;
+          holePuncher.startPhase(nhc, neighbourhoodSize);
+        } // Grab a random solution
+        else {
+          std::vector<DomainInt> randomSolution = solutionBag.back();
+          solutionBag.pop_back();
+          copyOverIncumbent(nhc, randomSolution);
+        }
+      }
+    }
+    // In this phase we want to generate random solutions
+    case Phase::HOLE_PUNCHER: {
+      holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
+      if(holePuncher.hasFinishedPhase()) {
+        currentPhase = Phase::HILL_CLIMBING;
+        solutionBag = std::move(holePuncher.getSolutionBag());
+      }
+      break;
+    }
+    }
+  }
+};
 
 #endif // MINION_SEARCHSTRATEGIES_H

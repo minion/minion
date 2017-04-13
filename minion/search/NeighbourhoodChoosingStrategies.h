@@ -124,11 +124,6 @@ private:
            std::sqrt((2 * std::log(totalActivations)) / (totalNeighbourhoodVisits));
   }
 
-  /*double ucbValue(NeighbourhoodRewards& neighbourhoodReward) {
-    return (neighbourhoodReward.reward/neighbourhoodReward.numberOfVisits) +
-           std::sqrt((2 * std::log(totalNumberOfVisits)) / (neighbourhoodReward.numberOfVisits));
-  }
-*/
   bool isEnabled(const NeighbourhoodContainer& nhc, int nhIndex) {
     return !(nhc.neighbourhoods[nhIndex].activation.isAssigned());
   }
@@ -144,26 +139,6 @@ public:
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {
     debug_log(neighbourhoodStats);
-    /* highestMinValue = neighbourhoodStats.newMinValue > highestMinValue ?
-     neighbourhoodStats.newMinValue
-                                                                  : highestMinValue;
-     totalTime += neighbourhoodStats.timeTaken == 0 ? TIMEOUT_PENALTY_COST :
-     neighbourhoodStats.timeTaken;
-     totalNumberOfVisits++;
-     for(int nhIndex : activatedNeighbourhoods) {
-       NeighbourhoodRewards& currentNeighbourhood = neighbourhoodRewards[nhIndex];
-       currentNeighbourhood.numberOfVisits++;
-       currentNeighbourhood.totalTimeTaken +=
-           neighbourhoodStats.timeTaken == 0 ? TIMEOUT_PENALTY_COST : neighbourhoodStats.timeTaken;
-       currentNeighbourhood.timeOut = neighbourhoodStats.timeoutReached;
-
-       if(neighbourhoodStats.solutionFound) {
-         currentNeighbourhood.reward += (neighbourhoodStats.newMinValue > mostRecentMinValue) ? 1 :
-     -1;
-       } else {
-         currentNeighbourhood.reward--;
-       }
-     }*/
     if(neighbourhoodStats.solutionFound) {
       std::cout << "soltuion found for " << activatedNeighbourhoods[0] << std::endl;
     } else {
@@ -174,47 +149,6 @@ public:
         neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
   }
 
-  /* vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
-                                           int& neighbourhoodTimeout) {
-     NeighbourhoodHistory currentHistory(neighbourhoodContainer);
-     double bestUCTValue = -(std::numeric_limits<double>::max());
-     int index = -1;
-     for(int i = 0; i < neighbourhoodRewards.size(); i++) {
-       if(isEnabled(neighbourhoodContainer, i)) {
-         if(neighbourhoodRewards[i].numberOfVisits == 0) {
-           currentHistory.addNeighbourhoodUCBValue(0, i);
-           currentHistory.addActivatedNeighbourhood(i);
-           neighbourhoodRewardHistory.push_back(currentHistory);
-           return {i};
-         }
-         double currentUCBValue = ucbValue(neighbourhoodRewards[i]);
-         // std::cout << "Neighbourhood " << i << " vale is " << currentUCBValue << std::endl;
-         if(currentUCBValue > bestUCTValue) {
-           bestUCTValue = currentUCBValue;
-           index = i;
-         }
-         currentHistory.addNeighbourhoodUCBValue(currentUCBValue, i);
-       } else {
-         currentHistory.addNeighbourhoodUCBValue(0, i);
-       }
-     }
-
-     currentHistory.addActivatedNeighbourhood(index);
-     neighbourhoodRewardHistory.push_back(currentHistory);
-     //if(activatedNeighbourhoods[index]) {
-       // neighbourhoodTimeout = neighbourhoodRewards[index].timeOutValue * 2;
-       // neighbourhoodRewards[index].timeOutValue *= 2;
-       //std::cout << "Neighbourhood  " << index << " has already been tried! " << std::endl;
-       // D_FATAL_ERROR("CALLING A NEIGHBOURHOOD TWICE on the same solution. Should implement logic
-       // to change timeout"
-       //               "or something!!");
-     //}
-
-     assert(index >= 0);
-     neighbourhoodTimeout = 500;
-     return {index};
-   }
- */
 
   vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& nhc,
                                           int& neighbourhoodTimeout,

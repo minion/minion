@@ -513,10 +513,10 @@ struct SearchOrder {
 };
 
 struct CSPInstance {
-    enum class NeighbourhoodSearchStrategy {  SIMULATED_ANNEALING, HILL_CLIMBING };
-    enum class NeighbourhoodSelectionStrategy { RANDOM, UCB };
-    NeighbourhoodSearchStrategy neighbourhoodSearchStrategy;
-    NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy;
+  enum class NeighbourhoodSearchStrategy { META_STRATEGY, HILL_CLIMBING };
+  enum class NeighbourhoodSelectionStrategy { RANDOM, UCB };
+  NeighbourhoodSearchStrategy neighbourhoodSearchStrategy;
+  NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy;
   option<ParsedNeighbourhoodContainer> neighbourhoodContainer;
   VarContainer vars;
   list<ConstraintBlob> constraints;

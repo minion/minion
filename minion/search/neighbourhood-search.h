@@ -40,7 +40,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
-                                                 vector<int>& activatedNeighbourhoods,
+                                                 SearchParams& searchParams,
                                                  int timeoutInMillis = 0,
                                                  bool restrictToFirstSolution = true) {
     // Save state of the world
@@ -50,11 +50,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     debug_log("Depth is: " << depth);
     Controller::world_push();
     vector<SearchOrder> searchOrder;
-    if(activatedNeighbourhoods.empty()) {
+    if(searchParams.neighbourhoodsToActivate.empty()) {
       nhc.shadow_disable.assign(1);
     } else {
-      switchOnNeighbourhoods(activatedNeighbourhoods, solution);
-      searchOrder.push_back(makeNeighbourhoodSearchOrder(activatedNeighbourhoods));
+      switchOnNeighbourhoods(searchParams.neighbourhoodsToActivate, solution);
+      searchOrder.push_back(makeNeighbourhoodSearchOrder(searchParams.neighbourhoodsToActivate));
     }
     searchOrder.insert(searchOrder.end(), base_order.begin(), base_order.end());
     solution.clear();
@@ -63,7 +63,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     prop->prop(vo->getVars());
 
     if(getState().isFailed()) {
-      if(activatedNeighbourhoods.empty()) {
+      if(searchParams.neighbourhoodsToActivate.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
         debug_log("---No Search was carried out---");
@@ -121,10 +121,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         nhc.neighbourhoods.size(),
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
     vector<DomainInt> solution;
-    vector<int> activatedNeighbourhoods;
+    SearchParams searchParams({});
     int neighbourhoodTimeout = 500;
     cout << "Searching for initial solution:\n";
-    NeighbourhoodStats stats = searchNeighbourhoods(solution, activatedNeighbourhoods);
+    NeighbourhoodStats stats = searchNeighbourhoods(solution, searchParams);
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
@@ -138,16 +138,17 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     int numberOfSearches = 0;
     while(searchStrategy->continueSearch(nhc)) {
-      activatedNeighbourhoods =
-          searchStrategy->getNeighbourHoodsToActivate(nhc, neighbourhoodTimeout, globalStats);
+      searchParams = searchStrategy->getSearchParams(nhc, neighbourhoodTimeout, globalStats);
       neighbourhoodTimeout = 500;
-      cout << "Searching with activated neighbourhoods: " << activatedNeighbourhoods
+      cout << "Searching with activated neighbourhoods: " << searchParams.neighbourhoodsToActivate
            << " and timeout " << neighbourhoodTimeout << endl;
-      stats = searchNeighbourhoods(solution, activatedNeighbourhoods, neighbourhoodTimeout, false);
+      stats = searchNeighbourhoods(solution, searchParams.neighbourhoodsToActivate,
+                                   neighbourhoodTimeout, false);
       cout << "Stats on last search: " << stats << endl;
-      searchStrategy->updateStats(nhc, prop, activatedNeighbourhoods, stats, solution);
+      searchStrategy->updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats,
+                                  solution);
       cout << "Global stats:\n";
-      globalStats.reportnewStats(activatedNeighbourhoods, stats);
+      globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
 
       if(numberOfSearches++ == 50)
         break;
@@ -276,13 +277,13 @@ MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method, vector<SearchOrder>
   switch(searchStrategy) {
   case CSPInstance::NeighbourhoodSearchStrategy::HILL_CLIMBING:
     D_FATAL_ERROR("dont instantiate this please");
-  // return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
-  //    prop, base_order, nhc, std::make_shared<HillClimbingSearch<NhSelectionStrategy>>(
-  //                              nhc, std::make_shared<NhSelectionStrategy>(nhc)));
-  case CSPInstance::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING:
-    return std::make_shared<NeighbourhoodSearchManager<SimulatedAnnealing<NhSelectionStrategy>>>(
-        prop, base_order, nhc, std::make_shared<SimulatedAnnealing<NhSelectionStrategy>>(
-                                   nhc, std::make_shared<NhSelectionStrategy>(nhc)));
+    break;
+  case CSPInstance::NeighbourhoodSearchStrategy::META_STRATEGY:
+    return std::make_shared<NeighbourhoodSearchManager<MetaStrategy<NhSelectionStrategy>>>(
+        prop, base_order, nhc, std::make_shared<MetaStrategy<NhSelectionStrategy>>());
+    // return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
+    //    prop, base_order, nhc, std::make_shared<HillClimbingSearch<NhSelectionStrategy>>(
+    //                              nhc, std::make_shared<NhSelectionStrategy>(nhc)));
   }
 }
 
@@ -291,7 +292,7 @@ MakeNeighbourhoodSearch(PropagationLevel prop_method, vector<SearchOrder> base_o
                         NeighbourhoodContainer nhc,
                         CSPInstance::NeighbourhoodSearchStrategy searchStrategy,
                         CSPInstance::NeighbourhoodSelectionStrategy selectionStrategy) {
-  searchStrategy = CSPInstance::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING;
+  searchStrategy = CSPInstance::NeighbourhoodSearchStrategy::META_STRATEGY;
   selectionStrategy = CSPInstance::NeighbourhoodSelectionStrategy::UCB;
   switch(selectionStrategy) {
   case CSPInstance::NeighbourhoodSelectionStrategy::RANDOM:
