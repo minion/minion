@@ -127,26 +127,21 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     } else {
       globalStats.setValueOfInitialSolution(stats.newMinValue);
       searchStrategy.initialise(nhc, stats.newMinValue, solution, prop);
-      cout << "Stats on initial solution:\n" << stats << endl;
+      debug_log("Stats on initial solution:\n" << stats << endl);
     }
 
-    int numberOfSearches = 0;
     while(!searchStrategy.hasFinishedPhase()) {
       SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
-      cout << "Searching with params  " << searchParams << endl;
+      debug_log("Searching with params  " << searchParams << endl);
       stats = searchNeighbourhoods(solution, searchParams, false);
-      cout << "Stats on last search: " << stats << endl;
+      debug_log("Stats on last search: " << stats << endl);
       searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution);
-      cout << "Global stats:\n";
+      debug_log("Global stats:\n");
       globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
-      // temp for debugging
-      if(numberOfSearches++ == 100) {
-        break;
-      }
 
-      globalStats.printStats(cout, nhc);
+      debug_code(globalStats.printStats(cout, nhc));
     }
-    globalStats.printStats(cout, nhc);
+    debug_code(globalStats.printStats(cout, nhc));
   }
 
   void printWorld() {
