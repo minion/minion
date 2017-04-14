@@ -275,7 +275,7 @@ public:
       break;
     // In this phase we want to generate random solutions
     case Phase::HOLE_PUNCHING: {
-     // D_FATAL_ERROR("IN THE HOLE PUNCHING PHASE");
+      // D_FATAL_ERROR("IN THE HOLE PUNCHING PHASE");
       holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());

@@ -57,8 +57,9 @@ public:
         valueOfInitialSolution(initialOptVarRange.first),
         lastOptVarValue(initialOptVarRange.first),
         bestOptVarValue(initialOptVarRange.first) {}
+
   inline u_int64_t getTotalTimeTaken() {
-return std::chrono::high_resolution_clock::now() - startTime).count();
+    return std::chrono::high_resolution_clock::now() - startTime).count();
   }
 
   inline void setValueOfInitialSolution(DomainInt valueOfInitialSolution) {
