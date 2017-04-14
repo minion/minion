@@ -39,10 +39,10 @@ public:
   }
 
   void printHistory(NeighbourhoodContainer& nhc) {
-    int timeStep(0);
-    for(int& n : neighbourhoodActivationHistory) {
-      std::cout << "Time Step: " << timeStep++ << " Neighbourhood Activated-> " << n << std::endl;
-    }
+    debug_code(for(int& n : neighbourhoodActivationHistory) {
+      int timeStep(0);
+      debug_log("Time Step: " << timeStep++ << " Neighbourhood Activated-> " << n << std::endl);
+    });
   }
 };
 
@@ -114,9 +114,9 @@ private:
   static const int TIMEOUT_PENALTY_COST = 1000;
 
   double ucbValue(double reward, int totalActivations, int totalNeighbourhoodVisits) {
-    std::cout << "Reward is " << reward << std::endl;
-    std::cout << "Total activations is " << totalActivations << std::endl;
-    std::cout << "total neighbourhood visits " << totalNeighbourhoodVisits << std::endl;
+    debug_log("Reward is " << reward << std::endl);
+    debug_log("Total activations is " << totalActivations << std::endl);
+    debug_log("total neighbourhood visits " << totalNeighbourhoodVisits << std::endl);
     return (reward / totalNeighbourhoodVisits) +
            std::sqrt((2 * std::log(totalActivations)) / (totalNeighbourhoodVisits));
   }
@@ -134,9 +134,9 @@ public:
                    const NeighbourhoodStats& neighbourhoodStats) {
     debug_log(neighbourhoodStats);
     if(neighbourhoodStats.solutionFound) {
-      std::cout << "soltuion found for " << activatedNeighbourhoods[0] << std::endl;
+      debug_log("soltuion found for " << activatedNeighbourhoods[0] << std::endl);
     } else {
-      std::cout << "solution not found for " << activatedNeighbourhoods[0] << std::endl;
+      debug_log("solution not found for " << activatedNeighbourhoods[0] << std::endl);
     }
     neighbourhoodRewardHistory.back().addActivatedNeighbourhood(
         activatedNeighbourhoods[0],
@@ -159,7 +159,6 @@ public:
             ucbValue(globalStats.numberPositiveSolutions[i] -
                          globalStats.numberNegativeSolutions[i] - globalStats.numberNoSolutions[i],
                      globalStats.numberIterations, globalStats.numberActivations[i]);
-        // std::cout << "Neighbourhood " << i << " vale is " << currentUCBValue << std::endl;
         if(currentUCBValue > bestUCTValue) {
           bestUCTValue = currentUCBValue;
           index = i;
@@ -175,13 +174,13 @@ public:
   }
 
   void printHistory(NeighbourhoodContainer& nhc) {
-    int currentTimeStep = 0;
-    for(NeighbourhoodHistory& n : neighbourhoodRewardHistory) {
-      std::cout << "Time Step: " << currentTimeStep++ << std::endl;
-      std::cout << "--------" << std::endl;
-      n.print(std::cout, nhc);
-      std::cout << "---------" << std::endl;
-    }
+    debug_code(for(NeighbourhoodHistory& n : neighbourhoodRewardHistory) {
+      int currentTimeStep = 0;
+      debug_log("Time Step: " << currentTimeStep++ << std::endl);
+      debug_log("--------" << std::endl);
+      debug_code(n.print(std::cout, nhc));
+      debug_log("---------" << std::endl);
+    });
   }
 };
 
