@@ -74,7 +74,7 @@ public:
       }
       getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
     } else {
-      localMaxProbability += (1 / nhc.neighbourhoods.size()) * probabilityIncrementConstant;
+      localMaxProbability += (1.0 / nhc.neighbourhoods.size()) * probabilityIncrementConstant;
     }
   }
 
@@ -91,6 +91,8 @@ public:
   }
 
   bool hasFinishedPhase() {
+    std::cout << "Current probability is " << localMaxProbability << std::endl;
+    std::cout << "Current random is " << static_cast<double>(std::rand()) / RAND_MAX << std::endl;
     return searchComplete || static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability;
   }
 
@@ -198,6 +200,7 @@ public:
     if(activeNeighbourhoods.empty())
       D_FATAL_ERROR("Cannot produce and active neighbourhoods in the hole puncher");
 
+    std::cout << "Initialise hole puncher: Neighbourhood size = " << neighbourhoodSize << std::endl;
     solutionBag = {};
     finishedPhase = false;
     copyOverIncumbent(nhc, incumbentSolution, prop);
@@ -239,11 +242,14 @@ public:
                    std::vector<DomainInt>& solution) {
     std::cout << "METASTRATEGY- UPDATE STATS" << std::endl;
     switch(currentPhase) {
-    case Phase::HILL_CLIMBING: {
+    case Phase::HILL_CLIMBING:
       std::cout << "IN HILL CLIMBING PHASE " << std::endl;
+      std::cout << "IN RANDOM MODE? " << solutionBag.empty() << std::endl;
       hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
       if(hillClimber.hasFinishedPhase()) {
+        std::cout << "HILL climbing phase has finished " << std::endl;
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
+          std::cout << "A new best value was found " << std::endl;
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = hillClimber.bestSolution;
           /*
@@ -254,21 +260,23 @@ public:
           holePuncher.resetNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
         } else if(solutionBag.empty()) {
+          std::cout << "Solution bag is empty move back to hole punching " << std::endl;
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
           currentPhase = Phase::HOLE_PUNCHING;
           holePuncher.incrementNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
         } else {
+          std::cout << "Grabbing random solution" << std::endl;
           // Grab a random solution
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop);
           solutionBag.pop_back();
         }
       }
-    }
-
+      break;
     // In this phase we want to generate random solutions
     case Phase::HOLE_PUNCHING: {
+     // D_FATAL_ERROR("IN THE HOLE PUNCHING PHASE");
       holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());
