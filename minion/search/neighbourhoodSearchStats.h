@@ -59,13 +59,13 @@ public:
         bestOptVarValue(initialOptVarRange.first) {}
 
   inline u_int64_t getTotalTimeTaken() {
-    return std::chrono::high_resolution_clock::now() - startTime).count();
+    auto endTime = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
   }
 
   inline void setValueOfInitialSolution(DomainInt valueOfInitialSolution) {
     this->valueOfInitialSolution = valueOfInitialSolution;
     totalTimeToBestSolution = getTotalTimeTaken();
-    std::chrono::duration_cast<std::chrono::milliseconds>(
   }
   inline void startTimer() {
     startTime = std::chrono::high_resolution_clock::now();
