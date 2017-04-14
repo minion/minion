@@ -40,7 +40,8 @@ public:
   DomainInt valueOfInitialSolution;
   DomainInt lastOptVarValue;
   DomainInt bestOptVarValue;
-
+  std::chrono::high_resolution_clock::time_point startTime;
+  u_int64_t totalTimeToBestSolution;
   NeighbourhoodSearchStats() {}
 
   NeighbourhoodSearchStats(int numberNeighbourhoods,
@@ -57,8 +58,17 @@ public:
         lastOptVarValue(initialOptVarRange.first),
         bestOptVarValue(initialOptVarRange.first) {}
 
+  inline void startTimer() {
+    startTime = std::chrono::high_resolution_clock::now();
+  }
   inline void setValueOfInitialSolution(DomainInt valueOfInitialSolution) {
     this->valueOfInitialSolution = valueOfInitialSolution;
+  }
+  inline void startTimer() {
+    startTime = std::chrono::high_resolution_clock::now();
+    totalTimeToBestSolution = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::high_resolution_clock::now() - startTime);
+    .count();
   }
 
   inline void reportnewStats(const vector<int>& activatedNeighbourhoods,
@@ -81,6 +91,9 @@ public:
 
       if(lastOptVarValue > bestOptVarValue) {
         bestOptVarValue = lastOptVarValue;
+        totalTimeToBestSolution = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::high_resolution_clock::now() - startTime);
+        .count();
       }
     }
   }
@@ -91,7 +104,7 @@ public:
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
     os << "Most recent optimise var value: " << lastOptVarValue << "\n";
     os << "Best optimise var value: " << lastOptVarValue << "\n";
-
+    os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
