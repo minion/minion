@@ -28,20 +28,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   shared_ptr<Propagate> prop;
   vector<SearchOrder> base_order;
   NeighbourhoodContainer nhc;
-  shared_ptr<SearchStrategy> searchStrategy;
+  SearchStrategy searchStrategy;
 
   NeighbourhoodSearchManager(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
-                             NeighbourhoodContainer _nhc, shared_ptr<SearchStrategy> searchStrategy)
-      : prop(std::move(_prop)),
-        base_order(_base_order),
-        nhc(_nhc),
-        searchStrategy(std::move(searchStrategy)) {
+                             NeighbourhoodContainer _nhc)
+      : prop(std::move(_prop)), base_order(_base_order), nhc(std::move(_nhc)) {
     signal(SIGVTALRM, triggerAlarm);
   }
 
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
-                                                 SearchParams& searchParams,
-                                                 int timeoutInMillis = 0,
+                                                 const SearchParams& searchParams,
                                                  bool restrictToFirstSolution = true) {
     // Save state of the world
     int depth = Controller::get_world_depth();
@@ -86,9 +82,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       for(const auto& var : this->nhc.shadow_mapping[0]) {
         solution.push_back(var.getAssignedValue());
       }
-      optimisationValueCache = getState().getOptimiseVar()->getMin();
-      if(restrictToFirstSolution) {
+      if(restrictToFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
         throw EndOfSearch();
+      }
+      if(searchParams.optimiseMode) {
+        optimisationValueCache = getState().getOptimiseVar()->getMin();
       }
     };
     auto optimisationHandler = [&]() {
@@ -97,8 +95,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     auto sm = make_shared<Controller::StandardSearchManager>(vo, prop, timeoutChecker,
                                                              solutionHandler, optimisationHandler);
 
-    if(timeoutInMillis) {
-      setTimeout(timeoutInMillis);
+    if(searchParams.timeoutInMillis > 0) {
+      setTimeout(searchParams.timeoutInMillis);
     }
 
     auto startTime = std::chrono::high_resolution_clock::now();
@@ -121,42 +119,35 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         nhc.neighbourhoods.size(),
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
     vector<DomainInt> solution;
-    SearchParams searchParams({});
     int neighbourhoodTimeout = 500;
     cout << "Searching for initial solution:\n";
-    NeighbourhoodStats stats = searchNeighbourhoods(solution, searchParams);
+    NeighbourhoodStats stats = searchNeighbourhoods(solution, SearchParams({}, true, 0));
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
     } else {
       globalStats.setValueOfInitialSolution(stats.newMinValue);
+      searchStrategy.initialise(nhc, stats.newMinValue, solution, prop);
       cout << "Stats on initial solution:\n" << stats << endl;
-      copyOverIncumbent(nhc, solution);
-      std::vector<AnyVarRef> emptyVars;
-      prop->prop(emptyVars);
     }
 
     int numberOfSearches = 0;
-    while(searchStrategy->continueSearch(nhc)) {
-      searchParams = searchStrategy->getSearchParams(nhc, neighbourhoodTimeout, globalStats);
-      neighbourhoodTimeout = 500;
-      cout << "Searching with activated neighbourhoods: " << searchParams.neighbourhoodsToActivate
-           << " and timeout " << neighbourhoodTimeout << endl;
-      stats = searchNeighbourhoods(solution, searchParams.neighbourhoodsToActivate,
-                                   neighbourhoodTimeout, false);
+    while(searchStrategy.hasFinishedPhase()) {
+      SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
+      cout << "Searching with params  " << searchParams << endl;
+      stats = searchNeighbourhoods(solution, searchParams, false);
       cout << "Stats on last search: " << stats << endl;
-      searchStrategy->updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats,
-                                  solution);
+      searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution);
       cout << "Global stats:\n";
       globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
-
-      if(numberOfSearches++ == 50)
+      // temp for debugging
+      if(numberOfSearches++ == 100) {
         break;
+      }
 
       globalStats.printStats(cout, nhc);
     }
     globalStats.printStats(cout, nhc);
-    searchStrategy->printHistory(nhc);
   }
 
   void printWorld() {
@@ -276,14 +267,11 @@ MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method, vector<SearchOrder>
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
   switch(searchStrategy) {
   case CSPInstance::NeighbourhoodSearchStrategy::HILL_CLIMBING:
-    D_FATAL_ERROR("dont instantiate this please");
-    break;
+    return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
+        prop, base_order, std::move(nhc));
   case CSPInstance::NeighbourhoodSearchStrategy::META_STRATEGY:
     return std::make_shared<NeighbourhoodSearchManager<MetaStrategy<NhSelectionStrategy>>>(
-        prop, base_order, nhc, std::make_shared<MetaStrategy<NhSelectionStrategy>>());
-    // return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
-    //    prop, base_order, nhc, std::make_shared<HillClimbingSearch<NhSelectionStrategy>>(
-    //                              nhc, std::make_shared<NhSelectionStrategy>(nhc)));
+        prop, base_order, nhc);
   }
 }
 

@@ -151,9 +151,7 @@ public:
 
 
   vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& nhc,
-                                          int& neighbourhoodTimeout,
                                           NeighbourhoodSearchStats& globalStats) {
-
     NeighbourhoodHistory currentHistory(nhc);
     double bestUCTValue = -(std::numeric_limits<double>::max());
     int index = -1;
@@ -179,7 +177,6 @@ public:
     }
     currentHistory.addStats(globalStats);
     neighbourhoodRewardHistory.push_back(currentHistory);
-    neighbourhoodTimeout = 500;
     return {index};
   }
 
