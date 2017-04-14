@@ -118,6 +118,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     NeighbourhoodSearchStats globalStats(
         nhc.neighbourhoods.size(),
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
+    globalStats.startTimer();
     vector<DomainInt> solution;
     cout << "Searching for initial solution:\n";
     NeighbourhoodStats stats = searchNeighbourhoods(solution, SearchParams({}, true, 0));
