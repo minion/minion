@@ -18,7 +18,7 @@ public:
   void updateStats(const vector<int>& activatedNeighbourhoods,
                    const NeighbourhoodStats& neighbourhoodStats) {}
 
-  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
+  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
                                           double neighbourhoodTimeout) {
 
     int random = std::rand() % neighbourhoodContainer.neighbourhoods.size();
@@ -109,9 +109,6 @@ private:
   // Stores the neighbourhood reward structs
   vector<NeighbourhoodRewards> neighbourhoodRewards;
 
-  int timeStep;
-  u_int64_t totalTime;
-  int totalNumberOfVisits;
   DomainInt mostRecentMinValue;
   DomainInt highestMinValue;
   static const int TIMEOUT_PENALTY_COST = 1000;
@@ -130,10 +127,7 @@ private:
 
 public:
   UCBNeighborHoodSelection()
-      : timeStep(0),
-        totalTime(0),
-        totalNumberOfVisits(0),
-        mostRecentMinValue(getState().getOptimiseVar()->getMin()),
+      : mostRecentMinValue(getState().getOptimiseVar()->getMin()),
         highestMinValue(getState().getOptimiseVar()->getMin()) {}
 
   void updateStats(const vector<int>& activatedNeighbourhoods,
@@ -149,8 +143,7 @@ public:
         neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
   }
 
-
-  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& nhc,
+  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
                                           NeighbourhoodSearchStats& globalStats) {
     NeighbourhoodHistory currentHistory(nhc);
     double bestUCTValue = -(std::numeric_limits<double>::max());
@@ -162,9 +155,10 @@ public:
           neighbourhoodRewardHistory.push_back(currentHistory);
           return {i};
         }
-        double currentUCBValue = ucbValue(
-            globalStats.numberPositiveSolutions[i] - globalStats.numberNegativeSolutions[i] - globalStats.numberNoSolutions[i],
-            globalStats.numberIterations, globalStats.numberActivations[i]);
+        double currentUCBValue =
+            ucbValue(globalStats.numberPositiveSolutions[i] -
+                         globalStats.numberNegativeSolutions[i] - globalStats.numberNoSolutions[i],
+                     globalStats.numberIterations, globalStats.numberActivations[i]);
         // std::cout << "Neighbourhood " << i << " vale is " << currentUCBValue << std::endl;
         if(currentUCBValue > bestUCTValue) {
           bestUCTValue = currentUCBValue;
@@ -188,7 +182,7 @@ public:
       n.print(std::cout, nhc);
       std::cout << "---------" << std::endl;
     }
-    }
+  }
 };
 
 class InteractiveNeighbourhoodChooser {
@@ -201,7 +195,7 @@ public:
     std::cout << neighbourhoodStats << std::endl;
   }
 
-  vector<int> getNeighbourHoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
+  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
                                           int& neighbourhoodTimeout,
                                           NeighbourhoodSearchStats& globalStats) {
     std::cout << "Global STats: " << std::endl;

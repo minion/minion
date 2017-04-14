@@ -9,7 +9,7 @@ struct SearchParams {
   std::vector<int> neighbourhoodsToActivate;
   bool optimiseMode;
   int timeoutInMillis;
-  SearchParams(std::vector<int> neighbourhoods, bool optimiseMode = true, int timeOutInMillis = 500)
+  SearchParams(std::vector<int> neighbourhoods, bool optimiseMode = true, int timeoutInMillis = 500)
       : neighbourhoodsToActivate(std::move(neighbourhoods)),
         optimiseMode(optimiseMode),
         timeoutInMillis(timeoutInMillis) {}
@@ -61,7 +61,7 @@ public:
                    std::vector<DomainInt>& solution) {
     std::cout << "Hill Climbing Search -- Update Stats " << std::endl;
 
-    selectionStrategy->updateStats(currentActivatedNeighbourhoods, stats);
+    selectionStrategy.updateStats(currentActivatedNeighbourhoods, stats);
 
     if(stats.solutionFound) {
       bestSolutionValue = stats.newMinValue;
@@ -250,13 +250,13 @@ public:
            * If a better solution has been found we want to punch random holes around this solution
            */
           solutionBag.clear();
-          currentPhase = Phase::HOLE_PUNCHER;
+          currentPhase = Phase::HOLE_PUNCHING;
           holePuncher.resetNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
         } else if(solutionBag.empty()) {
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
-          currentPhase = Phase::HOLE_PUNCHER;
+          currentPhase = Phase::HOLE_PUNCHING;
           holePuncher.incrementNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
         } else {
@@ -268,7 +268,7 @@ public:
     }
 
     // In this phase we want to generate random solutions
-    case Phase::HOLE_PUNCHER: {
+    case Phase::HOLE_PUNCHING: {
       holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());
@@ -278,19 +278,22 @@ public:
           solutionBag.pop_back();
         } else {
           holePuncher.incrementNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolution, prop);
+          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
         }
       }
       break;
     }
     }
   }
-  void initialise(NeighbourhoodContainer&, DomainInt newBestMinValue,
+  void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop) {
     bestSolutionValue = newBestMinValue;
     bestSolution = newBestSolution;
     currentPhase = Phase::HILL_CLIMBING;
-    hillClimber.initialise(newBestMinValue, newBestSolution, prop);
+    hillClimber.initialise(nhc, newBestMinValue, newBestSolution, prop);
+  }
+  bool hasFinishedPhase() {
+    return false; // tbc
   }
 };
 

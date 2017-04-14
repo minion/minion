@@ -119,7 +119,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         nhc.neighbourhoods.size(),
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
     vector<DomainInt> solution;
-    int neighbourhoodTimeout = 500;
     cout << "Searching for initial solution:\n";
     NeighbourhoodStats stats = searchNeighbourhoods(solution, SearchParams({}, true, 0));
     if(!stats.solutionFound) {
@@ -132,7 +131,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
 
     int numberOfSearches = 0;
-    while(searchStrategy.hasFinishedPhase()) {
+    while(!searchStrategy.hasFinishedPhase()) {
       SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
       cout << "Searching with params  " << searchParams << endl;
       stats = searchNeighbourhoods(solution, searchParams, false);
