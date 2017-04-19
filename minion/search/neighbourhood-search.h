@@ -146,7 +146,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       debug_log("Searching with params  " << searchParams << endl);
       stats = searchNeighbourhoods(solution, searchParams,globalStats, false);
       debug_log("Stats on last search: " << stats << endl);
-      searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution);
+      searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution, globalStats);
       debug_log("Global stats:\n");
       globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
 

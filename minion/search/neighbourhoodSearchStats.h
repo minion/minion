@@ -36,6 +36,11 @@ public:
   vector<int> numberNegativeSolutions;
   vector<int> numberNoSolutions;
   vector<int> numberTimeouts;
+  vector<pair<DomainInt, u_int64_t>> bestSolutions;
+  int numberOfExplorationPhases;
+  int numberOfBetterSolutionsFoundFromExploration;
+
+
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
   DomainInt lastOptVarValue;
@@ -53,6 +58,8 @@ public:
         numberNegativeSolutions(numberNeighbourhoods, 0),
         numberNoSolutions(numberNeighbourhoods, 0),
         numberTimeouts(numberNeighbourhoods, 0),
+        numberOfExplorationPhases(0),
+        numberOfBetterSolutionsFoundFromExploration(0),
         initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
         lastOptVarValue(initialOptVarRange.first),
@@ -90,6 +97,7 @@ public:
       }
 
       if(lastOptVarValue > bestOptVarValue) {
+        bestSolutions.emplace_back(lastOptVarValue, getTotalTimeTaken());
         bestOptVarValue = lastOptVarValue;
         totalTimeToBestSolution = getTotalTimeTaken();
       }
@@ -101,9 +109,11 @@ public:
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
     os << "Most recent optimise var value: " << lastOptVarValue << "\n";
-    os << "Best optimise var value: " << lastOptVarValue << "\n";
+    os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
+    os << "Number of explorations " << numberOfExplorationPhases << "\n";
+    os << "Number of better solutions found through exploration " << numberOfBetterSolutionsFoundFromExploration << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
@@ -115,6 +125,11 @@ public:
       os << indent << "Number no solutions: " << numberNoSolutions[i] << "\n";
       os << indent << "Number timeouts: " << numberTimeouts[i] << "\n";
     }
+    os << "History of best solutions found " << "\n";
+    for (auto &currentPair: bestSolutions){
+      os << "Value : " << currentPair.first << " Time : " << currentPair.second << " ";
+    }
+    os << "\n";
   }
 };
 

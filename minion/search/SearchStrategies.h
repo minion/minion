@@ -42,7 +42,7 @@ class HillClimbingSearch {
   friend MetaStrategy<SelectionStrategy>;
 
   static constexpr double INITIAL_LOCAL_MAX_PROBABILITY = 0.01;
-  static constexpr double probabilityIncrementConstant = 0.1;
+  static constexpr double probabilityIncrementConstant = 0.5;
   DomainInt bestSolutionValue;
   std::vector<DomainInt> bestSolution;
   bool searchComplete = false;
@@ -58,7 +58,7 @@ public:
    */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
-                   std::vector<DomainInt>& solution) {
+                   std::vector<DomainInt>& solution, NeighbourhoodSearchStats &) {
     debug_log("Hill Climbing Search -- Update Stats " << std::endl);
 
     selectionStrategy.updateStats(currentActivatedNeighbourhoods, stats);
@@ -133,7 +133,7 @@ public:
    */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
-                   std::vector<DomainInt>& solution) {
+                   std::vector<DomainInt>& solution, NeighbourhoodSearchStats &) {
     finishedPhase = activeNeighbourhoods.empty();
     if(finishedPhase) {
       std::random_shuffle(solutionBag.begin(), solutionBag.end());
@@ -239,16 +239,18 @@ public:
 
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
-                   std::vector<DomainInt>& solution) {
+                   std::vector<DomainInt>& solution, NeighbourhoodSearchStats &globalStats) {
     debug_log("METASTRATEGY- UPDATE STATS" << std::endl);
     switch(currentPhase) {
     case Phase::HILL_CLIMBING:
       debug_log("IN HILL CLIMBING PHASE " << std::endl);
-      hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
+      hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution, globalStats);
       if(hillClimber.hasFinishedPhase()) {
         debug_log("HILL climbing phase has finished " << std::endl);
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           debug_log("A new best value was found " << std::endl);
+          globalStats.numberOfBetterSolutionsFoundFromExploration++;
+          globalStats.numberOfExplorationPhases++;
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = hillClimber.bestSolution;
           /*
@@ -263,6 +265,7 @@ public:
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
           currentPhase = Phase::HOLE_PUNCHING;
+          globalStats.numberOfExplorationPhases++;
           holePuncher.incrementNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
         } else {
@@ -276,7 +279,7 @@ public:
     // In this phase we want to generate random solutions
     case Phase::HOLE_PUNCHING: {
       // D_FATAL_ERROR("IN THE HOLE PUNCHING PHASE");
-      holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution);
+      holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution, globalStats);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());
         if(!solutionBag.empty()) {
