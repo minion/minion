@@ -38,6 +38,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
                                                  const SearchParams& searchParams,
+                                                 NeighbourhoodSearchStats &globalStats,
                                                  bool restrictToFirstSolution = true) {
     // Save state of the world
     int depth = Controller::get_world_depth();
@@ -106,6 +107,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     } catch(EndOfSearch&) { clearTimeout(); } catch(TimeoutException&) {
       timeout = true;
     }
+
+    if (getState().isCtrlcPressed()){
+      cout << "Ctrl-C pressed----" << std::endl;
+      globalStats.printStats(cout, nhc);
+      cout << endl;
+      exit(0);
+    }
+
+
     bool solutionFound = !solution.empty();
     DomainInt bestOptimisation =
         (solutionFound) ? optimisationValueCache : optimisationValueCache + 1;
@@ -121,7 +131,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     globalStats.startTimer();
     vector<DomainInt> solution;
     cout << "Searching for initial solution:\n";
-    NeighbourhoodStats stats = searchNeighbourhoods(solution, SearchParams({}, true, 0));
+    NeighbourhoodStats stats = searchNeighbourhoods(solution, SearchParams({}, true, 0),globalStats);
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
@@ -134,7 +144,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     while(!searchStrategy.hasFinishedPhase()) {
       SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
       debug_log("Searching with params  " << searchParams << endl);
-      stats = searchNeighbourhoods(solution, searchParams, false);
+      stats = searchNeighbourhoods(solution, searchParams,globalStats, false);
       debug_log("Stats on last search: " << stats << endl);
       searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution);
       debug_log("Global stats:\n");
