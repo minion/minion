@@ -109,6 +109,7 @@ private:
   // Stores the neighbourhood reward structs
   vector<NeighbourhoodRewards> neighbourhoodRewards;
 
+
   DomainInt mostRecentMinValue;
   DomainInt highestMinValue;
   static const int TIMEOUT_PENALTY_COST = 1000;
@@ -141,6 +142,9 @@ public:
     neighbourhoodRewardHistory.back().addActivatedNeighbourhood(
         activatedNeighbourhoods[0],
         neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
+
+
+
   }
 
   vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,

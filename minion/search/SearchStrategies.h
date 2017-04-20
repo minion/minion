@@ -9,14 +9,18 @@ struct SearchParams {
   std::vector<int> neighbourhoodsToActivate;
   bool optimiseMode;
   int timeoutInMillis;
-  SearchParams(std::vector<int> neighbourhoods, bool optimiseMode = true, int timeoutInMillis = 500)
+  DomainInt initialNeighbourhoodSize;
+
+  SearchParams(std::vector<int> neighbourhoods, bool optimiseMode = true, int timeoutInMillis = 500, DomainInt initialNeighbourhoodSize = 1)
       : neighbourhoodsToActivate(std::move(neighbourhoods)),
         optimiseMode(optimiseMode),
-        timeoutInMillis(timeoutInMillis) {}
+        timeoutInMillis(timeoutInMillis),
+        initialNeighbourhoodSize(initialNeighbourhoodSize){}
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
     os << "SearchParams(\nneighbourhoodsToActivate =  " << searchParams.neighbourhoodsToActivate
        << ",\noptimiseMode = " << searchParams.optimiseMode
-       << ",\ntimeoutInMillis = " << searchParams.timeoutInMillis << ")";
+       << ",\ntimeoutInMillis = " << searchParams.timeoutInMillis <<
+        ",\ninitialNeighbourhoodSize = " << searchParams.initialNeighbourhoodSize << ")";
     return os;
   }
 };
@@ -50,6 +54,10 @@ class HillClimbingSearch {
   double localMaxProbability = INITIAL_LOCAL_MAX_PROBABILITY;
   SelectionStrategy selectionStrategy;
 
+  std::vector<DomainInt> highestNeighbourhoodValues;
+
+
+
 public:
   /*
    * If a solution is found reset the probability of random exploration and
@@ -57,13 +65,14 @@ public:
    * exploration mode.
    */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
-                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
+                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats & stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats &) {
     debug_log("Hill Climbing Search -- Update Stats " << std::endl);
 
     selectionStrategy.updateStats(currentActivatedNeighbourhoods, stats);
 
     if(stats.solutionFound) {
+      highestNeighbourhoodValues.assign(highestNeighbourhoodValues.size(), 1);
       bestSolutionValue = stats.newMinValue;
       bestSolution = solution;
       resetLocalMaxProbability();
@@ -74,6 +83,7 @@ public:
       }
       getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
     } else {
+      highestNeighbourhoodValues[currentActivatedNeighbourhoods[0]] = stats.highestNeighbourhoodSize;
       localMaxProbability += (1.0 / nhc.neighbourhoods.size()) * probabilityIncrementConstant;
     }
   }
@@ -83,7 +93,10 @@ public:
   }
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
-    return SearchParams(selectionStrategy.getNeighbourhoodsToActivate(nhc, globalStats));
+    std::vector<int> neighbourhoodsToActivate = selectionStrategy.getNeighbourhoodsToActivate(nhc, globalStats);
+    if (highestNeighbourhoodValues[neighbourhoodsToActivate[0]] != 1)
+      std::cout << "NEIGHBOURHOOD SIZE NOT STARTING AT 1 " << std::endl;
+    return SearchParams(neighbourhoodsToActivate, true, 500, highestNeighbourhoodValues[neighbourhoodsToActivate[0]]);
   }
 
   bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
@@ -99,6 +112,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop) {
     resetLocalMaxProbability();
+    highestNeighbourhoodValues.assign(nhc.neighbourhoods.size(), 1);
     bestSolutionValue = newBestMinValue;
     bestSolution = newBestSolution;
     getState().getOptimiseVar()->setMin(newBestMinValue + 1);

@@ -51,7 +51,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       nhc.shadow_disable.assign(1);
     } else {
       switchOnNeighbourhoods(searchParams.neighbourhoodsToActivate, solution);
-      searchOrder.push_back(makeNeighbourhoodSearchOrder(searchParams.neighbourhoodsToActivate));
+      searchOrder.push_back(makeNeighbourhoodSearchOrder(searchParams));
     }
     searchOrder.insert(searchOrder.end(), base_order.begin(), base_order.end());
     solution.clear();
@@ -69,15 +69,20 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     }
 
+    DomainInt highestNeighbourhoodSize;
     DomainInt optimisationValueCache = getState().getOptimiseVar()->getMin() - 1;
     // minus 1 is used as the optimisationHandler always sets it to optimisationValueCache +1
-    auto timeoutChecker = [](const vector<AnyVarRef>& var_array,
+    auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
                              const vector<Controller::triple>& branches) {
       Controller::standard_time_ctrlc_checks(var_array, branches);
       if(alarmTriggered) {
+        if (!searchParams.neighbourhoodsToActivate.empty()){
+          highestNeighbourhoodSize = nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.getMin();
+        }
         throw TimeoutException();
       }
     };
+
     auto solutionHandler = [&]() {
       solution.clear();
       for(const auto& var : this->nhc.shadow_mapping[0]) {
@@ -119,7 +124,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     bool solutionFound = !solution.empty();
     DomainInt bestOptimisation =
         (solutionFound) ? optimisationValueCache : optimisationValueCache + 1;
-    NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout);
+    NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout, highestNeighbourhoodSize);
     Controller::world_pop_to_depth(depth);
     return stats;
   }
@@ -181,14 +186,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    * sizes with ascending value ordering.  Followed by the primary variabels referenced by the
    * activated neighbourhoods with random ordering.
    */
-  SearchOrder makeNeighbourhoodSearchOrder(const vector<int>& activatedNeighbourhoods) {
+  SearchOrder makeNeighbourhoodSearchOrder(const SearchParams &searchParams) {
+    nhc.neighbourhoods[0].deviation.setMin(searchParams.initialNeighbourhoodSize);
     SearchOrder searchOrder;
-    for(int neighbourhoodIndex : activatedNeighbourhoods) {
+    for(int neighbourhoodIndex : searchParams.neighbourhoodsToActivate) {
       searchOrder.var_order.push_back(
           nhc.neighbourhoods[neighbourhoodIndex].deviation.getBaseVar());
       searchOrder.val_order.push_back(VALORDER_ASCEND);
     }
-    for(int neighbourhoodIndex : activatedNeighbourhoods) {
+    for(int neighbourhoodIndex : searchParams.neighbourhoodsToActivate) {
       for(const auto& primaryVar : nhc.neighbourhoods[neighbourhoodIndex].vars) {
         searchOrder.var_order.push_back(primaryVar.getBaseVar());
         searchOrder.val_order.push_back(VALORDER_RANDOM);

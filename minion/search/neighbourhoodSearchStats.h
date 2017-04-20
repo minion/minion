@@ -10,13 +10,15 @@ struct NeighbourhoodStats {
   u_int64_t timeTaken;
   bool solutionFound;
   bool timeoutReached;
+  DomainInt highestNeighbourhoodSize;
 
   NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound,
-                     bool timeoutReached)
+                     bool timeoutReached, DomainInt highestNeighbourhoodSize = 0)
       : newMinValue(newMinValue),
         timeTaken(timeTaken),
         solutionFound(solutionFound),
-        timeoutReached(timeoutReached) {}
+        timeoutReached(timeoutReached),
+        highestNeighbourhoodSize(highestNeighbourhoodSize){}
 
   friend std::ostream& operator<<(std::ostream& cout, const NeighbourhoodStats& stats) {
     cout << "New Min Value: " << stats.newMinValue << "\n"
@@ -131,5 +133,33 @@ public:
     }
   }
 };
+
+/*
+  I guess it would be nice to know the following:
+  1. How much time do we spend in hole punching mode?
+    So we can estimate this by looking at the number of neighbourhoods. As we know each neighbourhood hole punch is capped to 500 ms then we know
+    at most we spend 500ms * |numberOfNeighbourhoods| per hole punch.
+
+
+
+  2. The problem with UCB is that it will not respond to quick changes in performance very quickly so for tsp if one arm is doing really well even when we hit the peak
+  it will continue to select that arm for a bit until the holepuncher kicks in.
+
+
+
+  3. Should we update UCB after the fact?
+
+
+
+  Questions:
+  1. Is there any point in pulling the same arm twice??
+  -> Dont we start at the same value ordering for the size of the neighbourhood?
+  -> If we give it the same amount of time is it going to find out anything different?
+
+  Maybe we could do something whereby we include the size of the neighbourhood that the neighbourhood arrived at in part of the calculation of whether or not to stop.
+  The higher it managed to climb and if it fails then we take that as more of an indication that we should stop.
+
+*/
+
 
 #endif /* MINION_SEARCH_NEIGHBOURHOODSEARCHSTATS_H_ */
