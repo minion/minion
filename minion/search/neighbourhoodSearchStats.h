@@ -127,9 +127,8 @@ public:
     }
     os << "History of best solutions found " << "\n";
     for (auto &currentPair: bestSolutions){
-      os << "Value : " << currentPair.first << " Time : " << currentPair.second << " ";
+      os << "Value : " << currentPair.first << " Time : " << currentPair.second << " \n";
     }
-    os << "\n";
   }
 };
 
