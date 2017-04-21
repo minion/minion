@@ -42,17 +42,23 @@ public:
   int numberOfExplorationPhases;
   int numberOfBetterSolutionsFoundFromExploration;
 
+  vector<int> totalNeighbourhoodSizeExplorations;
+  vector<int> totalNeighbourhoodSizeSuccess;
+  vector<u_int64_t> neighbourhoodExplorationTimes;
 
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
   DomainInt lastOptVarValue;
   DomainInt bestOptVarValue;
   std::chrono::high_resolution_clock::time_point startTime;
+  std::chrono::high_resolution_clock::time_point startExplorationTime;
+  bool currentlyExploring = false;
+  int currentNeighbourhoodSize;
   u_int64_t totalTimeToBestSolution;
   NeighbourhoodSearchStats() {}
 
   NeighbourhoodSearchStats(int numberNeighbourhoods,
-                           const std::pair<DomainInt, DomainInt>& initialOptVarRange)
+                           const std::pair<DomainInt, DomainInt>& initialOptVarRange, int maxNeighbourhoodSize)
       : numberIterations(0),
         numberActivations(numberNeighbourhoods, 0),
         totalTime(numberNeighbourhoods, 0),
@@ -65,7 +71,10 @@ public:
         initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
         lastOptVarValue(initialOptVarRange.first),
-        bestOptVarValue(initialOptVarRange.first) {}
+        bestOptVarValue(initialOptVarRange.first),
+        totalNeighbourhoodSizeExplorations(maxNeighbourhoodSize),
+        totalNeighbourhoodSizeSuccess(maxNeighbourhoodSize),
+        neighbourhoodExplorationTimes(maxNeighbourhoodSize){}
 
   inline u_int64_t getTotalTimeTaken() {
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -106,6 +115,28 @@ public:
     }
   }
 
+
+  void foundSolution(int solutionValue){
+    if (currentlyExploring && solutionValue > bestOptVarValue){
+      auto endTime = std::chrono::high_resolution_clock::now();
+      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
+      currentlyExploring = false;
+      totalNeighbourhoodSizeSuccess[currentNeighbourhoodSize -1 ] += 1;
+      std::cout << "neighbourhood size is " << currentNeighbourhoodSize << std::endl;
+    }
+  }
+
+  void startExploration(int neighbourhoodSize){
+    if (currentlyExploring){
+      auto endTime = std::chrono::high_resolution_clock::now();
+      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
+    }
+    currentlyExploring = true;
+    startExplorationTime = std::chrono::high_resolution_clock::now();
+    totalNeighbourhoodSizeExplorations[neighbourhoodSize -1] += 1;
+    currentNeighbourhoodSize = neighbourhoodSize;
+  }
+
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
@@ -131,6 +162,16 @@ public:
     for (auto &currentPair: bestSolutions){
       os << "Value : " << currentPair.first << " Time : " << currentPair.second << " \n";
     }
+
+    os << "Stats of Explorations:" << "\n";
+    os << "---------------" << "\n";
+    for (int i = 0; i < totalNeighbourhoodSizeExplorations.size(); i++){
+      os << "NeighbourhoodSize " << (i+1) << ":" << "\n";
+      os << indent << "Activations: " << totalNeighbourhoodSizeExplorations[i] << "\n";
+      os << indent << "Sucess: " << totalNeighbourhoodSizeSuccess[i]<< "\n";
+      os << indent << "Time Spent: " << neighbourhoodExplorationTimes[i] << "\n";
+    }
+    os << "---------------" << "\n";
   }
 };
 

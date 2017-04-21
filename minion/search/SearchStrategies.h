@@ -43,6 +43,7 @@ class MetaStrategy;
 
 template <typename SelectionStrategy>
 class HillClimbingSearch {
+public:
   friend MetaStrategy<SelectionStrategy>;
 
   static constexpr double INITIAL_LOCAL_MAX_PROBABILITY = 0.01;
@@ -58,7 +59,6 @@ class HillClimbingSearch {
 
 
 
-public:
   /*
    * If a solution is found reset the probability of random exploration and
    * copy over the incumbent otherwise increase the probability that we will enter random
@@ -110,7 +110,8 @@ public:
   }
 
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
-                  const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop) {
+                  const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
+                  NeighbourhoodSearchStats &globalStats) {
     resetLocalMaxProbability();
     highestNeighbourhoodValues.assign(nhc.neighbourhoods.size(), 1);
     bestSolutionValue = newBestMinValue;
@@ -129,10 +130,10 @@ class HolePuncher {
   std::vector<int> activeNeighbourhoods;
 
   int currentNeighbourhoodSolutionsCount = 0;
-  int neighbourhoodSize = 0;
   bool finishedPhase = false;
 
 public:
+  int neighbourhoodSize = 0;
   void resetNeighbourhoodSize() {
     neighbourhoodSize = 1;
   }
@@ -192,7 +193,8 @@ public:
    */
   void initialise(NeighbourhoodContainer& nhc, DomainInt,
                   const std::vector<DomainInt>& incumbentSolution,
-                  std::shared_ptr<Propagate>& prop) {
+                  std::shared_ptr<Propagate>& prop,
+                  NeighbourhoodSearchStats &globalStats) {
     auto maxElement = std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
                                        [](const Neighbourhood& n1, const Neighbourhood& n2) {
                                          return n1.deviation.getMax() < n2.deviation.getMax();
@@ -217,6 +219,7 @@ public:
     debug_log("Initialise hole puncher: Neighbourhood size = " << neighbourhoodSize << std::endl);
     solutionBag = {};
     finishedPhase = false;
+    globalStats.startExploration(neighbourhoodSize);
     copyOverIncumbent(nhc, incumbentSolution, prop);
   }
 
@@ -235,6 +238,7 @@ class MetaStrategy {
   Phase currentPhase = Phase::HILL_CLIMBING;
   SolutionBag solutionBag;
   bool searchEnded = false;
+
 
 public:
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats& globalStats) {
@@ -257,35 +261,36 @@ public:
     debug_log("METASTRATEGY- UPDATE STATS" << std::endl);
     switch(currentPhase) {
     case Phase::HILL_CLIMBING:
-      debug_log("IN HILL CLIMBING PHASE " << std::endl);
+     debug_log("IN HILL CLIMBING PHASE " << std::endl);
       hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution, globalStats);
       if(hillClimber.hasFinishedPhase()) {
         debug_log("HILL climbing phase has finished " << std::endl);
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           debug_log("A new best value was found " << std::endl);
-          globalStats.numberOfBetterSolutionsFoundFromExploration++;
-          globalStats.numberOfExplorationPhases++;
+         // globalStats.numberOfBetterSolutionsFoundFromExploration++;
+         // globalStats.numberOfExplorationPhases++;
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = hillClimber.bestSolution;
+
           /*
            * If a better solution has been found we want to punch random holes around this solution
            */
           solutionBag.clear();
           currentPhase = Phase::HOLE_PUNCHING;
           holePuncher.resetNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
+          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
+          std::cout << "EXPLORATION STARTED" << std::endl;
         } else if(solutionBag.empty()) {
           debug_log("Solution bag is empty move back to hole punching " << std::endl);
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
           currentPhase = Phase::HOLE_PUNCHING;
-          globalStats.numberOfExplorationPhases++;
           holePuncher.incrementNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
+          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else {
-          debug_log("Grabbing random solution" << std::endl);
+          std::cout << "Grabbing random solution" << std::endl;
           // Grab a random solution
-          hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop);
+          hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop, globalStats);
           solutionBag.pop_back();
         }
       }
@@ -298,11 +303,11 @@ public:
         solutionBag = std::move(holePuncher.getSolutionBag());
         if(!solutionBag.empty()) {
           currentPhase = Phase::HILL_CLIMBING;
-          hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop);
+          hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop, globalStats);
           solutionBag.pop_back();
         } else {
           holePuncher.incrementNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop);
+          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         }
       }
       break;
@@ -310,11 +315,11 @@ public:
     }
   }
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
-                  const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop) {
+                  const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop, NeighbourhoodSearchStats &globalStats) {
     bestSolutionValue = newBestMinValue;
     bestSolution = newBestSolution;
     currentPhase = Phase::HILL_CLIMBING;
-    hillClimber.initialise(nhc, newBestMinValue, newBestSolution, prop);
+    hillClimber.initialise(nhc, newBestMinValue, newBestSolution, prop, globalStats);
   }
   bool hasFinishedPhase() {
     return false; // tbc

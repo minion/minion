@@ -88,6 +88,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       for(const auto& var : this->nhc.shadow_mapping[0]) {
         solution.push_back(var.getAssignedValue());
       }
+      globalStats.foundSolution(getState().getOptimiseVar()->getMin());
       if(restrictToFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
         throw EndOfSearch();
       }
@@ -132,7 +133,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   virtual void search() {
     NeighbourhoodSearchStats globalStats(
         nhc.neighbourhoods.size(),
-        make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()));
+        make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()),
+        std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
+                                       [](const Neighbourhood& n1, const Neighbourhood& n2) {
+                                         return n1.deviation.getMax() < n2.deviation.getMax();
+                                       })->deviation.getMax());
     globalStats.startTimer();
     vector<DomainInt> solution;
     cout << "Searching for initial solution:\n";
@@ -142,7 +147,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       return;
     } else {
       globalStats.setValueOfInitialSolution(stats.newMinValue);
-      searchStrategy.initialise(nhc, stats.newMinValue, solution, prop);
+      searchStrategy.initialise(nhc, stats.newMinValue, solution, prop, globalStats);
       debug_log("Stats on initial solution:\n" << stats << endl);
     }
 
