@@ -38,7 +38,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
                                                  const SearchParams& searchParams,
-                                                 NeighbourhoodSearchStats &globalStats,
+                                                 NeighbourhoodSearchStats& globalStats,
                                                  bool restrictToFirstSolution = true) {
     // Save state of the world
     int depth = Controller::get_world_depth();
@@ -51,7 +51,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       nhc.shadow_disable.assign(1);
     } else {
       switchOnNeighbourhoods(searchParams.neighbourhoodsToActivate, solution);
-      searchOrder.push_back(makeNeighbourhoodSearchOrder(searchParams));
+      searchOrder = makeNeighbourhoodSearchOrder(searchParams, base_order.front().order);
     }
     searchOrder.insert(searchOrder.end(), base_order.begin(), base_order.end());
     solution.clear();
@@ -73,11 +73,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     DomainInt optimisationValueCache = getState().getOptimiseVar()->getMin() - 1;
     // minus 1 is used as the optimisationHandler always sets it to optimisationValueCache +1
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
-                             const vector<Controller::triple>& branches) {
+                              const vector<Controller::triple>& branches) {
       Controller::standard_time_ctrlc_checks(var_array, branches);
       if(alarmTriggered) {
-        if (!searchParams.neighbourhoodsToActivate.empty()){
-          highestNeighbourhoodSize = nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.getMin();
+        if(!searchParams.neighbourhoodsToActivate.empty()) {
+          highestNeighbourhoodSize =
+              nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.getMin();
         }
         throw TimeoutException();
       }
@@ -114,18 +115,18 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       timeout = true;
     }
 
-    if (getState().isCtrlcPressed()){
+    if(getState().isCtrlcPressed()) {
       cout << "Ctrl-C pressed----" << std::endl;
       globalStats.printStats(cout, nhc);
       cout << endl;
       exit(0);
     }
 
-
     bool solutionFound = !solution.empty();
     DomainInt bestOptimisation =
         (solutionFound) ? optimisationValueCache : optimisationValueCache + 1;
-    NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout, highestNeighbourhoodSize);
+    NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout,
+                             highestNeighbourhoodSize);
     Controller::world_pop_to_depth(depth);
     return stats;
   }
@@ -135,13 +136,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         nhc.neighbourhoods.size(),
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()),
         std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
-                                       [](const Neighbourhood& n1, const Neighbourhood& n2) {
-                                         return n1.deviation.getMax() < n2.deviation.getMax();
-                                       })->deviation.getMax());
+                         [](const Neighbourhood& n1, const Neighbourhood& n2) {
+                           return n1.deviation.getMax() < n2.deviation.getMax();
+                         })
+            ->deviation.getMax());
     globalStats.startTimer();
     vector<DomainInt> solution;
     cout << "Searching for initial solution:\n";
-    NeighbourhoodStats stats = searchNeighbourhoods(solution, SearchParams({}, true, 0),globalStats);
+    NeighbourhoodStats stats =
+        searchNeighbourhoods(solution, SearchParams({}, true, 0), globalStats);
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
@@ -154,9 +157,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     while(!searchStrategy.hasFinishedPhase()) {
       SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
       debug_log("Searching with params  " << searchParams << endl);
-      stats = searchNeighbourhoods(solution, searchParams,globalStats, false);
+      stats = searchNeighbourhoods(solution, searchParams, globalStats, false);
       debug_log("Stats on last search: " << stats << endl);
-      searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution, globalStats);
+      searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution,
+                                 globalStats);
       debug_log("Global stats:\n");
       globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
 
@@ -191,21 +195,23 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    * sizes with ascending value ordering.  Followed by the primary variabels referenced by the
    * activated neighbourhoods with random ordering.
    */
-  SearchOrder makeNeighbourhoodSearchOrder(const SearchParams &searchParams) {
+  vector<SearchOrder> makeNeighbourhoodSearchOrder(const SearchParams& searchParams,
+                                                   VarOrderEnum varOrder) {
     nhc.neighbourhoods[0].deviation.setMin(searchParams.initialNeighbourhoodSize);
-    SearchOrder searchOrder;
+    vector<SearchOrder> searchOrders(2);
     for(int neighbourhoodIndex : searchParams.neighbourhoodsToActivate) {
-      searchOrder.var_order.push_back(
+      searchOrders[0].var_order.push_back(
           nhc.neighbourhoods[neighbourhoodIndex].deviation.getBaseVar());
-      searchOrder.val_order.push_back(VALORDER_ASCEND);
+      searchOrders[0].val_order.push_back(VALORDER_ASCEND);
     }
     for(int neighbourhoodIndex : searchParams.neighbourhoodsToActivate) {
       for(const auto& primaryVar : nhc.neighbourhoods[neighbourhoodIndex].vars) {
-        searchOrder.var_order.push_back(primaryVar.getBaseVar());
-        searchOrder.val_order.push_back(VALORDER_RANDOM);
+        searchOrders[1].var_order.push_back(primaryVar.getBaseVar());
+        searchOrders[1].val_order.push_back(VALORDER_RANDOM);
       }
     }
-    return searchOrder;
+    searchOrders[1].order = varOrder;
+    return searchOrders;
   }
   /**
    * Switch on the neighbourhood activation vars
