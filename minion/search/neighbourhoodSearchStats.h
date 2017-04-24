@@ -29,6 +29,14 @@ struct NeighbourhoodStats {
   }
 };
 
+struct ExplorationPhase{
+  int neighbourhoodSize;
+  u_int64_t startExplorationTime;
+  u_int64_t endExplorationTime;
+};
+
+
+
 class NeighbourhoodSearchStats {
 public:
   int numberIterations;
@@ -45,6 +53,8 @@ public:
   vector<int> totalNeighbourhoodSizeExplorations;
   vector<int> totalNeighbourhoodSizeSuccess;
   vector<u_int64_t> neighbourhoodExplorationTimes;
+  vector<ExplorationPhase> explorationPhases;
+
 
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
@@ -123,6 +133,7 @@ public:
       currentlyExploring = false;
       totalNeighbourhoodSizeSuccess[currentNeighbourhoodSize -1 ] += 1;
       std::cout << "neighbourhood size is " << currentNeighbourhoodSize << std::endl;
+      explorationPhases.back().endExplorationTime = getTotalTimeTaken();
     }
   }
 
@@ -130,11 +141,17 @@ public:
     if (currentlyExploring){
       auto endTime = std::chrono::high_resolution_clock::now();
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
+      explorationPhases.back().endExplorationTime = getTotalTimeTaken();
     }
     currentlyExploring = true;
     startExplorationTime = std::chrono::high_resolution_clock::now();
     totalNeighbourhoodSizeExplorations[neighbourhoodSize -1] += 1;
     currentNeighbourhoodSize = neighbourhoodSize;
+    ExplorationPhase currentPhase;
+    currentPhase.neighbourhoodSize = neighbourhoodSize;
+    currentPhase.startExplorationTime=getTotalTimeTaken();
+    explorationPhases.push_back(currentPhase);
+
   }
 
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
@@ -145,8 +162,6 @@ public:
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
-    os << "Number of explorations " << numberOfExplorationPhases << "\n";
-    os << "Number of better solutions found through exploration " << numberOfBetterSolutionsFoundFromExploration << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
@@ -172,35 +187,19 @@ public:
       os << indent << "Time Spent: " << neighbourhoodExplorationTimes[i] << "\n";
     }
     os << "---------------" << "\n";
+
+    os << "Exploration Phases: " << "\n";
+    for(int i = 0; i < explorationPhases.size(); i++){
+      os << "Phase " << (i+1) << "\n";
+      os << "------------" << "\n";
+      os << "Start Time: " << explorationPhases[i].startExplorationTime << "\n";
+      os << "End Time: " << explorationPhases[i].endExplorationTime << "\n";
+      os << "Neighbourhood Size: " << explorationPhases[i].neighbourhoodSize << "\n";
+      os << "-----------------" << "\n";
+    }
   }
 };
 
-/*
-  I guess it would be nice to know the following:
-  1. How much time do we spend in hole punching mode?
-    So we can estimate this by looking at the number of neighbourhoods. As we know each neighbourhood hole punch is capped to 500 ms then we know
-    at most we spend 500ms * |numberOfNeighbourhoods| per hole punch.
-
-
-
-  2. The problem with UCB is that it will not respond to quick changes in performance very quickly so for tsp if one arm is doing really well even when we hit the peak
-  it will continue to select that arm for a bit until the holepuncher kicks in.
-
-
-
-  3. Should we update UCB after the fact?
-
-
-
-  Questions:
-  1. Is there any point in pulling the same arm twice??
-  -> Dont we start at the same value ordering for the size of the neighbourhood?
-  -> If we give it the same amount of time is it going to find out anything different?
-
-  Maybe we could do something whereby we include the size of the neighbourhood that the neighbourhood arrived at in part of the calculation of whether or not to stop.
-  The higher it managed to climb and if it fails then we take that as more of an indication that we should stop.
-
-*/
 
 
 #endif /* MINION_SEARCH_NEIGHBOURHOODSEARCHSTATS_H_ */

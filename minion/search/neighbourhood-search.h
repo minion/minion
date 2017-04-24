@@ -115,6 +115,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       timeout = true;
     }
 
+    if(getOptions().timeout_active && (globalStats.getTotalTimeTaken()/1000) >= getOptions().time_limit){
+      cout << "Time limit Reached-----" << endl;
+      globalStats.printStats(cout, nhc);
+      cout << endl;
+      exit(0);
+    }
+
+
+
     if(getState().isCtrlcPressed()) {
       cout << "Ctrl-C pressed----" << std::endl;
       globalStats.printStats(cout, nhc);
