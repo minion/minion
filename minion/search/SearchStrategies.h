@@ -255,6 +255,8 @@ public:
     }
   }
 
+  int numberOfRandomSolutionsPulled = 0;
+
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats &globalStats) {
@@ -288,6 +290,7 @@ public:
           holePuncher.incrementNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else {
+          globalStats.totalNumberOfRandomSolutionsPulled += 1;
           std::cout << "Grabbing random solution" << std::endl;
           // Grab a random solution
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop, globalStats);
@@ -304,6 +307,7 @@ public:
         if(!solutionBag.empty()) {
           currentPhase = Phase::HILL_CLIMBING;
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop, globalStats);
+          globalStats.totalNumberOfRandomSolutionsPulled += 1;
           solutionBag.pop_back();
         } else {
           holePuncher.incrementNeighbourhoodSize();

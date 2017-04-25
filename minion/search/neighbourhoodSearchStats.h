@@ -55,6 +55,8 @@ public:
   vector<u_int64_t> neighbourhoodExplorationTimes;
   vector<ExplorationPhase> explorationPhases;
 
+  int totalNumberOfRandomSolutionsPulled;
+
 
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
@@ -84,7 +86,8 @@ public:
         bestOptVarValue(initialOptVarRange.first),
         totalNeighbourhoodSizeExplorations(maxNeighbourhoodSize),
         totalNeighbourhoodSizeSuccess(maxNeighbourhoodSize),
-        neighbourhoodExplorationTimes(maxNeighbourhoodSize){}
+        neighbourhoodExplorationTimes(maxNeighbourhoodSize),
+        totalNumberOfRandomSolutionsPulled(0) {}
 
   inline u_int64_t getTotalTimeTaken() {
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -162,6 +165,8 @@ public:
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
+    os << "Average number of random solutions pulled: " << (((double) totalNumberOfRandomSolutionsPulled)/explorationPhases.size()) << "\n";
+    os << "Total Number of random solutions pulled : " << totalNumberOfRandomSolutionsPulled << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
