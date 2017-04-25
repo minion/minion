@@ -232,17 +232,22 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
                               const vector<DomainInt>& solution) {
     std::unordered_set<AnyVarRef> shadowVariables;
     debug_log("Switiching on neighbourhoods with depth " << Controller::get_world_depth());
+    assert(neighbourHoodIndexes.size() == 1);
 
-    for(int i : neighbourHoodIndexes) {
-      debug_log("Switching on neighbourhood "
-                << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin() << " -> "
-                << nhc.neighbourhoods[i].activation.getMax());
-      Neighbourhood& neighbourhood = nhc.neighbourhoods[i];
-      neighbourhood.activation.assign(1);
+    for (int i = 0 ; i < nhc.neighbourhoods.size(); i++){
+      if (i != neighbourHoodIndexes[0])
+        nhc.neighbourhoods[i].activation.assign(0);
+    }
 
-      for(auto& n : neighbourhood.vars) {
-        shadowVariables.insert(n);
-      }
+    Neighbourhood& neighbourhood = nhc.neighbourhoods[neighbourHoodIndexes[0]];
+    neighbourhood.activation.assign(1);
+
+    debug_log("Switching on neighbourhood "
+              << i << " With domain: " << nhc.neighbourhoods[i].activation.getMin() << " -> "
+              << nhc.neighbourhoods[i].activation.getMax());
+
+    for(auto& n : neighbourhood.vars) {
+      shadowVariables.insert(n);
     }
 
     debug_code(for(int i = 0; i < nhc.neighbourhoods.size(); i++) {

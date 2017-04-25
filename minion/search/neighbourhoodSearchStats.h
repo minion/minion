@@ -33,6 +33,7 @@ struct ExplorationPhase{
   int neighbourhoodSize;
   u_int64_t startExplorationTime;
   u_int64_t endExplorationTime;
+  int numberOfRandomSolutionsPulled;
 };
 
 
@@ -56,6 +57,7 @@ public:
   vector<ExplorationPhase> explorationPhases;
 
   int totalNumberOfRandomSolutionsPulled;
+  int numberPulledThisPhase;
 
 
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
@@ -137,6 +139,8 @@ public:
       totalNeighbourhoodSizeSuccess[currentNeighbourhoodSize -1 ] += 1;
       std::cout << "neighbourhood size is " << currentNeighbourhoodSize << std::endl;
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
+      explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
+      numberPulledThisPhase = 0;
     }
   }
 
@@ -145,6 +149,8 @@ public:
       auto endTime = std::chrono::high_resolution_clock::now();
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
+      explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
+      numberPulledThisPhase = 0;
     }
     currentlyExploring = true;
     startExplorationTime = std::chrono::high_resolution_clock::now();
@@ -156,6 +162,7 @@ public:
     explorationPhases.push_back(currentPhase);
 
   }
+
 
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
     os << "Search Stats:\n";
@@ -200,6 +207,7 @@ public:
       os << "Start Time: " << explorationPhases[i].startExplorationTime << "\n";
       os << "End Time: " << explorationPhases[i].endExplorationTime << "\n";
       os << "Neighbourhood Size: " << explorationPhases[i].neighbourhoodSize << "\n";
+      os << "Number of random solutions PUlled " << explorationPhases[i].numberOfRandomSolutionsPulled << "\n";
       os << "-----------------" << "\n";
     }
   }

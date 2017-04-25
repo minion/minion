@@ -269,8 +269,6 @@ public:
         debug_log("HILL climbing phase has finished " << std::endl);
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           debug_log("A new best value was found " << std::endl);
-         // globalStats.numberOfBetterSolutionsFoundFromExploration++;
-         // globalStats.numberOfExplorationPhases++;
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = hillClimber.bestSolution;
 
@@ -291,6 +289,7 @@ public:
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else {
           globalStats.totalNumberOfRandomSolutionsPulled += 1;
+          globalStats.numberPulledThisPhase += 1;
           std::cout << "Grabbing random solution" << std::endl;
           // Grab a random solution
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop, globalStats);
@@ -308,6 +307,7 @@ public:
           currentPhase = Phase::HILL_CLIMBING;
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop, globalStats);
           globalStats.totalNumberOfRandomSolutionsPulled += 1;
+          globalStats.numberPulledThisPhase += 1;
           solutionBag.pop_back();
         } else {
           holePuncher.incrementNeighbourhoodSize();
