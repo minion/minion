@@ -504,7 +504,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
         instance->constraints.push_back(readConstraint(infile, false));
     } else if(s == "**GADGET**") {
       readGadget(infile);
-    } else if(s == "**NEIGHBOURHOOD**") {
+    } else if(s == "**NEIGHBOURHOODS**") {
       readNeighbourhood(infile);
     } else if(s == wrong_eof) {
       throw parse_exception("Section terminated with " + wrong_eof + " instead of " + eof);
@@ -520,29 +520,32 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
 template <typename FileReader>
 void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
   MAYBE_PARSER_INFO("Entering neighbourhood parsing");
-  string svc = infile->get_string();
-  if(svc != "SOFTVIOLATIONCOUNT")
-    throw parse_exception("Expected SOFTVIOLATIONCOUNT");
-  
+//  string svc = infile->get_string();
+//  if(svc != "SOFTVIOLATIONCOUNT")
+//    throw parse_exception("Expected SOFTVIOLATIONCOUNT");
+//
   if(instance->neighbourhoodContainer)
-    throw parse_exception("Only one **NEIGHBOURHOOD** section at present");
+    throw parse_exception("Only one **NEIGHBOURHOODS** section at present");
 
   instance->neighbourhoodContainer = ParsedNeighbourhoodContainer();
 
   ParsedNeighbourhoodContainer& nbhc = *(instance->neighbourhoodContainer);
-  nbhc.soft_violation_count = readIdentifier(infile);
+  nbhc.soft_violation_count = Var(VAR_CONSTANT, 1);
+
+
+
+  string shadowdisable = infile->get_string();
+  if(shadowdisable != "INCUMBENTDISABLE")
+    throw parse_exception("Expected INCUMBENTDISABLE");
+  nbhc.shadow_disable = readIdentifier(infile);
+
 
   string shadowmap = infile->get_string();
-  if(shadowmap != "SHADOWMAPPING")
-    throw parse_exception("Expected SHADOWMAPPING");
+  if(shadowmap != "INCUMBENTMAPPING")
+    throw parse_exception("Expected INCUMBENTMAPPING");
   
   nbhc.shadow_mapping = read2DMatrix(infile);
 
-  string shadowdisable = infile->get_string();
-  if(shadowdisable != "SHADOWDISABLE")
-    throw parse_exception("Expected SHADOWDISABLE");
-  nbhc.shadow_disable = readIdentifier(infile);
-  
   while(infile->peek_char() != '*') {
     string neighbourhood = infile->get_string();
     if(neighbourhood != "NEIGHBOURHOOD")
