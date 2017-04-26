@@ -554,9 +554,10 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
     ParsedNeighbourhood nbh;
     nbh.name = infile->get_string();
     infile->check_sym('(');
-    nbh.activation = readIdentifier(infile);
-    infile->check_sym(',');
     nbh.deviation = readIdentifier(infile);
+        infile->check_sym(',');
+    nbh.activation = readIdentifier(infile);
+
     infile->check_sym(',');
     nbh.vars = readLiteralVector(infile);
     infile->check_sym(')');
