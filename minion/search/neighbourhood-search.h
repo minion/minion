@@ -49,6 +49,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     vector<SearchOrder> searchOrder;
     if(searchParams.neighbourhoodsToActivate.empty()) {
       nhc.shadow_disable.assign(1);
+      switchOffAllNeighbourhoods();
     } else {
       switchOnNeighbourhoods(searchParams.neighbourhoodsToActivate, solution);
       searchOrder = makeNeighbourhoodSearchOrder(searchParams, base_order.front().order);
@@ -224,6 +225,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     searchOrders[1].order = varOrder;
     return searchOrders;
   }
+
+  /**assign all neighbourhood activation variables to false
+   *
+   */
+  inline void switchOffAllNeighbourhoods() {
+    for(auto& nh : nhc.neighbourhoods) {
+      nh.activation.assign(0);
+    }
+  }
+
   /**
    * Switch on the neighbourhood activation vars
    * Find the set of primary variables not contained in any neighbourhoods and assign them to the
