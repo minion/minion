@@ -141,14 +141,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   virtual void search() {
+    int maxNeighbourhoodSize =
+        checked_cast<int>(std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
+                                           [](const Neighbourhood& n1, const Neighbourhood& n2) {
+                                             return n1.deviation.getMax() < n2.deviation.getMax();
+                                           })
+                              ->deviation.getMax());
     NeighbourhoodSearchStats globalStats(
         nhc.neighbourhoods.size(),
         make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()),
-        std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
-                         [](const Neighbourhood& n1, const Neighbourhood& n2) {
-                           return n1.deviation.getMax() < n2.deviation.getMax();
-                         })
-            ->deviation.getMax());
+        maxNeighbourhoodSize);
     globalStats.startTimer();
     vector<DomainInt> solution;
     cout << "Searching for initial solution:\n";

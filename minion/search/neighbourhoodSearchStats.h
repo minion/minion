@@ -130,8 +130,7 @@ public:
     }
   }
 
-
-  void foundSolution(int solutionValue){
+  void foundSolution(DomainInt solutionValue) {
     if (currentlyExploring && solutionValue > bestOptVarValue){
       auto endTime = std::chrono::high_resolution_clock::now();
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
