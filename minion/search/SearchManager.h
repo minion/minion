@@ -58,7 +58,7 @@ struct StandardSearchManager : public SearchManager{
 
   inline virtual ~StandardSearchManager() {}
 
-  std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> check_func;
+  std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> check_func;
   std::function<void(void)> handle_sol_func, handle_opt_func;
 
   vector<AnyVarRef> var_array;
@@ -73,7 +73,7 @@ struct StandardSearchManager : public SearchManager{
   SysInt depth; // number of left branches
 
   StandardSearchManager(shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
-                std::function<void(vector<AnyVarRef>, vector<Controller::triple>)> _check_func,
+                std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> _check_func,
                 std::function<void(void)> _handle_sol_func, std::function<void(void)> _handle_opt_func)
       :
       check_func(_check_func), handle_sol_func(_handle_sol_func),
