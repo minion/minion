@@ -18,7 +18,7 @@ struct NeighbourhoodStats {
         timeTaken(timeTaken),
         solutionFound(solutionFound),
         timeoutReached(timeoutReached),
-        highestNeighbourhoodSize(highestNeighbourhoodSize){}
+        highestNeighbourhoodSize(highestNeighbourhoodSize) {}
 
   friend std::ostream& operator<<(std::ostream& cout, const NeighbourhoodStats& stats) {
     cout << "New Min Value: " << stats.newMinValue << "\n"
@@ -29,14 +29,12 @@ struct NeighbourhoodStats {
   }
 };
 
-struct ExplorationPhase{
+struct ExplorationPhase {
   int neighbourhoodSize;
   u_int64_t startExplorationTime;
   u_int64_t endExplorationTime;
   int numberOfRandomSolutionsPulled;
 };
-
-
 
 class NeighbourhoodSearchStats {
 public:
@@ -51,14 +49,13 @@ public:
   int numberOfExplorationPhases;
   int numberOfBetterSolutionsFoundFromExploration;
 
-  vector<int> totalNeighbourhoodSizeExplorations;
-  vector<int> totalNeighbourhoodSizeSuccess;
+  vector<int> numberExplorationsByNHSize;
+  vector<int> numberSuccessfulExplorationsByNHSize;
   vector<u_int64_t> neighbourhoodExplorationTimes;
   vector<ExplorationPhase> explorationPhases;
 
   int totalNumberOfRandomSolutionsPulled;
   int numberPulledThisPhase;
-
 
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
@@ -72,7 +69,8 @@ public:
   NeighbourhoodSearchStats() {}
 
   NeighbourhoodSearchStats(int numberNeighbourhoods,
-                           const std::pair<DomainInt, DomainInt>& initialOptVarRange, int maxNeighbourhoodSize)
+                           const std::pair<DomainInt, DomainInt>& initialOptVarRange,
+                           int maxNeighbourhoodSize)
       : numberIterations(0),
         numberActivations(numberNeighbourhoods, 0),
         totalTime(numberNeighbourhoods, 0),
@@ -85,9 +83,9 @@ public:
         initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
         lastOptVarValue(initialOptVarRange.first),
+        numberExplorationsByNHSize(maxNeighbourhoodSize),
         bestOptVarValue(initialOptVarRange.first),
-        totalNeighbourhoodSizeExplorations(maxNeighbourhoodSize),
-        totalNeighbourhoodSizeSuccess(maxNeighbourhoodSize),
+        numberSuccessfulExplorationsByNHSize(maxNeighbourhoodSize),
         neighbourhoodExplorationTimes(maxNeighbourhoodSize),
         totalNumberOfRandomSolutionsPulled(0) {}
 
@@ -131,37 +129,38 @@ public:
   }
 
   void foundSolution(DomainInt solutionValue) {
-    if (currentlyExploring && solutionValue > bestOptVarValue){
+    if(currentlyExploring && solutionValue > bestOptVarValue) {
       auto endTime = std::chrono::high_resolution_clock::now();
-      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
+      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
+          std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime)
+              .count();
       currentlyExploring = false;
-      totalNeighbourhoodSizeSuccess[currentNeighbourhoodSize -1 ] += 1;
-      std::cout << "neighbourhood size is " << currentNeighbourhoodSize << std::endl;
+      numberSuccessfulExplorationsByNHSize[currentNeighbourhoodSize - 1] += 1;
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
       explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
       numberPulledThisPhase = 0;
     }
   }
 
-  void startExploration(int neighbourhoodSize){
-    if (currentlyExploring){
+  void startExploration(int neighbourhoodSize) {
+    if(currentlyExploring) {
       auto endTime = std::chrono::high_resolution_clock::now();
-      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] += std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime).count();
+      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
+          std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime)
+              .count();
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
       explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
       numberPulledThisPhase = 0;
     }
     currentlyExploring = true;
     startExplorationTime = std::chrono::high_resolution_clock::now();
-    totalNeighbourhoodSizeExplorations[neighbourhoodSize -1] += 1;
+    numberExplorationsByNHSize[neighbourhoodSize - 1] += 1;
     currentNeighbourhoodSize = neighbourhoodSize;
     ExplorationPhase currentPhase;
     currentPhase.neighbourhoodSize = neighbourhoodSize;
-    currentPhase.startExplorationTime=getTotalTimeTaken();
+    currentPhase.startExplorationTime = getTotalTimeTaken();
     explorationPhases.push_back(currentPhase);
-
   }
-
 
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
     os << "Search Stats:\n";
@@ -171,8 +170,10 @@ public:
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
-    os << "Average number of random solutions pulled: " << (((double) totalNumberOfRandomSolutionsPulled)/explorationPhases.size()) << "\n";
-    os << "Total Number of random solutions pulled : " << totalNumberOfRandomSolutionsPulled << "\n";
+    os << "Average number of random solutions pulled: "
+       << (((double)totalNumberOfRandomSolutionsPulled) / explorationPhases.size()) << "\n";
+    os << "Total Number of random solutions pulled : " << totalNumberOfRandomSolutionsPulled
+       << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
       os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
@@ -184,34 +185,41 @@ public:
       os << indent << "Number no solutions: " << numberNoSolutions[i] << "\n";
       os << indent << "Number timeouts: " << numberTimeouts[i] << "\n";
     }
-    os << "History of best solutions found " << "\n";
-    for (auto &currentPair: bestSolutions){
+    os << "History of best solutions found "
+       << "\n";
+    for(auto& currentPair : bestSolutions) {
       os << "Value : " << currentPair.first << " Time : " << currentPair.second << " \n";
     }
 
-    os << "Stats of Explorations:" << "\n";
-    os << "---------------" << "\n";
-    for (int i = 0; i < totalNeighbourhoodSizeExplorations.size(); i++){
-      os << "NeighbourhoodSize " << (i+1) << ":" << "\n";
-      os << indent << "Activations: " << totalNeighbourhoodSizeExplorations[i] << "\n";
-      os << indent << "Sucess: " << totalNeighbourhoodSizeSuccess[i]<< "\n";
+    os << "Stats of Explorations:"
+       << "\n";
+    os << "---------------"
+       << "\n";
+    for(int i = 0; i < numberExplorationsByNHSize.size(); i++) {
+      os << "NeighbourhoodSize " << (i + 1) << ":"
+         << "\n";
+      os << indent << "Activations: " << numberExplorationsByNHSize[i] << "\n";
+      os << indent << "Number successful: " << numberSuccessfulExplorationsByNHSize[i] << "\n";
       os << indent << "Time Spent: " << neighbourhoodExplorationTimes[i] << "\n";
     }
-    os << "---------------" << "\n";
+    os << "---------------"
+       << "\n";
 
-    os << "Exploration Phases: " << "\n";
-    for(int i = 0; i < explorationPhases.size(); i++){
-      os << "Phase " << (i+1) << "\n";
-      os << "------------" << "\n";
+    os << "Exploration Phases: "
+       << "\n";
+    for(int i = 0; i < explorationPhases.size(); i++) {
+      os << "Phase " << (i + 1) << "\n";
+      os << "------------"
+         << "\n";
       os << "Start Time: " << explorationPhases[i].startExplorationTime << "\n";
       os << "End Time: " << explorationPhases[i].endExplorationTime << "\n";
       os << "Neighbourhood Size: " << explorationPhases[i].neighbourhoodSize << "\n";
-      os << "Number of random solutions PUlled " << explorationPhases[i].numberOfRandomSolutionsPulled << "\n";
-      os << "-----------------" << "\n";
+      os << "Number of random solutions PUlled "
+         << explorationPhases[i].numberOfRandomSolutionsPulled << "\n";
+      os << "-----------------"
+         << "\n";
     }
   }
 };
-
-
 
 #endif /* MINION_SEARCH_NEIGHBOURHOODSEARCHSTATS_H_ */

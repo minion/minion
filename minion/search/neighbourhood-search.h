@@ -43,8 +43,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     // Save state of the world
     int depth = Controller::get_world_depth();
 
-    debug_log("---In search function---");
-    debug_log("Depth is: " << depth);
     Controller::world_push();
     vector<SearchOrder> searchOrder;
     if(searchParams.neighbourhoodsToActivate.empty()) {
@@ -64,7 +62,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(searchParams.neighbourhoodsToActivate.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
-        debug_log("---No Search was carried out---");
         Controller::world_pop_to_depth(depth);
         return NeighbourhoodStats(getState().getOptimiseVar()->getMin(), 0, false, false);
       }
@@ -116,7 +113,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       timeout = true;
     }
 
-    if(getOptions().timeout_active && (globalStats.getTotalTimeTaken()/1000) >= getOptions().time_limit){
+    if(getOptions().timeout_active &&
+       (globalStats.getTotalTimeTaken() / 1000) >= getOptions().time_limit) {
       globalStats.printStats(cout, nhc);
       cout << endl;
       throw EndOfSearch();
@@ -150,7 +148,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         maxNeighbourhoodSize);
     globalStats.startTimer();
     vector<DomainInt> solution;
-    cout << "Searching for initial solution:\n";
+    std::cout << "Searching for initial solution:\n";
     NeighbourhoodStats stats =
         searchNeighbourhoods(solution, SearchParams({}, true, 0), globalStats);
     if(!stats.solutionFound) {
@@ -164,7 +162,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     while(!searchStrategy.hasFinishedPhase()) {
       SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
-      debug_log("Searching with params  " << searchParams << endl);
+      debug_log("Searching with params  " << searchParams);
       stats = searchNeighbourhoods(solution, searchParams, globalStats, false);
       debug_log("Stats on last search: " << stats << endl);
       searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution,
@@ -239,12 +237,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    */
   void switchOnNeighbourhoods(const vector<int>& neighbourHoodIndexes,
                               const vector<DomainInt>& solution) {
-    std::unordered_set<AnyVarRef> shadowVariables;
-    debug_log("Switiching on neighbourhoods with depth " << Controller::get_world_depth());
     assert(neighbourHoodIndexes.size() == 1);
+    std::unordered_set<AnyVarRef> shadowVariables;
 
-    for (int i = 0 ; i < nhc.neighbourhoods.size(); i++){
-      if (i != neighbourHoodIndexes[0])
+    for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
+      if(i != neighbourHoodIndexes[0])
         nhc.neighbourhoods[i].activation.assign(0);
     }
 
