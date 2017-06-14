@@ -113,16 +113,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       timeout = true;
     }
 
-    if(getOptions().timeout_active &&
-       (globalStats.getTotalTimeTaken() / 1000) >= getOptions().time_limit) {
-      globalStats.printStats(cout, nhc);
-      cout << endl;
-      throw EndOfSearch();
-    }
-    if(getState().isCtrlcPressed()) {
-      cout << "Ctrl-C pressed----" << std::endl;
-      globalStats.printStats(cout, nhc);
-      cout << endl;
+    if(getState().isCtrlcPressed() ||
+       (getOptions().timeout_active &&
+        (globalStats.getTotalTimeTaken() / 1000) >= getOptions().time_limit)) {
       throw EndOfSearch();
     }
 
@@ -159,20 +152,27 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       searchStrategy.initialise(nhc, stats.newMinValue, solution, prop, globalStats);
       debug_log("Stats on initial solution:\n" << stats << endl);
     }
+    try {
+      while(!searchStrategy.hasFinishedPhase()) {
+        SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
+        debug_log("Searching with params  " << searchParams);
+        stats = searchNeighbourhoods(solution, searchParams, globalStats, false);
+        debug_log("Stats on last search: " << stats << endl);
+        searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats,
+                                   solution, globalStats);
+        debug_log("Global stats:\n");
+        globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
 
-    while(!searchStrategy.hasFinishedPhase()) {
-      SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
-      debug_log("Searching with params  " << searchParams);
-      stats = searchNeighbourhoods(solution, searchParams, globalStats, false);
-      debug_log("Stats on last search: " << stats << endl);
-      searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats, solution,
-                                 globalStats);
-      debug_log("Global stats:\n");
-      globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
+        debug_code(globalStats.printStats(cout, nhc));
+      }
+    } catch(EndOfSearch&) {}
 
-      debug_code(globalStats.printStats(cout, nhc));
+    if(getState().isCtrlcPressed()) {
+      cout << "Ctrl-C pressed----" << std::endl;
     }
-    debug_code(globalStats.printStats(cout, nhc));
+    globalStats.printStats(cout, nhc);
+    cout << endl;
+    throw EndOfSearch();
   }
 
   void printWorld() {
