@@ -115,7 +115,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
 
   if(instance.neighbourhoodContainer) {
 
-     sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order, *instance.neighbourhoodContainer, instance.neighbourhoodSearchStrategy, instance.neighbourhoodSelectionStrategy);
+     sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order, *instance.neighbourhoodContainer);
   }
   else
     sm = Controller::make_search_manager(args.prop_method, instance.search_order);

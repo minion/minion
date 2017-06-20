@@ -252,6 +252,11 @@ public:
 /// be changed during search.
 class SearchOptions {
 public:
+    enum class NeighbourhoodSearchStrategy { META_STRATEGY, HILL_CLIMBING };
+    enum class NeighbourhoodSelectionStrategy { RANDOM, UCB,  INTERACTIVE  };
+    NeighbourhoodSearchStrategy neighbourhoodSearchStrategy = NeighbourhoodSearchStrategy::META_STRATEGY;
+    NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy = NeighbourhoodSelectionStrategy::UCB;
+
   /// Denotes if minion should print no output, other than that explicitally
   /// requested
   bool silent;

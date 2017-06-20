@@ -6,44 +6,23 @@
 #include <math.h>
 #include <vector>
 
-class RandomNeighbourhoodChooser  {
-
-  std::vector<bool> neighbourhoodSuccessHistory;
-  std::vector<int> neighbourhoodActivationHistory;
+class RandomNeighbourhoodChooser {
+  std::vector<int> viableNeighbourhoods;
 
 public:
-  RandomNeighbourhoodChooser(const NeighbourhoodContainer& neighbourhoodContainer)
-      : neighbourhoodSuccessHistory(neighbourhoodContainer.neighbourhoods.size(), true) {}
+  RandomNeighbourhoodChooser() {}
 
-  void updateStats(const vector<int>& activatedNeighbourhoods,
-                   const NeighbourhoodStats& neighbourhoodStats) {}
+  void updateStats(const vector<int>& activatedNeighbourhoods, const NeighbourhoodStats&) {}
 
-  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
-                                          double neighbourhoodTimeout) {
-
-    int random = std::rand() % neighbourhoodContainer.neighbourhoods.size();
-    int iterations(0);
-    while(true) {
-      if(!neighbourhoodContainer
-              .neighbourhoods[random % neighbourhoodContainer.neighbourhoods.size()]
-              .activation.isAssigned()) {
-        neighbourhoodActivationHistory.push_back(random);
-        return {random};
+  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
+                                          NeighbourhoodSearchStats&) {
+    viableNeighbourhoods.clear();
+    for(size_t i = 0; i < nhc.neighbourhoods.size(); i++) {
+      if(nhc.neighbourhoods[i].activation.inDomain(1)) {
+        viableNeighbourhoods.push_back(i);
       }
-      random++;
-      if(iterations++ == neighbourhoodContainer.neighbourhoods.size()) {
-        D_FATAL_ERROR("EMPTY NEIGHBOURHOODS!!!");
-        return {};
-      }
-    }
-  }
-
-  void printHistory(NeighbourhoodContainer& nhc) {
-    debug_code(for(int& n
-                   : neighbourhoodActivationHistory) {
-      int timeStep(0);
-      debug_log("Time Step: " << timeStep++ << " Neighbourhood Activated-> " << n << std::endl);
-    });
+    };
+    return {viableNeighbourhoods[std::rand() % viableNeighbourhoods.size()]};
   }
 };
 
@@ -100,7 +79,7 @@ std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
   return cout;
 }
 
-class UCBNeighborHoodSelection  {
+class UCBNeighborHoodSelection {
 private:
   /**
    * Stores the UCB of each neighbourhood for each timestep -> For Debugging
@@ -192,30 +171,29 @@ public:
 class InteractiveNeighbourhoodChooser {
 
 public:
-  InteractiveNeighbourhoodChooser(const NeighbourhoodContainer& neighbourhoodContainer) {}
+  InteractiveNeighbourhoodChooser() {}
 
-  void updateStats(const vector<int>& activatedNeighbourhoods,
-                   const NeighbourhoodStats& neighbourhoodStats) {
-    std::cout << neighbourhoodStats << std::endl;
+  void updateStats(const vector<int>& activatedNeighbourhoods, const NeighbourhoodStats& stats) {
+    std::cout << stats << std::endl;
   }
 
-  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& neighbourhoodContainer,
-                                          int& neighbourhoodTimeout,
-                                          NeighbourhoodSearchStats& globalStats) {
-    std::cout << "Global STats: " << std::endl;
-    globalStats.printStats(std::cout, neighbourhoodContainer);
-    neighbourhoodTimeout = 500;
-    for(int i = 0; i < neighbourhoodContainer.neighbourhoods.size(); i++) {
-      std::cout << "Neighbourhood " << i << " Is assigned? "
-                << neighbourhoodContainer.neighbourhoods[i].activation.isAssigned() << std::endl;
+  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
+                                          NeighbourhoodSearchStats&) {
+    while(true) {
+      std::cout << "Select Neighbourhood:\n";
+      for(size_t i = 0; i < nhc.neighbourhoods.size(); ++i) {
+        cout << i << ": " << nhc.neighbourhoods[i].name << endl;
+      }
+      int index;
+      bool readInt = bool(cin >> index);
+      if(!readInt || index < 0 || index >= (int)nhc.neighbourhoods.size()) {
+        cout << "Error, please enter an integer in the range 0.." << nhc.neighbourhoods.size()
+             << ".\n";
+      } else {
+        return {index};
+      }
     }
-    int activatedNeighbourhood;
-    std::cout << "Enter the neighbourhood would you like to activate " << std::endl;
-    cin >> activatedNeighbourhood;
-    return {activatedNeighbourhood};
   }
-
-  void printHistory(NeighbourhoodContainer& nhc) {}
 };
 
 #endif // MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H

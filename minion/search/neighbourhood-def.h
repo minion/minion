@@ -20,16 +20,12 @@ struct Neighbourhood {
   AnyVarRef activation;
   AnyVarRef deviation;
   std::vector<AnyVarRef> vars;
-  int numberOfRuns;
-  int currentValue;
 
   Neighbourhood(const ParsedNeighbourhood& p)
       : name(p.name),
         activation(get_AnyVarRef_from_Var(p.activation)),
         deviation(get_AnyVarRef_from_Var(p.deviation)),
-        vars(get_AnyVarRef_from_Var(p.vars)),
-        numberOfRuns(0),
-        currentValue(0) {}
+        vars(get_AnyVarRef_from_Var(p.vars)) {}
 };
 
 struct NeighbourhoodContainer {

@@ -314,37 +314,31 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 };
 
 template <typename NhSelectionStrategy>
-shared_ptr<Controller::SearchManager>
-MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method, vector<SearchOrder>& base_order,
-                              NeighbourhoodContainer& nhc,
-                              CSPInstance::NeighbourhoodSearchStrategy searchStrategy) {
+shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method,
+                                                                    vector<SearchOrder>& base_order,
+                                                                    NeighbourhoodContainer& nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  switch(searchStrategy) {
-  case CSPInstance::NeighbourhoodSearchStrategy::HILL_CLIMBING:
+  switch(getOptions().neighbourhoodSearchStrategy) {
+  case SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING:
     return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
         prop, base_order, std::move(nhc));
-  case CSPInstance::NeighbourhoodSearchStrategy::META_STRATEGY:
+  case SearchOptions::NeighbourhoodSearchStrategy::META_STRATEGY:
     return std::make_shared<NeighbourhoodSearchManager<MetaStrategy<NhSelectionStrategy>>>(
         prop, base_order, nhc);
   }
 }
 
-shared_ptr<Controller::SearchManager>
-MakeNeighbourhoodSearch(PropagationLevel prop_method, vector<SearchOrder> base_order,
-                        NeighbourhoodContainer nhc,
-                        CSPInstance::NeighbourhoodSearchStrategy searchStrategy,
-                        CSPInstance::NeighbourhoodSelectionStrategy selectionStrategy) {
-  searchStrategy = CSPInstance::NeighbourhoodSearchStrategy::META_STRATEGY;
-  selectionStrategy = CSPInstance::NeighbourhoodSelectionStrategy::UCB;
-  switch(selectionStrategy) {
-  case CSPInstance::NeighbourhoodSelectionStrategy::RANDOM:
-    D_FATAL_ERROR("Dont instantiate this please");
-  //   return MakeNeighbourhoodSearchHelper<RandomNeighbourhoodChooser>(prop_method, base_order,
-  //   nhc,
-  // searchStrategy);
-  case CSPInstance::NeighbourhoodSelectionStrategy::UCB:
-    return MakeNeighbourhoodSearchHelper<UCBNeighborHoodSelection>(prop_method, base_order, nhc,
-                                                                   searchStrategy);
+shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel prop_method,
+                                                              vector<SearchOrder> base_order,
+                                                              NeighbourhoodContainer nhc) {
+  switch(getOptions().neighbourhoodSelectionStrategy) {
+  case SearchOptions::NeighbourhoodSelectionStrategy::RANDOM:
+    return MakeNeighbourhoodSearchHelper<RandomNeighbourhoodChooser>(prop_method, base_order, nhc);
+  case SearchOptions::NeighbourhoodSelectionStrategy::UCB:
+    return MakeNeighbourhoodSearchHelper<UCBNeighborHoodSelection>(prop_method, base_order, nhc);
+  case SearchOptions::NeighbourhoodSelectionStrategy::INTERACTIVE:
+    return MakeNeighbourhoodSearchHelper<InteractiveNeighbourhoodChooser>(prop_method, base_order,
+                                                                          nhc);
   }
 }
 
