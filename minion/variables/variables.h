@@ -56,6 +56,24 @@ public:
     bigRangeVarContainer.lock();
     sparseBoundVarContainer.lock();
   }
+
+private:
+  template <typename Container>
+  inline void appendVarsFromContainer(Container& container, std::vector<AnyVarRef>& varRefs) {
+    for(UnsignedSysInt i = 0; i < container.var_count(); ++i) {
+      varRefs.push_back(container.get_var_num(i));
+    }
+  }
+
+public:
+  inline std::vector<AnyVarRef> makeAllVarsList() {
+    std::vector<AnyVarRef> varRefs;
+    appendVarsFromContainer(boundVarContainer, varRefs);
+    appendVarsFromContainer(boolVarContainer, varRefs);
+    appendVarsFromContainer(bigRangeVarContainer, varRefs);
+    appendVarsFromContainer(sparseBoundVarContainer, varRefs);
+    return varRefs;
+  }
 };
 
 #include "mappings/variable_neg.h"

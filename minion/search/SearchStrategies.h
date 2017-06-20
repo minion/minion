@@ -44,7 +44,7 @@ struct SearchParams {
 inline void copyOverIncumbent(NeighbourhoodContainer& nhc, const vector<DomainInt>& solution,
                               std::shared_ptr<Propagate>& prop) {
   if(Controller::get_world_depth() != 1) {
-    Controller::world_pop();
+    Controller::world_pop_to_depth(1);
   }
   Controller::world_push();
   for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
@@ -59,19 +59,18 @@ class MetaStrategy;
 
 template <typename SelectionStrategy>
 class HillClimbingSearch {
-  int iterationsSpentAtPeak = 0;
-
-public:
   friend MetaStrategy<SelectionStrategy>;
-
-  DomainInt bestSolutionValue;
-  std::vector<DomainInt> bestSolution;
+  int iterationsSpentAtPeak = 0;
   bool searchComplete = false;
   // The probability that we will enter a random mode of exploration.
   double localMaxProbability = tunableParams.hillClimberInitialLocalMaxProbability;
   SelectionStrategy selectionStrategy;
 
   std::vector<DomainInt> highestNeighbourhoodValues;
+
+public:
+  DomainInt bestSolutionValue;
+  std::vector<DomainInt> bestSolution;
 
   /*
    * If a solution is found reset the probability of random exploration and
@@ -213,6 +212,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt,
                   const std::vector<DomainInt>& incumbentSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
+    resetNeighbourhoodSize();
     auto maxElement = std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
                                        [](const Neighbourhood& n1, const Neighbourhood& n2) {
                                          return n1.deviation.getMax() < n2.deviation.getMax();
@@ -289,14 +289,13 @@ public:
       if(hillClimber.hasFinishedPhase()) {
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           bestSolutionValue = hillClimber.bestSolutionValue;
-          bestSolution = hillClimber.bestSolution;
+          bestSolution = std::move(hillClimber.bestSolution);
           std::cout << "MetaStrategy: new best value achieved, caching solution\n";
           /*
            * If a better solution has been found we want to punch random holes around this solution
            */
           solutionBag.clear();
           currentPhase = Phase::HOLE_PUNCHING;
-          holePuncher.resetNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else if(solutionBag.empty()) {
           std::cout << "MetaStrategy: new best value not achieved, solutionBag empty\n";

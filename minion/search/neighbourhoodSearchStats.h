@@ -12,6 +12,7 @@ struct NeighbourhoodStats {
   bool timeoutReached;
   DomainInt highestNeighbourhoodSize;
 
+public:
   NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound,
                      bool timeoutReached, DomainInt highestNeighbourhoodSize = 0)
       : newMinValue(newMinValue),
@@ -36,58 +37,63 @@ struct ExplorationPhase {
   int numberOfRandomSolutionsPulled;
 };
 
-class NeighbourhoodSearchStats {
-public:
-  int numberIterations;
+struct NeighbourhoodSearchStats {
+
+  const std::pair<DomainInt, DomainInt> initialOptVarRange;
+  DomainInt valueOfInitialSolution;
+  DomainInt bestOptVarValue;
+  DomainInt mostRecentOptVarValue;
+  vector<pair<DomainInt, u_int64_t>> bestValueTimes;
+  std::vector<std::pair<AnyVarRef, DomainInt>> bestCompleteSolutionAssignment;
+
+  int numberIterations = 0;
   vector<int> numberActivations; // mapping from nh index to number of times activated
   vector<u_int64_t> totalTime;
   vector<int> numberPositiveSolutions;
   vector<int> numberNegativeSolutions;
   vector<int> numberNoSolutions;
   vector<int> numberTimeouts;
-  vector<pair<DomainInt, u_int64_t>> bestSolutions;
-  int numberOfExplorationPhases;
-  int numberOfBetterSolutionsFoundFromExploration;
+
+  int numberOfExplorationPhases = 0;
+  int numberOfBetterSolutionsFoundFromExploration = 0;
 
   vector<int> numberExplorationsByNHSize;
   vector<int> numberSuccessfulExplorationsByNHSize;
   vector<u_int64_t> neighbourhoodExplorationTimes;
   vector<ExplorationPhase> explorationPhases;
 
-  int totalNumberOfRandomSolutionsPulled;
-  int numberPulledThisPhase;
+  int totalNumberOfRandomSolutionsPulled = 0;
+  int numberPulledThisPhase = 0;
 
-  const std::pair<DomainInt, DomainInt> initialOptVarRange;
-  DomainInt valueOfInitialSolution;
-  DomainInt lastOptVarValue;
-  DomainInt bestOptVarValue;
   std::chrono::high_resolution_clock::time_point startTime;
   std::chrono::high_resolution_clock::time_point startExplorationTime;
   bool currentlyExploring = false;
   int currentNeighbourhoodSize;
   u_int64_t totalTimeToBestSolution;
-  NeighbourhoodSearchStats() {}
 
   NeighbourhoodSearchStats(int numberNeighbourhoods,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange,
                            int maxNeighbourhoodSize)
-      : numberIterations(0),
+      : initialOptVarRange(initialOptVarRange),
+        valueOfInitialSolution(initialOptVarRange.first),
+        bestOptVarValue(initialOptVarRange.first),
+        mostRecentOptVarValue(initialOptVarRange.first),
         numberActivations(numberNeighbourhoods, 0),
         totalTime(numberNeighbourhoods, 0),
         numberPositiveSolutions(numberNeighbourhoods, 0),
         numberNegativeSolutions(numberNeighbourhoods, 0),
         numberNoSolutions(numberNeighbourhoods, 0),
         numberTimeouts(numberNeighbourhoods, 0),
-        numberOfExplorationPhases(0),
-        numberOfBetterSolutionsFoundFromExploration(0),
-        initialOptVarRange(initialOptVarRange),
-        valueOfInitialSolution(initialOptVarRange.first),
-        lastOptVarValue(initialOptVarRange.first),
-        numberExplorationsByNHSize(maxNeighbourhoodSize),
-        bestOptVarValue(initialOptVarRange.first),
-        numberSuccessfulExplorationsByNHSize(maxNeighbourhoodSize),
-        neighbourhoodExplorationTimes(maxNeighbourhoodSize),
-        totalNumberOfRandomSolutionsPulled(0) {}
+        numberExplorationsByNHSize(maxNeighbourhoodSize, 0),
+        numberSuccessfulExplorationsByNHSize(maxNeighbourhoodSize, 0),
+        neighbourhoodExplorationTimes(maxNeighbourhoodSize) {
+
+    std::vector<AnyVarRef> allVars = getVars().makeAllVarsList();
+    bestCompleteSolutionAssignment.resize(allVars.size());
+    for(size_t i = 0; i < allVars.size(); ++i) {
+      bestCompleteSolutionAssignment[i].first = std::move(allVars[i]);
+    }
+  }
 
   inline u_int64_t getTotalTimeTaken() {
     auto endTime = std::chrono::high_resolution_clock::now();
@@ -98,11 +104,12 @@ public:
     this->valueOfInitialSolution = valueOfInitialSolution;
     totalTimeToBestSolution = getTotalTimeTaken();
   }
+
   inline void startTimer() {
     startTime = std::chrono::high_resolution_clock::now();
   }
 
-  inline void reportnewStats(const vector<int>& activatedNeighbourhoods,
+  inline void reportnewStats(const std::vector<int>& activatedNeighbourhoods,
                              const NeighbourhoodStats& stats) {
     ++numberIterations;
     for(int nhIndex : activatedNeighbourhoods) {
@@ -110,25 +117,29 @@ public:
       totalTime[nhIndex] += stats.timeTaken;
       numberTimeouts[nhIndex] += stats.timeoutReached;
       if(stats.solutionFound) {
-        if(stats.newMinValue > lastOptVarValue) {
+        if(stats.newMinValue > mostRecentOptVarValue) {
           ++numberPositiveSolutions[nhIndex];
         } else {
           ++numberNegativeSolutions[nhIndex];
         }
-        lastOptVarValue = stats.newMinValue;
+        mostRecentOptVarValue = stats.newMinValue;
       } else {
         ++numberNoSolutions[nhIndex];
       }
-
-      if(lastOptVarValue > bestOptVarValue) {
-        bestSolutions.emplace_back(lastOptVarValue, getTotalTimeTaken());
-        bestOptVarValue = lastOptVarValue;
+      if(mostRecentOptVarValue > bestOptVarValue) {
+        bestOptVarValue = mostRecentOptVarValue;
         totalTimeToBestSolution = getTotalTimeTaken();
+        bestValueTimes.emplace_back(bestOptVarValue, totalTimeToBestSolution);
+        // save assignment
+        for(auto& varValuePair : bestCompleteSolutionAssignment) {
+          AnyVarRef v;
+          varValuePair.second = varValuePair.first.getAssignedValue();
+        }
       }
     }
   }
 
-  void foundSolution(DomainInt solutionValue) {
+  inline void foundSolution(DomainInt solutionValue) {
     if(currentlyExploring && solutionValue > bestOptVarValue) {
       auto endTime = std::chrono::high_resolution_clock::now();
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
@@ -142,7 +153,7 @@ public:
     }
   }
 
-  void startExploration(int neighbourhoodSize) {
+  inline void startExploration(int neighbourhoodSize) {
     if(currentlyExploring) {
       auto endTime = std::chrono::high_resolution_clock::now();
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
@@ -162,11 +173,15 @@ public:
     explorationPhases.push_back(currentPhase);
   }
 
+  inline std::vector<std::pair<AnyVarRef, DomainInt>>& getBestAssignment() {
+    return bestCompleteSolutionAssignment;
+  }
+
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
-    os << "Most recent optimise var value: " << lastOptVarValue << "\n";
+    os << "Most recent optimise var value: " << mostRecentOptVarValue << "\n";
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
@@ -185,19 +200,17 @@ public:
       os << indent << "Number no solutions: " << numberNoSolutions[i] << "\n";
       os << indent << "Number timeouts: " << numberTimeouts[i] << "\n";
     }
-    os << "History of best solutions found "
-       << "\n";
-    for(auto& currentPair : bestSolutions) {
-      os << "Value : " << currentPair.first << " Time : " << currentPair.second << " \n";
+    os << "History of best solutions found:\n";
+    for(const auto& valueTimePair : bestValueTimes) {
+      os << indent << "Value : " << valueTimePair.first << " Time : " << valueTimePair.second
+         << " \n";
     }
 
-    os << "Stats of Explorations:"
-       << "\n";
-    os << "---------------"
-       << "\n";
+    os << "Stats of Explorations:\n";
+    ;
+    os << "---------------\n";
     for(int i = 0; i < numberExplorationsByNHSize.size(); i++) {
-      os << "NeighbourhoodSize " << (i + 1) << ":"
-         << "\n";
+      os << "NeighbourhoodSize " << (i + 1) << ":\n";
       os << indent << "Activations: " << numberExplorationsByNHSize[i] << "\n";
       os << indent << "Number successful: " << numberSuccessfulExplorationsByNHSize[i] << "\n";
       os << indent << "Time Spent: " << neighbourhoodExplorationTimes[i] << "\n";

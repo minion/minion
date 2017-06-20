@@ -170,9 +170,21 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if(getState().isCtrlcPressed()) {
       cout << "Ctrl-C pressed----" << std::endl;
     }
+    printBestSolution(globalStats);
     globalStats.printStats(cout, nhc);
     cout << endl;
     throw EndOfSearch();
+  }
+
+  inline void printBestSolution(NeighbourhoodSearchStats& stats) {
+    if(Controller::get_world_depth() != 1) {
+      Controller::world_pop_to_depth(1);
+    }
+    std::vector<std::pair<AnyVarRef, DomainInt>>& bestAssignment = stats.getBestAssignment();
+    for(auto& varAssignmentPair : bestAssignment) {
+      varAssignmentPair.first.assign(varAssignmentPair.second);
+    }
+    Controller::check_sol_is_correct();
   }
 
   void printWorld() {

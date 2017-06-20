@@ -6,7 +6,7 @@
 #include <math.h>
 #include <vector>
 
-class RandomNeighbourhoodChooser {
+class RandomNeighbourhoodChooser  {
 
   std::vector<bool> neighbourhoodSuccessHistory;
   std::vector<int> neighbourhoodActivationHistory;
@@ -39,7 +39,8 @@ public:
   }
 
   void printHistory(NeighbourhoodContainer& nhc) {
-    debug_code(for(int& n : neighbourhoodActivationHistory) {
+    debug_code(for(int& n
+                   : neighbourhoodActivationHistory) {
       int timeStep(0);
       debug_log("Time Step: " << timeStep++ << " Neighbourhood Activated-> " << n << std::endl);
     });
@@ -64,7 +65,6 @@ struct NeighbourhoodHistory {
 public:
   std::vector<std::pair<int, DomainInt>> neighbourhoodsActivated;
   std::vector<double> neighbourhoodValues;
-  NeighbourhoodSearchStats stats;
 
   NeighbourhoodHistory(const NeighbourhoodContainer& nhc)
       : neighbourhoodValues(nhc.neighbourhoods.size()) {}
@@ -100,7 +100,7 @@ std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
   return cout;
 }
 
-class UCBNeighborHoodSelection {
+class UCBNeighborHoodSelection  {
 private:
   /**
    * Stores the UCB of each neighbourhood for each timestep -> For Debugging
@@ -108,7 +108,6 @@ private:
   std::vector<NeighbourhoodHistory> neighbourhoodRewardHistory;
   // Stores the neighbourhood reward structs
   vector<NeighbourhoodRewards> neighbourhoodRewards;
-
 
   DomainInt mostRecentMinValue;
   DomainInt highestMinValue;
@@ -142,9 +141,6 @@ public:
     neighbourhoodRewardHistory.back().addActivatedNeighbourhood(
         activatedNeighbourhoods[0],
         neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
-
-
-
   }
 
   vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
@@ -172,13 +168,18 @@ public:
         currentHistory.addNeighbourhoodUCBValue(0, i);
       }
     }
+    if(index == -1) {
+      std::cout << "UCBNeighborHoodSelection: could not activate a neighbourhood.\n";
+      throw EndOfSearch();
+    }
     currentHistory.addStats(globalStats);
     neighbourhoodRewardHistory.push_back(currentHistory);
     return {index};
   }
 
   void printHistory(NeighbourhoodContainer& nhc) {
-    debug_code(for(NeighbourhoodHistory& n : neighbourhoodRewardHistory) {
+    debug_code(for(NeighbourhoodHistory& n
+                   : neighbourhoodRewardHistory) {
       int currentTimeStep = 0;
       debug_log("Time Step: " << currentTimeStep++ << std::endl);
       debug_log("--------" << std::endl);
