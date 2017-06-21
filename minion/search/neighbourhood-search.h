@@ -62,8 +62,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(searchParams.neighbourhoodsToActivate.empty()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
+        NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), 0, false, false);
+        globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
         Controller::world_pop_to_depth(depth);
-        return NeighbourhoodStats(getState().getOptimiseVar()->getMin(), 0, false, false);
+        return stats;
       }
     }
 
@@ -124,6 +126,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         (solutionFound) ? optimisationValueCache : optimisationValueCache + 1;
     NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout,
                              highestNeighbourhoodSize);
+    globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
     Controller::world_pop_to_depth(depth);
     return stats;
   }
@@ -148,7 +151,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       cout << "Initial solution not found\n";
       return;
     } else {
-      globalStats.setValueOfInitialSolution(stats.newMinValue);
       searchStrategy.initialise(nhc, stats.newMinValue, solution, prop, globalStats);
       debug_log("Stats on initial solution:\n" << stats << endl);
     }
@@ -160,10 +162,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         debug_log("Stats on last search: " << stats << endl);
         searchStrategy.updateStats(nhc, prop, searchParams.neighbourhoodsToActivate, stats,
                                    solution, globalStats);
-        debug_log("Global stats:\n");
-        globalStats.reportnewStats(searchParams.neighbourhoodsToActivate, stats);
-
-        debug_code(globalStats.printStats(cout, nhc));
       }
     } catch(EndOfSearch&) {}
 

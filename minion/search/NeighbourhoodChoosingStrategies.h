@@ -186,9 +186,12 @@ public:
       }
       int index;
       bool readInt = bool(cin >> index);
-      if(!readInt || index < 0 || index >= (int)nhc.neighbourhoods.size()) {
+      if(!readInt || index < -1 || index >= (int)nhc.neighbourhoods.size()) {
         cout << "Error, please enter an integer in the range 0.." << nhc.neighbourhoods.size()
-             << ".\n";
+             << " to select a neighbourhood or -1 to end search.\n";
+      } else if(index == -1) {
+        std::cerr << "InteractiveNeighbourhoodChooser: ending search...\n";
+        throw EndOfSearch();
       } else {
         return {index};
       }

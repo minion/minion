@@ -42,7 +42,7 @@ struct NeighbourhoodSearchStats {
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
   DomainInt bestOptVarValue;
-  DomainInt mostRecentOptVarValue;
+  DomainInt optValueAchievedByLastNH;
   vector<pair<DomainInt, u_int64_t>> bestValueTimes;
   std::vector<std::pair<AnyVarRef, DomainInt>> bestCompleteSolutionAssignment;
 
@@ -77,7 +77,7 @@ struct NeighbourhoodSearchStats {
       : initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
         bestOptVarValue(initialOptVarRange.first),
-        mostRecentOptVarValue(initialOptVarRange.first),
+        optValueAchievedByLastNH(initialOptVarRange.first),
         numberActivations(numberNeighbourhoods, 0),
         totalTime(numberNeighbourhoods, 0),
         numberPositiveSolutions(numberNeighbourhoods, 0),
@@ -100,42 +100,40 @@ struct NeighbourhoodSearchStats {
     return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
   }
 
-  inline void setValueOfInitialSolution(DomainInt valueOfInitialSolution) {
-    this->valueOfInitialSolution = valueOfInitialSolution;
-    totalTimeToBestSolution = getTotalTimeTaken();
-  }
-
   inline void startTimer() {
     startTime = std::chrono::high_resolution_clock::now();
   }
 
   inline void reportnewStats(const std::vector<int>& activatedNeighbourhoods,
                              const NeighbourhoodStats& stats) {
-    ++numberIterations;
     for(int nhIndex : activatedNeighbourhoods) {
       ++numberActivations[nhIndex];
       totalTime[nhIndex] += stats.timeTaken;
       numberTimeouts[nhIndex] += stats.timeoutReached;
       if(stats.solutionFound) {
-        if(stats.newMinValue > mostRecentOptVarValue) {
+        if(stats.newMinValue > optValueAchievedByLastNH) {
           ++numberPositiveSolutions[nhIndex];
         } else {
           ++numberNegativeSolutions[nhIndex];
         }
-        mostRecentOptVarValue = stats.newMinValue;
+        optValueAchievedByLastNH = stats.newMinValue;
       } else {
         ++numberNoSolutions[nhIndex];
       }
-      if(mostRecentOptVarValue > bestOptVarValue) {
-        bestOptVarValue = mostRecentOptVarValue;
-        totalTimeToBestSolution = getTotalTimeTaken();
-        bestValueTimes.emplace_back(bestOptVarValue, totalTimeToBestSolution);
-        // save assignment
-        for(auto& varValuePair : bestCompleteSolutionAssignment) {
-          AnyVarRef v;
-          varValuePair.second = varValuePair.first.getAssignedValue();
-        }
-      }
+    }
+    ++numberIterations;
+  }
+
+  inline void saveCurrentAssignmentIfBest(DomainInt currentAssignmentOptValue) {
+    if(numberIterations == 0 || currentAssignmentOptValue > bestOptVarValue) {
+      bestOptVarValue = currentAssignmentOptValue;
+      totalTimeToBestSolution = getTotalTimeTaken();
+      bestValueTimes.emplace_back(bestOptVarValue, totalTimeToBestSolution);
+    }
+    // save assignment
+    for(auto& varValuePair : bestCompleteSolutionAssignment) {
+      assert(varValuePair.first.isAssigned());
+      varValuePair.second = varValuePair.first.getAssignedValue();
     }
   }
 
@@ -151,6 +149,7 @@ struct NeighbourhoodSearchStats {
       explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
       numberPulledThisPhase = 0;
     }
+    saveCurrentAssignmentIfBest(solutionValue);
   }
 
   inline void startExploration(int neighbourhoodSize) {
@@ -181,7 +180,7 @@ struct NeighbourhoodSearchStats {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
-    os << "Most recent optimise var value: " << mostRecentOptVarValue << "\n";
+    os << "Value achieved by last neighbourhood: " << optValueAchievedByLastNH << "\n";
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";

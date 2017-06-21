@@ -10,9 +10,10 @@
  */
 struct TunableParams {
   int iterationSearchTime = 500;
-  double hillClimberInitialLocalMaxProbability = 0.01;
-  double hillClimberProbabilityIncrementMultiplier = 0.125;
-  int holePuncherMaxSolutionBagSize = 5;
+  int hillClimberMinIterationsToSpendAtPeak = 4;
+  double hillClimberInitialLocalMaxProbability = 0.001;
+  double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
+  int holePuncherSolutionBagSizeConstant = 5;
   TunableParams() {}
 };
 
@@ -99,8 +100,10 @@ public:
     } else {
       highestNeighbourhoodValues[currentActivatedNeighbourhoods[0]] =
           stats.highestNeighbourhoodSize;
-      localMaxProbability += (1.0 / nhc.neighbourhoods.size()) *
-                             tunableParams.hillClimberProbabilityIncrementMultiplier;
+      localMaxProbability +=
+          (1.0 / nhc.neighbourhoods.size()) *
+          tunableParams.hillClimberProbabilityIncrementMultiplier *
+          (int)(iterationsSpentAtPeak > tunableParams.hillClimberMinIterationsToSpendAtPeak);
       ++iterationsSpentAtPeak;
     }
   }
@@ -121,8 +124,9 @@ public:
   }
 
   bool hasFinishedPhase() {
-    bool completed =
-        searchComplete || static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability;
+    bool completed = searchComplete ||
+                     (iterationsSpentAtPeak > tunableParams.hillClimberMinIterationsToSpendAtPeak &&
+                      static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability);
     if(completed) {
       std::cout << "HillClimber: completed search at opt value: "
                 << getState().getOptimiseVar()->getMin() << std::endl;
@@ -136,6 +140,8 @@ public:
                   NeighbourhoodSearchStats& globalStats) {
     resetLocalMaxProbability();
     highestNeighbourhoodValues.assign(nhc.neighbourhoods.size(), 1);
+    iterationsSpentAtPeak = 0;
+
     bestSolutionValue = newBestMinValue;
     bestSolution = newBestSolution;
     getState().getOptimiseVar()->setMin(newBestMinValue + 1);
@@ -150,8 +156,8 @@ typedef std::vector<std::pair<DomainInt, std::vector<DomainInt>>> SolutionBag;
 class HolePuncher {
   SolutionBag solutionBag;
   std::vector<int> activeNeighbourhoods;
-
   int currentNeighbourhoodSolutionsCount = 0;
+  int maxSolutionsPerNeighbourhood = 1;
   bool finishedPhase = false;
 
 public:
@@ -199,7 +205,7 @@ public:
    */
   bool continueSearch(NeighbourhoodContainer& nhc, const std::vector<DomainInt>& solution) {
     solutionBag.emplace_back(getState().getOptimiseVar()->getMin(), solution);
-    return ++currentNeighbourhoodSolutionsCount != tunableParams.holePuncherMaxSolutionBagSize;
+    return ++currentNeighbourhoodSolutionsCount <= maxSolutionsPerNeighbourhood;
   }
 
   bool hasFinishedPhase() {
@@ -241,6 +247,8 @@ public:
     std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
               << neighbourhoodSize << std::endl;
     solutionBag = {};
+    maxSolutionsPerNeighbourhood = (int)ceil(((double)tunableParams.holePuncherSolutionBagSizeConstant) /
+                                             activeNeighbourhoods.size());
     finishedPhase = false;
     globalStats.startExploration(neighbourhoodSize);
     copyOverIncumbent(nhc, incumbentSolution, prop);
