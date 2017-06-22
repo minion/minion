@@ -218,7 +218,6 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt,
                   const std::vector<DomainInt>& incumbentSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
-    resetNeighbourhoodSize();
     auto maxElement = std::max_element(nhc.neighbourhoods.begin(), nhc.neighbourhoods.end(),
                                        [](const Neighbourhood& n1, const Neighbourhood& n2) {
                                          return n1.deviation.getMax() < n2.deviation.getMax();
@@ -247,8 +246,8 @@ public:
     std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
               << neighbourhoodSize << std::endl;
     solutionBag = {};
-    maxSolutionsPerNeighbourhood = (int)ceil(((double)tunableParams.holePuncherSolutionBagSizeConstant) /
-                                             activeNeighbourhoods.size());
+    maxSolutionsPerNeighbourhood = (int)ceil(
+        ((double)tunableParams.holePuncherSolutionBagSizeConstant) / activeNeighbourhoods.size());
     finishedPhase = false;
     globalStats.startExploration(neighbourhoodSize);
     copyOverIncumbent(nhc, incumbentSolution, prop);
@@ -304,6 +303,7 @@ public:
            */
           solutionBag.clear();
           currentPhase = Phase::HOLE_PUNCHING;
+          holePuncher.resetNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else if(solutionBag.empty()) {
           std::cout << "MetaStrategy: new best value not achieved, solutionBag empty\n";
@@ -330,6 +330,9 @@ public:
                               globalStats);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());
+        solutionBag.resize(nhc.neighbourhoods.size());
+        std::cout << "MetaStrategy: trimmed solution bag to size " << solutionBag.size()
+                  << std::endl;
         if(!solutionBag.empty()) {
           currentPhase = Phase::HILL_CLIMBING;
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop,
