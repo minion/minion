@@ -104,22 +104,19 @@ struct NeighbourhoodSearchStats {
     startTime = std::chrono::high_resolution_clock::now();
   }
 
-  inline void reportnewStats(const std::vector<int>& activatedNeighbourhoods,
-                             const NeighbourhoodStats& stats) {
-    for(int nhIndex : activatedNeighbourhoods) {
-      ++numberActivations[nhIndex];
-      totalTime[nhIndex] += stats.timeTaken;
-      numberTimeouts[nhIndex] += stats.timeoutReached;
-      if(stats.solutionFound) {
-        if(stats.newMinValue > optValueAchievedByLastNH) {
-          ++numberPositiveSolutions[nhIndex];
-        } else {
-          ++numberNegativeSolutions[nhIndex];
-        }
-        optValueAchievedByLastNH = stats.newMinValue;
+  inline void reportnewStats(const int activatedNeighbourhood, const NeighbourhoodStats& stats) {
+    ++numberActivations[activatedNeighbourhood];
+    totalTime[activatedNeighbourhood] += stats.timeTaken;
+    numberTimeouts[activatedNeighbourhood] += stats.timeoutReached;
+    if(stats.solutionFound) {
+      if(stats.newMinValue > optValueAchievedByLastNH) {
+        ++numberPositiveSolutions[activatedNeighbourhood];
       } else {
-        ++numberNoSolutions[nhIndex];
+        ++numberNegativeSolutions[activatedNeighbourhood];
       }
+      optValueAchievedByLastNH = stats.newMinValue;
+    } else {
+      ++numberNoSolutions[activatedNeighbourhood];
     }
     ++numberIterations;
   }

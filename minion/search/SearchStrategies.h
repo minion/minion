@@ -1,4 +1,3 @@
-
 #ifndef MINION_SEARCHSTRATEGIES_H
 #define MINION_SEARCHSTRATEGIES_H
 
@@ -20,21 +19,19 @@ struct TunableParams {
 static const TunableParams tunableParams;
 
 struct SearchParams {
-  std::vector<int> neighbourhoodsToActivate;
+  int neighbourhoodToActivate;
   bool optimiseMode;
   int timeoutInMillis;
   DomainInt initialNeighbourhoodSize;
 
-  SearchParams(std::vector<int> neighbourhoods, bool optimiseMode, int timeoutInMillis,
+  SearchParams(int neighbourhood, bool optimiseMode, int timeoutInMillis,
                DomainInt initialNeighbourhoodSize = 1)
-      : neighbourhoodsToActivate(std::move(neighbourhoods)),
+      : neighbourhoodToActivate(neighbourhood),
         optimiseMode(optimiseMode),
         timeoutInMillis(timeoutInMillis),
-        initialNeighbourhoodSize(initialNeighbourhoodSize) {
-    assert(this->neighbourhoodsToActivate.size() <= 1);
-  }
+        initialNeighbourhoodSize(initialNeighbourhoodSize) {}
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
-    os << "SearchParams(\nneighbourhoodsToActivate =  " << searchParams.neighbourhoodsToActivate
+    os << "SearchParams(\nneighbourhoodToActivate =  " << searchParams.neighbourhoodToActivate
        << ",\noptimiseMode = " << searchParams.optimiseMode
        << ",\ntimeoutInMillis = " << searchParams.timeoutInMillis
        << ",\ninitialNeighbourhoodSize = " << searchParams.initialNeighbourhoodSize << ")";
@@ -79,10 +76,10 @@ public:
    * exploration mode.
    */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
-                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
+                   int currentActivatedNeighbourhood, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
 
-    selectionStrategy.updateStats(currentActivatedNeighbourhoods, stats);
+    selectionStrategy.updateStats(currentActivatedNeighbourhood, stats);
 
     if(stats.solutionFound) {
       highestNeighbourhoodValues.assign(highestNeighbourhoodValues.size(), 1);
@@ -98,8 +95,7 @@ public:
       }
       getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
     } else {
-      highestNeighbourhoodValues[currentActivatedNeighbourhoods[0]] =
-          stats.highestNeighbourhoodSize;
+      highestNeighbourhoodValues[currentActivatedNeighbourhood] = stats.highestNeighbourhoodSize;
       localMaxProbability +=
           (1.0 / nhc.neighbourhoods.size()) *
           tunableParams.hillClimberProbabilityIncrementMultiplier *
@@ -114,10 +110,9 @@ public:
   }
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
-    std::vector<int> neighbourhoodsToActivate =
-        selectionStrategy.getNeighbourhoodsToActivate(nhc, globalStats);
-    return SearchParams(neighbourhoodsToActivate, true, tunableParams.iterationSearchTime,
-                        highestNeighbourhoodValues[neighbourhoodsToActivate[0]]);
+    int neighbourhoodToActivate = selectionStrategy.getNeighbourhoodsToActivate(nhc, globalStats);
+    return SearchParams(neighbourhoodToActivate, true, tunableParams.iterationSearchTime,
+                        highestNeighbourhoodValues[neighbourhoodToActivate]);
   }
   bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
     return true;
@@ -175,7 +170,7 @@ public:
    * so that the generated solutions are in a random configuration.
    */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
-                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
+                   int currentActivatedNeighbourhood, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
     finishedPhase = activeNeighbourhoods.empty();
     if(finishedPhase) {
@@ -287,11 +282,11 @@ public:
   int numberOfRandomSolutionsPulled = 0;
 
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
-                   std::vector<int>& currentActivatedNeighbourhoods, NeighbourhoodStats& stats,
+                   int currentActivatedNeighbourhood, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
     switch(currentPhase) {
     case Phase::HILL_CLIMBING:
-      hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution,
+      hillClimber.updateStats(nhc, prop, currentActivatedNeighbourhood, stats, solution,
                               globalStats);
       if(hillClimber.hasFinishedPhase()) {
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
@@ -326,7 +321,7 @@ public:
       break;
     // In this phase we want to generate random solutions
     case Phase::HOLE_PUNCHING: {
-      holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhoods, stats, solution,
+      holePuncher.updateStats(nhc, prop, currentActivatedNeighbourhood, stats, solution,
                               globalStats);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());

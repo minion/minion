@@ -12,17 +12,16 @@ class RandomNeighbourhoodChooser {
 public:
   RandomNeighbourhoodChooser() {}
 
-  void updateStats(const vector<int>& activatedNeighbourhoods, const NeighbourhoodStats&) {}
+  void updateStats(int activatedNeighbourhood, const NeighbourhoodStats&) {}
 
-  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
-                                          NeighbourhoodSearchStats&) {
+  int getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
     viableNeighbourhoods.clear();
     for(size_t i = 0; i < nhc.neighbourhoods.size(); i++) {
       if(nhc.neighbourhoods[i].activation.inDomain(1)) {
         viableNeighbourhoods.push_back(i);
       }
-    };
-    return {viableNeighbourhoods[std::rand() % viableNeighbourhoods.size()]};
+    }
+    return viableNeighbourhoods[std::rand() % viableNeighbourhoods.size()];
   }
 };
 
@@ -54,20 +53,6 @@ public:
 
   void addActivatedNeighbourhood(int neighbourhood, DomainInt newMinValue) {
     neighbourhoodsActivated.push_back(std::make_pair(neighbourhood, newMinValue));
-  }
-
-  void addStats(NeighbourhoodSearchStats currentStats) {
-    // stats = currentStats;
-  }
-  void print(std::ostream& cout, NeighbourhoodContainer& nhc) {
-    cout << "Neighbourhood Values " << neighbourhoodValues << std::endl;
-    cout << "Activated Neighbourhoods: " << std::endl;
-    for(int i = 0; i < neighbourhoodsActivated.size(); i++) {
-      cout << nhc.neighbourhoods[neighbourhoodsActivated[i].first].name
-           << ": Achieved Min Value -> " << neighbourhoodsActivated[i].second;
-    }
-    cout << std::endl;
-    //  stats.printStats(cout, nhc);
   }
 };
 
@@ -109,21 +94,18 @@ public:
       : mostRecentMinValue(getState().getOptimiseVar()->getMin()),
         highestMinValue(getState().getOptimiseVar()->getMin()) {}
 
-  void updateStats(const vector<int>& activatedNeighbourhoods,
-                   const NeighbourhoodStats& neighbourhoodStats) {
+  void updateStats(int activatedNeighbourhood, const NeighbourhoodStats& neighbourhoodStats) {
     debug_log(neighbourhoodStats);
     if(neighbourhoodStats.solutionFound) {
-      debug_log("soltuion found for " << activatedNeighbourhoods[0] << std::endl);
     } else {
-      debug_log("solution not found for " << activatedNeighbourhoods[0] << std::endl);
     }
     neighbourhoodRewardHistory.back().addActivatedNeighbourhood(
-        activatedNeighbourhoods[0],
+        activatedNeighbourhood,
         neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
   }
 
-  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
-                                          NeighbourhoodSearchStats& globalStats) {
+  int getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
+                                  NeighbourhoodSearchStats& globalStats) {
     NeighbourhoodHistory currentHistory(nhc);
     double bestUCTValue = -(std::numeric_limits<double>::max());
     int index = -1;
@@ -132,7 +114,7 @@ public:
         if(globalStats.numberActivations[i] == 0) {
           currentHistory.addNeighbourhoodUCBValue(0, i);
           neighbourhoodRewardHistory.push_back(currentHistory);
-          return {i};
+          return i;
         }
         double currentUCBValue =
             ucbValue(globalStats.numberPositiveSolutions[i] -
@@ -151,9 +133,8 @@ public:
       std::cout << "UCBNeighborHoodSelection: could not activate a neighbourhood.\n";
       throw EndOfSearch();
     }
-    currentHistory.addStats(globalStats);
     neighbourhoodRewardHistory.push_back(currentHistory);
-    return {index};
+    return index;
   }
 
   void printHistory(NeighbourhoodContainer& nhc) {
@@ -173,12 +154,11 @@ class InteractiveNeighbourhoodChooser {
 public:
   InteractiveNeighbourhoodChooser() {}
 
-  void updateStats(const vector<int>& activatedNeighbourhoods, const NeighbourhoodStats& stats) {
+  void updateStats(int activatedNeighbourhood, const NeighbourhoodStats& stats) {
     std::cout << stats << std::endl;
   }
 
-  vector<int> getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
-                                          NeighbourhoodSearchStats&) {
+  int getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
     while(true) {
       std::cout << "Select Neighbourhood:\n";
       for(size_t i = 0; i < nhc.neighbourhoods.size(); ++i) {
@@ -193,7 +173,7 @@ public:
         std::cerr << "InteractiveNeighbourhoodChooser: ending search...\n";
         throw EndOfSearch();
       } else {
-        return {index};
+        return index;
       }
     }
   }
