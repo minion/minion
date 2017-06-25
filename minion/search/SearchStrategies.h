@@ -191,7 +191,7 @@ public:
     currentNeighbourhoodSolutionsCount = 0;
     int neighbourhood = activeNeighbourhoods.back();
     activeNeighbourhoods.pop_back();
-    return SearchParams({neighbourhood}, false, tunableParams.iterationSearchTime);
+    return SearchParams(neighbourhood, false, tunableParams.iterationSearchTime);
   }
 
   /*

@@ -126,11 +126,11 @@ struct NeighbourhoodSearchStats {
       bestOptVarValue = currentAssignmentOptValue;
       totalTimeToBestSolution = getTotalTimeTaken();
       bestValueTimes.emplace_back(bestOptVarValue, totalTimeToBestSolution);
-    }
-    // save assignment
-    for(auto& varValuePair : bestCompleteSolutionAssignment) {
-      assert(varValuePair.first.isAssigned());
-      varValuePair.second = varValuePair.first.getAssignedValue();
+      // save assignment
+      for(auto& varValuePair : bestCompleteSolutionAssignment) {
+        assert(varValuePair.first.isAssigned());
+        varValuePair.second = varValuePair.first.getAssignedValue();
+      }
     }
   }
 
