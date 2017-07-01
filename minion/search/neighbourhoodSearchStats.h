@@ -105,6 +105,9 @@ struct NeighbourhoodSearchStats {
   }
 
   inline void reportnewStats(const int activatedNeighbourhood, const NeighbourhoodStats& stats) {
+    if(activatedNeighbourhood < 0) {
+      return;
+    }
     ++numberActivations[activatedNeighbourhood];
     totalTime[activatedNeighbourhood] += stats.timeTaken;
     numberTimeouts[activatedNeighbourhood] += stats.timeoutReached;

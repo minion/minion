@@ -253,6 +253,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
 
     Neighbourhood& neighbourhood = nhc.neighbourhoods[neighbourHoodIndex];
+    assert(neighbourhood.activation.inDomain(1));
     neighbourhood.activation.assign(1);
 
     for(auto& n : neighbourhood.vars) {

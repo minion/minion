@@ -94,6 +94,8 @@ public:
         return;
       }
       getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
+      std::vector<AnyVarRef> emptyVars;
+        prop->prop(emptyVars);
     } else {
       highestNeighbourhoodValues[currentActivatedNeighbourhood] = stats.highestNeighbourhoodSize;
       localMaxProbability +=
