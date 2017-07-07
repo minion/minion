@@ -95,7 +95,7 @@ public:
       }
       getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
       std::vector<AnyVarRef> emptyVars;
-        prop->prop(emptyVars);
+      prop->prop(emptyVars);
     } else {
       highestNeighbourhoodValues[currentActivatedNeighbourhood] = stats.highestNeighbourhoodSize;
       localMaxProbability +=
@@ -327,7 +327,9 @@ public:
                               globalStats);
       if(holePuncher.hasFinishedPhase()) {
         solutionBag = std::move(holePuncher.getSolutionBag());
-        solutionBag.resize(nhc.neighbourhoods.size());
+        if(solutionBag.size() > nhc.neighbourhoods.size()) {
+          solutionBag.resize(nhc.neighbourhoods.size());
+        }
         std::cout << "MetaStrategy: trimmed solution bag to size " << solutionBag.size()
                   << std::endl;
         if(!solutionBag.empty()) {
