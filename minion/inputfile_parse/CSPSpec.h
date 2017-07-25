@@ -51,16 +51,21 @@ inline string to_var_name(const vector<DomainInt>& params) {
 struct ParsedNeighbourhood
 {
   std::string name;
+  std::string groupName;
   Var activation;
   Var deviation;
   std::vector<Var> vars;
 };
 
+struct ParsedNeighbourhoodGroup {
+  std::vector<Var> vars;
+};
+
 struct ParsedNeighbourhoodContainer
 {
-  Var soft_violation_count;
   std::vector<std::vector<Var> > shadow_mapping;
   Var shadow_disable;
+  std::unordered_map<std::string, ParsedNeighbourhoodGroup> neighbourhoodGroups;
   std::vector<ParsedNeighbourhood> neighbourhoods;
 };
 

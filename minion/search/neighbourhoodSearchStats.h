@@ -42,12 +42,12 @@ struct NeighbourhoodSearchStats {
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
   DomainInt bestOptVarValue;
-  DomainInt optValueAchievedByLastNH;
+  DomainInt optValueAchievedByLastNHCombination;
   vector<pair<DomainInt, u_int64_t>> bestValueTimes;
   std::vector<std::pair<AnyVarRef, DomainInt>> bestCompleteSolutionAssignment;
 
   int numberIterations = 0;
-  vector<int> numberActivations; // mapping from nh index to number of times activated
+  vector<int> numberActivations; // mapping from combinations index to number of times activated
   vector<u_int64_t> totalTime;
   vector<int> numberPositiveSolutions;
   vector<int> numberNegativeSolutions;
@@ -57,8 +57,8 @@ struct NeighbourhoodSearchStats {
   int numberOfExplorationPhases = 0;
   int numberOfBetterSolutionsFoundFromExploration = 0;
 
-  vector<int> numberExplorationsByNHSize;
-  vector<int> numberSuccessfulExplorationsByNHSize;
+  vector<int> numberExplorationsByNHCombinationSize;
+  vector<int> numberSuccessfulExplorationsByNHCombinationSize;
   vector<u_int64_t> neighbourhoodExplorationTimes;
   vector<ExplorationPhase> explorationPhases;
 
@@ -71,21 +71,21 @@ struct NeighbourhoodSearchStats {
   int currentNeighbourhoodSize;
   u_int64_t totalTimeToBestSolution;
 
-  NeighbourhoodSearchStats(int numberNeighbourhoods,
+  NeighbourhoodSearchStats(int numberCombinations,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange,
                            int maxNeighbourhoodSize)
       : initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
         bestOptVarValue(initialOptVarRange.first),
-        optValueAchievedByLastNH(initialOptVarRange.first),
-        numberActivations(numberNeighbourhoods, 0),
-        totalTime(numberNeighbourhoods, 0),
-        numberPositiveSolutions(numberNeighbourhoods, 0),
-        numberNegativeSolutions(numberNeighbourhoods, 0),
-        numberNoSolutions(numberNeighbourhoods, 0),
-        numberTimeouts(numberNeighbourhoods, 0),
-        numberExplorationsByNHSize(maxNeighbourhoodSize, 0),
-        numberSuccessfulExplorationsByNHSize(maxNeighbourhoodSize, 0),
+        optValueAchievedByLastNHCombination(initialOptVarRange.first),
+        numberActivations(numberCombinations, 0),
+        totalTime(numberCombinations, 0),
+        numberPositiveSolutions(numberCombinations, 0),
+        numberNegativeSolutions(numberCombinations, 0),
+        numberNoSolutions(numberCombinations, 0),
+        numberTimeouts(numberCombinations, 0),
+        numberExplorationsByNHCombinationSize(maxNeighbourhoodSize, 0),
+        numberSuccessfulExplorationsByNHCombinationSize(maxNeighbourhoodSize, 0),
         neighbourhoodExplorationTimes(maxNeighbourhoodSize) {
 
     std::vector<AnyVarRef> allVars = getVars().makeAllVarsList();
@@ -104,22 +104,22 @@ struct NeighbourhoodSearchStats {
     startTime = std::chrono::high_resolution_clock::now();
   }
 
-  inline void reportnewStats(const int activatedNeighbourhood, const NeighbourhoodStats& stats) {
-    if(activatedNeighbourhood < 0) {
+  inline void reportnewStats(const int activatedCombination, const NeighbourhoodStats& stats) {
+    if(activatedCombination < 0) {
       return;
     }
-    ++numberActivations[activatedNeighbourhood];
-    totalTime[activatedNeighbourhood] += stats.timeTaken;
-    numberTimeouts[activatedNeighbourhood] += stats.timeoutReached;
+    ++numberActivations[activatedCombination];
+    totalTime[activatedCombination] += stats.timeTaken;
+    numberTimeouts[activatedCombination] += stats.timeoutReached;
     if(stats.solutionFound) {
-      if(stats.newMinValue > optValueAchievedByLastNH) {
-        ++numberPositiveSolutions[activatedNeighbourhood];
+      if(stats.newMinValue > optValueAchievedByLastNHCombination) {
+        ++numberPositiveSolutions[activatedCombination];
       } else {
-        ++numberNegativeSolutions[activatedNeighbourhood];
+        ++numberNegativeSolutions[activatedCombination];
       }
-      optValueAchievedByLastNH = stats.newMinValue;
+      optValueAchievedByLastNHCombination = stats.newMinValue;
     } else {
-      ++numberNoSolutions[activatedNeighbourhood];
+      ++numberNoSolutions[activatedCombination];
     }
     ++numberIterations;
   }
@@ -144,7 +144,7 @@ struct NeighbourhoodSearchStats {
           std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime)
               .count();
       currentlyExploring = false;
-      numberSuccessfulExplorationsByNHSize[currentNeighbourhoodSize - 1] += 1;
+      numberSuccessfulExplorationsByNHCombinationSize[currentNeighbourhoodSize - 1] += 1;
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
       explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
       numberPulledThisPhase = 0;
@@ -164,7 +164,7 @@ struct NeighbourhoodSearchStats {
     }
     currentlyExploring = true;
     startExplorationTime = std::chrono::high_resolution_clock::now();
-    numberExplorationsByNHSize[neighbourhoodSize - 1] += 1;
+    numberExplorationsByNHCombinationSize[neighbourhoodSize - 1] += 1;
     currentNeighbourhoodSize = neighbourhoodSize;
     ExplorationPhase currentPhase;
     currentPhase.neighbourhoodSize = neighbourhoodSize;
@@ -180,7 +180,7 @@ struct NeighbourhoodSearchStats {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
-    os << "Value achieved by last neighbourhood: " << optValueAchievedByLastNH << "\n";
+    os << "Value achieved by last neighbourhood: " << optValueAchievedByLastNHCombination << "\n";
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
@@ -188,8 +188,8 @@ struct NeighbourhoodSearchStats {
        << (((double)totalNumberOfRandomSolutionsPulled) / explorationPhases.size()) << "\n";
     os << "Total Number of random solutions pulled : " << totalNumberOfRandomSolutionsPulled
        << "\n";
-    for(int i = 0; i < (int)nhc.neighbourhoods.size(); i++) {
-      os << "Neighbourhood: " << nhc.neighbourhoods[i].name << "\n";
+    for(int i = 0; i < (int)nhc.neighbourhoodCombinations.size(); i++) {
+      printCombinationDescription(os, nhc, i);
       os << indent << "Number activations: " << numberActivations[i] << "\n";
       u_int64_t averageTime = (numberActivations[i] > 0) ? totalTime[i] / numberActivations[i] : 0;
       os << indent << "Total time: " << totalTime[i] << "\n";
@@ -208,10 +208,11 @@ struct NeighbourhoodSearchStats {
     os << "Stats of Explorations:\n";
     ;
     os << "---------------\n";
-    for(int i = 0; i < numberExplorationsByNHSize.size(); i++) {
+    for(int i = 0; i < numberExplorationsByNHCombinationSize.size(); i++) {
       os << "NeighbourhoodSize " << (i + 1) << ":\n";
-      os << indent << "Activations: " << numberExplorationsByNHSize[i] << "\n";
-      os << indent << "Number successful: " << numberSuccessfulExplorationsByNHSize[i] << "\n";
+      os << indent << "Activations: " << numberExplorationsByNHCombinationSize[i] << "\n";
+      os << indent << "Number successful: " << numberSuccessfulExplorationsByNHCombinationSize[i]
+         << "\n";
       os << indent << "Time Spent: " << neighbourhoodExplorationTimes[i] << "\n";
     }
     os << "---------------"
@@ -231,6 +232,24 @@ struct NeighbourhoodSearchStats {
       os << "-----------------"
          << "\n";
     }
+  }
+
+  inline void printCombinationDescription(std::ostream& os, const NeighbourhoodContainer& nhc,
+                                          int combIndex) {
+    const std::vector<int>& combination = nhc.neighbourhoodCombinations[combIndex];
+    os << "Neighbourhood Combination:\n    Primary nh: " << nhc.neighbourhoods[combination[0]].name
+       << "\n";
+    os << "    Secondary nhs (random ordering): [";
+    bool first = true;
+    for(int i = 1; i < combination.size(); ++i) {
+      if(first) {
+        first = false;
+      } else {
+        os << ",";
+      }
+      os << nhc.neighbourhoods[combination[i]].name;
+    }
+    os << "]";
   }
 };
 

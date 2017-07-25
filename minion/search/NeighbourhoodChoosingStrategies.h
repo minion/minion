@@ -6,114 +6,46 @@
 #include <math.h>
 #include <vector>
 
-class RandomNeighbourhoodChooser {
-  std::vector<int> viableNeighbourhoods;
+class RandomCombinationChooser {
+  std::vector<int> viableCombinations;
 
 public:
-  RandomNeighbourhoodChooser() {}
+  RandomCombinationChooser() {}
 
-  void updateStats(int activatedNeighbourhood, const NeighbourhoodStats&) {}
+  void updateStats(int activatedCombination, const NeighbourhoodStats&) {}
 
-  int getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
-    viableNeighbourhoods.clear();
-    for(size_t i = 0; i < nhc.neighbourhoods.size(); i++) {
-      if(nhc.neighbourhoods[i].activation.inDomain(1)) {
-        viableNeighbourhoods.push_back(i);
+  int getCombinationsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
+    viableCombinations.clear();
+    for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); i++) {
+      if(nhc.isCombinationEnabled(i)) {
+        viableCombinations.push_back(i);
       }
     }
-    return viableNeighbourhoods[std::rand() % viableNeighbourhoods.size()];
+    return viableCombinations[std::rand() % viableCombinations.size()];
   }
 };
-
-struct NeighbourhoodRewards {
-public:
-  double reward;
-  int numberOfVisits;
-  u_int64_t totalTimeTaken;
-  bool timeOut;
-  double timeOutValue = 500;
-
-  NeighbourhoodRewards() : reward(0), numberOfVisits(0), totalTimeTaken(0), timeOut(false) {}
-
-  friend std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr);
-};
-
-struct NeighbourhoodHistory {
-
-public:
-  std::vector<std::pair<int, DomainInt>> neighbourhoodsActivated;
-  std::vector<double> neighbourhoodValues;
-
-  NeighbourhoodHistory(const NeighbourhoodContainer& nhc)
-      : neighbourhoodValues(nhc.neighbourhoods.size()) {}
-
-  void addNeighbourhoodUCBValue(double ucbValue, int index) {
-    neighbourhoodValues[index] = ucbValue;
-  }
-
-  void addActivatedNeighbourhood(int neighbourhood, DomainInt newMinValue) {
-    neighbourhoodsActivated.push_back(std::make_pair(neighbourhood, newMinValue));
-  }
-};
-
-std::ostream& operator<<(std::ostream& cout, const NeighbourhoodRewards& nr) {
-  cout << "Reward: " << nr.reward << "\n"
-       << "Number of Visits: " << nr.numberOfVisits << "\n"
-       << "Total Time Taken: " << nr.totalTimeTaken << "\n"
-       << "TimeOut: " << nr.timeOut << "\n";
-  return cout;
-}
 
 class UCBNeighborHoodSelection {
 private:
-  /**
-   * Stores the UCB of each neighbourhood for each timestep -> For Debugging
-   */
-  std::vector<NeighbourhoodHistory> neighbourhoodRewardHistory;
-  // Stores the neighbourhood reward structs
-  vector<NeighbourhoodRewards> neighbourhoodRewards;
-
-  DomainInt mostRecentMinValue;
-  DomainInt highestMinValue;
   static const int TIMEOUT_PENALTY_COST = 1000;
 
-  double ucbValue(double reward, int totalActivations, int totalNeighbourhoodVisits) {
-    debug_log("Reward is " << reward << std::endl);
-    debug_log("Total activations is " << totalActivations << std::endl);
-    debug_log("total neighbourhood visits " << totalNeighbourhoodVisits << std::endl);
-    return (reward / totalNeighbourhoodVisits) +
-           std::sqrt((2 * std::log(totalActivations)) / (totalNeighbourhoodVisits));
-  }
-
-  bool isEnabled(const NeighbourhoodContainer& nhc, int nhIndex) {
-    return !(nhc.neighbourhoods[nhIndex].activation.isAssigned());
+  inline double ucbValue(double reward, int totalActivations, int totalCombinationVisits) {
+    return (reward / totalCombinationVisits) +
+           std::sqrt((2 * std::log(totalActivations)) / (totalCombinationVisits));
   }
 
 public:
-  UCBNeighborHoodSelection()
-      : mostRecentMinValue(getState().getOptimiseVar()->getMin()),
-        highestMinValue(getState().getOptimiseVar()->getMin()) {}
+  UCBNeighborHoodSelection() {}
 
-  void updateStats(int activatedNeighbourhood, const NeighbourhoodStats& neighbourhoodStats) {
-    debug_log(neighbourhoodStats);
-    if(neighbourhoodStats.solutionFound) {
-    } else {
-    }
-    neighbourhoodRewardHistory.back().addActivatedNeighbourhood(
-        activatedNeighbourhood,
-        neighbourhoodStats.solutionFound ? neighbourhoodStats.newMinValue : -1);
-  }
+  void updateStats(int activatedCombination, const NeighbourhoodStats& combinationStats) {}
 
-  int getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc,
-                                  NeighbourhoodSearchStats& globalStats) {
-    NeighbourhoodHistory currentHistory(nhc);
+  int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
+                                NeighbourhoodSearchStats& globalStats) {
     double bestUCTValue = -(std::numeric_limits<double>::max());
     int index = -1;
-    for(int i = 0; i < globalStats.numberActivations.size(); i++) {
-      if(isEnabled(nhc, i)) {
+    for(int i = 0; i < (int)globalStats.numberActivations.size(); i++) {
+      if(nhc.isCombinationEnabled(i)) {
         if(globalStats.numberActivations[i] == 0) {
-          currentHistory.addNeighbourhoodUCBValue(0, i);
-          neighbourhoodRewardHistory.push_back(currentHistory);
           return i;
         }
         double currentUCBValue =
@@ -124,54 +56,45 @@ public:
           bestUCTValue = currentUCBValue;
           index = i;
         }
-        currentHistory.addNeighbourhoodUCBValue(currentUCBValue, i);
-      } else {
-        currentHistory.addNeighbourhoodUCBValue(0, i);
       }
     }
     if(index == -1) {
-      std::cout << "UCBNeighborHoodSelection: could not activate a neighbourhood.\n";
+      std::cout << "UCBNeighborHoodSelection: could not activate a combination.\n";
       throw EndOfSearch();
     }
-    neighbourhoodRewardHistory.push_back(currentHistory);
     return index;
-  }
-
-  void printHistory(NeighbourhoodContainer& nhc) {
-    debug_code(for(NeighbourhoodHistory& n
-                   : neighbourhoodRewardHistory) {
-      int currentTimeStep = 0;
-      debug_log("Time Step: " << currentTimeStep++ << std::endl);
-      debug_log("--------" << std::endl);
-      debug_code(n.print(std::cout, nhc));
-      debug_log("---------" << std::endl);
-    });
   }
 };
 
-class InteractiveNeighbourhoodChooser {
+class InteractiveCombinationChooser {
 
 public:
-  InteractiveNeighbourhoodChooser() {}
+  InteractiveCombinationChooser() {}
 
-  void updateStats(int activatedNeighbourhood, const NeighbourhoodStats& stats) {
+  void updateStats(int activatedCombination, const NeighbourhoodStats& stats) {
     std::cout << stats << std::endl;
   }
 
-  int getNeighbourhoodsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
+  int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
+                                NeighbourhoodSearchStats& globalStats) {
     while(true) {
-      std::cout << "Select Neighbourhood:\n";
-      for(size_t i = 0; i < nhc.neighbourhoods.size(); ++i) {
-        cout << i << ": " << nhc.neighbourhoods[i].name << endl;
+      std::cout << "Select Combination:\n";
+      for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
+        cout << i << ":\n";
+        globalStats.printCombinationDescription(cout, nhc, i);
       }
       int index;
       bool readInt = bool(cin >> index);
-      if(!readInt || index < -1 || index >= (int)nhc.neighbourhoods.size()) {
-        cout << "Error, please enter an integer in the range 0.." << nhc.neighbourhoods.size()
-             << " to select a neighbourhood or -1 to end search.\n";
+      if(!readInt || index < -1 || index >= (int)nhc.neighbourhoodCombinations.size()) {
+        cout << "Error, please enter an integer in the range 0.."
+             << nhc.neighbourhoodCombinations.size()
+             << " to select a combination or -1 to end search.\n";
       } else if(index == -1) {
-        std::cerr << "InteractiveNeighbourhoodChooser: ending search...\n";
+        std::cerr << "InteractiveCombinationChooser: ending search...\n";
         throw EndOfSearch();
+      } else if(!nhc.isCombinationEnabled(index)) {
+        cout << "Error: This combination cannot be activated, one or more of the neighbourhood "
+                "activation variables must be assigned to false.";
       } else {
         return index;
       }

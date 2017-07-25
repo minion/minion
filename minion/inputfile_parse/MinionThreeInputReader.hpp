@@ -518,27 +518,57 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
 }
 
 template <typename FileReader>
+void MinionThreeInputReader<FileReader>::parseGroup(FileReader* infile,
+                                                    ParsedNeighbourhoodContainer& nbhc) {
+  std::string name = infile->get_string();
+  auto insertion = nbhc.neighbourhoodGroups.emplace(name, ParsedNeighbourhoodGroup());
+  if(!insertion.second) {
+    throw parse_exception("The group name \"" + name + "\" has already been used.");
+  }
+  ParsedNeighbourhoodGroup& nbhg = insertion.first->second;
+  infile->check_sym('(');
+  nbhg.vars = readLiteralVector(infile);
+  infile->check_sym(')');
+}
+template <typename FileReader>
+void MinionThreeInputReader<FileReader>::parseNeighbourhood(FileReader* infile,
+                                                            ParsedNeighbourhoodContainer& nbhc) {
+  nbhc.neighbourhoods.emplace_back();
+  ParsedNeighbourhood& nbh = nbhc.neighbourhoods.back();
+  ;
+  nbh.name = infile->get_string();
+  infile->check_sym('(');
+  nbh.deviation = readIdentifier(infile);
+  infile->check_sym(',');
+  nbh.activation = readIdentifier(infile);
+  infile->check_sym(',');
+  std::string groupName = infile->get_string();
+  if(!nbhc.neighbourhoodGroups.count(groupName)) {
+    throw parse_exception("The group \"" + groupName +
+                          "\" does not exist.  A group must be created before a neighbourhood can "
+                          "be assigned to it.");
+  } else {
+    nbh.groupName = groupName;
+  }
+  infile->check_sym(',');
+  nbh.vars = readLiteralVector(infile);
+  infile->check_sym(')');
+}
+
+template <typename FileReader>
 void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
   MAYBE_PARSER_INFO("Entering neighbourhood parsing");
-//  string svc = infile->get_string();
-//  if(svc != "SOFTVIOLATIONCOUNT")
-//    throw parse_exception("Expected SOFTVIOLATIONCOUNT");
-//
   if(instance->neighbourhoodContainer)
     throw parse_exception("Only one **NEIGHBOURHOODS** section at present");
 
   instance->neighbourhoodContainer = ParsedNeighbourhoodContainer();
 
   ParsedNeighbourhoodContainer& nbhc = *(instance->neighbourhoodContainer);
-  nbhc.soft_violation_count = Var(VAR_CONSTANT, 1);
-
-
 
   string shadowdisable = infile->get_string();
   if(shadowdisable != "INCUMBENTDISABLE")
     throw parse_exception("Expected INCUMBENTDISABLE");
   nbhc.shadow_disable = readIdentifier(infile);
-
 
   string shadowmap = infile->get_string();
   if(shadowmap != "INCUMBENTMAPPING")
@@ -547,24 +577,18 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
   nbhc.shadow_mapping = read2DMatrix(infile);
 
   while(infile->peek_char() != '*') {
-    string neighbourhood = infile->get_string();
-    if(neighbourhood != "NEIGHBOURHOOD")
-      throw parse_exception("Expected NEIGHBOURHOOD");
-    
-    ParsedNeighbourhood nbh;
-    nbh.name = infile->get_string();
-    infile->check_sym('(');
-    nbh.deviation = readIdentifier(infile);
-        infile->check_sym(',');
-    nbh.activation = readIdentifier(infile);
-
-    infile->check_sym(',');
-    nbh.vars = readLiteralVector(infile);
-    infile->check_sym(')');
-    nbhc.neighbourhoods.push_back(nbh);
+    string token = infile->get_string();
+    if(token == "group") {
+      parseGroup(infile, nbhc);
+    } else if(token == "NEIGHBOURHOOD") {
+      parseNeighbourhood(infile, nbhc);
+    } else {
+      throw parse_exception("Could not read token \"" + token +
+                            "\".  Expected \"group\" or \"neighbourhood\".");
+    }
   }
 
-    MAYBE_PARSER_INFO("Exiting neighbourhood parsing");
+  MAYBE_PARSER_INFO("Exiting neighbourhood parsing");
 }
 
 template <typename FileReader>
