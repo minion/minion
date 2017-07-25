@@ -82,6 +82,7 @@ public:
       for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
         cout << i << ":\n";
         globalStats.printCombinationDescription(cout, nhc, i);
+        cout << "\n";
       }
       int index;
       bool readInt = bool(cin >> index);

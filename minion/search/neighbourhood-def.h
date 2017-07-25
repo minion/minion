@@ -116,7 +116,10 @@ struct NeighbourhoodContainer {
     int currentGroup = currentCombination.size();
     if(currentGroup == groups.size()) {
       // push this combination multiple times, each with a different primary neighbourhood
-      neighbourhoodCombinations.push_back(currentCombination);
+      // do not allow closed/open neighbourhoods to be primary
+      if(neighbourhoods[currentCombination[0]].type == Neighbourhood::STANDARD) {
+        neighbourhoodCombinations.push_back(currentCombination);
+      }
       for(int i = 1; i < groups.size(); ++i) {
         if(neighbourhoods[currentCombination[i]].type != Neighbourhood::STANDARD) {
           continue;
@@ -127,14 +130,10 @@ struct NeighbourhoodContainer {
       return;
     }
     for(int neighbourhoodIndex : groups[currentGroup]->neighbourhoodIndexes) {
-      if(currentGroup == 0 && neighbourhoods[neighbourhoodIndex].type != Neighbourhood::STANDARD) {
-        continue;
-      }
       currentCombination.push_back(neighbourhoodIndex);
       buildCombinations(groups, currentCombination);
       currentCombination.pop_back();
     }
-    std::random_shuffle(neighbourhoodCombinations.begin(), neighbourhoodCombinations.end());
   }
 
   inline bool isCombinationEnabled(int combIndex) const {
