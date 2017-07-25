@@ -190,6 +190,7 @@ struct NeighbourhoodSearchStats {
        << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoodCombinations.size(); i++) {
       printCombinationDescription(os, nhc, i);
+      os << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
       u_int64_t averageTime = (numberActivations[i] > 0) ? totalTime[i] / numberActivations[i] : 0;
       os << indent << "Total time: " << totalTime[i] << "\n";
