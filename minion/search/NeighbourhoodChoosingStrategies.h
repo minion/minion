@@ -42,27 +42,40 @@ public:
   int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
                                 NeighbourhoodSearchStats& globalStats) {
     double bestUCTValue = -(std::numeric_limits<double>::max());
-    int index = -1;
+    bool allCombinationsTryed = true;
+    std::vector<int> bestCombinations;
+    // changed so that if multiple neighbourhoods have the same best UCb value, a random one is
+    // selected
+
     for(int i = 0; i < (int)globalStats.numberActivations.size(); i++) {
       if(nhc.isCombinationEnabled(i)) {
         if(globalStats.numberActivations[i] == 0) {
-          return i;
+          if(allCombinationsTryed) {
+            allCombinationsTryed = false;
+            bestCombinations.clear();
+          }
+          bestCombinations.push_back(i);
         }
-        double currentUCBValue =
-            ucbValue(globalStats.numberPositiveSolutions[i] -
-                         globalStats.numberNegativeSolutions[i] - globalStats.numberNoSolutions[i],
-                     globalStats.numberIterations, globalStats.numberActivations[i]);
-        if(currentUCBValue > bestUCTValue) {
-          bestUCTValue = currentUCBValue;
-          index = i;
+        if(allCombinationsTryed) {
+          double currentUCBValue = ucbValue(
+              globalStats.numberPositiveSolutions[i] - globalStats.numberNegativeSolutions[i] -
+                  globalStats.numberNoSolutions[i],
+              globalStats.numberIterations, globalStats.numberActivations[i]);
+          if(currentUCBValue > bestUCTValue) {
+            bestUCTValue = currentUCBValue;
+            bestCombinations.clear();
+            bestCombinations.push_back(i);
+          } else if(currentUCBValue == bestUCTValue) {
+            bestCombinations.push_back(i);
+          }
         }
       }
     }
-    if(index == -1) {
+    if(bestCombinations.empty()) {
       std::cout << "UCBNeighborHoodSelection: could not activate a combination.\n";
       throw EndOfSearch();
     }
-    return index;
+    return bestCombinations[std::rand() % bestCombinations.size()];
   }
 };
 
