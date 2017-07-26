@@ -87,12 +87,8 @@ struct NeighbourhoodSearchStats {
         numberExplorationsByNHCombinationSize(maxNeighbourhoodSize, 0),
         numberSuccessfulExplorationsByNHCombinationSize(maxNeighbourhoodSize, 0),
         neighbourhoodExplorationTimes(maxNeighbourhoodSize) {
-
-    std::vector<AnyVarRef> allVars = getVars().makeAllVarsList();
-    bestCompleteSolutionAssignment.resize(allVars.size());
-    for(size_t i = 0; i < allVars.size(); ++i) {
-      bestCompleteSolutionAssignment[i].first = std::move(allVars[i]);
-    }
+    getVars().forAllVars(
+        [&](const AnyVarRef& v) { bestCompleteSolutionAssignment.emplace_back(v, 0); });
   }
 
   inline u_int64_t getTotalTimeTaken() {

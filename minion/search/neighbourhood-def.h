@@ -74,7 +74,7 @@ struct NeighbourhoodContainer {
   typedef decltype(*neighbourhoodGroups.begin()) NGMapPair;
   std::vector<Neighbourhood> neighbourhoods;
   std::vector<std::vector<int>> neighbourhoodCombinations;
-
+  std::vector<AnyVarRef> variablesOutOfNeighbourhoods;
   NeighbourhoodContainer(const ParsedNeighbourhoodContainer& p)
       : shadow_mapping(get_AnyVarRef_from_Var(p.shadow_mapping)),
         shadow_disable(get_AnyVarRef_from_Var(p.shadow_disable)) {
@@ -103,12 +103,15 @@ struct NeighbourhoodContainer {
     }
     std::vector<int> currentCombination;
     buildCombinations(groups, currentCombination);
+    findVariablesOutOfNeighbourhoods();
     std::cout << "\nParsed groups:\n";
     printNames(neighbourhoodGroups, [](NGMapPair& g) { return g.first; });
     std::cout << "\nParsed neighbourhoods:\n";
     printNames(neighbourhoods, [](const Neighbourhood& n) { return n.name; });
     std::cout << "\nNumber neighbourhood combinations: " << neighbourhoodCombinations.size()
               << "\n";
+    std::cout << "Number variables not used in neighbourhoods: "
+              << variablesOutOfNeighbourhoods.size() << "\n";
   }
 
   inline void buildCombinations(const std::vector<std::shared_ptr<NeighbourhoodGroup>>& groups,
@@ -134,6 +137,30 @@ struct NeighbourhoodContainer {
       buildCombinations(groups, currentCombination);
       currentCombination.pop_back();
     }
+  }
+
+  void findVariablesOutOfNeighbourhoods() {
+    std::unordered_set<AnyVarRef> allVars;
+    getVars().forAllVars([&](const AnyVarRef& v) { allVars.insert(v); });
+    for(const auto& nameNhgPair : neighbourhoodGroups) {
+      const NeighbourhoodGroup& nhg = *nameNhgPair.second;
+      for(const auto& v : nhg.vars) {
+        allVars.erase(v);
+      }
+      for(int nhIndex : nhg.neighbourhoodIndexes) {
+        if(neighbourhoods[nhIndex].type != Neighbourhood::STANDARD) {
+          continue;
+        }
+        allVars.erase(neighbourhoods[nhIndex].deviation);
+        allVars.erase(neighbourhoods[nhIndex].activation);
+        for(const auto& v : neighbourhoods[nhIndex].vars) {
+          if(allVars.count(v)) {
+            allVars.erase(v);
+          }
+        }
+      }
+    }
+    variablesOutOfNeighbourhoods.assign(allVars.begin(), allVars.end());
   }
 
   inline bool isCombinationEnabled(int combIndex) const {

@@ -255,6 +255,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         }
       }
     }
+    if(primaryNH) {
+      searchOrders.emplace_back();
+      searchOrders.back().find_one_assignment = true;
+      searchOrders.back().order = defaultOrdering;
+    }
+    for(AnyVarRef& v : nhc.variablesOutOfNeighbourhoods) {
+      searchOrders.back().var_order.push_back(v.getBaseVar());
+      searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+    }
     return searchOrders;
   }
 

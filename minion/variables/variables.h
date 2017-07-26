@@ -58,21 +58,20 @@ public:
   }
 
 private:
-  template <typename Container>
-  inline void appendVarsFromContainer(Container& container, std::vector<AnyVarRef>& varRefs) {
+  template <typename Container, typename Func>
+  inline void appendVarsFromContainer(Container& container, const Func& apply) {
     for(UnsignedSysInt i = 0; i < container.var_count(); ++i) {
-      varRefs.push_back(container.get_var_num(i));
+      apply(container.get_var_num(i));
     }
   }
 
 public:
-  inline std::vector<AnyVarRef> makeAllVarsList() {
-    std::vector<AnyVarRef> varRefs;
-    appendVarsFromContainer(boundVarContainer, varRefs);
-    appendVarsFromContainer(boolVarContainer, varRefs);
-    appendVarsFromContainer(bigRangeVarContainer, varRefs);
-    appendVarsFromContainer(sparseBoundVarContainer, varRefs);
-    return varRefs;
+  template <typename Func>
+  inline void forAllVars(const Func& apply) {
+    appendVarsFromContainer(boundVarContainer, apply);
+    appendVarsFromContainer(boolVarContainer, apply);
+    appendVarsFromContainer(bigRangeVarContainer, apply);
+    appendVarsFromContainer(sparseBoundVarContainer, apply);
   }
 };
 
