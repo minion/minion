@@ -23,8 +23,7 @@ class TimeoutException : public std::exception {};
 
 template <typename SearchStrategy>
 struct NeighbourhoodSearchManager : public Controller::SearchManager {
-#define STANDARD_SEARCH_ONLY                                                                       \
-  {}
+
   typedef std::chrono::high_resolution_clock::time_point timePoint;
 
   shared_ptr<Propagate> prop;
@@ -40,23 +39,21 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
                                                  const SearchParams& searchParams,
-                                                 NeighbourhoodSearchStats& globalStats,
-                                                 bool restrictToFirstSolution = true) {
-    bool standardSearchOnly = searchParams.neighbourhoodsToActivate.empty();
+                                                 NeighbourhoodSearchStats& globalStats) {
     // Save state of the world
     int depth = Controller::get_world_depth();
 
     Controller::world_push();
     vector<SearchOrder> searchOrder;
 
-    if(standardSearchOnly) {
+    if(searchParams.isStandardSearchOnly()) {
       nhc.shadow_disable.assign(1);
       switchOffAllNeighbourhoods();
     } else {
       switchOnNeighbourhoods(searchParams, solution);
       searchOrder = makeNeighbourhoodSearchOrder(searchParams, base_order.front().order);
     }
-    if(standardSearchOnly) {
+    if(searchParams.isStandardSearchOnly()) {
       searchOrder.insert(searchOrder.end(), base_order.begin(), base_order.end());
     }
     solution.clear();
@@ -65,7 +62,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     prop->prop(vo->getVars());
 
     if(getState().isFailed()) {
-      if(standardSearchOnly) {
+      if(searchParams.isStandardSearchOnly()) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
         NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), 0, false, false);
@@ -79,12 +76,12 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     DomainInt highestNeighbourhoodSize;
     DomainInt optimisationValueCache = getState().getOptimiseVar()->getMin() - 1;
     std::shared_ptr<Controller::StandardSearchManager> sm;
-    // minus 1 is used as the optimisationHandler always sets it to optimisationValueCache +1
+    // minus 1 is used because the optimisationHandler always sets it to optimisationValueCache +1
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
                               const vector<Controller::triple>& branches) {
       Controller::standard_time_ctrlc_checks(var_array, branches);
       if(alarmTriggered) {
-        if(!standardSearchOnly) {
+        if(!searchParams.isStandardSearchOnly()) {
           highestNeighbourhoodSize =
               nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.getMin();
         }
@@ -98,13 +95,13 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         solution.push_back(var.getAssignedValue());
       }
       globalStats.foundSolution(getState().getOptimiseVar()->getMin());
-      if(restrictToFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
+      if(searchParams.restrictToFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
         throw EndOfSearch();
       }
       if(searchParams.optimiseMode) {
         optimisationValueCache = getState().getOptimiseVar()->getMin();
       }
-      if(!standardSearchOnly) {
+      if(!searchParams.isStandardSearchOnly()) {
         jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()));
       }
     };
@@ -165,9 +162,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     globalStats.startTimer();
     vector<DomainInt> solution;
     std::cout << "Searching for initial solution:\n";
-    NeighbourhoodStats stats =
-        searchNeighbourhoods(solution, SearchParams(STANDARD_SEARCH_ONLY, true, 0), globalStats);
-
+    SearchParams searchParams = SearchParams::standardSearch(false, 0);
+    searchParams.restrictToFirstSolution = true;
+    NeighbourhoodStats stats = searchNeighbourhoods(solution, searchParams, globalStats);
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
@@ -177,9 +174,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
     try {
       while(!searchStrategy.hasFinishedPhase()) {
-        SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
+        searchParams = searchStrategy.getSearchParams(nhc, globalStats);
         debug_log("Searching with params  " << searchParams);
-        stats = searchNeighbourhoods(solution, searchParams, globalStats, false);
+        stats = searchNeighbourhoods(solution, searchParams, globalStats);
         debug_log("Stats on last search: " << stats << endl);
         searchStrategy.updateStats(nhc, prop, searchParams.combinationToActivate, stats, solution,
                                    globalStats);

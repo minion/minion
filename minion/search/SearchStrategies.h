@@ -19,33 +19,42 @@ struct TunableParams {
 static const TunableParams tunableParams;
 
 struct SearchParams {
+  static const int STANDARD_SEARCH = -1;
   int combinationToActivate;
+
   std::vector<int> neighbourhoodsToActivate;
   bool optimiseMode;
   int timeoutInMillis;
   DomainInt initialNeighbourhoodSize;
+  bool restrictToFirstSolution = false;
 
-  SearchParams(int combinationToActivate, const NeighbourhoodContainer& nhc, bool optimiseMode,
-               int timeoutInMillis, DomainInt initialNeighbourhoodSize = 1)
+private:
+  SearchParams(int combinationToActivate, std::vector<int> neighbourhoods, bool optimiseMode,
+               int timeoutInMillis, DomainInt initialNeighbourhoodSize)
       : combinationToActivate(combinationToActivate),
-        neighbourhoodsToActivate(nhc.neighbourhoodCombinations[combinationToActivate]),
-        optimiseMode(optimiseMode),
-        timeoutInMillis(timeoutInMillis),
-        initialNeighbourhoodSize(initialNeighbourhoodSize) {
-    if(neighbourhoodsToActivate.size() > 1) {
-      std::random_shuffle(neighbourhoodsToActivate.begin() + 1, neighbourhoodsToActivate.end());
-    }
-  }
-  SearchParams(std::vector<int> neighbourhoodsToActivate, bool optimiseMode, int timeoutInMillis,
-               DomainInt initialNeighbourhoodSize = 1)
-      : combinationToActivate(-1),
-        neighbourhoodsToActivate(std::move(neighbourhoodsToActivate)),
+        neighbourhoodsToActivate(std::move(neighbourhoods)),
         optimiseMode(optimiseMode),
         timeoutInMillis(timeoutInMillis),
         initialNeighbourhoodSize(initialNeighbourhoodSize) {}
 
+public:
+  SearchParams(int combinationToActivate, const NeighbourhoodContainer& nhc, bool optimiseMode,
+               int timeoutInMillis, DomainInt initialNeighbourhoodSize = 1)
+      : SearchParams(combinationToActivate, nhc.neighbourhoodCombinations[combinationToActivate],
+                     optimiseMode, timeoutInMillis, initialNeighbourhoodSize) {
+    if(neighbourhoodsToActivate.size() > 1) {
+      std::random_shuffle(neighbourhoodsToActivate.begin() + 1, neighbourhoodsToActivate.end());
+    }
+  }
+  inline bool isStandardSearchOnly() const {
+    return combinationToActivate == STANDARD_SEARCH;
+  }
+  static inline SearchParams standardSearch(bool optimiseMode, int timeoutInMillis) {
+    return SearchParams(STANDARD_SEARCH, {}, optimiseMode, timeoutInMillis, 1);
+  }
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
-    os << "SearchParams(\nneighbourhoodsToActivate =  " << searchParams.neighbourhoodsToActivate
+    os << "SearchParams(\ncombinationToActivate = " << searchParams.combinationToActivate
+       << "\nneighbourhoodsToActivate =  " << searchParams.neighbourhoodsToActivate
        << ",\noptimiseMode = " << searchParams.optimiseMode
        << ",\ntimeoutInMillis = " << searchParams.timeoutInMillis
        << ",\ninitialNeighbourhoodSize = " << searchParams.initialNeighbourhoodSize << ")";
