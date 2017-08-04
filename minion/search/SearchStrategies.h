@@ -18,6 +18,8 @@ struct TunableParams {
 
 static const TunableParams tunableParams;
 
+class RandomRestartException : public std::exception {};
+
 struct SearchParams {
   static const int STANDARD_SEARCH = -1;
   int combinationToActivate;

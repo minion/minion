@@ -73,9 +73,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     }
 
-    DomainInt highestNeighbourhoodSize, lastOptVal = getState().getOptimiseVar()->getMin();
-    DomainInt optimisationValueCache = lastOptVal - 1;
-    // minus 1 is used because the optimisationHandler always sets it to optimisationValueCache +1
+    DomainInt highestNeighbourhoodSize, lastOptVal = getState().getOptimiseVar()->getMin(),
+                                        newOptMinTarget = getState().getOptimiseVar()->getMin();
     std::shared_ptr<Controller::StandardSearchManager> sm;
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
                               const vector<Controller::triple>& branches) {
@@ -100,15 +99,13 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         throw EndOfSearch();
       }
       if(searchParams.optimiseMode) {
-        optimisationValueCache = getState().getOptimiseVar()->getMin();
+        newOptMinTarget = getState().getOptimiseVar()->getMin() + 1;
       }
       if(!searchParams.isStandardSearchOnly()) {
         jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()));
       }
     };
-    auto optimisationHandler = [&]() {
-      getState().getOptimiseVar()->setMin(optimisationValueCache + 1);
-    };
+    auto optimisationHandler = [&]() { getState().getOptimiseVar()->setMin(newOptMinTarget); };
     sm = make_shared<Controller::StandardSearchManager>(vo, prop, timeoutChecker, solutionHandler,
                                                         optimisationHandler);
 
