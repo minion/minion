@@ -73,10 +73,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     }
 
-    DomainInt highestNeighbourhoodSize;
-    DomainInt optimisationValueCache = getState().getOptimiseVar()->getMin() - 1;
-    std::shared_ptr<Controller::StandardSearchManager> sm;
+    DomainInt highestNeighbourhoodSize, lastOptVal = getState().getOptimiseVar()->getMin();
+    DomainInt optimisationValueCache = lastOptVal - 1;
     // minus 1 is used because the optimisationHandler always sets it to optimisationValueCache +1
+    std::shared_ptr<Controller::StandardSearchManager> sm;
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
                               const vector<Controller::triple>& branches) {
       Controller::standard_time_ctrlc_checks(var_array, branches);
@@ -90,6 +90,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     };
 
     auto solutionHandler = [&]() {
+      lastOptVal = getState().getOptimiseVar()->getMin();
       solution.clear();
       for(const auto& var : this->nhc.shadow_mapping[0]) {
         solution.push_back(var.getAssignedValue());
@@ -130,9 +131,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
 
     bool solutionFound = !solution.empty();
-    DomainInt bestOptimisation =
-        (solutionFound) ? optimisationValueCache : optimisationValueCache + 1;
-    NeighbourhoodStats stats(bestOptimisation, getTimeTaken(startTime), solutionFound, timeout,
+    NeighbourhoodStats stats(lastOptVal, getTimeTaken(startTime), solutionFound, timeout,
                              highestNeighbourhoodSize);
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);
     Controller::world_pop_to_depth(depth);
