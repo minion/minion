@@ -6,7 +6,6 @@
 #include <algorithm>
 #ifndef MINION_NEIGHBOURHOOD_DEF_H
 #define MINION_NEIGHBOURHOOD_DEF_H
-
 #ifdef DEBUG_MODE
 #define debug_log(x) std::cout << x << std::endl;
 #define debug_code(x) x

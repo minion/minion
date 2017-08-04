@@ -1,4 +1,3 @@
-
 #ifndef MINION_NEIGHBOURHOOD_SEARCH_H
 #define MINION_NEIGHBOURHOOD_SEARCH_H
 #include "NeighbourhoodChoosingStrategies.h"
@@ -45,24 +44,29 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     Controller::world_push();
     vector<SearchOrder> searchOrder;
-
-    if(searchParams.isStandardSearchOnly()) {
+    vector<SearchOrder>* chosenSearchOrder = NULL;
+    if(searchParams.mode != SearchParams::NEIGHBOURHOOD_SEARCH) {
       nhc.shadow_disable.assign(1);
       switchOffAllNeighbourhoods();
+      if(searchParams.mode == SearchParams::STANDARD_SEARCH) {
+        chosenSearchOrder = &base_order;
+      } else if(searchParams.mode == SearchParams::RANDOM_WALK) {
+        searchOrder = makeRandomWalkSearchOrder();
+        chosenSearchOrder = &searchOrder;
+      }
     } else {
       switchOnNeighbourhoods(searchParams, solution);
       searchOrder = makeNeighbourhoodSearchOrder(searchParams, base_order.front().order);
+      chosenSearchOrder = &searchOrder;
     }
-    if(searchParams.isStandardSearchOnly()) {
-      searchOrder.insert(searchOrder.end(), base_order.begin(), base_order.end());
-    }
+
     solution.clear();
-    auto vo = Controller::make_search_order_multiple(searchOrder);
+    auto vo = Controller::make_search_order_multiple(*chosenSearchOrder);
 
     prop->prop(vo->getVars());
 
     if(getState().isFailed()) {
-      if(searchParams.isStandardSearchOnly()) {
+      if(searchParams.mode == SearchParams::STANDARD_SEARCH) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
         NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), 0, false, false);
@@ -80,7 +84,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
                               const vector<Controller::triple>& branches) {
       Controller::standard_time_ctrlc_checks(var_array, branches);
       if(alarmTriggered) {
-        if(!searchParams.isStandardSearchOnly()) {
+        if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
           highestNeighbourhoodSize =
               nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.getMin();
         }
@@ -95,13 +99,13 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         solution.push_back(var.getAssignedValue());
       }
       globalStats.foundSolution(getState().getOptimiseVar()->getMin());
-      if(searchParams.restrictToFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
+      if(searchParams.stopAtFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
         throw EndOfSearch();
       }
       if(searchParams.optimiseMode) {
         newOptMinTarget = getState().getOptimiseVar()->getMin() + 1;
       }
-      if(!searchParams.isStandardSearchOnly()) {
+      if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
         jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()));
       }
     };
@@ -158,9 +162,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     globalStats.startTimer();
     vector<DomainInt> solution;
     std::cout << "Searching for initial solution:\n";
-    SearchParams searchParams = SearchParams::standardSearch(false, 0);
-    searchParams.restrictToFirstSolution = true;
-    NeighbourhoodStats stats = searchNeighbourhoods(solution, searchParams, globalStats);
+    NeighbourhoodStats stats =
+        searchNeighbourhoods(solution, SearchParams::standardSearch(false, true, 0), globalStats);
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
@@ -170,7 +173,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
     try {
       while(!searchStrategy.hasFinishedPhase()) {
-        searchParams = searchStrategy.getSearchParams(nhc, globalStats);
+        SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
         debug_log("Searching with params  " << searchParams);
         stats = searchNeighbourhoods(solution, searchParams, globalStats);
         debug_log("Stats on last search: " << stats << endl);
@@ -227,9 +230,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   /**
-   * Create a search order where the first variables to branch on are the activated neighbourhoods
-   * sizes with ascending value ordering.  Followed by the primary variabels referenced by the
-   * activated neighbourhoods with random ordering.
+   * Create a search order where for each activated neighbourhood, first come the neighbourhood's
+   * size and
+   * local variables in a static ordering, then the primary variables that the neighbourhood
+   * operates on in the ordering specified by minion..
    */
   vector<SearchOrder> makeNeighbourhoodSearchOrder(const SearchParams& searchParams,
                                                    VarOrderEnum defaultOrdering) {
@@ -265,6 +269,15 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     return searchOrders;
   }
 
+  vector<SearchOrder> makeRandomWalkSearchOrder() {
+    vector<SearchOrder> searchOrder(base_order.begin(), base_order.end());
+    for(auto& so : searchOrder) {
+      for(int i = 0; i < so.val_order.size(); i++) {
+        so.val_order[i] = VALORDER_RANDOM;
+      }
+    }
+    return searchOrder;
+  }
   /**assign all neighbourhood activation variables to false
    *
    */

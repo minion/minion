@@ -18,44 +18,61 @@ struct TunableParams {
 
 static const TunableParams tunableParams;
 
-class RandomRestartException : public std::exception {};
-
 struct SearchParams {
-  static const int STANDARD_SEARCH = -1;
+  enum Mode { STANDARD_SEARCH, NEIGHBOURHOOD_SEARCH, RANDOM_WALK };
+  Mode mode;
   int combinationToActivate;
-
   std::vector<int> neighbourhoodsToActivate;
   bool optimiseMode;
+  bool stopAtFirstSolution;
+
   int timeoutInMillis;
   DomainInt initialNeighbourhoodSize;
-  bool restrictToFirstSolution = false;
 
 private:
-  SearchParams(int combinationToActivate, std::vector<int> neighbourhoods, bool optimiseMode,
-               int timeoutInMillis, DomainInt initialNeighbourhoodSize)
-      : combinationToActivate(combinationToActivate),
+  SearchParams(Mode mode, int combinationToActivate, std::vector<int> neighbourhoods,
+               bool optimiseMode, bool stopAtFirstSolution, int timeoutInMillis,
+               DomainInt initialNeighbourhoodSize)
+      : mode(mode),
+        combinationToActivate(combinationToActivate),
         neighbourhoodsToActivate(std::move(neighbourhoods)),
         optimiseMode(optimiseMode),
+        stopAtFirstSolution(stopAtFirstSolution),
         timeoutInMillis(timeoutInMillis),
         initialNeighbourhoodSize(initialNeighbourhoodSize) {}
 
 public:
-  SearchParams(int combinationToActivate, const NeighbourhoodContainer& nhc, bool optimiseMode,
-               int timeoutInMillis, DomainInt initialNeighbourhoodSize = 1)
-      : SearchParams(combinationToActivate, nhc.neighbourhoodCombinations[combinationToActivate],
-                     optimiseMode, timeoutInMillis, initialNeighbourhoodSize) {
-    if(neighbourhoodsToActivate.size() > 1) {
-      std::random_shuffle(neighbourhoodsToActivate.begin() + 1, neighbourhoodsToActivate.end());
+  static inline SearchParams neighbourhoodSearch(int combinationToActivate,
+                                                 const NeighbourhoodContainer& nhc,
+                                                 bool optimiseMode, int timeoutInMillis,
+                                                 DomainInt initialNeighbourhoodSize = 1) {
+    SearchParams searchParams(NEIGHBOURHOOD_SEARCH, combinationToActivate,
+                              nhc.neighbourhoodCombinations[combinationToActivate], optimiseMode,
+                              false, timeoutInMillis, initialNeighbourhoodSize);
+    if(searchParams.neighbourhoodsToActivate.size() > 1) {
+      std::random_shuffle(searchParams.neighbourhoodsToActivate.begin() + 1,
+                          searchParams.neighbourhoodsToActivate.end());
     }
+    return searchParams;
   }
-  inline bool isStandardSearchOnly() const {
-    return combinationToActivate == STANDARD_SEARCH;
+
+  static inline SearchParams standardSearch(bool optimiseMode, bool stopAtFirstSolution,
+                                            int timeoutInMillis) {
+    return SearchParams(STANDARD_SEARCH, -1, {}, optimiseMode, stopAtFirstSolution, timeoutInMillis,
+                        0);
   }
-  static inline SearchParams standardSearch(bool optimiseMode, int timeoutInMillis) {
-    return SearchParams(STANDARD_SEARCH, {}, optimiseMode, timeoutInMillis, 1);
+  static inline SearchParams randomWalk(bool optimiseMode, bool stopAtFirstSolution,
+                                        int timeoutInMillis) {
+    return SearchParams(RANDOM_WALK, -1, {}, optimiseMode, stopAtFirstSolution, timeoutInMillis, 0);
   }
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
-    os << "SearchParams(\ncombinationToActivate = " << searchParams.combinationToActivate
+    os << "SearchParams(";
+    switch(searchParams.mode) {
+    case NEIGHBOURHOOD_SEARCH: os << "mode=NEIGHBOURHOOD_SEARCH"; break;
+    case STANDARD_SEARCH: os << "STANDARD_SEARCH"; break;
+    case RANDOM_WALK: os << "RANDOM_WALK"; break;
+    }
+    os << "\ncombinationToActivate = " << searchParams.combinationToActivate
        << "\nneighbourhoodsToActivate =  " << searchParams.neighbourhoodsToActivate
        << ",\noptimiseMode = " << searchParams.optimiseMode
        << ",\ntimeoutInMillis = " << searchParams.timeoutInMillis
@@ -139,8 +156,9 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams(combinationToActivate, nhc, true, tunableParams.iterationSearchTime,
-                        highestNeighbourhoodSizes[combinationToActivate]);
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true,
+                                             tunableParams.iterationSearchTime,
+                                             highestNeighbourhoodSizes[combinationToActivate]);
   }
   bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
     return true;
@@ -219,7 +237,8 @@ public:
     currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
-    return SearchParams(combination, nhc, false, tunableParams.iterationSearchTime);
+    return SearchParams::neighbourhoodSearch(combination, nhc, false,
+                                             tunableParams.iterationSearchTime);
   }
 
   /*
