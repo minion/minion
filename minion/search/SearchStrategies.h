@@ -202,13 +202,15 @@ class HolePuncher {
   bool finishedPhase = false;
 
 public:
-  int neighbourhoodSize = 0;
+  int minNeighbourhoodSize = 1;
+  int neighbourhoodSizeOffset = 0;
   void resetNeighbourhoodSize() {
-    neighbourhoodSize = 1;
+    minNeighbourhoodSize = 1;
+    neighbourhoodSizeOffset = 0;
   }
 
-  void incrementNeighbourhoodSize() {
-    ++neighbourhoodSize;
+  void nextNeighbourhoodSize() {
+    minNeighbourhoodSize *= 2;
   }
 
   /*
@@ -237,8 +239,8 @@ public:
     currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
-    return SearchParams::neighbourhoodSearch(combination, nhc, false,
-                                             tunableParams.iterationSearchTime);
+    return SearchParams::neighbourhoodSearch(
+        combination, nhc, false, tunableParams.iterationSearchTime, currentNeighbourhoodSize());
   }
 
   /*
@@ -254,6 +256,10 @@ public:
     return finishedPhase;
   }
 
+  inline int currentNeighbourhoodSize() const {
+    return minNeighbourhoodSize + neighbourhoodSizeOffset;
+  }
+
   /*
    * Generate the vector of neighbourhoods that can be activated.
    */
@@ -261,18 +267,18 @@ public:
                   const std::vector<DomainInt>& incumbentSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
     int maxNHSize = nhc.getMaxNeighbourhoodSize();
-    while(neighbourhoodSize <= maxNHSize) {
+    while(currentNeighbourhoodSize() <= maxNHSize) {
       activeCombinations.clear();
       for(int i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
         if(nhc.isCombinationEnabled(i) &&
            nhc.neighbourhoods[nhc.neighbourhoodCombinations[i][0]].deviation.inDomain(
-               neighbourhoodSize))
+               currentNeighbourhoodSize()))
           activeCombinations.push_back(i);
       }
       if(!activeCombinations.empty()) {
         break;
       } else {
-        ++neighbourhoodSize;
+        ++neighbourhoodSizeOffset;
       }
     }
 
@@ -285,12 +291,12 @@ public:
     }
 
     std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
-              << neighbourhoodSize << std::endl;
+              << currentNeighbourhoodSize() << std::endl;
     solutionBag = {};
     maxSolutionsPerNeighbourhood = (int)ceil(
         ((double)tunableParams.holePuncherSolutionBagSizeConstant) / activeCombinations.size());
     finishedPhase = false;
-    globalStats.startExploration(neighbourhoodSize);
+    globalStats.startExploration(currentNeighbourhoodSize());
     copyOverIncumbent(nhc, incumbentSolution, prop);
   }
 
@@ -351,7 +357,7 @@ public:
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
           currentPhase = Phase::HOLE_PUNCHING;
-          holePuncher.incrementNeighbourhoodSize();
+          holePuncher.nextNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else {
           std::cout << "MetaStrategy: new best value not achieved, trying hill climbing from next "
@@ -383,7 +389,7 @@ public:
           globalStats.numberPulledThisPhase += 1;
           solutionBag.pop_back();
         } else {
-          holePuncher.incrementNeighbourhoodSize();
+          holePuncher.nextNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         }
       }
