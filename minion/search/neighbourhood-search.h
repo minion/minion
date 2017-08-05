@@ -41,7 +41,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
                                                  NeighbourhoodSearchStats& globalStats) {
     // Save state of the world
     int depth = Controller::get_world_depth();
-
     Controller::world_push();
     vector<SearchOrder> searchOrder;
     vector<SearchOrder>* chosenSearchOrder = NULL;
@@ -70,8 +69,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
         NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), 0, false, false);
+
         globalStats.reportnewStats(searchParams.combinationToActivate, stats);
-        Controller::world_pop();
         Controller::world_pop_to_depth(depth);
         return stats;
       }
@@ -121,16 +120,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     bool timeout = false;
     try {
       sm->search();
-    } catch(EndOfSearch&) { clearTimeout(); } catch(TimeoutException&) {
-      timeout = true;
+    } catch(EndOfSearch&) {
+    } catch(TimeoutException&) { timeout = true; }
+    if(searchParams.timeoutInMillis > 0) {
+      clearTimeout();
     }
-
     if(getState().isCtrlcPressed() ||
        (getOptions().timeout_active &&
         (globalStats.getTotalTimeTaken() / 1000) >= getOptions().time_limit)) {
       throw EndOfSearch();
     }
-
     bool solutionFound = !solution.empty();
     NeighbourhoodStats stats(lastOptVal, getTimeTaken(startTime), solutionFound, timeout,
                              highestNeighbourhoodSize);
@@ -152,6 +151,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   virtual void search() {
+    srand(time(NULL));
     int maxSize = nhc.getMaxNeighbourhoodSize();
 
     NeighbourhoodSearchStats globalStats(

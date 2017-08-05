@@ -198,19 +198,22 @@ class HolePuncher {
   SolutionBag solutionBag;
   std::vector<int> activeCombinations;
   int currentNeighbourhoodSolutionsCount = 0;
-  int maxSolutionsPerNeighbourhood = 1;
+  int maxSolutionsPerCombination = 1;
   bool finishedPhase = false;
+  bool randomWalk = false;
 
 public:
   int minNeighbourhoodSize = 1;
   int neighbourhoodSizeOffset = 0;
+
   void resetNeighbourhoodSize() {
     minNeighbourhoodSize = 1;
     neighbourhoodSizeOffset = 0;
+    randomWalk = false;
   }
 
   void nextNeighbourhoodSize() {
-    minNeighbourhoodSize *= 2;
+    minNeighbourhoodSize *= (1 + !randomWalk);
   }
 
   /*
@@ -220,21 +223,31 @@ public:
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    int currentActivatedCombination, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
-    finishedPhase = activeCombinations.empty();
+    finishedPhase = activeCombinations.empty() || randomWalk;
     if(finishedPhase) {
-      std::random_shuffle(solutionBag.begin(), solutionBag.end());
+      if(randomWalk) {
+        if(solutionBag.size() == 0) {
+          cout << "HolePuncher: unable to find any random solutions.\n";
+          throw EndOfSearch();
+        }
+      } else {
+        std::random_shuffle(solutionBag.begin(), solutionBag.end());
+      }
       std::cout << "HolePuncher: search complete, solutionBag size = " << solutionBag.size()
                 << std::endl;
     }
   }
 
   /**
-   * Pop a neighbourhood from the vector of active neighbourhoods and return it
-   * in the struct SearchParams
+   * Pop a neighbourhood combination from the vector of active neighbourhoods and return it
+   * in the struct SearchParams.  Unless in Random walk mode.
    * @param nhc
    * @return Struct SearchParams which contains a neighbourhood to activate
    */
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
+    if(randomWalk) {
+      return SearchParams::randomWalk(false, true, 0);
+    }
     assert(!activeCombinations.empty());
     currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
@@ -249,7 +262,7 @@ public:
    */
   bool continueSearch(NeighbourhoodContainer& nhc, const std::vector<DomainInt>& solution) {
     solutionBag.emplace_back(getState().getOptimiseVar()->getMin(), solution);
-    return ++currentNeighbourhoodSolutionsCount <= maxSolutionsPerNeighbourhood;
+    return !randomWalk && ++currentNeighbourhoodSolutionsCount <= maxSolutionsPerCombination;
   }
 
   bool hasFinishedPhase() {
@@ -266,38 +279,41 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt,
                   const std::vector<DomainInt>& incumbentSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
-    int maxNHSize = nhc.getMaxNeighbourhoodSize();
-    while(currentNeighbourhoodSize() <= maxNHSize) {
-      activeCombinations.clear();
-      for(int i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
-        if(nhc.isCombinationEnabled(i) &&
-           nhc.neighbourhoods[nhc.neighbourhoodCombinations[i][0]].deviation.inDomain(
-               currentNeighbourhoodSize()))
-          activeCombinations.push_back(i);
+    if(randomWalk) {
+      cout << "HolePuncher: fetching another random solution:\n";
+    } else {
+      int maxNHSize = nhc.getMaxNeighbourhoodSize();
+      while(currentNeighbourhoodSize() <= maxNHSize) {
+        activeCombinations.clear();
+        for(int i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
+          if(nhc.isCombinationEnabled(i) &&
+             nhc.neighbourhoods[nhc.neighbourhoodCombinations[i][0]].deviation.inDomain(
+                 currentNeighbourhoodSize()))
+            activeCombinations.push_back(i);
+        }
+        if(!activeCombinations.empty()) {
+          break;
+        } else {
+          ++neighbourhoodSizeOffset;
+        }
       }
-      if(!activeCombinations.empty()) {
-        break;
+
+      if(activeCombinations.empty()) {
+        std::cout << "HolePuncher: there are no neighbourhood combinations that may be "
+                     "activated.  Fetching a random solution:\n";
+        randomWalk = true;
+        Controller::world_pop_to_depth(1);
       } else {
-        ++neighbourhoodSizeOffset;
+        std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
+                  << currentNeighbourhoodSize() << std::endl;
+        maxSolutionsPerCombination = (int)ceil(
+            ((double)tunableParams.holePuncherSolutionBagSizeConstant) / activeCombinations.size());
+        globalStats.startExploration(currentNeighbourhoodSize());
+        copyOverIncumbent(nhc, incumbentSolution, prop);
       }
     }
-
-    if(activeCombinations.empty()) {
-      std::cout << "HolePuncher: there are no neighbourhood combinations that may be "
-                   "activated.\nThrowing "
-                   "EndOfSearch."
-                << std::endl;
-      throw EndOfSearch();
-    }
-
-    std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
-              << currentNeighbourhoodSize() << std::endl;
     solutionBag = {};
-    maxSolutionsPerNeighbourhood = (int)ceil(
-        ((double)tunableParams.holePuncherSolutionBagSizeConstant) / activeCombinations.size());
     finishedPhase = false;
-    globalStats.startExploration(currentNeighbourhoodSize());
-    copyOverIncumbent(nhc, incumbentSolution, prop);
   }
 
   SolutionBag& getSolutionBag() {
