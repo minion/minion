@@ -169,8 +169,7 @@ public:
                      (iterationsSpentAtPeak > tunableParams.hillClimberMinIterationsToSpendAtPeak &&
                       static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability);
     if(completed) {
-      std::cout << "HillClimber: completed search at opt value: "
-                << getState().getOptimiseVar()->getMin() << std::endl;
+      std::cout << "HillClimber: completed search at opt value: " << bestSolutionValue << std::endl;
       std::cout << "Number iterations spent at peak: " << iterationsSpentAtPeak << std::endl;
     }
     return completed;

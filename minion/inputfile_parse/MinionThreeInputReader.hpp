@@ -578,7 +578,7 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
 
   while(infile->peek_char() != '*') {
     string token = infile->get_string();
-    if(token == "group") {
+    if(token == "GROUP") {
       parseGroup(infile, nbhc);
     } else if(token == "NEIGHBOURHOOD") {
       parseNeighbourhood(infile, nbhc);
