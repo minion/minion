@@ -584,7 +584,7 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
       parseNeighbourhood(infile, nbhc);
     } else {
       throw parse_exception("Could not read token \"" + token +
-                            "\".  Expected \"group\" or \"neighbourhood\".");
+                            "\".  Expected \"GROUP\" or \"NEIGHBOURHOOD\".");
     }
   }
 
