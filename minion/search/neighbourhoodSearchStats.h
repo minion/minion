@@ -198,8 +198,8 @@ struct NeighbourhoodSearchStats {
     }
     os << "History of best solutions found:\n";
     for(const auto& valueTimePair : bestValueTimes) {
-      os << indent << "Value : " << valueTimePair.first << " Time : " << valueTimePair.second
-         << " \n";
+      os << indent << "Value: " << valueTimePair.first << ", Time: " << valueTimePair.second
+         << "\n";
     }
 
     os << "Stats of Explorations:\n";

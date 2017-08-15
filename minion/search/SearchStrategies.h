@@ -225,7 +225,9 @@ public:
     finishedPhase = activeCombinations.empty() || randomWalk;
     if(finishedPhase) {
       if(randomWalk) {
-        if(solutionBag.size() == 0) {
+        if(stats.solutionFound) {
+          solutionBag.emplace_back(stats.newMinValue, solution);
+        } else {
           cout << "HolePuncher: unable to find any random solutions.\n";
           throw EndOfSearch();
         }
@@ -261,7 +263,7 @@ public:
    */
   bool continueSearch(NeighbourhoodContainer& nhc, const std::vector<DomainInt>& solution) {
     solutionBag.emplace_back(getState().getOptimiseVar()->getMin(), solution);
-    return !randomWalk && ++currentNeighbourhoodSolutionsCount <= maxSolutionsPerCombination;
+    return ++currentNeighbourhoodSolutionsCount <= maxSolutionsPerCombination;
   }
 
   bool hasFinishedPhase() {
@@ -280,6 +282,7 @@ public:
                   NeighbourhoodSearchStats& globalStats) {
     if(randomWalk) {
       cout << "HolePuncher: fetching another random solution:\n";
+      Controller::world_pop_to_depth(1);
     } else {
       int maxNHSize = nhc.getMaxNeighbourhoodSize();
       while(currentNeighbourhoodSize() <= maxNHSize) {
