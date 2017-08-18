@@ -163,7 +163,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     vector<DomainInt> solution;
     std::cout << "Searching for initial solution:\n";
     NeighbourhoodStats stats =
-        searchNeighbourhoods(solution, SearchParams::standardSearch(false, true, 0), globalStats);
+        searchNeighbourhoods(solution, SearchParams::randomWalk(false, true, 0), globalStats);
     if(!stats.solutionFound) {
       cout << "Initial solution not found\n";
       return;
