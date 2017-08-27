@@ -7,13 +7,13 @@ static const std::string indent = "    ";
 
 struct NeighbourhoodStats {
   DomainInt newMinValue;
-  u_int64_t timeTaken;
+  double timeTaken;
   bool solutionFound;
   bool timeoutReached;
   DomainInt highestNeighbourhoodSize;
 
 public:
-  NeighbourhoodStats(DomainInt newMinValue, u_int64_t timeTaken, bool solutionFound,
+  NeighbourhoodStats(DomainInt newMinValue, double timeTaken, bool solutionFound,
                      bool timeoutReached, DomainInt highestNeighbourhoodSize = 0)
       : newMinValue(newMinValue),
         timeTaken(timeTaken),
@@ -32,8 +32,8 @@ public:
 
 struct ExplorationPhase {
   int neighbourhoodSize;
-  u_int64_t startExplorationTime;
-  u_int64_t endExplorationTime;
+  double startExplorationTime;
+  double endExplorationTime;
   int numberOfRandomSolutionsPulled;
 };
 
@@ -43,12 +43,12 @@ struct NeighbourhoodSearchStats {
   DomainInt valueOfInitialSolution;
   DomainInt bestOptVarValue;
   DomainInt optValueAchievedByLastNHCombination;
-  vector<pair<DomainInt, u_int64_t>> bestValueTimes;
+  vector<pair<DomainInt, double>> bestValueTimes;
   std::vector<std::pair<AnyVarRef, DomainInt>> bestCompleteSolutionAssignment;
 
   int numberIterations = 0;
   vector<int> numberActivations; // mapping from combinations index to number of times activated
-  vector<u_int64_t> totalTime;
+  vector<double> totalTime;
   vector<int> numberPositiveSolutions;
   vector<int> numberNegativeSolutions;
   vector<int> numberNoSolutions;
@@ -59,17 +59,17 @@ struct NeighbourhoodSearchStats {
 
   vector<int> numberExplorationsByNHCombinationSize;
   vector<int> numberSuccessfulExplorationsByNHCombinationSize;
-  vector<u_int64_t> neighbourhoodExplorationTimes;
+  vector<double> neighbourhoodExplorationTimes;
   vector<ExplorationPhase> explorationPhases;
 
   int totalNumberOfRandomSolutionsPulled = 0;
   int numberPulledThisPhase = 0;
 
-  std::chrono::high_resolution_clock::time_point startTime;
-  std::chrono::high_resolution_clock::time_point startExplorationTime;
+  double startTime;
+  double startExplorationTime;
   bool currentlyExploring = false;
   int currentNeighbourhoodSize;
-  u_int64_t totalTimeToBestSolution;
+  double totalTimeToBestSolution;
 
   NeighbourhoodSearchStats(int numberCombinations,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange,
@@ -91,13 +91,12 @@ struct NeighbourhoodSearchStats {
         [&](const AnyVarRef& v) { bestCompleteSolutionAssignment.emplace_back(v, 0); });
   }
 
-  inline u_int64_t getTotalTimeTaken() {
-    auto endTime = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+  inline double getTotalTimeTaken() {
+    return get_cpu_time() - startTime;
   }
 
   inline void startTimer() {
-    startTime = std::chrono::high_resolution_clock::now();
+    startTime = get_cpu_time();
   }
 
   inline void reportnewStats(const int activatedCombination, const NeighbourhoodStats& stats) {
@@ -135,10 +134,9 @@ struct NeighbourhoodSearchStats {
 
   inline void foundSolution(DomainInt solutionValue) {
     if(currentlyExploring && solutionValue > bestOptVarValue) {
-      auto endTime = std::chrono::high_resolution_clock::now();
+
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
-          std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime)
-              .count();
+          get_cpu_time() - startExplorationTime;
       currentlyExploring = false;
       numberSuccessfulExplorationsByNHCombinationSize[currentNeighbourhoodSize - 1] += 1;
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
@@ -150,16 +148,14 @@ struct NeighbourhoodSearchStats {
 
   inline void startExploration(int neighbourhoodSize) {
     if(currentlyExploring) {
-      auto endTime = std::chrono::high_resolution_clock::now();
       neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
-          std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startExplorationTime)
-              .count();
+          get_cpu_time() - startExplorationTime;
       explorationPhases.back().endExplorationTime = getTotalTimeTaken();
       explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
       numberPulledThisPhase = 0;
     }
     currentlyExploring = true;
-    startExplorationTime = std::chrono::high_resolution_clock::now();
+    startExplorationTime = get_cpu_time();
     numberExplorationsByNHCombinationSize[neighbourhoodSize - 1] += 1;
     currentNeighbourhoodSize = neighbourhoodSize;
     ExplorationPhase currentPhase;
@@ -188,7 +184,7 @@ struct NeighbourhoodSearchStats {
       printCombinationDescription(os, nhc, i);
       os << "\n";
       os << indent << "Number activations: " << numberActivations[i] << "\n";
-      u_int64_t averageTime = (numberActivations[i] > 0) ? totalTime[i] / numberActivations[i] : 0;
+      double averageTime = (numberActivations[i] > 0) ? totalTime[i] / numberActivations[i] : 0;
       os << indent << "Total time: " << totalTime[i] << "\n";
       os << indent << "Average time per activation: " << averageTime << "\n";
       os << indent << "Number positive solutions: " << numberPositiveSolutions[i] << "\n";

@@ -23,8 +23,6 @@ class TimeoutException : public std::exception {};
 template <typename SearchStrategy>
 struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
-  typedef std::chrono::high_resolution_clock::time_point timePoint;
-
   shared_ptr<Propagate> prop;
   vector<SearchOrder> base_order;
   NeighbourhoodContainer nhc;
@@ -116,7 +114,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       setTimeout(searchParams.timeoutInMillis);
     }
 
-    auto startTime = std::chrono::high_resolution_clock::now();
+    double startTime = get_cpu_time();
     bool timeout = false;
     try {
       sm->search();
@@ -127,7 +125,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
     if(getState().isCtrlcPressed() ||
        (getOptions().timeout_active &&
-        (globalStats.getTotalTimeTaken() / 1000) >= getOptions().time_limit)) {
+        globalStats.getTotalTimeTaken() >= getOptions().time_limit)) {
       throw EndOfSearch();
     }
     bool solutionFound = !solution.empty();
@@ -353,9 +351,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     setitimer(ITIMER_VIRTUAL, &timer, NULL);
   }
 
-  inline u_int64_t getTimeTaken(timePoint startTime) {
-    auto endTime = std::chrono::high_resolution_clock::now();
-    return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+  inline double getTimeTaken(double startTime) {
+    return get_cpu_time() - startTime;
   }
 };
 
