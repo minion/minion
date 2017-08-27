@@ -184,9 +184,12 @@ public:
 
     bestSolutionValue = newBestMinValue;
     bestSolution = newBestSolution;
-    getState().getOptimiseVar()->setMin(newBestMinValue + 1);
     searchComplete = false;
     copyOverIncumbent(nhc, bestSolution, prop);
+    getState().getOptimiseVar()->setMin(newBestMinValue + 1);
+    std::vector<AnyVarRef> emptyVars;
+    prop->prop(emptyVars);
+
     std::cout << "HillClimber: Hill climbing from opt value: " << bestSolutionValue << std::endl;
   }
 };

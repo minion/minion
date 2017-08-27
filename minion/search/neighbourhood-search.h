@@ -238,7 +238,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   vector<SearchOrder> makeNeighbourhoodSearchOrder(const SearchParams& searchParams,
                                                    VarOrderEnum defaultOrdering) {
     vector<SearchOrder> searchOrders;
+    vector<bool> neighbourhoodSet(nhc.neighbourhoods.size());
     for(int nhIndex : searchParams.neighbourhoodsToActivate) {
+      neighbourhoodSet[nhIndex] = true;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[nhIndex];
       if(neighbourhood.type == Neighbourhood::STANDARD) {
         searchOrders.emplace_back();
@@ -265,6 +267,17 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     for(AnyVarRef& v : nhc.variablesOutOfNeighbourhoods) {
       searchOrders.back().var_order.push_back(v.getBaseVar());
       searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+    }
+    // also add the local vars for neighbourhoods not activated just in case they are not dontcared
+    for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
+      if(nhc.neighbourhoods[i].type == Neighbourhood::STANDARD && !neighbourhoodSet[i]) {
+        searchOrders.back().var_order.push_back(nhc.neighbourhoods[i].deviation.getBaseVar());
+        searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+        for(auto& varRef : nhc.neighbourhoods[i].vars) {
+          searchOrders.back().var_order.push_back(varRef.getBaseVar());
+          searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+        }
+      }
     }
     return searchOrders;
   }
