@@ -123,6 +123,7 @@ struct NeighbourhoodSearchStats {
     if(numberIterations == 0 || currentAssignmentOptValue > bestOptVarValue) {
       bestOptVarValue = currentAssignmentOptValue;
       totalTimeToBestSolution = getTotalTimeTaken();
+      cout << "Best solution: " << bestOptVarValue << " " << totalTimeToBestSolution << endl;
       bestValueTimes.emplace_back(bestOptVarValue, totalTimeToBestSolution);
       // save assignment
       for(auto& varValuePair : bestCompleteSolutionAssignment) {
