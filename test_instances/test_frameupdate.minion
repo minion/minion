@@ -1,0 +1,31 @@
+MINION 3
+#TEST SOLCOUNT 143327232
+**VARIABLES**
+
+DISCRETE idx_source[2] {1..4}
+DISCRETE idx_target[1] {1..4}
+
+DISCRETE source[12] {0..11}
+DISCRETE target[12] {0..11}
+
+**CONSTRAINTS**
+
+eq(source[0], 0)
+eq(source[1], 1)
+eq(source[2], 2)
+eq(source[3], 3)
+eq(source[4], 4)
+eq(source[5], 5)
+eq(source[6], 6)
+eq(source[7], 7)
+eq(source[8], 8)
+eq(source[9], 9)
+eq(source[10], 10)
+eq(source[11], 11)
+
+diseq(idx_source[0], idx_source[1])
+
+frameupdate(idx_source, idx_target, source, target, 3)
+
+
+**EOF**
