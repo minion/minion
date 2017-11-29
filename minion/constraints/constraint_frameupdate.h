@@ -41,32 +41,28 @@ on the rows and columns.
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
-#include <deque>
 #include <algorithm>
 #include <utility>
 #include <cmath>
 
 #include "constraint_checkassign.h"
 
-#define ADMPRINT(x)
-//#define ADMPRINT(x) std::cout << x << std::endl;
-
 template <typename V1, typename V2, typename V3, typename V4, typename ValueType>
 struct FrameUpdateConstraint : public AbstractConstraint {
-  V1 idx_source;
-  V2 idx_target;
-  V3 source;
-  V4 target;
+  V1 source;
+  V2 target;
+  V3 idx_source;
+  V4 idx_target;
   ValueType blocksize;
 
   //Reversible<SysInt> sourceidx;
   //Reversible<SysInt> targetidx;  //  Left of sourceidx and targetidx have already been copied over. 
   
   FrameUpdateConstraint(const V1& v1, const V2& v2, const V3& v3, const V4& v4, const ValueType _value)
-      : idx_source(v1),
-        idx_target(v2),
-        source(v3),
-        target(v4),
+      : source(v1),
+        target(v2),
+        idx_source(v3),
+        idx_target(v4),
         blocksize(_value)
         //,sourceidx(-1), targetidx(-1)
   {
@@ -90,10 +86,13 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     for(unsigned i = 0; i < idx_target.size(); ++i) {
       moveTriggerInt(idx_target[i], i+idx_source.size(), Assigned);
     }
+    
+    //  One trigger to use in the case where a source var is not assigned. 
+    moveTriggerInt(source[0], idx_source.size()+idx_target.size(), Assigned);
   }
 
   virtual SysInt dynamic_trigger_count() {
-    return idx_source.size() + idx_target.size();
+    return idx_source.size() + idx_target.size() + 1;
   }
 
   virtual void propagateDynInt(SysInt flag, DomainDelta) {
@@ -138,6 +137,11 @@ struct FrameUpdateConstraint : public AbstractConstraint {
         if(idxsource<=numblocks && idxtarget<=numblocks) {
             // Copy a block over. 
             for(SysInt i=0; i<blocksize; i++) {
+                if(! source[(idxsource-1)*blocksize + i].isAssigned()) {
+                    //  Source variable not assigned. Put an assignment trigger on it and bail out. 
+                    moveTriggerInt(source[(idxsource-1)*blocksize + i], idx_source.size()+idx_target.size(), Assigned);
+                    return;
+                }
                 target[(idxtarget-1)*blocksize + i].assign(source[(idxsource-1)*blocksize + i].getAssignedValue());
             }
             
@@ -217,12 +221,12 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
 template <typename V1, typename V2, typename V3, typename V4>
 AbstractConstraint* BuildCT_FRAMEUPDATE(const V1& v1, const V2& v2, const V3& v3, const V4& v4, ConstraintBlob& b) {
-    std::vector<AnyVarRef> avr1 = make_AnyVarRef(v1);
-    std::vector<AnyVarRef> avr2 = make_AnyVarRef(v2);
+    std::vector<AnyVarRef> avr3 = make_AnyVarRef(v3);
+    std::vector<AnyVarRef> avr4 = make_AnyVarRef(v4);
     
  //   return new FrameUpdateConstraint<V3,V4>(v1,v2,v3,v4,b.constants[0][0]);
-  return new FrameUpdateConstraint<std::vector<AnyVarRef>, std::vector<AnyVarRef>, V3, V4, decltype(b.constants[0][0])>(
-      avr1, avr2, v3, v4, b.constants[0][0]);
+  return new FrameUpdateConstraint<V1, V2, std::vector<AnyVarRef>, std::vector<AnyVarRef>, decltype(b.constants[0][0])>(
+      v1, v2, avr3, avr4, b.constants[0][0]);
 }
 
 /* JSON

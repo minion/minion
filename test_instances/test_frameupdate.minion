@@ -25,7 +25,7 @@ eq(source[11], 11)
 
 diseq(idx_source[0], idx_source[1])
 
-frameupdate(idx_source, idx_target, source, target, 3)
+frameupdate(source, target, idx_source, idx_target, 3)
 
 
 **EOF**
