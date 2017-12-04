@@ -208,7 +208,75 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     return v;
   }
   
-  //  get_satisfying_assignment missing.
+  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+    for(unsigned i = 0; i < idx_source.size(); ++i) {
+      if(! idx_source[i].isAssigned()) {
+        assignment.push_back(make_pair(i, idx_source[i].getMax()));
+        assignment.push_back(make_pair(i, idx_source[i].getMin()));
+        return true;
+      }
+    }
+    SysInt skip=idx_source.size();
+    for(unsigned i = 0; i < idx_target.size(); ++i) {
+      if(! idx_target[i].isAssigned()) {
+        assignment.push_back(make_pair(i+skip, idx_target[i].getMax()));
+        assignment.push_back(make_pair(i+skip, idx_target[i].getMin()));
+        return true;
+      }
+    }
+    skip=skip+idx_target.size();
+    for(unsigned i = 0; i < source.size(); ++i) {
+      if(! source[i].isAssigned()) {
+        assignment.push_back(make_pair(i+skip, source[i].getMax()));
+        assignment.push_back(make_pair(i+skip, source[i].getMin()));
+        return true;
+      }
+    }
+    skip=skip+source.size();
+    for(unsigned i = 0; i < target.size(); ++i) {
+      if(! target[i].isAssigned()) {
+        assignment.push_back(make_pair(i+skip, target[i].getMax()));
+        assignment.push_back(make_pair(i+skip, target[i].getMin()));
+        return true;
+      }
+    }
+    
+    //  All variables assigned. Check the assignment. 
+    std::set<DomainInt> idx_source_set;
+    std::set<DomainInt> idx_target_set;
+    
+    for(unsigned i=0; i<idx_source.size(); ++i) {
+        idx_source_set.insert(idx_source[i].getAssignedValue());
+    }
+    for(unsigned i=0; i<idx_target.size(); ++i) {
+        idx_target_set.insert(idx_target[i].getAssignedValue());
+    }
+    
+    SysInt numblocks=source.size()/blocksize;
+    SysInt idxsource=1;   ///  Index blocks from 1. 
+    SysInt idxtarget=1;
+    while(idxsource<=numblocks && idxtarget<=numblocks) {
+        //  Increment past any skips
+        while(idx_source_set.count(idxsource)>0) {
+            idxsource++;
+        }
+        while(idx_target_set.count(idxtarget)>0) {
+            idxtarget++;
+        }
+        if(idxsource<=numblocks && idxtarget<=numblocks) {
+            // Copy a block over. 
+            for(SysInt i=0; i<blocksize; i++) {
+                if(target[(idxtarget-1)*blocksize + i].getAssignedValue() != source[(idxsource-1)*blocksize + i].getAssignedValue()) {
+                    return false;
+                }
+            }
+            
+            idxsource++;
+            idxtarget++;
+        }
+    }
+    return true;
+  }
   
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverse_constraint() {
