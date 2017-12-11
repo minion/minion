@@ -44,11 +44,12 @@ private:
 public:
   static inline SearchParams neighbourhoodSearch(int combinationToActivate,
                                                  const NeighbourhoodContainer& nhc,
-                                                 bool optimiseMode, int timeoutInMillis,
+                                                 bool optimiseMode, bool stopAtFirstSolution,
+                                                 int timeoutInMillis,
                                                  DomainInt initialNeighbourhoodSize = 1) {
     SearchParams searchParams(NEIGHBOURHOOD_SEARCH, combinationToActivate,
                               nhc.neighbourhoodCombinations[combinationToActivate], optimiseMode,
-                              false, timeoutInMillis, initialNeighbourhoodSize);
+                              stopAtFirstSolution, timeoutInMillis, initialNeighbourhoodSize);
     if(searchParams.neighbourhoodsToActivate.size() > 1) {
       std::random_shuffle(searchParams.neighbourhoodsToActivate.begin() + 1,
                           searchParams.neighbourhoodsToActivate.end());
@@ -156,7 +157,7 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true,
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, false,
                                              tunableParams.iterationSearchTime,
                                              highestNeighbourhoodSizes[combinationToActivate]);
   }
@@ -256,8 +257,9 @@ public:
     currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
-    return SearchParams::neighbourhoodSearch(
-        combination, nhc, false, tunableParams.iterationSearchTime, currentNeighbourhoodSize());
+    return SearchParams::neighbourhoodSearch(combination, nhc, false, false,
+                                             tunableParams.iterationSearchTime,
+                                             currentNeighbourhoodSize());
   }
 
   /*
