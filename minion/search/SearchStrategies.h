@@ -141,7 +141,7 @@ public:
         throw EndOfSearch();
         return;
       }
-      getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
+      getState().getOptimiseVar()->setMin(stats.newMinValue);
       std::vector<AnyVarRef> emptyVars;
       prop->prop(emptyVars);
     } else {
@@ -161,7 +161,7 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, false, true, true,
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, false, false, true,
                                              tunableParams.iterationSearchTime,
                                              highestNeighbourhoodSizes[combinationToActivate]);
   }
