@@ -158,17 +158,35 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         maxSize);
 
     globalStats.startTimer();
+
     vector<DomainInt> solution;
-    std::cout << "Searching for initial solution:\n";
-    NeighbourhoodStats stats =
-        searchNeighbourhoods(solution, SearchParams::randomWalk(false, true, 0), globalStats);
-    if(!stats.solutionFound) {
+    // holds the last solution of any search iteration
+
+    NeighbourhoodStats stats(0, 0, false, false);
+    // holds return value of each search iteration
+
+    // try to find initial solution
+    try {
+      int initialSearchTimeout = 1000;
+      const double multiplier = 1.5;
+      do {
+        std::cout << "Searching for initial solution, timeout=" << initialSearchTimeout << ":\n";
+        stats = searchNeighbourhoods(
+            solution, SearchParams::randomWalk(false, true, initialSearchTimeout), globalStats);
+        if(!stats.solutionFound) {
+          initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
+        }
+      } while(!stats.solutionFound);
+    } catch(EndOfSearch&) {
+      if(getState().isCtrlcPressed()) {
+        cout << "Ctrl-C pressed----" << std::endl;
+      }
       cout << "Initial solution not found\n";
-      return;
-    } else {
-      searchStrategy.initialise(nhc, stats.newMinValue, solution, prop, globalStats);
-      debug_log("Stats on initial solution:\n" << stats << endl);
+      cout << endl;
+      throw EndOfSearch();
     }
+    searchStrategy.initialise(nhc, stats.newMinValue, solution, prop, globalStats);
+    debug_log("Stats on initial solution:\n" << stats << endl);
     try {
       while(!searchStrategy.hasFinishedPhase()) {
         SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
@@ -266,7 +284,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       searchOrders.back().var_order.push_back(v.getBaseVar());
       searchOrders.back().val_order.push_back(VALORDER_RANDOM);
     }
-    // also add the local vars for neighbourhoods not activated just in case they are not dontcared
+    // also add the local vars for neighbourhoods not activated just in case they are not
+    // dontcared
     for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
       if(nhc.neighbourhoods[i].type == Neighbourhood::STANDARD && !neighbourhoodSet[i]) {
         searchOrders.back().var_order.push_back(nhc.neighbourhoods[i].deviation.getBaseVar());
