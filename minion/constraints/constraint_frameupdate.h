@@ -87,10 +87,6 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       moveTriggerInt(idx_target[i], i+idx_source.size(), Assigned);
     }
     
-    //  One trigger to use in the case where a source var is not assigned. 
-    if(source.size() > 0) {
-        moveTriggerInt(source[0], idx_source.size()+idx_target.size(), Assigned);
-    }
   }
 
   virtual SysInt dynamic_trigger_count() {
