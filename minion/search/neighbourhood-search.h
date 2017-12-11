@@ -387,6 +387,7 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
   case SearchOptions::NeighbourhoodSearchStrategy::META_STRATEGY:
     return std::make_shared<NeighbourhoodSearchManager<MetaStrategy<NhSelectionStrategy>>>(
         prop, base_order, nhc);
+  default: assert(false); abort();
   }
 }
 
@@ -401,6 +402,7 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
   case SearchOptions::NeighbourhoodSelectionStrategy::INTERACTIVE:
     return MakeNeighbourhoodSearchHelper<InteractiveCombinationChooser>(prop_method, base_order,
                                                                         nhc);
+  default: assert(false); abort();
   }
 }
 
