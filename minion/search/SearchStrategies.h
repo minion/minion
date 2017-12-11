@@ -23,6 +23,7 @@ struct SearchParams {
   Mode mode;
   int combinationToActivate;
   std::vector<int> neighbourhoodsToActivate;
+  bool makeNeighbourhoodSizeFirst;
   bool optimiseMode;
   bool stopAtFirstSolution;
 
@@ -31,11 +32,12 @@ struct SearchParams {
 
 private:
   SearchParams(Mode mode, int combinationToActivate, std::vector<int> neighbourhoods,
-               bool optimiseMode, bool stopAtFirstSolution, int timeoutInMillis,
-               DomainInt initialNeighbourhoodSize)
+               bool makeNeighbourhoodSizeFirst, bool optimiseMode, bool stopAtFirstSolution,
+               int timeoutInMillis, DomainInt initialNeighbourhoodSize)
       : mode(mode),
         combinationToActivate(combinationToActivate),
         neighbourhoodsToActivate(std::move(neighbourhoods)),
+        makeNeighbourhoodSizeFirst(makeNeighbourhoodSizeFirst),
         optimiseMode(optimiseMode),
         stopAtFirstSolution(stopAtFirstSolution),
         timeoutInMillis(timeoutInMillis),
@@ -44,12 +46,13 @@ private:
 public:
   static inline SearchParams neighbourhoodSearch(int combinationToActivate,
                                                  const NeighbourhoodContainer& nhc,
-                                                 bool optimiseMode, bool stopAtFirstSolution,
-                                                 int timeoutInMillis,
+                                                 bool makeNeighbourhoodSizeFirst, bool optimiseMode,
+                                                 bool stopAtFirstSolution, int timeoutInMillis,
                                                  DomainInt initialNeighbourhoodSize = 1) {
     SearchParams searchParams(NEIGHBOURHOOD_SEARCH, combinationToActivate,
-                              nhc.neighbourhoodCombinations[combinationToActivate], optimiseMode,
-                              stopAtFirstSolution, timeoutInMillis, initialNeighbourhoodSize);
+                              nhc.neighbourhoodCombinations[combinationToActivate],
+                              makeNeighbourhoodSizeFirst, optimiseMode, stopAtFirstSolution,
+                              timeoutInMillis, initialNeighbourhoodSize);
     if(searchParams.neighbourhoodsToActivate.size() > 1) {
       std::random_shuffle(searchParams.neighbourhoodsToActivate.begin() + 1,
                           searchParams.neighbourhoodsToActivate.end());
@@ -59,12 +62,13 @@ public:
 
   static inline SearchParams standardSearch(bool optimiseMode, bool stopAtFirstSolution,
                                             int timeoutInMillis) {
-    return SearchParams(STANDARD_SEARCH, -1, {}, optimiseMode, stopAtFirstSolution, timeoutInMillis,
-                        0);
+    return SearchParams(STANDARD_SEARCH, -1, {}, false, optimiseMode, stopAtFirstSolution,
+                        timeoutInMillis, 0);
   }
   static inline SearchParams randomWalk(bool optimiseMode, bool stopAtFirstSolution,
                                         int timeoutInMillis) {
-    return SearchParams(RANDOM_WALK, -1, {}, optimiseMode, stopAtFirstSolution, timeoutInMillis, 0);
+    return SearchParams(RANDOM_WALK, -1, {}, false, optimiseMode, stopAtFirstSolution,
+                        timeoutInMillis, 0);
   }
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
     os << "SearchParams(";
@@ -157,7 +161,7 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true,
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, false, true, true,
                                              tunableParams.iterationSearchTime,
                                              highestNeighbourhoodSizes[combinationToActivate]);
   }
@@ -257,7 +261,7 @@ public:
     currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
-    return SearchParams::neighbourhoodSearch(combination, nhc, false, false,
+    return SearchParams::neighbourhoodSearch(combination, nhc, true, false, false,
                                              tunableParams.iterationSearchTime,
                                              currentNeighbourhoodSize());
   }

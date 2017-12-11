@@ -42,6 +42,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     Controller::world_push();
     vector<SearchOrder> searchOrder;
     vector<SearchOrder>* chosenSearchOrder = NULL;
+    int bottomOfPrimaryNhIndex;
     if(searchParams.mode != SearchParams::NEIGHBOURHOOD_SEARCH) {
       nhc.shadow_disable.assign(1);
       switchOffAllNeighbourhoods();
@@ -53,7 +54,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     } else {
       switchOnNeighbourhoods(searchParams, solution);
-      searchOrder = makeNeighbourhoodSearchOrder(searchParams, base_order.front().order);
+      auto indexSearchOrderPair =
+          makeNeighbourhoodSearchOrder(searchParams, base_order.front().order);
+      searchOrder = std::move(indexSearchOrderPair.second);
+      bottomOfPrimaryNhIndex = indexSearchOrderPair.first;
       chosenSearchOrder = &searchOrder;
     }
 
@@ -103,7 +107,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         newOptMinTarget = getState().getOptimiseVar()->getMin() + 1;
       }
       if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
-        jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()));
+        jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()), bottomOfPrimaryNhIndex);
       }
     };
     auto optimisationHandler = [&]() { getState().getOptimiseVar()->setMin(newOptMinTarget); };
@@ -137,8 +141,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   inline void jumpBacktToPrimaryNeighbourhood(Controller::StandardSearchManager& sm,
-                                              MultiBranch& varOrder) {
-    while(varOrder.pos > 1) {
+                                              MultiBranch& varOrder, int bottomOfPrimaryNhIndex) {
+    while(varOrder.pos > bottomOfPrimaryNhIndex) {
       if(sm.branches.back().isLeft) {
         Controller::world_pop();
         Controller::maybe_print_right_backtrack();
@@ -251,18 +255,36 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
    * local variables in a static ordering, then the primary variables that the neighbourhood
    * operates on in the ordering specified by minion..
    */
-  vector<SearchOrder> makeNeighbourhoodSearchOrder(const SearchParams& searchParams,
-                                                   VarOrderEnum defaultOrdering) {
+  pair<int, vector<SearchOrder>> makeNeighbourhoodSearchOrder(const SearchParams& searchParams,
+                                                              VarOrderEnum defaultOrdering) {
+    int bottomOfPrimaryNhIndex = 0;
+    if(searchParams.makeNeighbourhoodSizeFirst) {
+      bottomOfPrimaryNhIndex = 1;
+    }
     vector<SearchOrder> searchOrders;
     vector<bool> neighbourhoodSet(nhc.neighbourhoods.size());
     for(int nhIndex : searchParams.neighbourhoodsToActivate) {
       neighbourhoodSet[nhIndex] = true;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[nhIndex];
       if(neighbourhood.type == Neighbourhood::STANDARD) {
-        searchOrders.emplace_back();
-        searchOrders.back().order = ORDER_STATIC;
+        bool newVarOrderCreated = false;
 
+        if(searchParams.makeNeighbourhoodSizeFirst) {
+          searchOrders.emplace_back();
+          searchOrders.back().order = ORDER_STATIC;
+          searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
+          searchOrders.back().val_order.push_back(VALORDER_ASCEND);
+          newVarOrderCreated = true;
+        }
         for(AnyVarRef& nhLocalVar : neighbourhood.vars) {
+          if(!newVarOrderCreated) {
+            searchOrders.emplace_back();
+            searchOrders.back().order = ORDER_STATIC;
+            newVarOrderCreated = true;
+            if(searchOrders.size() == 1) {
+              bottomOfPrimaryNhIndex = 1;
+            }
+          }
           searchOrders.back().var_order.push_back(nhLocalVar.getBaseVar());
           searchOrders.back().val_order.push_back(VALORDER_RANDOM);
         }
@@ -270,9 +292,10 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(neighbourhood.type != Neighbourhood::CLOSED) {
         searchOrders.emplace_back();
         searchOrders.back().order = defaultOrdering;
-        searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
-        searchOrders.back().val_order.push_back(VALORDER_RANDOM);
-
+        if(!searchParams.makeNeighbourhoodSizeFirst) {
+          searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
+          searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+        }
         for(AnyVarRef& varRef : neighbourhood.group->vars) {
           searchOrders.back().var_order.push_back(varRef.getBaseVar());
           searchOrders.back().val_order.push_back(VALORDER_RANDOM);
@@ -297,7 +320,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         }
       }
     }
-    return searchOrders;
+    return pair<int, vector<SearchOrder>>(bottomOfPrimaryNhIndex, move(searchOrders));
   }
 
   vector<SearchOrder> makeRandomWalkSearchOrder() {
