@@ -53,7 +53,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   V2 target;
   V3 idx_source;
   V4 idx_target;
-  ValueType blocksize;
+  SysInt blocksize;
 
   //Reversible<SysInt> sourceidx;
   //Reversible<SysInt> targetidx;  //  Left of sourceidx and targetidx have already been copied over. 
@@ -63,7 +63,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
         target(v2),
         idx_source(v3),
         idx_target(v4),
-        blocksize(_value)
+        blocksize(checked_cast<SysInt>(_value))
         //,sourceidx(-1), targetidx(-1)
   {
     CHECK(( source.size()==target.size() ),
@@ -88,7 +88,9 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     }
     
     //  One trigger to use in the case where a source var is not assigned. 
-    moveTriggerInt(source[0], idx_source.size()+idx_target.size(), Assigned);
+    if(source.size() > 0) {
+        moveTriggerInt(source[0], idx_source.size()+idx_target.size(), Assigned);
+    }
   }
 
   virtual SysInt dynamic_trigger_count() {
@@ -117,10 +119,22 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     std::set<DomainInt> idx_target_set;
     
     for(unsigned i=0; i<idx_source.size(); ++i) {
-        idx_source_set.insert(idx_source[i].getAssignedValue());
+        DomainInt val = idx_source[i].getAssignedValue();
+        if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size())
+        {
+            getState().setFailed(true);
+            return;
+        }
+        idx_source_set.insert(val);
     }
     for(unsigned i=0; i<idx_target.size(); ++i) {
-        idx_target_set.insert(idx_target[i].getAssignedValue());
+        DomainInt val = idx_target[i].getAssignedValue();
+        if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size())
+        {
+            getState().setFailed(true);
+            return;
+        }
+        idx_target_set.insert(val);
     }
     
     SysInt numblocks=source.size()/blocksize;
@@ -156,16 +170,23 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     std::set<DomainInt> idx_target_set;
     
     for(unsigned i=0; i<idx_source.size(); ++i) {
-        idx_source_set.insert(v[i]);
+        DomainInt val = v[i];
+        if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size())
+            return false;
+
+        idx_source_set.insert(val);
     }
     for(unsigned i=0; i<idx_target.size(); ++i) {
-        idx_target_set.insert(v[i+idx_source.size()]);
+        DomainInt val = v[i+idx_source.size()];
+        if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size())
+            return false;
+        idx_target_set.insert(val);
     }
     
     DomainInt* src=v+idx_source.size()+idx_target.size();
     DomainInt* trg=src+source.size();
     
-    SysInt numblocks=source.size()/blocksize;
+    SysInt numblocks=checked_cast<SysInt>(source.size()/blocksize);
     SysInt idxsource=1;   ///  Index blocks from 1. 
     SysInt idxtarget=1;
     while(idxsource<=numblocks && idxtarget<=numblocks) {
@@ -246,10 +267,16 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     std::set<DomainInt> idx_target_set;
     
     for(unsigned i=0; i<idx_source.size(); ++i) {
-        idx_source_set.insert(idx_source[i].getAssignedValue());
+        DomainInt val = idx_source[i].getAssignedValue();
+        if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size())
+            return false;
+        idx_source_set.insert(val);
     }
     for(unsigned i=0; i<idx_target.size(); ++i) {
-        idx_target_set.insert(idx_target[i].getAssignedValue());
+        DomainInt val = idx_target[i].getAssignedValue();
+        if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size())
+            return false;
+        idx_target_set.insert(val);
     }
     
     SysInt numblocks=source.size()/blocksize;
