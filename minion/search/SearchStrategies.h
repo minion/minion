@@ -157,7 +157,7 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, false,
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true,
                                              tunableParams.iterationSearchTime,
                                              highestNeighbourhoodSizes[combinationToActivate]);
   }
@@ -344,6 +344,7 @@ public:
     switch(currentPhase) {
     case Phase::HILL_CLIMBING: return hillClimber.getSearchParams(nhc, globalStats);
     case Phase::HOLE_PUNCHING: return holePuncher.getSearchParams(nhc, globalStats);
+    default: assert(false); abort();
     }
   }
 
