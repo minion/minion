@@ -262,8 +262,6 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         searchOrders.emplace_back();
         searchOrders.back().order = ORDER_STATIC;
 
-        searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
-        searchOrders.back().val_order.push_back(VALORDER_ASCEND);
         for(AnyVarRef& nhLocalVar : neighbourhood.vars) {
           searchOrders.back().var_order.push_back(nhLocalVar.getBaseVar());
           searchOrders.back().val_order.push_back(VALORDER_RANDOM);
@@ -272,6 +270,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(neighbourhood.type != Neighbourhood::CLOSED) {
         searchOrders.emplace_back();
         searchOrders.back().order = defaultOrdering;
+        searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
+        searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+
         for(AnyVarRef& varRef : neighbourhood.group->vars) {
           searchOrders.back().var_order.push_back(varRef.getBaseVar());
           searchOrders.back().val_order.push_back(VALORDER_RANDOM);
