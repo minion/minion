@@ -57,10 +57,9 @@ public:
           bestCombinations.push_back(i);
         }
         if(allCombinationsTryed) {
-          double currentUCBValue = ucbValue(
-              globalStats.numberPositiveSolutions[i] - globalStats.numberNegativeSolutions[i] -
-                  globalStats.numberNoSolutions[i],
-              globalStats.numberIterations, globalStats.numberActivations[i]);
+          double currentUCBValue =
+              ucbValue(globalStats.numberPositiveSolutions[i], globalStats.numberIterations,
+                       globalStats.numberActivations[i]);
           if(currentUCBValue > bestUCTValue) {
             bestUCTValue = currentUCBValue;
             bestCombinations.clear();

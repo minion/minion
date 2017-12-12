@@ -8,7 +8,7 @@
  * Struct containing hardcoded parameters that need to be tuned
  */
 struct TunableParams {
-  int iterationSearchTime = 3500;
+  int iterationSearchTime = 500;
   int hillClimberMinIterationsToSpendAtPeak = 4;
   double hillClimberInitialLocalMaxProbability = 0.001;
   double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
