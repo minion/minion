@@ -191,7 +191,7 @@ public:
     bestSolution = newBestSolution;
     searchComplete = false;
     copyOverIncumbent(nhc, bestSolution, prop);
-    getState().getOptimiseVar()->setMin(newBestMinValue + 1);
+    getState().getOptimiseVar()->setMin(newBestMinValue);
     std::vector<AnyVarRef> emptyVars;
     prop->prop(emptyVars);
 
