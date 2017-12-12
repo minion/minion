@@ -292,7 +292,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(neighbourhood.type != Neighbourhood::CLOSED) {
         searchOrders.emplace_back();
         searchOrders.back().order = defaultOrdering;
-        if(!searchParams.makeNeighbourhoodSizeFirst) {
+        if(!searchParams.makeNeighbourhoodSizeFirst &&
+           neighbourhood.type == Neighbourhood::STANDARD) {
           searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
           searchOrders.back().val_order.push_back(VALORDER_RANDOM);
         }
