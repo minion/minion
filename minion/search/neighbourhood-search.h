@@ -263,7 +263,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
     vector<SearchOrder> searchOrders;
     vector<bool> neighbourhoodSet(nhc.neighbourhoods.size());
-    for(int nhIndex : searchParams.neighbourhoodsToActivate) {
+    for(size_t i = 0; i < searchParams.neighbourhoodsToActivate.size(); ++i) {
+      const int& nhIndex = searchParams.neighbourhoodsToActivate[i];
       neighbourhoodSet[nhIndex] = true;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[nhIndex];
       if(neighbourhood.type == Neighbourhood::STANDARD) {
@@ -281,7 +282,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
             searchOrders.emplace_back();
             searchOrders.back().order = ORDER_STATIC;
             newVarOrderCreated = true;
-            if(searchOrders.size() == 1) {
+            if(i == 0 && searchOrders.size() == 1) {
               bottomOfPrimaryNhIndex = 1;
             }
           }
