@@ -359,6 +359,9 @@ with open(outname, "w") as out:
     if arg.buildsystem == "sh":
         out.write("#!/usr/bin/env bash\n")
 
+    if arg.buildsystem == "make":
+        commandargs = commandargs + ["-MD", "-MP"]
+
     out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
     
     if arg.buildsystem != "tup":
@@ -379,8 +382,8 @@ with open(outname, "w") as out:
         out.write('all : minion\n')
 
     if arg.buildsystem == "make":
-        out.write(".PHONY: " +
-        " ".join([objname(i) for i in constraintsrclist] + [objname(i) for i in minionsrclist]) + "\n")
+        out.write("-include $(CONOBJS:.o=.d)\n")
+        out.write("-include $(MINOBJS:.o=.d)\n")
     for i in constraintsrclist:
         if arg.buildsystem == "make":
             out.write(objname(i) + ":\n")
