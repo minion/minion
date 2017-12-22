@@ -58,19 +58,32 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   //Reversible<SysInt> sourceidx;
   //Reversible<SysInt> targetidx;  //  Left of sourceidx and targetidx have already been copied over. 
   
+  Reversible<bool> idxes_assigned;
+ 
+  // These should only be read when idxes_assigned is true
+    std::set<DomainInt> idx_source_set;
+    std::set<DomainInt> idx_target_set;
+    std::vector<SysInt> source_to_target_map;
+    std::vector<SysInt> target_to_source_map;
+  
   FrameUpdateConstraint(const V1& v1, const V2& v2, const V3& v3, const V4& v4, const ValueType _value)
       : source(v1),
         target(v2),
         idx_source(v3),
         idx_target(v4),
-        blocksize(checked_cast<SysInt>(_value))
-        //,sourceidx(-1), targetidx(-1)
+        blocksize(checked_cast<SysInt>(_value)),
+        //,sourceidx(-1), targetidx(-1),
+        idxes_assigned()
   {
+    idxes_assigned = false;
     CHECK(( source.size()==target.size() ),
           "Source and target vectors are different sizes in frameupdate constraint.");
     
     CHECK(( source.size()%blocksize == 0 ),
           "Source and target vector size does not divide by block size in frameupdate constraint.");
+
+    source_to_target_map.assign(source.size(), -1);
+    target_to_source_map.assign(target.size(), -1);
   }
   
   virtual string constraint_name() {
@@ -80,46 +93,54 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   CONSTRAINT_ARG_LIST5(idx_source, idx_target, source, target, blocksize);
   
   void trigger_setup() {
+    int trig = 0;
+
     for(unsigned i = 0; i < idx_source.size(); ++i) {
-      moveTriggerInt(idx_source[i], i, Assigned);
+      moveTriggerInt(idx_source[i], trig++, Assigned);
     }
     for(unsigned i = 0; i < idx_target.size(); ++i) {
-      moveTriggerInt(idx_target[i], i+idx_source.size(), Assigned);
+      moveTriggerInt(idx_target[i], trig++, Assigned);
     }
+
+    for(unsigned i = 0; i < source.size(); ++i) {
+      moveTriggerInt(source[i], trig++, LowerBound);
+      moveTriggerInt(source[i], trig++, UpperBound);
+    }
+
+    for(unsigned i = 0; i < source.size(); ++i) {
+      moveTriggerInt(target[i], trig++, LowerBound);
+      moveTriggerInt(target[i], trig++, UpperBound);
+    }
+    D_ASSERT(trig == dynamic_trigger_count());
     
   }
 
   virtual SysInt dynamic_trigger_count() {
-    return idx_source.size() + idx_target.size() + 1;
+    return idx_source.size() + idx_target.size() + (source.size() + target.size()) * 2;
   }
 
-  virtual void propagateDynInt(SysInt flag, DomainDelta) {
-    full_propagate();
-  }
-
-  virtual void full_propagate() {
-    trigger_setup();
-    
+  bool check_idx_sets() {
+    D_ASSERT(idxes_assigned == false);
     for(unsigned i=0; i<idx_source.size(); ++i) {
         if(!idx_source[i].isAssigned()) {
-            return;
+            return false;
         }
     }
     for(unsigned i=0; i<idx_target.size(); ++i) {
         if(!idx_target[i].isAssigned()) {
-            return;
+            return false;
         }
     }
-    
-    std::set<DomainInt> idx_source_set;
-    std::set<DomainInt> idx_target_set;
-    
-    for(unsigned i=0; i<idx_source.size(); ++i) {
+
+    idx_source_set.clear();
+    idx_target_set.clear();
+
+   for(unsigned i=0; i<idx_source.size(); ++i) {
         DomainInt val = idx_source[i].getAssignedValue();
         if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size())
         {
             getState().setFailed(true);
-            return;
+            return false;
         }
         idx_source_set.insert(val);
     }
@@ -128,11 +149,15 @@ struct FrameUpdateConstraint : public AbstractConstraint {
         if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size())
         {
             getState().setFailed(true);
-            return;
+            return false;
         }
         idx_target_set.insert(val);
     }
-    
+
+    // Setup mapping arrays
+    source_to_target_map.assign(source.size(), -1);
+    target_to_source_map.assign(target.size(), -1);
+
     SysInt numblocks=source.size()/blocksize;
     SysInt idxsource=1;   ///  Index blocks from 1. 
     SysInt idxtarget=1;
@@ -145,19 +170,74 @@ struct FrameUpdateConstraint : public AbstractConstraint {
             idxtarget++;
         }
         if(idxsource<=numblocks && idxtarget<=numblocks) {
-            // Copy a block over. 
-            for(SysInt i=0; i<blocksize; i++) {
-                if(! source[(idxsource-1)*blocksize + i].isAssigned()) {
-                    //  Source variable not assigned. Put an assignment trigger on it and bail out. 
-                    moveTriggerInt(source[(idxsource-1)*blocksize + i], idx_source.size()+idx_target.size(), Assigned);
-                    return;
-                }
-                target[(idxtarget-1)*blocksize + i].assign(source[(idxsource-1)*blocksize + i].getAssignedValue());
-            }
-            
-            idxsource++;
-            idxtarget++;
+            source_to_target_map[idxsource-1] = idxtarget-1;
+            target_to_source_map[idxtarget-1] = idxsource-1;
         }
+        
+        idxsource++;
+        idxtarget++;
+    }
+
+    idxes_assigned = true;
+    return true;
+  }
+
+  virtual void full_propagate() {
+    trigger_setup();
+    propagateDynInt(0, DomainDelta::empty());
+  }
+
+  void copy_from_source(SysInt i) {
+    SysInt block = i / blocksize;
+    if(source_to_target_map[block] >= 0)
+    {
+        SysInt blockpos = i % blocksize;
+        SysInt targetpos = source_to_target_map[block]*blocksize+i;
+        target[targetpos].setMax(source[i].getMax());
+        target[targetpos].setMin(source[i].getMin());
+    }
+  }
+
+  void copy_from_target(SysInt i) {
+    SysInt block = i / blocksize;
+    if(target_to_source_map[block] >= 0)
+    {
+        SysInt blockpos = i % blocksize;
+        SysInt sourcepos = target_to_source_map[block]*blocksize+i;
+        source[sourcepos].setMax(target[i].getMax());
+        source[sourcepos].setMin(target[i].getMin());
+    }
+  }
+
+
+  virtual void propagateDynInt(SysInt flag, DomainDelta) {
+    if(!idxes_assigned) {
+        // Not an idx variable
+        if(flag >= idx_source.size() + idx_target.size())
+            return;
+        // Check if idx sets incomplete or invalid
+        if(!check_idx_sets())
+            return;
+
+        for(int i = 0; i < source.size(); ++i)
+            copy_from_source(i);
+        
+        for(int i = 0; i < target.size(); ++i)
+            copy_from_target(i);
+    }
+
+    flag -= idx_source.size() + idx_target.size();
+    SysInt parity = flag % 2;
+    flag /= 2;
+    if(flag < source.size())
+    {
+        copy_from_source(flag);
+    }
+    else
+    {
+        flag -= source.size();
+        D_ASSERT(flag < target.size());
+        copy_from_target(flag);
     }
   }
   
