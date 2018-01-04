@@ -142,7 +142,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   inline void jumpBacktToPrimaryNeighbourhood(Controller::StandardSearchManager& sm,
                                               MultiBranch& varOrder, int bottomOfPrimaryNhIndex) {
-    while(varOrder.pos > bottomOfPrimaryNhIndex) {
+    while(!sm.branches.empty() && varOrder.pos > bottomOfPrimaryNhIndex) {
       if(sm.branches.back().isLeft) {
         Controller::world_pop();
         Controller::maybe_print_right_backtrack();
