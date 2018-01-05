@@ -258,7 +258,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   pair<int, vector<SearchOrder>> makeNeighbourhoodSearchOrder(const SearchParams& searchParams,
                                                               VarOrderEnum defaultOrdering) {
     int bottomOfPrimaryNhIndex = 0;
-    if(searchParams.makeNeighbourhoodSizeFirst) {
+    if(searchParams.nhLocalVarsComeFirst) {
       bottomOfPrimaryNhIndex = 1;
     }
     vector<SearchOrder> searchOrders;
@@ -267,36 +267,17 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       const int& nhIndex = searchParams.neighbourhoodsToActivate[i];
       neighbourhoodSet[nhIndex] = true;
       Neighbourhood& neighbourhood = nhc.neighbourhoods[nhIndex];
-      if(neighbourhood.type == Neighbourhood::STANDARD) {
-        bool newVarOrderCreated = false;
-
-        if(searchParams.makeNeighbourhoodSizeFirst) {
-          searchOrders.emplace_back();
-          searchOrders.back().order = ORDER_STATIC;
-          searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
-          searchOrders.back().val_order.push_back(VALORDER_ASCEND);
-          newVarOrderCreated = true;
-        }
-        for(AnyVarRef& nhLocalVar : neighbourhood.vars) {
-          if(!newVarOrderCreated) {
-            searchOrders.emplace_back();
-            searchOrders.back().order = ORDER_STATIC;
-            newVarOrderCreated = true;
-            if(i == 0 && searchOrders.size() == 1) {
-              bottomOfPrimaryNhIndex = 1;
-            }
-          }
-          searchOrders.back().var_order.push_back(nhLocalVar.getBaseVar());
-          searchOrders.back().val_order.push_back(VALORDER_RANDOM);
-        }
-      }
       if(neighbourhood.type != Neighbourhood::CLOSED) {
         searchOrders.emplace_back();
         searchOrders.back().order = defaultOrdering;
-        if(!searchParams.makeNeighbourhoodSizeFirst &&
-           neighbourhood.type == Neighbourhood::STANDARD) {
-          searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
-          searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+        if(neighbourhood.type == Neighbourhood::STANDARD) {
+          if(searchParams.nhLocalVarsComeFirst) {
+            addNhLocalVars(searchOrders, neighbourhood, VALORDER_ASCEND);
+            searchOrders.emplace_back();
+            searchOrders.back().order = defaultOrdering;
+          } else {
+            addNhLocalVars(searchOrders, neighbourhood, VALORDER_RANDOM);
+          }
         }
         for(AnyVarRef& varRef : neighbourhood.group->vars) {
           searchOrders.back().var_order.push_back(varRef.getBaseVar());
@@ -314,15 +295,20 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     // dontcared
     for(int i = 0; i < nhc.neighbourhoods.size(); i++) {
       if(nhc.neighbourhoods[i].type == Neighbourhood::STANDARD && !neighbourhoodSet[i]) {
-        searchOrders.back().var_order.push_back(nhc.neighbourhoods[i].deviation.getBaseVar());
-        searchOrders.back().val_order.push_back(VALORDER_RANDOM);
-        for(auto& varRef : nhc.neighbourhoods[i].vars) {
-          searchOrders.back().var_order.push_back(varRef.getBaseVar());
-          searchOrders.back().val_order.push_back(VALORDER_RANDOM);
-        }
+        addNhLocalVars(searchOrders, nhc.neighbourhoods[i], VALORDER_RANDOM);
       }
     }
     return pair<int, vector<SearchOrder>>(bottomOfPrimaryNhIndex, move(searchOrders));
+  }
+
+  void addNhLocalVars(vector<SearchOrder>& searchOrders, Neighbourhood& neighbourhood,
+                      ValOrderEnum nhSizeOrder) {
+    searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
+    searchOrders.back().val_order.push_back(nhSizeOrder);
+    for(AnyVarRef& nhLocalVar : neighbourhood.vars) {
+      searchOrders.back().var_order.push_back(nhLocalVar.getBaseVar());
+      searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+    }
   }
 
   vector<SearchOrder> makeRandomWalkSearchOrder() {

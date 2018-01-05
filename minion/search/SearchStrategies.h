@@ -23,7 +23,7 @@ struct SearchParams {
   Mode mode;
   int combinationToActivate;
   std::vector<int> neighbourhoodsToActivate;
-  bool makeNeighbourhoodSizeFirst;
+  bool nhLocalVarsComeFirst;
   bool optimiseMode;
   bool stopAtFirstSolution;
 
@@ -32,12 +32,12 @@ struct SearchParams {
 
 private:
   SearchParams(Mode mode, int combinationToActivate, std::vector<int> neighbourhoods,
-               bool makeNeighbourhoodSizeFirst, bool optimiseMode, bool stopAtFirstSolution,
+               bool nhLocalVarsComeFirst, bool optimiseMode, bool stopAtFirstSolution,
                int timeoutInMillis, DomainInt initialNeighbourhoodSize)
       : mode(mode),
         combinationToActivate(combinationToActivate),
         neighbourhoodsToActivate(std::move(neighbourhoods)),
-        makeNeighbourhoodSizeFirst(makeNeighbourhoodSizeFirst),
+        nhLocalVarsComeFirst(nhLocalVarsComeFirst),
         optimiseMode(optimiseMode),
         stopAtFirstSolution(stopAtFirstSolution),
         timeoutInMillis(timeoutInMillis),
@@ -46,12 +46,12 @@ private:
 public:
   static inline SearchParams neighbourhoodSearch(int combinationToActivate,
                                                  const NeighbourhoodContainer& nhc,
-                                                 bool makeNeighbourhoodSizeFirst, bool optimiseMode,
+                                                 bool nhLocalVarsComeFirst, bool optimiseMode,
                                                  bool stopAtFirstSolution, int timeoutInMillis,
                                                  DomainInt initialNeighbourhoodSize = 1) {
     SearchParams searchParams(NEIGHBOURHOOD_SEARCH, combinationToActivate,
                               nhc.neighbourhoodCombinations[combinationToActivate],
-                              makeNeighbourhoodSizeFirst, optimiseMode, stopAtFirstSolution,
+                              nhLocalVarsComeFirst, optimiseMode, stopAtFirstSolution,
                               timeoutInMillis, initialNeighbourhoodSize);
     if(searchParams.neighbourhoodsToActivate.size() > 1) {
       std::random_shuffle(searchParams.neighbourhoodsToActivate.begin() + 1,
