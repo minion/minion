@@ -272,6 +272,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         searchOrders.back().order = defaultOrdering;
         if(neighbourhood.type == Neighbourhood::STANDARD) {
           if(searchParams.nhLocalVarsComeFirst) {
+            searchOrders.back().order = ORDER_STATIC;
             addNhLocalVars(searchOrders, neighbourhood, VALORDER_ASCEND);
             searchOrders.emplace_back();
             searchOrders.back().order = defaultOrdering;
