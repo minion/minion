@@ -192,7 +192,9 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     if(source_to_target_map[block] >= 0)
     {
         SysInt blockpos = i % blocksize;
-        SysInt targetpos = source_to_target_map[block]*blocksize+i;
+        SysInt targetpos = source_to_target_map[block]*blocksize+blockpos;
+        D_ASSERT(targetpos >= 0 && targetpos < target.size());
+        D_ASSERT(i >= 0 && i < source.size());
         target[targetpos].setMax(source[i].getMax());
         target[targetpos].setMin(source[i].getMin());
     }
@@ -203,18 +205,21 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     if(target_to_source_map[block] >= 0)
     {
         SysInt blockpos = i % blocksize;
-        SysInt sourcepos = target_to_source_map[block]*blocksize+i;
+        SysInt sourcepos = target_to_source_map[block]*blocksize+blockpos;
+        D_ASSERT(sourcepos >= 0 && sourcepos < source.size());
+        D_ASSERT(i >= 0 && i < target.size());
         source[sourcepos].setMax(target[i].getMax());
         source[sourcepos].setMin(target[i].getMin());
     }
   }
 
 
-  virtual void propagateDynInt(SysInt flag, DomainDelta) {
-    if(!idxes_assigned) {
-        // Not an idx variable
-        if(flag >= idx_source.size() + idx_target.size())
+  virtual void propagateDynInt(SysInt flagin, DomainDelta) {
+    SysInt flag = flagin;
+    if(flag < idx_source.size() + idx_target.size()) {
+        if(idxes_assigned)
             return;
+
         // Check if idx sets incomplete or invalid
         if(!check_idx_sets())
             return;
@@ -224,9 +229,15 @@ struct FrameUpdateConstraint : public AbstractConstraint {
         
         for(int i = 0; i < target.size(); ++i)
             copy_from_target(i);
+
+        return;
     }
 
+    if(!idxes_assigned)
+        return;
+
     flag -= idx_source.size() + idx_target.size();
+    D_ASSERT(flag >= 0);
     SysInt parity = flag % 2;
     flag /= 2;
     if(flag < source.size())
