@@ -184,7 +184,9 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     trigger_setup();
-    propagateDynInt(0, DomainDelta::empty());
+
+    // -1 to force we check the indices
+    propagateDynInt(-1, DomainDelta::empty());
   }
 
   void copy_from_source(SysInt i) {
@@ -216,7 +218,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt flagin, DomainDelta) {
     SysInt flag = flagin;
-    if(flag < idx_source.size() + idx_target.size()) {
+    if(flag < (SysInt)(idx_source.size() + idx_target.size())) {
         if(idxes_assigned)
             return;
 
