@@ -10,6 +10,7 @@ class RandomCombinationChooser {
   std::vector<int> viableCombinations;
 
 public:
+  RandomCombinationChooser(const NeighbourhoodContainer&) {}
   RandomCombinationChooser() {}
 
   void updateStats(int activatedCombination, const NeighbourhoodStats&) {}
@@ -56,7 +57,7 @@ private:
   }
 
 public:
-  UCBNeighborHoodSelection() {}
+  UCBNeighborHoodSelection(const NeighbourhoodContainer&) {}
 
   void updateStats(int activatedCombination, const NeighbourhoodStats& combinationStats) {}
 
@@ -102,7 +103,7 @@ public:
 class InteractiveCombinationChooser {
 
 public:
-  InteractiveCombinationChooser() {}
+  InteractiveCombinationChooser(const NeighbourhoodContainer&) {}
 
   void updateStats(int activatedCombination, const NeighbourhoodStats& stats) {
     std::cout << stats << std::endl;

@@ -30,7 +30,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   NeighbourhoodSearchManager(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
                              NeighbourhoodContainer _nhc)
-      : prop(std::move(_prop)), base_order(_base_order), nhc(std::move(_nhc)) {
+      : prop(std::move(_prop)), base_order(_base_order), nhc(std::move(_nhc)), searchStrategy(nhc) {
     signal(SIGVTALRM, triggerAlarm);
   }
 

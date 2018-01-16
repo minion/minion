@@ -111,9 +111,10 @@ class HillClimbingSearch {
   double localMaxProbability = tunableParams.hillClimberInitialLocalMaxProbability;
   SelectionStrategy selectionStrategy;
 
+public:
+  HillClimbingSearch(const NeighbourhoodContainer& nhc) : selectionStrategy(nhc) {}
   std::vector<DomainInt> highestNeighbourhoodSizes;
 
-public:
   DomainInt bestSolutionValue;
   std::vector<DomainInt> bestSolution;
 
@@ -344,6 +345,8 @@ class MetaStrategy {
   bool searchEnded = false;
 
 public:
+  MetaStrategy(const NeighbourhoodContainer& nhc) : hillClimber(nhc){};
+
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats& globalStats) {
     switch(currentPhase) {
     case Phase::HILL_CLIMBING: return hillClimber.getSearchParams(nhc, globalStats);
