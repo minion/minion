@@ -404,9 +404,21 @@ reify<BoolVar>* reifyCon(AbstractConstraint* c, BoolVar var) {
   return new reify<BoolVar>(&*c, var);
 }
 
+
 template <typename VarArray>
 inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& bl) {
   switch(bl.internal_constraints[0].constraint->type) {
+  case CT_GACEQ:
+  {
+    ConstraintBlob blob(bl.internal_constraints[0]);
+    auto bound1 = get_initialBounds_from_Var(blob.vars[0][0]);
+    auto bound2 = get_initialBounds_from_Var(blob.vars[1][0]);
+    auto minbound = std::max(bound1.first, bound2.first);
+    auto maxbound = std::min(bound1.second, bound2.second);
+    if(minbound < 0 || maxbound > 1)
+      break;
+  }
+  // fallthrough on purpose
   case CT_EQ: {
     ConstraintBlob blob(bl.internal_constraints[0]);
     blob.vars.push_back(make_vec(bl.vars[0][0]));
@@ -425,8 +437,10 @@ inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& b
     blob.constraint = get_constraint(CT_MINUSEQ_REIFY);
     return build_constraint(blob);
   }
-  default: return reifyCon(build_constraint(bl.internal_constraints[0]), vars[0]);
+  default:; // to hide warnings
   }
+
+    return reifyCon(build_constraint(bl.internal_constraints[0]), vars[0]);
 }
 
 /* JSON
