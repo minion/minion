@@ -26,10 +26,31 @@ public:
 };
 
 class UCBNeighborHoodSelection {
+  std::vector<u_int64_t> initialNumberActivations;
+  std::vector<u_int64_t> initialNumberPositiveSolutions;
+  u_int64_t initialNumberIterations = 0;
+
+  inline u_int64_t numberPositiveSolutions(const NeighbourhoodSearchStats& globalStats, int index) {
+    return (!initialNumberPositiveSolutions.empty())
+               ? initialNumberPositiveSolutions[index] + globalStats.numberPositiveSolutions[index]
+               : globalStats.numberPositiveSolutions[index];
+  }
+
+  inline u_int64_t numberActivations(const NeighbourhoodSearchStats& globalStats, int index) {
+    return (!initialNumberActivations.empty())
+               ? initialNumberActivations[index] + globalStats.numberActivations[index]
+               : globalStats.numberActivations[index];
+  }
+
+  inline u_int64_t numberIterations(const NeighbourhoodSearchStats& globalStats) {
+    return initialNumberIterations + globalStats.numberIterations;
+  }
+
 private:
   static const int TIMEOUT_PENALTY_COST = 1000;
 
-  inline double ucbValue(double reward, int totalActivations, int totalCombinationVisits) {
+  inline double ucbValue(double reward, u_int64_t totalActivations,
+                         u_int64_t totalCombinationVisits) {
     return (reward / totalCombinationVisits) +
            std::sqrt((2 * std::log(totalActivations)) / (totalCombinationVisits));
   }
@@ -58,8 +79,8 @@ public:
         }
         if(allCombinationsTryed) {
           double currentUCBValue =
-              ucbValue(globalStats.numberPositiveSolutions[i], globalStats.numberIterations,
-                       globalStats.numberActivations[i]);
+              ucbValue(numberPositiveSolutions(globalStats, i), numberIterations(globalStats),
+                       numberActivations(globalStats, i));
           if(currentUCBValue > bestUCTValue) {
             bestUCTValue = currentUCBValue;
             bestCombinations.clear();

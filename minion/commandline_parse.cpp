@@ -632,7 +632,7 @@ specified. Options are "meta" (default) or "hillclimbing".
       }
     }
 
-    /** @help switches;-nhsearch Description
+    /** @help switches;-nhselection Description
 When running neighbourhood search, the flag -nhselection allows the neighbourhood selection strategy
 to be specified. Options are "ucb" (default), "random" or "interactive".
         */
@@ -653,6 +653,14 @@ to be specified. Options are "ucb" (default), "random" or "interactive".
         output_fatal_error(oss.str());
       }
     }
+    /** @help switches;-ucbInit Description
+When When using the UCB neighbourhood selector during neighbourhood search, the -ucbInit flag allows a file to be specified that will be used to initialise the UCB neighbourhood  selector with values from previous runs of the same problem class.  If the file cannot be found, a new file shall be created.  When search is finished, the state of the UCB is saved to the same file.
+        */
+    else if(command == string("-ucbInit")) {
+      INCREMENT_i("-nhsearch");
+      getOptions().pathToUCBInitFile = argv[i];
+    }
+
 
     else if(command[0] == '-' && command != string("--")) {
       cout << "I don't understand '" << command << "'. Sorry. " << endl;
