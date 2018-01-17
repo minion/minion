@@ -37,6 +37,21 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   return check_failed;
 }
 
+template <typename Var, typename Vars, typename Prop>
+bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop) {
+  Controller::world_push();
+  var.setMin(lowval);
+  var.setMax(highval);
+  prop(vars);
+
+  bool check_failed = getState().isFailed();
+  getState().setFailed(false);
+
+  Controller::world_pop();
+
+  return check_failed;
+}
+
 inline bool check_sac_timeout() {
   if(getState().isAlarmActivated()) {
     getState().clearAlarm();
@@ -52,6 +67,66 @@ inline bool check_sac_timeout() {
   return false;
 }
 
+template<typename Var, typename Prop>
+void prune_domain_top(Var& var, vector<Var>& vararray, Prop prop)
+{
+  DomainInt gallop = 1;
+  while(true) {
+    DomainInt maxval = var.getMax();
+    DomainInt step = maxval - gallop;
+    bool check = check_fail_range(var, step, maxval, vararray, prop);
+    if(check) {
+      var.setMax(step - 1);
+      prop(vararray);
+      if(getState().isFailed())
+        return;
+      gallop *= 2;
+      DomainInt maxstep = var.getMax() - var.getMin();
+      if(maxstep == 0)
+        return;
+      gallop = min(gallop, maxstep);
+    }
+    else {
+      if(gallop > 1) {
+        gallop /= 2;
+      }
+      else {
+        return;
+      }
+    }
+  }
+}
+
+template<typename Var, typename Prop>
+void prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop)
+{
+  DomainInt gallop = 1;
+  while(true) {
+    DomainInt minval = var.getMin();
+    DomainInt step = minval + gallop;
+    bool check = check_fail_range(var, minval, step, vararray, prop);
+    if(check) {
+      var.setMin(step + 1);
+      prop(vararray);
+      if(getState().isFailed())
+        return;
+      gallop *= 2;
+      DomainInt maxstep = var.getMax() - var.getMin();
+      if(maxstep == 0)
+        return;
+      gallop = min(gallop, maxstep);
+    }
+    else {
+      if(gallop > 1) {
+        gallop /= 2;
+      }
+      else {
+        return;
+      }
+    }
+  }
+}
+
 template <typename Var, typename Prop>
 void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBounds) {
   getQueue().propagateQueue();
@@ -62,28 +137,16 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
     reduced = false;
     for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
       Var& var = vararray[i];
-      if(onlyCheckBounds || var.isBound()) {
-        while(check_fail(var, var.getMax(), vararray, prop)) {
-          if(check_sac_timeout())
-            throw EndOfSearch();
-          reduced = true;
-          var.setMax(var.getMax() - 1);
-          prop(vararray);
-          if(getState().isFailed())
-            return;
-        }
-
-        while(check_fail(var, var.getMin(), vararray, prop)) {
-          if(check_sac_timeout())
-            throw EndOfSearch();
-          reduced = true;
-          var.setMin(var.getMin() + 1);
-          prop(vararray);
-          if(getState().isFailed())
-            return;
-        }
-      } else {
-        for(DomainInt val = var.getMin(); val <= var.getMax(); ++val) {
+      if(var.isAssigned())
+        break;
+      prune_domain_bottom(var, vararray, prop);
+      if(getState().isFailed())
+        return;
+      prune_domain_top(var, vararray, prop);
+      if(getState().isFailed())
+        return;
+      if(!onlyCheckBounds && !var.isBound()) {
+        for(DomainInt val = var.getMin() + 1; val <= var.getMax() - 1; ++val) {
           if(check_sac_timeout())
             throw EndOfSearch();
           if(var.inDomain(val) && check_fail(var, val, vararray, prop)) {
