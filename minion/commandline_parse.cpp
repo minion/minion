@@ -193,7 +193,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-X - prop - node);
       string prop_mode(argv[i]);
       args.prop_method = GetPropMethodFromString(prop_mode);
-      if(args.prop_method == PropLevel_None) {
+      if(args.prop_method.type == PropLevel_None) {
         output_fatal_error("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
@@ -263,6 +263,11 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     success of higher levels of preprocessing is problem specific; SAC
     preprocesses may take a long time to complete, but may reduce search
     time enough to justify the cost.
+
+    Each of the SAC variants can have '_limit' added (for example 
+    SACBound_limit). The '_limit' variants of these algorithm add checks
+    which stop the algorithms in some situations when they are taking a
+    very long time.
     */
 
 /** @help switches;-preprocess Example

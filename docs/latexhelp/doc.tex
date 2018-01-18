@@ -1,12 +1,3 @@
-\section{@help}
-\paragraph{switches;-nodelimit}
-{\footnotesize
-\begin{verbatim}
-    To stop search after N nodes, do
-
-       minion -nodelimit N myinput.minion
-\end{verbatim}
-}
 \section{constraints}
 \paragraph{Description}
 {\footnotesize
@@ -858,28 +849,6 @@ ensures that x=-y.
 help constraints eq
 \end{verbatim}
 }
-\section{constraints mod\textunderscore undefzero}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint
-
-   mod_undefzero(x,y,z)
-
-is the same as mod except the constraint is always
-true when y = 0, instead of false.
-
-This constraint exists for certain special requirements.
-In general, if you are unsure what constraint to use,
-then what you want is a plain mod constraint!
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-help constraints mod
-\end{verbatim}
-}
 \section{constraints modulo}
 \paragraph{Description}
 {\footnotesize
@@ -905,6 +874,28 @@ To be fully concrete, here are some examples:
 {\footnotesize
 \begin{verbatim}
 help constraints div
+\end{verbatim}
+}
+\section{constraints mod\textunderscore undefzero}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint
+
+   mod_undefzero(x,y,z)
+
+is the same as mod except the constraint is always
+true when y = 0, instead of false.
+
+This constraint exists for certain special requirements.
+In general, if you are unsure what constraint to use,
+then what you want is a plain mod constraint!
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+help constraints mod
 \end{verbatim}
 }
 \section{constraints negativemddc}
@@ -1344,107 +1335,6 @@ help input negativetable
 help input haggisgac
 \end{verbatim}
 }
-\section{constraints w-inintervalset}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value
-of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of
-intervals must be given in numerical order.
-\end{verbatim}
-}
-\section{constraints w-inrange}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notinrange
-\end{verbatim}
-}
-\section{constraints w-inset}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
-{a1,..,an}.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notinset
-\end{verbatim}
-}
-\section{constraints w-literal}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-literal(x, a) ensures that x=a.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-notliteral
-\end{verbatim}
-}
-\section{constraints w-notinrange}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-inrange
-\end{verbatim}
-}
-\section{constraints w-notinset}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
-set {a1,..,an}.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-inset
-\end{verbatim}
-}
-\section{constraints w-notliteral}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-  The constraint w-notliteral(x, a) ensures that x =/= a.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-  See also
-
-  help constraints w-literal
-\end{verbatim}
-}
 \section{constraints watched-and}
 \paragraph{Description}
 {\footnotesize
@@ -1699,6 +1589,116 @@ the scalar dot product of constantVec and varVec.
 help constraints weightedsumgeq
 help constraints sumleq
 help constraints sumgeq
+\end{verbatim}
+}
+\section{constraints w-inintervalset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value
+of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of
+intervals must be given in numerical order.
+\end{verbatim}
+}
+\section{constraints w-inrange}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notinrange
+\end{verbatim}
+}
+\section{constraints w-inset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
+{a1,..,an}.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notinset
+\end{verbatim}
+}
+\section{constraints w-literal}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-literal(x, a) ensures that x=a.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-notliteral
+\end{verbatim}
+}
+\section{constraints w-notinrange}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-inrange
+\end{verbatim}
+}
+\section{constraints w-notinset}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
+set {a1,..,an}.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-inset
+\end{verbatim}
+}
+\section{constraints w-notliteral}
+\paragraph{Description}
+{\footnotesize
+\begin{verbatim}
+  The constraint w-notliteral(x, a) ensures that x =/= a.
+\end{verbatim}
+}
+\paragraph{References}
+{\footnotesize
+\begin{verbatim}
+  See also
+
+  help constraints w-literal
+\end{verbatim}
+}
+\section{@help}
+\paragraph{switches;-nodelimit}
+{\footnotesize
+\begin{verbatim}
+    To stop search after N nodes, do
+
+       minion -nodelimit N myinput.minion
 \end{verbatim}
 }
 \section{input}
@@ -2312,6 +2312,11 @@ problem contains any minimising or maximising objective.
     success of higher levels of preprocessing is problem specific; SAC
     preprocesses may take a long time to complete, but may reduce search
     time enough to justify the cost.
+
+    Each of the SAC variants can have '_limit' added (for example 
+    SACBound_limit). The '_limit' variants of these algorithm add checks
+    which stop the algorithms in some situations when they are taking a
+    very long time.
 \end{verbatim}
 }
 \paragraph{Example}
