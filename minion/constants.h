@@ -32,7 +32,7 @@ static const SysInt NoDomainValue = -98765;
 
 enum BoundType { Bound_Yes, Bound_No, Bound_Maybe };
 
-enum PropagationLevel {
+enum PropagationType {
   PropLevel_None,
   PropLevel_GAC,
   PropLevel_SACBounds,
@@ -41,25 +41,80 @@ enum PropagationLevel {
   PropLevel_SSAC
 };
 
-inline PropagationLevel GetPropMethodFromString(std::string s) {
+inline std::ostream& operator<<(std::ostream& o, PropagationType p)
+{
+  switch(p) {
+    case PropLevel_None: o << "none"; break;
+    case PropLevel_GAC: o << "GAC"; break;
+    case PropLevel_SACBounds: o << "SACBounds"; break;
+    case PropLevel_SAC: o << "SAC"; break;
+    case PropLevel_SSACBounds: o << "SSACBounds"; break;
+    case PropLevel_SSAC: o << "SSAC"; break;
+  }
+  return o;
+}
+
+
+struct PropagationLevel {
+  PropagationType type;
+  bool limit;
+
+  PropagationLevel(PropagationType _t = PropLevel_GAC, bool _l = false)
+  : type(_t), limit(_l)
+  { }
+};
+
+inline std::ostream& operator<<(std::ostream& o, PropagationLevel pl)
+{
+  o << pl.type;
+  if(pl.limit)
+    o << "_limit";
+  return o;
+}
+
+inline bool operator<(PropagationLevel lhs, PropagationLevel rhs)
+{
+  return std::make_pair(lhs.type, lhs.limit) < std::make_pair(rhs.type, rhs.limit);
+}
+
+
+inline PropagationLevel GetPropMethodFromString(std::string instring) {
+  int find_split = instring.find('_');
+  string s = instring;
+  if(find_split != string::npos) {
+    s = instring.substr(0, find_split);
+  }
+
+  PropagationType type = PropLevel_None;
+
   if(s == "None")
-    return PropLevel_None;
+    type = PropLevel_None;
   else if(s == "GAC")
-    return PropLevel_GAC;
+    type = PropLevel_GAC;
   else if(s == "SAC")
-    return PropLevel_SAC;
+    type = PropLevel_SAC;
   else if(s == "SSAC")
-    return PropLevel_SSAC;
+    type = PropLevel_SSAC;
   else if(s == "SACBounds")
-    return PropLevel_SACBounds;
+    type = PropLevel_SACBounds;
   else if(s == "SSACBounds")
-    return PropLevel_SSACBounds;
+    type = PropLevel_SSACBounds;
   else {
     ostringstream oss;
     oss << "'" << s << "'' is not a valid Propagation Method!" << std::endl;
     oss << "Valid Values: None, GAC, SAC, SSAC, SACBounds, SSACBounds" << std::endl;
     output_fatal_error(oss.str());
   }
+
+  bool limit = false;
+  if(find_split != string::npos) {
+    string subtype = instring.substr(find_split+1, instring.size());
+    if(subtype != "limit") {
+      output_fatal_error(instring + " is not a valid propagation method");
+    }
+    limit = true;
+  }
+  return PropagationLevel(type, limit);
 }
 
 struct EndOfSearch {};

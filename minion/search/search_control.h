@@ -95,12 +95,12 @@ shared_ptr<VariableOrder> make_search_order_multiple(const vector<SearchOrder>& 
 shared_ptr<Propagate> make_propagator(PropagationLevel prop_method)
 {
   shared_ptr<Propagate> p;
-  switch(prop_method) { // doesn't cover the PropLevel_None case.
-  case PropLevel_GAC: p = shared_ptr<Propagate>(new PropGAC()); break;
-  case PropLevel_SAC: p = shared_ptr<Propagate>(new PropSAC()); break;
-  case PropLevel_SSAC: p = shared_ptr<Propagate>(new PropSSAC()); break;
-  case PropLevel_SACBounds: p = shared_ptr<Propagate>(new PropSAC_Bounds()); break;
-  case PropLevel_SSACBounds: p = shared_ptr<Propagate>(new PropSSAC_Bounds()); break;
+  switch(prop_method.type) { // doesn't cover the PropLevel_None case.
+  case PropLevel_GAC: p = shared_ptr<Propagate>(new PropGAC(prop_method)); break;
+  case PropLevel_SAC: p = shared_ptr<Propagate>(new PropSAC(prop_method)); break;
+  case PropLevel_SSAC: p = shared_ptr<Propagate>(new PropSSAC(prop_method)); break;
+  case PropLevel_SACBounds: p = shared_ptr<Propagate>(new PropSAC_Bounds(prop_method)); break;
+  case PropLevel_SSACBounds: p = shared_ptr<Propagate>(new PropSSAC_Bounds(prop_method)); break;
   default: cout << "Propagation method not found in make_search_manager." << endl; abort();
   }
   return p;

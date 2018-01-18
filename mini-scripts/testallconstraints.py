@@ -31,7 +31,7 @@ conslist+=["gcc", "gccweak", "occurrence", "occurrenceleq", "occurrencegeq"]
 #element constraints
 conslist+=["element", "element_undefzero", "watchelement", "watchelement_undefzero"]
 
-conslist+=["watchelement_one", "element_one"]
+conslist+=["watchelement_one", "element_one", "watchelement_one_undefzero"]
 
 # arithmetic constraints
 conslist+=["modulo", "modulo_undefzero", "pow", "minuseq", "product", "div", "div_undefzero", "abs"]

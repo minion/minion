@@ -24,24 +24,24 @@
 /** This function is not particularly optimised, implementing only the most
  * basic SAC and SSAC algorithms */
 void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool print_info) {
-  if(preprocessLevel == PropLevel_None)
+  if(preprocessLevel.type == PropLevel_None)
     return;
 
-  PropagateGAC propGAC;
+  PropagateGAC propGAC(preprocessLevel);
   propGAC(vars);
 
-  if(preprocessLevel == PropLevel_GAC)
+  if(preprocessLevel.type == PropLevel_GAC)
     return;
 
   DomainInt lits = lit_count(vars);
   bool bounds_check =
-      ((preprocessLevel == PropLevel_SACBounds) || (preprocessLevel == PropLevel_SSACBounds));
+      ((preprocessLevel.type == PropLevel_SACBounds) || (preprocessLevel.type == PropLevel_SSACBounds));
 
   if(bounds_check) {
-    PropagateSAC_Bounds prop_SAC_bounds;
+    PropagateSAC_Bounds prop_SAC_bounds(preprocessLevel);
     prop_SAC_bounds(vars);
   } else {
-    PropagateSAC prop_SAC;
+    PropagateSAC prop_SAC(preprocessLevel);
     prop_SAC(vars);
   }
 
@@ -50,15 +50,15 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
          << " literals" << endl;
   }
 
-  if(preprocessLevel == PropLevel_SAC || preprocessLevel == PropLevel_SACBounds)
+  if(preprocessLevel.type == PropLevel_SAC || preprocessLevel.type == PropLevel_SACBounds)
     return;
 
   lits = lit_count(vars);
   if(bounds_check) {
-    PropagateSSAC_Bounds prop_SSAC_bounds;
+    PropagateSSAC_Bounds prop_SSAC_bounds(preprocessLevel);
     prop_SSAC_bounds(vars);
   } else {
-    PropagateSSAC prop_SSAC;
+    PropagateSSAC prop_SSAC(preprocessLevel);
     prop_SSAC(vars);
   }
   if(print_info) {
