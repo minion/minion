@@ -256,6 +256,7 @@ public:
     enum class NeighbourhoodSelectionStrategy { RANDOM, UCB,  INTERACTIVE  };
     NeighbourhoodSearchStrategy neighbourhoodSearchStrategy = NeighbourhoodSearchStrategy::META_STRATEGY;
     NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy = NeighbourhoodSelectionStrategy::UCB;
+    std::string pathToUCBInitFile;
 
   /// Denotes if minion should print no output, other than that explicitally
   /// requested

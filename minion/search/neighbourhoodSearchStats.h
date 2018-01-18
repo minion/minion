@@ -46,24 +46,25 @@ struct NeighbourhoodSearchStats {
   vector<pair<DomainInt, double>> bestValueTimes;
   std::vector<std::pair<AnyVarRef, DomainInt>> bestCompleteSolutionAssignment;
 
-  int numberIterations = 0;
-  vector<int> numberActivations; // mapping from combinations index to number of times activated
+  u_int64_t numberIterations = 0;
+  vector<u_int64_t>
+      numberActivations; // mapping from combinations index to number of times activated
   vector<double> totalTime;
-  vector<int> numberPositiveSolutions;
-  vector<int> numberNegativeSolutions;
-  vector<int> numberNoSolutions;
-  vector<int> numberTimeouts;
+  vector<u_int64_t> numberPositiveSolutions;
+  vector<u_int64_t> numberNegativeSolutions;
+  vector<u_int64_t> numberNoSolutions;
+  vector<u_int64_t> numberTimeouts;
 
-  int numberOfExplorationPhases = 0;
-  int numberOfBetterSolutionsFoundFromExploration = 0;
+  u_int64_t numberOfExplorationPhases = 0;
+  u_int64_t numberOfBetterSolutionsFoundFromExploration = 0;
 
-  vector<int> numberExplorationsByNHCombinationSize;
-  vector<int> numberSuccessfulExplorationsByNHCombinationSize;
+  vector<u_int64_t> numberExplorationsByNHCombinationSize;
+  vector<u_int64_t> numberSuccessfulExplorationsByNHCombinationSize;
   vector<double> neighbourhoodExplorationTimes;
   vector<ExplorationPhase> explorationPhases;
 
-  int totalNumberOfRandomSolutionsPulled = 0;
-  int numberPulledThisPhase = 0;
+  u_int64_t totalNumberOfRandomSolutionsPulled = 0;
+  u_int64_t numberPulledThisPhase = 0;
 
   double startTime;
   double startExplorationTime;
