@@ -203,6 +203,7 @@ struct ProductConstraint : public AbstractConstraint {
 };
 
 #include "constraint_and.h"
+#include "constraint_product_bool.h"
 
 inline AbstractConstraint* BuildCT_PRODUCT2(const vector<BoolVarRef>& vars,
                                             const vector<BoolVarRef>& var2, ConstraintBlob&) {
@@ -211,11 +212,22 @@ inline AbstractConstraint* BuildCT_PRODUCT2(const vector<BoolVarRef>& vars,
   return AndCon(vars[0], vars[1], var2[0]);
 }
 
+
+
 template <typename VarRef1, typename VarRef2>
 AbstractConstraint* BuildCT_PRODUCT2(const vector<VarRef1>& vars, const vector<VarRef2>& var2,
                                      ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
+  bool isBound = (vars[0].isBound() || vars[1].isBound() || var2[0].isBound());
+  if(!isBound && vars[0].getInitialMin() >= 0 && vars[0].getInitialMax() <= 1) {
+    return new BoolProdConstraint<VarRef1, VarRef1, VarRef2>(vars[0], vars[1], var2[0]);
+  }
+  
+  if(!isBound && vars[1].getInitialMin() >= 0 && vars[1].getInitialMax() <= 1) {
+    return new BoolProdConstraint<VarRef1, VarRef1, VarRef2>(vars[1], vars[0], var2[0]);
+  }
+
   return new ProductConstraint<VarRef1, VarRef1, VarRef2>(vars[0], vars[1], var2[0]);
 }
 

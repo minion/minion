@@ -29,8 +29,8 @@
 struct SearchMethod {
   VarOrderEnum order;
   unsigned int limit; // for static limited.
-  enum PropagationLevel preprocess;
-  enum PropagationLevel prop_method;
+  PropagationLevel preprocess;
+  PropagationLevel prop_method;
   UnsignedSysInt random_seed;
   SearchMethod()
       : order(ORDER_NONE),

@@ -36,6 +36,21 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   return check_failed;
 }
 
+template <typename Var, typename Vars, typename Prop>
+bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop) {
+  Controller::world_push();
+  var.setMin(lowval);
+  var.setMax(highval);
+  prop(vars);
+
+  bool check_failed = getState().isFailed();
+  getState().setFailed(false);
+
+  Controller::world_pop();
+
+  return check_failed;
+}
+
 inline bool check_sac_timeout() {
   if(getState().isAlarmActivated()) {
     getState().clearAlarm();
@@ -51,46 +66,137 @@ inline bool check_sac_timeout() {
   return false;
 }
 
+template<typename Var, typename Prop>
+bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit)
+{
+  bool pruned = false;
+  bool everfailed = false;
+  DomainInt gallop = 1;
+  while(true) {
+    if(check_sac_timeout())
+      throw EndOfSearch();
+
+    DomainInt maxval = var.getMax();
+    DomainInt step = maxval - gallop;
+    bool check = check_fail_range(var, step+1, maxval, vararray, prop);
+    if(check) {
+      pruned = true;
+      var.setMax(step);
+      prop(vararray);
+      if(getState().isFailed())
+        return pruned;
+      if(everfailed && limit) {
+        gallop /= 2;
+      }
+      else {
+        gallop *= 2;
+      }
+      DomainInt maxstep = var.getMax() - var.getMin();
+      if(maxstep == 0)
+        return pruned;
+      gallop = min(gallop, maxstep);
+    }
+    else {
+      everfailed = true;
+      if(gallop > 1) {
+        gallop /= 2;
+      }
+    }
+    if(gallop == 0) {
+      return pruned;
+    }
+  }
+}
+
+template<typename Var, typename Prop>
+bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
+{
+  bool pruned = false;
+  bool everfailed = false;
+  DomainInt gallop = 1;
+  while(true) {
+    if(check_sac_timeout())
+      throw EndOfSearch();
+
+    DomainInt minval = var.getMin();
+    DomainInt step = minval + gallop;
+    bool check = check_fail_range(var, minval, step-1, vararray, prop);
+    if(check) {
+      pruned = true;
+      var.setMin(step);
+      prop(vararray);
+      if(getState().isFailed())
+        return pruned;
+      if(everfailed && limit) {
+        gallop /= 2;
+      }
+      else {
+        gallop *= 2;
+      }
+      DomainInt maxstep = var.getMax() - var.getMin();
+      if(maxstep == 0)
+        return pruned;
+      gallop = min(gallop, maxstep);
+    }
+    else {
+      everfailed = true;
+      if(gallop > 1) {
+        gallop /= 2;
+      }
+    }
+    if(gallop == 0) {
+      return pruned;
+    }
+  }
+}
+
 template <typename Var, typename Prop>
-void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBounds) {
+void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBounds, bool limit) {
   getQueue().propagateQueue();
   if(getState().isFailed())
     return;
   bool reduced = true;
+  int loops = 0;
   while(reduced) {
-    reduced = false;
-    for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
-      Var& var = vararray[i];
-      if(onlyCheckBounds || var.isBound()) {
-        while(check_fail(var, var.getMax(), vararray, prop)) {
-          if(check_sac_timeout())
-            throw EndOfSearch();
-          reduced = true;
-          var.setMax(var.getMax() - 1);
-          prop(vararray);
+    // First loop around bounds as long as possible
+    while(reduced) {
+      if(limit) {
+        loops++;
+        if(loops > log2(vararray.size())) {
+          return;
+        }
+      } 
+      reduced = false;
+      for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
+        Var& var = vararray[i];
+        if(!var.isAssigned()) {
+          reduced = reduced || prune_domain_bottom(var, vararray, prop, limit);
           if(getState().isFailed())
             return;
+          reduced = reduced || prune_domain_top(var, vararray, prop, limit);
+          if(getState().isFailed())
+            return;
+          if(check_sac_timeout())
+            throw EndOfSearch();
         }
+      }
+    }
 
-        while(check_fail(var, var.getMin(), vararray, prop)) {
-          if(check_sac_timeout())
-            throw EndOfSearch();
-          reduced = true;
-          var.setMin(var.getMin() + 1);
-          prop(vararray);
-          if(getState().isFailed())
-            return;
-        }
-      } else {
-        for(DomainInt val = var.getMin(); val <= var.getMax(); ++val) {
-          if(check_sac_timeout())
-            throw EndOfSearch();
-          if(var.inDomain(val) && check_fail(var, val, vararray, prop)) {
-            reduced = true;
-            var.removeFromDomain(val);
-            prop(vararray);
-            if(getState().isFailed())
-              return;
+    // Then try inside domain
+    if(!onlyCheckBounds) {
+      for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
+        Var& var = vararray[i];
+        if(!var.isBound()) {
+          for(DomainInt val = var.getMin() + 1; val <= var.getMax() - 1; ++val) {
+            if(check_sac_timeout())
+              throw EndOfSearch();
+            if(var.inDomain(val) && check_fail(var, val, vararray, prop)) {
+              reduced = true;
+              var.removeFromDomain(val);
+              prop(vararray);
+              if(getState().isFailed())
+                return;
+            }
           }
         }
       }
@@ -99,6 +205,11 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
 }
 
 struct PropagateGAC {
+  PropagationLevel level;
+
+  PropagateGAC(PropagationLevel _level) :
+  level(_level) {}
+  
   template <typename Vars>
   void operator()(Vars&) {
     getQueue().propagateQueue();
@@ -106,32 +217,52 @@ struct PropagateGAC {
 };
 
 struct PropagateSAC {
+  PropagationLevel level;
+
+  PropagateSAC(PropagationLevel _level) :
+  level(_level) {}
+  
   template <typename Vars>
   void operator()(Vars& vars) {
-    propagateSAC_internal(vars, PropagateGAC(), false);
+    propagateSAC_internal(vars, PropagateGAC(level), false, level.limit);
   }
 };
 
 struct PropagateSAC_Bounds {
-  template <typename Vars>
+  PropagationLevel level;
+
+  PropagateSAC_Bounds(PropagationLevel _level) :
+  level(_level) {}
+  
+    template <typename Vars>
   void operator()(Vars& vars) {
-    propagateSAC_internal(vars, PropagateGAC(), true);
+    propagateSAC_internal(vars, PropagateGAC(level), true, level.limit);
   }
 };
 
 struct PropagateSSAC {
+  PropagationLevel level;
+
+  PropagateSSAC(PropagationLevel _level) :
+  level(_level) {}
+  
   template <typename Vars>
   void operator()(Vars& vars) {
-    PropagateSAC sac;
-    propagateSAC_internal(vars, sac, false);
+    PropagateSAC sac(level);;
+    propagateSAC_internal(vars, sac, false, level.limit);
   }
 };
 
 struct PropagateSSAC_Bounds {
+  PropagationLevel level;
+
+  PropagateSSAC_Bounds(PropagationLevel _level) :
+  level(_level) {}
+
   template <typename Vars>
   void operator()(Vars& vars) {
-    PropagateSAC sac;
-    propagateSAC_internal(vars, sac, true);
+    PropagateSAC sac(level);
+    propagateSAC_internal(vars, sac, true, level.limit);
   }
 };
 
@@ -142,6 +273,10 @@ struct Propagate {
 };
 
 struct PropGAC : Propagate {
+  PropGAC(PropagationLevel level)
+  : prop_obj(level)
+  { }
+
   PropagateGAC prop_obj;
   inline void prop(vector<AnyVarRef>& vars) {
     prop_obj(vars);
@@ -149,6 +284,10 @@ struct PropGAC : Propagate {
 };
 
 struct PropSAC : Propagate {
+  PropSAC(PropagationLevel level)
+  : prop_obj(level)
+  { }
+  
   PropagateSAC prop_obj;
   inline void prop(vector<AnyVarRef>& vars) {
     prop_obj(vars);
@@ -156,6 +295,10 @@ struct PropSAC : Propagate {
 };
 
 struct PropSSAC : Propagate {
+  PropSSAC(PropagationLevel level)
+  : prop_obj(level)
+  { }
+
   PropagateSSAC prop_obj;
   inline void prop(vector<AnyVarRef>& vars) {
     prop_obj(vars);
@@ -163,6 +306,10 @@ struct PropSSAC : Propagate {
 };
 
 struct PropSAC_Bounds : Propagate {
+  PropSAC_Bounds(PropagationLevel level)
+  : prop_obj(level)
+  { }
+
   PropagateSAC_Bounds prop_obj;
   inline void prop(vector<AnyVarRef>& vars) {
     prop_obj(vars);
@@ -170,6 +317,10 @@ struct PropSAC_Bounds : Propagate {
 };
 
 struct PropSSAC_Bounds : Propagate {
+  PropSSAC_Bounds(PropagationLevel level)
+  : prop_obj(level)
+  { }
+
   PropagateSSAC_Bounds prop_obj;
   inline void prop(vector<AnyVarRef>& vars) {
     prop_obj(vars);

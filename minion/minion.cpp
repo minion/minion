@@ -160,18 +160,7 @@ int main(int argc, char** argv) {
 
     // Copy args into tableout
     getTableOut().set("RandomSeed", tostring(args.random_seed));
-    {
-      const char* b = "";
-      switch(args.preprocess) {
-      case PropLevel_None: b = "None"; break;
-      case PropLevel_GAC: b = "GAC"; break;
-      case PropLevel_SAC: b = "SAC"; break;
-      case PropLevel_SSAC: b = "SSAC"; break;
-      case PropLevel_SACBounds: b = "SACBounds"; break;
-      case PropLevel_SSACBounds: b = "SSACBounds"; break;
-      }
-      getTableOut().set("Preprocess", string(b));
-    }
+    getTableOut().set("Preprocess", tostring(args.preprocess));
     // should be one for varorder as well.
     getTableOut().set("MinionVersion", -1);
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.

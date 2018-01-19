@@ -193,7 +193,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-X - prop - node);
       string prop_mode(argv[i]);
       args.prop_method = GetPropMethodFromString(prop_mode);
-      if(args.prop_method == PropLevel_None) {
+      if(args.prop_method.type == PropLevel_None) {
         output_fatal_error("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
@@ -225,55 +225,60 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         output_fatal_error(" -X-map-long-short <none|keeplong|eager|lazy>");
       }
     }
-    /** @help switches;-preprocess
+/** @help switches;-preprocess
 
-        This switch allows the user to choose what level of preprocess is
-        applied to their model before search commences.
+    This switch allows the user to choose what level of preprocess is
+    applied to their model before search commences.
 
-        The choices are:
+    The choices are:
 
-        - GAC
-        - generalised arc consistency (default)
-        - all propagators are run to a fixed point
-        - if some propagators enforce less than GAC then the model will
-        not necessarily be fully GAC at the outset
+    - GAC
+    - generalised arc consistency (default)
+    - all propagators are run to a fixed point
+    - if some propagators enforce less than GAC then the model will
+    not necessarily be fully GAC at the outset
 
-        - SACBounds
-        - singleton arc consistency on the bounds of each variable
-        - AC can be achieved when any variable lower or upper bound is a
-        singleton in its own domain
+    - SACBounds
+    - singleton arc consistency on the bounds of each variable
+    - AC can be achieved when any variable lower or upper bound is a
+    singleton in its own domain
 
-        - SAC
-        - singleton arc consistency
-        - AC can be achieved in the model if any value is a singleton in
-        its own domain
+    - SAC
+    - singleton arc consistency
+    - AC can be achieved in the model if any value is a singleton in
+    its own domain
 
-        - SSACBounds
-        - singleton singleton bounds arc consistency
-        - SAC can be achieved in the model when domains are replaced by either
-        the singleton containing their upper bound, or the singleton containing
-        their lower bound
+    - SSACBounds
+    - singleton singleton bounds arc consistency
+    - SAC can be achieved in the model when domains are replaced by either
+    the singleton containing their upper bound, or the singleton containing
+    their lower bound
 
-        - SSAC
-        - singleton singleton arc consistency
-        - SAC can be achieved when any value is a singleton in its own domain
+    - SSAC
+    - singleton singleton arc consistency
+    - SAC can be achieved when any value is a singleton in its own domain
 
-        These are listed in order of roughly how long they take to
-        achieve. Preprocessing is a one off cost at the start of search. The
-        success of higher levels of preprocessing is problem specific; SAC
-        preprocesses may take a long time to complete, but may reduce search
-        time enough to justify the cost.
-        */
+    These are listed in order of roughly how long they take to
+    achieve. Preprocessing is a one off cost at the start of search. The
+    success of higher levels of preprocessing is problem specific; SAC
+    preprocesses may take a long time to complete, but may reduce search
+    time enough to justify the cost.
 
-    /** @help switches;-preprocess Example
-        To enforce SAC before search:
+    Each of the SAC variants can have '_limit' added (for example 
+    SACBound_limit). The '_limit' variants of these algorithm add checks
+    which stop the algorithms in some situations when they are taking a
+    very long time.
+    */
 
-           minion -preprocess SAC myinputfile.minion
-        */
+/** @help switches;-preprocess Example
+    To enforce SAC before search:
 
-    /** @help switches;-preprocess References
-        help switches -prop-node
-        */
+       minion -preprocess SAC myinputfile.minion
+    */
+
+/** @help switches;-preprocess References
+    help switches -prop-node
+    */
     else if(command == string("-preprocess")) {
       INCREMENT_i(-preprocess);
       string prop_mode(argv[i]);
