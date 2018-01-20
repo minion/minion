@@ -81,10 +81,10 @@ void build_variables(const ProbSpec::VarContainer& vars) {
   for(int i = 0; i < vars.BOOLs; ++i)
     getVars().boolVarContainer.addVariables(1);
   for(int i = 0; i < vars.bound.size(); ++i)
-    getVars().boundVarContainer.addVariables(vars.bound[i].second, vars.bound[i].first);
+    getVars().boundVarContainer.addVariables(vars.bound[i], 1);
 
   for(int i = 0; i < vars.sparse_bound.size(); ++i)
-    getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound[i].second, vars.sparse_bound[i].first);
+    getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound[i], 1);
 
 
   getVars().bigRangeVarContainer.addVariables(vars.discrete);

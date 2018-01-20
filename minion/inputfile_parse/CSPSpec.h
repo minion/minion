@@ -176,10 +176,10 @@ struct VarContainer {
   SysInt BOOLs;
   INPUT_MAP_TYPE<string, Var> symbol_table;
   INPUT_MAP_TYPE<Var, string> name_table;
-  vector<pair<SysInt, Bounds>> bound;
-  vector<pair<SysInt, vector<DomainInt>>> sparse_bound;
-  vector<pair<SysInt, Bounds>> discrete;
-  vector<pair<SysInt, vector<DomainInt>>> sparse_discrete;
+  vector<Bounds> bound;
+  vector<vector<DomainInt>> sparse_bound;
+  vector<Bounds> discrete;
+  vector<vector<DomainInt>> sparse_discrete;
   INPUT_MAP_TYPE<string, vector<DomainInt>> matrix_table;
   VarContainer() : BOOLs(0) {}
 
@@ -307,46 +307,24 @@ struct VarContainer {
       dom.push_back(1);
       return make_pair(Bound_No, dom);
     case VAR_BOUND: {
-      SysInt bound_size = 0;
-      for(UnsignedSysInt x = 0; x < bound.size(); ++x) {
-        bound_size += bound[x].first;
-        if(v.pos() < bound_size) {
-          dom.push_back(bound[x].second.lower_bound);
-          dom.push_back(bound[x].second.upper_bound);
-          return make_pair(Bound_Yes, dom);
-        }
-      }
-      throw parse_exception("Internal Error - Bound OverFlow");
+      D_ASSERT(v.pos() < bound.size());
+      dom.push_back(bound[v.pos()].lower_bound);
+      dom.push_back(bound[v.pos()].upper_bound);
+      return make_pair(Bound_Yes, dom);
     }
     case VAR_SPARSEBOUND: {
-      SysInt sparse_bound_size = 0;
-      for(UnsignedSysInt x = 0; x < sparse_bound.size(); ++x) {
-        sparse_bound_size += sparse_bound[x].first;
-        if(v.pos() < sparse_bound_size)
-          return make_pair(Bound_No, sparse_bound[x].second);
-      }
-      throw parse_exception("Internal Error - SparseBound OverFlow");
+      D_ASSERT(v.pos() < sparse_bound.size());
+      return make_pair(Bound_No, sparse_bound[v.pos()]);
     }
     case VAR_DISCRETE: {
-      SysInt discrete_size = 0;
-      for(UnsignedSysInt x = 0; x < discrete.size(); ++x) {
-        discrete_size += discrete[x].first;
-        if(v.pos() < discrete_size) {
-          dom.push_back(discrete[x].second.lower_bound);
-          dom.push_back(discrete[x].second.upper_bound);
-          return make_pair(Bound_Yes, dom);
-        }
-      }
-      throw parse_exception("Internal Error - Discrete OverFlow");
+      D_ASSERT(v.pos() < discrete.size());
+      dom.push_back(discrete[v.pos()].lower_bound);
+      dom.push_back(discrete[v.pos()].upper_bound);
+      return make_pair(Bound_Yes, dom);
     }
     case VAR_SPARSEDISCRETE: {
-      SysInt sparse_discrete_size = 0;
-      for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x) {
-        sparse_discrete_size += sparse_discrete[x].first;
-        if(v.pos() < sparse_discrete_size)
-          return make_pair(Bound_No, sparse_discrete[x].second);
-      }
-      throw parse_exception("Internal Error - SparseDiscrete OverFlow");
+      D_ASSERT(v.pos() < sparse_discrete.size());
+      return make_pair(Bound_No, sparse_discrete[v.pos()]);
     }
     default: throw parse_exception("Internal Error - Unknown Variable Type");
     }
@@ -357,41 +335,22 @@ struct VarContainer {
     case VAR_CONSTANT: return Bounds(v.pos(), v.pos());
     case VAR_BOOL: return Bounds(0, 1);
     case VAR_BOUND: {
-      SysInt bound_size = 0;
-      for(UnsignedSysInt x = 0; x < bound.size(); ++x) {
-        bound_size += bound[x].first;
-        if(v.pos() < bound_size)
-          return bound[x].second;
-      }
-      throw parse_exception("Internal Error - Bound OverFlow");
+      D_ASSERT(v.pos() < bound.size());
+      return bound[v.pos()];
     }
 
     case VAR_SPARSEBOUND: {
-      SysInt sparse_bound_size = 0;
-      for(UnsignedSysInt x = 0; x < sparse_bound.size(); ++x) {
-        sparse_bound_size += sparse_bound[x].first;
-        if(v.pos() < sparse_bound_size)
-          return Bounds(sparse_bound[x].second.front(), sparse_bound[x].second.back());
-      }
-      throw parse_exception("Internal Error - SparseBound OverFlow");
+      D_ASSERT(v.pos() < sparse_bound.size());
+      return Bounds(sparse_bound[v.pos()].front(), sparse_bound[v.pos()].back());
     }
+
     case VAR_DISCRETE: {
-      SysInt discrete_size = 0;
-      for(UnsignedSysInt x = 0; x < discrete.size(); ++x) {
-        discrete_size += discrete[x].first;
-        if(v.pos() < discrete_size)
-          return discrete[x].second;
-      }
-      throw parse_exception("Internal Error - Discrete OverFlow");
+      D_ASSERT(v.pos() < discrete.size());
+      return discrete[v.pos()];
     }
     case VAR_SPARSEDISCRETE: {
-      SysInt sparse_discrete_size = 0;
-      for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x) {
-        sparse_discrete_size += sparse_discrete[x].first;
-        if(v.pos() < sparse_discrete_size)
-          return Bounds(sparse_discrete[x].second.front(), sparse_discrete[x].second.back());
-      }
-      throw parse_exception("Internal Error - SparseDiscrete OverFlow");
+      D_ASSERT(v.pos() < sparse_discrete.size());
+      return Bounds(sparse_discrete[v.pos()].front(), sparse_discrete[v.pos()].back());
     }
     default: throw parse_exception("Internal Error - Unknown Variable Type");
     }
@@ -402,39 +361,23 @@ struct VarContainer {
     if(i < BOOLs)
       return Var(VAR_BOOL, i);
     i -= BOOLs;
-    {
-      SysInt bound_size = 0;
-      for(UnsignedSysInt x = 0; x < bound.size(); ++x)
-        bound_size += bound[x].first;
-      if(i < bound_size)
-        return Var(VAR_BOUND, i);
-      i -= bound_size;
-    }
-    {
-      SysInt sparse_bound_size = 0;
-      for(UnsignedSysInt x = 0; x < sparse_bound.size(); ++x)
-        sparse_bound_size += sparse_bound[x].first;
-      if(i < sparse_bound_size)
-        return Var(VAR_SPARSEBOUND, i);
-      i -= sparse_bound_size;
-    }
 
-    {
-      SysInt discrete_size = 0;
-      for(UnsignedSysInt x = 0; x < discrete.size(); ++x)
-        discrete_size += discrete[x].first;
-      if(i < discrete_size)
-        return Var(VAR_DISCRETE, i);
-      i -= discrete_size;
-    }
-    {
-      SysInt sparse_discrete_size = 0;
-      for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x)
-        sparse_discrete_size += sparse_discrete[x].first;
-      if(i < sparse_discrete_size)
-        return Var(VAR_SPARSEDISCRETE, i);
-      i -= sparse_discrete_size;
-    }
+    if(i < bound.size())
+      return Var(VAR_BOUND, i);
+    i -= bound.size();
+
+    if(i < sparse_bound.size())
+      return Var(VAR_SPARSEBOUND, i);
+    i -= sparse_bound.size();
+
+    if(i < discrete.size())
+      return Var(VAR_DISCRETE, i);
+    i -= discrete.size();
+
+    if(i < sparse_discrete.size())
+      return Var(VAR_SPARSEDISCRETE, i);
+    i -= sparse_discrete.size();
+
     throw parse_exception("Var Out of Range!");
   }
 
@@ -455,17 +398,17 @@ struct VarContainer {
   }
 
   Var getNewBoundVar(DomainInt lower, DomainInt upper) {
-    bound.push_back(make_pair(1, Bounds(lower, upper)));
+    bound.push_back(Bounds(lower, upper));
     return Var(VAR_BOUND, (SysInt)bound.size() - 1);
   }
 
   Var getNewSparseBoundVar(const vector<DomainInt>& vals) {
-    sparse_bound.push_back(make_pair(1, vals));
+    sparse_bound.push_back(vals);
     return Var(VAR_SPARSEBOUND, (SysInt)sparse_bound.size() - 1);
   }
 
   Var getNewDiscreteVar(DomainInt lower, DomainInt upper) {
-    discrete.push_back(make_pair(1, Bounds(lower, upper)));
+    discrete.push_back(Bounds(lower, upper));
     return Var(VAR_DISCRETE, (SysInt)discrete.size() - 1);
   }
 
@@ -473,14 +416,11 @@ struct VarContainer {
     SysInt total_var_count = 0;
     total_var_count += BOOLs;
 
-    for(UnsignedSysInt x = 0; x < bound.size(); ++x)
-      total_var_count += bound[x].first;
-    for(UnsignedSysInt x = 0; x < sparse_bound.size(); ++x)
-      total_var_count += sparse_bound[x].first;
-    for(UnsignedSysInt x = 0; x < discrete.size(); ++x)
-      total_var_count += discrete[x].first;
-    for(UnsignedSysInt x = 0; x < sparse_discrete.size(); ++x)
-      total_var_count += sparse_discrete[x].first;
+    total_var_count += bound.size();
+    total_var_count += sparse_bound.size();
+    total_var_count += discrete.size();
+    total_var_count += sparse_discrete.size();
+
     vector<Var> all_vars(total_var_count);
     for(SysInt i = 0; i < total_var_count; ++i)
       all_vars[i] = get_var('x', i);

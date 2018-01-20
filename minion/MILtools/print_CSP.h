@@ -155,51 +155,32 @@ struct MinionInstancePrinter {
       default: abort();
       }
     }
+  }
 
-    return;
+  void print_short_tuples() {
+    typedef map<string, ShortTupleList*>::const_iterator it_type;
 
-    for(SysInt i = 0; i < vars.BOOLs; ++i) {
-      oss << "BOOL ";
-      print_instance(Var(VAR_BOOL, i));
+    for(it_type it = csp.shorttable_symboltable.begin(); it != csp.shorttable_symboltable.end(); ++it) {
+      oss << it->first << " " << it->second->size() << "\n";
+
+      vector<vector<pair<SysInt, DomainInt>>> const* tptr = it->second->tuplePtr();
+      for(int i = 0; i < tptr->size(); ++i) {
+        const vector<pair<SysInt, DomainInt>>& tup = (*tptr)[i];
+        oss << "[";
+        bool first = true;
+        for(int j = 0; j < tup.size(); ++j)
+        {
+          if(first) {
+            first = false;
+          } else {
+            oss << ", ";
+          }
+          oss << "("<<tup[j].first<<","<<tup[j].second<<")";
+        }
+
+        oss << "]\n";
+      }
       oss << endl;
-    }
-
-    // Bounds.
-    SysInt bound_sum = 0;
-    for(SysInt x = 0; x < (SysInt)vars.bound.size(); ++x) {
-      for(SysInt i = 0; i < vars.bound[x].first; ++i) {
-        oss << "BOUND ";
-        print_instance(Var(VAR_BOUND, i + bound_sum));
-        oss << "{" << vars.bound[x].second.lower_bound << ".." << vars.bound[x].second.upper_bound
-            << "}" << endl;
-      }
-      bound_sum += vars.bound[x].first;
-    }
-
-    // Sparse Bounds.
-
-    SysInt sparse_bound_sum = 0;
-    for(SysInt x = 0; x < (SysInt)vars.sparse_bound.size(); ++x) {
-      for(SysInt i = 0; i < vars.sparse_bound[x].first; ++i) {
-        oss << "SPARSEBOUND ";
-        print_instance(Var(VAR_BOUND, i + sparse_bound_sum));
-        oss << " ";
-        print_instance(vars.sparse_bound[x].second, '{', '}');
-        oss << endl;
-      }
-      sparse_bound_sum += vars.sparse_bound[x].first;
-    }
-
-    // Bounds.
-    SysInt discrete_sum = 0;
-    for(SysInt x = 0; x < (SysInt)vars.discrete.size(); ++x) {
-      for(SysInt i = 0; i < vars.discrete[x].first; ++i) {
-        oss << "DISCRETE ";
-        print_instance(Var(VAR_DISCRETE, i + discrete_sum));
-        oss << "{" << vars.discrete[x].second.lower_bound << ".."
-            << vars.discrete[x].second.upper_bound << "}" << endl;
-      }
-      discrete_sum += vars.discrete[x].first;
     }
   }
 
@@ -334,6 +315,9 @@ struct MinionInstancePrinter {
 
     oss << "**TUPLELIST**" << endl;
     print_tuples();
+
+    oss << "**SHORTTUPLELIST**" << endl;
+    print_short_tuples();
 
     oss << "**CONSTRAINTS**" << endl;
     for(list<ConstraintBlob>::const_iterator it = constraints.begin(); it != constraints.end();
