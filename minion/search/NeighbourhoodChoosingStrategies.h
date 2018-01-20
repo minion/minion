@@ -2,6 +2,7 @@
 #define MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #include "neighbourhood-def.h"
 #include "neighbourhoodSearchStats.h"
+#include "ucbNeighbourhoodSelectionStrategy.h"
 #include <cassert>
 #include <math.h>
 #include <vector>

@@ -2,18 +2,20 @@
 #define MINION_SEARCH_UCBNEIGHBOURHOODSELECTIONSTRATEGY_H_
 #include "neighbourhood-def.h"
 #include "neighbourhoodSearchStats.h"
+#include <math.h>
+
 #include <cassert>
 #include <fstream>
 #include <iostream>
 #include <vector>
+static const char* NUMBER_ITERATIONS_KEY = "numberIterations:";
+static const char* NUMBER_POSITIVE_KEY = "numberPositive:";
+static const char* NUMBER_ACTIVATIONS_KEY = "numberActivations:";
 
 class UCBNeighborHoodSelection {
   std::vector<u_int64_t> initialNumberActivations;
   std::vector<u_int64_t> initialNumberPositiveSolutions;
   u_int64_t initialNumberIterations = 0;
-static const std::string NUMBER_ITERATIONS_KEY = "numberIterations:"
-static const std::string NUMBER_POSITIVE_KEY = "numberPositive:"
-static const std::string NUMBER_ACTIVATIONS_KEY = "numberActivations:"
   inline u_int64_t numberPositiveSolutions(const NeighbourhoodSearchStats& globalStats, int index) {
     return (!initialNumberPositiveSolutions.empty())
                ? initialNumberPositiveSolutions[index] + globalStats.numberPositiveSolutions[index]
@@ -81,16 +83,16 @@ public:
     }
     return bestCombinations[std::rand() % bestCombinations.size()];
   }
-
-  inline void readInitialValuesFromFile(std::istream& is, int number neighbourhoods) {
-      checkName(NUMBER_ITERATIONS_KEY, is);
-      if (!is >> initialNumberIterations) {
-          std::cerr << "Error when reading " << NUMBER_ITERATIONS_KEY << " expected integer after.\n";
-          exit(1);
-      }
-      std::ws(is);
-      checkName(NUMBER_ACTIVATIONS_KEY,is);
-      readVector()
+/*
+  inline void readInitialValuesFromFile(std::istream& is, int numberNeighbourhoods) {
+    checkName(NUMBER_ITERATIONS_KEY, is);
+    if(!is >> initialNumberIterations) {
+      std::cerr << "Error when reading " << NUMBER_ITERATIONS_KEY << " expected integer after.\n";
+      exit(1);
+    }
+    std::ws(is);
+    checkName(NUMBER_ACTIVATIONS_KEY, is);
+    readVector()
   }
   inline void checkName(const std::string& name, std::istream& is) {
     for(const char i : name) {
@@ -98,8 +100,8 @@ public:
     }
   }
 
-  inline void readVector(size_t expectedVectorLength, const std::string& name,
-                                 std::istream& is, std::vector<u_int64_t>& vec) {
+  inline void readVector(size_t expectedVectorLength, const std::string& name, std::istream& is,
+                         std::vector<u_int64_t>& vec) {
     checkChar('[', name, is);
     for(size_t i = 0; i < expectedVectorLength; i++) {
       int read;
@@ -121,6 +123,7 @@ public:
       std::cerr << "Expected '" << i << "' but found '" << read << "'\n";
       exit(1);
     }
+    */
   };
 
 #endif /* MINION_SEARCH_UCBNEIGHBOURHOODSELECTIONSTRATEGY_H_ */
