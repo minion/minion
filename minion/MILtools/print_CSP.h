@@ -231,6 +231,14 @@ struct MinionInstancePrinter {
 
       if(!var_order.empty()) {
         oss << "VARORDER ";
+        if(csp.search_order[i].find_one_assignment) {
+          oss << "AUX ";
+        }
+
+        if(csp.search_order[i].order != ORDER_ORIGINAL) {
+          oss << csp.search_order[i].order << " ";
+        }
+
         print_instance(var_order);
         oss << endl;
       }

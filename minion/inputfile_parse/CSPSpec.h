@@ -91,6 +91,22 @@ enum VarOrderEnum {
   ORDER_CONFLICT
 };
 
+inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
+  switch(voe) {
+    case ORDER_NONE: return o << "NONE";
+    case ORDER_STATIC: return o << "STATIC";
+    case ORDER_SDF: return o << "SDF";
+    case ORDER_SRF: return o << "SRF";
+    case ORDER_LDF: return o << "LDF";
+    case ORDER_ORIGINAL: return o << "ORIGINAL";
+    case ORDER_STATIC_LIMITED: return o << "STATIC_LIMITED";
+    case ORDER_WDEG: return o << "WDEG";
+    case ORDER_DOMOVERWDEG: return o << "DOMOVERWDEG";
+    case ORDER_CONFLICT: return o << "CONFLICT";
+  }
+  abort();
+}
+
 enum ValOrderEnum { VALORDER_ASCEND, VALORDER_DESCEND, VALORDER_RANDOM };
 
 struct ConstraintDef {
