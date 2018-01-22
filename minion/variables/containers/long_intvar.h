@@ -173,22 +173,20 @@ struct BigRangeVarContainer {
     // bms_array->lock(); // gets locked in constraint_setup.cpp
   }
 
-  void addVariables(const vector<pair<SysInt, Bounds>>& new_domains) {
+  void addVariables(const vector<Bounds>& new_domains) {
     D_ASSERT(!lock_m);
     for(SysInt i = 0; i < (SysInt)new_domains.size(); ++i) {
-      for(DomainInt j = 0; j < new_domains[i].first; ++j) {
         initial_bounds.push_back(
-            make_pair(new_domains[i].second.lower_bound, new_domains[i].second.upper_bound));
+            make_pair(new_domains[i].lower_bound, new_domains[i].upper_bound));
         DomainInt domain_size;
-        domain_size = new_domains[i].second.upper_bound - new_domains[i].second.lower_bound + 1;
+        domain_size = new_domains[i].upper_bound - new_domains[i].lower_bound + 1;
         var_offset.push_back(var_offset.back() + domain_size);
         var_count_m++;
-      }
-      constraints.resize(var_count_m);
-#ifdef WDEG
-      wdegs.resize(var_count_m);
-#endif
     }
+      constraints.resize(new_domains.size());
+#ifdef WDEG
+      wdegs.resize(new_domains.size());
+#endif
 
     bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * BOUND_DATA_SIZE *
                                                        sizeof(domain_bound_type));

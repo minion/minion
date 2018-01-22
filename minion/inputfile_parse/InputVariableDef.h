@@ -50,7 +50,7 @@ struct CSPInstance;
 
 class Var {
   VariableType type_m;
-  DomainInt pos_m;
+  SysInt pos_m;
 
 public:
 
@@ -58,7 +58,7 @@ public:
     return type_m != VAR_INVALID;
   }
 
-  DomainInt pos() const {
+  SysInt pos() const {
     D_ASSERT(isValid());
     return pos_m;
   }
@@ -71,7 +71,7 @@ public:
     type_m = v;
   }
 
-  Var(VariableType _type, DomainInt _pos) : type_m(_type), pos_m(_pos) {}
+  Var(VariableType _type, DomainInt _pos) : type_m(_type), pos_m(checked_cast<SysInt>(_pos)) {}
 
   Var(const Var& v) : type_m(v.type_m), pos_m(v.pos_m) {}
 
