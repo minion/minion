@@ -162,7 +162,7 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, false, true,
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true, false,
                                              tunableParams.iterationSearchTime,
                                              highestNeighbourhoodSizes[combinationToActivate]);
   }
