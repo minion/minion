@@ -20,6 +20,9 @@ static const TunableParams tunableParams;
 
 struct SearchParams {
   enum Mode { STANDARD_SEARCH, NEIGHBOURHOOD_SEARCH, RANDOM_WALK };
+  // Only used with RANDOM_WALK
+  int random_bias;
+
   Mode mode;
   int combinationToActivate;
   std::vector<int> neighbourhoodsToActivate;
@@ -31,10 +34,11 @@ struct SearchParams {
   DomainInt initialNeighbourhoodSize;
 
 private:
-  SearchParams(Mode mode, int combinationToActivate, std::vector<int> neighbourhoods,
+  SearchParams(int random_bias, Mode mode, int combinationToActivate, std::vector<int> neighbourhoods,
                bool nhLocalVarsComeFirst, bool optimiseMode, bool stopAtFirstSolution,
                int timeoutInMillis, DomainInt initialNeighbourhoodSize)
-      : mode(mode),
+      : random_bias(random_bias),
+        mode(mode),
         combinationToActivate(combinationToActivate),
         neighbourhoodsToActivate(std::move(neighbourhoods)),
         nhLocalVarsComeFirst(nhLocalVarsComeFirst),
@@ -49,7 +53,7 @@ public:
                                                  bool nhLocalVarsComeFirst, bool optimiseMode,
                                                  bool stopAtFirstSolution, int timeoutInMillis,
                                                  DomainInt initialNeighbourhoodSize = 1) {
-    SearchParams searchParams(NEIGHBOURHOOD_SEARCH, combinationToActivate,
+    SearchParams searchParams(0, NEIGHBOURHOOD_SEARCH, combinationToActivate,
                               nhc.neighbourhoodCombinations[combinationToActivate],
                               nhLocalVarsComeFirst, optimiseMode, stopAtFirstSolution,
                               timeoutInMillis, initialNeighbourhoodSize);
@@ -62,12 +66,12 @@ public:
 
   static inline SearchParams standardSearch(bool optimiseMode, bool stopAtFirstSolution,
                                             int timeoutInMillis) {
-    return SearchParams(STANDARD_SEARCH, -1, {}, false, optimiseMode, stopAtFirstSolution,
+    return SearchParams(0, STANDARD_SEARCH, -1, {}, false, optimiseMode, stopAtFirstSolution,
                         timeoutInMillis, 0);
   }
   static inline SearchParams randomWalk(bool optimiseMode, bool stopAtFirstSolution,
-                                        int timeoutInMillis) {
-    return SearchParams(RANDOM_WALK, -1, {}, false, optimiseMode, stopAtFirstSolution,
+                                        int timeoutInMillis, int bias) {
+    return SearchParams(bias, RANDOM_WALK, -1, {}, false, optimiseMode, stopAtFirstSolution,
                         timeoutInMillis, 0);
   }
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
@@ -256,7 +260,7 @@ public:
    */
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
     if(randomWalk) {
-      return SearchParams::randomWalk(false, true, 0);
+      return SearchParams::randomWalk(false, true, 0, 0);
     }
     assert(!activeCombinations.empty());
     currentNeighbourhoodSolutionsCount = 0;

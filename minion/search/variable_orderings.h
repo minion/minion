@@ -26,12 +26,24 @@
 //#include "../memory_management/reversible_vals.h"
 
 template <typename T>
-DomainInt chooseVal(T& var, ValOrderEnum vo) {
-  switch(vo) {
+DomainInt chooseVal(T& var, ValOrder vo) {
+  switch(vo.type) {
   case VALORDER_ASCEND: return var.getMin();
   case VALORDER_DESCEND: return var.getMax();
 
   case VALORDER_RANDOM: {
+    if(vo.bias != 0) {
+      if(vo.bias > 0) {
+        if(rand() % 100 <= vo.bias) {
+          return var.getMax();
+        }
+      }
+      else {
+        if(rand() % 100 <= -vo.bias) {
+          return var.getMin();
+        }
+      }
+    }
     if(var.isBound()) {
       switch(rand() % 2) {
       case 0: return var.getMin();
@@ -143,10 +155,10 @@ struct MultiBranch : public VariableOrder {
 };
 
 struct StaticBranch : public VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
   Reversible<SysInt> pos;
 
-  StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  StaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order), pos() {
     pos = 0;
     D_ASSERT(var_order.size() == val_order.size());
@@ -168,11 +180,11 @@ struct StaticBranch : public VariableOrder {
 };
 
 struct StaticBranchLimited : public VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
   Reversible<SysInt> pos;
   unsigned int limit;
 
-  StaticBranchLimited(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order,
+  StaticBranchLimited(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order,
                       unsigned int _limit)
       : VariableOrder(_var_order), val_order(_val_order), pos(), limit(_limit) {
     pos = 0;
@@ -198,9 +210,9 @@ struct StaticBranchLimited : public VariableOrder {
 };
 
 struct SDFBranch : public VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
-  SDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  SDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   // THIS DOES NOT DO SDF -- just an approximation with the bounds.
@@ -235,9 +247,9 @@ struct SDFBranch : public VariableOrder {
 };
 
 struct SlowStaticBranch : public VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
-  SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  SlowStaticBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -258,9 +270,9 @@ struct SlowStaticBranch : public VariableOrder {
 #ifdef WDEG
 // see Boosting Systematic Search by Weighting Constraints by Boussemart et al
 struct WdegBranch : public VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
-  WdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  WdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -324,9 +336,9 @@ struct WdegBranch : public VariableOrder {
 };
 
 struct DomOverWdegBranch : VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
-  DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  DomOverWdegBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -403,9 +415,9 @@ struct DomOverWdegBranch : VariableOrder {
 #endif
 
 struct SRFBranch : VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
-  SRFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  SRFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -438,9 +450,9 @@ struct SRFBranch : VariableOrder {
 };
 
 struct LDFBranch : VariableOrder {
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
-  LDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order)
+  LDFBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order)
       : VariableOrder(_var_order), val_order(_val_order) {}
 
   pair<SysInt, DomainInt> pickVarVal() {
@@ -476,13 +488,13 @@ struct LDFBranch : VariableOrder {
 struct ConflictBranch : VariableOrder {
   // Implements the conflict variable ordering from
   // "Last Conflict based Reasoning", Lecoutre et al, ECAI 06.
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
 
   Reversible<SysInt> pos;
 
   VariableOrder* innervarorder;
 
-  ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrderEnum>& _val_order,
+  ConflictBranch(const vector<AnyVarRef>& _var_order, const vector<ValOrder>& _val_order,
                  VariableOrder* _innervarorder)
       : VariableOrder(_var_order),
         val_order(_val_order),

@@ -86,7 +86,7 @@ void dump_searchorder(const SearchOrder& order, ostream& os) {
       first = false;
     else
       os << ",";
-    switch(order.val_order[non_assigned_vars[i]]) {
+    switch(order.val_order[non_assigned_vars[i]].type) {
     case VALORDER_ASCEND: os << "a"; break;
     case VALORDER_DESCEND: os << "d"; break;
     case VALORDER_RANDOM: os << "r"; break;

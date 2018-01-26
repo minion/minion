@@ -218,7 +218,7 @@ struct MinionInstancePrinter {
       // Filter the var and val orders.
 
       vector<Var> var_order = csp.search_order[i].var_order;
-      vector<ValOrderEnum> val_order = csp.search_order[i].val_order;
+      vector<ValOrder> val_order = csp.search_order[i].val_order;
 
       SysInt pos = 0;
       while(pos < (SysInt)var_order.size()) {
@@ -247,7 +247,7 @@ struct MinionInstancePrinter {
         oss << "VALORDER ";
         vector<string> output_vars;
         for(SysInt j = 0; j < (SysInt)val_order.size(); ++j)
-          switch(val_order[j]) {
+          switch(val_order[j].type) {
           case VALORDER_ASCEND: output_vars.push_back("a"); break;
           case VALORDER_DESCEND: output_vars.push_back("d"); break;
           case VALORDER_RANDOM: output_vars.push_back("r"); break;
