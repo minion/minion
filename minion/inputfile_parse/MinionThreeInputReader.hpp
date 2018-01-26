@@ -1212,7 +1212,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
         throw parse_exception("Must declare VARORDER first");
       if(!instance->search_order.back().val_order.empty())
         throw parse_exception("Can't have two VALORDERs for a VARORDER");
-      vector<ValOrderEnum> valOrder;
+      vector<ValOrder> valOrder;
 
       infile->check_sym('[');
 

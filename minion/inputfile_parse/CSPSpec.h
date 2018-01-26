@@ -114,6 +114,14 @@ inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
 
 enum ValOrderEnum { VALORDER_ASCEND, VALORDER_DESCEND, VALORDER_RANDOM };
 
+struct ValOrder {
+  ValOrderEnum type;
+  int bias;
+
+  ValOrder(ValOrderEnum t, int b = 0) : type(t), bias(b)
+  { }
+};
+
 struct ConstraintDef {
   std::string name;
   ConstraintType type;
@@ -451,7 +459,7 @@ struct VarContainer {
 
 struct SearchOrder {
   vector<Var> var_order;
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
   VarOrderEnum order;
   unsigned int limit;
   bool find_one_assignment;

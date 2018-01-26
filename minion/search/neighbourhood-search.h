@@ -49,7 +49,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(searchParams.mode == SearchParams::STANDARD_SEARCH) {
         chosenSearchOrder = &base_order;
       } else if(searchParams.mode == SearchParams::RANDOM_WALK) {
-        searchOrder = makeRandomWalkSearchOrder();
+        searchOrder = makeRandomWalkSearchOrder(searchParams.random_bias);
         chosenSearchOrder = &searchOrder;
       }
     } else {
@@ -171,15 +171,20 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
     // try to find initial solution
     try {
-      int initialSearchTimeout = 1000;
+      int initialSearchTimeout = 100;
       const double multiplier = 1.5;
+      int attempt = 0;
       do {
+        int bias = 0;
+        if(attempt % 5 == 2) bias=90;
+        if(attempt % 5 == 3) bias=-90;
         std::cout << "Searching for initial solution, timeout=" << initialSearchTimeout << ":\n";
         stats = searchNeighbourhoods(
-            solution, SearchParams::randomWalk(false, true, initialSearchTimeout), globalStats);
+            solution, SearchParams::randomWalk(false, true, initialSearchTimeout, bias), globalStats);
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
         }
+        attempt++;
       } while(!stats.solutionFound);
     } catch(EndOfSearch&) {
       if(getState().isCtrlcPressed()) {
@@ -303,7 +308,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   void addNhLocalVars(vector<SearchOrder>& searchOrders, Neighbourhood& neighbourhood,
-                      ValOrderEnum nhSizeOrder) {
+                      ValOrder nhSizeOrder) {
     searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
     searchOrders.back().val_order.push_back(nhSizeOrder);
     for(AnyVarRef& nhLocalVar : neighbourhood.vars) {
@@ -312,11 +317,11 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     }
   }
 
-  vector<SearchOrder> makeRandomWalkSearchOrder() {
+  vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
     vector<SearchOrder> searchOrder(base_order.begin(), base_order.end());
     for(auto& so : searchOrder) {
       for(int i = 0; i < so.val_order.size(); i++) {
-        so.val_order[i] = VALORDER_RANDOM;
+        so.val_order[i] = ValOrder(VALORDER_RANDOM, bias);
       }
     }
     return searchOrder;
