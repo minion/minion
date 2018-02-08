@@ -64,7 +64,7 @@ help constraints div
 #ifndef CONSTRAINT_DIV_H
 #define CONSTRAINT_DIV_H
 
-#include "constraint_checkassign.h"
+#include "../constraint_checkassign.h"
 #include <math.h>
 
 // Not a constraint -- just contains a checker.
@@ -134,7 +134,7 @@ public:
   }
 };
 
-#include "forward_checking.h"
+#include "../forward_checking.h"
 template <typename V1, typename V2>
 inline AbstractConstraint* BuildCT_DIV(const V1& vars, const V2& var2, ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);

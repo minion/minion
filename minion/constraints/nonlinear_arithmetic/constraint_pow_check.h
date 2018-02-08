@@ -32,7 +32,7 @@
 #ifndef CONSTRAINT_POW_CHECK_H
 #define CONSTRAINT_POW_CHECK_H
 
-#include "constraint_checkassign.h"
+#include "../constraint_checkassign.h"
 #include <math.h>
 
 // Not a constraint -- just contains a checker.
@@ -88,7 +88,7 @@ public:
 };
 
 #include "constraint_pow.h"
-#include "forward_checking.h"
+#include "../forward_checking.h"
 
 template <typename V1, typename V2>
 inline AbstractConstraint* BuildCT_POW(const V1& vars, const V2& var2, ConstraintBlob&) {

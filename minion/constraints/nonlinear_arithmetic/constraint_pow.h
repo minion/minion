@@ -34,7 +34,7 @@ This constraint is only available for positive domains x, y and z.
 #define CONSTRAINT_POW_H
 
 #include <math.h>
-#include "constraint_checkassign.h"
+#include "../constraint_checkassign.h"
 
 // This constraint is half-way to being changed from using
 // LRINT to roundup and rounddown. Still don't quite have my head around

@@ -122,8 +122,8 @@ public:
   }
 };
 
-#include "constraint_checkassign.h"
-#include "forward_checking.h"
+#include "../constraint_checkassign.h"
+#include "../forward_checking.h"
 
 template <typename V1, typename V2>
 inline AbstractConstraint* BuildCT_MODULO(const V1& vars, const V2& var2, ConstraintBlob&) {
