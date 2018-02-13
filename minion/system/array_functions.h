@@ -23,7 +23,33 @@ struct Bounds {
   DomainInt lower_bound;
   DomainInt upper_bound;
   Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper) {}
+
+  bool contains(DomainInt i) {
+    return lower_bound <= i && i <= upper_bound;
+  }
+
+  DomainInt min() const
+  { return lower_bound; }
+
+  DomainInt max() const
+  { return upper_bound; }
+
+  bool hasSingleValue() const
+  { return min() == max(); }
 };
+
+inline bool operator==(Bounds lhs, Bounds rhs) {
+  return lhs.lower_bound == rhs.lower_bound && lhs.upper_bound == rhs.upper_bound;
+}
+
+inline Bounds emptyBounds() { return Bounds(DomainInt_Max, DomainInt_Min); }
+
+template<typename T>
+inline Bounds getBounds(const T& t) { return Bounds(t.getMin(), t.getMax()); }
+
+inline Bounds addValue(Bounds b, DomainInt d) {
+  return Bounds(std::min(b.lower_bound, d), std::max(b.upper_bound, d));
+}
 
 inline bool checkAllZero(char* begin, char* end)
 {
