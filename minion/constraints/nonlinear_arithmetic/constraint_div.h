@@ -65,6 +65,7 @@ help constraints div
 #define CONSTRAINT_DIV_H
 
 #include "../constraint_checkassign.h"
+#include "helper_funcs.h"
 #include <math.h>
 
 /// var1 * var2 = var3
@@ -98,32 +99,6 @@ struct DivConstraint : public AbstractConstraint {
     moveTriggerInt(var2, 3, UpperBound);
     moveTriggerInt(var3, 4, LowerBound);
     moveTriggerInt(var3, 5, UpperBound);
-  }
-
-  // This function does i/j with Minion semantics.
-  // It will assert if undef==false and j==0
-  DomainInt do_div(DomainInt i, DomainInt j) {
-    if(j == 0) {
-      D_ASSERT(undef);
-      return 0;
-    }
-
-    bool negsign = (i < 0 || j < 0) && (i > 0 || j > 0);
-    DomainInt r = i / j;
-    if(negsign && r * j != i)
-      r--;
-    return r;
-  }
-
-  // This function exists for two reasons:
-  // 1) Make sure we never divide by zero
-  // 2) Abstract checking div_undefzero
-  bool check_div_result(DomainInt i, DomainInt j, DomainInt k) {
-    if(j == 0) {
-      return (undef && k==0);
-    }
-
-    return do_div(i,j) == k;
   }
 
   // Adds possible values for v1 to Bounds, given v2 and v3
@@ -163,12 +138,12 @@ struct DivConstraint : public AbstractConstraint {
       }
     }
     else {
-      b = addValue(b, do_div(v1,v3) );
+      b = addValue(b, do_div<undef>(v1,v3) );
       // I think this could be improved slightly, but it's close enough!
       if(v3 != -1)
-      b = addValue(b, do_div(v1+1,v3+1));
+      b = addValue(b, do_div<undef>(v1+1,v3+1));
       if(v3 != 1)
-      b = addValue(b, do_div(v1+1,v3-1));
+      b = addValue(b, do_div<undef>(v1+1,v3-1));
     }
 
     return b;
@@ -183,7 +158,7 @@ struct DivConstraint : public AbstractConstraint {
     int assigedcount = b1.hasSingleValue() + b2.hasSingleValue() + b3.hasSingleValue();
     
     if(assigedcount == 3) {
-      if(!check_div_result(b1.min(), b2.min(), b3.min())) {
+      if(!check_div_result<undef>(b1.min(), b2.min(), b3.min())) {
         getState().setFailed(true);
       }
       return;
@@ -193,12 +168,12 @@ struct DivConstraint : public AbstractConstraint {
     {
     Bounds b = emptyBounds();
     if(b2.min() != 0) {
-      b = addValue(b, do_div(b1.min(), b2.min() ));
-      b = addValue(b, do_div(b1.max(), b2.min() ));
+      b = addValue(b, do_div<undef>(b1.min(), b2.min() ));
+      b = addValue(b, do_div<undef>(b1.max(), b2.min() ));
     }
     if(b2.max() != 0) {
-      b = addValue(b, do_div(b1.min(), b2.max() ));
-      b = addValue(b, do_div(b1.max(), b2.max() ));
+      b = addValue(b, do_div<undef>(b1.min(), b2.max() ));
+      b = addValue(b, do_div<undef>(b1.max(), b2.max() ));
     }
     if(b2.contains(1)) {
       b = addValue(b, b1.min());
@@ -270,7 +245,7 @@ struct DivConstraint : public AbstractConstraint {
 
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
-    return check_div_result(v[0], v[1], v[2]);
+    return check_div_result<undef>(v[0], v[1], v[2]);
   }
 
   virtual vector<AnyVarRef> get_vars() {
@@ -293,10 +268,10 @@ struct DivConstraint : public AbstractConstraint {
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
       if(var1.inDomain(v1)) {
         for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
-          if(v2 != 0 && var2.inDomain(v2) && var3.inDomain(do_div(v1, v2))) {
+          if(v2 != 0 && var2.inDomain(v2) && var3.inDomain(do_div<undef>(v1, v2))) {
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));
-            assignment.push_back(make_pair(2, do_div(v1,v2) ));
+            assignment.push_back(make_pair(2, do_div<undef>(v1,v2) ));
             return true;
           }
         }
