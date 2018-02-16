@@ -117,6 +117,8 @@ parser.add_argument('--wdeg', action='store_const', const=["-DWDEG"],
                     help='Enable wdeg heuristics')
 parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
                     help='Quick build')
+parser.add_argument('--static', action='store_const', const=["-static"],
+                    help='Enable static build')
 
 parser.add_argument('--compiler', help="Set compiler")
 
@@ -176,7 +178,7 @@ verbose_print(1, "Minion base dir: " + scriptdir)
 commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
-for c in ['domains64', 'wdeg', 'quick', 'debug', 'print', 'info', 'profile']:
+for c in ['domains64', 'wdeg', 'quick', 'debug', 'print', 'info', 'profile', 'static']:
     if getattr(arg, c) != None:
         commandargs = commandargs + getattr(arg, c)
 
@@ -192,7 +194,7 @@ if not arg.unoptimised:
     elif arg.basicopt:
         commandargs = commandargs + ["-O2"]
     else:
-        if platform.system() == 'Darwin':
+        if platform.system() == 'Darwin' and ("-static" not in commandargs):
             commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
         else:
             commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
