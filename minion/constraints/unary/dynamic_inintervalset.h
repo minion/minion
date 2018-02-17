@@ -101,7 +101,6 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
       if(it_low != intervals.begin() && (*(it_low - 1)).second < var.getMin()) {
         // Lower bound of var is not in the interval below it_low. Prune it to
         // the bottom of it_low.
-        cout << "Pruning lower bound:" << (*it_low).first << endl;
         var.setMin((*it_low).first);
       }
     }
