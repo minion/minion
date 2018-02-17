@@ -264,7 +264,7 @@ public:
   bool dumptree;
   /// Store the current json search tree (and isActive if we should
   /// output it
-  JSONStreamer dumpjsontree;
+  JSONStreamer dumptreejson;
   /// Gives the solutions which should be found.
   /// -1 denotes finding all solutions.
   long long sollimit;
@@ -334,7 +334,7 @@ public:
       : silent(false),
         printonlyoptimal(false),
         dumptree(false),
-        dumpjsontree(),
+        dumptreejson(),
         sollimit(1),
 #ifdef NO_DEBUG
         nocheck(true),

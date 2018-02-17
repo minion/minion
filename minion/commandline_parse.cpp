@@ -310,20 +310,20 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-dumptree")) {
       getOptions().dumptree = true;
     }
-/** @help switches;-dumpjsontree Description
+/** @help switches;-dumptreejson Description
     Print out the branching decisions and variable states at each node.
     Accepts filename to output tree to
     */
-    else if(command == string("-dumpjsontree")) {
-      INCREMENT_i(-dumptree);
-      if(getOptions().dumpjsontree.isActive()) {
-        output_fatal_error("Only pass -dumpjsontree at most once!");
+    else if(command == string("-dumptreejson")) {
+      INCREMENT_i(-dumptreejson);
+      if(getOptions().dumptreejson.isActive()) {
+        output_fatal_error("Only pass -dumptreejson at most once!");
       }
       std::ostream* outfile = new std::ofstream(argv[i]);
       if(!outfile || !(*outfile) ) {
         output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
       }        
-      getOptions().dumpjsontree = JSONStreamer(outfile);
+      getOptions().dumptreejson = JSONStreamer(outfile);
     }/** @help switches;-nodelimit Description
     To stop search after N nodes, do
 

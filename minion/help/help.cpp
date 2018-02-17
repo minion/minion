@@ -184,7 +184,12 @@ cout << "" << endl
 << " achieve. Preprocessing is a one off cost at the start of search. The" << endl
 << " success of higher levels of preprocessing is problem specific; SAC" << endl
 << " preprocesses may take a long time to complete, but may reduce search" << endl
-<< " time enough to justify the cost." << endl << endl << endl;
+<< " time enough to justify the cost." << endl
+<< "" << endl
+<< " Each of the SAC variants can have '_limit' added (for example " << endl
+<< " SACBound_limit). The '_limit' variants of these algorithm add checks" << endl
+<< " which stop the algorithms in some situations when they are taking a" << endl
+<< " very long time." << endl << endl << endl;
 cout << "Example" << "-------------------------------------------------------------------------" << endl;
 cout << "To enforce SAC before search:" << endl
 << "" << endl
@@ -211,8 +216,8 @@ cout << "Help entry: " << "switches -dumptree" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print out the branching decisions and variable states at each node." << endl << endl << endl;
 } else
-if("switches -dumpjsontree" == request) {
-cout << "Help entry: " << "switches -dumpjsontree" << endl << endl;
+if("switches -dumptreejson" == request) {
+cout << "Help entry: " << "switches -dumptreejson" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
 cout << "Print out the branching decisions and variable states at each node." << endl
 << " Accepts filename to output tree to" << endl << endl << endl;
@@ -388,13 +393,6 @@ cout << "The constraint" << endl
 cout << "Reference" << "-----------------------------------------------------------------------" << endl;
 cout << "help constraints abs" << endl << endl << endl;
 } else
-if("constraints alldiffciaran" == request) {
-cout << "Help entry: " << "constraints alldiffciaran" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "Forces the input vector of variables to take distinct values. This is for experiment only." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint enforces an unknown consistency." << endl << endl << endl;
-} else
 if("constraints alldiffmatrix" == request) {
 cout << "Help entry: " << "constraints alldiffmatrix" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -412,6 +410,13 @@ cout << "Notes" << "------------------------------------------------------------
 cout << "This constraint adds some extra reasoning in addition to the GAC Alldifferents" << endl
 << "on the rows and columns." << endl << endl << endl;
 } else
+if("constraints alldiffciaran" == request) {
+cout << "Help entry: " << "constraints alldiffciaran" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "Forces the input vector of variables to take distinct values. This is for experiment only." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint enforces an unknown consistency." << endl << endl << endl;
+} else
 if("constraints difference" == request) {
 cout << "Help entry: " << "constraints difference" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -424,47 +429,6 @@ cout << "Notes" << "------------------------------------------------------------
 cout << "This constraint can be expressed in a much longer form, this form both avoids" << endl
 << "requiring an extra variable, and also gets better propagation. It gets bounds" << endl
 << "consistency." << endl << endl << endl;
-} else
-if("constraints div" == request) {
-cout << "Help entry: " << "constraints div" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " div(x,y,z)" << endl
-<< "" << endl
-<< "ensures that floor(x/y)=z." << endl
-<< "" << endl
-<< "For example:" << endl
-<< "" << endl
-<< "10/3 = 3" << endl
-<< "(-10)/3 = -4" << endl
-<< "10/(-3) = -4" << endl
-<< "(-10)/(-3) = 3" << endl
-<< "" << endl
-<< "div and mod satisfy together the condition that:" << endl
-<< "" << endl
-<< "y*(x/y) + x % y = x" << endl
-<< "" << endl
-<< "The constraint is always false when y = 0" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints modulo" << endl << endl << endl;
-} else
-if("constraints div_undefzero" == request) {
-cout << "Help entry: " << "constraints div_undefzero" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " div_undefzero(x,y,z)" << endl
-<< "" << endl
-<< "is the same as div (it ensures that floor(x/y)=z)" << endl
-<< "except the constraint is always true when y = 0," << endl
-<< "instead of false." << endl
-<< "" << endl
-<< "This constraint exists for certain special requirements." << endl
-<< "In general, if you are unsure what constraint to use," << endl
-<< "then what you want is a plain div constraint!" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints div" << endl << endl << endl;
 } else
 if("constraints element_one" == request) {
 cout << "Help entry: " << "constraints element_one" << endl << endl;
@@ -980,43 +944,6 @@ cout << "See" << endl
 << "" << endl
 << "for the opposite constraint." << endl << endl << endl;
 } else
-if("constraints modulo" == request) {
-cout << "Help entry: " << "constraints modulo" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " modulo(x,y,z)" << endl
-<< "" << endl
-<< "ensures that x%y=z i.e. z is the remainder of dividing x by y." << endl
-<< "For negative values, we ensure that:" << endl
-<< "" << endl
-<< "y(x/y) + x%y = x" << endl
-<< "" << endl
-<< "To be fully concrete, here are some examples:" << endl
-<< "" << endl
-<< "3 % 5 = 3" << endl
-<< "-3 % 5 = 2" << endl
-<< "3 % -5 = -2" << endl
-<< "-3 % -5 = -3" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints div" << endl << endl << endl;
-} else
-if("constraints mod_undefzero" == request) {
-cout << "Help entry: " << "constraints mod_undefzero" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " mod_undefzero(x,y,z)" << endl
-<< "" << endl
-<< "is the same as mod except the constraint is always" << endl
-<< "true when y = 0, instead of false." << endl
-<< "" << endl
-<< "This constraint exists for certain special requirements." << endl
-<< "In general, if you are unsure what constraint to use," << endl
-<< "then what you want is a plain mod constraint!" << endl << endl << endl;
-cout << "References" << "----------------------------------------------------------------------" << endl;
-cout << "help constraints mod" << endl << endl << endl;
-} else
 if("constraints alldiff" == request) {
 cout << "Help entry: " << "constraints alldiff" << endl << endl;
 cout << "Description" << "---------------------------------------------------------------------" << endl;
@@ -1104,35 +1031,6 @@ cout << "elem and count must be constants" << endl << endl << endl;
 cout << "References" << "----------------------------------------------------------------------" << endl;
 cout << "help constraints occurrence" << endl
 << "help constraints occurrenceleq" << endl << endl << endl;
-} else
-if("constraints pow" == request) {
-cout << "Help entry: " << "constraints pow" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " pow(x,y,z)" << endl
-<< "" << endl
-<< "ensures that x^y=z." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
-} else
-if("constraints product" == request) {
-cout << "Help entry: " << "constraints product" << endl << endl;
-cout << "Description" << "---------------------------------------------------------------------" << endl;
-cout << "The constraint" << endl
-<< "" << endl
-<< " product(x,y,z)" << endl
-<< "" << endl
-<< "ensures that z=xy in any solution." << endl << endl << endl;
-cout << "Notes" << "---------------------------------------------------------------------------" << endl;
-cout << "This constraint can be used for (and, in fact, has a specialised" << endl
-<< "implementation for) achieving boolean AND, i.e. x & y=z can be modelled" << endl
-<< "as" << endl
-<< "" << endl
-<< " product(x,y,z)" << endl
-<< "" << endl
-<< "The general constraint achieves bounds generalised arc consistency for" << endl
-<< "positive numbers." << endl << endl << endl;
 } else
 if("constraints shortstr2" == request) {
 cout << "Help entry: " << "constraints shortstr2" << endl << endl;
@@ -1396,6 +1294,113 @@ cout << "The constraint" << endl
 << "" << endl
 << "ensures that A and B are not the same vector, i.e., there exists some index i" << endl
 << "such that A[i] != B[i]." << endl << endl << endl;
+} else
+if("constraints div" == request) {
+cout << "Help entry: " << "constraints div" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " div(x,y,z)" << endl
+<< "" << endl
+<< "ensures that floor(x/y)=z." << endl
+<< "" << endl
+<< "For example:" << endl
+<< "" << endl
+<< "10/3 = 3" << endl
+<< "(-10)/3 = -4" << endl
+<< "10/(-3) = -4" << endl
+<< "(-10)/(-3) = 3" << endl
+<< "" << endl
+<< "div and mod satisfy together the condition that:" << endl
+<< "" << endl
+<< "y*(x/y) + x % y = x" << endl
+<< "" << endl
+<< "The constraint is always false when y = 0" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints modulo" << endl << endl << endl;
+} else
+if("constraints div_undefzero" == request) {
+cout << "Help entry: " << "constraints div_undefzero" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " div_undefzero(x,y,z)" << endl
+<< "" << endl
+<< "is the same as div (it ensures that floor(x/y)=z)" << endl
+<< "except the constraint is always true when y = 0," << endl
+<< "instead of false." << endl
+<< "" << endl
+<< "This constraint exists for certain special requirements." << endl
+<< "In general, if you are unsure what constraint to use," << endl
+<< "then what you want is a plain div constraint!" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints div" << endl << endl << endl;
+} else
+if("constraints modulo" == request) {
+cout << "Help entry: " << "constraints modulo" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " modulo(x,y,z)" << endl
+<< "" << endl
+<< "ensures that x%y=z i.e. z is the remainder of dividing x by y." << endl
+<< "For negative values, we ensure that:" << endl
+<< "" << endl
+<< "y(x/y) + x%y = x" << endl
+<< "" << endl
+<< "To be fully concrete, here are some examples:" << endl
+<< "" << endl
+<< "3 % 5 = 3" << endl
+<< "-3 % 5 = 2" << endl
+<< "3 % -5 = -2" << endl
+<< "-3 % -5 = -3" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints div" << endl << endl << endl;
+} else
+if("constraints mod_undefzero" == request) {
+cout << "Help entry: " << "constraints mod_undefzero" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " mod_undefzero(x,y,z)" << endl
+<< "" << endl
+<< "is the same as mod except the constraint is always" << endl
+<< "true when y = 0, instead of false." << endl
+<< "" << endl
+<< "This constraint exists for certain special requirements." << endl
+<< "In general, if you are unsure what constraint to use," << endl
+<< "then what you want is a plain mod constraint!" << endl << endl << endl;
+cout << "References" << "----------------------------------------------------------------------" << endl;
+cout << "help constraints mod" << endl << endl << endl;
+} else
+if("constraints pow" == request) {
+cout << "Help entry: " << "constraints pow" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " pow(x,y,z)" << endl
+<< "" << endl
+<< "ensures that x^y=z." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint is only available for positive domains x, y and z." << endl << endl << endl;
+} else
+if("constraints product" == request) {
+cout << "Help entry: " << "constraints product" << endl << endl;
+cout << "Description" << "---------------------------------------------------------------------" << endl;
+cout << "The constraint" << endl
+<< "" << endl
+<< " product(x,y,z)" << endl
+<< "" << endl
+<< "ensures that z=xy in any solution." << endl << endl << endl;
+cout << "Notes" << "---------------------------------------------------------------------------" << endl;
+cout << "This constraint can be used for (and, in fact, has a specialised" << endl
+<< "implementation for) achieving boolean AND, i.e. x & y=z can be modelled" << endl
+<< "as" << endl
+<< "" << endl
+<< " product(x,y,z)" << endl
+<< "" << endl
+<< "The general constraint achieves bounds generalised arc consistency for" << endl
+<< "positive numbers." << endl << endl << endl;
 } else
 if("constraints reify" == request) {
 cout << "Help entry: " << "constraints reify" << endl << endl;
@@ -2102,8 +2107,8 @@ cout << "Declaration of a sparse bounds variable called myvar containing values"
 cout << "Unknown entry, please try again." << endl;
 if("" == request) {
 cout << "Available subentries:" << endl;
-cout << "help @help" << endl;
 cout << "help constraints" << endl;
+cout << "help @help" << endl;
 cout << "help input" << endl;
 cout << "help switches" << endl;
 cout << "help variables" << endl;
@@ -2138,8 +2143,8 @@ cout << "help constraints max" << endl;
 cout << "help constraints mddc" << endl;
 cout << "help constraints min" << endl;
 cout << "help constraints minuseq" << endl;
-cout << "help constraints mod_undefzero" << endl;
 cout << "help constraints modulo" << endl;
+cout << "help constraints mod_undefzero" << endl;
 cout << "help constraints negativemddc" << endl;
 cout << "help constraints negativetable" << endl;
 cout << "help constraints nvaluegeq" << endl;
@@ -2159,13 +2164,6 @@ cout << "help constraints str2plus" << endl;
 cout << "help constraints sumgeq" << endl;
 cout << "help constraints sumleq" << endl;
 cout << "help constraints table" << endl;
-cout << "help constraints w-inintervalset" << endl;
-cout << "help constraints w-inrange" << endl;
-cout << "help constraints w-inset" << endl;
-cout << "help constraints w-literal" << endl;
-cout << "help constraints w-notinrange" << endl;
-cout << "help constraints w-notinset" << endl;
-cout << "help constraints w-notliteral" << endl;
 cout << "help constraints watched-and" << endl;
 cout << "help constraints watched-or" << endl;
 cout << "help constraints watchelement" << endl;
@@ -2177,6 +2175,13 @@ cout << "help constraints watchsumleq" << endl;
 cout << "help constraints watchvecneq" << endl;
 cout << "help constraints weightedsumgeq" << endl;
 cout << "help constraints weightedsumleq" << endl;
+cout << "help constraints w-inintervalset" << endl;
+cout << "help constraints w-inrange" << endl;
+cout << "help constraints w-inset" << endl;
+cout << "help constraints w-literal" << endl;
+cout << "help constraints w-notinrange" << endl;
+cout << "help constraints w-notinset" << endl;
+cout << "help constraints w-notliteral" << endl;
 } else
 if("input" == request) {
 cout << "Available subentries:" << endl;
@@ -2191,8 +2196,8 @@ if("switches" == request) {
 cout << "Available subentries:" << endl;
 cout << "help switches -check" << endl;
 cout << "help switches -cpulimit" << endl;
-cout << "help switches -dumpjsontree" << endl;
 cout << "help switches -dumptree" << endl;
+cout << "help switches -dumptreejson" << endl;
 cout << "help switches -findallsols" << endl;
 cout << "help switches -gap" << endl;
 cout << "help switches -makeresume" << endl;

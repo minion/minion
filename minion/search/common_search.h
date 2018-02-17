@@ -325,10 +325,10 @@ template <typename T>
 void inline maybe_print_node(T& vars) {
   if(getOptions().dumptree)
     cout << "Node: " << getState().getNodeCount() << "," << get_dom_as_string(vars) << endl;
-  if(getOptions().dumpjsontree.isActive()) {
-    getOptions().dumpjsontree.mapElement("Node", getState().getNodeCount());
-    getOptions().dumpjsontree.mapElement("Domains", get_dom_as_json(vars));
-    getOptions().dumpjsontree.newline();
+  if(getOptions().dumptreejson.isActive()) {
+    getOptions().dumptreejson.mapElement("Node", getState().getNodeCount());
+    getOptions().dumptreejson.mapElement("Domains", get_dom_as_json(vars));
+    getOptions().dumptreejson.newline();
   }
 }
 
@@ -336,8 +336,8 @@ void inline maybe_print_backtrack() {
   // used to print "bt" usually
   if(getOptions().dumptree)
     cout << "SearchAction: bt" << endl;
-  if(getOptions().dumpjsontree.isActive()) {
-    getOptions().dumpjsontree.closeMap();
+  if(getOptions().dumptreejson.isActive()) {
+    getOptions().dumptreejson.closeMap();
   }
 }
 
@@ -345,8 +345,8 @@ void inline maybe_print_backtrack() {
 // in dumptree, for historical reasons
 void inline maybe_print_right_backtrack() {
   // used to print "bt" usually
-  if(getOptions().dumpjsontree.isActive()) {
-    getOptions().dumpjsontree.closeMap();
+  if(getOptions().dumptreejson.isActive()) {
+    getOptions().dumptreejson.closeMap();
   }
 }
 
