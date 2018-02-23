@@ -38,25 +38,38 @@ struct BoolProdConstraint : public AbstractConstraint {
 
   SysInt dvar3;
   SysInt dvarbool;
+  SysInt dvarequalval;
 
 
   BoolProdConstraint(ProdVarRef1 _v1, ProdVarRef2 _v2, ProdVarRef3 _v3) :
   var1(_v1), var2(_v2), var3(_v3)
-  { }
+  { 
+    if(var1.getMin() < 0 || var1.getMax() > 1) {
+      D_FATAL_ERROR("Internal error in BoolProdConstraint");
+    }
+  }
   
   SysInt dynamic_trigger_count() {
-    return checked_cast<SysInt>(var2.getInitialMax() - var2.getInitialMin() + var3.getInitialMax() -
-                                var3.getInitialMin() + 2 + 3);
+    return checked_cast<SysInt>(var2.getInitialMax() - var2.getInitialMin() + 1 +
+                                var3.getInitialMax() - var3.getInitialMin() + 1 +
+                                2 + 2);
   }
 
 
   void full_check() {
-  if(!var3.inDomain(0)) {
+    if(!var3.inDomain(0)) {
       var1.removeFromDomain(0);
       var2.removeFromDomain(0);
     }
 
-    bool zeroInBool = (var1.getMin() == 0);
+    if(!var1.inDomain(1)) {
+      var3.assign(0);
+      return;
+    }
+
+    if(!var1.inDomain(0) && !var2.inDomain(0)) {
+      var3.removeFromDomain(0);
+    }
 
     for(DomainInt val = var3.getMin(); val <= var3.getMax(); val++) {
       if(!var2.inDomain(val) && val != 0) {
@@ -64,11 +77,9 @@ struct BoolProdConstraint : public AbstractConstraint {
       }
     }
 
-    if(!var1.inDomain(0) && !var2.inDomain(0)) {
-      var3.removeFromDomain(0);
-    }
-
-    if(!zeroInBool) {
+    if(var1.getMin() > 0) {
+      var2.setMin(var3.getMin());
+      var2.setMax(var3.getMax());
       for(DomainInt val = var2.getMin(); val <= var2.getMax(); ++val) {
         if(!var3.inDomain(val)) {
           var2.removeFromDomain(val);
@@ -76,15 +87,33 @@ struct BoolProdConstraint : public AbstractConstraint {
       }
     }
 
-    if(var3.isAssignedValue(0) && !var2.inDomain(0)) {
-      var1.removeFromDomain(1);
+    find_any_equal_value();
+  }
+
+  void find_any_equal_value()
+  {
+    if(!var1.inDomain(1)) {
+      return;
     }
 
+    DomainInt minval = std::max(var2.getMin(), var3.getMin());
+    DomainInt maxval = std::min(var2.getMax(), var3.getMax());
+    for(DomainInt val = minval; val <= maxval; ++val)
+    {
+      if(var2.inDomain(val) && var3.inDomain(val)) {
+        moveTriggerInt(var2, dvarequalval, DomainRemoval, val);
+        moveTriggerInt(var3, dvarequalval + 1, DomainRemoval, val);
+      }
+        return;
+    }
+    var1.removeFromDomain(1);
+    var3.assign(0);
   }
 
   virtual void full_propagate() {
     dvar3 = checked_cast<SysInt>(var2.getInitialMax() - var2.getInitialMin() + 1);
     dvarbool = dvar3 + checked_cast<SysInt>(var3.getInitialMax() - var3.getInitialMin() + 1);
+    dvarequalval = dvarbool + 2;
 
     full_check();
 
@@ -110,27 +139,45 @@ struct BoolProdConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt pos, DomainDelta) {
     if(pos < dvar3) {
       DomainInt domval = pos + var2.getInitialMin();
+      D_ASSERT(!var2.inDomain(domval));
       if(domval != 0) {
         var3.removeFromDomain(domval);
       }
       else {
-        full_check();
+        if(!var1.inDomain(0)) {
+          var3.removeFromDomain(0);
+        }
       }
     }
     else if(pos < dvarbool) {
       pos -= dvar3;
       DomainInt domval = pos + var3.getInitialMin();
+      D_ASSERT(!var3.inDomain(domval));
       if(domval != 0) {
-        if(!var3.inDomain(0)) {
+        if(var1.getMin() > 0) {
           var2.removeFromDomain(domval);
         }
       }
       else {
+        var1.removeFromDomain(0);
+        var2.removeFromDomain(0);
+      }
+    }
+    else if(pos < dvarequalval) {
+      D_ASSERT(pos == dvarbool || pos == dvarbool+1);
+      if(pos == dvarbool + 1) {
+        D_ASSERT(var1.isAssignedValue(0));
+        var3.assign(0);
+      }
+      else {
+        D_ASSERT(var1.isAssignedValue(1));
+        // var1 has changed, do a full pass
         full_check();
       }
     }
     else {
-      full_check();
+      D_ASSERT(pos == dvarequalval || pos == dvarequalval + 1);
+      find_any_equal_value();
     }
   }
 

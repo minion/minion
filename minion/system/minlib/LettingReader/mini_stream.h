@@ -232,7 +232,7 @@ public:
 
           else if(!needcomma && get_int(var_value)) { // add value
             if(depth == 0) {
-              depth = (SysInt)array_pointer.size() - 1;
+              depth = (int)array_pointer.size() - 1;
             }
             if(c_lvl != depth) {
               p_error("Array dimensions do not match:", charnum - 1);

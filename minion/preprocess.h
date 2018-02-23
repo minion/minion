@@ -30,7 +30,6 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   prop(vars);
 
   bool check_failed = getState().isFailed();
-  getState().setFailed(false);
 
   Controller::world_pop();
 

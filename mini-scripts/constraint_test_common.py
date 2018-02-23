@@ -826,6 +826,11 @@ class testnegativetable:
                 setattr(tablegen, "const%d"%constnum, const)
                 constraint+="%d,"%const
                 constnum+=1
+            elif i=="smallposconst":
+                const=random.randint(1,3)
+                setattr(tablegen, "const%d"%constnum, const)
+                constraint+="%d,"%const
+                constnum+=1
             elif i>1:
                 #print vector
                 constraint+="[x%d"%curvar
@@ -1594,6 +1599,75 @@ class testgcc:
         else:
             return runtestgeneral("gcc", False, options, [5,4,4], ["smallnum","smallconst_distinct", "num"], self, False)
 
+def checkFrameUpdate(s, t, si, ti, step):
+    spos = 1
+    tpos = 1
+    assert(len(s) % step == 0)
+    assert(len(t) % step == 0)
+    maxpos = min(len(s), len(t))/step
+    while True:
+        while spos in si:
+            spos += 1
+        while tpos in ti:
+            tpos += 1
+        if spos > maxpos or tpos > maxpos:
+            return True
+        if s[(spos-1)*step:spos*step] != t[(tpos-1)*step:tpos*step]:
+            return False
+        spos += 1
+        tpos += 1
+
+class testframeupdate:
+    def printtable(self, domains):
+        split=self.constants[0]
+        SLen = self.varnums[0]
+        TLen = self.varnums[1]
+        SiLen = self.varnums[2]
+        TiLen = self.varnums[3]
+
+        assert(SLen == TLen)
+        if SLen % split != 0:
+            return False
+        
+        SDoms = domains[0:SLen]
+        TDoms = domains[SLen:SLen+TLen]
+        SiDoms = domains[SLen+TLen:SLen+TLen+SiLen]
+        TiDoms = domains[SLen+TLen+SiLen:SLen+TLen+SiLen+TiLen]
+
+        assert(len(domains) == SLen+TLen+SiLen+TiLen)
+
+        SCross = []
+        TCross = []
+        SiCross = []
+        TiCross = []
+        
+        crossprod(SDoms, [], SCross)
+        crossprod(TDoms, [], TCross)
+        crossprod(SiDoms, [], SiCross)
+        crossprod(TiDoms, [], TiCross)
+
+        fullcross = []
+
+        for si in SiCross:
+            siSet = set(si)
+            if len(si)==len(siSet) and siSet.issubset(range(1,SLen+1)):
+                for ti in TiCross:
+                    tiSet = set(ti)
+                    if len(ti)==len(tiSet) and tiSet.issubset(range(1,TLen+1)):
+                        for s in SCross:
+                            for t in TCross:
+                                if checkFrameUpdate(s, t, siSet, tiSet,split):
+                                    fullcross.append(s+t+si+ti)
+        fullcross.sort()
+        return fullcross
+        
+    def runtest(self, options=dict()):
+        if options['reifyimply'] or options['reify']:
+            return runtestgeneral("frameupdate", False, options, [4,4,3,2,1], ["verysmallnum", "verysmallnum","verysmallnum","verysmallnum","smallposconst"], self, False)
+        else:
+            return runtestgeneral("frameupdate", False, options, [4,4,3,2,1], ["verysmallnum", "verysmallnum", "verysmallnum","verysmallnum", "smallposconst"], self, False)
+
+
 class testgccweak(testgcc):
     def runtest(self, options=dict()):
         if options['reifyimply'] or options['reify']:
@@ -1776,22 +1850,25 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     isvector=[a>1 for a in varnums]  # Is it to be printed as a vector. This seems to suffice at the moment.
     
     # sometimes (1/4) test very short constraints to find edge cases
-    shortvector=random.randint(0,2)
+    shortvector=random.randint(0,1)
     if shortvector==0 and not options["fixlength"]:
         # for each item in varnums which is greater than 1...
         varnumsused=[a for a in list(set(varnums)) if a>1]
-        # pick one at random
-        if len(varnumsused)>0:
-            oldvalue=varnumsused[random.randint(0,len(varnumsused)-1)]
-            newvalue=random.randint(0,oldvalue)
-            # replace every instance of oldvalue so that we don't end up with
-            # non-matching array lengths. But it could make arrays non-matching..perhaps
-            for i in range(len(varnums)):
-                if varnums[i]==oldvalue:
-                    varnums[i]=newvalue
+        # pick between 0 and 3 at random
+        picks = random.randint(0,2)
+        for squish in range(picks):
+            if len(varnumsused)>0:
+                oldvalue=varnumsused[random.randint(0,len(varnumsused)-1)]
+                newvalue=random.randint(0,oldvalue)
+                # replace every instance of oldvalue so that we don't end up with
+                # non-matching array lengths. But it could make arrays non-matching..perhaps
+                for i in range(len(varnums)):
+                    if varnums[i]==oldvalue:
+                        varnums[i]=newvalue
     
     (domlists, modvars, tablevars, constants, diseq_constraints)=generatevariables(varnums, vartypes, boundsallowed)
     setattr(tablegen, "constants", constants)
+    setattr(tablegen, "varnums", varnums)
     
     if modvars.find("BOUND")!=-1:
         treesame=False    # Assume can't have GAC when there are bound variables around.
@@ -1813,7 +1890,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
     constnum=0   # number of the current constant
     
     for (num,typ,vect) in zip(varnums3, vartypes3, isvector3):
-        if typ=="const" or typ=="smallconst" or typ=="smallconst_distinct" or typ=="intervals":
+        if typ=="const" or typ=="smallconst" or typ=="smallposconst" or typ=="smallconst_distinct" or typ=="intervals":
             if vect:
                 # print vector of constants
                 constraint+="["
@@ -1867,7 +1944,7 @@ def runtestgeneral(constraintname, boundsallowed, options, varnums, vartypes, ta
 
     varnums2=varnums[:]
     for (i,t) in zip(range(len(varnums)), vartypes):
-        if t in ["const", "smallconst", "smallconst_distinct", "intervals"]:
+        if t in ["const", "smallconst", "smallposconst", "smallconst_distinct", "intervals"]:
             varnums2[i]=0   # constants, so don't count as vars.
     
     # add a line to optimise a random variable.
@@ -2061,7 +2138,7 @@ def generatevariables(varblocks, types, boundallowed):
     st_table=[]
     domainlists=[]
     constants=[]
-    typesconst=["const", "smallconst", "smallconst_distinct", "longtable", "intervals"]
+    typesconst=["const", "smallconst", "smallconst_distinct", "smallposconst", "longtable", "intervals"]
     constraints=[]   # extra constraints needed to adjust domain when Discrete is substituted for Sparsebound
     varblocks2=varblocks[:]
     for (i,t) in zip(range(len(varblocks)), types):
@@ -2147,6 +2224,9 @@ def generatevariables(varblocks, types, boundallowed):
                 elif types[i]=="smallconst":
                     lb=random.randint(-5, 5)
                     ub=lb
+                elif types[i]=="smallposconst":
+                    lb=random.randint(1, 3)
+                    ub=lb
                 elif types[i]=="smallconst_distinct":
                     assert varblocks[i]<=11
                     lb=random.randint(-5, 5)
@@ -2154,6 +2234,7 @@ def generatevariables(varblocks, types, boundallowed):
                         lb=random.randint(-5, 5)
                     ub=lb
                 else:
+                    print("Unknown var type: ", types[i])
                     assert False
                 
                 varnum=sum(varblocks2[0:i])+j
@@ -2198,7 +2279,7 @@ def generatevariables(varblocks, types, boundallowed):
     dic={"BOOL":1, "BOUN":2, "SPAR":3, "DISC":4}
     deco2=list(zip( map(lambda x: dic[x[0][:4]], deco), deco))
     
-    deco2.sort()
+    # deco2.sort()
     
     # get rid of the index decoration.
     if len(deco2)>0:

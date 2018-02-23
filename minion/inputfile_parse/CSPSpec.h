@@ -51,16 +51,21 @@ inline string to_var_name(const vector<DomainInt>& params) {
 struct ParsedNeighbourhood
 {
   std::string name;
+  std::string groupName;
   Var activation;
   Var deviation;
   std::vector<Var> vars;
 };
 
+struct ParsedNeighbourhoodGroup {
+  std::vector<Var> vars;
+};
+
 struct ParsedNeighbourhoodContainer
 {
-  Var soft_violation_count;
   std::vector<std::vector<Var> > shadow_mapping;
   Var shadow_disable;
+  std::unordered_map<std::string, ParsedNeighbourhoodGroup> neighbourhoodGroups;
   std::vector<ParsedNeighbourhood> neighbourhoods;
 };
 
@@ -109,11 +114,19 @@ inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
 
 enum ValOrderEnum { VALORDER_ASCEND, VALORDER_DESCEND, VALORDER_RANDOM };
 
+struct ValOrder {
+  ValOrderEnum type;
+  int bias;
+
+  ValOrder(ValOrderEnum t, int b = 0) : type(t), bias(b)
+  { }
+};
+
 struct ConstraintDef {
   std::string name;
   ConstraintType type;
   SysInt number_of_params;
-  std::array<ReadTypes, 4> read_types;
+  std::array<ReadTypes, 5> read_types;
 };
 
 extern ConstraintDef constraint_list[];
@@ -446,7 +459,7 @@ struct VarContainer {
 
 struct SearchOrder {
   vector<Var> var_order;
-  vector<ValOrderEnum> val_order;
+  vector<ValOrder> val_order;
   VarOrderEnum order;
   unsigned int limit;
   bool find_one_assignment;

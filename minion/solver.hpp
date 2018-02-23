@@ -26,6 +26,7 @@ inline SysInt get_world_depth() {
 
 /// Pushes the state of the whole world.
 inline void world_push() {
+  D_ASSERT(!getState().isFailed());
   getQueue().getTbq().world_push();
   getMemory().monotonicSet().before_branch_left();
   D_ASSERT(getQueue().isQueuesEmpty());
@@ -37,6 +38,7 @@ inline void world_push() {
 
 /// Pops the state of the whole world.
 inline void world_pop() {
+  getState().setFailed(false);
   getQueue().clearQueues();
   getState().getGenericBacktracker().world_pop();
   getMemory().backTrack().world_pop();

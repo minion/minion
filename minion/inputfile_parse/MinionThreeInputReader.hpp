@@ -504,7 +504,7 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
         instance->constraints.push_back(readConstraint(infile, false));
     } else if(s == "**GADGET**") {
       readGadget(infile);
-    } else if(s == "**NEIGHBOURHOOD**") {
+    } else if(s == "**NEIGHBOURHOODS**") {
       readNeighbourhood(infile);
     } else if(s == wrong_eof) {
       throw parse_exception("Section terminated with " + wrong_eof + " instead of " + eof);
@@ -518,49 +518,77 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
 }
 
 template <typename FileReader>
+void MinionThreeInputReader<FileReader>::parseGroup(FileReader* infile,
+                                                    ParsedNeighbourhoodContainer& nbhc) {
+  std::string name = infile->get_string();
+  auto insertion = nbhc.neighbourhoodGroups.emplace(name, ParsedNeighbourhoodGroup());
+  if(!insertion.second) {
+    throw parse_exception("The group name \"" + name + "\" has already been used.");
+  }
+  ParsedNeighbourhoodGroup& nbhg = insertion.first->second;
+  infile->check_sym('(');
+  nbhg.vars = readLiteralVector(infile);
+  infile->check_sym(')');
+}
+template <typename FileReader>
+void MinionThreeInputReader<FileReader>::parseNeighbourhood(FileReader* infile,
+                                                            ParsedNeighbourhoodContainer& nbhc) {
+  nbhc.neighbourhoods.emplace_back();
+  ParsedNeighbourhood& nbh = nbhc.neighbourhoods.back();
+  ;
+  nbh.name = infile->get_string();
+  infile->check_sym('(');
+  nbh.deviation = readIdentifier(infile);
+  infile->check_sym(',');
+  nbh.activation = readIdentifier(infile);
+  infile->check_sym(',');
+  std::string groupName = infile->get_string();
+  if(!nbhc.neighbourhoodGroups.count(groupName)) {
+    throw parse_exception("The group \"" + groupName +
+                          "\" does not exist.  A group must be created before a neighbourhood can "
+                          "be assigned to it.");
+  } else {
+    nbh.groupName = groupName;
+  }
+  infile->check_sym(',');
+  nbh.vars = readLiteralVector(infile);
+  infile->check_sym(')');
+}
+
+template <typename FileReader>
 void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
   MAYBE_PARSER_INFO("Entering neighbourhood parsing");
-  string svc = infile->get_string();
-  if(svc != "SOFTVIOLATIONCOUNT")
-    throw parse_exception("Expected SOFTVIOLATIONCOUNT");
-  
   if(instance->neighbourhoodContainer)
-    throw parse_exception("Only one **NEIGHBOURHOOD** section at present");
+    throw parse_exception("Only one **NEIGHBOURHOODS** section at present");
 
   instance->neighbourhoodContainer = ParsedNeighbourhoodContainer();
 
   ParsedNeighbourhoodContainer& nbhc = *(instance->neighbourhoodContainer);
-  nbhc.soft_violation_count = readIdentifier(infile);
+
+  string shadowdisable = infile->get_string();
+  if(shadowdisable != "INCUMBENTDISABLE")
+    throw parse_exception("Expected INCUMBENTDISABLE");
+  nbhc.shadow_disable = readIdentifier(infile);
 
   string shadowmap = infile->get_string();
-  if(shadowmap != "SHADOWMAPPING")
-    throw parse_exception("Expected SHADOWMAPPING");
+  if(shadowmap != "INCUMBENTMAPPING")
+    throw parse_exception("Expected INCUMBENTMAPPING");
   
   nbhc.shadow_mapping = read2DMatrix(infile);
 
-  string shadowdisable = infile->get_string();
-  if(shadowdisable != "SHADOWDISABLE")
-    throw parse_exception("Expected SHADOWDISABLE");
-  nbhc.shadow_disable = readIdentifier(infile);
-  
   while(infile->peek_char() != '*') {
-    string neighbourhood = infile->get_string();
-    if(neighbourhood != "NEIGHBOURHOOD")
-      throw parse_exception("Expected NEIGHBOURHOOD");
-    
-    ParsedNeighbourhood nbh;
-    nbh.name = infile->get_string();
-    infile->check_sym('(');
-    nbh.activation = readIdentifier(infile);
-    infile->check_sym(',');
-    nbh.deviation = readIdentifier(infile);
-    infile->check_sym(',');
-    nbh.vars = readLiteralVector(infile);
-    infile->check_sym(')');
-    nbhc.neighbourhoods.push_back(nbh);
+    string token = infile->get_string();
+    if(token == "GROUP") {
+      parseGroup(infile, nbhc);
+    } else if(token == "NEIGHBOURHOOD") {
+      parseNeighbourhood(infile, nbhc);
+    } else {
+      throw parse_exception("Could not read token \"" + token +
+                            "\".  Expected \"GROUP\" or \"NEIGHBOURHOOD\".");
+    }
   }
 
-    MAYBE_PARSER_INFO("Exiting neighbourhood parsing");
+  MAYBE_PARSER_INFO("Exiting neighbourhood parsing");
 }
 
 template <typename FileReader>
@@ -1184,7 +1212,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
         throw parse_exception("Must declare VARORDER first");
       if(!instance->search_order.back().val_order.empty())
         throw parse_exception("Can't have two VALORDERs for a VARORDER");
-      vector<ValOrderEnum> valOrder;
+      vector<ValOrder> valOrder;
 
       infile->check_sym('[');
 

@@ -26,6 +26,20 @@ using namespace BuildCon;
 #define MERGE(x, y) MERGE2(x, y)
 #define MERGE2(x, y) x##y
 
+#define TERMINATE_BUILDCON4(CT_NAME)                                                               \
+  namespace BuildCon {                                                                             \
+  template <>                                                                                      \
+  struct BuildConObj<CT_NAME, 0> {                                                                 \
+    template <typename T1, typename T2, typename T3, typename T4>                                               \
+    static AbstractConstraint*                                                                     \
+    build(const pair<pair<pair<pair<EmptyType, vector<T1>*>, vector<T2>*>, vector<T3>*>, vector<T4>*>& vars,          \
+          ConstraintBlob& b, SysInt) {                                                             \
+      return Build##CT_NAME(*(vars.first.first.first.second), *(vars.first.first.second), *(vars.first.second), *(vars.second), b);  \
+    }                                                                                              \
+  };                                                                                               \
+  }
+
+
 #define TERMINATE_BUILDCON3(CT_NAME)                                                               \
   namespace BuildCon {                                                                             \
   template <>                                                                                      \

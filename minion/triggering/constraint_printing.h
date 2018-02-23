@@ -214,6 +214,16 @@ string print_con(string name, const T1& args1, const T2& args2, const T3& args3)
   return name + "(" + s1 + "," + s2 + "," + s3 + ")";
 }
 
+template <typename T1, typename T2, typename T3, typename T4, typename T5>
+string print_con(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4, const T5& args5) {
+  string s1 = print_vars(args1);
+  string s2 = print_vars(args2);
+  string s3 = print_vars(args3);
+  string s4 = print_vars(args4);
+  string s5 = print_vars(args5);
+  return name + "(" + s1 + "," + s2 + "," + s3 + "," + s4 + "," + s5 + ")";
+}
+
 inline string print_weight_array_var_con(string name, vector<DomainInt> args1,
                                          vector<AnyVarRef> args2, const AnyVarRef& args3) {
   string s1 = print_vars(args1);
@@ -295,6 +305,12 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
     return ConOutput::print_con(constraint_name(), x, y);                                          \
   }
 
+#define CONSTRAINT_ARG_LIST5(a, b, c, d, e)                                                                 \
+  virtual string full_output_name() {                                                              \
+    return ConOutput::print_con(constraint_name(), a, b, c, d, e);                                          \
+  }
+
+  
 #define CONSTRAINT_REVERSIBLE_ARG_LIST2(name, revname, x, y)                                       \
   virtual string full_output_name() {                                                              \
     return ConOutput::print_reversible_con(name, revname, x, y);                                   \

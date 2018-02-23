@@ -442,7 +442,27 @@ public:
                          TrigOp op = TO_Default) {
     data->addDynamicTrigger(t, type, pos, op);
   }
+
+  friend bool operator==(const AnyVarRef& lhs, const AnyVarRef& rhs)
+  { return lhs.getBaseVar() == rhs.getBaseVar(); }
+
+  friend bool operator!=(const AnyVarRef& lhs, const AnyVarRef& rhs)
+  { return lhs.getBaseVar() != rhs.getBaseVar(); }
+
+  friend bool operator<(const AnyVarRef& lhs, const AnyVarRef& rhs)
+  { return lhs.getBaseVar() < rhs.getBaseVar(); }
+
 };
+
+namespace std {
+  template <> struct hash<AnyVarRef>
+  {
+    size_t operator()(const AnyVarRef & avr) const
+    {
+      return getHash(avr.getBaseVar());
+    }
+  };
+}
 
 template <typename VarRef>
 AnyVarRef AnyVarRef_Concrete<VarRef>::popOneMapper() const {
