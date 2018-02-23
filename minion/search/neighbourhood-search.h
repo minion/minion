@@ -153,7 +153,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   virtual void search() {
-    srand(time(NULL));
+    //srand(time(NULL));
     int maxSize = nhc.getMaxNeighbourhoodSize();
 
     NeighbourhoodSearchStats globalStats(
