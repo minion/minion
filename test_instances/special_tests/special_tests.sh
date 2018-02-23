@@ -32,3 +32,7 @@ if [[ "`$exec bibd.minion -preprocess SSAC | grep ^SSAC | awk '{print $3}'`" != 
   exit 1
 fi
 
+if [[ "`$exec meb-inst-18-09.eprime-param.minion  -nodelimit 50000 | grep 'Value: ' | awk '{print $2}'`" != "-1045," ]]; then
+  echo Neighbourhood test failed
+  exit 1
+fi
