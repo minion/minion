@@ -90,10 +90,10 @@ enum VarOrderEnum {
   ORDER_SRF,
   ORDER_LDF,
   ORDER_ORIGINAL,
-  ORDER_STATIC_LIMITED,
   ORDER_WDEG,
   ORDER_DOMOVERWDEG,
-  ORDER_CONFLICT
+  ORDER_CONFLICT,
+  ORDER_STATIC_LIMITED,
 };
 
 inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {

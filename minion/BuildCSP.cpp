@@ -25,6 +25,8 @@
 #include "search/search_control.h"
 
 #include "search/neighbourhood-search.h"
+#include "search/restartSearchManager.h"
+
 
 #include "dump_state.hpp"
 
@@ -117,8 +119,14 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
 
      sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order, *instance.neighbourhoodContainer);
   }
-  else
-    sm = Controller::make_search_manager(args.prop_method, instance.search_order);
+  else {
+    if(getOptions().restarts) {
+      sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
+    }
+    else {
+      sm = Controller::make_search_manager(args.prop_method, instance.search_order);
+    }
+  }
 
   getState().getOldTimer().maybePrintTimestepStore(
       cout, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions().silent);

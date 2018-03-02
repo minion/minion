@@ -258,6 +258,8 @@ public:
     NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy = NeighbourhoodSelectionStrategy::UCB;
     std::string pathToUCBInitFile;
 
+  bool restarts = false;
+
   /// Denotes if minion should print no output, other than that explicitally
   /// requested
   bool silent;

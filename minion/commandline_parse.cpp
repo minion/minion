@@ -442,7 +442,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     } // TODO : Should remove -varorder for beta orderings.
     else if(command == string("-varorder")) {
       INCREMENT_i(-varorder);
-      
+
       string order(argv[i]);
 
       if(order == "static")
@@ -665,7 +665,9 @@ When When using the UCB neighbourhood selector during neighbourhood search, the 
       INCREMENT_i("-nhsearch");
       getOptions().pathToUCBInitFile = argv[i];
     }
-
+    else if(command == string("-restarts")) {
+      getOptions().restarts = true;
+    }
 
     else if(command[0] == '-' && command != string("--")) {
       cout << "I don't understand '" << command << "'. Sorry. " << endl;
