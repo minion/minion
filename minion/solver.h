@@ -251,12 +251,25 @@ public:
 /// Stored all the options related to search. This item should not
 /// be changed during search.
 class SearchOptions {
+
 public:
-    enum class NeighbourhoodSearchStrategy { META_STRATEGY, HILL_CLIMBING };
-    enum class NeighbourhoodSelectionStrategy { RANDOM, UCB,  INTERACTIVE  };
-    NeighbourhoodSearchStrategy neighbourhoodSearchStrategy = NeighbourhoodSearchStrategy::META_STRATEGY;
-    NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy = NeighbourhoodSelectionStrategy::UCB;
-    std::string pathToUCBInitFile;
+  struct NHConfig {
+    int iterationSearchTime = 500;
+    int hillClimberMinIterationsToSpendAtPeak = 4;
+    double hillClimberInitialLocalMaxProbability = 0.001;
+    double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
+    int holePuncherSolutionBagSizeConstant = 5;
+    NHConfig() {}
+  };
+
+  enum class NeighbourhoodSearchStrategy { META_STRATEGY, HILL_CLIMBING };
+  enum class NeighbourhoodSelectionStrategy { RANDOM, UCB, INTERACTIVE };
+  NeighbourhoodSearchStrategy neighbourhoodSearchStrategy =
+      NeighbourhoodSearchStrategy::META_STRATEGY;
+  NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy =
+      NeighbourhoodSelectionStrategy::UCB;
+  NHConfig nhConfig;
+  std::string pathToUCBInitFile;
 
   /// Denotes if minion should print no output, other than that explicitally
   /// requested

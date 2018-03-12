@@ -7,16 +7,7 @@
 /**
  * Struct containing hardcoded parameters that need to be tuned
  */
-struct TunableParams {
-  int iterationSearchTime = 500;
-  int hillClimberMinIterationsToSpendAtPeak = 4;
-  double hillClimberInitialLocalMaxProbability = 0.001;
-  double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
-  int holePuncherSolutionBagSizeConstant = 5;
-  TunableParams() {}
-};
 
-static const TunableParams tunableParams;
 
 struct SearchParams {
   enum Mode { STANDARD_SEARCH, NEIGHBOURHOOD_SEARCH, RANDOM_WALK };
@@ -112,7 +103,7 @@ class HillClimbingSearch {
   int iterationsSpentAtPeak = 0;
   bool searchComplete = false;
   // The probability that we will enter a random mode of exploration.
-  double localMaxProbability = tunableParams.hillClimberInitialLocalMaxProbability;
+  double localMaxProbability = getOptions().nhConfig.hillClimberInitialLocalMaxProbability;
   SelectionStrategy selectionStrategy;
 
 public:
@@ -151,23 +142,23 @@ public:
       prop->prop(emptyVars);
     } else {
       highestNeighbourhoodSizes[currentActivatedCombination] = stats.highestNeighbourhoodSize;
-      localMaxProbability +=
-          (1.0 / nhc.neighbourhoodCombinations.size()) *
-          tunableParams.hillClimberProbabilityIncrementMultiplier *
-          (int)(iterationsSpentAtPeak > tunableParams.hillClimberMinIterationsToSpendAtPeak);
+      localMaxProbability += (1.0 / nhc.neighbourhoodCombinations.size()) *
+                             getOptions().nhConfig.hillClimberProbabilityIncrementMultiplier *
+                             (int)(iterationsSpentAtPeak >
+                                   getOptions().nhConfig.hillClimberMinIterationsToSpendAtPeak);
       ++iterationsSpentAtPeak;
     }
   }
 
   void resetLocalMaxProbability() {
-    localMaxProbability = tunableParams.hillClimberInitialLocalMaxProbability;
+    localMaxProbability = getOptions().nhConfig.hillClimberInitialLocalMaxProbability;
     iterationsSpentAtPeak = 0;
   }
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
     return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true, false,
-                                             tunableParams.iterationSearchTime,
+                                             getOptions().nhConfig.iterationSearchTime,
                                              highestNeighbourhoodSizes[combinationToActivate]);
   }
   bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
@@ -175,9 +166,10 @@ public:
   }
 
   bool hasFinishedPhase() {
-    bool completed = searchComplete ||
-                     (iterationsSpentAtPeak > tunableParams.hillClimberMinIterationsToSpendAtPeak &&
-                      static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability);
+    bool completed =
+        searchComplete ||
+        (iterationsSpentAtPeak > getOptions().nhConfig.hillClimberMinIterationsToSpendAtPeak &&
+         static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability);
     if(completed) {
       std::cout << "HillClimber: completed search at opt value: " << bestSolutionValue << std::endl;
       std::cout << "Number iterations spent at peak: " << iterationsSpentAtPeak << std::endl;
@@ -267,7 +259,7 @@ public:
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
     return SearchParams::neighbourhoodSearch(combination, nhc, true, false, false,
-                                             tunableParams.iterationSearchTime,
+                                             getOptions().nhConfig.iterationSearchTime,
                                              currentNeighbourhoodSize());
   }
 
@@ -322,8 +314,9 @@ public:
       } else {
         std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
                   << currentNeighbourhoodSize() << std::endl;
-        maxSolutionsPerCombination = (int)ceil(
-            ((double)tunableParams.holePuncherSolutionBagSizeConstant) / activeCombinations.size());
+        maxSolutionsPerCombination =
+            (int)ceil(((double)getOptions().nhConfig.holePuncherSolutionBagSizeConstant) /
+                      activeCombinations.size());
         globalStats.startExploration(currentNeighbourhoodSize());
         copyOverIncumbent(nhc, incumbentSolution, prop);
       }
