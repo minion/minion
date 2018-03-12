@@ -672,7 +672,7 @@ created.  When search is finished, the state of the UCB is saved to the same fil
     /** @help switches;--nhconfig Description
 When Allows values used during neighbourhood search to be configured.
         */
-    else if(command == string("nhconfig")) {
+    else if(command == string("-nhconfig")) {
       INCREMENT_i("-nhconfig");
       SearchOptions::NHConfig& nhConfig = getOptions().nhConfig;
       try {

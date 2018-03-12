@@ -14,7 +14,7 @@
 #include <sys/time.h>
 
 static std::atomic<bool> alarmTriggered(false);
-
+std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig& config);
 void triggerAlarm(int) {
   alarmTriggered = true;
 }
@@ -153,6 +153,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
   }
 
   virtual void search() {
+    cout << getOptions().nhConfig << endl;
     int maxSize = nhc.getMaxNeighbourhoodSize();
 
     NeighbourhoodSearchStats globalStats(
@@ -175,11 +176,14 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       int attempt = 0;
       do {
         int bias = 0;
-        if(attempt % 5 == 2) bias=90;
-        if(attempt % 5 == 3) bias=-90;
+        if(attempt % 5 == 2)
+          bias = 90;
+        if(attempt % 5 == 3)
+          bias = -90;
         std::cout << "Searching for initial solution, timeout=" << initialSearchTimeout << ":\n";
         stats = searchNeighbourhoods(
-            solution, SearchParams::randomWalk(false, true, initialSearchTimeout, bias), globalStats);
+            solution, SearchParams::randomWalk(false, true, initialSearchTimeout, bias),
+            globalStats);
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
         }
@@ -423,4 +427,14 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
   }
 }
 
+inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig& config) {
+  cout << "iterationSearchTime:" << config.iterationSearchTime << endl;
+  cout << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
+       << endl;
+  cout << "hillClimberInitialLocalMaxProbability : " << config.hillClimberInitialLocalMaxProbability
+       << endl;
+  cout << "hillClimberProbabilityIncrementMultiplier: "
+       << config.hillClimberProbabilityIncrementMultiplier << endl;
+  return os;
+}
 #endif
