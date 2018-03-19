@@ -8,7 +8,6 @@
  * Struct containing hardcoded parameters that need to be tuned
  */
 
-
 struct SearchParams {
   enum Mode { STANDARD_SEARCH, NEIGHBOURHOOD_SEARCH, RANDOM_WALK };
   // Only used with RANDOM_WALK
@@ -22,12 +21,15 @@ struct SearchParams {
   bool stopAtFirstSolution;
 
   int timeoutInMillis;
+  int backtrackLimit;
+  bool backtrackInsteadOfTimeLimit;
   DomainInt initialNeighbourhoodSize;
 
 private:
-  SearchParams(int random_bias, Mode mode, int combinationToActivate, std::vector<int> neighbourhoods,
-               bool nhLocalVarsComeFirst, bool optimiseMode, bool stopAtFirstSolution,
-               int timeoutInMillis, DomainInt initialNeighbourhoodSize)
+  SearchParams(int random_bias, Mode mode, int combinationToActivate,
+               std::vector<int> neighbourhoods, bool nhLocalVarsComeFirst, bool optimiseMode,
+               bool stopAtFirstSolution, int timeoutInMillis, int backtrackLimit,
+               bool backtrackInsteadOfTimeLimit, DomainInt initialNeighbourhoodSize)
       : random_bias(random_bias),
         mode(mode),
         combinationToActivate(combinationToActivate),
@@ -36,18 +38,21 @@ private:
         optimiseMode(optimiseMode),
         stopAtFirstSolution(stopAtFirstSolution),
         timeoutInMillis(timeoutInMillis),
+        backtrackLimit(backtrackLimit),
+        backtrackInsteadOfTimeLimit(backtrackInsteadOfTimeLimit),
         initialNeighbourhoodSize(initialNeighbourhoodSize) {}
 
 public:
-  static inline SearchParams neighbourhoodSearch(int combinationToActivate,
-                                                 const NeighbourhoodContainer& nhc,
-                                                 bool nhLocalVarsComeFirst, bool optimiseMode,
-                                                 bool stopAtFirstSolution, int timeoutInMillis,
-                                                 DomainInt initialNeighbourhoodSize = 1) {
+  static inline SearchParams
+  neighbourhoodSearch(int combinationToActivate, const NeighbourhoodContainer& nhc,
+                      bool nhLocalVarsComeFirst, bool optimiseMode, bool stopAtFirstSolution,
+                      int timeoutInMillis, int backtrackLimit, bool backtrackInsteadOfTimeLimit,
+                      DomainInt initialNeighbourhoodSize = 1) {
     SearchParams searchParams(0, NEIGHBOURHOOD_SEARCH, combinationToActivate,
                               nhc.neighbourhoodCombinations[combinationToActivate],
                               nhLocalVarsComeFirst, optimiseMode, stopAtFirstSolution,
-                              timeoutInMillis, initialNeighbourhoodSize);
+                              timeoutInMillis, backtrackLimit, backtrackInsteadOfTimeLimit,
+                              initialNeighbourhoodSize);
     if(searchParams.neighbourhoodsToActivate.size() > 1) {
       std::random_shuffle(searchParams.neighbourhoodsToActivate.begin() + 1,
                           searchParams.neighbourhoodsToActivate.end());
@@ -56,14 +61,16 @@ public:
   }
 
   static inline SearchParams standardSearch(bool optimiseMode, bool stopAtFirstSolution,
-                                            int timeoutInMillis) {
+                                            int timeoutInMillis, int backtrackLimit,
+                                            bool backtrackInsteadOfTimeLimit) {
     return SearchParams(0, STANDARD_SEARCH, -1, {}, false, optimiseMode, stopAtFirstSolution,
-                        timeoutInMillis, 0);
+                        timeoutInMillis, backtrackLimit, backtrackInsteadOfTimeLimit, 0);
   }
   static inline SearchParams randomWalk(bool optimiseMode, bool stopAtFirstSolution,
-                                        int timeoutInMillis, int bias) {
+                                        int timeoutInMillis, int backtrackLimit,
+                                        bool backtrackInsteadOfTimeLimit, int bias) {
     return SearchParams(bias, RANDOM_WALK, -1, {}, false, optimiseMode, stopAtFirstSolution,
-                        timeoutInMillis, 0);
+                        timeoutInMillis, backtrackLimit, backtrackInsteadOfTimeLimit, 0);
   }
   friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
     os << "SearchParams(";
@@ -157,9 +164,10 @@ public:
 
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhc, globalStats);
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true, false,
-                                             getOptions().nhConfig.iterationSearchTime,
-                                             highestNeighbourhoodSizes[combinationToActivate]);
+    return SearchParams::neighbourhoodSearch(
+        combinationToActivate, nhc, true, true, false, getOptions().nhConfig.iterationSearchTime,
+        getOptions().nhConfig.backtrackLimit, getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+        highestNeighbourhoodSizes[combinationToActivate]);
   }
   bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
     return true;
@@ -252,15 +260,17 @@ public:
    */
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
     if(randomWalk) {
-      return SearchParams::randomWalk(false, true, 0, 0);
+      return SearchParams::randomWalk(false, true, 0, 0, 0,
+                                      getOptions().nhConfig.backtrackInsteadOfTimeLimit);
     }
     assert(!activeCombinations.empty());
     currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
-    return SearchParams::neighbourhoodSearch(combination, nhc, true, false, false,
-                                             getOptions().nhConfig.iterationSearchTime,
-                                             currentNeighbourhoodSize());
+    return SearchParams::neighbourhoodSearch(
+        combination, nhc, true, false, false, getOptions().nhConfig.iterationSearchTime,
+        getOptions().nhConfig.backtrackLimit, getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+        currentNeighbourhoodSize());
   }
 
   /*

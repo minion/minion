@@ -110,11 +110,19 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()), bottomOfPrimaryNhIndex);
       }
     };
-    auto optimisationHandler = [&]() { getState().getOptimiseVar()->setMin(newOptMinTarget); };
+    auto backtrackCountAtStart = getState().getBacktrackCount();
+
+    auto optimisationHandler = [&]() {
+
+      getState().getOptimiseVar()->setMin(newOptMinTarget);
+      if(searchParams.backtrackInsteadOfTimeLimit && searchParams.backtrackLimit > 0 &&
+         (getState().getBacktrackCount() - backtrackCountAtStart) > searchParams.backtrackLimit) {
+        throw TimeoutException();
+      }
+    };
     sm = make_shared<Controller::StandardSearchManager>(vo, prop, timeoutChecker, solutionHandler,
                                                         optimisationHandler);
-
-    if(searchParams.timeoutInMillis > 0) {
+    if(!searchParams.backtrackInsteadOfTimeLimit && searchParams.timeoutInMillis > 0) {
       setTimeout(searchParams.timeoutInMillis);
     }
 
@@ -124,7 +132,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       sm->search();
     } catch(EndOfSearch&) {
     } catch(TimeoutException&) { timeout = true; }
-    if(searchParams.timeoutInMillis > 0) {
+    if(!searchParams.backtrackInsteadOfTimeLimit && searchParams.timeoutInMillis > 0) {
       clearTimeout();
     }
     if(getState().isCtrlcPressed() ||
@@ -180,9 +188,16 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
           bias = 90;
         if(attempt % 5 == 3)
           bias = -90;
-        std::cout << "Searching for initial solution, timeout=" << initialSearchTimeout << ":\n";
+        std::cout << "Searching for initial solution, ";
+        if(getOptions().nhConfig.backtrackInsteadOfTimeLimit) {
+          cout << "backtrackLimit=" << (initialSearchTimeout / 10) << endl;
+        } else {
+          cout << "timeout=" << initialSearchTimeout << ":\n";
+        }
         stats = searchNeighbourhoods(
-            solution, SearchParams::randomWalk(false, true, initialSearchTimeout, bias),
+            solution,
+            SearchParams::randomWalk(false, true, initialSearchTimeout, initialSearchTimeout / 10,
+                                     getOptions().nhConfig.backtrackInsteadOfTimeLimit, bias),
             globalStats);
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
@@ -428,13 +443,20 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
 }
 
 inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig& config) {
-  cout << "iterationSearchTime:" << config.iterationSearchTime << endl;
-  cout << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
-       << endl;
-  cout << "hillClimberInitialLocalMaxProbability : " << config.hillClimberInitialLocalMaxProbability
-       << endl;
-  cout << "hillClimberProbabilityIncrementMultiplier: "
-       << config.hillClimberProbabilityIncrementMultiplier << endl;
+  os << "NHConfig {";
+  if(config.backtrackInsteadOfTimeLimit) {
+    os << "Using backtracks,\n";
+  } else {
+    os << "Using timelimit,\n";
+  }
+  os << "Backtrack limit:" << config.backtrackLimit << ",\n";
+  os << "iterationSearchTime:" << config.iterationSearchTime << ",\n";
+  os << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
+     << ",\n";
+  os << "hillClimberInitialLocalMaxProbability : " << config.hillClimberInitialLocalMaxProbability
+     << ",\n";
+  os << "hillClimberProbabilityIncrementMultiplier: "
+     << config.hillClimberProbabilityIncrementMultiplier << "\n}";
   return os;
 }
 #endif

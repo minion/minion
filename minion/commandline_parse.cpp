@@ -322,7 +322,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       std::ostream* outfile = new std::ofstream(argv[i]);
       if(!outfile || !(*outfile)) {
         output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
-      }        
+      }
       getOptions().dumptreejson = JSONStreamer(outfile);
     } /** @help switches;-nodelimit Description
     To stop search after N nodes, do
@@ -675,20 +675,28 @@ When Allows values used during neighbourhood search to be configured.
     else if(command == string("-nhconfig")) {
       INCREMENT_i("-nhconfig");
       SearchOptions::NHConfig& nhConfig = getOptions().nhConfig;
+      if(command == string("-countbacktracks")) {
+        nhConfig.backtrackInsteadOfTimeLimit = true;
+      } else if(command == string("-counttime")) {
+        nhConfig.backtrackInsteadOfTimeLimit = false;
+      } else {
+        cerr << "expected -countbacktracks or -counttime, instead found " << command << endl;
+        exit(1);
+      }
+      INCREMENT_i(command);
       try {
         nhConfig.iterationSearchTime = fromstring<int>(argv[i]);
-        ++i;
+        INCREMENT_i(command);
         nhConfig.hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
-        ++i;
+        INCREMENT_i(command);
         nhConfig.hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
-        ++i;
+        INCREMENT_i(command);
         nhConfig.hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
-
       } catch(...) {
         cout << "Could not read argument " << argv[i] << endl;
         exit(1);
       }
-
+    }
 
     else if(command == string("-restarts")) {
       getOptions().restarts = true;

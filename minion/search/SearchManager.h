@@ -208,7 +208,8 @@ struct StandardSearchManager : public SearchManager{
         if(!flag) { // No remaining left branches to branch right.
           return;
         }
-        // Deal with optimisation variables 
+        // Deal with optimisation variables
+        getState().incrementBacktrackCount();
         handle_opt_func();
         prop->prop(var_array);
       }

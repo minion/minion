@@ -42,6 +42,7 @@ struct CSPInstance;
 class SearchState {
 
   long long nodes;
+  long long backtracks;
   AnyVarRef* optimise_var;
   AnyVarRef* raw_optimise_var;
   DomainInt current_optimise_position;
@@ -101,11 +102,17 @@ public:
   long long getNodeCount() {
     return nodes;
   }
+  long long getBacktrackCount() {
+    return backtracks;
+  }
   void setNodeCount(long long _nodes) {
     nodes = _nodes;
   }
   void incrementNodeCount() {
     nodes++;
+  }
+  void incrementBacktrackCount() {
+    backtracks++;
   }
 
   AnyVarRef* getOptimiseVar() {
@@ -204,6 +211,7 @@ public:
 
   SearchState()
       : nodes(0),
+        backtracks(0),
         optimise_var(NULL),
         raw_optimise_var(NULL),
         current_optimise_position(0),
@@ -254,7 +262,9 @@ class SearchOptions {
 
 public:
   struct NHConfig {
+    bool backtrackInsteadOfTimeLimit = true;
     int iterationSearchTime = 500;
+    int backtrackLimit = 50;
     int hillClimberMinIterationsToSpendAtPeak = 4;
     double hillClimberInitialLocalMaxProbability = 0.001;
     double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
