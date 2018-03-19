@@ -75,7 +75,9 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit)
   while(true) {
     if(check_sac_timeout())
       throw EndOfSearch();
-
+    if(var.getMin() == var.getMax()) {
+      return pruned;
+    }
     DomainInt maxval = var.getMax();
     DomainInt step = maxval - gallop;
     bool check = check_fail_range(var, step+1, maxval, vararray, prop);
@@ -98,9 +100,7 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     else {
       everfailed = true;
-      if(gallop > 1) {
-        gallop /= 2;
-      }
+      gallop /= 2;
     }
     if(gallop == 0) {
       return pruned;
@@ -117,7 +117,9 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
   while(true) {
     if(check_sac_timeout())
       throw EndOfSearch();
-
+    if(var.getMin() == var.getMax()) {
+      return pruned;
+    }
     DomainInt minval = var.getMin();
     DomainInt step = minval + gallop;
     bool check = check_fail_range(var, minval, step-1, vararray, prop);
@@ -140,9 +142,7 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     else {
       everfailed = true;
-      if(gallop > 1) {
-        gallop /= 2;
-      }
+      gallop /= 2;
     }
     if(gallop == 0) {
       return pruned;
@@ -162,10 +162,11 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
     while(reduced) {
       if(limit) {
         loops++;
-        if(loops > log2(vararray.size())) {
+        if(loops > std::min(5, (int)log2(vararray.size()))) {
           return;
         }
       } 
+
       reduced = false;
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
         Var& var = vararray[i];

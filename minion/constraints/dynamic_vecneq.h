@@ -22,7 +22,7 @@
 #include "unary/dynamic_literal.h"
 #include "constraint_less.h"
 #include "constraint_equal.h"
-#include "constraint_product.h"
+#include "nonlinear_arithmetic/constraint_product.h"
 #include "constraint_checkassign.h"
 
 /** @help constraints;watchvecneq Description

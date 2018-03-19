@@ -40,7 +40,8 @@ positive numbers.
 #ifndef CONSTRAINT_PRODUCT_H
 #define CONSTRAINT_PRODUCT_H
 
-#include "constraint_checkassign.h"
+#include "../constraint_checkassign.h"
+#include "helper_funcs.h"
 
 /// var1 * var2 = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3>
@@ -91,21 +92,6 @@ struct ProductConstraint : public AbstractConstraint {
 
   DomainInt mult_min(DomainInt min1, DomainInt max1, DomainInt min2, DomainInt max2) {
     return mymin(mymin(min1 * min2, min1 * max2), mymin(max1 * min2, max1 * max2));
-  }
-
-  DomainInt round_up_div(DomainInt x, DomainInt y) {
-    if(y == 0)
-      return 0;
-    DomainInt ret = x / y;
-    if(x % y != 0)
-      ret++;
-    return ret;
-  }
-
-  DomainInt round_down_div(DomainInt x, DomainInt y) {
-    if(y == 0)
-      return DomainInt_Max;
-    return x / y;
   }
 
   virtual void propagateDynInt(SysInt, DomainDelta) {
@@ -202,7 +188,7 @@ struct ProductConstraint : public AbstractConstraint {
   }
 };
 
-#include "constraint_and.h"
+#include "../constraint_and.h"
 #include "constraint_product_bool.h"
 
 inline AbstractConstraint* BuildCT_PRODUCT2(const vector<BoolVarRef>& vars,
