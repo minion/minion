@@ -434,7 +434,10 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
   case SearchOptions::NeighbourhoodSelectionStrategy::RANDOM:
     return MakeNeighbourhoodSearchHelper<RandomCombinationChooser>(prop_method, base_order, nhc);
   case SearchOptions::NeighbourhoodSelectionStrategy::UCB:
-    return MakeNeighbourhoodSearchHelper<UCBNeighborHoodSelection>(prop_method, base_order, nhc);
+    return MakeNeighbourhoodSearchHelper<UCBNeighbourhoodSelection>(prop_method, base_order, nhc);
+  case SearchOptions::NeighbourhoodSelectionStrategy::LEARNING_AUTOMATON:
+    return MakeNeighbourhoodSearchHelper<LearningAutomatonNeighbourhoodSelection>(prop_method,
+                                                                                  base_order, nhc);
   case SearchOptions::NeighbourhoodSelectionStrategy::INTERACTIVE:
     return MakeNeighbourhoodSearchHelper<InteractiveCombinationChooser>(prop_method, base_order,
                                                                         nhc);

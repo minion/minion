@@ -12,7 +12,7 @@ static const char* NUMBER_ITERATIONS_KEY = "numberIterations:";
 static const char* NUMBER_POSITIVE_KEY = "numberPositive:";
 static const char* NUMBER_ACTIVATIONS_KEY = "numberActivations:";
 
-class UCBNeighborHoodSelection {
+class UCBNeighbourhoodSelection {
   std::vector<u_int64_t> initialNumberActivations;
   std::vector<u_int64_t> initialNumberPositiveSolutions;
   u_int64_t initialNumberIterations = 0;
@@ -43,12 +43,12 @@ private:
   }
 
 public:
-  UCBNeighborHoodSelection(const NeighbourhoodContainer&) {}
+  UCBNeighbourhoodSelection(const NeighbourhoodContainer&) {}
 
   void updateStats(int activatedCombination, const NeighbourhoodStats& combinationStats) {}
 
   int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
-                                NeighbourhoodSearchStats& globalStats) {
+                                NeighbourhoodSearchStats& globalStats, DomainInt) {
     double bestUCTValue = -(std::numeric_limits<double>::max());
     bool allCombinationsTryed = true;
     std::vector<int> bestCombinations;
@@ -79,7 +79,7 @@ public:
       }
     }
     if(bestCombinations.empty()) {
-      std::cout << "UCBNeighborHoodSelection: could not activate a combination.\n";
+      std::cout << "UCBNeighbourhoodSelection: could not activate a combination.\n";
       throw EndOfSearch();
     }
     return bestCombinations[std::rand() % bestCombinations.size()];

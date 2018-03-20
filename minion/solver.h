@@ -269,12 +269,13 @@ public:
     double hillClimberInitialLocalMaxProbability = 0.001;
     double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
     double ucbExplorationBias = 2;
+    double learningAutomatonRate = 0.1;
     int holePuncherSolutionBagSizeConstant = 5;
     NHConfig() {}
   };
 
   enum class NeighbourhoodSearchStrategy { META_STRATEGY, HILL_CLIMBING };
-  enum class NeighbourhoodSelectionStrategy { RANDOM, UCB, INTERACTIVE };
+  enum class NeighbourhoodSelectionStrategy { RANDOM, UCB, LEARNING_AUTOMATON, INTERACTIVE };
   NeighbourhoodSearchStrategy neighbourhoodSearchStrategy =
       NeighbourhoodSearchStrategy::META_STRATEGY;
   NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy =

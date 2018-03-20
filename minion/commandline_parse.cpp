@@ -639,7 +639,7 @@ specified. Options are "meta" (default) or "hillclimbing".
 
     /** @help switches;-nhselection Description
 When running neighbourhood search, the flag -nhselection allows the neighbourhood selection strategy
-to be specified. Options are "ucb" (default), "random" or "interactive".
+to be specified. Options are "ucb" (default), "la" (learning automaton), random" or "interactive".
         */
     else if(command == string("-nhselection")) {
       INCREMENT_i("-nhsearch");
@@ -649,6 +649,13 @@ to be specified. Options are "ucb" (default), "random" or "interactive".
         if(i + 1 < argc && argv[i + 1][0] != '-') {
           ++i;
           getOptions().nhConfig.ucbExplorationBias = fromstring<double>(argv[i]);
+        }
+      } else if(argv[i] == string("la")) {
+        getOptions().neighbourhoodSelectionStrategy =
+            SearchOptions::NeighbourhoodSelectionStrategy::LEARNING_AUTOMATON;
+        if(i + 1 < argc && argv[i + 1][0] != '-') {
+          ++i;
+          getOptions().nhConfig.learningAutomatonRate = fromstring<double>(argv[i]);
         }
       } else if(argv[i] == string("random")) {
         getOptions().neighbourhoodSelectionStrategy =

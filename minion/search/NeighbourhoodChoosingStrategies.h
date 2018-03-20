@@ -1,5 +1,6 @@
 #ifndef MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #define MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
+#include "learningAutomatonNeighbourhoodSelectionStrategy.h"
 #include "neighbourhood-def.h"
 #include "neighbourhoodSearchStats.h"
 #include "ucbNeighbourhoodSelectionStrategy.h"
@@ -16,7 +17,8 @@ public:
 
   void updateStats(int activatedCombination, const NeighbourhoodStats&) {}
 
-  int getCombinationsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
+  int getCombinationsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&,
+                                DomainInt) {
     viableCombinations.clear();
     for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); i++) {
       if(nhc.isCombinationEnabled(i)) {
@@ -37,7 +39,7 @@ public:
   }
 
   int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
-                                NeighbourhoodSearchStats& globalStats) {
+                                NeighbourhoodSearchStats& globalStats, DomainInt) {
     while(true) {
       std::cout << "Select Combination:\n";
       for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
