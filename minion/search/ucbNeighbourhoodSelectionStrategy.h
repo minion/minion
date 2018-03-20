@@ -38,7 +38,8 @@ private:
   inline double ucbValue(double reward, u_int64_t totalActivations,
                          u_int64_t totalCombinationVisits) {
     return (reward / totalCombinationVisits) +
-           std::sqrt((2 * std::log(totalActivations)) / (totalCombinationVisits));
+           std::sqrt((getOptions().nhConfig.ucbExplorationBias * std::log(totalActivations)) /
+                     (totalCombinationVisits));
   }
 
 public:
@@ -83,47 +84,47 @@ public:
     }
     return bestCombinations[std::rand() % bestCombinations.size()];
   }
-/*
-  inline void readInitialValuesFromFile(std::istream& is, int numberNeighbourhoods) {
-    checkName(NUMBER_ITERATIONS_KEY, is);
-    if(!is >> initialNumberIterations) {
-      std::cerr << "Error when reading " << NUMBER_ITERATIONS_KEY << " expected integer after.\n";
-      exit(1);
-    }
-    std::ws(is);
-    checkName(NUMBER_ACTIVATIONS_KEY, is);
-    readVector()
-  }
-  inline void checkName(const std::string& name, std::istream& is) {
-    for(const char i : name) {
-      checkChar(i, name, is);
-    }
-  }
-
-  inline void readVector(size_t expectedVectorLength, const std::string& name, std::istream& is,
-                         std::vector<u_int64_t>& vec) {
-    checkChar('[', name, is);
-    for(size_t i = 0; i < expectedVectorLength; i++) {
-      int read;
-      if(!(is >> read)) {
-        std::cerr << "Error when reading numbers after key " << name << ".  Expected "
-                  << expectedVectorLength
-                  << " integers but something else was found after only reading " << i
-                  << " integers.\n";
+  /*
+    inline void readInitialValuesFromFile(std::istream& is, int numberNeighbourhoods) {
+      checkName(NUMBER_ITERATIONS_KEY, is);
+      if(!is >> initialNumberIterations) {
+        std::cerr << "Error when reading " << NUMBER_ITERATIONS_KEY << " expected integer after.\n";
         exit(1);
       }
-      vec.push_back(read);
+      std::ws(is);
+      checkName(NUMBER_ACTIVATIONS_KEY, is);
+      readVector()
     }
-  }
+    inline void checkName(const std::string& name, std::istream& is) {
+      for(const char i : name) {
+        checkChar(i, name, is);
+      }
+    }
 
-  inline void checkChar(const char i, const std::string& name, std::istream& is) {
-    char read;
-    if(!(is >> read) || read != i) {
-      std::cerr << "Error when reading key " << name << std::endl;
-      std::cerr << "Expected '" << i << "' but found '" << read << "'\n";
-      exit(1);
+    inline void readVector(size_t expectedVectorLength, const std::string& name, std::istream& is,
+                           std::vector<u_int64_t>& vec) {
+      checkChar('[', name, is);
+      for(size_t i = 0; i < expectedVectorLength; i++) {
+        int read;
+        if(!(is >> read)) {
+          std::cerr << "Error when reading numbers after key " << name << ".  Expected "
+                    << expectedVectorLength
+                    << " integers but something else was found after only reading " << i
+                    << " integers.\n";
+          exit(1);
+        }
+        vec.push_back(read);
+      }
     }
-    */
-  };
+
+    inline void checkChar(const char i, const std::string& name, std::istream& is) {
+      char read;
+      if(!(is >> read) || read != i) {
+        std::cerr << "Error when reading key " << name << std::endl;
+        std::cerr << "Expected '" << i << "' but found '" << read << "'\n";
+        exit(1);
+      }
+      */
+};
 
 #endif /* MINION_SEARCH_UCBNEIGHBOURHOODSELECTIONSTRATEGY_H_ */

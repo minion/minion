@@ -646,6 +646,10 @@ to be specified. Options are "ucb" (default), "random" or "interactive".
       if(argv[i] == string("ucb")) {
         getOptions().neighbourhoodSelectionStrategy =
             SearchOptions::NeighbourhoodSelectionStrategy::UCB;
+        if(i + 1 < argc && argv[i + 1][0] != '-') {
+          ++i;
+          getOptions().nhConfig.ucbExplorationBias = fromstring<double>(argv[i]);
+        }
       } else if(argv[i] == string("random")) {
         getOptions().neighbourhoodSelectionStrategy =
             SearchOptions::NeighbourhoodSelectionStrategy::RANDOM;
@@ -686,7 +690,8 @@ When Allows values used during neighbourhood search to be configured.
           INCREMENT_i("number for iteration search time or backtracks");
           nhConfig.iterationSearchTime = fromstring<int>(argv[i]);
         } else {
-          cerr << "expected \"countbacktracks \"or \"counttime\", instead found " << command << endl;
+          cerr << "expected \"countbacktracks \"or \"counttime\", instead found " << command
+               << endl;
           exit(1);
         }
 
