@@ -650,6 +650,7 @@ to be specified. Options are "ucb" (default), "la" (learning automaton), random"
           ++i;
           getOptions().nhConfig.ucbExplorationBias = fromstring<double>(argv[i]);
         }
+
       } else if(argv[i] == string("la")) {
         getOptions().neighbourhoodSelectionStrategy =
             SearchOptions::NeighbourhoodSelectionStrategy::LEARNING_AUTOMATON;
