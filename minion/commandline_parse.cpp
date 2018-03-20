@@ -675,22 +675,26 @@ When Allows values used during neighbourhood search to be configured.
     else if(command == string("-nhconfig")) {
       INCREMENT_i("-nhconfig");
       SearchOptions::NHConfig& nhConfig = getOptions().nhConfig;
-      if(command == string("-countbacktracks")) {
-        nhConfig.backtrackInsteadOfTimeLimit = true;
-      } else if(command == string("-counttime")) {
-        nhConfig.backtrackInsteadOfTimeLimit = false;
-      } else {
-        cerr << "expected -countbacktracks or -counttime, instead found " << command << endl;
-        exit(1);
-      }
-      INCREMENT_i(command);
       try {
-        nhConfig.iterationSearchTime = fromstring<int>(argv[i]);
-        INCREMENT_i(command);
+
+        if(argv[i] == string("countbacktracks")) {
+          nhConfig.backtrackInsteadOfTimeLimit = true;
+          INCREMENT_i("number for  backtrack limit");
+          nhConfig.backtrackLimit = fromstring<int>(argv[i]);
+        } else if(argv[i] == string("counttime")) {
+          nhConfig.backtrackInsteadOfTimeLimit = false;
+          INCREMENT_i("number for iteration search time or backtracks");
+          nhConfig.iterationSearchTime = fromstring<int>(argv[i]);
+        } else {
+          cerr << "expected \"countbacktracks \"or \"counttime\", instead found " << command << endl;
+          exit(1);
+        }
+
+        INCREMENT_i("number for hill climber min iterations to spend at peak");
         nhConfig.hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
-        INCREMENT_i(command);
+        INCREMENT_i("number for hill climber initial local max probability");
         nhConfig.hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
-        INCREMENT_i(command);
+        INCREMENT_i("number for hill climber increment multiplier");
         nhConfig.hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
       } catch(...) {
         cout << "Could not read argument " << argv[i] << endl;
