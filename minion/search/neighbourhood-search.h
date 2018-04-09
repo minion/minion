@@ -162,6 +162,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
 
   virtual void search() {
     cout << getOptions().nhConfig << endl;
+    cout.setf(ios::fixed, ios::floatfield);
+    cout.precision(3);
+
     int maxSize = nhc.getMaxNeighbourhoodSize();
 
     NeighbourhoodSearchStats globalStats(
