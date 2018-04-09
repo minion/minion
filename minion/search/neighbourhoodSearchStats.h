@@ -30,13 +30,6 @@ public:
   }
 };
 
-struct ExplorationPhase {
-  int neighbourhoodSize;
-  double startExplorationTime;
-  double endExplorationTime;
-  int numberOfRandomSolutionsPulled;
-};
-
 struct NeighbourhoodSearchStats {
 
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
@@ -54,22 +47,7 @@ struct NeighbourhoodSearchStats {
   vector<u_int64_t> numberNegativeSolutions;
   vector<u_int64_t> numberNoSolutions;
   vector<u_int64_t> numberTimeouts;
-
-  u_int64_t numberOfExplorationPhases = 0;
-  u_int64_t numberOfBetterSolutionsFoundFromExploration = 0;
-
-  vector<u_int64_t> numberExplorationsByNHCombinationSize;
-  vector<u_int64_t> numberSuccessfulExplorationsByNHCombinationSize;
-  vector<double> neighbourhoodExplorationTimes;
-  vector<ExplorationPhase> explorationPhases;
-
-  u_int64_t totalNumberOfRandomSolutionsPulled = 0;
-  u_int64_t numberPulledThisPhase = 0;
-
   double startTime;
-  double startExplorationTime;
-  bool currentlyExploring = false;
-  int currentNeighbourhoodSize;
   double totalTimeToBestSolution;
 
   NeighbourhoodSearchStats(int numberCombinations,
@@ -84,10 +62,7 @@ struct NeighbourhoodSearchStats {
         numberPositiveSolutions(numberCombinations, 0),
         numberNegativeSolutions(numberCombinations, 0),
         numberNoSolutions(numberCombinations, 0),
-        numberTimeouts(numberCombinations, 0),
-        numberExplorationsByNHCombinationSize(maxNeighbourhoodSize, 0),
-        numberSuccessfulExplorationsByNHCombinationSize(maxNeighbourhoodSize, 0),
-        neighbourhoodExplorationTimes(maxNeighbourhoodSize) {
+        numberTimeouts(numberCombinations, 0) {
     getVars().forAllVars(
         [&](const AnyVarRef& v) { bestCompleteSolutionAssignment.emplace_back(v, 0); });
   }
@@ -135,35 +110,7 @@ struct NeighbourhoodSearchStats {
   }
 
   inline void foundSolution(DomainInt solutionValue) {
-    if(currentlyExploring && solutionValue > bestOptVarValue) {
-
-      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
-          get_cpu_time() - startExplorationTime;
-      currentlyExploring = false;
-      numberSuccessfulExplorationsByNHCombinationSize[currentNeighbourhoodSize - 1] += 1;
-      explorationPhases.back().endExplorationTime = getTotalTimeTaken();
-      explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
-      numberPulledThisPhase = 0;
-    }
     saveCurrentAssignmentIfBest(solutionValue);
-  }
-
-  inline void startExploration(int neighbourhoodSize) {
-    if(currentlyExploring) {
-      neighbourhoodExplorationTimes[currentNeighbourhoodSize - 1] +=
-          get_cpu_time() - startExplorationTime;
-      explorationPhases.back().endExplorationTime = getTotalTimeTaken();
-      explorationPhases.back().numberOfRandomSolutionsPulled = numberPulledThisPhase;
-      numberPulledThisPhase = 0;
-    }
-    currentlyExploring = true;
-    startExplorationTime = get_cpu_time();
-    numberExplorationsByNHCombinationSize[neighbourhoodSize - 1] += 1;
-    currentNeighbourhoodSize = neighbourhoodSize;
-    ExplorationPhase currentPhase;
-    currentPhase.neighbourhoodSize = neighbourhoodSize;
-    currentPhase.startExplorationTime = getTotalTimeTaken();
-    explorationPhases.push_back(currentPhase);
   }
 
   inline std::vector<std::pair<AnyVarRef, DomainInt>>& getBestAssignment() {
@@ -178,10 +125,6 @@ struct NeighbourhoodSearchStats {
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
     os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
-    os << "Average number of random solutions pulled: "
-       << (((double)totalNumberOfRandomSolutionsPulled) / explorationPhases.size()) << "\n";
-    os << "Total Number of random solutions pulled : " << totalNumberOfRandomSolutionsPulled
-       << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoodCombinations.size(); i++) {
       printCombinationDescription(os, nhc, i);
       os << "\n";
@@ -197,34 +140,6 @@ struct NeighbourhoodSearchStats {
     os << "History of best solutions found:\n";
     for(const auto& valueTimePair : bestValueTimes) {
       os << indent << "Value: " << valueTimePair.first << ", Time: " << valueTimePair.second
-         << "\n";
-    }
-
-    os << "Stats of Explorations:\n";
-    ;
-    os << "---------------\n";
-    for(int i = 0; i < numberExplorationsByNHCombinationSize.size(); i++) {
-      os << "NeighbourhoodSize " << (i + 1) << ":\n";
-      os << indent << "Activations: " << numberExplorationsByNHCombinationSize[i] << "\n";
-      os << indent << "Number successful: " << numberSuccessfulExplorationsByNHCombinationSize[i]
-         << "\n";
-      os << indent << "Time Spent: " << neighbourhoodExplorationTimes[i] << "\n";
-    }
-    os << "---------------"
-       << "\n";
-
-    os << "Exploration Phases: "
-       << "\n";
-    for(int i = 0; i < explorationPhases.size(); i++) {
-      os << "Phase " << (i + 1) << "\n";
-      os << "------------"
-         << "\n";
-      os << "Start Time: " << explorationPhases[i].startExplorationTime << "\n";
-      os << "End Time: " << explorationPhases[i].endExplorationTime << "\n";
-      os << "Neighbourhood Size: " << explorationPhases[i].neighbourhoodSize << "\n";
-      os << "Number of random solutions PUlled "
-         << explorationPhases[i].numberOfRandomSolutionsPulled << "\n";
-      os << "-----------------"
          << "\n";
     }
   }

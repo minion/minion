@@ -188,7 +188,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
           bias = 90;
         if(attempt % 5 == 3)
           bias = -90;
-        std::cout << "Searching for initial solution, ";
+        nhLog("Searching for initial solution");
         if(getOptions().nhConfig.backtrackInsteadOfTimeLimit) {
           cout << "backtrackLimit=" << (initialSearchTimeout / 10) << endl;
         } else {

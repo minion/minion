@@ -139,8 +139,7 @@ public:
       copyOverIncumbent(nhc, solution, prop);
       if(stats.newMinValue == getState().getOptimiseVar()->getMax()) {
         searchComplete = true;
-        std::cout << "HillClimber: achieved max possible opt value : " << stats.newMinValue
-                  << std::endl;
+        nhLog("HillClimber: achieved max possible opt value : " << stats.newMinValue);
         throw EndOfSearch();
         return;
       }
@@ -180,8 +179,9 @@ public:
         (iterationsSpentAtPeak > getOptions().nhConfig.hillClimberMinIterationsToSpendAtPeak &&
          static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability);
     if(completed) {
-      std::cout << "HillClimber: completed search at opt value: " << bestSolutionValue << std::endl;
-      std::cout << "Number iterations spent at peak: " << iterationsSpentAtPeak << std::endl;
+      nhLog("HillClimber: completed search at opt value: " << bestSolutionValue << endl
+                                                           << "Number iterations spent at peak: "
+                                                           << iterationsSpentAtPeak);
     }
     return completed;
   }
@@ -201,7 +201,7 @@ public:
     std::vector<AnyVarRef> emptyVars;
     prop->prop(emptyVars);
 
-    std::cout << "HillClimber: Hill climbing from opt value: " << bestSolutionValue << std::endl;
+    nhLog("HillClimber: Hill climbing from opt value: " << bestSolutionValue);
   }
 };
 
@@ -242,14 +242,13 @@ public:
         if(stats.solutionFound) {
           solutionBag.emplace_back(stats.newMinValue, solution);
         } else {
-          cout << "HolePuncher: unable to find any random solutions.\n";
+          nhLog("HolePuncher: unable to find any random solutions.");
           throw EndOfSearch();
         }
       } else {
         std::random_shuffle(solutionBag.begin(), solutionBag.end());
       }
-      std::cout << "HolePuncher: search complete, solutionBag size = " << solutionBag.size()
-                << std::endl;
+      nhLog("HolePuncher: search complete, solutionBag size = " << solutionBag.size());
     }
   }
 
@@ -298,7 +297,7 @@ public:
                   const std::vector<DomainInt>& incumbentSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
     if(randomWalk) {
-      cout << "HolePuncher: fetching another random solution:\n";
+      nhLog("HolePuncher: fetching another random solution:");
       Controller::world_pop_to_depth(1);
     } else {
       int maxNHSize = nhc.getMaxNeighbourhoodSize();
@@ -318,17 +317,16 @@ public:
       }
 
       if(activeCombinations.empty()) {
-        std::cout << "HolePuncher: there are no neighbourhood combinations that may be "
-                     "activated.  Fetching a random solution:\n";
+        nhLog("HolePuncher: there are no neighbourhood combinations that may be "
+              "activated.  Fetching a random solution:");
         randomWalk = true;
         Controller::world_pop_to_depth(1);
       } else {
-        std::cout << "HolePuncher: initialised search starting at neighbourhood size: "
-                  << currentNeighbourhoodSize() << std::endl;
+        nhLog("HolePuncher: initialised search starting at neighbourhood size: "
+              << currentNeighbourhoodSize());
         maxSolutionsPerCombination =
             (int)ceil(((double)getOptions().nhConfig.holePuncherSolutionBagSizeConstant) /
                       activeCombinations.size());
-        globalStats.startExploration(currentNeighbourhoodSize());
         copyOverIncumbent(nhc, incumbentSolution, prop);
       }
     }
@@ -382,7 +380,7 @@ public:
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = std::move(hillClimber.bestSolution);
-          std::cout << "MetaStrategy: new best value achieved, caching solution\n";
+          nhLog("MetaStrategy: new best value achieved, caching solution");
           /*
            * If a better solution has been found we want to punch random holes around this
            * solution
@@ -392,17 +390,15 @@ public:
           holePuncher.resetNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else if(solutionBag.empty()) {
-          std::cout << "MetaStrategy: new best value not achieved, solutionBag empty\n";
+          nhLog("MetaStrategy: new best value not achieved, solutionBag empty");
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
           currentPhase = Phase::HOLE_PUNCHING;
           holePuncher.nextNeighbourhoodSize();
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else {
-          std::cout << "MetaStrategy: new best value not achieved, trying hill climbing from next "
-                       "solution in solution bag\n";
-          globalStats.totalNumberOfRandomSolutionsPulled += 1;
-          globalStats.numberPulledThisPhase += 1;
+          nhLog("MetaStrategy: new best value not achieved, trying hill climbing from next "
+                "solution in solution bag");
           // Grab a random solution
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop,
                                  globalStats);
@@ -418,14 +414,11 @@ public:
         if(solutionBag.size() > nhc.neighbourhoodCombinations.size()) {
           solutionBag.resize(nhc.neighbourhoodCombinations.size());
         }
-        std::cout << "MetaStrategy: trimmed solution bag to size " << solutionBag.size()
-                  << std::endl;
+        nhLog("MetaStrategy: trimmed solution bag to size " << solutionBag.size());
         if(!solutionBag.empty()) {
           currentPhase = Phase::HILL_CLIMBING;
           hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop,
                                  globalStats);
-          globalStats.totalNumberOfRandomSolutionsPulled += 1;
-          globalStats.numberPulledThisPhase += 1;
           solutionBag.pop_back();
         } else {
           holePuncher.nextNeighbourhoodSize();
