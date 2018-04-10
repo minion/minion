@@ -49,6 +49,13 @@ struct NeighbourhoodSearchStats {
   vector<u_int64_t> numberTimeouts;
   double startTime;
   double totalTimeToBestSolution;
+  double hillClimberStartTime;
+  double totalHillClimberTime = 0;
+  int numberHillClimbs = 0;
+  double explorationStartTime;
+  double totalExplorationTime = 0;
+  int numberExplorations = 0;
+  int numberTimesSolutionBagExhausted = 0;
 
   NeighbourhoodSearchStats(int numberCombinations,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange,
@@ -117,14 +124,37 @@ struct NeighbourhoodSearchStats {
     return bestCompleteSolutionAssignment;
   }
 
+  inline void notifyStartHillClimb() {
+    numberHillClimbs += 1;
+    hillClimberStartTime = getTotalTimeTaken();
+  }
+
+  inline void notifyEndHillClimb() {
+    totalHillClimberTime += (getTotalTimeTaken() - hillClimberStartTime);
+  }
+
+  inline void notifyStartExploration() {
+    numberExplorations += 1;
+    explorationStartTime = getTotalTimeTaken();
+  }
+
+  inline void notifyEndExploration() {
+    totalExplorationTime += (getTotalTimeTaken() - explorationStartTime);
+  }
+
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
     os << "Value achieved by last neighbourhood: " << optValueAchievedByLastNHCombination << "\n";
     os << "Best optimise var value: " << bestOptVarValue << "\n";
-    os << "Time till best solution: " << totalTimeToBestSolution << " (ms)\n";
-    os << "Total time: " << getTotalTimeTaken() << " (ms)\n";
+    os << "Time till best solution: " << totalTimeToBestSolution << "s\n";
+    os << "Total time: " << getTotalTimeTaken() << "s\n";
+    os << "Total hill climbing time: " << totalHillClimberTime << "s\n";
+    os << "Number hill climbs: " << numberHillClimbs << "\n";
+    os << "Total exploration time: " << totalExplorationTime << "s\n";
+    os << "Number explorations: " << numberExplorations << "\n";
+    os << "Number of times solution bag exhausted: " << numberTimesSolutionBagExhausted << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoodCombinations.size(); i++) {
       printCombinationDescription(os, nhc, i);
       os << "\n";

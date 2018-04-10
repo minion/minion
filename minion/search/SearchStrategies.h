@@ -189,6 +189,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
+    globalStats.notifyStartHillClimb();
     resetLocalMaxProbability();
     highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
     iterationsSpentAtPeak = 0;
@@ -235,7 +236,7 @@ public:
    */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    int currentActivatedCombination, NeighbourhoodStats& stats,
-                   std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
+                   std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
     finishedPhase = activeCombinations.empty() || randomWalk;
     if(finishedPhase) {
       if(randomWalk) {
@@ -247,6 +248,7 @@ public:
         }
       } else {
         std::random_shuffle(solutionBag.begin(), solutionBag.end());
+        globalStats.notifyEndExploration();
       }
       nhLog("HolePuncher: search complete, solutionBag size = " << solutionBag.size());
     }
@@ -322,6 +324,7 @@ public:
         randomWalk = true;
         Controller::world_pop_to_depth(1);
       } else {
+        globalStats.notifyStartExploration();
         nhLog("HolePuncher: initialised search starting at neighbourhood size: "
               << currentNeighbourhoodSize());
         maxSolutionsPerCombination =
@@ -377,6 +380,7 @@ public:
     case Phase::HILL_CLIMBING:
       hillClimber.updateStats(nhc, prop, currentActivatedCombination, stats, solution, globalStats);
       if(hillClimber.hasFinishedPhase()) {
+        globalStats.notifyEndHillClimb();
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = std::move(hillClimber.bestSolution);
@@ -391,6 +395,7 @@ public:
           holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else if(solutionBag.empty()) {
           nhLog("MetaStrategy: new best value not achieved, solutionBag empty");
+          globalStats.numberTimesSolutionBagExhausted += 1;
           // If there are no solutions left want to generate new random solutions for a larger
           // neighbourhood size
           currentPhase = Phase::HOLE_PUNCHING;
