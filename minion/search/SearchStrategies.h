@@ -185,6 +185,7 @@ public:
       nhLog("HillClimber: completed search at opt value: " << bestSolutionValue << endl
                                                            << "Number iterations spent at peak: "
                                                            << iterationsSpentAtPeak);
+      cout << "HillClimber: backtrack limit = " << round(backtrackLimit) << endl;
     }
     return completed;
   }
@@ -195,6 +196,7 @@ public:
     if(getOptions().nhConfig.resetBacktrackAfterHillClimb) {
       backtrackLimit = 1;
     }
+    cout << "HillClimber: backtrack limit = " << round(backtrackLimit) << endl;
     numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
     resetLocalMaxProbability();
