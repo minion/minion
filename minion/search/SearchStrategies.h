@@ -108,6 +108,7 @@ template <typename SelectionStrategy>
 class HillClimbingSearch {
   friend MetaStrategy<SelectionStrategy>;
   int iterationsSpentAtPeak = 0;
+  int numberIterationsAtStart;
   bool searchComplete = false;
   // The probability that we will enter a random mode of exploration.
   double localMaxProbability = getOptions().nhConfig.hillClimberInitialLocalMaxProbability;
@@ -189,6 +190,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
+    numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
     resetLocalMaxProbability();
     highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
@@ -381,6 +383,8 @@ public:
       hillClimber.updateStats(nhc, prop, currentActivatedCombination, stats, solution, globalStats);
       if(hillClimber.hasFinishedPhase()) {
         globalStats.notifyEndHillClimb();
+        cout << "Number iterations spent during this hill climb: "
+             << (globalStats.numberIterations - hillClimber.numberIterationsAtStart) << endl;
         if(hillClimber.bestSolutionValue > bestSolutionValue) {
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = std::move(hillClimber.bestSolution);
