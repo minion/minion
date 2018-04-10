@@ -241,6 +241,7 @@ public:
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
     finishedPhase = activeCombinations.empty() || randomWalk;
     if(finishedPhase) {
+      globalStats.notifyEndRandomSearch();
       if(randomWalk) {
         if(stats.solutionFound) {
           solutionBag.emplace_back(stats.newMinValue, solution);
@@ -302,6 +303,7 @@ public:
                   NeighbourhoodSearchStats& globalStats) {
     if(randomWalk) {
       nhLog("HolePuncher: fetching another random solution:");
+      globalStats.notifyStartRandomSearch();
       Controller::world_pop_to_depth(1);
     } else {
       int maxNHSize = nhc.getMaxNeighbourhoodSize();
@@ -323,8 +325,10 @@ public:
       if(activeCombinations.empty()) {
         nhLog("HolePuncher: there are no neighbourhood combinations that may be "
               "activated.  Fetching a random solution:");
+        globalStats.notifyStartRandomSearch();
         randomWalk = true;
         Controller::world_pop_to_depth(1);
+
       } else {
         globalStats.notifyStartExploration();
         nhLog("HolePuncher: initialised search starting at neighbourhood size: "

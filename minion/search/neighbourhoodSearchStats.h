@@ -56,6 +56,9 @@ struct NeighbourhoodSearchStats {
   double totalExplorationTime = 0;
   int numberExplorations = 0;
   int numberTimesSolutionBagExhausted = 0;
+  double randomSearchStartTime;
+  double totalRandomSearchTime = 0;
+  int numberRandomSearches = 0;
 
   NeighbourhoodSearchStats(int numberCombinations,
                            const std::pair<DomainInt, DomainInt>& initialOptVarRange,
@@ -142,6 +145,15 @@ struct NeighbourhoodSearchStats {
     totalExplorationTime += (getTotalTimeTaken() - explorationStartTime);
   }
 
+  inline void notifyStartRandomSearch() {
+    numberRandomSearches += 1;
+    randomSearchStartTime = getTotalTimeTaken();
+  }
+
+  inline void notifyEndRandomSearch() {
+    totalRandomSearchTime += (getTotalTimeTaken() - randomSearchStartTime);
+  }
+
   inline void printStats(std::ostream& os, const NeighbourhoodContainer& nhc) {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
@@ -154,6 +166,8 @@ struct NeighbourhoodSearchStats {
     os << "Number hill climbs: " << numberHillClimbs << "\n";
     os << "Total exploration time: " << totalExplorationTime << "s\n";
     os << "Number explorations: " << numberExplorations << "\n";
+    os << "Total random search time: " << totalRandomSearchTime << "s\n";
+    os << "Number random searches: " << numberRandomSearches << "\n";
     os << "Number of times solution bag exhausted: " << numberTimesSolutionBagExhausted << "\n";
     for(int i = 0; i < (int)nhc.neighbourhoodCombinations.size(); i++) {
       printCombinationDescription(os, nhc, i);
