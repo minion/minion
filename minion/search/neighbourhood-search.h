@@ -183,7 +183,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     // try to find initial solution
     try {
       int initialSearchTimeout = 100;
-      const double multiplier = 1.5;
+      double multiplier = 1.5;
+      int initialBacktrackLimit = 1;
       int attempt = 0;
       do {
         int bias = 0;
@@ -193,17 +194,21 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
           bias = -90;
         nhLog("Searching for initial solution");
         if(getOptions().nhConfig.backtrackInsteadOfTimeLimit) {
-          cout << "backtrackLimit=" << (initialSearchTimeout / 10) << endl;
+          cout << "backtrackLimit=" << round(initialBacktrackLimit) << endl;
         } else {
           cout << "timeout=" << initialSearchTimeout << ":\n";
         }
         stats = searchNeighbourhoods(
             solution,
-            SearchParams::randomWalk(false, true, initialSearchTimeout, initialSearchTimeout / 10,
+            SearchParams::randomWalk(false, true, initialSearchTimeout,
+                                     round(initialBacktrackLimit),
                                      getOptions().nhConfig.backtrackInsteadOfTimeLimit, bias),
             globalStats);
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
+          initialBacktrackLimit =
+              initialBacktrackLimit * getOptions().nhConfig.backtrackLimitMultiplier +
+              getOptions().nhConfig.backtrackLimitIncrement;
         }
         attempt++;
       } while(!stats.solutionFound);
@@ -455,7 +460,9 @@ inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig&
   } else {
     os << "Using timelimit,\n";
   }
-  os << "Backtrack limit:" << config.backtrackLimit << ",\n";
+  os << "Backtrack limit multiplier:" << config.backtrackLimitMultiplier << ",\n";
+  os << "Backtrack limit increment:" << config.backtrackLimitIncrement << ",\n";
+  os << "reset backtrack limit after hill climb: " << config.resetBacktrackAfterHillClimb << ",\n";
   os << "iterationSearchTime:" << config.iterationSearchTime << ",\n";
   os << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
      << ",\n";

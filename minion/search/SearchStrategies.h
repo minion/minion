@@ -112,6 +112,7 @@ class HillClimbingSearch {
   bool searchComplete = false;
   // The probability that we will enter a random mode of exploration.
   double localMaxProbability = getOptions().nhConfig.hillClimberInitialLocalMaxProbability;
+  double backtrackLimit;
   SelectionStrategy selectionStrategy;
 
 public:
@@ -131,7 +132,8 @@ public:
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
-
+    backtrackLimit = backtrackLimit * getOptions().nhConfig.backtrackLimitMultiplier +
+                     getOptions().nhConfig.backtrackLimitIncrement;
     if(stats.solutionFound) {
       highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
       bestSolutionValue = stats.newMinValue;
@@ -167,7 +169,7 @@ public:
         nhc, globalStats, getState().getOptimiseVar()->getMin());
     return SearchParams::neighbourhoodSearch(
         combinationToActivate, nhc, true, true, false, getOptions().nhConfig.iterationSearchTime,
-        getOptions().nhConfig.backtrackLimit, getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+        round(backtrackLimit), getOptions().nhConfig.backtrackInsteadOfTimeLimit,
         highestNeighbourhoodSizes[combinationToActivate]);
   }
   bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
@@ -190,6 +192,9 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
+    if(getOptions().nhConfig.resetBacktrackAfterHillClimb) {
+      backtrackLimit = 1;
+    }
     numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
     resetLocalMaxProbability();
@@ -274,8 +279,8 @@ public:
     activeCombinations.pop_back();
     return SearchParams::neighbourhoodSearch(
         combination, nhc, true, false, false, getOptions().nhConfig.iterationSearchTime,
-        getOptions().nhConfig.backtrackLimit, getOptions().nhConfig.backtrackInsteadOfTimeLimit,
-        currentNeighbourhoodSize());
+        getOptions().nhConfig.holePuncherBacktrackLimit,
+        getOptions().nhConfig.backtrackInsteadOfTimeLimit, currentNeighbourhoodSize());
   }
 
   /*

@@ -262,9 +262,16 @@ class SearchOptions {
 
 public:
   struct NHConfig {
+    // values here are not necessarily optimal (tuned)
+    // they are defaults until tuning info can be given
+    // can be overridden by commandline
+
     bool backtrackInsteadOfTimeLimit = true;
     int iterationSearchTime = 500;
-    int backtrackLimit = 50;
+    double backtrackLimitMultiplier = 1.1;
+    int backtrackLimitIncrement = 1;
+    bool resetBacktrackAfterHillClimb = true;
+    int holePuncherBacktrackLimit = 22;
     int hillClimberMinIterationsToSpendAtPeak = 4;
     double hillClimberInitialLocalMaxProbability = 0.001;
     double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;

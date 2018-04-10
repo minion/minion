@@ -691,8 +691,19 @@ When Allows values used during neighbourhood search to be configured.
 
         if(argv[i] == string("countbacktracks")) {
           nhConfig.backtrackInsteadOfTimeLimit = true;
-          INCREMENT_i("number for  backtrack limit");
-          nhConfig.backtrackLimit = fromstring<int>(argv[i]);
+          INCREMENT_i("backtrack limit multiplier");
+          nhConfig.backtrackLimitMultiplier = fromstring<double>(argv[i]);
+          INCREMENT_i("backtrack limit increment");
+          nhConfig.backtrackLimitIncrement = fromstring<int>(argv[i]);
+          INCREMENT_i("reset or not reset bactrack");
+          if(argv[i] == string("reset")) {
+            nhConfig.resetBacktrackAfterHillClimb = true;
+          } else if(argv[i] == string("noreset")) {
+            nhConfig.resetBacktrackAfterHillClimb = false;
+          } else {
+            cerr << "expected \"reset\" or \"noreset\", instead found " << argv[i] << endl;
+            exit(1);
+          }
         } else if(argv[i] == string("counttime")) {
           nhConfig.backtrackInsteadOfTimeLimit = false;
           INCREMENT_i("number for iteration search time or backtracks");
