@@ -248,8 +248,9 @@ public:
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
     finishedPhase = activeCombinations.empty() || randomWalk;
     if(finishedPhase) {
-      globalStats.notifyEndRandomSearch();
       if(randomWalk) {
+        globalStats.notifyEndRandomSearch();
+
         if(stats.solutionFound) {
           solutionBag.emplace_back(stats.newMinValue, solution);
         } else {
