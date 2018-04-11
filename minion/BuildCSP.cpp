@@ -98,8 +98,6 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
     }
 
     if(getOptions().randomise_valvarorder) {
-      getOptions().printLine("Using seed: " + tostring(args.random_seed));
-      srand(args.random_seed);
 
       std::random_shuffle(instance.search_order[i].var_order.begin(),
                           instance.search_order[i].var_order.end());
