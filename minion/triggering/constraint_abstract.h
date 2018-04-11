@@ -259,7 +259,6 @@ public:
     vector<AnyVarRef> vars = get_vars();
     DomainInt* t = new DomainInt[vars.size()];
     SysInt unsatcounter = 0;
-    srand(12345);
     for(SysInt i = 0; i < 1000; i++) {
       for(SysInt j = 0; j < (SysInt)vars.size(); j++) {
         DomainInt dsize = vars[j].getInitialMax() - vars[j].getInitialMin() + 1;
@@ -279,7 +278,6 @@ public:
     DomainInt* t = new DomainInt[vars.size()];
     t[var] = val; // fix specified component
     SysInt unsatcounter = 0;
-    srand(12345);
     for(SysInt i = 0; i < 100; i++) {
       for(size_t j = 0; j < vars.size(); j++) {
         if(j != var) {

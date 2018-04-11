@@ -93,10 +93,12 @@ int main(int argc, char** argv) {
     CSPInstance instance;
     SearchMethod args;
 
+
     parse_command_line(args, argc, argv);
 
+    srand(args.random_seed);
+    
     if(!getOptions().silent) {
-
       time_t rawtime;
       time(&rawtime);
       cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
@@ -106,6 +108,7 @@ int main(int argc, char** argv) {
         cout << argv[i] << " ";
       }
       cout << endl;
+      getOptions().printLine("Using seed: " + tostring(args.random_seed));
     }
 
     if(!getOptions().noTimers) {

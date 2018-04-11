@@ -113,8 +113,8 @@ def grabjsonfromfile(fname):
 parser = argparse.ArgumentParser(description="Minion Builder")
 parser.add_argument('--domains64', action='store_const', const=["-DDOMAINS64"],
                     help='Enable 64-bit domains')
-parser.add_argument('--wdeg', action='store_const', const=["-DWDEG"],
-                    help='Enable wdeg heuristics')
+parser.add_argument('--wdeg', help='Enable wdeg heuristics (yes/no, default = yes)')
+
 parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
                     help='Quick build')
 parser.add_argument('--static', action='store_const', const=["-static"],
@@ -149,6 +149,7 @@ parser.add_argument('--buildsystem', help="Set build system. Current options: ma
 
 arg = parser.parse_args()
 
+
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 currentdir = os.getcwd()
 
@@ -178,9 +179,17 @@ verbose_print(1, "Minion base dir: " + scriptdir)
 commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
-for c in ['domains64', 'wdeg', 'quick', 'debug', 'print', 'info', 'profile', 'static']:
+for c in ['domains64', 'quick', 'debug', 'print', 'info', 'profile', 'static']:
     if getattr(arg, c) != None:
         commandargs = commandargs + getattr(arg, c)
+
+if getattr(arg, 'wdeg'):
+    if arg.wdeg == 'yes':
+        commandargs = commandargs + ["-DWDEG"]
+    elif arg.wdeg <> 'no':
+        fatal_error("Invalid argument for --wdeg:" + arg.wdeg)
+else:
+    commandargs = commandargs + ["-DWDEG"]
 
 if arg.extraflags:
     commandargs = commandargs + arg.extraflags.split()
