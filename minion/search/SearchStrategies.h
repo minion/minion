@@ -331,7 +331,7 @@ public:
       }
     }
     if(!activeCombinations.empty()) {
-      std::shuffle(activeCombinations.begin(), activeCombinations.end());
+      std::random_shuffle(activeCombinations.begin(), activeCombinations.end());
     }
   }
 };
