@@ -330,6 +330,9 @@ public:
         ++neighbourhoodSizeOffset;
       }
     }
+    if(!activeCombinations.empty()) {
+      std::shuffle(activeCombinations.begin(), activeCombinations.end());
+    }
   }
 };
 
