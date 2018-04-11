@@ -175,7 +175,7 @@ struct NeighbourhoodContainer {
     return true;
   }
 
-  int getMaxNeighbourhoodSize() {
+  int getMaxNeighbourhoodSize() const {
     auto nhIter =
         std::find_if(neighbourhoods.begin(), neighbourhoods.end(),
                      [](const Neighbourhood& n) { return n.type == Neighbourhood::STANDARD; });

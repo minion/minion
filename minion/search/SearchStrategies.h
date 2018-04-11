@@ -215,143 +215,121 @@ public:
   }
 };
 
-typedef std::vector<std::pair<DomainInt, std::vector<DomainInt>>> SolutionBag;
-
 class HolePuncher {
-  SolutionBag solutionBag;
   std::vector<int> activeCombinations;
-  int currentNeighbourhoodSolutionsCount = 0;
-  int maxSolutionsPerCombination = 1;
-  bool finishedPhase = false;
   bool randomWalk = false;
-
-public:
-  int minNeighbourhoodSize = 1;
+  int minNeighbourhoodSize = 0;
   int neighbourhoodSizeOffset = 0;
 
+public:
+  bool solutionFound = false;
+  std::pair<DomainInt, std::vector<DomainInt>> solution;
+
   void resetNeighbourhoodSize() {
-    minNeighbourhoodSize = 1;
+    minNeighbourhoodSize = 0;
     neighbourhoodSizeOffset = 0;
     randomWalk = false;
   }
 
-  void nextNeighbourhoodSize() {
-    minNeighbourhoodSize *= (1 + !randomWalk);
+  void increaseMinNeighbourhoodSize() {
+    if(minNeighbourhoodSize == 0) {
+      minNeighbourhoodSize = 1;
+    } else {
+      minNeighbourhoodSize *= (1 + !randomWalk);
+    }
+    neighbourhoodSizeOffset = 0;
   }
 
-  /*
-   * Check if we have run out of neighbourhoods to activate. If so shuffle the solution bag
-   * so that the generated solutions are in a random configuration.
-   */
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    int currentActivatedCombination, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
-    finishedPhase = activeCombinations.empty() || randomWalk;
-    if(finishedPhase) {
+    solutionFound = stats.solutionFound;
+    if(solutionFound) {
+      nhLog("HolePuncher: solution found.");
+      this->solution = make_pair(stats.newMinValue, solution);
+    } else {
+      nhLog("HolePuncher: solution not found.");
+    }
+    if(randomWalk) {
       globalStats.notifyEndRandomSearch();
-      if(randomWalk) {
-        if(stats.solutionFound) {
-          solutionBag.emplace_back(stats.newMinValue, solution);
-        } else {
-          nhLog("HolePuncher: unable to find any random solutions.");
-          throw EndOfSearch();
-        }
-      } else {
-        std::random_shuffle(solutionBag.begin(), solutionBag.end());
-        globalStats.notifyEndExploration();
+      if(!stats.solutionFound) {
+        nhLog("HolePuncher: unable to find any random solutions.");
+        throw EndOfSearch();
       }
-      nhLog("HolePuncher: search complete, solutionBag size = " << solutionBag.size());
+    } else {
+      globalStats.notifyEndExploration();
     }
   }
 
-  /**
-   * Pop a neighbourhood combination from the vector of active neighbourhoods and return it
-   * in the struct SearchParams.  Unless in Random walk mode.
-   * @param nhc
-   * @return Struct SearchParams which contains a neighbourhood to activate
-   */
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&) {
     if(randomWalk) {
       return SearchParams::randomWalk(false, true, 0, 0, 0,
                                       getOptions().nhConfig.backtrackInsteadOfTimeLimit);
     }
     assert(!activeCombinations.empty());
-    currentNeighbourhoodSolutionsCount = 0;
     int combination = activeCombinations.back();
     activeCombinations.pop_back();
     return SearchParams::neighbourhoodSearch(
-        combination, nhc, true, false, false, getOptions().nhConfig.iterationSearchTime,
+        combination, nhc, true, false, true, getOptions().nhConfig.iterationSearchTime,
         getOptions().nhConfig.holePuncherBacktrackLimit,
         getOptions().nhConfig.backtrackInsteadOfTimeLimit, currentNeighbourhoodSize());
   }
 
-  /*
-   * Called during Minion Search once a solution has been found. If the number of solutions
-   * found for the currently activated neighbourhood equals the max stop search.
-   */
   bool continueSearch(NeighbourhoodContainer& nhc, const std::vector<DomainInt>& solution) {
-    solutionBag.emplace_back(getState().getOptimiseVar()->getMin(), solution);
-    return ++currentNeighbourhoodSolutionsCount <= maxSolutionsPerCombination;
+    return false;
   }
 
-  bool hasFinishedPhase() {
-    return finishedPhase;
+  inline bool hasFinishedPhase() {
+    return true;
   }
 
   inline int currentNeighbourhoodSize() const {
     return minNeighbourhoodSize + neighbourhoodSizeOffset;
   }
 
-  /*
-   * Generate the vector of neighbourhoods that can be activated.
-   */
   void initialise(NeighbourhoodContainer& nhc, DomainInt,
                   const std::vector<DomainInt>& incumbentSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
-    if(randomWalk) {
-      nhLog("HolePuncher: fetching another random solution:");
-      globalStats.notifyStartRandomSearch();
-      Controller::world_pop_to_depth(1);
-    } else {
-      int maxNHSize = nhc.getMaxNeighbourhoodSize();
-      while(currentNeighbourhoodSize() <= maxNHSize) {
-        activeCombinations.clear();
-        for(int i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
-          if(nhc.isCombinationEnabled(i) &&
-             nhc.neighbourhoods[nhc.neighbourhoodCombinations[i][0]].deviation.inDomain(
-                 currentNeighbourhoodSize()))
-            activeCombinations.push_back(i);
-        }
-        if(!activeCombinations.empty()) {
-          break;
-        } else {
-          ++neighbourhoodSizeOffset;
-        }
-      }
-
+    solutionFound = false;
+    if(!randomWalk && activeCombinations.empty()) {
+      increaseMinNeighbourhoodSize();
+      findNextNeighbourhoodSizeWithActiveCombinations(nhc);
       if(activeCombinations.empty()) {
-        nhLog("HolePuncher: there are no neighbourhood combinations that may be "
-              "activated.  Fetching a random solution:");
-        globalStats.notifyStartRandomSearch();
         randomWalk = true;
-        Controller::world_pop_to_depth(1);
-
+        nhLog("HolePuncher: reached neighbourhood size limit.");
       } else {
-        globalStats.notifyStartExploration();
-        nhLog("HolePuncher: initialised search starting at neighbourhood size: "
-              << currentNeighbourhoodSize());
-        maxSolutionsPerCombination =
-            (int)ceil(((double)getOptions().nhConfig.holePuncherSolutionBagSizeConstant) /
-                      activeCombinations.size());
-        copyOverIncumbent(nhc, incumbentSolution, prop);
+        nhLog("HolePuncher: increasing neighbourhood size to " << currentNeighbourhoodSize());
       }
     }
-    solutionBag = {};
-    finishedPhase = false;
+
+    if(!randomWalk) {
+      globalStats.notifyStartExploration();
+      nhLog("HolePuncher: searching for solution in neighbourhood with size "
+            << currentNeighbourhoodSize());
+      copyOverIncumbent(nhc, incumbentSolution, prop);
+    } else {
+      nhLog("HolePuncher: fetching an entirely random solution");
+      globalStats.notifyStartRandomSearch();
+      Controller::world_pop_to_depth(1);
+    }
   }
 
-  SolutionBag& getSolutionBag() {
-    return solutionBag;
+  inline void findNextNeighbourhoodSizeWithActiveCombinations(const NeighbourhoodContainer& nhc) {
+    int maxNHSize = nhc.getMaxNeighbourhoodSize();
+    while(currentNeighbourhoodSize() <= maxNHSize) {
+      activeCombinations.clear();
+      for(int i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
+        if(nhc.isCombinationEnabled(i) &&
+           nhc.neighbourhoods[nhc.neighbourhoodCombinations[i][0]].deviation.inDomain(
+               currentNeighbourhoodSize()))
+          activeCombinations.push_back(i);
+      }
+      if(!activeCombinations.empty()) {
+        break;
+      } else {
+        ++neighbourhoodSizeOffset;
+      }
+    }
   }
 };
 
@@ -363,7 +341,6 @@ class MetaStrategy {
   DomainInt bestSolutionValue;
   std::vector<DomainInt> bestSolution;
   Phase currentPhase = Phase::HILL_CLIMBING;
-  SolutionBag solutionBag;
   bool searchEnded = false;
 
 public:
@@ -400,50 +377,23 @@ public:
           bestSolutionValue = hillClimber.bestSolutionValue;
           bestSolution = std::move(hillClimber.bestSolution);
           nhLog("MetaStrategy: new best value achieved, caching solution");
-          /*
-           * If a better solution has been found we want to punch random holes around this
-           * solution
-           */
-          solutionBag.clear();
-          currentPhase = Phase::HOLE_PUNCHING;
           holePuncher.resetNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
-        } else if(solutionBag.empty()) {
-          nhLog("MetaStrategy: new best value not achieved, solutionBag empty");
-          globalStats.numberTimesSolutionBagExhausted += 1;
-          // If there are no solutions left want to generate new random solutions for a larger
-          // neighbourhood size
-          currentPhase = Phase::HOLE_PUNCHING;
-          holePuncher.nextNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
         } else {
-          nhLog("MetaStrategy: new best value not achieved, trying hill climbing from next "
-                "solution in solution bag");
-          // Grab a random solution
-          hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop,
-                                 globalStats);
-          solutionBag.pop_back();
+          nhLog("MetaStrategy: new best value not achieved");
         }
+        currentPhase = Phase::HOLE_PUNCHING;
+        holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
       }
       break;
     // In this phase we want to generate random solutions
     case Phase::HOLE_PUNCHING: {
       holePuncher.updateStats(nhc, prop, currentActivatedCombination, stats, solution, globalStats);
-      if(holePuncher.hasFinishedPhase()) {
-        solutionBag = std::move(holePuncher.getSolutionBag());
-        if(solutionBag.size() > nhc.neighbourhoodCombinations.size()) {
-          solutionBag.resize(nhc.neighbourhoodCombinations.size());
-        }
-        nhLog("MetaStrategy: trimmed solution bag to size " << solutionBag.size());
-        if(!solutionBag.empty()) {
-          currentPhase = Phase::HILL_CLIMBING;
-          hillClimber.initialise(nhc, solutionBag.back().first, solutionBag.back().second, prop,
-                                 globalStats);
-          solutionBag.pop_back();
-        } else {
-          holePuncher.nextNeighbourhoodSize();
-          holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
-        }
+      if(holePuncher.solutionFound) {
+        currentPhase = Phase::HILL_CLIMBING;
+        hillClimber.initialise(nhc, holePuncher.solution.first, holePuncher.solution.second, prop,
+                               globalStats);
+      } else {
+        holePuncher.initialise(nhc, bestSolutionValue, bestSolution, prop, globalStats);
       }
       break;
     }
