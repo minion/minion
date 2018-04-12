@@ -691,17 +691,19 @@ When Allows values used during neighbourhood search to be configured.
 
         if(argv[i] == string("countbacktracks")) {
           nhConfig.backtrackInsteadOfTimeLimit = true;
-          INCREMENT_i("backtrack limit multiplier");
-          nhConfig.backtrackLimitMultiplier = fromstring<double>(argv[i]);
-          INCREMENT_i("backtrack limit increment");
-          nhConfig.backtrackLimitIncrement = fromstring<int>(argv[i]);
-          INCREMENT_i("reset or not reset bactrack");
-          if(argv[i] == string("reset")) {
-            nhConfig.resetBacktrackAfterHillClimb = true;
-          } else if(argv[i] == string("noreset")) {
-            nhConfig.resetBacktrackAfterHillClimb = false;
+          INCREMENT_i("initial search backtrack limit multiplier");
+          nhConfig.initialSearchBacktrackLimitMultiplier = fromstring<double>(argv[i]);
+          INCREMENT_i("hill climber  backtrack limit multiplier");
+          nhConfig.hillClimberBacktrackLimitMultiplier = fromstring<double>(argv[i]);
+          INCREMENT_i("hole puncher backtrack limit multiplier");
+          nhConfig.holePuncherBacktrackLimitMultiplier = fromstring<double>(argv[i]);
+          INCREMENT_i("increase hill climber backtrack limit \"onfailure\" or \"always\"");
+          if(argv[i] == string("onfailure")) {
+            nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure = true;
+          } else if(argv[i] == string("always")) {
+            nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure = false;
           } else {
-            cerr << "expected \"reset\" or \"noreset\", instead found " << argv[i] << endl;
+            cerr << "expected \"onfailure\" or \"always\", instead found " << argv[i] << endl;
             exit(1);
           }
         } else if(argv[i] == string("counttime")) {

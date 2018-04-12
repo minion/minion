@@ -132,8 +132,9 @@ public:
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
-    backtrackLimit = backtrackLimit * getOptions().nhConfig.backtrackLimitMultiplier +
-                     getOptions().nhConfig.backtrackLimitIncrement;
+    if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound) {
+      backtrackLimit *= getOptions().nhConfig.hillClimberBacktrackLimitMultiplier;
+    }
     if(stats.solutionFound) {
       highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
       bestSolutionValue = stats.newMinValue;
@@ -193,9 +194,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
-    if(getOptions().nhConfig.resetBacktrackAfterHillClimb) {
-      backtrackLimit = 1;
-    }
+    backtrackLimit = getOptions().nhConfig.initialBacktrackLimit;
     cout << "HillClimber: backtrack limit = " << round(backtrackLimit) << endl;
     numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
@@ -220,6 +219,7 @@ class HolePuncher {
   bool randomWalk = false;
   int minNeighbourhoodSize = 0;
   int neighbourhoodSizeOffset = 0;
+  double backtrackLimit = getOptions().nhConfig.initialBacktrackLimit;
 
 public:
   bool solutionFound = false;
@@ -243,13 +243,16 @@ public:
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    int currentActivatedCombination, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
+
     solutionFound = stats.solutionFound;
     if(solutionFound) {
       nhLog("HolePuncher: solution found.");
       this->solution = make_pair(stats.newMinValue, solution);
     } else {
       nhLog("HolePuncher: solution not found.");
+      backtrackLimit *= getOptions().nhConfig.holePuncherBacktrackLimitMultiplier;
     }
+
     if(randomWalk) {
       globalStats.notifyEndRandomSearch();
       if(!stats.solutionFound) {
@@ -271,8 +274,8 @@ public:
     activeCombinations.pop_back();
     return SearchParams::neighbourhoodSearch(
         combination, nhc, true, false, true, getOptions().nhConfig.iterationSearchTime,
-        getOptions().nhConfig.holePuncherBacktrackLimit,
-        getOptions().nhConfig.backtrackInsteadOfTimeLimit, currentNeighbourhoodSize());
+        round(backtrackLimit), getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+        currentNeighbourhoodSize());
   }
 
   bool continueSearch(NeighbourhoodContainer& nhc, const std::vector<DomainInt>& solution) {
