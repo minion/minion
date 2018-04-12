@@ -183,8 +183,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     // try to find initial solution
     try {
       int initialSearchTimeout = 100;
-      double multiplier = 1.5;
-      int initialBacktrackLimit = 1;
+      const double multiplier = 1.5;
+      int initialBacktrackLimit = getOptions().nhConfig.initialBacktrackLimit;
       int attempt = 0;
       do {
         int bias = 0;
@@ -206,9 +206,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
             globalStats);
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
-          initialBacktrackLimit =
-              initialBacktrackLimit * getOptions().nhConfig.backtrackLimitMultiplier +
-              getOptions().nhConfig.backtrackLimitIncrement;
+          initialBacktrackLimit *= getOptions().nhConfig.initialSearchBacktrackLimitMultiplier;
         }
         attempt++;
       } while(!stats.solutionFound);
@@ -460,9 +458,10 @@ inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig&
   } else {
     os << "Using timelimit,\n";
   }
-  os << "Backtrack limit multiplier:" << config.backtrackLimitMultiplier << ",\n";
-  os << "Backtrack limit increment:" << config.backtrackLimitIncrement << ",\n";
-  os << "reset backtrack limit after hill climb: " << config.resetBacktrackAfterHillClimb << ",\n";
+  os << "search Backtrack limit multiplier:" << config.initialSearchBacktrackLimitMultiplier << ",\n";
+  os << "hill climber Backtrack limit multiplier:" << config.hillClimberBacktrackLimitMultiplier << ",\n";
+  os << "hole puncher Backtrack limit multiplier:" << config.holePuncherBacktrackLimitMultiplier << ",\n";
+  os << "hill climber Increase backtrack only on failure: " << config.hillClimberIncreaseBacktrackOnlyOnFailure << ",\n";
   os << "iterationSearchTime:" << config.iterationSearchTime << ",\n";
   os << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
      << ",\n";

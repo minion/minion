@@ -132,8 +132,9 @@ public:
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
-    backtrackLimit = backtrackLimit * getOptions().nhConfig.backtrackLimitMultiplier +
-                     getOptions().nhConfig.backtrackLimitIncrement;
+    if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound) {
+      backtrackLimit *= getOptions().nhConfig.hillClimberBacktrackLimitMultiplier;
+    }
     if(stats.solutionFound) {
       highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
       bestSolutionValue = stats.newMinValue;
@@ -193,9 +194,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
-    if(getOptions().nhConfig.resetBacktrackAfterHillClimb) {
-      backtrackLimit = 1;
-    }
+    backtrackLimit = getOptions().nhConfig.initialBacktrackLimit;
     cout << "HillClimber: backtrack limit = " << round(backtrackLimit) << endl;
     numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
@@ -224,7 +223,7 @@ class HolePuncher {
   int maxSolutionsPerCombination = 1;
   bool finishedPhase = false;
   bool randomWalk = false;
-
+double backtrackLimit = getOptions().nhConfig.initialBacktrackLimit;
 public:
   int minNeighbourhoodSize = 1;
   int neighbourhoodSizeOffset = 0;
@@ -246,6 +245,9 @@ public:
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    int currentActivatedCombination, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats& globalStats) {
+	  if (!stats.solutionFound) {
+		  backtrackLimit *= getOptions().nhConfig.holePuncherBacktrackLimitMultiplier;
+	  }
     finishedPhase = activeCombinations.empty() || randomWalk;
     if(finishedPhase) {
       if(randomWalk) {
@@ -282,7 +284,7 @@ public:
     activeCombinations.pop_back();
     return SearchParams::neighbourhoodSearch(
         combination, nhc, true, false, false, getOptions().nhConfig.iterationSearchTime,
-        getOptions().nhConfig.holePuncherBacktrackLimit,
+        round(backtrackLimit),
         getOptions().nhConfig.backtrackInsteadOfTimeLimit, currentNeighbourhoodSize());
   }
 
