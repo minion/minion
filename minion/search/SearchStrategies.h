@@ -106,7 +106,7 @@ class MetaStrategy;
 
 template <typename SelectionStrategy>
 class HillClimbingSearch {
-  friend MetaStrategy<SelectionStrategy>;
+  friend MetaStrategy<HillClimbingSearch<SelectionStrategy>>;
   int iterationsSpentAtPeak = 0;
   int numberIterationsAtStart;
   bool searchComplete = false;
@@ -211,6 +211,113 @@ public:
     prop->prop(emptyVars);
 
     nhLog("HillClimber: Hill climbing from opt value: " << bestSolutionValue);
+  }
+};
+
+template <typename SelectionStrategy>
+class LateAcceptanceHillClimbingSearch {
+public:
+  friend MetaStrategy<LateAcceptanceHillClimbingSearch<SelectionStrategy>>;
+  int iterationsSpentAtPeak = 0;
+  int numberIterationsAtStart;
+  bool searchComplete = false;
+  SelectionStrategy selectionStrategy;
+  std::vector<DomainInt> highestNeighbourhoodSizes;
+
+  DomainInt bestSolutionValue;
+  DomainInt currentSolutionValue;
+  std::vector<DomainInt> currentSolution;
+  std::vector<DomainInt> bestSolution;
+  std::deque<DomainInt> recentSolutionValueQueue;
+
+  LateAcceptanceHillClimbingSearch(const NeighbourhoodContainer& nhc) : selectionStrategy(nhc) {}
+
+  void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
+                   int currentActivatedCombination, NeighbourhoodStats& stats,
+                   std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
+
+    selectionStrategy.updateStats(currentActivatedCombination, stats);
+    if(stats.solutionFound && stats.newMinValue > bestSolutionValue) {
+      iterationsSpentAtPeak = 0;
+      bestSolutionValue = stats.newMinValue;
+      bestSolution = solution;
+    } else {
+      ++iterationsSpentAtPeak;
+    }
+
+    if(stats.solutionFound) {
+      if(stats.newMinValue == getState().getOptimiseVar()->getMax()) {
+        searchComplete = true;
+        nhLog("lahc: achieved max possible opt value : " << stats.newMinValue);
+        throw EndOfSearch();
+        return;
+      }
+      highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
+      recentSolutionValueQueue.push_back(stats.newMinValue);
+      recentSolutionValueQueue.pop_front();
+      currentSolutionValue = stats.newMinValue;
+
+      currentSolution = solution;
+    } else {
+      recentSolutionValueQueue.push_back(currentSolutionValue);
+      recentSolutionValueQueue.pop_front();
+      highestNeighbourhoodSizes[currentActivatedCombination] = stats.highestNeighbourhoodSize;
+    }
+
+    copyOverIncumbent(nhc, currentSolution, prop);
+    getState().getOptimiseVar()->setMin(
+        std::min(currentSolutionValue, recentSolutionValueQueue.front()));
+    std::vector<AnyVarRef> emptyVars;
+    prop->prop(emptyVars);
+  }
+
+  SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
+    int combinationToActivate = selectionStrategy.getCombinationsToActivate(
+        nhc, globalStats, getState().getOptimiseVar()->getMin());
+    // warning, needs to be updated to support updating backtrack limit rather than using constant.
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true, false,
+                                             getOptions().nhConfig.iterationSearchTime, 22,
+                                             getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+                                             highestNeighbourhoodSizes[combinationToActivate]);
+  }
+
+  bool continueSearch(NeighbourhoodContainer&, std::vector<DomainInt>&) {
+    return true;
+  }
+
+  bool hasFinishedPhase() {
+    int iterationLimit =
+        round(getOptions().nhConfig.lahcQueueSize * getOptions().nhConfig.lahcStoppingLimitRatio);
+    bool completed = searchComplete || iterationsSpentAtPeak > iterationLimit;
+    if(completed) {
+      nhLog("lahc: completed search at opt value: " << bestSolutionValue << endl
+                                                    << "Number iterations spent at peak: "
+                                                    << iterationsSpentAtPeak);
+    }
+    return completed;
+  }
+
+  void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
+                  const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
+                  NeighbourhoodSearchStats& globalStats) {
+    numberIterationsAtStart = globalStats.numberIterations;
+    globalStats.notifyStartHillClimb();
+    highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
+    iterationsSpentAtPeak = 0;
+
+    bestSolutionValue = newBestMinValue;
+    bestSolution = newBestSolution;
+
+    currentSolutionValue = bestSolutionValue;
+    currentSolution = newBestSolution;
+    searchComplete = false;
+    recentSolutionValueQueue.assign(getOptions().nhConfig.lahcQueueSize, currentSolutionValue);
+
+    copyOverIncumbent(nhc, bestSolution, prop);
+    getState().getOptimiseVar()->setMin(newBestMinValue);
+    std::vector<AnyVarRef> emptyVars;
+    prop->prop(emptyVars);
+    nhLog("lahc: Hill climbing from opt value: " << bestSolutionValue);
   }
 };
 
@@ -339,10 +446,10 @@ public:
   }
 };
 
-template <typename SelectionStrategy>
+template <typename SearchStrategy>
 class MetaStrategy {
   enum class Phase { HILL_CLIMBING, HOLE_PUNCHING };
-  HillClimbingSearch<SelectionStrategy> hillClimber;
+  SearchStrategy hillClimber;
   HolePuncher holePuncher;
   DomainInt bestSolutionValue;
   std::vector<DomainInt> bestSolution;

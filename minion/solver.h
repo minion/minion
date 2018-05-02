@@ -271,6 +271,8 @@ public:
     double initialSearchBacktrackLimitMultiplier = 1.5;
     int initialBacktrackLimit = 22;
     double hillClimberBacktrackLimitMultiplier = 1.1;
+    int lahcQueueSize = 100;
+    double lahcStoppingLimitRatio = 1.0;
     double holePuncherBacktrackLimitMultiplier = 1.1;
     bool hillClimberIncreaseBacktrackOnlyOnFailure = true;
     int hillClimberMinIterationsToSpendAtPeak = 4;
@@ -282,10 +284,15 @@ public:
     NHConfig() {}
   };
 
-  enum class NeighbourhoodSearchStrategy { META_STRATEGY, HILL_CLIMBING };
+  enum class NeighbourhoodSearchStrategy {
+    META_WITH_HILLCLIMBING,
+    META_WITH_LAHC,
+    HILL_CLIMBING,
+    LAHC
+  };
   enum class NeighbourhoodSelectionStrategy { RANDOM, UCB, LEARNING_AUTOMATON, INTERACTIVE };
   NeighbourhoodSearchStrategy neighbourhoodSearchStrategy =
-      NeighbourhoodSearchStrategy::META_STRATEGY;
+      NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING;
   NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy =
       NeighbourhoodSelectionStrategy::UCB;
   NHConfig nhConfig;

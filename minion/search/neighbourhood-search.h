@@ -423,11 +423,20 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
                                                                     NeighbourhoodContainer& nhc) {
   shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
   switch(getOptions().neighbourhoodSearchStrategy) {
+  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING:
+    return std::make_shared<
+        NeighbourhoodSearchManager<MetaStrategy<HillClimbingSearch<NhSelectionStrategy>>>>(
+        prop, base_order, nhc);
+  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC:
+    return std::make_shared<NeighbourhoodSearchManager<
+        MetaStrategy<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>>(prop, base_order,
+                                                                              nhc);
   case SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING:
     return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
         prop, base_order, std::move(nhc));
-  case SearchOptions::NeighbourhoodSearchStrategy::META_STRATEGY:
-    return std::make_shared<NeighbourhoodSearchManager<MetaStrategy<NhSelectionStrategy>>>(
+  case SearchOptions::NeighbourhoodSearchStrategy::LAHC:
+    return std::make_shared<
+        NeighbourhoodSearchManager<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>(
         prop, base_order, nhc);
   default: assert(false); abort();
   }

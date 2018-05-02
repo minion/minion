@@ -624,10 +624,13 @@ specified. Options are "meta" (default) or "hillclimbing".
         */
     else if(command == string("-nhsearch")) {
       INCREMENT_i("-nhsearch");
-      if(argv[i] == string("meta")) {
+      if(argv[i] == string("metawithhillclimbing")) {
         getOptions().neighbourhoodSearchStrategy =
-            SearchOptions::NeighbourhoodSearchStrategy::META_STRATEGY;
-      } else if(argv[i] == string("hillclimbing")) {
+            SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING;
+      } else       if(argv[i] == string("metawithlahc")) {
+          getOptions().neighbourhoodSearchStrategy =
+              SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC;
+        } else if(argv[i] == string("hillclimbing")) {
         getOptions().neighbourhoodSearchStrategy =
             SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING;
       } else {
