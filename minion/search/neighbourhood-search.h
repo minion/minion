@@ -458,10 +458,14 @@ inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig&
   } else {
     os << "Using timelimit,\n";
   }
-  os << "search Backtrack limit multiplier:" << config.initialSearchBacktrackLimitMultiplier << ",\n";
-  os << "hill climber Backtrack limit multiplier:" << config.hillClimberBacktrackLimitMultiplier << ",\n";
-  os << "hole puncher Backtrack limit multiplier:" << config.holePuncherBacktrackLimitMultiplier << ",\n";
-  os << "hill climber Increase backtrack only on failure: " << config.hillClimberIncreaseBacktrackOnlyOnFailure << ",\n";
+  os << "search Backtrack limit multiplier:" << config.initialSearchBacktrackLimitMultiplier
+     << ",\n";
+  os << "hill climber Backtrack limit multiplier:" << config.hillClimberBacktrackLimitMultiplier
+     << ",\n";
+  os << "hole puncher Backtrack limit multiplier:" << config.holePuncherBacktrackLimitMultiplier
+     << ",\n";
+  os << "hill climber Increase backtrack only on failure: "
+     << config.hillClimberIncreaseBacktrackOnlyOnFailure << ",\n";
   os << "iterationSearchTime:" << config.iterationSearchTime << ",\n";
   os << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
      << ",\n";
