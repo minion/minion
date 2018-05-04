@@ -202,7 +202,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
             solution,
             SearchParams::randomWalk(false, true, initialSearchTimeout,
                                      round(initialBacktrackLimit),
-                                     getOptions().nhConfig.backtrackInsteadOfTimeLimit, bias),
+                                     //getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+                                     true, //NGUYEN: test - using backtrack counts for initialisation instead of time, to make initial phase reproducible
+                                     bias),
             globalStats);
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);

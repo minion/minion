@@ -317,6 +317,7 @@ public:
     getState().getOptimiseVar()->setMin(newBestMinValue);
     std::vector<AnyVarRef> emptyVars;
     prop->prop(emptyVars);
+    nhLog("lahc: lahcQueueSize = " << getOptions().nhConfig.lahcQueueSize); //NGUYEN: DEBUG
     nhLog("lahc: Hill climbing from opt value: " << bestSolutionValue);
   }
 };
