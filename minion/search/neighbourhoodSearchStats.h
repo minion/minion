@@ -99,6 +99,7 @@ struct NeighbourhoodSearchStats {
         ++numberNegativeSolutions[activatedCombination];
       }
       optValueAchievedByLastNHCombination = stats.newMinValue;
+      //cout << "Current solution: " << stats.newMinValue << endl; //NGUYEN: DEBUG
     } else {
       ++numberNoSolutions[activatedCombination];
     }

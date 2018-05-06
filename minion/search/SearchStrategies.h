@@ -318,6 +318,7 @@ public:
     std::vector<AnyVarRef> emptyVars;
     prop->prop(emptyVars);
     nhLog("lahc: lahcQueueSize = " << getOptions().nhConfig.lahcQueueSize); //NGUYEN: DEBUG
+    nhLog("lahc: lahcStoppingLimitRatio = " << getOptions().nhConfig.lahcStoppingLimitRatio); //NGUYEN: DEBUG
     nhLog("lahc: Hill climbing from opt value: " << bestSolutionValue);
   }
 };

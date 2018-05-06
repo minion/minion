@@ -719,12 +719,21 @@ When Allows values used during neighbourhood search to be configured.
           exit(1);
         }
 
-        INCREMENT_i("number for hill climber min iterations to spend at peak");
-        nhConfig.hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
-        INCREMENT_i("number for hill climber initial local max probability");
-        nhConfig.hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
-        INCREMENT_i("number for hill climber increment multiplier");
-        nhConfig.hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
+        if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING
+            || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING){
+            INCREMENT_i("number for hill climber min iterations to spend at peak");
+            nhConfig.hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
+            INCREMENT_i("number for hill climber initial local max probability");
+            nhConfig.hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
+            INCREMENT_i("number for hill climber increment multiplier");
+            nhConfig.hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
+        } else if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC
+                    || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::LAHC){
+            INCREMENT_i("lahc list size");
+            nhConfig.lahcQueueSize = fromstring<int>(argv[i]);
+            INCREMENT_i("lahc stoplimit ratio");            
+            nhConfig.lahcStoppingLimitRatio = fromstring<double>(argv[i]);
+        }
       } catch(...) {
         cout << "Could not read argument " << argv[i] << endl;
         exit(1);

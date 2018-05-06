@@ -206,6 +206,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
                                      true, //NGUYEN: test - using backtrack counts for initialisation instead of time, to make initial phase reproducible
                                      bias),
             globalStats);
+            cout << "NGUYEN: initialise using backtrack count (22 * 1.5)" << endl; //NGUYEN: DEBUG
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
           initialBacktrackLimit *= getOptions().nhConfig.initialSearchBacktrackLimitMultiplier;
