@@ -271,6 +271,7 @@ public:
     double initialSearchBacktrackLimitMultiplier = 2.0; //NGUYEN: test (2.0 is the best one return by tuning-initialise-only), original value: 1.5
     int initialBacktrackLimit = 22;
     double hillClimberBacktrackLimitMultiplier = 1.1;
+    double hillClimberBacktrackLimitIncrement = 0;
     int lahcQueueSize = 100;
     double lahcStoppingLimitRatio = 1.0;
     double holePuncherBacktrackLimitMultiplier = 1.1;

@@ -200,13 +200,14 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         }
         stats = searchNeighbourhoods(
             solution,
-            SearchParams::randomWalk(false, true, initialSearchTimeout,
-                                     round(initialBacktrackLimit),
-                                     //getOptions().nhConfig.backtrackInsteadOfTimeLimit,
-                                     true, //NGUYEN: test - using backtrack counts for initialisation instead of time, to make initial phase reproducible
-                                     bias),
+            SearchParams::randomWalk(
+                false, true, initialSearchTimeout, round(initialBacktrackLimit),
+                // getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+                true, // NGUYEN: test - using backtrack counts for initialisation instead of time,
+                      // to make initial phase reproducible
+                bias),
             globalStats);
-            cout << "NGUYEN: initialise using backtrack count (22 * 1.5)" << endl; //NGUYEN: DEBUG
+        cout << "NGUYEN: initialise using backtrack count (22 * 1.5)" << endl; // NGUYEN: DEBUG
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
           initialBacktrackLimit *= getOptions().nhConfig.initialSearchBacktrackLimitMultiplier;
@@ -473,6 +474,8 @@ inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig&
   os << "search Backtrack limit multiplier:" << config.initialSearchBacktrackLimitMultiplier
      << ",\n";
   os << "hill climber Backtrack limit multiplier:" << config.hillClimberBacktrackLimitMultiplier
+     << ",\n";
+  os << "hill climber Backtrack limit increment:" << config.hillClimberBacktrackLimitIncrement
      << ",\n";
   os << "hole puncher Backtrack limit multiplier:" << config.holePuncherBacktrackLimitMultiplier
      << ",\n";

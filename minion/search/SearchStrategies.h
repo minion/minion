@@ -104,6 +104,11 @@ inline void copyOverIncumbent(NeighbourhoodContainer& nhc, const vector<DomainIn
 template <typename>
 class MetaStrategy;
 
+void incrementBacktrackLimit(double& backtrackLimit) {
+  backtrackLimit *= getOptions().nhConfig.hillClimberBacktrackLimitMultiplier;
+  backtrackLimit += getOptions().nhConfig.hillClimberBacktrackLimitIncrement;
+}
+
 template <typename SelectionStrategy>
 class HillClimbingSearch {
   friend MetaStrategy<HillClimbingSearch<SelectionStrategy>>;
@@ -133,7 +138,7 @@ public:
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
     if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound) {
-      backtrackLimit *= getOptions().nhConfig.hillClimberBacktrackLimitMultiplier;
+      incrementBacktrack(backtrackLimit);
     }
     if(stats.solutionFound) {
       highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
@@ -221,6 +226,7 @@ public:
   int iterationsSpentAtPeak = 0;
   int numberIterationsAtStart;
   bool searchComplete = false;
+  double backtrackLimit;
   SelectionStrategy selectionStrategy;
   std::vector<DomainInt> highestNeighbourhoodSizes;
 
@@ -237,6 +243,9 @@ public:
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
+    if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound) {
+      incrementBacktrack(backtrackLimit);
+    }
     if(stats.solutionFound && stats.newMinValue > bestSolutionValue) {
       iterationsSpentAtPeak = 0;
       bestSolutionValue = stats.newMinValue;
@@ -300,6 +309,7 @@ public:
   void initialise(NeighbourhoodContainer& nhc, DomainInt newBestMinValue,
                   const std::vector<DomainInt>& newBestSolution, std::shared_ptr<Propagate>& prop,
                   NeighbourhoodSearchStats& globalStats) {
+    backtrackLimit = getOptions().nhConfig.initialBacktrackLimit;
     numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
     highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
@@ -317,8 +327,9 @@ public:
     getState().getOptimiseVar()->setMin(newBestMinValue);
     std::vector<AnyVarRef> emptyVars;
     prop->prop(emptyVars);
-    nhLog("lahc: lahcQueueSize = " << getOptions().nhConfig.lahcQueueSize); //NGUYEN: DEBUG
-    nhLog("lahc: lahcStoppingLimitRatio = " << getOptions().nhConfig.lahcStoppingLimitRatio); //NGUYEN: DEBUG
+    nhLog("lahc: lahcQueueSize = " << getOptions().nhConfig.lahcQueueSize); // NGUYEN: DEBUG
+    nhLog("lahc: lahcStoppingLimitRatio = "
+          << getOptions().nhConfig.lahcStoppingLimitRatio); // NGUYEN: DEBUG
     nhLog("lahc: Hill climbing from opt value: " << bestSolutionValue);
   }
 };
