@@ -279,6 +279,8 @@ public:
     int hillClimberMinIterationsToSpendAtPeak = 4;
     double hillClimberInitialLocalMaxProbability = 0.001;
     double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
+    double simulatedAnnealingTemperatureCoolingFactor  = 0.9;
+    int simulatedAnnealingIterationsBetweenCool  = 5;
     double ucbExplorationBias = 2;
     double learningAutomatonRate = 0.1;
     int holePuncherSolutionBagSizeConstant = 5;
