@@ -171,10 +171,12 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
         Var& var = vararray[i];
         if(!var.isAssigned()) {
-          reduced = reduced || prune_domain_bottom(var, vararray, prop, limit);
+          if(prune_domain_bottom(var, vararray, prop, limit))
+            reduced = true;
           if(getState().isFailed())
             return;
-          reduced = reduced || prune_domain_top(var, vararray, prop, limit);
+          if(prune_domain_top(var, vararray, prop, limit))
+            reduced = true;
           if(getState().isFailed())
             return;
           if(check_sac_timeout())
