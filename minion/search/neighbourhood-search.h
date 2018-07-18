@@ -306,7 +306,9 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         if(neighbourhood.type == Neighbourhood::STANDARD) {
           if(searchParams.nhLocalVarsComeFirst) {
             searchOrders.back().order = ORDER_STATIC;
-            addNhLocalVars(searchOrders, neighbourhood, VALORDER_ASCEND);
+            auto sizeVarValOrder =
+                (searchParams.nhSizeVarAscendVsRandom) ? VALORDER_ASCEND : VALORDER_RANDOM;
+            addNhLocalVars(searchOrders, neighbourhood, sizeVarValOrder);
             searchOrders.emplace_back();
             searchOrders.back().order = defaultOrdering;
           } else {
@@ -435,6 +437,10 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
     return std::make_shared<NeighbourhoodSearchManager<
         MetaStrategy<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>>(prop, base_order,
                                                                               nhc);
+  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANEALING:
+    return std::make_shared<
+        NeighbourhoodSearchManager<MetaStrategy<SimulatedAnnealingSearch<NhSelectionStrategy>>>>(
+        prop, base_order, nhc);
   case SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING:
     return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
         prop, base_order, std::move(nhc));
@@ -442,6 +448,10 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
     return std::make_shared<
         NeighbourhoodSearchManager<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>(
         prop, base_order, nhc);
+  case SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANEALING:
+    return std::make_shared<
+        NeighbourhoodSearchManager<SimulatedAnnealingSearch<NhSelectionStrategy>>>(prop, base_order,
+                                                                                   nhc);
   default: assert(false); abort();
   }
 }

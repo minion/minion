@@ -138,7 +138,7 @@ public:
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
     if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound) {
-      incrementBacktrack(backtrackLimit);
+      incrementBacktrackLimit(backtrackLimit);
     }
     if(stats.solutionFound) {
       highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
@@ -244,7 +244,7 @@ public:
 
     selectionStrategy.updateStats(currentActivatedCombination, stats);
     if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound) {
-      incrementBacktrack(backtrackLimit);
+      incrementBacktrackLimit(backtrackLimit);
     }
     if(stats.solutionFound && stats.newMinValue > bestSolutionValue) {
       iterationsSpentAtPeak = 0;
@@ -356,13 +356,17 @@ public:
   void updateStats(NeighbourhoodContainer& nhc, std::shared_ptr<Propagate>& prop,
                    int currentActivatedCombination, NeighbourhoodStats& stats,
                    std::vector<DomainInt>& solution, NeighbourhoodSearchStats&) {
-
-    selectionStrategy.updateStats(currentActivatedCombination, stats);
-    int delta = (stats.solutionFound) ? checked_cast(stats.newMinValue - currentSolutionValue) : 0;
+    // selection strategies use solution found to mean an improvement.  So give the selection
+    // strategy altered stats where solution found is true only if the solution was actually
+    // improved.
+    int delta = (stats.solutionFound) ? checked_cast<int>(stats.newMinValue - currentSolutionValue) : 0;
+    NeighbourhoodStats alteredStats = stats;
+    alteredStats.solutionFound = stats.solutionFound && delta > 0;
+    selectionStrategy.updateStats(currentActivatedCombination, alteredStats);
 
     if(!getOptions().nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure || !stats.solutionFound ||
        delta < 0) {
-      incrementBacktrack(backtrackLimit);
+      incrementBacktrackLimit(backtrackLimit);
     }
     if(stats.solutionFound && stats.newMinValue > bestSolutionValue) {
       iterationsSpentAtPeak = 0;
@@ -413,6 +417,7 @@ public:
   }
 
   bool hasFinishedPhase() {
+    int iterationLimit = 10; // todo
     bool completed = searchComplete || iterationsSpentAtPeak > iterationLimit;
     if(completed) {
       nhLog("lahc: completed search at opt value: " << bestSolutionValue << endl
@@ -428,7 +433,6 @@ public:
     backtrackLimit = getOptions().nhConfig.initialBacktrackLimit;
     numberIterationsAtStart = globalStats.numberIterations;
     globalStats.notifyStartHillClimb();
-    highestNeighbourhoodSizes.assign(nhc.neighbourhoodCombinations.size(), 1);
     iterationsSpentAtPeak = 0;
 
     bestSolutionValue = newBestMinValue;
@@ -437,16 +441,12 @@ public:
     currentSolutionValue = bestSolutionValue;
     currentSolution = newBestSolution;
     searchComplete = false;
-    recentSolutionValueQueue.assign(getOptions().nhConfig.lahcQueueSize, currentSolutionValue);
 
     copyOverIncumbent(nhc, bestSolution, prop);
     getState().getOptimiseVar()->setMin(newBestMinValue);
     std::vector<AnyVarRef> emptyVars;
     prop->prop(emptyVars);
-    nhLog("lahc: lahcQueueSize = " << getOptions().nhConfig.lahcQueueSize); // NGUYEN: DEBUG
-    nhLog("lahc: lahcStoppingLimitRatio = "
-          << getOptions().nhConfig.lahcStoppingLimitRatio); // NGUYEN: DEBUG
-    nhLog("lahc: Hill climbing from opt value: " << bestSolutionValue);
+    nhLog("sa: climbing from opt value: " << bestSolutionValue);
   }
 };
 

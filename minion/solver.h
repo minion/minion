@@ -290,8 +290,10 @@ public:
   enum class NeighbourhoodSearchStrategy {
     META_WITH_HILLCLIMBING,
     META_WITH_LAHC,
+    META_WITH_SIMULATED_ANEALING,
     HILL_CLIMBING,
-    LAHC
+    LAHC,
+    SIMULATED_ANEALING
   };
   enum class NeighbourhoodSelectionStrategy { RANDOM, UCB, LEARNING_AUTOMATON, INTERACTIVE };
   NeighbourhoodSearchStrategy neighbourhoodSearchStrategy =

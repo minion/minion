@@ -699,7 +699,7 @@ When Allows values used during neighbourhood search to be configured.
           INCREMENT_i("hill climber  backtrack limit multiplier");
           nhConfig.hillClimberBacktrackLimitMultiplier = fromstring<double>(argv[i]);
           INCREMENT_i("hill climber  backtrack limit incrementer");
-          nhConfig.hillClimberBacktrackLimitIncrementer = fromstring<double>(argv[i]);
+          nhConfig.hillClimberBacktrackLimitIncrement= fromstring<double>(argv[i]);
           INCREMENT_i("hole puncher backtrack limit multiplier");
           nhConfig.holePuncherBacktrackLimitMultiplier = fromstring<double>(argv[i]);
           INCREMENT_i("increase hill climber backtrack limit \"onfailure\" or \"always\"");
