@@ -406,7 +406,7 @@ public:
   SearchParams getSearchParams(NeighbourhoodContainer& nhc, NeighbourhoodSearchStats globalStats) {
     int combinationToActivate = selectionStrategy.getCombinationsToActivate(
         nhc, globalStats, getState().getOptimiseVar()->getMin());
-    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, true, false,
+    return SearchParams::neighbourhoodSearch(combinationToActivate, nhc, true, false, true,
                                              getOptions().nhConfig.iterationSearchTime, round(backtrackLimit),
                                              getOptions().nhConfig.backtrackInsteadOfTimeLimit,
                                              1, false);
