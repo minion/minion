@@ -38,7 +38,7 @@ private:
   inline double ucbValue(double reward, u_int64_t totalActivations,
                          u_int64_t totalCombinationVisits) {
     return (reward / totalCombinationVisits) +
-           std::sqrt((getOptions().nhConfig.ucbExplorationBias * std::log(totalActivations)) /
+           std::sqrt((getOptions().nhConfig->ucbExplorationBias * std::log(totalActivations)) /
                      (totalCombinationVisits));
   }
 

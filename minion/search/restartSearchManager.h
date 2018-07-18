@@ -70,4 +70,4 @@ shared_ptr<Controller::SearchManager> make_restart_search_manager(PropagationLev
                                                       vector<SearchOrder> order) {
   return shared_ptr<Controller::SearchManager>(new RestartSearchManager(prop_method, order));
 }
-}
+} // namespace Controller

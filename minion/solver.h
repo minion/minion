@@ -256,36 +256,14 @@ public:
   }
 };
 
+struct NhConfig;
+std::shared_ptr<NhConfig> makeNhConfig();
+
 /// Stored all the options related to search. This item should not
 /// be changed during search.
 class SearchOptions {
 
 public:
-  struct NHConfig {
-    // values here are not necessarily optimal (tuned)
-    // they are defaults until tuning info can be given
-    // can be overridden by commandline
-
-    bool backtrackInsteadOfTimeLimit = true;
-    int iterationSearchTime = 500;
-    double initialSearchBacktrackLimitMultiplier = 2.0; //NGUYEN: test (2.0 is the best one return by tuning-initialise-only), original value: 1.5
-    int initialBacktrackLimit = 22;
-    double hillClimberBacktrackLimitMultiplier = 1.1;
-    double hillClimberBacktrackLimitIncrement = 0;
-    int lahcQueueSize = 100;
-    double lahcStoppingLimitRatio = 1.0;
-    double holePuncherBacktrackLimitMultiplier = 1.1;
-    bool hillClimberIncreaseBacktrackOnlyOnFailure = true;
-    int hillClimberMinIterationsToSpendAtPeak = 4;
-    double hillClimberInitialLocalMaxProbability = 0.001;
-    double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
-    double simulatedAnnealingTemperatureCoolingFactor  = 0.9;
-    int simulatedAnnealingIterationsBetweenCool  = 5;
-    double ucbExplorationBias = 2;
-    double learningAutomatonRate = 0.1;
-    int holePuncherSolutionBagSizeConstant = 5;
-    NHConfig() {}
-  };
 
   enum class NeighbourhoodSearchStrategy {
     META_WITH_HILLCLIMBING,
@@ -300,7 +278,7 @@ public:
       NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING;
   NeighbourhoodSelectionStrategy neighbourhoodSelectionStrategy =
       NeighbourhoodSelectionStrategy::UCB;
-  NHConfig nhConfig;
+  std::shared_ptr<NhConfig> nhConfig = makeNhConfig();
   std::string pathToUCBInitFile;
 
   bool restarts = false;

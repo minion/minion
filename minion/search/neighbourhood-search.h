@@ -5,6 +5,7 @@
 #include "SearchStrategies.h"
 #include "inputfile_parse/CSPSpec.h"
 #include "neighbourhood-def.h"
+#include "search/nhConfig.h"
 #include <atomic>
 #include <cstdlib>
 #include <ctime>
@@ -14,7 +15,7 @@
 #include <sys/time.h>
 
 static std::atomic<bool> alarmTriggered(false);
-std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig& config);
+std::ostream& operator<<(std::ostream& os, const SearchOptions::NhConfig& config);
 void triggerAlarm(int) {
   alarmTriggered = true;
 }
@@ -184,7 +185,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     try {
       int initialSearchTimeout = 100;
       const double multiplier = 1.5;
-      int initialBacktrackLimit = getOptions().nhConfig.initialBacktrackLimit;
+      int initialBacktrackLimit = getOptions().nhConfig->initialBacktrackLimit;
       int attempt = 0;
       do {
         int bias = 0;
@@ -193,7 +194,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         if(attempt % 5 == 3)
           bias = -90;
         nhLog("Searching for initial solution");
-        if(getOptions().nhConfig.backtrackInsteadOfTimeLimit) {
+        if(getOptions().nhConfig->backtrackInsteadOfTimeLimit) {
           cout << "backtrackLimit=" << round(initialBacktrackLimit) << endl;
         } else {
           cout << "timeout=" << initialSearchTimeout << ":\n";
@@ -202,7 +203,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
             solution,
             SearchParams::randomWalk(
                 false, true, initialSearchTimeout, round(initialBacktrackLimit),
-                // getOptions().nhConfig.backtrackInsteadOfTimeLimit,
+                // getOptions().nhConfig->backtrackInsteadOfTimeLimit,
                 true, // NGUYEN: test - using backtrack counts for initialisation instead of time,
                       // to make initial phase reproducible
                 bias),
@@ -210,7 +211,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         cout << "NGUYEN: initialise using backtrack count (22 * 1.5)" << endl; // NGUYEN: DEBUG
         if(!stats.solutionFound) {
           initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
-          initialBacktrackLimit *= getOptions().nhConfig.initialSearchBacktrackLimitMultiplier;
+          initialBacktrackLimit *= getOptions().nhConfig->initialSearchBacktrackLimitMultiplier;
         }
         attempt++;
       } while(!stats.solutionFound);
@@ -474,30 +475,4 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel p
   }
 }
 
-inline std::ostream& operator<<(std::ostream& os, const SearchOptions::NHConfig& config) {
-  os << "NHConfig {";
-  if(config.backtrackInsteadOfTimeLimit) {
-    os << "Using backtracks,\n";
-  } else {
-    os << "Using timelimit,\n";
-  }
-  os << "search Backtrack limit multiplier:" << config.initialSearchBacktrackLimitMultiplier
-     << ",\n";
-  os << "hill climber Backtrack limit multiplier:" << config.hillClimberBacktrackLimitMultiplier
-     << ",\n";
-  os << "hill climber Backtrack limit increment:" << config.hillClimberBacktrackLimitIncrement
-     << ",\n";
-  os << "hole puncher Backtrack limit multiplier:" << config.holePuncherBacktrackLimitMultiplier
-     << ",\n";
-  os << "hill climber Increase backtrack only on failure: "
-     << config.hillClimberIncreaseBacktrackOnlyOnFailure << ",\n";
-  os << "iterationSearchTime:" << config.iterationSearchTime << ",\n";
-  os << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
-     << ",\n";
-  os << "hillClimberInitialLocalMaxProbability : " << config.hillClimberInitialLocalMaxProbability
-     << ",\n";
-  os << "hillClimberProbabilityIncrementMultiplier: "
-     << config.hillClimberProbabilityIncrementMultiplier << "\n}";
-  return os;
-}
 #endif

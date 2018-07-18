@@ -76,6 +76,7 @@ the available orderings) do:
 */
 
 #include "commandline_parse.h"
+#include "search/nhConfig.h"
 
 #define INCREMENT_i(flag)                                                                          \
   {                                                                                                \
@@ -651,7 +652,7 @@ to be specified. Options are "ucb" (default), "la" (learning automaton), random"
             SearchOptions::NeighbourhoodSelectionStrategy::UCB;
         if(i + 1 < argc && argv[i + 1][0] != '-') {
           ++i;
-          getOptions().nhConfig.ucbExplorationBias = fromstring<double>(argv[i]);
+          getOptions().nhConfig->ucbExplorationBias = fromstring<double>(argv[i]);
         }
 
       } else if(argv[i] == string("la")) {
@@ -659,7 +660,7 @@ to be specified. Options are "ucb" (default), "la" (learning automaton), random"
             SearchOptions::NeighbourhoodSelectionStrategy::LEARNING_AUTOMATON;
         if(i + 1 < argc && argv[i + 1][0] != '-') {
           ++i;
-          getOptions().nhConfig.learningAutomatonRate = fromstring<double>(argv[i]);
+          getOptions().nhConfig->learningAutomatonRate = fromstring<double>(argv[i]);
         }
       } else if(argv[i] == string("random")) {
         getOptions().neighbourhoodSelectionStrategy =
@@ -689,32 +690,32 @@ When Allows values used during neighbourhood search to be configured.
         */
     else if(command == string("-nhconfig")) {
       INCREMENT_i("-nhconfig");
-      SearchOptions::NHConfig& nhConfig = getOptions().nhConfig;
+      auto& nhConfig = getOptions().nhConfig;
       try {
 
         if(argv[i] == string("countbacktracks")) {
-          nhConfig.backtrackInsteadOfTimeLimit = true;
+          nhConfig->backtrackInsteadOfTimeLimit = true;
           INCREMENT_i("initial search backtrack limit multiplier");
-          nhConfig.initialSearchBacktrackLimitMultiplier = fromstring<double>(argv[i]);
+          nhConfig->initialSearchBacktrackLimitMultiplier = fromstring<double>(argv[i]);
           INCREMENT_i("hill climber  backtrack limit multiplier");
-          nhConfig.hillClimberBacktrackLimitMultiplier = fromstring<double>(argv[i]);
+          nhConfig->backtrackLimitMultiplier = fromstring<double>(argv[i]);
           INCREMENT_i("hill climber  backtrack limit incrementer");
-          nhConfig.hillClimberBacktrackLimitIncrement= fromstring<double>(argv[i]);
+          nhConfig->backtrackLimitIncrement = fromstring<double>(argv[i]);
           INCREMENT_i("hole puncher backtrack limit multiplier");
-          nhConfig.holePuncherBacktrackLimitMultiplier = fromstring<double>(argv[i]);
+          nhConfig->holePuncherBacktrackLimitMultiplier = fromstring<double>(argv[i]);
           INCREMENT_i("increase hill climber backtrack limit \"onfailure\" or \"always\"");
           if(argv[i] == string("onfailure")) {
-            nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure = true;
+            nhConfig->increaseBacktrackOnlyOnFailure = true;
           } else if(argv[i] == string("always")) {
-            nhConfig.hillClimberIncreaseBacktrackOnlyOnFailure = false;
+            nhConfig->increaseBacktrackOnlyOnFailure = false;
           } else {
             cerr << "expected \"onfailure\" or \"always\", instead found " << argv[i] << endl;
             exit(1);
           }
         } else if(argv[i] == string("counttime")) {
-          nhConfig.backtrackInsteadOfTimeLimit = false;
+          nhConfig->backtrackInsteadOfTimeLimit = false;
           INCREMENT_i("number for iteration search time or backtracks");
-          nhConfig.iterationSearchTime = fromstring<int>(argv[i]);
+          nhConfig->iterationSearchTime = fromstring<int>(argv[i]);
         } else {
           cerr << "expected \"countbacktracks \"or \"counttime\", instead found " << command
                << endl;
@@ -724,17 +725,17 @@ When Allows values used during neighbourhood search to be configured.
         if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING
             || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING){
             INCREMENT_i("number for hill climber min iterations to spend at peak");
-            nhConfig.hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
+            nhConfig->hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
             INCREMENT_i("number for hill climber initial local max probability");
-            nhConfig.hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
+            nhConfig->hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
             INCREMENT_i("number for hill climber increment multiplier");
-            nhConfig.hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
+            nhConfig->hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
         } else if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC
                     || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::LAHC){
             INCREMENT_i("lahc list size");
-            nhConfig.lahcQueueSize = fromstring<int>(argv[i]);
-            INCREMENT_i("lahc stoplimit ratio");            
-            nhConfig.lahcStoppingLimitRatio = fromstring<double>(argv[i]);
+            nhConfig->lahcQueueSize = fromstring<int>(argv[i]);
+            INCREMENT_i("lahc stoplimit ratio");
+            nhConfig->lahcStoppingLimitRatio = fromstring<double>(argv[i]);
         }
       } catch(...) {
         cout << "Could not read argument " << argv[i] << endl;

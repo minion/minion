@@ -20,7 +20,7 @@ public:
 
   void updateStats(int activatedCombination, const NeighbourhoodStats& combinationStats) {
     bool improved = combinationStats.newMinValue > lastSolutionValue;
-    double rate = getOptions().nhConfig.learningAutomatonRate;
+    double rate = getOptions().nhConfig->learningAutomatonRate;
     double& currentProb = combinationProbabilities[activatedCombination];
     currentProb =
         currentProb + rate * improved * (1 - currentProb) - rate * (1 - improved) * currentProb;
