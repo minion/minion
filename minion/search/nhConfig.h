@@ -9,7 +9,7 @@ struct NhConfig {
   // they are defaults until tuning info can be given
   // can be overridden by commandline
 
-  bool backtrackInsteadOfTimeLimit = true;
+  bool backtrackInsteadOfTimeLimit = false;
   int iterationSearchTime = 500;
   double initialSearchBacktrackLimitMultiplier = 2.0;
   int initialBacktrackLimit = 22;
