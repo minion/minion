@@ -11,9 +11,7 @@ struct NhConfig {
 
   bool backtrackInsteadOfTimeLimit = true;
   int iterationSearchTime = 500;
-  double initialSearchBacktrackLimitMultiplier =
-      2.0; // NGUYEN: test (2.0 is the best one return by
-           // tuning-initialise-only), original value: 1.5
+  double initialSearchBacktrackLimitMultiplier = 2.0;
   int initialBacktrackLimit = 22;
   double backtrackLimitMultiplier = 1.1;
   double backtrackLimitIncrement = 0;
@@ -26,38 +24,47 @@ struct NhConfig {
   double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
   double simulatedAnnealingTemperatureCoolingFactor = 0.9;
   int simulatedAnnealingIterationsBetweenCool = 5;
+  double simulatedAnnealingTargetProbabilityForInitialTemperature = 0.8;
   double ucbExplorationBias = 2;
   double learningAutomatonRate = 0.1;
   int holePuncherSolutionBagSizeConstant = 5;
 };
+inline std::ostream& operator<<(std::ostream& os, NhConfig& nhConfig) {
+  os << "NhConfig {" << std::endl;
+  os << "backtrackInsteadOfTimeLimit = " << nhConfig.backtrackInsteadOfTimeLimit << ",\n";
+  os << "iterationSearchTime = " << nhConfig.iterationSearchTime << ",\n";
+  os << "initialSearchBacktrackLimitMultiplier = " << nhConfig.initialSearchBacktrackLimitMultiplier
+     << ",\n";
+  os << "initialBacktrackLimit = " << nhConfig.initialBacktrackLimit << ",\n";
+  os << "backtrackLimitMultiplier = " << nhConfig.backtrackLimitMultiplier << ",\n";
+  os << "backtrackLimitIncrement = " << nhConfig.backtrackLimitIncrement << ",\n";
+  os << "lahcQueueSize = " << nhConfig.lahcQueueSize << ",\n";
+  os << "lahcStoppingLimitRatio = " << nhConfig.lahcStoppingLimitRatio << ",\n";
+  os << "holePuncherBacktrackLimitMultiplier = " << nhConfig.holePuncherBacktrackLimitMultiplier
+     << ",\n";
+  os << "increaseBacktrackOnlyOnFailure = " << nhConfig.increaseBacktrackOnlyOnFailure << ",\n";
+  os << "hillClimberMinIterationsToSpendAtPeak = " << nhConfig.hillClimberMinIterationsToSpendAtPeak
+     << ",\n";
+  os << "hillClimberInitialLocalMaxProbability = " << nhConfig.hillClimberInitialLocalMaxProbability
+     << ",\n";
+  os << "hillClimberProbabilityIncrementMultiplier = "
+     << nhConfig.hillClimberProbabilityIncrementMultiplier << ",\n";
+  os << "simulatedAnnealingTemperatureCoolingFactor = "
+     << nhConfig.simulatedAnnealingTemperatureCoolingFactor << ",\n";
+  os << "simulatedAnnealingIterationsBetweenCool = "
+     << nhConfig.simulatedAnnealingIterationsBetweenCool << ",\n";
+  os << "simulatedAnnealingTargetProbabilityForInitialTemperature = "
+     << nhConfig.simulatedAnnealingTargetProbabilityForInitialTemperature << ",\n";
+  os << "ucbExplorationBias = " << nhConfig.ucbExplorationBias << ",\n";
+  os << "learningAutomatonRate = " << nhConfig.learningAutomatonRate << ",\n";
+  os << "holePuncherSolutionBagSizeConstant = " << nhConfig.holePuncherSolutionBagSizeConstant
+     << "\n";
+  os << "}\n";
+  return os;
+}
 
 std::shared_ptr<NhConfig> makeNhConfig() {
   return make_shared<NhConfig>();
-}
-
-inline std::ostream& operator<<(std::ostream& os, const NhConfig& config) {
-  os << "NhConfig {";
-  if(config.backtrackInsteadOfTimeLimit) {
-    os << "Using backtracks,\n";
-  } else {
-    os << "Using timelimit,\n";
-  }
-  os << "search Backtrack limit multiplier:" << config.initialSearchBacktrackLimitMultiplier
-     << ",\n";
-  os << "hill climber Backtrack limit multiplier:" << config.backtrackLimitMultiplier << ",\n";
-  os << "hill climber Backtrack limit increment:" << config.backtrackLimitIncrement << ",\n";
-  os << "hole puncher Backtrack limit multiplier:" << config.holePuncherBacktrackLimitMultiplier
-     << ",\n";
-  os << "hill climber Increase backtrack only on failure: " << config.increaseBacktrackOnlyOnFailure
-     << ",\n";
-  os << "iterationSearchTime:" << config.iterationSearchTime << ",\n";
-  os << "hillClimberMinIterationsToSpendAtPeak: " << config.hillClimberMinIterationsToSpendAtPeak
-     << ",\n";
-  os << "hillClimberInitialLocalMaxProbability : " << config.hillClimberInitialLocalMaxProbability
-     << ",\n";
-  os << "hillClimberProbabilityIncrementMultiplier: "
-     << config.hillClimberProbabilityIncrementMultiplier << "\n}";
-  return os;
 }
 
 #endif /* MINION_SEARCH_NHCONFIG_H_ */

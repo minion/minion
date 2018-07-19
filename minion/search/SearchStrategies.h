@@ -337,7 +337,6 @@ public:
 
 template <typename SelectionStrategy>
 class SimulatedAnnealingSearch {
-  bool initMode;
 
 public:
   friend MetaStrategy<LateAcceptanceHillClimbingSearch<SelectionStrategy>>;
@@ -353,6 +352,8 @@ public:
   DomainInt bestSolutionValue;
   std::vector<DomainInt> currentSolution;
   std::vector<DomainInt> bestSolution;
+  bool initMode;
+  std::vecctor<DomainInt> objectivesForInitTemperature;
 
   SimulatedAnnealingSearch(const NeighbourhoodContainer& nhc) : selectionStrategy(nhc) {}
 
