@@ -84,6 +84,7 @@ public:
     nhState.copyOverIncumbent(bestSolution);
     getState().getOptimiseVar()->setMin(bestSolutionValue);
     nhState.propagate();
+    nhState.globalStats.notifyStartClimb();
     while(true) {
       auto nhInfo = runNeighbourhood(nhState, backtrackLimit, highestNeighbourhoodSizes);
       NeighbourhoodStats& stats = nhInfo.second;
@@ -153,6 +154,9 @@ public:
     while(true) {
       bool success = false;
       auto availableNHCombinations = findNextNeighbourhoodSizeWithActiveCombinations(nhState.nhc);
+      nhLog("Exploration with neighbourhood of ssize "
+            << currentNeighbourhoodSize()
+            << ", number of available neighbourhoods: " << availableNHCombinations.size());
       if(availableNHCombinations.empty()) {
         randomClimbUntilBetter(nhState);
         resetNeighbourhoodSize();
@@ -166,7 +170,10 @@ public:
           bestSolution = searchStrategy.bestSolution;
           resetNeighbourhoodSize();
           success = true;
+          nhLog("New best solution found");
           break;
+        } else {
+          nhLog("New best solution not found");
         }
       }
       if(!success) {
@@ -177,6 +184,7 @@ public:
 
   void randomClimbUntilBetter(NeighbourhoodState& nhState) {
     while(true) {
+        nhLog("Exploring from random solution");
       NeighbourhoodStats stats = findRandomSolutionUsingNormalSearch(nhState);
       if(stats.newMinValue > bestSolutionValue) {
         bestSolutionValue = stats.newMinValue;
