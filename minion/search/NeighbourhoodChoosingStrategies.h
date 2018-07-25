@@ -2,6 +2,7 @@
 #define MINION_NEIGHBOURHOODCHOOSINGSTRATEGIES_H
 #include "learningAutomatonNeighbourhoodSelectionStrategy.h"
 #include "neighbourhood-def.h"
+#include "neighbourhood-search.h"
 #include "neighbourhoodSearchStats.h"
 #include "ucbNeighbourhoodSelectionStrategy.h"
 #include <cassert>
@@ -13,15 +14,13 @@ class RandomCombinationChooser {
 
 public:
   RandomCombinationChooser(const NeighbourhoodContainer&) {}
-  RandomCombinationChooser() {}
 
   void updateStats(int activatedCombination, const NeighbourhoodStats&) {}
 
-  int getCombinationsToActivate(const NeighbourhoodContainer& nhc, NeighbourhoodSearchStats&,
-                                DomainInt) {
+  int getCombinationsToActivate(const NeighbourhoodState& nhState) {
     viableCombinations.clear();
-    for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); i++) {
-      if(nhc.isCombinationEnabled(i)) {
+    for(size_t i = 0; i < nhState.nhc.neighbourhoodCombinations.size(); i++) {
+      if(nhState.nhc.isCombinationEnabled(i)) {
         viableCombinations.push_back(i);
       }
     }
@@ -38,25 +37,24 @@ public:
     std::cout << stats << std::endl;
   }
 
-  int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
-                                NeighbourhoodSearchStats& globalStats, DomainInt) {
+  int getCombinationsToActivate(const NeighbourhoodState& nhState) {
     while(true) {
       std::cout << "Select Combination:\n";
-      for(size_t i = 0; i < nhc.neighbourhoodCombinations.size(); ++i) {
+      for(size_t i = 0; i < nhState.nhc.neighbourhoodCombinations.size(); ++i) {
         cout << i << ":\n";
-        globalStats.printCombinationDescription(cout, nhc, i);
+        nhState.globalStats.printCombinationDescription(cout, nhState.nhc, i);
         cout << "\n";
       }
       int index;
       bool readInt = bool(cin >> index);
-      if(!readInt || index < -1 || index >= (int)nhc.neighbourhoodCombinations.size()) {
+      if(!readInt || index < -1 || index >= (int)nhState.nhc.neighbourhoodCombinations.size()) {
         cout << "Error, please enter an integer in the range 0.."
-             << nhc.neighbourhoodCombinations.size()
+             << nhState.nhc.neighbourhoodCombinations.size()
              << " to select a combination or -1 to end search.\n";
       } else if(index == -1) {
         std::cerr << "InteractiveCombinationChooser: ending search...\n";
         throw EndOfSearch();
-      } else if(!nhc.isCombinationEnabled(index)) {
+      } else if(!nhState.nhc.isCombinationEnabled(index)) {
         cout << "Error: This combination cannot be activated, one or more of the neighbourhood "
                 "activation variables must be assigned to false.";
       } else {

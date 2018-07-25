@@ -1,10 +1,9 @@
 #ifndef MINION_NEIGHBOURHOOD_SEARCH_H
 #define MINION_NEIGHBOURHOOD_SEARCH_H
-#include "NeighbourhoodChoosingStrategies.h"
 #include "SearchManager.h"
-#include "SearchStrategies.h"
 #include "inputfile_parse/CSPSpec.h"
 #include "neighbourhood-def.h"
+#include "neighbourhoodSearchStats.h"
 #include "search/nhConfig.h"
 #include <atomic>
 #include <cstdlib>
@@ -15,29 +14,118 @@
 #include <sys/time.h>
 
 static std::atomic<bool> alarmTriggered(false);
-std::ostream& operator<<(std::ostream& os, const SearchOptions::NhConfig& config);
 void triggerAlarm(int) {
   alarmTriggered = true;
 }
 class TimeoutException : public std::exception {};
+struct SearchParams {
+  enum Mode { STANDARD_SEARCH, NEIGHBOURHOOD_SEARCH, RANDOM_WALK };
+  // Only used with RANDOM_WALK
+  int random_bias;
 
-template <typename SearchStrategy>
-struct NeighbourhoodSearchManager : public Controller::SearchManager {
+  Mode mode;
+  int combinationToActivate;
+  std::vector<int> neighbourhoodsToActivate;
+  bool nhLocalVarsComeFirst;
+  bool optimiseMode;
+  bool stopAtFirstSolution;
 
-  shared_ptr<Propagate> prop;
-  vector<SearchOrder> base_order;
-  NeighbourhoodContainer nhc;
-  SearchStrategy searchStrategy;
+  int timeoutInMillis;
+  int backtrackLimit;
+  bool backtrackInsteadOfTimeLimit;
+  DomainInt initialNeighbourhoodSize;
+  bool nhSizeVarAscendVsRandom;
 
-  NeighbourhoodSearchManager(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
-                             NeighbourhoodContainer _nhc)
-      : prop(std::move(_prop)), base_order(_base_order), nhc(std::move(_nhc)), searchStrategy(nhc) {
-    signal(SIGVTALRM, triggerAlarm);
+private:
+  SearchParams(int random_bias, Mode mode, int combinationToActivate,
+               std::vector<int> neighbourhoods, bool nhLocalVarsComeFirst, bool optimiseMode,
+               bool stopAtFirstSolution, int timeoutInMillis, int backtrackLimit,
+               bool backtrackInsteadOfTimeLimit, DomainInt initialNeighbourhoodSize,
+               bool nhSizeVarAscendVsRandom)
+      : random_bias(random_bias),
+        mode(mode),
+        combinationToActivate(combinationToActivate),
+        neighbourhoodsToActivate(std::move(neighbourhoods)),
+        nhLocalVarsComeFirst(nhLocalVarsComeFirst),
+        optimiseMode(optimiseMode),
+        stopAtFirstSolution(stopAtFirstSolution),
+        timeoutInMillis(timeoutInMillis),
+        backtrackLimit(backtrackLimit),
+        backtrackInsteadOfTimeLimit(backtrackInsteadOfTimeLimit),
+        initialNeighbourhoodSize(initialNeighbourhoodSize),
+        nhSizeVarAscendVsRandom(nhSizeVarAscendVsRandom) {}
+
+public:
+  static inline SearchParams
+  neighbourhoodSearch(int combinationToActivate, const NeighbourhoodContainer& nhc,
+                      bool nhLocalVarsComeFirst, bool optimiseMode, bool stopAtFirstSolution,
+                      int timeoutInMillis, int backtrackLimit, bool backtrackInsteadOfTimeLimit,
+                      DomainInt initialNeighbourhoodSize, bool nhSizeVarAscendVsRandom = true) {
+    SearchParams searchParams(0, NEIGHBOURHOOD_SEARCH, combinationToActivate,
+                              nhc.neighbourhoodCombinations[combinationToActivate],
+                              nhLocalVarsComeFirst, optimiseMode, stopAtFirstSolution,
+                              timeoutInMillis, backtrackLimit, backtrackInsteadOfTimeLimit,
+                              initialNeighbourhoodSize, nhSizeVarAscendVsRandom);
+    if(searchParams.neighbourhoodsToActivate.size() > 1) {
+      std::random_shuffle(searchParams.neighbourhoodsToActivate.begin() + 1,
+                          searchParams.neighbourhoodsToActivate.end());
+    }
+    return searchParams;
   }
 
-  inline NeighbourhoodStats searchNeighbourhoods(vector<DomainInt>& solution,
-                                                 const SearchParams& searchParams,
-                                                 NeighbourhoodSearchStats& globalStats) {
+  static inline SearchParams standardSearch(bool optimiseMode, bool stopAtFirstSolution,
+                                            int timeoutInMillis, int backtrackLimit,
+                                            bool backtrackInsteadOfTimeLimit) {
+    return SearchParams(0, STANDARD_SEARCH, -1, {}, false, optimiseMode, stopAtFirstSolution,
+                        timeoutInMillis, backtrackLimit, backtrackInsteadOfTimeLimit, 0, false);
+  }
+  static inline SearchParams randomWalk(bool optimiseMode, bool stopAtFirstSolution,
+                                        int timeoutInMillis, int backtrackLimit,
+                                        bool backtrackInsteadOfTimeLimit, int bias) {
+    return SearchParams(bias, RANDOM_WALK, -1, {}, false, optimiseMode, stopAtFirstSolution,
+                        timeoutInMillis, backtrackLimit, backtrackInsteadOfTimeLimit, 0, false);
+  }
+  friend inline std::ostream& operator<<(std::ostream& os, const SearchParams& searchParams) {
+    os << "SearchParams(";
+    switch(searchParams.mode) {
+    case NEIGHBOURHOOD_SEARCH: os << "mode=NEIGHBOURHOOD_SEARCH"; break;
+    case STANDARD_SEARCH: os << "STANDARD_SEARCH"; break;
+    case RANDOM_WALK: os << "RANDOM_WALK"; break;
+    }
+    os << "\ncombinationToActivate = " << searchParams.combinationToActivate
+       << "\nneighbourhoodsToActivate =  " << searchParams.neighbourhoodsToActivate
+       << ",\noptimiseMode = " << searchParams.optimiseMode
+       << ",\ntimeoutInMillis = " << searchParams.timeoutInMillis
+       << ",\ninitialNeighbourhoodSize = " << searchParams.initialNeighbourhoodSize << ")";
+    return os;
+  }
+};
+
+struct NeighbourhoodState {
+  struct DefaultContinueSearchFunc {
+    bool operator()(vector<DomainInt>&) const {
+      return true;
+    }
+  };
+  shared_ptr<Propagate> prop;
+  vector<SearchOrder> base_order;
+  vector<DomainInt> solution;
+  // holds the last solution of any search iteration
+  NeighbourhoodContainer nhc;
+  NeighbourhoodSearchStats globalStats;
+  NeighbourhoodState(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
+                     NeighbourhoodContainer _nhc)
+      : prop(std::move(_prop)),
+        base_order(_base_order),
+        nhc(std::move(_nhc)),
+        globalStats(
+            nhc.neighbourhoodCombinations.size(),
+            make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()),
+            nhc.maxNeighbourhoodSize) {}
+  template <typename ContinueSearchFunc = DefaultContinueSearchFunc>
+  inline NeighbourhoodStats
+  searchNeighbourhoods(const SearchParams& searchParams,
+                       ContinueSearchFunc&& continueSearch = DefaultContinueSearchFunc()) {
     // Save state of the world
     int depth = Controller::get_world_depth();
     Controller::world_push();
@@ -71,7 +159,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       if(searchParams.mode == SearchParams::STANDARD_SEARCH) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
-        NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(), 0, false, false);
+        NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(),
+                                 getState().getOptimiseVar()->getMin(), 0, false, false);
 
         globalStats.reportnewStats(searchParams.combinationToActivate, stats);
         Controller::world_pop_to_depth(depth);
@@ -79,8 +168,8 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
       }
     }
 
-    DomainInt highestNeighbourhoodSize, lastOptVal = getState().getOptimiseVar()->getMin(),
-                                        newOptMinTarget = getState().getOptimiseVar()->getMin();
+    DomainInt highestNeighbourhoodSize, oldMinValue = getState().getOptimiseVar()->getMin(),
+                                        newOptMinTarget = oldMinValue, lastOptVal = oldMinValue;
     std::shared_ptr<Controller::StandardSearchManager> sm;
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
                               const vector<Controller::triple>& branches) {
@@ -101,7 +190,7 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
         solution.push_back(var.getAssignedValue());
       }
       globalStats.foundSolution(getState().getOptimiseVar()->getMin());
-      if(searchParams.stopAtFirstSolution || !searchStrategy.continueSearch(nhc, solution)) {
+      if(searchParams.stopAtFirstSolution || !continueSearch(solution)) {
         throw EndOfSearch();
       }
       if(searchParams.optimiseMode) {
@@ -136,120 +225,45 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     if(!searchParams.backtrackInsteadOfTimeLimit && searchParams.timeoutInMillis > 0) {
       clearTimeout();
     }
-    if(getState().isCtrlcPressed() ||
-       (getOptions().timeout_active &&
-        globalStats.getTotalTimeTaken() >= getOptions().time_limit)) {
-      throw EndOfSearch();
-    }
     bool solutionFound = !solution.empty();
-    NeighbourhoodStats stats(lastOptVal, getTimeTaken(startTime), solutionFound, timeout,
+    double totalTime = get_cpu_time();
+    NeighbourhoodStats stats(lastOptVal, oldMinValue, totalTime - startTime, solutionFound, timeout,
                              highestNeighbourhoodSize);
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);
+
+    if(getState().isCtrlcPressed()) {
+      cout << "Ctrl-C pressed----" << std::endl;
+      throw EndOfSearch();
+    } else if(getOptions().timeout_active && totalTime >= getOptions().time_limit) {
+      cout << "Timeout\n";
+      throw EndOfSearch();
+    }
+
     Controller::world_pop_to_depth(depth);
     return stats;
   }
 
-  inline void jumpBacktToPrimaryNeighbourhood(Controller::StandardSearchManager& sm,
-                                              MultiBranch& varOrder, int bottomOfPrimaryNhIndex) {
-    while(!sm.branches.empty() && varOrder.pos > bottomOfPrimaryNhIndex) {
-      if(sm.branches.back().isLeft) {
-        Controller::world_pop();
-        Controller::maybe_print_right_backtrack();
-        sm.depth--;
-      }
-      sm.branches.pop_back();
-    }
-  }
-
-  virtual void search() {
-    cout << getOptions().nhConfig << endl;
-    cout.setf(ios::fixed, ios::floatfield);
-    cout.precision(3);
-
-    int maxSize = nhc.getMaxNeighbourhoodSize();
-
-    NeighbourhoodSearchStats globalStats(
-        nhc.neighbourhoodCombinations.size(),
-        make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()),
-        maxSize);
-
-    globalStats.startTimer();
-
-    vector<DomainInt> solution;
-    // holds the last solution of any search iteration
-
-    NeighbourhoodStats stats(0, 0, false, false);
-    // holds return value of each search iteration
-
-    // try to find initial solution
-    try {
-      int initialSearchTimeout = 100;
-      const double multiplier = 1.5;
-      int initialBacktrackLimit = getOptions().nhConfig->initialBacktrackLimit;
-      int attempt = 0;
-      do {
-        int bias = 0;
-        if(attempt % 5 == 2)
-          bias = 90;
-        if(attempt % 5 == 3)
-          bias = -90;
-        nhLog("Searching for initial solution");
-        if(getOptions().nhConfig->backtrackInsteadOfTimeLimit) {
-          cout << "backtrackLimit=" << round(initialBacktrackLimit) << endl;
-        } else {
-          cout << "timeout=" << initialSearchTimeout << ":\n";
-        }
-        stats = searchNeighbourhoods(
-            solution,
-            SearchParams::randomWalk(
-                false, true, initialSearchTimeout, round(initialBacktrackLimit),
-                // getOptions().nhConfig->backtrackInsteadOfTimeLimit,
-                true, // NGUYEN: test - using backtrack counts for initialisation instead of time,
-                      // to make initial phase reproducible
-                bias),
-            globalStats);
-        cout << "NGUYEN: initialise using backtrack count (22 * 1.5)" << endl; // NGUYEN: DEBUG
-        if(!stats.solutionFound) {
-          initialSearchTimeout = (int)(initialSearchTimeout * multiplier);
-          initialBacktrackLimit *= getOptions().nhConfig->initialSearchBacktrackLimitMultiplier;
-        }
-        attempt++;
-      } while(!stats.solutionFound);
-    } catch(EndOfSearch&) {
-      if(getState().isCtrlcPressed()) {
-        cout << "Ctrl-C pressed----" << std::endl;
-      }
-      cout << "Initial solution not found\n";
-      cout << endl;
-      throw EndOfSearch();
-    }
-    searchStrategy.initialise(nhc, stats.newMinValue, solution, prop, globalStats);
-    debug_log("Stats on initial solution:\n" << stats << endl);
-    try {
-      while(!searchStrategy.hasFinishedPhase()) {
-        SearchParams searchParams = searchStrategy.getSearchParams(nhc, globalStats);
-        debug_log("Searching with params  " << searchParams);
-        stats = searchNeighbourhoods(solution, searchParams, globalStats);
-        debug_log("Stats on last search: " << stats << endl);
-        searchStrategy.updateStats(nhc, prop, searchParams.combinationToActivate, stats, solution,
-                                   globalStats);
-      }
-    } catch(EndOfSearch&) {}
-
-    if(getState().isCtrlcPressed()) {
-      cout << "Ctrl-C pressed----" << std::endl;
-    }
-    printBestSolution(globalStats);
-    globalStats.printStats(cout, nhc);
-    cout << endl;
-    throw EndOfSearch();
-  }
-
-  inline void printBestSolution(NeighbourhoodSearchStats& stats) {
+  inline void copyOverIncumbent(const vector<DomainInt>& solution) {
     if(Controller::get_world_depth() != 1) {
       Controller::world_pop_to_depth(1);
     }
-    std::vector<std::pair<AnyVarRef, DomainInt>>& bestAssignment = stats.getBestAssignment();
+    Controller::world_push();
+    for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
+      nhc.shadow_mapping[1][i].assign(solution[i]);
+    }
+    std::vector<AnyVarRef> emptyVars;
+    prop->prop(emptyVars);
+  }
+
+  void propagate() {
+    vector<AnyVarRef> emptyVars;
+    prop->prop(emptyVars);
+  }
+  inline void printBestSolution() {
+    if(Controller::get_world_depth() != 1) {
+      Controller::world_pop_to_depth(1);
+    }
+    std::vector<std::pair<AnyVarRef, DomainInt>>& bestAssignment = globalStats.getBestAssignment();
     for(auto& varAssignmentPair : bestAssignment) {
       varAssignmentPair.first.assign(varAssignmentPair.second);
     }
@@ -281,6 +295,19 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
            << nhc.neighbourhoods[i].activation.getMax() << endl;
     }
     cout << "---------------" << endl;
+  }
+
+private:
+  inline void jumpBacktToPrimaryNeighbourhood(Controller::StandardSearchManager& sm,
+                                              MultiBranch& varOrder, int bottomOfPrimaryNhIndex) {
+    while(!sm.branches.empty() && varOrder.pos > bottomOfPrimaryNhIndex) {
+      if(sm.branches.back().isLeft) {
+        Controller::world_pop();
+        Controller::maybe_print_right_backtrack();
+        sm.depth--;
+      }
+      sm.branches.pop_back();
+    }
   }
 
   /**
@@ -418,61 +445,56 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     alarmTriggered = false;
     setitimer(ITIMER_VIRTUAL, &timer, NULL);
   }
-
-  inline double getTimeTaken(double startTime) {
-    return get_cpu_time() - startTime;
-  }
 };
 
-template <typename NhSelectionStrategy>
-shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method,
-                                                                    vector<SearchOrder>& base_order,
-                                                                    NeighbourhoodContainer& nhc) {
-  shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
-  switch(getOptions().neighbourhoodSearchStrategy) {
-  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING:
-    return std::make_shared<
-        NeighbourhoodSearchManager<MetaStrategy<HillClimbingSearch<NhSelectionStrategy>>>>(
-        prop, base_order, nhc);
-  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC:
-    return std::make_shared<NeighbourhoodSearchManager<
-        MetaStrategy<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>>(prop, base_order,
-                                                                              nhc);
-  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANEALING:
-    return std::make_shared<
-        NeighbourhoodSearchManager<MetaStrategy<SimulatedAnnealingSearch<NhSelectionStrategy>>>>(
-        prop, base_order, nhc);
-  case SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING:
-    return std::make_shared<NeighbourhoodSearchManager<HillClimbingSearch<NhSelectionStrategy>>>(
-        prop, base_order, std::move(nhc));
-  case SearchOptions::NeighbourhoodSearchStrategy::LAHC:
-    return std::make_shared<
-        NeighbourhoodSearchManager<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>(
-        prop, base_order, nhc);
-  case SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANEALING:
-    return std::make_shared<
-        NeighbourhoodSearchManager<SimulatedAnnealingSearch<NhSelectionStrategy>>>(prop, base_order,
-                                                                                   nhc);
-  default: assert(false); abort();
-  }
+inline NeighbourhoodStats findRandomSolutionUsingNormalSearch(NeighbourhoodState& nhState) {
+  // holds return value of each search iteration
+
+  // try to find initial solution
+  int initialBacktrackLimit = getOptions().nhConfig->initialBacktrackLimit;
+  int attempt = 0;
+  do {
+    int bias = 0;
+    if(attempt % 5 == 2)
+      bias = 90;
+    if(attempt % 5 == 3)
+      bias = -90;
+    nhLog("Searching for random solution, backtrack limit = " << round(initialBacktrackLimit));
+    NeighbourhoodStats stats = nhState.searchNeighbourhoods(
+        SearchParams::randomWalk(false, true, 0, round(initialBacktrackLimit), true, bias));
+    if(stats.solutionFound) {
+      return stats;
+    }
+    initialBacktrackLimit *= getOptions().nhConfig->initialSearchBacktrackLimitMultiplier;
+    attempt++;
+  } while(true);
 }
 
-shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel prop_method,
-                                                              vector<SearchOrder> base_order,
-                                                              NeighbourhoodContainer nhc) {
-  switch(getOptions().neighbourhoodSelectionStrategy) {
-  case SearchOptions::NeighbourhoodSelectionStrategy::RANDOM:
-    return MakeNeighbourhoodSearchHelper<RandomCombinationChooser>(prop_method, base_order, nhc);
-  case SearchOptions::NeighbourhoodSelectionStrategy::UCB:
-    return MakeNeighbourhoodSearchHelper<UCBNeighbourhoodSelection>(prop_method, base_order, nhc);
-  case SearchOptions::NeighbourhoodSelectionStrategy::LEARNING_AUTOMATON:
-    return MakeNeighbourhoodSearchHelper<LearningAutomatonNeighbourhoodSelection>(prop_method,
-                                                                                  base_order, nhc);
-  case SearchOptions::NeighbourhoodSelectionStrategy::INTERACTIVE:
-    return MakeNeighbourhoodSearchHelper<InteractiveCombinationChooser>(prop_method, base_order,
-                                                                        nhc);
-  default: assert(false); abort();
+template <typename SearchStrategy>
+struct NeighbourhoodSearchManager : public Controller::SearchManager {
+  NeighbourhoodState nhState;
+  SearchStrategy searchStrategy;
+  NeighbourhoodSearchManager(shared_ptr<Propagate> _prop, vector<SearchOrder> _base_order,
+                             NeighbourhoodContainer _nhc)
+      : nhState(_prop, std::move(_base_order), std::move(_nhc)), searchStrategy(nhState.nhc) {}
+
+  virtual void search() {
+    signal(SIGVTALRM, triggerAlarm);
+    cout << getOptions().nhConfig << endl;
+    cout.setf(ios::fixed, ios::floatfield);
+    cout.precision(3);
+
+    nhState.globalStats.startTimer();
+    try {
+      NeighbourhoodStats initialStats = findRandomSolutionUsingNormalSearch(nhState);
+      debug_log("Stats on initial solution:\n" << initialStats << endl);
+      searchStrategy.run(nhState, initialStats.newMinValue, nhState.solution);
+    } catch(EndOfSearch&) {}
+    nhState.printBestSolution();
+    nhState.globalStats.printStats(cout, nhState.nhc);
+    cout << endl;
+    throw EndOfSearch();
   }
-}
+};
 
 #endif

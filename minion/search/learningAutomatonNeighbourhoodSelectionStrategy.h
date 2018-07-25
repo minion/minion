@@ -1,6 +1,7 @@
 #ifndef MINION_SEARCH_LEARNINGAUTOMATONNEIGHBOURHOODSELECTIONSTRATEGY_H_
 #define MINION_SEARCH_LEARNINGAUTOMATONNEIGHBOURHOODSELECTIONSTRATEGY_H_
 #include "neighbourhood-def.h"
+#include "neighbourhood-search.h"
 #include "neighbourhoodSearchStats.h"
 #include <math.h>
 
@@ -9,7 +10,6 @@
 #include <iostream>
 #include <vector>
 class LearningAutomatonNeighbourhoodSelection {
-  DomainInt lastSolutionValue;
 
   std::vector<double> combinationProbabilities;
 
@@ -19,7 +19,7 @@ public:
                                  ((double)1) / nhc.neighbourhoodCombinations.size()) {}
 
   void updateStats(int activatedCombination, const NeighbourhoodStats& combinationStats) {
-    bool improved = combinationStats.newMinValue > lastSolutionValue;
+    bool improved = combinationStats.newMinValue > combinationStats.oldMinValue;
     double rate = getOptions().nhConfig->learningAutomatonRate;
     double& currentProb = combinationProbabilities[activatedCombination];
     currentProb =
@@ -35,10 +35,7 @@ public:
     }
   }
 
-  int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
-                                NeighbourhoodSearchStats& globalStats,
-                                DomainInt currentSolutionValue) {
-    lastSolutionValue = currentSolutionValue;
+  int getCombinationsToActivate(const NeighbourhoodState&) {
     double randomNumber = ((double)rand()) / RAND_MAX;
     double totalProb = 0;
     for(size_t i = 0; i < combinationProbabilities.size(); i++) {

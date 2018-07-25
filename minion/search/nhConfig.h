@@ -17,6 +17,7 @@ struct NhConfig {
   double backtrackLimitIncrement = 0;
   int lahcQueueSize = 100;
   double lahcStoppingLimitRatio = 1.0;
+  int holePuncherInitialBacktrackLimit = 22;
   double holePuncherBacktrackLimitMultiplier = 1.1;
   bool increaseBacktrackOnlyOnFailure = true;
   int hillClimberMinIterationsToSpendAtPeak = 4;
@@ -27,7 +28,6 @@ struct NhConfig {
   double simulatedAnnealingTargetProbabilityForInitialTemperature = 0.8;
   double ucbExplorationBias = 2;
   double learningAutomatonRate = 0.1;
-  int holePuncherSolutionBagSizeConstant = 5;
 };
 inline std::ostream& operator<<(std::ostream& os, NhConfig& nhConfig) {
   os << "NhConfig {" << std::endl;
@@ -42,6 +42,7 @@ inline std::ostream& operator<<(std::ostream& os, NhConfig& nhConfig) {
   os << "lahcStoppingLimitRatio = " << nhConfig.lahcStoppingLimitRatio << ",\n";
   os << "holePuncherBacktrackLimitMultiplier = " << nhConfig.holePuncherBacktrackLimitMultiplier
      << ",\n";
+  os << "holePuncherInitialBacktrackLimit= " << nhConfig.holePuncherInitialBacktrackLimit << ",\n";
   os << "increaseBacktrackOnlyOnFailure = " << nhConfig.increaseBacktrackOnlyOnFailure << ",\n";
   os << "hillClimberMinIterationsToSpendAtPeak = " << nhConfig.hillClimberMinIterationsToSpendAtPeak
      << ",\n";
@@ -57,14 +58,8 @@ inline std::ostream& operator<<(std::ostream& os, NhConfig& nhConfig) {
      << nhConfig.simulatedAnnealingTargetProbabilityForInitialTemperature << ",\n";
   os << "ucbExplorationBias = " << nhConfig.ucbExplorationBias << ",\n";
   os << "learningAutomatonRate = " << nhConfig.learningAutomatonRate << ",\n";
-  os << "holePuncherSolutionBagSizeConstant = " << nhConfig.holePuncherSolutionBagSizeConstant
-     << "\n";
   os << "}\n";
   return os;
-}
-
-std::shared_ptr<NhConfig> makeNhConfig() {
-  return make_shared<NhConfig>();
 }
 
 #endif /* MINION_SEARCH_NHCONFIG_H_ */

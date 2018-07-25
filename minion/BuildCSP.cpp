@@ -24,6 +24,7 @@
 
 #include "search/search_control.h"
 
+#include "search/SearchStrategies.h"
 #include "search/neighbourhood-search.h"
 #include "search/restartSearchManager.h"
 
@@ -31,6 +32,10 @@
 #include "dump_state.hpp"
 
 using namespace ProbSpec;
+std::shared_ptr<NhConfig> makeNhConfig() {
+  return make_shared<NhConfig>();
+}
+
 
 void BuildCSP(CSPInstance& instance) {
   getState().setTupleListContainer(instance.tupleListContainer);

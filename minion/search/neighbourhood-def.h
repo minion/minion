@@ -76,6 +76,7 @@ struct NeighbourhoodContainer {
   std::vector<Neighbourhood> neighbourhoods;
   std::vector<std::vector<int>> neighbourhoodCombinations;
   std::vector<AnyVarRef> variablesOutOfNeighbourhoods;
+  int maxNeighbourhoodSize;
   NeighbourhoodContainer(const ParsedNeighbourhoodContainer& p)
       : shadow_mapping(get_AnyVarRef_from_Var(p.shadow_mapping)),
         shadow_disable(get_AnyVarRef_from_Var(p.shadow_disable)) {
@@ -113,6 +114,7 @@ struct NeighbourhoodContainer {
               << "\n";
     std::cout << "Number variables not used in neighbourhoods: "
               << variablesOutOfNeighbourhoods.size() << "\n";
+    maxNeighbourhoodSize = getMaxNeighbourhoodSize();
   }
 
   inline void buildCombinations(const std::vector<std::shared_ptr<NeighbourhoodGroup>>& groups,

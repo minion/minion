@@ -1,6 +1,7 @@
 #ifndef MINION_SEARCH_UCBNEIGHBOURHOODSELECTIONSTRATEGY_H_
 #define MINION_SEARCH_UCBNEIGHBOURHOODSELECTIONSTRATEGY_H_
 #include "neighbourhood-def.h"
+#include "neighbourhood-search.h"
 #include "neighbourhoodSearchStats.h"
 #include <math.h>
 
@@ -47,17 +48,16 @@ public:
 
   void updateStats(int activatedCombination, const NeighbourhoodStats& combinationStats) {}
 
-  int getCombinationsToActivate(const NeighbourhoodContainer& nhc,
-                                NeighbourhoodSearchStats& globalStats, DomainInt) {
+  int getCombinationsToActivate(const NeighbourhoodState& nhState) {
     double bestUCTValue = -(std::numeric_limits<double>::max());
     bool allCombinationsTryed = true;
     std::vector<int> bestCombinations;
     // changed so that if multiple neighbourhoods have the same best UCb value, a random one is
     // selected
 
-    for(int i = 0; i < (int)globalStats.numberActivations.size(); i++) {
-      if(nhc.isCombinationEnabled(i)) {
-        if(globalStats.numberActivations[i] == 0) {
+    for(int i = 0; i < (int)nhState.globalStats.numberActivations.size(); i++) {
+      if(nhState.nhc.isCombinationEnabled(i)) {
+        if(nhState.globalStats.numberActivations[i] == 0) {
           if(allCombinationsTryed) {
             allCombinationsTryed = false;
             bestCombinations.clear();
@@ -65,9 +65,9 @@ public:
           bestCombinations.push_back(i);
         }
         if(allCombinationsTryed) {
-          double currentUCBValue =
-              ucbValue(numberPositiveSolutions(globalStats, i), numberIterations(globalStats),
-                       numberActivations(globalStats, i));
+          double currentUCBValue = ucbValue(numberPositiveSolutions(nhState.globalStats, i),
+                                            numberIterations(nhState.globalStats),
+                                            numberActivations(nhState.globalStats, i));
           if(currentUCBValue > bestUCTValue) {
             bestUCTValue = currentUCBValue;
             bestCombinations.clear();

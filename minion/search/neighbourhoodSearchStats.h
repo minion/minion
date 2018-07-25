@@ -7,15 +7,18 @@ static const std::string indent = "    ";
 
 struct NeighbourhoodStats {
   DomainInt newMinValue;
+  DomainInt oldMinValue;
   double timeTaken;
   bool solutionFound;
   bool timeoutReached;
   DomainInt highestNeighbourhoodSize;
 
 public:
-  NeighbourhoodStats(DomainInt newMinValue, double timeTaken, bool solutionFound,
-                     bool timeoutReached, DomainInt highestNeighbourhoodSize = 0)
+  NeighbourhoodStats(DomainInt newMinValue, DomainInt oldMinValue, double timeTaken,
+                     bool solutionFound, bool timeoutReached,
+                     DomainInt highestNeighbourhoodSize = 0)
       : newMinValue(newMinValue),
+        oldMinValue(oldMinValue),
         timeTaken(timeTaken),
         solutionFound(solutionFound),
         timeoutReached(timeoutReached),
@@ -35,7 +38,6 @@ struct NeighbourhoodSearchStats {
   const std::pair<DomainInt, DomainInt> initialOptVarRange;
   DomainInt valueOfInitialSolution;
   DomainInt bestOptVarValue;
-  DomainInt optValueAchievedByLastNHCombination;
   vector<pair<DomainInt, double>> bestValueTimes;
   std::vector<std::pair<AnyVarRef, DomainInt>> bestCompleteSolutionAssignment;
 
@@ -66,7 +68,6 @@ struct NeighbourhoodSearchStats {
       : initialOptVarRange(initialOptVarRange),
         valueOfInitialSolution(initialOptVarRange.first),
         bestOptVarValue(initialOptVarRange.first),
-        optValueAchievedByLastNHCombination(initialOptVarRange.first),
         numberActivations(numberCombinations, 0),
         totalTime(numberCombinations, 0),
         numberPositiveSolutions(numberCombinations, 0),
@@ -93,17 +94,20 @@ struct NeighbourhoodSearchStats {
     totalTime[activatedCombination] += stats.timeTaken;
     numberTimeouts[activatedCombination] += stats.timeoutReached;
     if(stats.solutionFound) {
-      if(stats.newMinValue > optValueAchievedByLastNHCombination) {
+      if(stats.newMinValue > stats.oldMinValue) {
         ++numberPositiveSolutions[activatedCombination];
       } else {
         ++numberNegativeSolutions[activatedCombination];
       }
-      optValueAchievedByLastNHCombination = stats.newMinValue;
-      //cout << "Current solution: " << stats.newMinValue << endl; //NGUYEN: DEBUG
     } else {
       ++numberNoSolutions[activatedCombination];
     }
     ++numberIterations;
+    if(stats.solutionFound && stats.newMinValue == getState().getOptimiseVar()->getMax()) {
+      nhLog("achieved max possible opt value : " << stats.newMinValue);
+      throw EndOfSearch();
+      return;
+    }
   }
 
   inline void saveCurrentAssignmentIfBest(DomainInt currentAssignmentOptValue) {
@@ -128,13 +132,17 @@ struct NeighbourhoodSearchStats {
     return bestCompleteSolutionAssignment;
   }
 
-  inline void notifyStartHillClimb() {
+  inline void notifyStartClimb() {
     numberHillClimbs += 1;
     hillClimberStartTime = getTotalTimeTaken();
+    nhLog("Start climb from value " << getState().getOptimiseVar()->getMin()
+                                    << ", number iterations = " << numberIterations);
   }
 
-  inline void notifyEndHillClimb() {
+  inline void notifyEndClimb() {
     totalHillClimberTime += (getTotalTimeTaken() - hillClimberStartTime);
+    nhLog("End climb from value " << getState().getOptimiseVar()->getMin()
+                                  << ", number iterations = " << numberIterations);
   }
 
   inline void notifyStartExploration() {
@@ -159,7 +167,6 @@ struct NeighbourhoodSearchStats {
     os << "Search Stats:\n";
     os << "Number iterations: " << numberIterations << "\n";
     os << "Initial optimise var range: " << initialOptVarRange << "\n";
-    os << "Value achieved by last neighbourhood: " << optValueAchievedByLastNHCombination << "\n";
     os << "Best optimise var value: " << bestOptVarValue << "\n";
     os << "Time till best solution: " << totalTimeToBestSolution << "s\n";
     os << "Total time: " << getTotalTimeTaken() << "s\n";
@@ -190,7 +197,7 @@ struct NeighbourhoodSearchStats {
   }
 
   inline void printCombinationDescription(std::ostream& os, const NeighbourhoodContainer& nhc,
-                                          int combIndex) {
+                                          int combIndex) const {
     const std::vector<int>& combination = nhc.neighbourhoodCombinations[combIndex];
     os << "Neighbourhood Combination:\n    Primary nh: " << nhc.neighbourhoods[combination[0]].name
        << "\n";
