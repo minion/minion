@@ -32,6 +32,11 @@ class HillClimbingSearch {
 
   SelectionStrategy selectionStrategy;
 
+public:
+  DomainInt bestSolutionValue;
+  std::vector<DomainInt> bestSolution;
+
+private:
   pair<size_t, NeighbourhoodStats>
   runNeighbourhood(NeighbourhoodState& nhState, ExponentialIncrementer<int> backtrackLimit,
                    const vector<size_t>& highestNeighbourhoodSizes) {
@@ -51,7 +56,6 @@ class HillClimbingSearch {
                             vector<size_t> highestNeighbourhoodSizes) {
     iterationsSpentAtPeak = 0;
     localMaxProbability = getOptions().nhConfig->hillClimberInitialLocalMaxProbability;
-    cout << "prob reset\n";
     highestNeighbourhoodSizes.assign(nhState.nhc.neighbourhoodCombinations.size(), 1);
     bestSolutionValue = stats.newMinValue;
     bestSolution = std::move(nhState.solution);
@@ -62,9 +66,6 @@ class HillClimbingSearch {
   }
 
 public:
-  DomainInt bestSolutionValue;
-  std::vector<DomainInt> bestSolution;
-
   HillClimbingSearch(const NeighbourhoodContainer& nhc) : selectionStrategy(nhc) {}
 
   void run(NeighbourhoodState& nhState, DomainInt initSolutionValue,
@@ -101,7 +102,6 @@ public:
         localMaxProbability += (1.0 / nhState.nhc.neighbourhoodCombinations.size()) *
                                getOptions().nhConfig->hillClimberProbabilityIncrementMultiplier;
         ++iterationsSpentAtPeak;
-        cout << "prob " << localMaxProbability << endl;
         if(iterationsSpentAtPeak > getOptions().nhConfig->hillClimberMinIterationsToSpendAtPeak &&
            static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability) {
           nhState.globalStats.notifyEndClimb();
@@ -115,14 +115,107 @@ public:
 };
 
 template <typename SelectionStrategy>
-class LateAcceptanceHillClimbingSearch : public HillClimbingSearch<SelectionStrategy> {
+class LateAcceptanceHillClimbingSearch {
+
+  SelectionStrategy selectionStrategy;
+  DomainInt currentSolutionValue;
+  std::vector<DomainInt> currentSolution;
+  std::deque<DomainInt> recentSolutionValueQueue;
+
 public:
-  LateAcceptanceHillClimbingSearch(const NeighbourhoodContainer& nhc)
-      : HillClimbingSearch<SelectionStrategy>(nhc) {
-    std::cout << "todo\n";
-    abort();
+  DomainInt bestSolutionValue;
+  std::vector<DomainInt> bestSolution;
+
+private:
+  pair<size_t, NeighbourhoodStats>
+  runNeighbourhood(NeighbourhoodState& nhState, ExponentialIncrementer<int> backtrackLimit,
+                   const vector<size_t>& highestNeighbourhoodSizes) {
+    int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhState);
+    SearchParams params = SearchParams::neighbourhoodSearch(
+        combinationToActivate, nhState.nhc, true, true, false,
+        getOptions().nhConfig->iterationSearchTime, backtrackLimit.getValue(),
+        getOptions().nhConfig->backtrackInsteadOfTimeLimit,
+        highestNeighbourhoodSizes[combinationToActivate]);
+    NeighbourhoodStats stats = nhState.searchNeighbourhoods(params);
+    selectionStrategy.updateStats(combinationToActivate, stats);
+
+    return make_pair(combinationToActivate, stats);
+  }
+
+  void handleSolutionFound(NeighbourhoodState& nhState, NeighbourhoodStats& stats,
+                           int& iterationsSpentAtPeak, vector<size_t> highestNeighbourhoodSizes) {
+    highestNeighbourhoodSizes.assign(nhState.nhc.neighbourhoodCombinations.size(), 1);
+    currentSolutionValue = stats.newMinValue;
+
+    currentSolution = nhState.solution;
+    recentSolutionValueQueue.push_back(stats.newMinValue);
+    recentSolutionValueQueue.pop_front();
+
+    if(stats.newMinValue > bestSolutionValue) {
+      iterationsSpentAtPeak = 0;
+
+      bestSolutionValue = stats.newMinValue;
+      bestSolution = std::move(nhState.solution);
+      nhState.solution = {};
+    }
+  }
+  bool hasFinished(size_t iterationsSpentAtPeak) {
+    size_t iterationLimit =
+        round(getOptions().nhConfig->lahcQueueSize * getOptions().nhConfig->lahcStoppingLimitRatio);
+    return iterationsSpentAtPeak > iterationLimit;
+  }
+
+public:
+  LateAcceptanceHillClimbingSearch(const NeighbourhoodContainer& nhc) : selectionStrategy(nhc) {}
+
+  void run(NeighbourhoodState& nhState, DomainInt initSolutionValue,
+           std::vector<DomainInt>& initSolution) {
+
+    int iterationsSpentAtPeak = 0;
+    size_t numberIterationsAtStart = nhState.globalStats.numberIterations;
+    auto& nhConfig = getOptions().nhConfig;
+    ExponentialIncrementer<int> backtrackLimit(nhConfig->initialBacktrackLimit,
+                                               nhConfig->backtrackLimitMultiplier,
+                                               nhConfig->backtrackLimitIncrement);
+    vector<size_t> highestNeighbourhoodSizes(nhState.nhc.neighbourhoodCombinations.size(), 1);
+
+    bestSolutionValue = initSolutionValue;
+    bestSolution = initSolution;
+    currentSolutionValue = bestSolutionValue;
+    currentSolution = bestSolution;
+    recentSolutionValueQueue.assign(getOptions().nhConfig->lahcQueueSize, currentSolutionValue);
+    nhState.globalStats.notifyStartClimb();
+    while(true) {
+      nhState.copyOverIncumbent(currentSolution);
+      getState().getOptimiseVar()->setMin(
+          std::min(currentSolutionValue, recentSolutionValueQueue.front()));
+      nhState.propagate();
+      auto nhInfo = runNeighbourhood(nhState, backtrackLimit, highestNeighbourhoodSizes);
+      NeighbourhoodStats& stats = nhInfo.second;
+      if(!getOptions().nhConfig->increaseBacktrackOnlyOnFailure || !stats.solutionFound) {
+        backtrackLimit.increase();
+      }
+      if(!stats.solutionFound || stats.newMinValue <= bestSolutionValue) {
+        ++iterationsSpentAtPeak;
+        if(hasFinished(iterationsSpentAtPeak)) {
+          nhState.globalStats.notifyEndClimb();
+          cout << "numberIterations: "
+               << (nhState.globalStats.numberIterations - numberIterationsAtStart) << std::endl;
+          return;
+        }
+      }
+
+      if(stats.solutionFound) {
+        handleSolutionFound(nhState, stats, iterationsSpentAtPeak, highestNeighbourhoodSizes);
+      } else {
+        recentSolutionValueQueue.push_back(currentSolutionValue);
+        recentSolutionValueQueue.pop_front();
+        highestNeighbourhoodSizes[nhInfo.first] = stats.highestNeighbourhoodSize;
+      }
+    }
   }
 };
+
 template <typename SelectionStrategy>
 class SimulatedAnnealingSearch : public HillClimbingSearch<SelectionStrategy> {
 public:
