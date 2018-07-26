@@ -269,8 +269,31 @@ private:
         round(getOptions().nhConfig->lahcQueueSize * getOptions().nhConfig->lahcStoppingLimitRatio);
     return iterationsSpentAtPeak > iterationLimit;
   }
-  void setInitialTemperature(NeighbourhoodState&) {
-    cout << "todo\n";
+  void setInitialTemperature(NeighbourhoodState& nhState, vector<DomainInt>& initSolution) {
+    nhState.solution = initSolution;
+    vector<int> solutionDeltas;
+    auto& nhConfig = getOptions().nhConfig;
+    ExponentialIncrementer<int> backtrackLimit(nhConfig->initialBacktrackLimit,
+                                               nhConfig->backtrackLimitMultiplier,
+                                               nhConfig->backtrackLimitIncrement);
+    size_t i = 0;
+    while(i < 10) {
+      nhState.copyOverIncumbent(nhState.solution);
+      nhState.propagate();
+      NeighbourhoodStats stats = runNeighbourhood(nhState, backtrackLimit).second;
+      if(!stats.solutionFound) {
+        // nguyen what to do in this case?
+        // maybe backtrackLimit.increase and just don't count this run.
+        // I am not incrementing i in this case so that we get exactly 10 deltas
+        backtrackLimit.increase();
+      } else {
+        solutionDeltas.push_back(checked_cast<int>(stats.newMinValue - stats.oldMinValue));
+        ++i;
+      }
+    }
+    // do something with the deltas
+    cerr << "todo\n";
+    // when finished, set the class member called temperature
     abort();
   }
 
@@ -287,12 +310,13 @@ public:
                                                nhConfig->backtrackLimitMultiplier,
                                                nhConfig->backtrackLimitIncrement);
     size_t numberIterationsSinceLastCool = 0;
-    setInitialTemperature(nhState);
 
     bestSolutionValue = initSolutionValue;
     bestSolution = initSolution;
     currentSolutionValue = bestSolutionValue;
     currentSolution = bestSolution;
+    setInitialTemperature(nhState, currentSolution);
+
     nhState.globalStats.notifyStartClimb();
     while(true) {
       nhState.copyOverIncumbent(currentSolution);
