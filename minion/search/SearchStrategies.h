@@ -51,12 +51,13 @@ class HillClimbingSearch {
                             vector<size_t> highestNeighbourhoodSizes) {
     iterationsSpentAtPeak = 0;
     localMaxProbability = getOptions().nhConfig->hillClimberInitialLocalMaxProbability;
+    cout << "prob reset\n";
     highestNeighbourhoodSizes.assign(nhState.nhc.neighbourhoodCombinations.size(), 1);
     bestSolutionValue = stats.newMinValue;
     bestSolution = std::move(nhState.solution);
     nhState.solution = {};
     nhState.copyOverIncumbent(bestSolution);
-    getState().getOptimiseVar()->setMin(stats.newMinValue);
+    getState().getOptimiseVar()->setMin(stats.newMinValue + 1);
     nhState.propagate();
   }
 
@@ -100,6 +101,7 @@ public:
         localMaxProbability += (1.0 / nhState.nhc.neighbourhoodCombinations.size()) *
                                getOptions().nhConfig->hillClimberProbabilityIncrementMultiplier;
         ++iterationsSpentAtPeak;
+        cout << "prob " << localMaxProbability << endl;
         if(iterationsSpentAtPeak > getOptions().nhConfig->hillClimberMinIterationsToSpendAtPeak &&
            static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability) {
           nhState.globalStats.notifyEndClimb();
@@ -152,6 +154,9 @@ public:
     bestSolutionValue = searchStrategy.bestSolutionValue;
     resetNeighbourhoodSize();
     while(true) {
+      nhState.copyOverIncumbent(bestSolution);
+      nhState.propagate();
+
       bool success = false;
       auto availableNHCombinations = findNextNeighbourhoodSizeWithActiveCombinations(nhState.nhc);
       nhLog("Exploration with neighbourhood of ssize "
@@ -168,12 +173,17 @@ public:
         if(searchStrategy.bestSolutionValue > bestSolutionValue) {
           bestSolutionValue = searchStrategy.bestSolutionValue;
           bestSolution = searchStrategy.bestSolution;
+          nhState.copyOverIncumbent(bestSolution);
+          nhState.propagate();
+
           resetNeighbourhoodSize();
           success = true;
           nhLog("New best solution found");
           break;
         } else {
           nhLog("New best solution not found");
+          nhState.copyOverIncumbent(bestSolution);
+          nhState.propagate();
         }
       }
       if(!success) {
@@ -184,12 +194,19 @@ public:
 
   void randomClimbUntilBetter(NeighbourhoodState& nhState) {
     while(true) {
-        nhLog("Exploring from random solution");
+      nhLog("Exploring from random solution");
+      nhState.popToBaseDepth();
+
       NeighbourhoodStats stats = findRandomSolutionUsingNormalSearch(nhState);
-      if(stats.newMinValue > bestSolutionValue) {
-        bestSolutionValue = stats.newMinValue;
+      searchStrategy.run(nhState, stats.newMinValue, nhState.solution);
+      if(searchStrategy.bestSolutionValue > bestSolutionValue) {
+        bestSolutionValue = searchStrategy.bestSolutionValue;
         bestSolution = nhState.solution;
+        nhLog("New best solution found");
+        resetNeighbourhoodSize();
         return;
+      } else {
+        nhLog("New best solution not found");
       }
     }
   }

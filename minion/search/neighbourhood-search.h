@@ -243,11 +243,14 @@ struct NeighbourhoodState {
     return stats;
   }
 
-  inline void copyOverIncumbent(const vector<DomainInt>& solution) {
+  void popToBaseDepth() {
     if(Controller::get_world_depth() != 1) {
       Controller::world_pop_to_depth(1);
     }
     Controller::world_push();
+  }
+  inline void copyOverIncumbent(const vector<DomainInt>& solution) {
+    popToBaseDepth();
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
       nhc.shadow_mapping[1][i].assign(solution[i]);
     }

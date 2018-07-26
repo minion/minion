@@ -103,7 +103,7 @@ struct NeighbourhoodSearchStats {
       ++numberNoSolutions[activatedCombination];
     }
     ++numberIterations;
-    if(stats.solutionFound && stats.newMinValue == getState().getOptimiseVar()->getMax()) {
+    if(stats.solutionFound && stats.newMinValue == initialOptVarRange.second) {
       nhLog("achieved max possible opt value : " << stats.newMinValue);
       throw EndOfSearch();
       return;
@@ -141,7 +141,7 @@ struct NeighbourhoodSearchStats {
 
   inline void notifyEndClimb() {
     totalHillClimberTime += (getTotalTimeTaken() - hillClimberStartTime);
-    nhLog("End climb from value " << getState().getOptimiseVar()->getMin()
+    nhLog("End climb at value " << getState().getOptimiseVar()->getMin()
                                   << ", number iterations = " << numberIterations);
   }
 
