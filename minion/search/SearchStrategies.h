@@ -217,12 +217,115 @@ public:
 };
 
 template <typename SelectionStrategy>
-class SimulatedAnnealingSearch : public HillClimbingSearch<SelectionStrategy> {
+class SimulatedAnnealingSearch {
+
+  SelectionStrategy selectionStrategy;
+  DomainInt currentSolutionValue;
+  std::vector<DomainInt> currentSolution;
+  double temperature;
+
 public:
-  SimulatedAnnealingSearch(const NeighbourhoodContainer& nhc)
-      : HillClimbingSearch<SelectionStrategy>(nhc) {
-    std::cout << "todo\n";
+  DomainInt bestSolutionValue;
+  std::vector<DomainInt> bestSolution;
+
+private:
+  pair<size_t, NeighbourhoodStats> runNeighbourhood(NeighbourhoodState& nhState,
+                                                    ExponentialIncrementer<int> backtrackLimit) {
+    int combinationToActivate = selectionStrategy.getCombinationsToActivate(nhState);
+    SearchParams params = SearchParams::neighbourhoodSearch(
+        combinationToActivate, nhState.nhc, true, false, true,
+        getOptions().nhConfig->iterationSearchTime, backtrackLimit.getValue(),
+        getOptions().nhConfig->backtrackInsteadOfTimeLimit, 1, false);
+    NeighbourhoodStats stats = nhState.searchNeighbourhoods(params);
+    selectionStrategy.updateStats(combinationToActivate, stats);
+
+    return make_pair(combinationToActivate, stats);
+  }
+
+  void handleSolutionFound(NeighbourhoodState& nhState, NeighbourhoodStats& stats,
+                           int& iterationsSpentAtPeak, int delta) {
+    bool solutionAccepted;
+    if(stats.newMinValue > currentSolutionValue) {
+      solutionAccepted = true;
+    } else {
+      double acceptanceProb = exp(delta / temperature);
+      solutionAccepted = rand() <= acceptanceProb;
+    }
+    if(solutionAccepted) {
+      currentSolutionValue = stats.newMinValue;
+      currentSolution = nhState.solution;
+    }
+
+    if(stats.newMinValue > bestSolutionValue) {
+      iterationsSpentAtPeak = 0;
+
+      bestSolutionValue = stats.newMinValue;
+      bestSolution = std::move(nhState.solution);
+      nhState.solution = {};
+    }
+  }
+  bool hasFinished(size_t iterationsSpentAtPeak) {
+    size_t iterationLimit =
+        round(getOptions().nhConfig->lahcQueueSize * getOptions().nhConfig->lahcStoppingLimitRatio);
+    return iterationsSpentAtPeak > iterationLimit;
+  }
+  void setInitialTemperature(NeighbourhoodState&) {
+    cout << "todo\n";
     abort();
+  }
+
+public:
+  SimulatedAnnealingSearch(const NeighbourhoodContainer& nhc) : selectionStrategy(nhc) {}
+
+  void run(NeighbourhoodState& nhState, DomainInt initSolutionValue,
+           std::vector<DomainInt>& initSolution) {
+
+    int iterationsSpentAtPeak = 0;
+    size_t numberIterationsAtStart = nhState.globalStats.numberIterations;
+    auto& nhConfig = getOptions().nhConfig;
+    ExponentialIncrementer<int> backtrackLimit(nhConfig->initialBacktrackLimit,
+                                               nhConfig->backtrackLimitMultiplier,
+                                               nhConfig->backtrackLimitIncrement);
+    size_t numberIterationsSinceLastCool = 0;
+    setInitialTemperature(nhState);
+
+    bestSolutionValue = initSolutionValue;
+    bestSolution = initSolution;
+    currentSolutionValue = bestSolutionValue;
+    currentSolution = bestSolution;
+    nhState.globalStats.notifyStartClimb();
+    while(true) {
+      nhState.copyOverIncumbent(currentSolution);
+      nhState.propagate();
+      auto nhInfo = runNeighbourhood(nhState, backtrackLimit);
+      NeighbourhoodStats& stats = nhInfo.second;
+      int delta =
+          (stats.solutionFound) ? checked_cast<int>(stats.newMinValue - currentSolutionValue) : 0;
+
+      if(!getOptions().nhConfig->increaseBacktrackOnlyOnFailure || !stats.solutionFound ||
+         delta < 0) {
+
+        backtrackLimit.increase();
+      }
+      if(!stats.solutionFound || stats.newMinValue <= bestSolutionValue) {
+        ++iterationsSpentAtPeak;
+        if(hasFinished(iterationsSpentAtPeak)) {
+          nhState.globalStats.notifyEndClimb();
+          cout << "numberIterations: "
+               << (nhState.globalStats.numberIterations - numberIterationsAtStart) << std::endl;
+          return;
+        }
+      }
+
+      if(stats.solutionFound) {
+        handleSolutionFound(nhState, stats, iterationsSpentAtPeak, delta);
+      }
+      if(++numberIterationsSinceLastCool >
+         getOptions().nhConfig->simulatedAnnealingIterationsBetweenCool) {
+        temperature *= getOptions().nhConfig->simulatedAnnealingTemperatureCoolingFactor;
+        numberIterationsSinceLastCool = 0;
+      }
+    }
   }
 };
 template <typename SearchStrategy>
