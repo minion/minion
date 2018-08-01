@@ -75,6 +75,13 @@ the available orderings) do:
    minion -varorder sdf myinput.minion
 */
 
+/** @help switches;-valorder Description
+
+Choose the value ordering (overruling any selection in the input file).
+
+Current orders are, ascend, descend and random.
+*/
+
 #include "commandline_parse.h"
 
 #define INCREMENT_i(flag)                                                                          \
@@ -484,6 +491,21 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         ostringstream oss;
         oss << "I do not understand the order:" << order;
         output_fatal_error(oss.str());
+      }
+    }
+    else if(command == string("-valorder")) {
+      INCREMENT_i(-valorder);
+      
+      string order(argv[i]);
+
+      if(order == "ascend") {
+        args.valorder = VALORDER_ASCEND;
+      }
+      else if(order == "descend") {
+        args.valorder = VALORDER_DESCEND;
+      }
+      else if(order == "random") {
+        args.valorder = VALORDER_RANDOM;
       }
     }
 
