@@ -28,12 +28,14 @@
 
 struct SearchMethod {
   VarOrderEnum order;
+  ValOrder valorder;
   unsigned int limit; // for static limited.
   PropagationLevel preprocess;
   PropagationLevel prop_method;
   UnsignedSysInt random_seed;
   SearchMethod()
       : order(ORDER_NONE),
+        valorder(VALORDER_NONE),
         preprocess(PropLevel_None),
         prop_method(PropLevel_GAC),
         random_seed((UnsignedSysInt)time(NULL) ^ getpid()) {}

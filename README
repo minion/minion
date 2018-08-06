@@ -15,7 +15,7 @@ First, create a directory to do the build in, e.g.
 
 mkdir bin
 
-Then change to that directory. Now run CMake to configure Minion:
+Then change to that directory. Now run the configure script:
 
 ../configure.py
 

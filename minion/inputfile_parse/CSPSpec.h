@@ -112,7 +112,7 @@ inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
   abort();
 }
 
-enum ValOrderEnum { VALORDER_ASCEND, VALORDER_DESCEND, VALORDER_RANDOM };
+enum ValOrderEnum { VALORDER_NONE, VALORDER_ASCEND, VALORDER_DESCEND, VALORDER_RANDOM };
 
 struct ValOrder {
   ValOrderEnum type;
@@ -120,6 +120,14 @@ struct ValOrder {
 
   ValOrder(ValOrderEnum t, int b = 0) : type(t), bias(b)
   { }
+
+  friend bool operator==(const ValOrder& lhs, const ValOrder& rhs) {
+    return std::make_tuple(lhs.type, lhs.bias) == std::make_tuple(rhs.type, rhs.bias);
+  }
+
+  friend bool operator!=(const ValOrder& lhs, const ValOrder& rhs) {
+    return !(lhs == rhs);
+  }
 };
 
 struct ConstraintDef {

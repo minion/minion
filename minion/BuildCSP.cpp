@@ -97,6 +97,14 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
       instance.search_order[i].limit = args.limit;
     }
 
+    if(args.valorder != ValOrder(VALORDER_NONE)) {
+      //  For each varorder block, overwrite with order given on the command
+      //  line.
+      for(UnsignedSysInt j = 0; j < instance.search_order[i].val_order.size(); ++j) {
+        instance.search_order[i].val_order[j] = args.valorder;
+      }
+    }
+
     for(SysInt j = 0; j < (SysInt)instance.search_order[i].var_order.size();
         j++) { // cobble together all the varorder blocks for preprocessing.
       preprocess_vars.push_back(get_AnyVarRef_from_Var(instance.search_order[i].var_order[j]));

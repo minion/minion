@@ -248,6 +248,7 @@ struct MinionInstancePrinter {
         vector<string> output_vars;
         for(SysInt j = 0; j < (SysInt)val_order.size(); ++j)
           switch(val_order[j].type) {
+          case VALORDER_NONE: D_FATAL_ERROR("Invalid value ordering");
           case VALORDER_ASCEND: output_vars.push_back("a"); break;
           case VALORDER_DESCEND: output_vars.push_back("d"); break;
           case VALORDER_RANDOM: output_vars.push_back("r"); break;

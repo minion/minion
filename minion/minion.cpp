@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     readInputFromFiles(instance, files, getOptions().parser_verbose, getOptions().map_long_short,
                        getOptions().ensure_branch_on_all_vars);
 
-    /* XXX
+    
       if(getOptions().graph)
       {
         GraphBuilder graph(instance);
@@ -135,8 +135,7 @@ int main(int argc, char** argv) {
           InstanceStats s(instance);
           s.output_stats();
 
-          // Do the minimal amount of setting up to create the constraint
-      objects.
+          // Do the minimal amount of setting up to create the constraint objects
           getState().setTupleListContainer(instance.tupleListContainer);
           getState().setShortTupleListContainer(instance.shortTupleListContainer);
 
@@ -153,7 +152,7 @@ int main(int argc, char** argv) {
           s.output_stats_tightness(cons);
           exit(0);
       }
-    */
+    
     if(getOptions().redump) {
       MinionInstancePrinter printer(instance);
       printer.build_instance();
