@@ -1,0 +1,1442 @@
+-nhconfig countbacktracks 2.0 1.1 0 1.1 onfailure -nhsearch metawithhillclimbing 4 0.001 0.0625 -nhselection ucb 2.0
+# Minion Version 2
+# Git version: "569c354f (2018-07-26 16:14:21 +0100)"
+#  Run at: UTC Fri Aug  3 15:50:04 2018
+
+# Input filename: sonet-60-45-33-2768.eprime-param.minion
+# Command line: minion -varorder domoverwdeg -noprintsols -timelimit 300 -randomseed 123 -nhconfig countbacktracks 2.0 1.1 0 1.1 onfailure -nhsearch metawithhillclimbing 4 0.001 0.0625 -nhselection ucb 2.0 sonet-60-45-33-2768.eprime-param.minion 
+Using seed: 123
+Parsing Time: 0.520704
+Setup Time: 0.123063
+Initial Propagate: 0.071776
+
+Parsed groups:
+[network_neighbourhoodGroup]
+Parsed neighbourhoods:
+[closed(network_neighbourhoodGroup),open(network_neighbourhoodGroup),network_mSetLiftMultiple_setCollect,network_mSetLiftMultiple_setCrossOver,network_mSetLiftMultiple_setMerge,network_mSetLiftMultiple_setMove,network_mSetLiftMultiple_setSplit,network_mSetLiftSingle_setAdd,network_mSetLiftSingle_setDiff,network_mSetLiftSingle_setRemove,network_mSetLiftSingle_setSwap,network_mSetLiftSingle_setSwapAdd,network_mSetLiftSingle_setSwapRemove]
+Number neighbourhood combinations: 11
+Number variables not used in neighbourhoods: 10560
+Build Search Ordering Time: 0.005899
+Preprocess Time: 0.000014
+0x4752890
+0.723: Searching for random solution, backtrack limit = 22.000
+Best solution: -1357 0.349
+1.091: Start climb from value -1357, number iterations = 0
+Best solution: -1357 0.391
+Best solution: -1345 0.515
+Best solution: -1344 0.515
+Best solution: -1343 0.515
+Best solution: -1342 0.516
+Best solution: -1341 0.516
+Best solution: -1340 0.674
+Best solution: -1339 0.718
+Best solution: -1338 0.745
+Best solution: -1330 0.793
+Best solution: -1329 0.793
+Best solution: -1328 0.793
+Best solution: -1327 0.794
+Best solution: -1326 0.794
+Best solution: -1325 0.794
+Best solution: -1318 0.818
+Best solution: -1317 0.819
+Best solution: -1316 0.819
+Best solution: -1315 0.819
+Best solution: -1314 0.820
+Best solution: -1313 0.820
+Best solution: -1312 0.820
+Best solution: -1300 0.844
+Best solution: -1299 0.844
+Best solution: -1298 0.844
+Best solution: -1297 0.844
+Best solution: -1296 0.845
+Best solution: -1295 0.845
+Best solution: -1294 0.845
+Best solution: -1293 1.122
+Best solution: -1292 1.174
+Best solution: -1291 1.222
+Best solution: -1285 1.313
+Best solution: -1284 1.314
+Best solution: -1283 1.314
+Best solution: -1274 1.339
+Best solution: -1273 1.340
+Best solution: -1272 1.340
+Best solution: -1271 1.340
+Best solution: -1270 1.340
+Best solution: -1261 1.365
+Best solution: -1260 1.365
+Best solution: -1259 1.365
+Best solution: -1258 1.365
+Best solution: -1257 1.366
+Best solution: -1256 1.366
+Best solution: -1255 1.366
+Best solution: -1248 1.390
+Best solution: -1247 1.390
+Best solution: -1246 1.390
+Best solution: -1245 1.391
+Best solution: -1244 1.391
+Best solution: -1233 1.417
+Best solution: -1232 1.417
+Best solution: -1231 1.418
+Best solution: -1230 1.418
+Best solution: -1229 1.418
+Best solution: -1228 1.418
+Best solution: -1227 1.418
+Best solution: -1226 1.419
+Best solution: -1223 1.444
+Best solution: -1222 1.444
+Best solution: -1221 1.444
+Best solution: -1220 1.445
+Best solution: -1219 1.445
+Best solution: -1218 1.445
+Best solution: -1206 1.471
+Best solution: -1205 1.471
+Best solution: -1204 1.499
+Best solution: -1203 1.746
+Best solution: -1202 2.274
+Best solution: -1190 2.345
+Best solution: -1189 2.345
+Best solution: -1188 2.345
+Best solution: -1187 2.346
+Best solution: -1186 2.346
+Best solution: -1185 2.346
+Best solution: -1184 2.346
+Best solution: -1183 2.347
+Best solution: -1172 2.381
+Best solution: -1171 2.382
+Best solution: -1170 2.382
+Best solution: -1169 2.382
+Best solution: -1168 2.383
+Best solution: -1167 2.383
+Best solution: -1161 2.411
+Best solution: -1160 2.411
+Best solution: -1159 2.411
+Best solution: -1158 2.412
+Best solution: -1157 2.412
+Best solution: -1148 2.443
+Best solution: -1147 2.444
+Best solution: -1146 2.444
+Best solution: -1144 2.470
+Best solution: -1143 2.471
+Best solution: -1134 2.504
+Best solution: -1133 2.505
+Best solution: -1132 2.505
+Best solution: -1131 2.505
+Best solution: -1130 2.505
+Best solution: -1129 2.505
+Best solution: -1119 2.538
+Best solution: -1118 2.538
+Best solution: -1110 2.568
+Best solution: -1109 2.569
+Best solution: -1108 2.569
+Best solution: -1099 2.600
+Best solution: -1098 2.600
+Best solution: -1097 2.601
+Best solution: -1096 2.601
+Best solution: -1095 2.601
+Best solution: -1094 2.601
+Best solution: -1093 2.602
+Best solution: -1092 2.602
+Best solution: -1083 2.632
+Best solution: -1082 2.633
+Best solution: -1081 2.633
+Best solution: -1078 2.660
+Best solution: -1077 2.660
+Best solution: -1076 2.810
+Best solution: -1075 2.854
+Best solution: -1074 3.574
+Best solution: -1073 3.701
+Best solution: -1071 3.803
+Best solution: -1070 3.803
+Best solution: -1065 3.849
+Best solution: -1064 3.850
+Best solution: -1063 3.850
+Best solution: -1062 3.850
+Best solution: -1061 3.851
+Best solution: -1059 3.898
+Best solution: -1058 3.898
+Best solution: -1057 3.898
+Best solution: -1056 3.899
+Best solution: -1046 3.943
+Best solution: -1045 3.943
+Best solution: -1044 3.943
+Best solution: -1034 3.987
+Best solution: -1033 3.987
+Best solution: -1032 3.988
+Best solution: -1031 3.988
+Best solution: -1030 3.988
+Best solution: -1026 4.025
+Best solution: -1025 4.025
+Best solution: -1024 4.025
+Best solution: -1023 4.025
+Best solution: -1018 4.063
+Best solution: -1017 4.063
+Best solution: -1011 4.103
+Best solution: -1010 4.104
+Best solution: -1002 4.148
+Best solution: -995 4.188
+Best solution: -994 4.189
+Best solution: -993 4.189
+Best solution: -992 4.189
+Best solution: -985 4.230
+Best solution: -984 4.230
+Best solution: -983 4.231
+Best solution: -982 4.231
+Best solution: -981 4.265
+Best solution: -970 4.308
+Best solution: -969 4.308
+Best solution: -968 4.309
+Best solution: -967 4.309
+Best solution: -958 4.345
+Best solution: -957 4.345
+Best solution: -956 4.345
+Best solution: -955 4.346
+Best solution: -954 4.346
+Best solution: -953 4.381
+Best solution: -952 4.483
+Best solution: -951 5.236
+Best solution: -950 5.365
+Best solution: -942 5.604
+Best solution: -941 5.604
+Best solution: -940 5.605
+Best solution: -939 5.605
+Best solution: -935 5.652
+Best solution: -932 5.702
+Best solution: -931 5.702
+Best solution: -930 5.702
+Best solution: -929 5.702
+Best solution: -920 5.751
+Best solution: -919 5.751
+Best solution: -918 5.752
+Best solution: -917 5.752
+Best solution: -911 5.803
+Best solution: -910 5.803
+Best solution: -909 5.803
+Best solution: -907 5.853
+Best solution: -906 5.853
+Best solution: -905 5.853
+Best solution: -897 5.911
+Best solution: -896 5.911
+Best solution: -895 5.911
+Best solution: -894 5.911
+Best solution: -882 5.956
+Best solution: -881 5.957
+Best solution: -880 5.957
+Best solution: -879 5.957
+Best solution: -878 5.957
+Best solution: -877 5.958
+Best solution: -876 5.958
+Best solution: -867 6.006
+Best solution: -866 6.007
+Best solution: -865 6.007
+Best solution: -859 6.058
+Best solution: -854 6.104
+Best solution: -853 6.104
+Best solution: -852 6.104
+Best solution: -851 6.152
+Best solution: -850 6.199
+Best solution: -849 6.199
+Best solution: -848 6.200
+Best solution: -845 6.253
+Best solution: -844 6.253
+Best solution: -842 6.305
+Best solution: -841 6.305
+Best solution: -840 6.306
+Best solution: -839 6.306
+Best solution: -831 6.367
+Best solution: -830 6.367
+Best solution: -829 6.367
+Best solution: -828 6.367
+Best solution: -827 6.368
+Best solution: -821 6.419
+Best solution: -820 6.420
+Best solution: -819 6.420
+Best solution: -817 6.458
+Best solution: -816 6.459
+Best solution: -810 6.512
+Best solution: -809 6.512
+Best solution: -808 6.519
+Best solution: -807 6.857
+Best solution: -806 7.051
+Best solution: -805 7.257
+Best solution: -804 7.351
+Best solution: -802 8.281
+Best solution: -801 8.281
+Best solution: -796 8.353
+Best solution: -795 8.353
+Best solution: -794 8.354
+Best solution: -793 8.354
+Best solution: -789 8.417
+Best solution: -788 8.417
+Best solution: -787 8.428
+Best solution: -786 8.557
+Best solution: -785 8.558
+Best solution: -784 8.562
+Best solution: -782 8.630
+Best solution: -779 8.692
+Best solution: -778 8.693
+Best solution: -777 8.693
+Best solution: -776 8.693
+Best solution: -775 8.715
+Best solution: -774 8.715
+Best solution: -773 8.716
+Best solution: -767 8.790
+Best solution: -766 8.790
+Best solution: -765 8.790
+Best solution: -753 8.853
+Best solution: -752 8.854
+Best solution: -751 8.856
+Best solution: -749 8.983
+Best solution: -748 8.983
+Best solution: -747 8.984
+Best solution: -746 8.984
+Best solution: -745 9.008
+Best solution: -744 9.086
+Best solution: -743 9.161
+Best solution: -742 9.210
+Best solution: -741 9.210
+Best solution: -737 9.241
+Best solution: -736 9.242
+Best solution: -735 9.242
+Best solution: -734 9.313
+Best solution: -733 9.313
+Best solution: -732 9.394
+Best solution: -731 9.395
+Best solution: -730 9.408
+Best solution: -726 9.473
+Best solution: -725 9.473
+Best solution: -722 9.563
+Best solution: -721 9.564
+Best solution: -717 9.638
+Best solution: -716 9.715
+Best solution: -715 10.369
+Best solution: -714 10.920
+Best solution: -713 11.082
+Best solution: -712 12.910
+Best solution: -711 12.911
+Best solution: -710 12.965
+Best solution: -709 12.965
+Best solution: -708 13.014
+Best solution: -707 13.014
+Best solution: -706 13.014
+Best solution: -705 13.015
+Best solution: -704 13.114
+Best solution: -703 13.204
+Best solution: -702 13.205
+Best solution: -701 13.205
+Best solution: -700 13.244
+Best solution: -699 13.306
+Best solution: -697 13.368
+Best solution: -696 13.368
+Best solution: -695 13.368
+Best solution: -694 13.482
+Best solution: -693 13.482
+Best solution: -692 13.601
+Best solution: -691 13.601
+Best solution: -690 13.602
+Best solution: -689 13.602
+Best solution: -688 13.602
+Best solution: -687 13.706
+Best solution: -686 13.754
+Best solution: -685 13.759
+Best solution: -684 13.818
+Best solution: -681 13.947
+Best solution: -679 14.051
+Best solution: -678 14.051
+Best solution: -677 14.052
+Best solution: -676 14.058
+Best solution: -675 14.171
+Best solution: -674 14.171
+Best solution: -673 14.171
+Best solution: -672 14.172
+Best solution: -671 14.172
+Best solution: -670 14.189
+Best solution: -666 14.291
+Best solution: -665 14.338
+Best solution: -664 14.389
+Best solution: -662 14.433
+Best solution: -661 14.434
+Best solution: -660 14.434
+Best solution: -659 14.445
+Best solution: -657 14.511
+Best solution: -656 14.511
+Best solution: -655 14.621
+Best solution: -654 14.622
+Best solution: -653 14.640
+Best solution: -651 14.737
+Best solution: -650 14.805
+Best solution: -649 14.872
+Best solution: -648 14.878
+Best solution: -647 14.979
+Best solution: -646 14.979
+Best solution: -645 14.979
+Best solution: -644 14.980
+Best solution: -640 15.009
+Best solution: -639 15.009
+Best solution: -638 15.009
+Best solution: -637 15.009
+Best solution: -633 15.193
+Best solution: -632 15.193
+Best solution: -631 15.194
+Best solution: -630 15.313
+Best solution: -629 15.318
+Best solution: -628 15.437
+Best solution: -627 15.438
+Best solution: -626 15.438
+Best solution: -625 15.438
+Best solution: -624 15.440
+Best solution: -623 15.448
+Best solution: -622 15.565
+Best solution: -621 15.692
+Best solution: -620 15.692
+Best solution: -619 15.692
+Best solution: -618 15.693
+Best solution: -617 15.704
+Best solution: -616 15.804
+Best solution: -613 15.945
+Best solution: -612 15.945
+Best solution: -611 15.945
+Best solution: -610 15.948
+Best solution: -609 16.057
+Best solution: -608 16.057
+Best solution: -607 16.058
+Best solution: -606 16.059
+Best solution: -605 16.077
+Best solution: -604 16.223
+Best solution: -603 16.274
+Best solution: -602 16.277
+Best solution: -601 16.300
+Best solution: -600 16.303
+Best solution: -599 16.341
+Best solution: -598 16.343
+Best solution: -597 16.345
+Best solution: -596 16.448
+Best solution: -595 16.449
+Best solution: -594 16.566
+Best solution: -593 16.589
+Best solution: -592 16.700
+Best solution: -591 16.701
+Best solution: -590 16.757
+Best solution: -589 19.022
+Best solution: -588 19.335
+Best solution: -587 21.116
+Best solution: -586 21.465
+Best solution: -585 21.690
+Best solution: -584 22.057
+Best solution: -583 22.265
+Best solution: -582 22.537
+Best solution: -581 22.776
+Best solution: -580 23.090
+Best solution: -579 23.330
+Best solution: -578 23.639
+Best solution: -577 23.870
+Best solution: -576 24.164
+Best solution: -575 24.433
+Best solution: -574 24.771
+Best solution: -573 25.038
+Best solution: -572 25.294
+Best solution: -571 25.561
+Best solution: -570 25.865
+Best solution: -569 26.151
+Best solution: -568 26.496
+Best solution: -567 26.774
+Best solution: -566 27.014
+Best solution: -565 27.306
+Best solution: -564 27.660
+Best solution: -563 27.951
+Best solution: -562 28.273
+Best solution: -561 28.547
+Best solution: -560 28.846
+Best solution: -559 29.178
+Best solution: -558 29.497
+Best solution: -557 29.781
+Best solution: -556 30.121
+Best solution: -555 30.418
+Best solution: -554 30.751
+Best solution: -553 31.046
+Best solution: -552 31.313
+Best solution: -551 31.607
+Best solution: -550 31.882
+Best solution: -549 32.199
+Best solution: -548 32.451
+Best solution: -547 32.731
+Best solution: -546 33.108
+Best solution: -545 33.432
+Best solution: -544 33.788
+Best solution: -543 34.129
+Best solution: -542 34.388
+Best solution: -541 34.733
+Best solution: -540 34.989
+Best solution: -539 35.351
+Best solution: -538 35.648
+Best solution: -537 35.965
+Best solution: -536 36.213
+Best solution: -535 36.573
+Best solution: -534 36.868
+Best solution: -533 37.250
+Best solution: -532 37.545
+Best solution: -531 37.867
+Best solution: -530 38.147
+Best solution: -529 38.523
+Best solution: -528 38.577
+Best solution: -527 38.851
+Best solution: -526 39.157
+Best solution: -525 39.190
+Best solution: -524 39.515
+Best solution: -523 39.874
+Best solution: -522 39.913
+Best solution: -521 40.199
+Best solution: -520 40.507
+Best solution: -519 40.580
+Best solution: -518 40.926
+Best solution: -517 41.256
+Best solution: -516 41.384
+Best solution: -515 41.724
+Best solution: -514 42.008
+Best solution: -513 42.075
+Best solution: -512 42.329
+Best solution: -511 42.652
+Best solution: -510 42.724
+Best solution: -509 42.973
+Best solution: -508 43.236
+Best solution: -507 43.382
+Best solution: -506 43.726
+Best solution: -505 44.028
+Best solution: -504 44.169
+Best solution: -503 44.461
+Best solution: -502 44.755
+Best solution: -501 44.929
+Best solution: -500 45.268
+Best solution: -499 45.623
+Best solution: -498 45.721
+Best solution: -497 45.964
+Best solution: -496 46.332
+Best solution: -495 46.506
+Best solution: -494 46.871
+Best solution: -493 47.161
+Best solution: -492 47.349
+Best solution: -491 47.668
+Best solution: -490 47.974
+Best solution: -489 48.136
+Best solution: -488 48.409
+Best solution: -487 48.687
+Best solution: -486 48.957
+Best solution: -485 49.226
+Best solution: -484 49.515
+Best solution: -483 49.781
+Best solution: -482 50.029
+Best solution: -481 50.312
+Best solution: -480 50.557
+Best solution: -479 50.845
+Best solution: -478 51.109
+Best solution: -477 51.388
+Best solution: -476 51.737
+Best solution: -475 52.038
+Best solution: -474 52.327
+Best solution: -473 52.388
+Best solution: -472 52.700
+Best solution: -471 53.035
+Best solution: -470 53.276
+Best solution: -469 53.332
+Best solution: -468 53.566
+Best solution: -467 53.937
+Best solution: -466 54.182
+Best solution: -465 54.426
+Best solution: -464 54.748
+Best solution: -463 54.991
+Best solution: -462 55.289
+Best solution: -461 55.523
+Best solution: -460 55.700
+Best solution: -459 56.068
+Best solution: -458 56.304
+Best solution: -457 56.547
+Best solution: -456 56.825
+Best solution: -455 57.124
+Best solution: -454 57.324
+Best solution: -453 57.362
+Best solution: -452 57.658
+Best solution: -451 57.925
+Best solution: -450 58.160
+Best solution: -449 58.453
+Best solution: -448 58.677
+Best solution: -447 59.000
+Best solution: -446 59.886
+Best solution: -445 60.139
+Best solution: -444 60.419
+Best solution: -443 60.679
+Best solution: -442 60.891
+Best solution: -441 61.240
+Best solution: -440 62.520
+Best solution: -439 62.816
+Best solution: -438 63.122
+Best solution: -437 63.440
+Best solution: -436 63.671
+Best solution: -435 65.347
+Best solution: -434 65.702
+Best solution: -433 65.947
+Best solution: -432 66.185
+Best solution: -431 66.485
+Best solution: -430 68.158
+Best solution: -429 68.435
+Best solution: -428 68.717
+Best solution: -427 69.028
+Best solution: -426 71.175
+Best solution: -425 71.503
+Best solution: -424 71.734
+Best solution: -423 72.032
+Best solution: -422 74.095
+Best solution: -421 74.411
+Best solution: -420 74.737
+Best solution: -419 76.850
+Best solution: -418 77.145
+Best solution: -417 77.422
+Best solution: -416 79.697
+Best solution: -415 80.031
+Best solution: -414 80.318
+Best solution: -413 82.595
+Best solution: -412 82.814
+Best solution: -411 83.246
+Best solution: -410 85.410
+Best solution: -409 85.756
+Best solution: -408 86.000
+Best solution: -407 88.121
+Best solution: -406 88.400
+Best solution: -405 91.059
+Best solution: -404 91.320
+Best solution: -403 93.945
+Best solution: -402 94.244
+Best solution: -401 96.807
+Best solution: -400 97.095
+Best solution: -399 99.851
+Best solution: -398 100.166
+Best solution: -397 102.713
+Best solution: -396 103.084
+Best solution: -395 105.756
+Best solution: -394 106.123
+Best solution: -393 108.802
+Best solution: -392 109.119
+Best solution: -391 111.927
+Best solution: -390 112.251
+Best solution: -389 114.946
+Best solution: -388 115.324
+Best solution: -387 117.992
+Best solution: -386 118.400
+Best solution: -385 121.006
+Best solution: -384 121.457
+Best solution: -383 123.972
+Best solution: -382 127.076
+Best solution: -381 130.071
+Best solution: -380 138.972
+Best solution: -379 142.124
+Best solution: -378 145.189
+Best solution: -377 148.468
+Best solution: -376 148.482
+Best solution: -375 148.810
+Best solution: -374 149.182
+Best solution: -373 149.761
+Best solution: -372 152.468
+Best solution: -371 155.800
+Best solution: -370 155.963
+Best solution: -369 155.963
+Best solution: -368 156.065
+Best solution: -367 156.445
+Best solution: -366 156.728
+Best solution: -365 159.502
+Best solution: -364 162.622
+Best solution: -363 162.945
+Best solution: -362 193.387
+Best solution: -361 198.608
+Best solution: -360 212.302
+Best solution: -359 216.681
+Best solution: -358 221.932
+Best solution: -357 225.768
+Best solution: -356 226.212
+Best solution: -355 226.404
+Best solution: -354 226.406
+Best solution: -353 227.141
+Best solution: -352 227.919
+Best solution: -351 231.493
+Best solution: -350 232.190
+Best solution: -349 236.220
+Best solution: -348 236.547
+Best solution: -347 240.384
+Best solution: -346 242.785
+Best solution: -345 242.960
+Best solution: -344 246.619
+Time out.
+Best solution: -343 299.561
+Timeout
+Search Stats:
+Number iterations: 294
+Initial optimise var range: (-1485,-1)
+Best optimise var value: -343
+Time till best solution: 299.561s
+Total time: 300.286s
+Total hill climbing time: 0.000s
+Number hill climbs: 1
+Total exploration time: 0.000s
+Number explorations: 0
+Total random search time: 0.000s
+Number random searches: 0
+Number of times solution bag exhausted: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCollect
+    Secondary nhs (random ordering): []
+    Number activations: 10
+    Total time: 3.205
+    Average time per activation: 0.320
+    Number positive solutions: 0
+    Number negative solutions: 6
+    Number no solutions: 4
+    Number timeouts: 10
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCrossOver
+    Secondary nhs (random ordering): []
+    Number activations: 125
+    Total time: 16.520
+    Average time per activation: 0.132
+    Number positive solutions: 101
+    Number negative solutions: 18
+    Number no solutions: 6
+    Number timeouts: 125
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMerge
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMove
+    Secondary nhs (random ordering): []
+    Number activations: 10
+    Total time: 4.601
+    Average time per activation: 0.460
+    Number positive solutions: 0
+    Number negative solutions: 1
+    Number no solutions: 9
+    Number timeouts: 10
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setSplit
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setAdd
+    Secondary nhs (random ordering): []
+    Number activations: 10
+    Total time: 26.239
+    Average time per activation: 2.624
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 10
+    Number timeouts: 9
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setDiff
+    Secondary nhs (random ordering): []
+    Number activations: 10
+    Total time: 26.671
+    Average time per activation: 2.667
+    Number positive solutions: 0
+    Number negative solutions: 9
+    Number no solutions: 1
+    Number timeouts: 9
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setRemove
+    Secondary nhs (random ordering): []
+    Number activations: 98
+    Total time: 158.677
+    Average time per activation: 1.619
+    Number positive solutions: 76
+    Number negative solutions: 22
+    Number no solutions: 0
+    Number timeouts: 92
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwap
+    Secondary nhs (random ordering): []
+    Number activations: 10
+    Total time: 22.786
+    Average time per activation: 2.279
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 10
+    Number timeouts: 9
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapAdd
+    Secondary nhs (random ordering): []
+    Number activations: 10
+    Total time: 23.565
+    Average time per activation: 2.357
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 10
+    Number timeouts: 9
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapRemove
+    Secondary nhs (random ordering): []
+    Number activations: 11
+    Total time: 13.436
+    Average time per activation: 1.221
+    Number positive solutions: 1
+    Number negative solutions: 6
+    Number no solutions: 4
+    Number timeouts: 9
+History of best solutions found:
+    Value: -1357, Time: 0.349
+    Value: -1357, Time: 0.391
+    Value: -1345, Time: 0.515
+    Value: -1344, Time: 0.515
+    Value: -1343, Time: 0.515
+    Value: -1342, Time: 0.516
+    Value: -1341, Time: 0.516
+    Value: -1340, Time: 0.674
+    Value: -1339, Time: 0.718
+    Value: -1338, Time: 0.745
+    Value: -1330, Time: 0.793
+    Value: -1329, Time: 0.793
+    Value: -1328, Time: 0.793
+    Value: -1327, Time: 0.794
+    Value: -1326, Time: 0.794
+    Value: -1325, Time: 0.794
+    Value: -1318, Time: 0.818
+    Value: -1317, Time: 0.819
+    Value: -1316, Time: 0.819
+    Value: -1315, Time: 0.819
+    Value: -1314, Time: 0.820
+    Value: -1313, Time: 0.820
+    Value: -1312, Time: 0.820
+    Value: -1300, Time: 0.844
+    Value: -1299, Time: 0.844
+    Value: -1298, Time: 0.844
+    Value: -1297, Time: 0.844
+    Value: -1296, Time: 0.845
+    Value: -1295, Time: 0.845
+    Value: -1294, Time: 0.845
+    Value: -1293, Time: 1.122
+    Value: -1292, Time: 1.174
+    Value: -1291, Time: 1.222
+    Value: -1285, Time: 1.313
+    Value: -1284, Time: 1.314
+    Value: -1283, Time: 1.314
+    Value: -1274, Time: 1.339
+    Value: -1273, Time: 1.340
+    Value: -1272, Time: 1.340
+    Value: -1271, Time: 1.340
+    Value: -1270, Time: 1.340
+    Value: -1261, Time: 1.365
+    Value: -1260, Time: 1.365
+    Value: -1259, Time: 1.365
+    Value: -1258, Time: 1.365
+    Value: -1257, Time: 1.366
+    Value: -1256, Time: 1.366
+    Value: -1255, Time: 1.366
+    Value: -1248, Time: 1.390
+    Value: -1247, Time: 1.390
+    Value: -1246, Time: 1.390
+    Value: -1245, Time: 1.391
+    Value: -1244, Time: 1.391
+    Value: -1233, Time: 1.417
+    Value: -1232, Time: 1.417
+    Value: -1231, Time: 1.418
+    Value: -1230, Time: 1.418
+    Value: -1229, Time: 1.418
+    Value: -1228, Time: 1.418
+    Value: -1227, Time: 1.418
+    Value: -1226, Time: 1.419
+    Value: -1223, Time: 1.444
+    Value: -1222, Time: 1.444
+    Value: -1221, Time: 1.444
+    Value: -1220, Time: 1.445
+    Value: -1219, Time: 1.445
+    Value: -1218, Time: 1.445
+    Value: -1206, Time: 1.471
+    Value: -1205, Time: 1.471
+    Value: -1204, Time: 1.499
+    Value: -1203, Time: 1.746
+    Value: -1202, Time: 2.274
+    Value: -1190, Time: 2.345
+    Value: -1189, Time: 2.345
+    Value: -1188, Time: 2.345
+    Value: -1187, Time: 2.346
+    Value: -1186, Time: 2.346
+    Value: -1185, Time: 2.346
+    Value: -1184, Time: 2.346
+    Value: -1183, Time: 2.347
+    Value: -1172, Time: 2.381
+    Value: -1171, Time: 2.382
+    Value: -1170, Time: 2.382
+    Value: -1169, Time: 2.382
+    Value: -1168, Time: 2.383
+    Value: -1167, Time: 2.383
+    Value: -1161, Time: 2.411
+    Value: -1160, Time: 2.411
+    Value: -1159, Time: 2.411
+    Value: -1158, Time: 2.412
+    Value: -1157, Time: 2.412
+    Value: -1148, Time: 2.443
+    Value: -1147, Time: 2.444
+    Value: -1146, Time: 2.444
+    Value: -1144, Time: 2.470
+    Value: -1143, Time: 2.471
+    Value: -1134, Time: 2.504
+    Value: -1133, Time: 2.505
+    Value: -1132, Time: 2.505
+    Value: -1131, Time: 2.505
+    Value: -1130, Time: 2.505
+    Value: -1129, Time: 2.505
+    Value: -1119, Time: 2.538
+    Value: -1118, Time: 2.538
+    Value: -1110, Time: 2.568
+    Value: -1109, Time: 2.569
+    Value: -1108, Time: 2.569
+    Value: -1099, Time: 2.600
+    Value: -1098, Time: 2.600
+    Value: -1097, Time: 2.601
+    Value: -1096, Time: 2.601
+    Value: -1095, Time: 2.601
+    Value: -1094, Time: 2.601
+    Value: -1093, Time: 2.602
+    Value: -1092, Time: 2.602
+    Value: -1083, Time: 2.632
+    Value: -1082, Time: 2.633
+    Value: -1081, Time: 2.633
+    Value: -1078, Time: 2.660
+    Value: -1077, Time: 2.660
+    Value: -1076, Time: 2.810
+    Value: -1075, Time: 2.854
+    Value: -1074, Time: 3.574
+    Value: -1073, Time: 3.701
+    Value: -1071, Time: 3.803
+    Value: -1070, Time: 3.803
+    Value: -1065, Time: 3.849
+    Value: -1064, Time: 3.850
+    Value: -1063, Time: 3.850
+    Value: -1062, Time: 3.850
+    Value: -1061, Time: 3.851
+    Value: -1059, Time: 3.898
+    Value: -1058, Time: 3.898
+    Value: -1057, Time: 3.898
+    Value: -1056, Time: 3.899
+    Value: -1046, Time: 3.943
+    Value: -1045, Time: 3.943
+    Value: -1044, Time: 3.943
+    Value: -1034, Time: 3.987
+    Value: -1033, Time: 3.987
+    Value: -1032, Time: 3.988
+    Value: -1031, Time: 3.988
+    Value: -1030, Time: 3.988
+    Value: -1026, Time: 4.025
+    Value: -1025, Time: 4.025
+    Value: -1024, Time: 4.025
+    Value: -1023, Time: 4.025
+    Value: -1018, Time: 4.063
+    Value: -1017, Time: 4.063
+    Value: -1011, Time: 4.103
+    Value: -1010, Time: 4.104
+    Value: -1002, Time: 4.148
+    Value: -995, Time: 4.188
+    Value: -994, Time: 4.189
+    Value: -993, Time: 4.189
+    Value: -992, Time: 4.189
+    Value: -985, Time: 4.230
+    Value: -984, Time: 4.230
+    Value: -983, Time: 4.231
+    Value: -982, Time: 4.231
+    Value: -981, Time: 4.265
+    Value: -970, Time: 4.308
+    Value: -969, Time: 4.308
+    Value: -968, Time: 4.309
+    Value: -967, Time: 4.309
+    Value: -958, Time: 4.345
+    Value: -957, Time: 4.345
+    Value: -956, Time: 4.345
+    Value: -955, Time: 4.346
+    Value: -954, Time: 4.346
+    Value: -953, Time: 4.381
+    Value: -952, Time: 4.483
+    Value: -951, Time: 5.236
+    Value: -950, Time: 5.365
+    Value: -942, Time: 5.604
+    Value: -941, Time: 5.604
+    Value: -940, Time: 5.605
+    Value: -939, Time: 5.605
+    Value: -935, Time: 5.652
+    Value: -932, Time: 5.702
+    Value: -931, Time: 5.702
+    Value: -930, Time: 5.702
+    Value: -929, Time: 5.702
+    Value: -920, Time: 5.751
+    Value: -919, Time: 5.751
+    Value: -918, Time: 5.752
+    Value: -917, Time: 5.752
+    Value: -911, Time: 5.803
+    Value: -910, Time: 5.803
+    Value: -909, Time: 5.803
+    Value: -907, Time: 5.853
+    Value: -906, Time: 5.853
+    Value: -905, Time: 5.853
+    Value: -897, Time: 5.911
+    Value: -896, Time: 5.911
+    Value: -895, Time: 5.911
+    Value: -894, Time: 5.911
+    Value: -882, Time: 5.956
+    Value: -881, Time: 5.957
+    Value: -880, Time: 5.957
+    Value: -879, Time: 5.957
+    Value: -878, Time: 5.957
+    Value: -877, Time: 5.958
+    Value: -876, Time: 5.958
+    Value: -867, Time: 6.006
+    Value: -866, Time: 6.007
+    Value: -865, Time: 6.007
+    Value: -859, Time: 6.058
+    Value: -854, Time: 6.104
+    Value: -853, Time: 6.104
+    Value: -852, Time: 6.104
+    Value: -851, Time: 6.152
+    Value: -850, Time: 6.199
+    Value: -849, Time: 6.199
+    Value: -848, Time: 6.200
+    Value: -845, Time: 6.253
+    Value: -844, Time: 6.253
+    Value: -842, Time: 6.305
+    Value: -841, Time: 6.305
+    Value: -840, Time: 6.306
+    Value: -839, Time: 6.306
+    Value: -831, Time: 6.367
+    Value: -830, Time: 6.367
+    Value: -829, Time: 6.367
+    Value: -828, Time: 6.367
+    Value: -827, Time: 6.368
+    Value: -821, Time: 6.419
+    Value: -820, Time: 6.420
+    Value: -819, Time: 6.420
+    Value: -817, Time: 6.458
+    Value: -816, Time: 6.459
+    Value: -810, Time: 6.512
+    Value: -809, Time: 6.512
+    Value: -808, Time: 6.519
+    Value: -807, Time: 6.857
+    Value: -806, Time: 7.051
+    Value: -805, Time: 7.257
+    Value: -804, Time: 7.351
+    Value: -802, Time: 8.281
+    Value: -801, Time: 8.281
+    Value: -796, Time: 8.353
+    Value: -795, Time: 8.353
+    Value: -794, Time: 8.354
+    Value: -793, Time: 8.354
+    Value: -789, Time: 8.417
+    Value: -788, Time: 8.417
+    Value: -787, Time: 8.428
+    Value: -786, Time: 8.557
+    Value: -785, Time: 8.558
+    Value: -784, Time: 8.562
+    Value: -782, Time: 8.630
+    Value: -779, Time: 8.692
+    Value: -778, Time: 8.693
+    Value: -777, Time: 8.693
+    Value: -776, Time: 8.693
+    Value: -775, Time: 8.715
+    Value: -774, Time: 8.715
+    Value: -773, Time: 8.716
+    Value: -767, Time: 8.790
+    Value: -766, Time: 8.790
+    Value: -765, Time: 8.790
+    Value: -753, Time: 8.853
+    Value: -752, Time: 8.854
+    Value: -751, Time: 8.856
+    Value: -749, Time: 8.983
+    Value: -748, Time: 8.983
+    Value: -747, Time: 8.984
+    Value: -746, Time: 8.984
+    Value: -745, Time: 9.008
+    Value: -744, Time: 9.086
+    Value: -743, Time: 9.161
+    Value: -742, Time: 9.210
+    Value: -741, Time: 9.210
+    Value: -737, Time: 9.241
+    Value: -736, Time: 9.242
+    Value: -735, Time: 9.242
+    Value: -734, Time: 9.313
+    Value: -733, Time: 9.313
+    Value: -732, Time: 9.394
+    Value: -731, Time: 9.395
+    Value: -730, Time: 9.408
+    Value: -726, Time: 9.473
+    Value: -725, Time: 9.473
+    Value: -722, Time: 9.563
+    Value: -721, Time: 9.564
+    Value: -717, Time: 9.638
+    Value: -716, Time: 9.715
+    Value: -715, Time: 10.369
+    Value: -714, Time: 10.920
+    Value: -713, Time: 11.082
+    Value: -712, Time: 12.910
+    Value: -711, Time: 12.911
+    Value: -710, Time: 12.965
+    Value: -709, Time: 12.965
+    Value: -708, Time: 13.014
+    Value: -707, Time: 13.014
+    Value: -706, Time: 13.014
+    Value: -705, Time: 13.015
+    Value: -704, Time: 13.114
+    Value: -703, Time: 13.204
+    Value: -702, Time: 13.205
+    Value: -701, Time: 13.205
+    Value: -700, Time: 13.244
+    Value: -699, Time: 13.306
+    Value: -697, Time: 13.368
+    Value: -696, Time: 13.368
+    Value: -695, Time: 13.368
+    Value: -694, Time: 13.482
+    Value: -693, Time: 13.482
+    Value: -692, Time: 13.601
+    Value: -691, Time: 13.601
+    Value: -690, Time: 13.602
+    Value: -689, Time: 13.602
+    Value: -688, Time: 13.602
+    Value: -687, Time: 13.706
+    Value: -686, Time: 13.754
+    Value: -685, Time: 13.759
+    Value: -684, Time: 13.818
+    Value: -681, Time: 13.947
+    Value: -679, Time: 14.051
+    Value: -678, Time: 14.051
+    Value: -677, Time: 14.052
+    Value: -676, Time: 14.058
+    Value: -675, Time: 14.171
+    Value: -674, Time: 14.171
+    Value: -673, Time: 14.171
+    Value: -672, Time: 14.172
+    Value: -671, Time: 14.172
+    Value: -670, Time: 14.189
+    Value: -666, Time: 14.291
+    Value: -665, Time: 14.338
+    Value: -664, Time: 14.389
+    Value: -662, Time: 14.433
+    Value: -661, Time: 14.434
+    Value: -660, Time: 14.434
+    Value: -659, Time: 14.445
+    Value: -657, Time: 14.511
+    Value: -656, Time: 14.511
+    Value: -655, Time: 14.621
+    Value: -654, Time: 14.622
+    Value: -653, Time: 14.640
+    Value: -651, Time: 14.737
+    Value: -650, Time: 14.805
+    Value: -649, Time: 14.872
+    Value: -648, Time: 14.878
+    Value: -647, Time: 14.979
+    Value: -646, Time: 14.979
+    Value: -645, Time: 14.979
+    Value: -644, Time: 14.980
+    Value: -640, Time: 15.009
+    Value: -639, Time: 15.009
+    Value: -638, Time: 15.009
+    Value: -637, Time: 15.009
+    Value: -633, Time: 15.193
+    Value: -632, Time: 15.193
+    Value: -631, Time: 15.194
+    Value: -630, Time: 15.313
+    Value: -629, Time: 15.318
+    Value: -628, Time: 15.437
+    Value: -627, Time: 15.438
+    Value: -626, Time: 15.438
+    Value: -625, Time: 15.438
+    Value: -624, Time: 15.440
+    Value: -623, Time: 15.448
+    Value: -622, Time: 15.565
+    Value: -621, Time: 15.692
+    Value: -620, Time: 15.692
+    Value: -619, Time: 15.692
+    Value: -618, Time: 15.693
+    Value: -617, Time: 15.704
+    Value: -616, Time: 15.804
+    Value: -613, Time: 15.945
+    Value: -612, Time: 15.945
+    Value: -611, Time: 15.945
+    Value: -610, Time: 15.948
+    Value: -609, Time: 16.057
+    Value: -608, Time: 16.057
+    Value: -607, Time: 16.058
+    Value: -606, Time: 16.059
+    Value: -605, Time: 16.077
+    Value: -604, Time: 16.223
+    Value: -603, Time: 16.274
+    Value: -602, Time: 16.277
+    Value: -601, Time: 16.300
+    Value: -600, Time: 16.303
+    Value: -599, Time: 16.341
+    Value: -598, Time: 16.343
+    Value: -597, Time: 16.345
+    Value: -596, Time: 16.448
+    Value: -595, Time: 16.449
+    Value: -594, Time: 16.566
+    Value: -593, Time: 16.589
+    Value: -592, Time: 16.700
+    Value: -591, Time: 16.701
+    Value: -590, Time: 16.757
+    Value: -589, Time: 19.022
+    Value: -588, Time: 19.335
+    Value: -587, Time: 21.116
+    Value: -586, Time: 21.465
+    Value: -585, Time: 21.690
+    Value: -584, Time: 22.057
+    Value: -583, Time: 22.265
+    Value: -582, Time: 22.537
+    Value: -581, Time: 22.776
+    Value: -580, Time: 23.090
+    Value: -579, Time: 23.330
+    Value: -578, Time: 23.639
+    Value: -577, Time: 23.870
+    Value: -576, Time: 24.164
+    Value: -575, Time: 24.433
+    Value: -574, Time: 24.771
+    Value: -573, Time: 25.038
+    Value: -572, Time: 25.294
+    Value: -571, Time: 25.561
+    Value: -570, Time: 25.865
+    Value: -569, Time: 26.151
+    Value: -568, Time: 26.496
+    Value: -567, Time: 26.774
+    Value: -566, Time: 27.014
+    Value: -565, Time: 27.306
+    Value: -564, Time: 27.660
+    Value: -563, Time: 27.951
+    Value: -562, Time: 28.273
+    Value: -561, Time: 28.547
+    Value: -560, Time: 28.846
+    Value: -559, Time: 29.178
+    Value: -558, Time: 29.497
+    Value: -557, Time: 29.781
+    Value: -556, Time: 30.121
+    Value: -555, Time: 30.418
+    Value: -554, Time: 30.751
+    Value: -553, Time: 31.046
+    Value: -552, Time: 31.313
+    Value: -551, Time: 31.607
+    Value: -550, Time: 31.882
+    Value: -549, Time: 32.199
+    Value: -548, Time: 32.451
+    Value: -547, Time: 32.731
+    Value: -546, Time: 33.108
+    Value: -545, Time: 33.432
+    Value: -544, Time: 33.788
+    Value: -543, Time: 34.129
+    Value: -542, Time: 34.388
+    Value: -541, Time: 34.733
+    Value: -540, Time: 34.989
+    Value: -539, Time: 35.351
+    Value: -538, Time: 35.648
+    Value: -537, Time: 35.965
+    Value: -536, Time: 36.213
+    Value: -535, Time: 36.573
+    Value: -534, Time: 36.868
+    Value: -533, Time: 37.250
+    Value: -532, Time: 37.545
+    Value: -531, Time: 37.867
+    Value: -530, Time: 38.147
+    Value: -529, Time: 38.523
+    Value: -528, Time: 38.577
+    Value: -527, Time: 38.851
+    Value: -526, Time: 39.157
+    Value: -525, Time: 39.190
+    Value: -524, Time: 39.515
+    Value: -523, Time: 39.874
+    Value: -522, Time: 39.913
+    Value: -521, Time: 40.199
+    Value: -520, Time: 40.507
+    Value: -519, Time: 40.580
+    Value: -518, Time: 40.926
+    Value: -517, Time: 41.256
+    Value: -516, Time: 41.384
+    Value: -515, Time: 41.724
+    Value: -514, Time: 42.008
+    Value: -513, Time: 42.075
+    Value: -512, Time: 42.329
+    Value: -511, Time: 42.652
+    Value: -510, Time: 42.724
+    Value: -509, Time: 42.973
+    Value: -508, Time: 43.236
+    Value: -507, Time: 43.382
+    Value: -506, Time: 43.726
+    Value: -505, Time: 44.028
+    Value: -504, Time: 44.169
+    Value: -503, Time: 44.461
+    Value: -502, Time: 44.755
+    Value: -501, Time: 44.929
+    Value: -500, Time: 45.268
+    Value: -499, Time: 45.623
+    Value: -498, Time: 45.721
+    Value: -497, Time: 45.964
+    Value: -496, Time: 46.332
+    Value: -495, Time: 46.506
+    Value: -494, Time: 46.871
+    Value: -493, Time: 47.161
+    Value: -492, Time: 47.349
+    Value: -491, Time: 47.668
+    Value: -490, Time: 47.974
+    Value: -489, Time: 48.136
+    Value: -488, Time: 48.409
+    Value: -487, Time: 48.687
+    Value: -486, Time: 48.957
+    Value: -485, Time: 49.226
+    Value: -484, Time: 49.515
+    Value: -483, Time: 49.781
+    Value: -482, Time: 50.029
+    Value: -481, Time: 50.312
+    Value: -480, Time: 50.557
+    Value: -479, Time: 50.845
+    Value: -478, Time: 51.109
+    Value: -477, Time: 51.388
+    Value: -476, Time: 51.737
+    Value: -475, Time: 52.038
+    Value: -474, Time: 52.327
+    Value: -473, Time: 52.388
+    Value: -472, Time: 52.700
+    Value: -471, Time: 53.035
+    Value: -470, Time: 53.276
+    Value: -469, Time: 53.332
+    Value: -468, Time: 53.566
+    Value: -467, Time: 53.937
+    Value: -466, Time: 54.182
+    Value: -465, Time: 54.426
+    Value: -464, Time: 54.748
+    Value: -463, Time: 54.991
+    Value: -462, Time: 55.289
+    Value: -461, Time: 55.523
+    Value: -460, Time: 55.700
+    Value: -459, Time: 56.068
+    Value: -458, Time: 56.304
+    Value: -457, Time: 56.547
+    Value: -456, Time: 56.825
+    Value: -455, Time: 57.124
+    Value: -454, Time: 57.324
+    Value: -453, Time: 57.362
+    Value: -452, Time: 57.658
+    Value: -451, Time: 57.925
+    Value: -450, Time: 58.160
+    Value: -449, Time: 58.453
+    Value: -448, Time: 58.677
+    Value: -447, Time: 59.000
+    Value: -446, Time: 59.886
+    Value: -445, Time: 60.139
+    Value: -444, Time: 60.419
+    Value: -443, Time: 60.679
+    Value: -442, Time: 60.891
+    Value: -441, Time: 61.240
+    Value: -440, Time: 62.520
+    Value: -439, Time: 62.816
+    Value: -438, Time: 63.122
+    Value: -437, Time: 63.440
+    Value: -436, Time: 63.671
+    Value: -435, Time: 65.347
+    Value: -434, Time: 65.702
+    Value: -433, Time: 65.947
+    Value: -432, Time: 66.185
+    Value: -431, Time: 66.485
+    Value: -430, Time: 68.158
+    Value: -429, Time: 68.435
+    Value: -428, Time: 68.717
+    Value: -427, Time: 69.028
+    Value: -426, Time: 71.175
+    Value: -425, Time: 71.503
+    Value: -424, Time: 71.734
+    Value: -423, Time: 72.032
+    Value: -422, Time: 74.095
+    Value: -421, Time: 74.411
+    Value: -420, Time: 74.737
+    Value: -419, Time: 76.850
+    Value: -418, Time: 77.145
+    Value: -417, Time: 77.422
+    Value: -416, Time: 79.697
+    Value: -415, Time: 80.031
+    Value: -414, Time: 80.318
+    Value: -413, Time: 82.595
+    Value: -412, Time: 82.814
+    Value: -411, Time: 83.246
+    Value: -410, Time: 85.410
+    Value: -409, Time: 85.756
+    Value: -408, Time: 86.000
+    Value: -407, Time: 88.121
+    Value: -406, Time: 88.400
+    Value: -405, Time: 91.059
+    Value: -404, Time: 91.320
+    Value: -403, Time: 93.945
+    Value: -402, Time: 94.244
+    Value: -401, Time: 96.807
+    Value: -400, Time: 97.095
+    Value: -399, Time: 99.851
+    Value: -398, Time: 100.166
+    Value: -397, Time: 102.713
+    Value: -396, Time: 103.084
+    Value: -395, Time: 105.756
+    Value: -394, Time: 106.123
+    Value: -393, Time: 108.802
+    Value: -392, Time: 109.119
+    Value: -391, Time: 111.927
+    Value: -390, Time: 112.251
+    Value: -389, Time: 114.946
+    Value: -388, Time: 115.324
+    Value: -387, Time: 117.992
+    Value: -386, Time: 118.400
+    Value: -385, Time: 121.006
+    Value: -384, Time: 121.457
+    Value: -383, Time: 123.972
+    Value: -382, Time: 127.076
+    Value: -381, Time: 130.071
+    Value: -380, Time: 138.972
+    Value: -379, Time: 142.124
+    Value: -378, Time: 145.189
+    Value: -377, Time: 148.468
+    Value: -376, Time: 148.482
+    Value: -375, Time: 148.810
+    Value: -374, Time: 149.182
+    Value: -373, Time: 149.761
+    Value: -372, Time: 152.468
+    Value: -371, Time: 155.800
+    Value: -370, Time: 155.963
+    Value: -369, Time: 155.963
+    Value: -368, Time: 156.065
+    Value: -367, Time: 156.445
+    Value: -366, Time: 156.728
+    Value: -365, Time: 159.502
+    Value: -364, Time: 162.622
+    Value: -363, Time: 162.945
+    Value: -362, Time: 193.387
+    Value: -361, Time: 198.608
+    Value: -360, Time: 212.302
+    Value: -359, Time: 216.681
+    Value: -358, Time: 221.932
+    Value: -357, Time: 225.768
+    Value: -356, Time: 226.212
+    Value: -355, Time: 226.404
+    Value: -354, Time: 226.406
+    Value: -353, Time: 227.141
+    Value: -352, Time: 227.919
+    Value: -351, Time: 231.493
+    Value: -350, Time: 232.190
+    Value: -349, Time: 236.220
+    Value: -348, Time: 236.547
+    Value: -347, Time: 240.384
+    Value: -346, Time: 242.785
+    Value: -345, Time: 242.960
+    Value: -344, Time: 246.619
+    Value: -343, Time: 299.561
+
+Solve Time: 300.287
+Total Time: 301.008
+Total System Time: 0.363
+Total Wall Time: 301.398
+Maximum RSS (kB): 233016
+Total Nodes: 172396
+Problem solvable?: yes
+Solutions Found: 643

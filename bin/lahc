@@ -1,0 +1,176 @@
+-nhconfig counttime 500 -nhsearch metawithlahc 100 1.0 -nhselection ucb 2.0
+# Minion Version 2
+# Git version: "569c354f (2018-07-26 16:14:21 +0100)"
+#  Run at: UTC Fri Aug  3 15:38:31 2018
+
+# Input filename: sonet-60-45-33-2768.eprime-param.minion
+# Command line: minion -varorder domoverwdeg -noprintsols -timelimit 5 -randomseed 123 -nhconfig counttime 500 -nhsearch metawithlahc 100 1.0 -nhselection ucb 2.0 sonet-60-45-33-2768.eprime-param.minion 
+Using seed: 123
+Parsing Time: 0.460296
+Setup Time: 0.115117
+Initial Propagate: 0.057819
+
+Parsed groups:
+[network_neighbourhoodGroup]
+Parsed neighbourhoods:
+[closed(network_neighbourhoodGroup),open(network_neighbourhoodGroup),network_mSetLiftMultiple_setCollect,network_mSetLiftMultiple_setCrossOver,network_mSetLiftMultiple_setMerge,network_mSetLiftMultiple_setMove,network_mSetLiftMultiple_setSplit,network_mSetLiftSingle_setAdd,network_mSetLiftSingle_setDiff,network_mSetLiftSingle_setRemove,network_mSetLiftSingle_setSwap,network_mSetLiftSingle_setSwapAdd,network_mSetLiftSingle_setSwapRemove]
+Number neighbourhood combinations: 11
+Number variables not used in neighbourhoods: 10560
+Build Search Ordering Time: 0.004325
+Preprocess Time: 0.000011
+0x4144890
+0.638: Searching for random solution, backtrack limit = 22.000
+Best solution: -1357 0.320
+0.962: Start climb from value -1485, number iterations = 0
+Best solution: -1357 0.356
+Best solution: -1356 0.869
+Best solution: -1355 2.930
+Best solution: -1354 3.449
+Time out.
+Best solution: -1343 4.209
+Best solution: -1342 4.210
+Best solution: -1341 4.210
+Best solution: -1340 4.210
+Timeout
+Search Stats:
+Number iterations: 9
+Initial optimise var range: (-1485,-1)
+Best optimise var value: -1340
+Time till best solution: 4.210s
+Total time: 4.702s
+Total hill climbing time: 0.000s
+Number hill climbs: 1
+Total exploration time: 0.000s
+Number explorations: 0
+Total random search time: 0.000s
+Number random searches: 0
+Number of times solution bag exhausted: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCollect
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 1
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCrossOver
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 1
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMerge
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMove
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 0
+    Number negative solutions: 1
+    Number no solutions: 0
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setSplit
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setAdd
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 0
+    Number negative solutions: 1
+    Number no solutions: 0
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setDiff
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 1
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setRemove
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 1
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwap
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.232
+    Average time per activation: 0.232
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 1
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapAdd
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.501
+    Average time per activation: 0.501
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 1
+    Number timeouts: 1
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapRemove
+    Secondary nhs (random ordering): []
+    Number activations: 1
+    Total time: 0.500
+    Average time per activation: 0.500
+    Number positive solutions: 1
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 1
+History of best solutions found:
+    Value: -1357, Time: 0.320
+    Value: -1357, Time: 0.356
+    Value: -1356, Time: 0.869
+    Value: -1355, Time: 2.930
+    Value: -1354, Time: 3.449
+    Value: -1343, Time: 4.209
+    Value: -1342, Time: 4.210
+    Value: -1341, Time: 4.210
+    Value: -1340, Time: 4.210
+
+Solve Time: 4.702
+Total Time: 5.339
+Total System Time: 0.176
+Total Wall Time: 5.517
+Maximum RSS (kB): 232852
+Total Nodes: 16564
+Problem solvable?: yes
+Solutions Found: 13

@@ -1,0 +1,375 @@
+-nhconfig countbacktracks 2.0 1.1 0 1.1 onfailure -nhsearch sa 0.8 5 0.995 100 -nhselection ucb 2.0
+# Minion Version 2
+# Git version: "569c354f (2018-07-26 16:14:21 +0100)"
+#  Run at: UTC Fri Aug  3 21:36:25 2018
+
+# Input filename: sonet-60-45-33-2768.eprime-param.minion
+# Command line: minion -varorder domoverwdeg -noprintsols -timelimit 300 -randomseed 123 -nhconfig countbacktracks 2.0 1.1 0 1.1 onfailure -nhsearch sa 0.8 5 0.995 100 -nhselection ucb 2.0 sonet-60-45-33-2768.eprime-param.minion 
+Using seed: 123
+Parsing Time: 0.507164
+Setup Time: 0.144286
+Initial Propagate: 0.063434
+
+Parsed groups:
+[network_neighbourhoodGroup]
+Parsed neighbourhoods:
+[closed(network_neighbourhoodGroup),open(network_neighbourhoodGroup),network_mSetLiftMultiple_setCollect,network_mSetLiftMultiple_setCrossOver,network_mSetLiftMultiple_setMerge,network_mSetLiftMultiple_setMove,network_mSetLiftMultiple_setSplit,network_mSetLiftSingle_setAdd,network_mSetLiftSingle_setDiff,network_mSetLiftSingle_setRemove,network_mSetLiftSingle_setSwap,network_mSetLiftSingle_setSwapAdd,network_mSetLiftSingle_setSwapRemove]
+Number neighbourhood combinations: 11
+Number variables not used in neighbourhoods: 10560
+Build Search Ordering Time: 0.005521
+Preprocess Time: 0.000016
+0x3b65890
+0.722: Searching for random solution, backtrack limit = 22.000
+Best solution: -1357 0.296
+Best solution: -1329 0.355
+Best solution: -1327 0.479
+Best solution: -1313 0.587
+Best solution: -1297 0.618
+Best solution: -1273 0.682
+Best solution: -1270 0.788
+Best solution: -1267 0.825
+Best solution: -1250 1.045
+Best solution: -1233 1.121
+Best solution: -1211 1.234
+Best solution: -1206 1.280
+Best solution: -1205 1.306
+Best solution: -1202 1.486
+Best solution: -1173 1.743
+Best solution: -1170 2.040
+Best solution: -1168 2.118
+Best solution: -1156 2.154
+Best solution: -1155 2.697
+Best solution: -1149 2.836
+Best solution: -1127 2.868
+Best solution: -1121 3.130
+Best solution: -1107 3.340
+Best solution: -1100 3.369
+Best solution: -1092 3.500
+Best solution: -1091 3.525
+Best solution: -1086 3.555
+Best solution: -1065 3.624
+Best solution: -1037 3.770
+Best solution: -1036 3.815
+Best solution: -1003 4.147
+Best solution: -1001 4.177
+Best solution: -985 4.317
+Best solution: -981 4.391
+Best solution: -980 4.561
+Best solution: -979 4.668
+Best solution: -954 4.699
+Best solution: -953 4.902
+Best solution: -952 5.161
+Best solution: -931 5.231
+Best solution: -930 5.299
+Best solution: -913 5.382
+Best solution: -899 5.926
+Best solution: -898 5.970
+Best solution: -874 6.355
+Best solution: -873 6.411
+Best solution: -855 6.471
+Best solution: -832 7.359
+Best solution: -823 7.430
+Best solution: -821 7.554
+Best solution: -812 7.932
+Best solution: -809 8.630
+Best solution: -794 9.088
+Best solution: -782 9.809
+Best solution: -781 9.931
+Best solution: -765 9.964
+Best solution: -764 10.005
+Best solution: -747 10.304
+Best solution: -723 10.875
+Best solution: -697 10.955
+Best solution: -690 12.700
+Best solution: -689 12.741
+Best solution: -671 13.042
+Best solution: -666 13.125
+Best solution: -654 13.199
+Best solution: -641 14.556
+Best solution: -629 16.610
+Best solution: -616 16.941
+Best solution: -615 17.823
+Best solution: -607 17.947
+Best solution: -594 18.036
+Best solution: -588 18.135
+Best solution: -577 18.209
+Best solution: -574 18.890
+Best solution: -569 19.172
+Best solution: -555 19.439
+Best solution: -544 19.790
+Best solution: -539 19.973
+Best solution: -538 23.707
+Best solution: -530 27.012
+Best solution: -516 27.095
+Best solution: -500 27.264
+Best solution: -493 27.658
+Best solution: -491 47.911
+Best solution: -480 48.052
+Best solution: -478 48.213
+Best solution: -476 48.372
+Best solution: -473 94.961
+Best solution: -462 95.127
+Best solution: -453 105.188
+Best solution: -452 108.980
+Best solution: -446 109.449
+Best solution: -433 110.419
+Best solution: -427 110.994
+Best solution: -423 111.083
+Best solution: -415 111.543
+Best solution: -414 111.761
+Best solution: -408 112.078
+Best solution: -400 112.728
+Best solution: -392 275.438
+Best solution: -384 276.859
+Best solution: -376 277.475
+Best solution: -374 277.766
+Best solution: -367 278.290
+Best solution: -366 278.488
+Best solution: -364 279.892
+Best solution: -362 280.653
+Best solution: -356 282.260
+Best solution: -355 283.300
+Time out.
+Timeout
+Search Stats:
+Number iterations: 657
+Initial optimise var range: (-1485,-1)
+Best optimise var value: -355
+Time till best solution: 283.300s
+Total time: 299.620s
+Total hill climbing time: 0.000s
+Number hill climbs: 0
+Total exploration time: 0.000s
+Number explorations: 0
+Total random search time: 0.000s
+Number random searches: 0
+Number of times solution bag exhausted: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCollect
+    Secondary nhs (random ordering): []
+    Number activations: 26
+    Total time: 55.456
+    Average time per activation: 2.133
+    Number positive solutions: 14
+    Number negative solutions: 0
+    Number no solutions: 12
+    Number timeouts: 11
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCrossOver
+    Secondary nhs (random ordering): []
+    Number activations: 73
+    Total time: 39.991
+    Average time per activation: 0.548
+    Number positive solutions: 62
+    Number negative solutions: 0
+    Number no solutions: 11
+    Number timeouts: 11
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMerge
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMove
+    Secondary nhs (random ordering): []
+    Number activations: 50
+    Total time: 62.238
+    Average time per activation: 1.245
+    Number positive solutions: 38
+    Number negative solutions: 0
+    Number no solutions: 12
+    Number timeouts: 12
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setSplit
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setAdd
+    Secondary nhs (random ordering): []
+    Number activations: 11
+    Total time: 11.572
+    Average time per activation: 1.052
+    Number positive solutions: 2
+    Number negative solutions: 0
+    Number no solutions: 9
+    Number timeouts: 9
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setDiff
+    Secondary nhs (random ordering): []
+    Number activations: 119
+    Total time: 25.338
+    Average time per activation: 0.213
+    Number positive solutions: 112
+    Number negative solutions: 0
+    Number no solutions: 7
+    Number timeouts: 7
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setRemove
+    Secondary nhs (random ordering): []
+    Number activations: 176
+    Total time: 12.735
+    Average time per activation: 0.072
+    Number positive solutions: 176
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwap
+    Secondary nhs (random ordering): []
+    Number activations: 19
+    Total time: 21.615
+    Average time per activation: 1.138
+    Number positive solutions: 8
+    Number negative solutions: 0
+    Number no solutions: 11
+    Number timeouts: 11
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapAdd
+    Secondary nhs (random ordering): []
+    Number activations: 55
+    Total time: 29.846
+    Average time per activation: 0.543
+    Number positive solutions: 43
+    Number negative solutions: 0
+    Number no solutions: 12
+    Number timeouts: 12
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapRemove
+    Secondary nhs (random ordering): []
+    Number activations: 128
+    Total time: 29.658
+    Average time per activation: 0.232
+    Number positive solutions: 122
+    Number negative solutions: 0
+    Number no solutions: 6
+    Number timeouts: 6
+History of best solutions found:
+    Value: -1357, Time: 0.296
+    Value: -1329, Time: 0.355
+    Value: -1327, Time: 0.479
+    Value: -1313, Time: 0.587
+    Value: -1297, Time: 0.618
+    Value: -1273, Time: 0.682
+    Value: -1270, Time: 0.788
+    Value: -1267, Time: 0.825
+    Value: -1250, Time: 1.045
+    Value: -1233, Time: 1.121
+    Value: -1211, Time: 1.234
+    Value: -1206, Time: 1.280
+    Value: -1205, Time: 1.306
+    Value: -1202, Time: 1.486
+    Value: -1173, Time: 1.743
+    Value: -1170, Time: 2.040
+    Value: -1168, Time: 2.118
+    Value: -1156, Time: 2.154
+    Value: -1155, Time: 2.697
+    Value: -1149, Time: 2.836
+    Value: -1127, Time: 2.868
+    Value: -1121, Time: 3.130
+    Value: -1107, Time: 3.340
+    Value: -1100, Time: 3.369
+    Value: -1092, Time: 3.500
+    Value: -1091, Time: 3.525
+    Value: -1086, Time: 3.555
+    Value: -1065, Time: 3.624
+    Value: -1037, Time: 3.770
+    Value: -1036, Time: 3.815
+    Value: -1003, Time: 4.147
+    Value: -1001, Time: 4.177
+    Value: -985, Time: 4.317
+    Value: -981, Time: 4.391
+    Value: -980, Time: 4.561
+    Value: -979, Time: 4.668
+    Value: -954, Time: 4.699
+    Value: -953, Time: 4.902
+    Value: -952, Time: 5.161
+    Value: -931, Time: 5.231
+    Value: -930, Time: 5.299
+    Value: -913, Time: 5.382
+    Value: -899, Time: 5.926
+    Value: -898, Time: 5.970
+    Value: -874, Time: 6.355
+    Value: -873, Time: 6.411
+    Value: -855, Time: 6.471
+    Value: -832, Time: 7.359
+    Value: -823, Time: 7.430
+    Value: -821, Time: 7.554
+    Value: -812, Time: 7.932
+    Value: -809, Time: 8.630
+    Value: -794, Time: 9.088
+    Value: -782, Time: 9.809
+    Value: -781, Time: 9.931
+    Value: -765, Time: 9.964
+    Value: -764, Time: 10.005
+    Value: -747, Time: 10.304
+    Value: -723, Time: 10.875
+    Value: -697, Time: 10.955
+    Value: -690, Time: 12.700
+    Value: -689, Time: 12.741
+    Value: -671, Time: 13.042
+    Value: -666, Time: 13.125
+    Value: -654, Time: 13.199
+    Value: -641, Time: 14.556
+    Value: -629, Time: 16.610
+    Value: -616, Time: 16.941
+    Value: -615, Time: 17.823
+    Value: -607, Time: 17.947
+    Value: -594, Time: 18.036
+    Value: -588, Time: 18.135
+    Value: -577, Time: 18.209
+    Value: -574, Time: 18.890
+    Value: -569, Time: 19.172
+    Value: -555, Time: 19.439
+    Value: -544, Time: 19.790
+    Value: -539, Time: 19.973
+    Value: -538, Time: 23.707
+    Value: -530, Time: 27.012
+    Value: -516, Time: 27.095
+    Value: -500, Time: 27.264
+    Value: -493, Time: 27.658
+    Value: -491, Time: 47.911
+    Value: -480, Time: 48.052
+    Value: -478, Time: 48.213
+    Value: -476, Time: 48.372
+    Value: -473, Time: 94.961
+    Value: -462, Time: 95.127
+    Value: -453, Time: 105.188
+    Value: -452, Time: 108.980
+    Value: -446, Time: 109.449
+    Value: -433, Time: 110.419
+    Value: -427, Time: 110.994
+    Value: -423, Time: 111.083
+    Value: -415, Time: 111.543
+    Value: -414, Time: 111.761
+    Value: -408, Time: 112.078
+    Value: -400, Time: 112.728
+    Value: -392, Time: 275.438
+    Value: -384, Time: 276.859
+    Value: -376, Time: 277.475
+    Value: -374, Time: 277.766
+    Value: -367, Time: 278.290
+    Value: -366, Time: 278.488
+    Value: -364, Time: 279.892
+    Value: -362, Time: 280.653
+    Value: -356, Time: 282.260
+    Value: -355, Time: 283.300
+
+Solve Time: 299.620
+Total Time: 300.341
+Total System Time: 0.371
+Total Wall Time: 300.736
+Maximum RSS (kB): 227140
+Total Nodes: 619484
+Problem solvable?: yes
+Solutions Found: 579

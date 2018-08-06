@@ -1,0 +1,231 @@
+-nhconfig countbacktracks 2.0 1.1 0 1.1 onfailure -nhsearch sa 0.8 5 0.995 100 -nhselection ucb 2.0
+# Minion Version 2
+# Git version: "569c354f (2018-07-26 16:14:21 +0100)"
+#  Run at: UTC Fri Aug  3 15:41:38 2018
+
+# Input filename: sonet-60-45-33-2768.eprime-param.minion
+# Command line: minion -varorder domoverwdeg -noprintsols -timelimit 5 -randomseed 123 -nhconfig countbacktracks 2.0 1.1 0 1.1 onfailure -nhsearch sa 0.8 5 0.995 100 -nhselection ucb 2.0 sonet-60-45-33-2768.eprime-param.minion 
+Using seed: 123
+Parsing Time: 0.484715
+Setup Time: 0.125405
+Initial Propagate: 0.052842
+
+Parsed groups:
+[network_neighbourhoodGroup]
+Parsed neighbourhoods:
+[closed(network_neighbourhoodGroup),open(network_neighbourhoodGroup),network_mSetLiftMultiple_setCollect,network_mSetLiftMultiple_setCrossOver,network_mSetLiftMultiple_setMerge,network_mSetLiftMultiple_setMove,network_mSetLiftMultiple_setSplit,network_mSetLiftSingle_setAdd,network_mSetLiftSingle_setDiff,network_mSetLiftSingle_setRemove,network_mSetLiftSingle_setSwap,network_mSetLiftSingle_setSwapAdd,network_mSetLiftSingle_setSwapRemove]
+Number neighbourhood combinations: 11
+Number variables not used in neighbourhoods: 10560
+Build Search Ordering Time: 0.005191
+Preprocess Time: 0.000012
+0x2c61890
+0.669: Searching for random solution, backtrack limit = 22.000
+Best solution: -1357 0.282
+Best solution: -1329 0.342
+Best solution: -1327 0.465
+Best solution: -1313 0.573
+Best solution: -1297 0.605
+Best solution: -1273 0.669
+Best solution: -1270 0.775
+Best solution: -1267 0.811
+Best solution: -1250 1.030
+Best solution: -1233 1.102
+Best solution: -1211 1.224
+Best solution: -1206 1.270
+Best solution: -1205 1.295
+Best solution: -1202 1.398
+Best solution: -1173 1.549
+Best solution: -1170 1.733
+Best solution: -1168 1.767
+Best solution: -1156 1.797
+Best solution: -1155 2.292
+Best solution: -1149 2.417
+Best solution: -1127 2.445
+Best solution: -1121 2.673
+Best solution: -1107 2.839
+Best solution: -1100 2.865
+Best solution: -1092 2.983
+Best solution: -1091 3.005
+Best solution: -1086 3.033
+Best solution: -1065 3.095
+Best solution: -1037 3.230
+Best solution: -1036 3.270
+Best solution: -1003 3.566
+Best solution: -1001 3.590
+Best solution: -985 3.716
+Best solution: -981 3.786
+Best solution: -980 3.961
+Best solution: -979 4.065
+Best solution: -954 4.095
+Time out.
+Timeout
+Search Stats:
+Number iterations: 109
+Initial optimise var range: (-1485,-1)
+Best optimise var value: -954
+Time till best solution: 4.095s
+Total time: 4.345s
+Total hill climbing time: 0.000s
+Number hill climbs: 0
+Total exploration time: 0.000s
+Number explorations: 0
+Total random search time: 0.000s
+Number random searches: 0
+Number of times solution bag exhausted: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCollect
+    Secondary nhs (random ordering): []
+    Number activations: 5
+    Total time: 0.068
+    Average time per activation: 0.014
+    Number positive solutions: 1
+    Number negative solutions: 0
+    Number no solutions: 4
+    Number timeouts: 4
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setCrossOver
+    Secondary nhs (random ordering): []
+    Number activations: 9
+    Total time: 0.200
+    Average time per activation: 0.022
+    Number positive solutions: 5
+    Number negative solutions: 0
+    Number no solutions: 4
+    Number timeouts: 4
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMerge
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setMove
+    Secondary nhs (random ordering): []
+    Number activations: 7
+    Total time: 0.213
+    Average time per activation: 0.030
+    Number positive solutions: 3
+    Number negative solutions: 0
+    Number no solutions: 4
+    Number timeouts: 4
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftMultiple_setSplit
+    Secondary nhs (random ordering): []
+    Number activations: 0
+    Total time: 0.000
+    Average time per activation: 0.000
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setAdd
+    Secondary nhs (random ordering): []
+    Number activations: 4
+    Total time: 0.175
+    Average time per activation: 0.044
+    Number positive solutions: 0
+    Number negative solutions: 0
+    Number no solutions: 4
+    Number timeouts: 4
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setDiff
+    Secondary nhs (random ordering): []
+    Number activations: 24
+    Total time: 0.477
+    Average time per activation: 0.020
+    Number positive solutions: 24
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setRemove
+    Secondary nhs (random ordering): []
+    Number activations: 24
+    Total time: 0.308
+    Average time per activation: 0.013
+    Number positive solutions: 24
+    Number negative solutions: 0
+    Number no solutions: 0
+    Number timeouts: 0
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwap
+    Secondary nhs (random ordering): []
+    Number activations: 8
+    Total time: 0.361
+    Average time per activation: 0.045
+    Number positive solutions: 4
+    Number negative solutions: 0
+    Number no solutions: 4
+    Number timeouts: 4
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapAdd
+    Secondary nhs (random ordering): []
+    Number activations: 12
+    Total time: 0.340
+    Average time per activation: 0.028
+    Number positive solutions: 9
+    Number negative solutions: 0
+    Number no solutions: 3
+    Number timeouts: 3
+Neighbourhood Combination:
+    Primary nh: network_mSetLiftSingle_setSwapRemove
+    Secondary nhs (random ordering): []
+    Number activations: 16
+    Total time: 0.379
+    Average time per activation: 0.024
+    Number positive solutions: 13
+    Number negative solutions: 0
+    Number no solutions: 3
+    Number timeouts: 2
+History of best solutions found:
+    Value: -1357, Time: 0.282
+    Value: -1329, Time: 0.342
+    Value: -1327, Time: 0.465
+    Value: -1313, Time: 0.573
+    Value: -1297, Time: 0.605
+    Value: -1273, Time: 0.669
+    Value: -1270, Time: 0.775
+    Value: -1267, Time: 0.811
+    Value: -1250, Time: 1.030
+    Value: -1233, Time: 1.102
+    Value: -1211, Time: 1.224
+    Value: -1206, Time: 1.270
+    Value: -1205, Time: 1.295
+    Value: -1202, Time: 1.398
+    Value: -1173, Time: 1.549
+    Value: -1170, Time: 1.733
+    Value: -1168, Time: 1.767
+    Value: -1156, Time: 1.797
+    Value: -1155, Time: 2.292
+    Value: -1149, Time: 2.417
+    Value: -1127, Time: 2.445
+    Value: -1121, Time: 2.673
+    Value: -1107, Time: 2.839
+    Value: -1100, Time: 2.865
+    Value: -1092, Time: 2.983
+    Value: -1091, Time: 3.005
+    Value: -1086, Time: 3.033
+    Value: -1065, Time: 3.095
+    Value: -1037, Time: 3.230
+    Value: -1036, Time: 3.270
+    Value: -1003, Time: 3.566
+    Value: -1001, Time: 3.590
+    Value: -985, Time: 3.716
+    Value: -981, Time: 3.786
+    Value: -980, Time: 3.961
+    Value: -979, Time: 4.065
+    Value: -954, Time: 4.095
+
+Solve Time: 4.346
+Total Time: 5.014
+Total System Time: 0.163
+Total Wall Time: 5.178
+Maximum RSS (kB): 226952
+Total Nodes: 8376
+Problem solvable?: yes
+Solutions Found: 85

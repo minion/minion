@@ -266,7 +266,7 @@ private:
   }
   bool hasFinished(size_t iterationsSpentAtPeak) {
     size_t iterationLimit =
-        round(getOptions().nhConfig->lahcQueueSize * getOptions().nhConfig->lahcStoppingLimitRatio);
+        round(getOptions().nhConfig->simulatedAnnealingIterationsBetweenCool * getOptions().nhConfig->simulatedAnnealingRatioForStopping);
     return iterationsSpentAtPeak > iterationLimit;
   }
   void setInitialTemperature(NeighbourhoodState& nhState, vector<DomainInt>& initSolution) {
@@ -287,14 +287,23 @@ private:
         // I am not incrementing i in this case so that we get exactly 10 deltas
         backtrackLimit.increase();
       } else {
-        solutionDeltas.push_back(checked_cast<int>(stats.newMinValue - stats.oldMinValue));
-        ++i;
+        int delta = checked_cast<int>(stats.newMinValue - stats.oldMinValue);
+        if (delta < 0){
+          solutionDeltas.push_back(delta);
+          ++i;
+        }
       }
     }
+    
     // do something with the deltas
-    cerr << "todo\n";
+    double meanDelta = 0;
+    for (int i=0; i<solutionDeltas.size(); i++)
+        meanDelta += solutionDeltas[i];
+    meanDelta /= solutionDeltas.size();
+
     // when finished, set the class member called temperature
-    abort();
+     temperature = meanDelta / log(nhConfig->simulatedAnnealingTargetProbabilityForInitialTemperature);   
+     //abort();
   }
 
 public:
@@ -488,7 +497,7 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
   case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC:
     return std::make_shared<NeighbourhoodSearchManager<
         MetaSearch<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>>(prop, base_order, nhc);
-  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANEALING:
+  case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANNEALING:
     return std::make_shared<
         NeighbourhoodSearchManager<MetaSearch<SimulatedAnnealingSearch<NhSelectionStrategy>>>>(
         prop, base_order, nhc);
@@ -499,7 +508,7 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
     return std::make_shared<
         NeighbourhoodSearchManager<LateAcceptanceHillClimbingSearch<NhSelectionStrategy>>>(
         prop, base_order, nhc);
-  case SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANEALING:
+  case SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING:
     return std::make_shared<
         NeighbourhoodSearchManager<SimulatedAnnealingSearch<NhSelectionStrategy>>>(prop, base_order,
                                                                                    nhc);
