@@ -27,6 +27,7 @@
 #include "search/SearchStrategies.h"
 #include "search/neighbourhood-search.h"
 #include "search/restartSearchManager.h"
+#include "search/restartNewSearchManager.h"
 
 
 #include "dump_state.hpp"
@@ -132,7 +133,8 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   }
   else {
     if(getOptions().restarts) {
-      sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
+      //sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
+      sm = Controller::make_restart_new_search_manager(args.prop_method, instance.search_order);
     }
     else {
       sm = Controller::make_search_manager(args.prop_method, instance.search_order);
