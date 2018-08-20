@@ -36,16 +36,43 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   return check_failed;
 }
 
+// Copied from dump_state.cpp
+template <typename T>
+inline string getNameFromVar(const T& v) {
+  return getState().getInstance()->vars.getName(v.getBaseVar());
+}
+
+
 template <typename Var, typename Vars, typename Prop>
-bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop) {
+bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop, bool amo) {
   Controller::world_push();
+  bool doamo=(var.getMin()==0 && var.getMax()==1);
+  
+  Vars listbools;
+  if(amo && doamo && lowval==1 && highval==1) {
+      //std::cout << "setting up for var:" << getNameFromVar(var) <<std::endl;
+      for(int i=0; i<vars.size(); i++) {
+          if(vars[i].getMin()==0 && vars[i].getMax()==1) {
+              listbools.push_back(vars[i]);
+          }
+      }
+  }
+  
   var.setMin(lowval);
   var.setMax(highval);
   prop(vars);
-
+  
   bool check_failed = getState().isFailed();
   getState().setFailed(false);
-
+  
+  if(amo && doamo && lowval==1 && highval==1) {
+      for(int i=0; i<listbools.size(); i++) {
+          if(listbools[i].getMax()==0) {
+              std::cout << "AMO  " << getNameFromVar(var) << "  " << getNameFromVar(listbools[i]) << std::endl;
+          }
+      }
+  }
+  
   Controller::world_pop();
 
   return check_failed;
@@ -79,7 +106,7 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     DomainInt maxval = var.getMax();
     DomainInt step = maxval - gallop;
-    bool check = check_fail_range(var, step+1, maxval, vararray, prop);
+    bool check = check_fail_range(var, step+1, maxval, vararray, prop, true);
     if(check) {
       pruned = true;
       var.setMax(step);
@@ -121,7 +148,7 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     DomainInt minval = var.getMin();
     DomainInt step = minval + gallop;
-    bool check = check_fail_range(var, minval, step-1, vararray, prop);
+    bool check = check_fail_range(var, minval, step-1, vararray, prop, false);
     if(check) {
       pruned = true;
       var.setMin(step);
