@@ -68,7 +68,7 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   if(amo && doamo && lowval==1 && highval==1) {
       for(int i=0; i<listbools.size(); i++) {
           if(listbools[i].getMax()==0) {
-              std::cout << "AMO  " << getNameFromVar(var) << "  " << getNameFromVar(listbools[i]) << std::endl;
+              std::cout << "AMO " << getNameFromVar(var) << " " << getNameFromVar(listbools[i]) << std::endl;
           }
       }
   }
