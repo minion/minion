@@ -52,7 +52,7 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     double timelimit = getOptions().time_limit;
 
     if(solutionFound) {
-        cout << "Solution found, stop the search" << endl;
+        //cout << "Solution found, stop the search" << endl;
          throw EndOfSearch();
     } else if (timeout){
         if (getOptions().timeout_active && get_cpu_time() > getOptions().time_limit)
@@ -68,10 +68,21 @@ struct RestartNewSearchManager : public Controller::SearchManager {
   RestartNewSearchManager(PropagationLevel _prop_method, const vector<SearchOrder>& _order)
       : prop_method(_prop_method), initial_order(_order) {}
 
+vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
+    vector<SearchOrder> searchOrder(initial_order);
+    for(auto& so : searchOrder) {
+      for(int i = 0; i < so.val_order.size(); i++) {
+        so.val_order[i] = ValOrder(VALORDER_RANDOM, bias);
+      }
+    }
+    return searchOrder;
+  }
+
   virtual void search() {
-    for(int i = 1; i < 10000000; i *= 2) {
-        cout << "Increasing backtrack limit to " << i << endl;
-        vector<SearchOrder> new_order = initial_order;
+    for(int i = 10; i < 10000000; i *= 1.5) {
+       cout << "Increasing backtrack limit to " << i << endl;
+        int bias = random()%200 - 100;
+        vector<SearchOrder> new_order = makeRandomWalkSearchOrder(bias);
         doASearch(new_order, i);
     }
   }
