@@ -133,6 +133,9 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   }
   else {
     if(getOptions().restarts) {
+      if(getOptions().sollimit != 1) {
+        D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
+      }
       //sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
       sm = Controller::make_restart_new_search_manager(args.prop_method, instance.search_order);
     }
