@@ -79,11 +79,16 @@ vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
   }
 
   virtual void search() {
-    for(int i = 10; i < 10000000; i *= 1.5) {
-       cout << "Increasing backtrack limit to " << i << endl;
-        int bias = random()%200 - 100;
-        vector<SearchOrder> new_order = makeRandomWalkSearchOrder(bias);
-        doASearch(new_order, i);
+    bool useBias = getOptions().restart.bias;
+    double multiplier = getOptions().restart.multiplier;
+
+    for(int i = 10; i < 10000000; i *= multiplier) {
+      cout << "Increasing backtrack limit to " << i << endl;
+      int bias = 0;
+      if(useBias)
+        bias = random()%200 - 100;
+      vector<SearchOrder> new_order = makeRandomWalkSearchOrder(bias);
+      doASearch(new_order, i);
     }
   }
 };

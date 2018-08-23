@@ -793,9 +793,15 @@ When Allows values used during neighbourhood search to be configured.
     }
 
     else if(command == string("-restarts")) {
-      getOptions().restarts = true;
+      getOptions().restart.active = true;
     }
-
+    else if(command == string("-restarts-multiplier")) {
+      INCREMENT_i("restarts multiplier");
+      getOptions().restart.multiplier = fromstring<double>(argv[i]);
+    }
+    else if(command == string("-no-restarts-bias")) {
+      getOptions().restart.bias = false;
+    }
     else if(command[0] == '-' && command != string("--")) {
       cout << "I don't understand '" << command << "'. Sorry. " << endl;
       exit(1);

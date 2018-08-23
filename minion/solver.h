@@ -281,7 +281,13 @@ public:
   std::shared_ptr<NhConfig> nhConfig = makeNhConfig();
   std::string pathToUCBInitFile;
 
-  bool restarts = false;
+  struct RestartStruct {
+    bool active = false;
+    double multiplier = 1.5;
+    bool bias = true;
+  };
+
+  RestartStruct restart;
 
   /// Denotes if minion should print no output, other than that explicitally
   /// requested

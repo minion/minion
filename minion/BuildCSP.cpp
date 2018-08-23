@@ -132,7 +132,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
      sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order, *instance.neighbourhoodContainer);
   }
   else {
-    if(getOptions().restarts) {
+    if(getOptions().restart.active) {
       if(getOptions().sollimit != 1) {
         D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
       }
