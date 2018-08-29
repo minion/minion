@@ -28,7 +28,6 @@ for i in `grep -l "#TEST SOLCOUNT" *.minion tests-32domains/*.minion`; do
   then
     echo -n 
   else
-#    echo $i
     while [ $LOOP -lt $tests ]; do
       j=$(($j + 1));
       

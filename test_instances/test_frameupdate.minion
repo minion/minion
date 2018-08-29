@@ -1,5 +1,5 @@
 MINION 3
-#TEST SOLCOUNT 143327232
+#TEST SOLCOUNT 2
 **VARIABLES**
 
 DISCRETE idx_source[2] {1..4}
@@ -22,6 +22,9 @@ eq(source[8], 8)
 eq(source[9], 9)
 eq(source[10], 10)
 eq(source[11], 11)
+
+lexleq(target, [0,0,0,0,1,2,3,4,5,4,7,7])
+lexleq([0,0,0,0,1,2,3,4,5,4,7,7], target)
 
 diseq(idx_source[0], idx_source[1])
 

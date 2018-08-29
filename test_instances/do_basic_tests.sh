@@ -24,6 +24,7 @@ exec=$1
 shift
 
 for i in *.minion; do
+  printf "."
   j=$(($j + 1))
 
   # This gives the value that the program should return.
