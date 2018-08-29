@@ -1,0 +1,25 @@
+# We want Ubuntu 14.04 "Trust" instead of 12.04 "Precise" to get newer
+# and less buggy gcov
+dist: trusty
+language: c
+
+env:
+  global:
+    - CFLAGS="--coverage -O2"
+    - LDFLAGS="--coverage"
+    - CONFIGFLAGS="--quick"
+
+addons:
+  apt_packages:
+    - libgmp-dev
+    - libreadline-dev
+
+matrix:
+  include:
+    - env: TEST_SUITES="test_instances"
+script:
+  - gcov --version
+  - bash etc/ci-prepare.sh && bash etc/ci.sh
+
+after_script:
+  - bash <(curl -s https://codecov.io/bash)
