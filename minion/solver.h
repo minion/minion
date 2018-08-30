@@ -362,6 +362,10 @@ public:
 
   string gapname;
 
+  bool parallel = false;
+  int parallelcores = 0;
+  bool parallelStealHigh = true;
+
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
 
