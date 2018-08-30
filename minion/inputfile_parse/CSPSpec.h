@@ -418,49 +418,45 @@ struct VarContainer {
     throw parse_exception("Var Out of Range!");
   }
 
+  vector<Var> all_vars;
+
   Var getNewVar(VariableType type, vector<DomainInt> bounds) {
+    Var v;
     switch(type) {
-    case VAR_BOOL: return getNewBoolVar();
-    case VAR_BOUND: return getNewBoundVar(bounds[0], bounds[1]);
-    case VAR_SPARSEBOUND: return getNewSparseBoundVar(bounds);
-    case VAR_DISCRETE: return getNewDiscreteVar(bounds[0], bounds[1]);
+    case VAR_BOOL: v = _getNewBoolVar(); break;
+    case VAR_BOUND: v = _getNewBoundVar(bounds[0], bounds[1]); break;
+    case VAR_SPARSEBOUND: v = _getNewSparseBoundVar(bounds); break;
+    case VAR_DISCRETE: v = _getNewDiscreteVar(bounds[0], bounds[1]); break;
     default: D_FATAL_ERROR("Internal error");
     }
+    all_vars.push_back(v);
+    return v;
   }
 
-  Var getNewBoolVar() {
+private:
+  Var _getNewBoolVar() {
     Var newBool(VAR_BOOL, BOOLs);
     BOOLs++;
     return newBool;
   }
 
-  Var getNewBoundVar(DomainInt lower, DomainInt upper) {
+  Var _getNewBoundVar(DomainInt lower, DomainInt upper) {
     bound.push_back(Bounds(lower, upper));
     return Var(VAR_BOUND, (SysInt)bound.size() - 1);
   }
 
-  Var getNewSparseBoundVar(const vector<DomainInt>& vals) {
+  Var _getNewSparseBoundVar(const vector<DomainInt>& vals) {
     sparse_bound.push_back(vals);
     return Var(VAR_SPARSEBOUND, (SysInt)sparse_bound.size() - 1);
   }
 
-  Var getNewDiscreteVar(DomainInt lower, DomainInt upper) {
+  Var _getNewDiscreteVar(DomainInt lower, DomainInt upper) {
     discrete.push_back(Bounds(lower, upper));
     return Var(VAR_DISCRETE, (SysInt)discrete.size() - 1);
   }
 
+public:
   vector<Var> get_all_vars() const {
-    SysInt total_var_count = 0;
-    total_var_count += BOOLs;
-
-    total_var_count += bound.size();
-    total_var_count += sparse_bound.size();
-    total_var_count += discrete.size();
-    total_var_count += sparse_discrete.size();
-
-    vector<Var> all_vars(total_var_count);
-    for(SysInt i = 0; i < total_var_count; ++i)
-      all_vars[i] = get_var('x', i);
     return all_vars;
   }
 };
