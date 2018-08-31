@@ -218,24 +218,27 @@ struct StandardSearchManager : public SearchManager{
             else {
               // Todo, avoid this process creation?
               if(steal == -1) exit(0);
-              lockSolsout();
-              std::cerr << "stealing " << steal << "\n";
-              std::cerr << branches << "\n";
-              while(branches.size() > steal) {
-                branch_right();
+              //lockSolsout();
+              //std::cerr << "stealing " << steal << "\n";
+              //std::cerr << branches << "\n";
+              while(branches.size() > steal + 1) {
+                //std::cerr << "right branch: " << branches << "\n";
+                D_ASSERT(branch_right());
               }
-              std::cerr << branches << "\n";
-              unlockSolsout();
+              D_ASSERT(branches.size() == steal + 1);
+              prop->prop(var_array);
+              //std::cerr << branches << "\n";
+              //unlockSolsout();
             }
           }
         }
         else {
           bool doFork = shouldDoParallelFork();
           if(doFork) {
-            std::cerr << "Yes, do a fork!\n";
+            //std::cerr << "Yes, do a fork!\n";
 
             int isParent = fork();
-            D_ASSERT(isParent >= 0);
+            D_CHECK(isParent >= 0);
             if(isParent) {
               // Force to ignore left branch
               getState().setFailed(true);
