@@ -115,6 +115,8 @@ inline void check_sol_is_correct() {
   getState().incrementSolutionCount();
 
   if(getOptions().solsoutWrite) {
+    lockSolsout();
+
     vector<vector<AnyVarRef>> print_matrix = getState().getPrintMatrix();
     for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
       for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j) {
@@ -123,6 +125,9 @@ inline void check_sol_is_correct() {
         solsoutFile << print_matrix[i][j].getAssignedValue() << " ";
       }
     solsoutFile << "\n";
+    solsoutFile.flush();
+
+    unlockSolsout();
   }
 
   if(getOptions().print_solution) {
@@ -148,11 +153,20 @@ struct triple {
   bool isLeft;
   SysInt var;
   DomainInt val;
+  bool stolen;
 
-  triple(bool _isLeft, SysInt _var, DomainInt _val) : isLeft(_isLeft), var(_var), val(_val) {}
+  triple(bool _isLeft, SysInt _var, DomainInt _val)
+  : isLeft(_isLeft), var(_var), val(_val), stolen(false) {}
   friend std::ostream& operator<<(std::ostream& o, const triple& t) {
-    o << "(" << t.isLeft << "," << t.var << "," << t.val << ")";
+    o << "(" << t.isLeft << "," << t.var << "," << t.val <<  ":" << t.stolen << ")";
     return o;
+  }
+
+  friend bool operator==(triple lhs, triple rhs) {
+    return lhs.isLeft == rhs.isLeft &&
+           lhs.var == rhs.var &&
+           lhs.val == rhs.val &&
+           lhs.stolen == rhs.stolen;
   }
 };
 

@@ -70,27 +70,22 @@ struct StandardSearchManager : public SearchManager{
 
   vector<Controller::triple> branches; // L & R branches so far (isLeftBranch?,var,value)
 
-  SysInt depth; // number of left branches
-
   StandardSearchManager(shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
                 std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> _check_func,
                 std::function<void(void)> _handle_sol_func, std::function<void(void)> _handle_opt_func)
       :
       check_func(_check_func), handle_sol_func(_handle_sol_func),
       handle_opt_func(_handle_opt_func),
-      var_order(_var_order), prop(_prop), depth(0) {
+      var_order(_var_order), prop(_prop) {
     var_array = var_order->getVars();
     branches.reserve(var_array.size());
   }
 
   void reset() {
     branches.clear();
-    depth = 0;
+   
   }
 
-  SysInt search_depth() {
-    return depth;
-  }
 
   // returns false if left branch not possible.
   inline void branch_left(pair<SysInt, DomainInt> picked) {
@@ -101,27 +96,29 @@ struct StandardSearchManager : public SearchManager{
     var_array[picked.first].assign(picked.second);
     maybe_print_search_assignment(var_array[picked.first], picked.second, true);
     branches.push_back(Controller::triple(true, picked.first, picked.second));
-    depth++;
   }
 
   inline bool branch_right() {
     while(!branches.empty() && !branches.back().isLeft) { // pop off all the
                                                           // RBs
       maybe_print_right_backtrack();
+      D_ASSERT(!branches.back().stolen);
       branches.pop_back();
     }
 
-    if(branches.empty()) {
+    if(branches.empty())
       return false;
-    }
+
+    world_pop();
 
     SysInt var = branches.back().var;
     DomainInt val = branches.back().val;
+    bool isLeft = branches.back().isLeft;
+    bool stolen = branches.back().stolen;
 
+    D_ASSERT(isLeft);
     // remove the left branch.
     branches.pop_back();
-    world_pop();
-    depth--;
 
     D_ASSERT(var_array[var].inDomain(val));
 
@@ -136,15 +133,24 @@ struct StandardSearchManager : public SearchManager{
     }
     maybe_print_search_assignment(var_array[var], val, false);
     branches.push_back(Controller::triple(false, var, val));
-    return true;
+
+    // If this branch was stolen, then we want to carry on
+    // backtracking
+    if(stolen)
+      return branch_right();
+    else
+      return true;
+  }
+
+  inline bool in_aux_vars() {
+    return !branches.empty() && branches.back().var >= var_order->auxVarStart();
   }
 
   inline void jump_out_aux_vars() {
-    while(!branches.empty() && branches.back().var >= var_order->auxVarStart()) {
+    while(in_aux_vars()) {
       if(branches.back().isLeft) {
         world_pop();
         maybe_print_right_backtrack();
-        depth--;
       }
 
       branches.pop_back();
@@ -152,20 +158,13 @@ struct StandardSearchManager : public SearchManager{
   }
 
   // Steal work isn't used, but is left here in case anyone ever wants it.
-  option<std::vector<Controller::triple>>
-  steal_work() { // steal the topmost left branch from this search.
-
-    for(UnsignedSysInt newceil = 0; newceil < branches.size(); ++newceil) {
-      if(branches[newceil].isLeft) {
-        std::vector<Controller::triple> work(branches.begin(), branches.begin() + newceil + 1);
-        work.back().isLeft = false;
-        branches[newceil].isLeft = false;
-
-        return work;
+  int steal_work() { // find where to steal the topmost left branch from this search.
+    for(UnsignedSysInt newceil = 0; newceil < branches.size() - 1; ++newceil) {
+      if(branches[newceil].isLeft && !branches[newceil].stolen) {
+        return newceil;
       }
     }
-
-    return option<std::vector<Controller::triple>>();
+    return -1;
   }
 
   // Most basic search procedure
@@ -197,9 +196,61 @@ struct StandardSearchManager : public SearchManager{
         prop->prop(var_array);
       }
 
+      if(getOptions().parallel && !getState().isFailed() && !in_aux_vars()) {
+        if(getOptions().parallelStealHigh) {
+          bool doFork = shouldDoParallelFork();
+
+          int steal = steal_work();
+            
+          int isParent = 0;
+
+          //std::cerr << "Fork?" << getState().isFailed() << "\n";;
+          if(doFork) {
+            //std::cerr << "Yes, do a fork!\n";
+
+            isParent = fork();
+
+            if(isParent) {
+              if(steal != -1) {
+                branches[steal].stolen = true;
+              }
+            }
+            else {
+              // Todo, avoid this process creation?
+              if(steal == -1) exit(0);
+              lockSolsout();
+              std::cerr << "stealing " << steal << "\n";
+              std::cerr << branches << "\n";
+              while(branches.size() > steal) {
+                branch_right();
+              }
+              std::cerr << branches << "\n";
+              unlockSolsout();
+            }
+          }
+        }
+        else {
+          bool doFork = shouldDoParallelFork();
+          if(doFork) {
+            std::cerr << "Yes, do a fork!\n";
+
+            int isParent = fork();
+            D_ASSERT(isParent >= 0);
+            if(isParent) {
+              // Force to ignore left branch
+              getState().setFailed(true);
+            }
+            else {
+              // Force to stay in left branch
+              reset();
+            }
+          }
+        }
+      }
+
       // loop to
       while(getState().isFailed()) {
-        if(depth == 0) {
+        if(branches.size() == 0) {
           return;
         }
 

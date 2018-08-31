@@ -352,7 +352,8 @@ minionsrclist = ['minion/BuildVariables.cpp',
 'minion/system/sha1.cpp',
 'minion/help/help.cpp',
 'minion/inputfile_parse/inputfile_parse.cpp',
-'minion/dump_state.cpp']
+'minion/dump_state.cpp',
+'minion/parallel.cpp']
 
 
 
@@ -424,4 +425,4 @@ with open(outname, "w") as out:
     if arg.buildsystem == "make":
         out.write('minion: $(CONOBJS) $(MINOBJS)\n')
     out.write('\t' + compiler + ' ' + varsub('FLAGS') + varsub('CONOBJS') +
-               varsub('MINOBJS') + ' -o minion\n')
+               varsub('MINOBJS') + ' -pthread -o minion\n')

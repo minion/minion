@@ -587,6 +587,18 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-gap);
       getOptions().gapname = argv[i];
     }
+    else if(command == string("-parallel")) {
+      std::cerr << "Warning: parallel is beta\n";
+      std::cerr << "Use -solsout to store the solutions";
+      getOptions().parallel = true;
+    }
+    else if(command == string("-cores")) {
+      INCREMENT_i(-cores);
+      getOptions().parallelcores = atoi(argv[i]);
+    }
+    else if(command == string("-steallow")) {
+      getOptions().parallelStealHigh = false;
+    }
     /** @help switches;-split Description
     When Minion is terminated before the end of search, write out two new input
     files that split the remaining search space in half. Each of the files will

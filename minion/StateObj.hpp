@@ -22,6 +22,7 @@
 #define STATEOBJ_HPP
 
 #include "StateObj_forward.h"
+#include "parallel/parallel.h"
 
 VARDEF(Memory searchMem_m);
 VARDEF(SearchOptions options_m);
@@ -29,6 +30,7 @@ VARDEF(SearchState state_m);
 VARDEF(Queues queues_m);
 VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
+VARDEF(ParallelData* parData_m);
 
 inline BoolContainer& getBools() {
   return bools_m;
@@ -48,6 +50,14 @@ inline Memory& getMemory() {
 inline VariableContainer& getVars() {
   return varContainer_m;
 }
+
+inline ParallelData& getParallelData() {
+  if(parData_m == 0) {
+    parData_m = setupParallelData();
+  }
+  return *parData_m;
+}
+
 
 template <typename DomType>
 inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static() {
