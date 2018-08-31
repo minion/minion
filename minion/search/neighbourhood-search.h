@@ -304,7 +304,6 @@ private:
       if(sm.branches.back().isLeft) {
         Controller::world_pop();
         Controller::maybe_print_right_backtrack();
-        sm.depth--;
       }
       sm.branches.pop_back();
     }
