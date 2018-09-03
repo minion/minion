@@ -50,12 +50,14 @@ endpage() {
 
 # finally outputs an index page from which the entries can be accessed
 
-find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname "*.h" \) -type f -exec grep -H -n "/\*\* @help" {} \; | while read entry ; do
-    match_file=`echo $entry | cut -d: -f1`; #file comment is in
-    match_line=`echo $entry | cut -d: -f2`; #line comment begins on
-    match_entry=`echo $entry | cut -d' ' -f3`; #entry comment is for
-    match_heading=`echo $entry | cut -d' ' -f 4`; #heading comment is for
-    lines_in_file=`wc -l $match_file | awk '{print $1}' | cut -d' ' -f1`; #lines in match file
+find minion -type f | sort | xargs grep -H -n " @help " | while read entry ; do
+    echo "$entry"
+    match_file=`echo "$entry" | cut -d: -f1`; #file comment is in
+    match_line=`echo "$entry" | cut -d: -f2`; #line comment begins on
+    match_entry=`echo "$entry" |cut -d: -f3 | awk '{print $3}'`; #entry comment is for
+    echo "$match_entry"
+    match_heading=`echo "$entry" | cut -d: -f3 | awk '{print $4}'`; #heading comment is for
+    lines_in_file=`wc -l "$match_file" | awk '{print $1}' | cut -d' ' -f1`; #lines in match file
     reqd_lines=$(($lines_in_file-$match_line))
     end_of_comment_in_tail=`tail -n$reqd_lines $match_file | grep -m1 -n "\*/" | cut -d':' -f1`;
     end_of_comment=$(($match_line+$end_of_comment_in_tail)); #line comment ends on
@@ -65,6 +67,7 @@ find . \( ! -regex '.*/\..*' \) \( -iname "*.cpp" -or -iname "*.hpp" -or -iname 
     html_body=`echo "$body" | sed 's/</\&lt;/g' | sed 's/>/\&gt;/g'`; #replace < by &lt;, etc.
     match_entry_spaces=`echo $match_entry | sed 's/;/ /g'`;
     match_entry_underbars=`echo $match_entry | sed 's/;/_/g'`;
+    echo "$match_entry_underbars"
     echo $match_entry_spaces >> $TMP_FILE #record entry for later
     outfile="docs/htmlhelp/$match_entry_underbars.html";
     querymakepage $outfile "$match_entry_spaces"; #make page for entry if necessary

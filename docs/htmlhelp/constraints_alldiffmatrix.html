@@ -25,6 +25,26 @@ alldiffmatrix(myVec, Value)
 This constraint adds some extra reasoning in addition to the GAC Alldifferents
 on the rows and columns.
 </pre>
+<h3>Description</h3>
+<pre>
+For a latin square this constraint is placed on the whole matrix once for each
+value.
+It ensures there is a bipartite matching between rows and columns where the
+edges
+in the matching correspond to a pair (row, column) where the variable in
+position
+(row,column) in the matrix may be assigned to the given value.
+</pre>
+<h3>Example</h3>
+<pre>
+
+alldiffmatrix(myVec, Value)
+</pre>
+<h3>Notes</h3>
+<pre>
+This constraint adds some extra reasoning in addition to the GAC Alldifferents
+on the rows and columns.
+</pre>
 <p><a href="index.html">Home</a></p>
 </body>
 </html>

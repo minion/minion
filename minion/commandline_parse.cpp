@@ -332,7 +332,8 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
       }
       getOptions().dumptreejson = JSONStreamer(outfile);
-    } /** @help switches;-nodelimit Description
+    }
+    /** @help switches;-nodelimit Description
     To stop search after N nodes, do
 
        minion -nodelimit N myinput.minion
