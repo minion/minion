@@ -210,7 +210,8 @@ public:
       } else {
         recentSolutionValueQueue.push_back(currentSolutionValue);
         recentSolutionValueQueue.pop_front();
-        highestNeighbourhoodSizes[nhInfo.first] = stats.highestNeighbourhoodSize;
+        highestNeighbourhoodSizes[nhInfo.first] =
+            checked_cast<size_t>(stats.highestNeighbourhoodSize);
       }
     }
   }
@@ -265,8 +266,8 @@ private:
     }
   }
   bool hasFinished(size_t iterationsSpentAtPeak) {
-    size_t iterationLimit =
-        round(getOptions().nhConfig->simulatedAnnealingIterationsBetweenCool * getOptions().nhConfig->simulatedAnnealingRatioForStopping);
+    size_t iterationLimit = round(getOptions().nhConfig->simulatedAnnealingIterationsBetweenCool *
+                                  getOptions().nhConfig->simulatedAnnealingRatioForStopping);
     return iterationsSpentAtPeak > iterationLimit;
   }
   void setInitialTemperature(NeighbourhoodState& nhState, vector<DomainInt>& initSolution) {
@@ -288,22 +289,23 @@ private:
         backtrackLimit.increase();
       } else {
         int delta = checked_cast<int>(stats.newMinValue - stats.oldMinValue);
-        if (delta < 0){
+        if(delta < 0) {
           solutionDeltas.push_back(delta);
           ++i;
         }
       }
     }
-    
+
     // do something with the deltas
     double meanDelta = 0;
-    for (int i=0; i<solutionDeltas.size(); i++)
-        meanDelta += solutionDeltas[i];
+    for(int i = 0; i < solutionDeltas.size(); i++)
+      meanDelta += solutionDeltas[i];
     meanDelta /= solutionDeltas.size();
 
     // when finished, set the class member called temperature
-     temperature = meanDelta / log(nhConfig->simulatedAnnealingTargetProbabilityForInitialTemperature);   
-     //abort();
+    temperature =
+        meanDelta / log(nhConfig->simulatedAnnealingTargetProbabilityForInitialTemperature);
+    // abort();
   }
 
 public:
