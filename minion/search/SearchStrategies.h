@@ -400,6 +400,9 @@ public:
       }
       for(int nhIndex : availableNHCombinations) {
         NeighbourhoodStats stats = runNeighbourhood(nhState, nhIndex);
+        if(!stats.solutionFound) {
+          continue;
+        }
         searchStrategy.run(nhState, stats.newMinValue, nhState.solution);
         if(searchStrategy.bestSolutionValue > bestSolutionValue) {
           bestSolutionValue = searchStrategy.bestSolutionValue;
