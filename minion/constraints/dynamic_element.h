@@ -375,12 +375,14 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     // initial_result_dom_min + 1);
     if(pos < result_support_triggers) { // It was a value in the result var
                                         // which lost support
+      std::cerr << "FNSFR\n";
       find_new_support_for_result(pos / 2);
       return;
     }
     pos -= result_support_triggers;
 
     if(pos < index_support_triggers) { // A value in the index var lost support
+      std::cerr << "FNSFI\n";
       find_new_support_for_index(pos / 2);
       return;
     }
