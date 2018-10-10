@@ -266,11 +266,9 @@ struct GraphBuilder {
       g.aux_vertex_colour[const_name].insert(const_name);
       return const_name;
     } else if(v.type() == VAR_NOTBOOL) {
-      cerr << "No symmetry !bool support yet, sorry" << endl;
-      exit(1);
-      //      string aux_v = g.new_vertex("NOTBOOL");
-      //      add_edge(aux_v, csp.vars.getName(Var(VAR_BOOL, v.pos())));
-      //      return aux_v;
+      string aux_v = g.new_vertex("NOTBOOL");
+      add_edge(aux_v, csp.vars.getName(Var(VAR_BOOL, v.pos())));
+      return aux_v;
     } else
       return csp.vars.getName(v);
   }
@@ -537,11 +535,15 @@ struct GraphBuilder {
 
     case CT_WATCHED_ELEMENT: return colour_element(b, "ELEMENT");
 
+    case CT_ELEMENT_UNDEFZERO : return colour_element(b, "ELEMENT_UNDEFZERO");
+
     case CT_WATCHED_ELEMENT_UNDEFZERO: return colour_element(b, "ELEMENT_UNDEFZERO");
 
     case CT_ELEMENT_ONE: return colour_element(b, "ELEMENT_ONE");
 
     case CT_WATCHED_ELEMENT_ONE: return colour_element(b, "ELEMENT_ONE");
+
+    case CT_WATCHED_ELEMENT_ONE_UNDEFZERO: return colour_element(b, "ELEMENT_ONE_UNDEFZERO");
 
     case CT_ALLDIFF: return colour_symmetric_constraint(b, "ALLDIFF");
 
@@ -551,7 +553,7 @@ struct GraphBuilder {
 
     case CT_DISEQ: return colour_eq(b, "DISEQ");
 
-    case CT_EQ: return colour_eq(b, "EQ");
+    case CT_EQ: case CT_GACEQ: return colour_eq(b, "EQ");
 
     case CT_MINUSEQ: return colour_no_symmetry(b, "MINUSEQ");
 
@@ -597,9 +599,9 @@ struct GraphBuilder {
 
     case CT_WATCHED_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
 
-    case CT_WATCHED_TABLE: return colour_no_symmetry(b, "TABLE");
+    case CT_WATCHED_TABLE: case CT_MDDC: case CT_HAGGISGAC: case CT_HAGGISGAC_STABLE: case CT_LIGHTTABLE: case CT_STR: return colour_no_symmetry(b, "TABLE");
 
-    case CT_WATCHED_NEGATIVE_TABLE: return colour_no_symmetry(b, "NEG_TABLE");
+    case CT_WATCHED_NEGATIVE_TABLE: case CT_NEGATIVEMDDC: return colour_no_symmetry(b, "NEG_TABLE");
 
     case CT_WATCHED_VECNEQ: return colour_array_swap_each_index(b, "VECNEQ");
 
@@ -609,7 +611,11 @@ struct GraphBuilder {
 
     case CT_DIV: return colour_no_symmetry(b, "DIV");
 
+    case CT_DIV_UNDEFZERO: return colour_no_symmetry(b, "DIV_UNDEFZERO");
+
     case CT_MODULO: return colour_no_symmetry(b, "MOD");
+
+    case CT_MODULO_UNDEFZERO: return colour_no_symmetry(b, "MOD_UNDEFZERO");
 
     case CT_WATCHED_VEC_OR_LESS: return colour_symmetric_indexes(b, "VEC_OR_LESS");
 
