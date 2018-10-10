@@ -661,6 +661,7 @@ struct InstanceStats {
     case CT_WATCHED_INSET:
     case CT_WATCHED_NOT_INSET:
     case CT_WATCHED_INRANGE:
+    case CT_WATCHED_ININTERVALSET:
     case CT_WATCHED_NOT_INRANGE: (*unary)++; break;
     case CT_ALLDIFF:
     case CT_GACALLDIFF: {
@@ -695,11 +696,14 @@ struct InstanceStats {
     case CT_PRODUCT2:
     case CT_DIFFERENCE:
     case CT_MODULO:
+    case CT_MODULO_UNDEFZERO:
     case CT_DIV:
+    case CT_DIV_UNDEFZERO:
     case CT_POW: (*ternary)++; break;
     case CT_ABS:
     case CT_INEQ:
     case CT_EQ:
+    case CT_GACEQ:
     case CT_MINUSEQ:
     case CT_DISEQ:
     case CT_WATCHED_NEQ:
@@ -719,6 +723,13 @@ struct InstanceStats {
       break;
     case CT_WATCHED_TABLE:
     case CT_WATCHED_NEGATIVE_TABLE:
+    case CT_GACSCHEMA:
+    case CT_HAGGISGAC:
+    case CT_HAGGISGAC_STABLE:
+    case CT_MDDC: case CT_NEGATIVEMDDC:
+    case CT_SHORTSTR:
+    case CT_STR:
+    case CT_SHORTSTR_CTUPLE:
     case CT_LIGHTTABLE: (*table)++; break;
     case CT_GACLEXLEQ:
     case CT_QUICK_LEXLEQ:
@@ -730,7 +741,9 @@ struct InstanceStats {
     case CT_ELEMENT:
     case CT_ELEMENT_ONE:
     case CT_WATCHED_ELEMENT:
+    case CT_ELEMENT_UNDEFZERO:
     case CT_WATCHED_ELEMENT_ONE:
+    case CT_WATCHED_ELEMENT_ONE_UNDEFZERO:
     case CT_WATCHED_ELEMENT_UNDEFZERO: (*element)++; break;
     case CT_MIN:
     case CT_MAX: (*minmax)++; break;
@@ -738,10 +751,17 @@ struct InstanceStats {
     case CT_LEQ_OCCURRENCE:
     case CT_GEQ_OCCURRENCE:
     case CT_GCC:
+    case CT_LEQNVALUE:
+    case CT_GEQNVALUE:
     case CT_GCCWEAK: (*occurrence)++; break;
-    default:
+
+    case CT_CHECK_GSA:
+    case CT_ALLDIFFMATRIX:
+    case CT_FRAMEUPDATE:
+    case CT_FORWARD_CHECKING:
+    case CT_CHECK_ASSIGN:
+    //default:
       cerr << "Stats: Uncategorised constraint:" << i.constraint->name << endl;
-      // constraints missing: CT_GADGET, CT_CHECK_GSA, CT_CHECK_ASSIGN.
     }
   }
 
