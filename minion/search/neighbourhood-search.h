@@ -488,12 +488,18 @@ struct NeighbourhoodSearchManager : public Controller::SearchManager {
     cout.precision(3);
 
     nhState.globalStats.startTimer();
+    bool solutionFound = false;
     try {
       NeighbourhoodStats initialStats = findRandomSolutionUsingNormalSearch(nhState);
+      solutionFound = initialStats.solutionFound;
       debug_log("Stats on initial solution:\n" << initialStats << endl);
       searchStrategy.run(nhState, initialStats.newMinValue, nhState.solution);
     } catch(EndOfSearch&) {}
-    nhState.printBestSolution();
+    if(solutionFound) {
+      nhState.printBestSolution();
+    } else {
+      cout << "Initial solution not found\n";
+    }
     nhState.globalStats.printStats(cout, nhState.nhc);
     cout << endl;
     throw EndOfSearch();
