@@ -669,6 +669,14 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
 
   infile->check_sym(')');
 
+  if(def->read_types[1] == read_tuples && con.tuples->size() == 0) {
+    return ConstraintBlob(get_constraint(CT_FALSE));
+  }
+
+  if(def->read_types[1] == read_short_tuples && con.short_tuples->size() == 0) {
+    return ConstraintBlob(get_constraint(CT_FALSE));
+  }
+
   if(def->read_types[1] == read_tuples) {
     if((SysInt)con.vars[0].size() != con.tuples->tuple_size()) {
       throw parse_exception("Tuple constraint with " + tostring(con.vars[0].size()) +
@@ -677,23 +685,12 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
     }
   }
 
+  // We already know there is at least one tuple
   if(con.vars[0].size() == 0) {
-    if(def->read_types[1] == read_tuples) {
-      // Either trivially true, or trivially false, depending on how many tuples
-      // there are.
-      if(con.tuples->size() != 0)
-        return ConstraintBlob(get_constraint(CT_TRUE));
-      else
-        return ConstraintBlob(get_constraint(CT_FALSE));
-    } else {
-      if(con.short_tuples->size() == 0)
-        return ConstraintBlob(get_constraint(CT_FALSE));
-      else if((*con.short_tuples->tuplePtr())[0].empty())
-        return ConstraintBlob(get_constraint(CT_TRUE));
-      else
+    if(def->read_types[1] == read_short_tuples && !(*con.short_tuples->tuplePtr())[0].empty())
         throw parse_exception("Not a valid list of short tuples for a "
                               "constraint with no variables!");
-    }
+    return ConstraintBlob(get_constraint(CT_TRUE));
   }
 
   return con;
