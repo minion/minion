@@ -277,13 +277,24 @@ if arg.constraints:
 constraintsrclist = []
 constraintsrclistshort = []
 
+constraint_chunk = 0
+# Force first loop to create a file
+constraint_current_chunk = 4
+
 for c in constraints:
+    constraint_current_chunk += 1
+    if constraint_current_chunk >= 5:
+        constraint_chunk += 1
+        constraint_current_chunk = 0
+        srcname = "build_constraint_" + str(constraint_chunk) + ".cpp"
+        constraintsrclistshort.append("src/"+srcname)
+        srcname = outsrcdir+srcname
+        constraintsrclist.append(srcname)
+        with open(srcname, "w") as conout:
+            conout.write("// Minion constraint file\n")
+            
     varcount = sum([ m in ["read_list", "read_var", "read_2_vars"] for m in c["args"]])
-    srcname = "build_"+c["internal_name"]+".cpp"
-    constraintsrclistshort.append("src/"+srcname)
-    srcname = outsrcdir+srcname
-    constraintsrclist.append(srcname)
-    with open(srcname, "w") as conout:
+    with open(srcname, "a") as conout:
         conout.write('#include "minion.h"\n')
         conout.write('#include "' + c["filename"] + '"\n\n')
         conout.write("BUILD_CT("+c["internal_name"] + ", "+str(varcount)+")\n")
