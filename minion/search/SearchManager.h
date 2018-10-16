@@ -34,7 +34,7 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
   }
   if(getOptions().dumptreejson.isActive()) {
     if(equal) {
-      getOptions().dumptreejson.mapElement("branchVar", tostring(var));
+      getOptions().dumptreejson.mapElement("branchVar", getBaseVarName(var));
       getOptions().dumptreejson.mapElement("branchVal", val);
       getOptions().dumptreejson.openMapWithKey("left");
     }

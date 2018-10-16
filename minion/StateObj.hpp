@@ -74,4 +74,11 @@ inline SearchState::~SearchState() {
     delete constraints[i];
 }
 
+
+template<typename Var>
+std::string getBaseVarName(const Var& v)
+{
+   return getState().getInstance()->vars.getName(v.getBaseVar());
+}
+
 #endif

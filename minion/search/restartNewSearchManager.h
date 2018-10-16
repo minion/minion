@@ -48,8 +48,8 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     } catch(EndOfSearch&) {}
 
 
-    double cputime = get_cpu_time();
-    double timelimit = getOptions().time_limit;
+    //double cputime = get_cpu_time();
+    //double timelimit = getOptions().time_limit;
 
     if(solutionFound) {
         //cout << "Solution found, stop the search" << endl;

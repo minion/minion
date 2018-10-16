@@ -9,9 +9,6 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-static const char* NUMBER_ITERATIONS_KEY = "numberIterations:";
-static const char* NUMBER_POSITIVE_KEY = "numberPositive:";
-static const char* NUMBER_ACTIVATIONS_KEY = "numberActivations:";
 
 class UCBNeighbourhoodSelection {
   std::vector<u_int64_t> initialNumberActivations;
@@ -85,8 +82,11 @@ public:
     return bestCombinations[std::rand() % bestCombinations.size()];
   }
   /*
+  
     inline void readInitialValuesFromFile(std::istream& is, int numberNeighbourhoods) {
-      checkName(NUMBER_ITERATIONS_KEY, is);
+     static const char* NUMBER_ITERATIONS_KEY = "numberIterations:";
+     static const char* NUMBER_ACTIVATIONS_KEY = "numberActivations:";
+     checkName(NUMBER_ITERATIONS_KEY, is);
       if(!is >> initialNumberIterations) {
         std::cerr << "Error when reading " << NUMBER_ITERATIONS_KEY << " expected integer after.\n";
         exit(1);

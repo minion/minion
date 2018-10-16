@@ -26,8 +26,13 @@
 
 #include <vector>
 
+
+template<typename T>
+std::string getBaseVarName(const T& t);
+
 template <typename Var>
 void add_var_dom_to_json(Var& v, std::ostream& s) {
+  s << '"' << getBaseVarName(v) << "\":";
   if(v.isAssigned() || v.isBound()) {
     s << "[ [" << v.getMin() << "," << v.getMax() << "] ]";
   } else {
@@ -61,7 +66,7 @@ void add_var_dom_to_json(Var& v, std::ostream& s) {
 template <typename T>
 raw_json get_dom_as_json(vector<T>& vec) {
   std::ostringstream s;
-  s << "[";
+  s << "{";
   if(!vec.empty()) {
     add_var_dom_to_json(vec[0], s);
     for(UnsignedSysInt i = 1; i < vec.size(); ++i) {
