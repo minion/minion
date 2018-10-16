@@ -627,6 +627,8 @@ struct GraphBuilder {
 
     case CT_WATCHED_INSET: return colour_litlist(b, "WATCHED_INSET");
 
+    case CT_WATCHED_ININTERVALSET: return colour_litlist(b, "WATCHED_ININTERVAL_SET");
+
     case CT_WATCHED_NOT_INSET: return colour_litlist(b, "WATCHED_NOT_INSET");
 
     case CT_WATCHED_INRANGE: return colour_litlist(b, "WATCHED_INRANGE");
