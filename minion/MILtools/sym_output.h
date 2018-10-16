@@ -773,18 +773,26 @@ struct InstanceStats {
     }
   }
 
+#define START_CLOCK() start_time = get_cpu_time()
+#define END_CLOCK() measured_time = get_cpu_time() - start_time; cout << "TIME: " << measured_time << endl;
+#define output_stat cout << measured_time << " " << s 
+
   void output_stats() {
     string s("stats_"); // common prefix
     // Variables statistics
+    double start_time, measured_time;
+    START_CLOCK();
     VarContainer& v = csp.vars;
     SysInt varcount = v.BOOLs + v.bound.size() + v.sparse_bound.size() + v.discrete.size();
-    cout << s << "varcount:" << varcount << endl;
-    cout << s << "var_bool:" << v.BOOLs << endl;
-    cout << s << "var_discrete:" << v.discrete.size() << endl;
-    cout << s << "var_bound:" << v.bound.size() << endl;
-    cout << s << "var_sparsebound:" << v.sparse_bound.size() << endl;
+    END_CLOCK();
+    output_stat << "varcount:" << varcount << endl;
+    output_stat << "var_bool:" << v.BOOLs << endl;
+    output_stat << "var_discrete:" << v.discrete.size() << endl;
+    output_stat << "var_bound:" << v.bound.size() << endl;
+    output_stat << "var_sparsebound:" << v.sparse_bound.size() << endl;
 
     // collect all domain sizes into an array
+    START_CLOCK();
     vector<DomainInt> domsizes;
     long long int var_memory_usage = 0;
     double domain_product = 1;
@@ -811,26 +819,27 @@ struct InstanceStats {
       var_memory_usage += 64;
       domain_product += log((double)v.sparse_bound[i].size());
     }
-
-    cout << s << "VarMemory: " << var_memory_usage << endl;
-    cout << s << "DomainProductLog: " << domain_product << endl;
+    END_CLOCK();
+    output_stat << "VarMemory: " << var_memory_usage << endl;
+    output_stat << "DomainProductLog: " << domain_product << endl;
     std::sort(domsizes.begin(), domsizes.end());
     // Some rubbish which does not give you the real medians, quartiles
-    cout << s << "dom_0:" << domsizes[0] << endl;
-    cout << s << "dom_25:" << domsizes[domsizes.size() / 4] << endl;
-    cout << s << "dom_50:" << domsizes[domsizes.size() / 2] << endl;
-    cout << s << "dom_75:" << domsizes[(domsizes.size() * 3) / 4] << endl;
-    cout << s << "dom_100:" << domsizes.back() << endl;
+    output_stat << "dom_0:" << domsizes[0] << endl;
+    output_stat << "dom_25:" << domsizes[domsizes.size() / 4] << endl;
+    output_stat << "dom_50:" << domsizes[domsizes.size() / 2] << endl;
+    output_stat << "dom_75:" << domsizes[(domsizes.size() * 3) / 4] << endl;
+    output_stat << "dom_100:" << domsizes.back() << endl;
 
     SysInt totaldom =
         checked_cast<SysInt>(std::accumulate(domsizes.begin(), domsizes.end(), (DomainInt)0));
-    cout << s << "dom_mean:" << ((double)totaldom) / (double)domsizes.size() << endl;
+    output_stat << "dom_mean:" << ((double)totaldom) / (double)domsizes.size() << endl;
 
     SysInt num2s = std::count(domsizes.begin(), domsizes.end(), (DomainInt)2);
-    cout << s << "dom_not2_2_ratio:" << ((double)(varcount - num2s)) / (double)num2s << endl;
+    output_stat << "dom_not2_2_ratio:" << ((double)(varcount - num2s)) / (double)num2s << endl;
 
-    cout << s << "discrete_bool_ratio:" << ((double)v.discrete.size()) / (double)v.BOOLs << endl;
+    output_stat << "discrete_bool_ratio:" << ((double)v.discrete.size()) / (double)v.BOOLs << endl;
 
+    START_CLOCK();
     SysInt branchingvars = 0;
     SysInt auxvars = 0;
     for(SysInt i = 0; i < (SysInt)csp.search_order.size(); i++) {
@@ -840,38 +849,42 @@ struct InstanceStats {
         branchingvars = branchingvars + csp.search_order[i].var_order.size();
       }
     }
-    cout << s << "branchingvars:" << branchingvars << endl;
-    cout << s << "auxvars:" << auxvars << endl;
-    cout << s << "auxvar_branching_ratio:" << ((double)auxvars) / (double)branchingvars << endl;
+    END_CLOCK();
+    output_stat << "branchingvars:" << branchingvars << endl;
+    output_stat << "auxvars:" << auxvars << endl;
+    output_stat << "auxvar_branching_ratio:" << ((double)auxvars) / (double)branchingvars << endl;
 
     //////////////////////////////////////////////////////////////////////////
     // Constraint stats
+    START_CLOCK();
     list<ConstraintBlob>& c = csp.constraints;
-
-    cout << s << "conscount:" << c.size() << endl;
+    END_CLOCK();
+    output_stat << "conscount:" << c.size() << endl;
+    START_CLOCK();
     vector<DomainInt> arities;
     for(list<ConstraintBlob>::iterator i = c.begin(); i != c.end(); ++i) {
       arities.push_back(arity(*i));
     }
     std::sort(arities.begin(), arities.end());
-
-    cout << s << "arity_0:" << arities[0] << endl;
-    cout << s << "arity_25:" << arities[arities.size() / 4] << endl;
-    cout << s << "arity_50:" << arities[arities.size() / 2] << endl;
-    cout << s << "arity_75:" << arities[(arities.size() * 3) / 4] << endl;
-    cout << s << "arity_100:" << arities.back() << endl;
+    END_CLOCK();
+    output_stat << "arity_0:" << arities[0] << endl;
+    output_stat << "arity_25:" << arities[arities.size() / 4] << endl;
+    output_stat << "arity_50:" << arities[arities.size() / 2] << endl;
+    output_stat << "arity_75:" << arities[(arities.size() * 3) / 4] << endl;
+    output_stat << "arity_100:" << arities.back() << endl;
 
     const SysInt totalarity =
         checked_cast<SysInt>(std::accumulate(arities.begin(), arities.end(), (DomainInt)0));
 
-    cout << s << "TotalArity: " << totalarity << endl;
-    cout << s << "arity_mean:" << ((double)totalarity) / (double)arities.size() << endl;
-    cout << s << "arity_mean_normalised:"
+    output_stat << "TotalArity: " << totalarity << endl;
+    output_stat << "arity_mean:" << ((double)totalarity) / (double)arities.size() << endl;
+    output_stat << "arity_mean_normalised:"
          << (((double)totalarity) / (double)arities.size()) / ((double)varcount) << endl;
-    cout << s << "cts_per_var_mean:" << ((double)totalarity) / (double)varcount << endl;
-    cout << s << "cts_per_var_mean_normalised:"
+    output_stat << "cts_per_var_mean:" << ((double)totalarity) / (double)varcount << endl;
+    output_stat << "cts_per_var_mean_normalised:"
          << (((double)totalarity) / ((double)varcount)) / ((double)c.size()) << endl;
 
+    START_CLOCK();
     // alldiff stats
     vector<double> alldiffdomovervars;
 
@@ -888,50 +901,52 @@ struct InstanceStats {
     }
 
     std::sort(alldiffdomovervars.begin(), alldiffdomovervars.end());
+    END_CLOCK();
 
-    cout << s << "alldiffdomovervars_0:" << alldiffdomovervars[0] << endl;
-    cout << s << "alldiffdomovervars_25:" << alldiffdomovervars[alldiffdomovervars.size() / 4]
+    output_stat << "alldiffdomovervars_0:" << alldiffdomovervars[0] << endl;
+    output_stat << "alldiffdomovervars_25:" << alldiffdomovervars[alldiffdomovervars.size() / 4]
          << endl;
-    cout << s << "alldiffdomovervars_50:" << alldiffdomovervars[alldiffdomovervars.size() / 2]
+    output_stat << "alldiffdomovervars_50:" << alldiffdomovervars[alldiffdomovervars.size() / 2]
          << endl;
-    cout << s << "alldiffdomovervars_75:" << alldiffdomovervars[(alldiffdomovervars.size() * 3) / 4]
+    output_stat << "alldiffdomovervars_75:" << alldiffdomovervars[(alldiffdomovervars.size() * 3) / 4]
          << endl;
-    cout << s << "alldiffdomovervars_100:" << alldiffdomovervars.back() << endl;
+    output_stat << "alldiffdomovervars_100:" << alldiffdomovervars.back() << endl;
 
     double alldiffdomovervarstotal =
         std::accumulate(alldiffdomovervars.begin(), alldiffdomovervars.end(), 0.0);
-    cout << s << "alldiffdomovervars_mean:"
+    output_stat << "alldiffdomovervars_mean:"
          << (alldiffdomovervarstotal) / (double)alldiffdomovervars.size() << endl;
 
-    cout << s << "alldiff_count:" << alldiff << endl;
-    cout << s << "alldiff_proportion:" << ((double)alldiff) / (double)c.size() << endl;
-    cout << s << "sums_count:" << sums << endl;
-    cout << s << "sums_proportion:" << ((double)sums) / (double)c.size() << endl;
-    cout << s << "or_atleastk_count:" << or_atleastk << endl;
-    cout << s << "or_atleastk_proportion:" << ((double)or_atleastk) / (double)c.size() << endl;
-    cout << s << "ternary_count:" << ternary << endl;
-    cout << s << "ternary_proportion:" << ((double)ternary) / (double)c.size() << endl;
-    cout << s << "binary_count:" << binary << endl;
-    cout << s << "binary_proportion:" << ((double)binary) / (double)c.size() << endl;
-    cout << s << "reify_count:" << reify << endl;
-    cout << s << "reify_proportion:" << ((double)reify) / (double)c.size() << endl;
-    cout << s << "table_count:" << table << endl;
-    cout << s << "table_proportion:" << ((double)table) / (double)c.size() << endl;
-    cout << s << "lex_count:" << lex << endl;
-    cout << s << "lex_proportion:" << ((double)lex) / (double)c.size() << endl;
-    cout << s << "unary_count:" << unary << endl;
-    cout << s << "unary_proportion:" << ((double)unary) / (double)c.size() << endl;
-    cout << s << "nullary_count:" << nullary << endl;
-    cout << s << "nullary_proportion:" << ((double)nullary) / (double)c.size() << endl;
-    cout << s << "element_count:" << element << endl;
-    cout << s << "element_proportion:" << ((double)element) / (double)c.size() << endl;
-    cout << s << "minmax_count:" << minmax << endl;
-    cout << s << "minmax_proportion:" << ((double)minmax) / (double)c.size() << endl;
-    cout << s << "occurrence_count:" << occurrence << endl;
-    cout << s << "occurrence_proportion:" << ((double)occurrence) / (double)c.size() << endl;
+    output_stat << "alldiff_count:" << alldiff << endl;
+    output_stat << "alldiff_proportion:" << ((double)alldiff) / (double)c.size() << endl;
+    output_stat << "sums_count:" << sums << endl;
+    output_stat << "sums_proportion:" << ((double)sums) / (double)c.size() << endl;
+    output_stat << "or_atleastk_count:" << or_atleastk << endl;
+    output_stat << "or_atleastk_proportion:" << ((double)or_atleastk) / (double)c.size() << endl;
+    output_stat << "ternary_count:" << ternary << endl;
+    output_stat << "ternary_proportion:" << ((double)ternary) / (double)c.size() << endl;
+    output_stat << "binary_count:" << binary << endl;
+    output_stat << "binary_proportion:" << ((double)binary) / (double)c.size() << endl;
+    output_stat << "reify_count:" << reify << endl;
+    output_stat << "reify_proportion:" << ((double)reify) / (double)c.size() << endl;
+    output_stat << "table_count:" << table << endl;
+    output_stat << "table_proportion:" << ((double)table) / (double)c.size() << endl;
+    output_stat << "lex_count:" << lex << endl;
+    output_stat << "lex_proportion:" << ((double)lex) / (double)c.size() << endl;
+    output_stat << "unary_count:" << unary << endl;
+    output_stat << "unary_proportion:" << ((double)unary) / (double)c.size() << endl;
+    output_stat << "nullary_count:" << nullary << endl;
+    output_stat << "nullary_proportion:" << ((double)nullary) / (double)c.size() << endl;
+    output_stat << "element_count:" << element << endl;
+    output_stat << "element_proportion:" << ((double)element) / (double)c.size() << endl;
+    output_stat << "minmax_count:" << minmax << endl;
+    output_stat << "minmax_proportion:" << ((double)minmax) / (double)c.size() << endl;
+    output_stat << "occurrence_count:" << occurrence << endl;
+    output_stat << "occurrence_proportion:" << ((double)occurrence) / (double)c.size() << endl;
 
     // Count the number of pairs of constraints that overlap by two or more
     // variables.
+    START_CLOCK();
     SysInt count_2_overlaps = 0;
 
     vector<vector<Var>> var_sets;
@@ -958,12 +973,14 @@ struct InstanceStats {
     }
 
     SysInt conspairs = ((double)(c.size() * (c.size() - 1))) / 2.0;
-
+    END_CLOCK();
     double proportion = 0;
     if(conspairs > 0)
       proportion = ((double)count_2_overlaps) / conspairs;
     // proportion of pairs of constraints that share two or more variables.
-    cout << s << "multi_shared_vars:" << proportion << endl;
+    output_stat << "multi_shared_vars:" << proportion << endl;
+
+    START_CLOCK();
 
     // Edge density of primal graph
     std::set<pair<Var, Var>> seen_pairs;
@@ -982,32 +999,41 @@ struct InstanceStats {
         }
       }
     }
-    cout << s
+    END_CLOCK();
+    output_stat
          << "edge_density:" << ((double)count_pairs) / (((double)(varcount * (varcount - 1))) / 2.0)
          << endl;
 
+    START_CLOCK();
     GraphBuilder graph(csp);
-    cout << s << "Local_Variance:" << partition_graph(graph.g.build_graph_info(csp, false)) << endl;
+    double p = partition_graph(graph.g.build_graph_info(csp, false));
+    END_CLOCK();
+    output_stat << "Local_Variance:" << p << endl;
   }
 
   void output_stats_tightness(vector<AbstractConstraint*> cons) {
-    vector<DomainInt> tightness;
+    double start_time, measured_time;
+
     string s("stats_");
+    {
+    START_CLOCK();
+    vector<DomainInt> tightness;
     for(SysInt i = 0; i < (SysInt)cons.size(); i++) {
       tightness.push_back(cons[i]->getTightnessEstimate());
     }
     std::sort(tightness.begin(), tightness.end());
-
-    cout << s << "tightness_0:" << tightness[0] << endl;
-    cout << s << "tightness_25:" << tightness[tightness.size() / 4] << endl;
-    cout << s << "tightness_50:" << tightness[tightness.size() / 2] << endl;
-    cout << s << "tightness_75:" << tightness[(tightness.size() * 3) / 4] << endl;
-    cout << s << "tightness_100:" << tightness.back() << endl;
+    END_CLOCK();
+    output_stat << "tightness_0:" << tightness[0] << endl;
+    output_stat << "tightness_25:" << tightness[tightness.size() / 4] << endl;
+    output_stat << "tightness_50:" << tightness[tightness.size() / 2] << endl;
+    output_stat << "tightness_75:" << tightness[(tightness.size() * 3) / 4] << endl;
+    output_stat << "tightness_100:" << tightness.back() << endl;
 
     const SysInt totaltightness =
         checked_cast<SysInt>(std::accumulate(tightness.begin(), tightness.end(), (DomainInt)0));
-    cout << s << "tightness_mean:" << ((double)totaltightness) / (double)tightness.size() << endl;
-
+    output_stat << "tightness_mean:" << ((double)totaltightness) / (double)tightness.size() << endl;
+    }
+    START_CLOCK();
     // now literal tightness
     map<pair<Var, DomainInt>, vector<DomainInt>> scores_for_varval;
     // all available tightnesses for varvals
@@ -1035,23 +1061,23 @@ struct InstanceStats {
     }
 
     std::sort(lit_tightness.begin(), lit_tightness.end());
-
-    cout << s << "literal_tightness_0:" << lit_tightness[0] << endl;
-    cout << s << "literal_tightness_25:" << lit_tightness[lit_tightness.size() / 4] << endl;
-    cout << s << "literal_tightness_50:" << lit_tightness[lit_tightness.size() / 2] << endl;
-    cout << s << "literal_tightness_75:" << lit_tightness[(lit_tightness.size() * 3) / 4] << endl;
-    cout << s << "literal_tightness_100:" << lit_tightness.back() << endl;
+    END_CLOCK();
+    output_stat << "literal_tightness_0:" << lit_tightness[0] << endl;
+    output_stat << "literal_tightness_25:" << lit_tightness[lit_tightness.size() / 4] << endl;
+    output_stat << "literal_tightness_50:" << lit_tightness[lit_tightness.size() / 2] << endl;
+    output_stat << "literal_tightness_75:" << lit_tightness[(lit_tightness.size() * 3) / 4] << endl;
+    output_stat << "literal_tightness_100:" << lit_tightness.back() << endl;
 
     double new_totaltightness = std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
     double lt_mean = (double)new_totaltightness / (double)lit_tightness.size();
-    cout << s << "literal_tightness_mean:" << lt_mean << endl;
+    output_stat << "literal_tightness_mean:" << lt_mean << endl;
     // coefficient of variation
     double st_dev = 0;
     for(size_t i = 0; i < lit_tightness.size(); i++) {
       st_dev += pow((double)lit_tightness[i] - lt_mean, 2);
     }
     st_dev = sqrt(st_dev / lit_tightness.size());
-    cout << s << "literal_coeff_of_variation:" << st_dev / lt_mean << endl;
+    output_stat << "literal_coeff_of_variation:" << st_dev / lt_mean << endl;
   }
 
   SysInt arity(ConstraintBlob& ct) {
