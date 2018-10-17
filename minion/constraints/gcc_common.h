@@ -44,6 +44,10 @@
 
 #define INCREMENTALMATCH
 
+#ifdef UseIncGraph
+#undef UseIncGraph
+#endif
+
 // Incremental graph -- maintains adjacency lists for values and vars
 #define UseIncGraph 1
 

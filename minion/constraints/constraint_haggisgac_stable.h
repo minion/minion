@@ -56,6 +56,9 @@
 // Switches on the zeroLits array.
 // This flag is a small slowdown on qg-supportsgac-7-9 -findallsols
 //
+#ifdef CLASSNAME
+#undef CLASSNAME
+#endif
 
 #define CLASSNAME HaggisGACStable
 

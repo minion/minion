@@ -407,9 +407,11 @@ reify<BoolVar>* reifyCon(AbstractConstraint* c, BoolVar var) {
 
 template <typename VarArray>
 inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& bl) {
-  switch(bl.internal_constraints[0].constraint->type) {
-  case CT_GACEQ:
-  {
+  ConstraintType type = bl.internal_constraints[0].constraint->type;
+  switch(type) {
+  case CT_GACEQ: case CT_EQ:
+  // Code just for GACEQ case
+  if (type == CT_GACEQ) {
     ConstraintBlob blob(bl.internal_constraints[0]);
     auto bound1 = get_initialBounds_from_Var(blob.vars[0][0]);
     auto bound2 = get_initialBounds_from_Var(blob.vars[1][0]);
@@ -418,8 +420,8 @@ inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& b
     if(minbound < 0 || maxbound > 1)
       break;
   }
-  // fallthrough on purpose
-  case CT_EQ: {
+  // Common code for GACEQ and EQ
+  {
     ConstraintBlob blob(bl.internal_constraints[0]);
     blob.vars.push_back(make_vec(bl.vars[0][0]));
     blob.constraint = get_constraint(CT_EQ_REIFY);

@@ -125,6 +125,10 @@ help constraints shortstr2
 //
 #define SupportsGACUseZeroVals 1
 
+#ifdef CLASSNAME
+#undef CLASSNAME
+#endif
+
 #define CLASSNAME HaggisGAC
 template <typename VarArray>
 struct HaggisGAC : public AbstractConstraint, Backtrackable {

@@ -54,6 +54,10 @@ using namespace std;
 // Use BFS instead of HK
 #define BFSMATCHING
 
+#ifdef UseIncGraph
+#undef UseIncGraph
+#endif
+
 // Incremental graph stored in adjlist
 #define UseIncGraph 0
 

@@ -240,7 +240,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
     flag -= idx_source.size() + idx_target.size();
     D_ASSERT(flag >= 0);
-    SysInt parity = flag % 2;
+    //SysInt parity = flag % 2;
     flag /= 2;
     if(flag < source.size())
     {
