@@ -274,6 +274,8 @@ if arg.constraints:
             fatal_error("Did not find constraint '"+c+"'")
     constraints = newcon
 
+constraints.sort()
+
 constraintsrclist = []
 constraintsrclistshort = []
 
