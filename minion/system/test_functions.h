@@ -74,7 +74,7 @@ raw_json get_dom_as_json(vector<T>& vec) {
       add_var_dom_to_json(vec[i], s);
     }
   }
-  s << "]";
+  s << "}";
   return raw_json(s.str());
 }
 
