@@ -284,7 +284,6 @@ inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& var_array,
   if(getState().isAlarmActivated()) { // Either a timeout has occurred, or
                                       // ctrl+c has been pressed.
     generateRestartFile(var_array, branches);
-    getState().clearAlarm();
     if(getState().isCtrlcPressed()) {
       throw EndOfSearch();
     }
