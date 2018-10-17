@@ -124,19 +124,20 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
 
 fn print_variables_def<F: Write>(
     f: &mut F,
-    vars: &Arc<Vec<Vec<Arc<MinionVariable>>>>,
+    con: &ConstraintInstance,
 ) -> Result<()> {
-    for list in vars.iter() {
+    for list in con.vars().iter() {
         for item in list.iter() {
             print_variable_def(f, item)?;
         }
     }
+    
     Ok(())
 }
 
 pub fn print_minion_file_pair<F: Write>(fcon: &mut F, con: &ConstraintInstance) -> Result<()> {
     print_minion_prefix(fcon)?;
-    print_variables_def(fcon, &con.vars())?;
+    print_variables_def(fcon, con)?;
 
     print_minion_constraint(fcon, con)?;
 

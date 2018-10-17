@@ -55,14 +55,6 @@ impl Tuples {
     }
 }
 
-#[derive(Clone)]
-pub struct ConstraintInstance {
-    pub constraint: ConstraintDef,
-    varlist: Arc<Vec<Vec<Arc<MinionVariable>>>>,
-    pub tuples: Option<Tuples>,
-    pub child_constraints: Vec<ConstraintInstance>
-}
-
 
 fn random_in_range(low: i64, high: i64) -> i64 {
     let mut rng = rand::thread_rng();
@@ -156,6 +148,23 @@ impl ConstraintDef {
         }
     }
 
+        fn new_parent(
+        name: &str,
+        arg: Vec<Arg>,
+        checker: fn(&ConstraintInstance, &[&[i64]]) -> bool,
+        gac: bool,
+        reifygac: bool,
+    ) -> ConstraintDef {
+        ConstraintDef {
+            name: name.to_string(),
+            arg,
+            checker: Arc::new(checker),
+            gac,
+            reifygac,
+            valid_instance: |_| true,
+        }
+    }
+
     fn new_with_validator(
         name: &str,
         arg: Vec<Arg>,
@@ -185,11 +194,22 @@ impl fmt::Debug for ConstraintDef {
     }
 }
 
+#[derive(Clone)]
+pub struct ConstraintInstance {
+    pub constraint: ConstraintDef,
+    varlist: Arc<Vec<Vec<Arc<MinionVariable>>>>,
+    pub tuples: Option<Tuples>,
+    pub child_constraints: Vec<ConstraintInstance>
+}
 
 
 impl ConstraintInstance {
     pub fn vars(&self) -> Arc<Vec<Vec<Arc<MinionVariable>>>> {
-        self.varlist.clone()
+        let mut varlist = (*self.varlist).clone();
+        for child in &self.child_constraints {
+            varlist.extend((*child.varlist).clone().into_iter());
+        }
+        Arc::new(varlist)
     }
 
     fn check_tuple(&self, tup: &Vec<i64>) -> bool {
@@ -270,7 +290,10 @@ pub fn build_random_instance_with_children(constraint: &ConstraintDef, children:
                     variables.push(vec![MinionVariable::random(d), MinionVariable::random(d)]);
                 }
                 Tuples => unimplemented!(),
-                Constraint => { constraints.push(build_random_instance_with_children(children[constraint_child], &[])); constraint_child += 1; }
+                Constraint => { 
+                    // Leave dummy empty vec in variables
+                    variables.push(vec![]);
+                    constraints.push(build_random_instance_with_children(children[constraint_child], &[])); constraint_child += 1; }
             }
         }
         let c = ConstraintInstance {
@@ -328,15 +351,71 @@ lazy_static! {
 
 fn nested_constraint_list() -> Vec<ConstraintDef> {
     vec![
-        ConstraintDef::new(
+        ConstraintDef::new_parent(
             "reify", // CT_REIFY
             vec![Constraint, Var(Bool) ],
-            |_v| true,
+            |c,assign| {
+                let ref child = c.child_constraints[0];
+                let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
+                (assign[1][0] == 1) == ischildtrue
+            },
+            false,
+            false,
+        ),
+        ConstraintDef::new_parent(
+            "reifyimply-quick", // CT_REIFYIMPLY_QUICK
+            vec![Constraint, Var(Bool) ],
+            |c,assign| {
+                let ref child = c.child_constraints[0];
+                let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
+                (assign[1][0] == 1) <= ischildtrue
+            },
+            false,
+            false,
+        ),
+        ConstraintDef::new_parent(
+            "reifyimply", // CT_REIFYIMPLY
+            vec![Constraint, Var(Bool) ],
+            |c,assign| {
+                let ref child = c.child_constraints[0];
+                let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
+                (assign[1][0] == 1) <= ischildtrue
+            },
+            false,
+            false,
+        ),
+        ConstraintDef::new_parent(
+            "forwardchecking", // CT_FORWARD_CHECKING
+            vec![Constraint],
+            |c,assign| {
+                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0],&assign[1..])
+            },
+            false,
+            false,
+        ),
+        ConstraintDef::new_parent(
+            "check[gsa]", // CT_CHECK_GSA
+            vec![Constraint],
+            |c,assign| {
+                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0],&assign[1..])
+            },
+            false,
+            false,
+        ),
+        ConstraintDef::new_parent(
+            "check[assign]", // CT_CHECK_ASSIGN
+            vec![Constraint],
+            |c,assign| {
+                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0],&assign[1..])
+            },
             false,
             false,
         ),
     ]
 }
+
+
+
 
 lazy_static! {
     pub static ref CONSTRAINT_LIST: Vec<ConstraintDef> = constraint_list();
@@ -359,7 +438,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
         ),
         // TODO: ALLDIFF_MATRIX
-        // TODO: CHECK_ASSIGN, CHECK_GSA
         ConstraintDef::new(
             "difference", // CT_DIFFERENCE
             vec![Var(Discrete), Var(Discrete), Var(Discrete)],
@@ -438,7 +516,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             true,
         ),
-        // TODO: CT_FORWARD_CHECKING,
         // TODO: CT_FRAMEUPDATE
         ConstraintDef::new(
             "gacalldiff",
@@ -553,7 +630,7 @@ false,
 false,
             false,
         ),
-        // TODO: MINUSEQ_REIFY
+        // MINUSEQ_REIFY handled by CT_MINUSEQ
         ConstraintDef::new(
             "minuseq", // CT_MINUSEQ
             vec![Var(Discrete), Var(Discrete)],
@@ -643,7 +720,6 @@ false,
             |v| v.vars()[0].len() == v.vars()[1].len(),
         ),
 
-        // TODO: CT_REIFY , CT_REIFYIMPLY_QUICK,CT_REIFYIMPLY CT_REIFYIMPLY
         // TODO: CT_SHORTSTR_TUPLE, CT_SHORTSTR, CT_STR
         ConstraintDef::new(
             "true", // CT_TRUEArc
