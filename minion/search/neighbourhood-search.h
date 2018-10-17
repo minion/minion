@@ -231,11 +231,8 @@ struct NeighbourhoodState {
                              highestNeighbourhoodSize);
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);
 
-    if(getState().isCtrlcPressed()) {
-      cout << "Ctrl-C pressed----" << std::endl;
-      throw EndOfSearch();
-    } else if(getOptions().timeout_active && totalTime >= getOptions().time_limit) {
-      cout << "Timeout\n";
+    if(getState().isAlarmActivated()) {
+      Controller::world_pop_to_depth(depth);
       throw EndOfSearch();
     }
 
