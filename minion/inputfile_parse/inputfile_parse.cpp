@@ -81,7 +81,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
         // instance = std::move(readerThree.instance);
         needs_finalise_three = true;
       }
-    } catch(parse_exception s) {
+    } catch(const parse_exception& s) {
       cerr << "Error in input!" << endl;
       cerr << s.what() << endl;
 
