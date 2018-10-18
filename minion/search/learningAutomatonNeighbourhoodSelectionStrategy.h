@@ -36,7 +36,8 @@ public:
   }
 
   int getCombinationsToActivate(const NeighbourhoodState&) {
-    double randomNumber = ((double)rand()) / RAND_MAX;
+    uniform_real_distribution<double> dist(0.0, 1.0);
+    double randomNumber = dist(global_random_gen);
     double totalProb = 0;
     for(size_t i = 0; i < combinationProbabilities.size(); i++) {
       totalProb += combinationProbabilities[i];

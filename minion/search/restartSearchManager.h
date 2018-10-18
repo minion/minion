@@ -56,10 +56,11 @@ struct RestartSearchManager : public Controller::SearchManager {
       : prop_method(_prop_method), initial_order(_order) {}
 
   virtual void search() {
+    std::uniform_int_distribution<int> order(1,7);
     for(int i = 1; i < 10000000; i *= 10) {
         vector<SearchOrder> new_order = initial_order;
         for(int j = 0; j < new_order.size(); ++j) {
-            new_order[j].order = (VarOrderEnum)(1 + rand() % 7);
+            new_order[j].order = (VarOrderEnum)(order(global_random_gen));
         }
       doASearch(new_order, i);
     }

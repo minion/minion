@@ -79,7 +79,9 @@ public:
       std::cout << "UCBNeighbourhoodSelection: could not activate a combination.\n";
       throw EndOfSearch();
     }
-    return bestCombinations[std::rand() % bestCombinations.size()];
+
+    uniform_int_distribution<int> dist(0, bestCombinations.size() - 1);
+    return bestCombinations[dist(global_random_gen)];
   }
   /*
   

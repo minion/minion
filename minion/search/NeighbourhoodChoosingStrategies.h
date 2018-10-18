@@ -24,7 +24,8 @@ public:
         viableCombinations.push_back(i);
       }
     }
-    return viableCombinations[std::rand() % viableCombinations.size()];
+    std::uniform_int_distribution<int> dist(0, viableCombinations.size()-1);
+    return viableCombinations[dist(global_random_gen)];
   }
 };
 

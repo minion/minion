@@ -102,8 +102,10 @@ public:
         localMaxProbability += (1.0 / nhState.nhc.neighbourhoodCombinations.size()) *
                                getOptions().nhConfig->hillClimberProbabilityIncrementMultiplier;
         ++iterationsSpentAtPeak;
+        uniform_real_distribution<double> dist(0.0, 1.0);
+        double random_number = dist(global_random_gen);
         if(iterationsSpentAtPeak > getOptions().nhConfig->hillClimberMinIterationsToSpendAtPeak &&
-           static_cast<double>(std::rand()) / RAND_MAX < localMaxProbability) {
+           random_number < localMaxProbability) {
           nhState.globalStats.notifyEndClimb();
           cout << "numberIterations: "
                << (nhState.globalStats.numberIterations - numberIterationsAtStart) << std::endl;
@@ -250,7 +252,8 @@ private:
       solutionAccepted = true;
     } else {
       double acceptanceProb = exp(delta / temperature);
-      solutionAccepted = rand() <= acceptanceProb;
+      uniform_real_distribution<double> dist(0.0, 1.0);
+      solutionAccepted = dist(global_random_gen) <= acceptanceProb;
     }
     if(solutionAccepted) {
       currentSolutionValue = stats.newMinValue;

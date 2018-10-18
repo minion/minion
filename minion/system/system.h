@@ -77,4 +77,8 @@ inline void* checked_realloc(void* ptr, size_t size) {
   return new_ptr;
 }
 
+#include <random>
+
+VARDEF(std::mt19937 global_random_gen);
+
 #endif

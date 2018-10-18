@@ -38,7 +38,7 @@ struct SearchMethod {
         valorder(VALORDER_NONE),
         preprocess(PropLevel_None),
         prop_method(PropLevel_GAC),
-        random_seed((UnsignedSysInt)time(NULL) ^ getpid()) {}
+        random_seed(std::random_device{}()) {}
 };
 
 void BuildCSP(ProbSpec::CSPInstance& instance);

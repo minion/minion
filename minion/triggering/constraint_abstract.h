@@ -262,7 +262,8 @@ public:
     for(SysInt i = 0; i < 1000; i++) {
       for(SysInt j = 0; j < (SysInt)vars.size(); j++) {
         DomainInt dsize = vars[j].getInitialMax() - vars[j].getInitialMin() + 1;
-        t[j] = (rand() % checked_cast<SysInt>(dsize)) + vars[j].getInitialMin();
+        uniform_int_distribution<int> dist(0, checked_cast<SysInt>(dsize));
+        t[j] = dist(global_random_gen) + vars[j].getInitialMin();
       }
       if(!check_assignment(t, vars.size())) {
         unsatcounter++;
@@ -282,7 +283,8 @@ public:
       for(size_t j = 0; j < vars.size(); j++) {
         if(j != var) {
           DomainInt dsize = vars[j].getInitialMax() - vars[j].getInitialMin() + 1;
-          t[j] = (rand() % dsize) + vars[j].getInitialMin();
+          uniform_int_distribution<int> dist(0, checked_cast<SysInt>(dsize));
+          t[j] = dist(global_random_gen) + vars[j].getInitialMin();
         }
       }
       if(!check_assignment(t, vars.size())) {

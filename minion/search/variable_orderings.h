@@ -32,20 +32,22 @@ DomainInt chooseVal(T& var, ValOrder vo) {
   case VALORDER_DESCEND: return var.getMax();
 
   case VALORDER_RANDOM: {
+    uniform_int_distribution<int> dist100(0, 100);
+    uniform_int_distribution<int> dist2(0, 1);
     if(vo.bias != 0) {
       if(vo.bias > 0) {
-        if(rand() % 100 <= vo.bias) {
+        if(dist100(global_random_gen) <= vo.bias) {
           return var.getMax();
         }
       }
       else {
-        if(rand() % 100 <= -vo.bias) {
+        if(dist100(global_random_gen) <= -vo.bias) {
           return var.getMin();
         }
       }
     }
     if(var.isBound()) {
-      switch(rand() % 2) {
+      switch(dist2(global_random_gen)) {
       case 0: return var.getMin();
       case 1: return var.getMax();
       default: abort();
@@ -53,12 +55,13 @@ DomainInt chooseVal(T& var, ValOrder vo) {
     }
     DomainInt min_val = var.getMin();
     DomainInt max_val = var.getMax();
-    DomainInt val = (rand() % (max_val - min_val + 1)) + min_val;
+    uniform_int_distribution<int> distdom(0, checked_cast<SysInt>(max_val - min_val));
+    DomainInt val = distdom(global_random_gen) + min_val;
     D_ASSERT(val >= min_val);
     D_ASSERT(val <= max_val);
     if(var.inDomain(val))
       return val;
-    switch(rand() % 2) {
+    switch(dist2(global_random_gen)) {
     case 0: {
       val--;
       while(!var.inDomain(val))

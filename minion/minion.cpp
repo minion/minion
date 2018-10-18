@@ -96,7 +96,7 @@ int main(int argc, char** argv) {
 
     parse_command_line(args, argc, argv);
 
-    srand(args.random_seed);
+    global_random_gen.seed(args.random_seed);
     
     if(!getOptions().silent) {
       time_t rawtime;
