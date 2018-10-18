@@ -6,6 +6,42 @@ use self::rand::Rng;
 
 use simple_error::SimpleError;
 
+use run_minion::{NodeCheck, SolCheck};
+
+pub fn test_constraint_with_flags(
+    c: &constraint_def::ConstraintDef,
+    flags: &[&str],
+    node_check: NodeCheck,
+    sol_check: SolCheck,
+) -> Result<(), SimpleError> {
+    let instance = constraint_def::build_random_instance(c);
+    let ret = run_minion::get_minion_solutions(
+        "/home/caj/bin/minion",
+        &["-findallsols"],
+        &instance,
+        "original",
+    )?;
+
+    let mut args = flags.to_vec();
+    args.push("-findallsols");
+    let ret2 = run_minion::get_minion_solutions("/home/caj/bin/minion", &args, &instance, "flags")?;
+
+    try_with!(
+        node_check(ret.nodes, ret2.nodes),
+        "in {} vs {}",
+        ret.filename,
+        ret2.filename
+    );
+    try_with!(
+        sol_check(ret.solutions, ret2.solutions),
+        "in {} vs {}",
+        ret.filename,
+        ret2.filename
+    );
+
+    Ok(())
+}
+
 pub fn test_constraint(c: &constraint_def::ConstraintDef) -> Result<(), SimpleError> {
     let instance = constraint_def::build_random_instance(c);
     let tups = instance.tableise();
@@ -37,7 +73,9 @@ pub fn test_constraint(c: &constraint_def::ConstraintDef) -> Result<(), SimpleEr
 }
 
 pub fn test_constraint_nested(c: &constraint_def::ConstraintDef) -> Result<(), SimpleError> {
-    let nest_type = rand::thread_rng().choose(&constraint_def::NESTED_CONSTRAINT_LIST).unwrap();
+    let nest_type = rand::thread_rng()
+        .choose(&constraint_def::NESTED_CONSTRAINT_LIST)
+        .unwrap();
     let instance = constraint_def::build_random_instance_with_children(nest_type, &[c]);
     let tups = instance.tableise();
     let ret = run_minion::get_minion_solutions(

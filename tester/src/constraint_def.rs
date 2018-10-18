@@ -3,7 +3,7 @@ extern crate rand;
 
 use num_integer::Integer;
 
-use counter::{get_unique_value, get_unique_name};
+use counter::{get_unique_name, get_unique_value};
 use std::collections::HashSet;
 use std::fmt;
 use std::iter::FromIterator;
@@ -46,15 +46,17 @@ pub struct MinionVariable {
 #[derive(Clone)]
 pub struct Tuples {
     pub tupledata: Vec<Vec<i64>>,
-    pub name: String
+    pub name: String,
 }
 
 impl Tuples {
     fn new(tupledata: Vec<Vec<i64>>) -> Tuples {
-        Tuples{tupledata, name: get_unique_name("tuples","") }
+        Tuples {
+            tupledata,
+            name: get_unique_name("tuples", ""),
+        }
     }
 }
-
 
 fn random_in_range(low: i64, high: i64) -> i64 {
     let mut rng = rand::thread_rng();
@@ -148,7 +150,7 @@ impl ConstraintDef {
         }
     }
 
-        fn new_parent(
+    fn new_parent(
         name: &str,
         arg: Vec<Arg>,
         checker: fn(&ConstraintInstance, &[&[i64]]) -> bool,
@@ -199,9 +201,8 @@ pub struct ConstraintInstance {
     pub constraint: ConstraintDef,
     varlist: Arc<Vec<Vec<Arc<MinionVariable>>>>,
     pub tuples: Option<Tuples>,
-    pub child_constraints: Vec<ConstraintInstance>
+    pub child_constraints: Vec<ConstraintInstance>,
 }
-
 
 impl ConstraintInstance {
     pub fn vars(&self) -> Arc<Vec<Vec<Arc<MinionVariable>>>> {
@@ -256,7 +257,7 @@ impl ConstraintInstance {
                 Arc::new(vec![vars])
             },
             tuples: Some(Tuples::new(self.build_tuples())),
-            child_constraints: vec![]
+            child_constraints: vec![],
         }
     }
     /*
@@ -270,7 +271,10 @@ pub fn build_random_instance(constraint: &ConstraintDef) -> ConstraintInstance {
     build_random_instance_with_children(constraint, &[])
 }
 
-pub fn build_random_instance_with_children(constraint: &ConstraintDef, children:&[&ConstraintDef]) -> ConstraintInstance {
+pub fn build_random_instance_with_children(
+    constraint: &ConstraintDef,
+    children: &[&ConstraintDef],
+) -> ConstraintInstance {
     loop {
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
@@ -290,17 +294,22 @@ pub fn build_random_instance_with_children(constraint: &ConstraintDef, children:
                     variables.push(vec![MinionVariable::random(d), MinionVariable::random(d)]);
                 }
                 Tuples => unimplemented!(),
-                Constraint => { 
+                Constraint => {
                     // Leave dummy empty vec in variables
                     variables.push(vec![]);
-                    constraints.push(build_random_instance_with_children(children[constraint_child], &[])); constraint_child += 1; }
+                    constraints.push(build_random_instance_with_children(
+                        children[constraint_child],
+                        &[],
+                    ));
+                    constraint_child += 1;
+                }
             }
         }
         let c = ConstraintInstance {
             constraint: constraint.clone(),
             varlist: Arc::new(variables),
             tuples: None,
-            child_constraints: constraints
+            child_constraints: constraints,
         };
         if (constraint.valid_instance)(&c) {
             return c;
@@ -353,8 +362,8 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
     vec![
         ConstraintDef::new_parent(
             "reify", // CT_REIFY
-            vec![Constraint, Var(Bool) ],
-            |c,assign| {
+            vec![Constraint, Var(Bool)],
+            |c, assign| {
                 let ref child = c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) == ischildtrue
@@ -364,8 +373,8 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_parent(
             "reifyimply-quick", // CT_REIFYIMPLY_QUICK
-            vec![Constraint, Var(Bool) ],
-            |c,assign| {
+            vec![Constraint, Var(Bool)],
+            |c, assign| {
                 let ref child = c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) <= ischildtrue
@@ -375,8 +384,8 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_parent(
             "reifyimply", // CT_REIFYIMPLY
-            vec![Constraint, Var(Bool) ],
-            |c,assign| {
+            vec![Constraint, Var(Bool)],
+            |c, assign| {
                 let ref child = c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) <= ischildtrue
@@ -387,8 +396,8 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new_parent(
             "forwardchecking", // CT_FORWARD_CHECKING
             vec![Constraint],
-            |c,assign| {
-                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0],&assign[1..])
+            |c, assign| {
+                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0], &assign[1..])
             },
             false,
             false,
@@ -396,8 +405,8 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new_parent(
             "check[gsa]", // CT_CHECK_GSA
             vec![Constraint],
-            |c,assign| {
-                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0],&assign[1..])
+            |c, assign| {
+                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0], &assign[1..])
             },
             false,
             false,
@@ -405,17 +414,14 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new_parent(
             "check[assign]", // CT_CHECK_ASSIGN
             vec![Constraint],
-            |c,assign| {
-                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0],&assign[1..])
+            |c, assign| {
+                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0], &assign[1..])
             },
             false,
             false,
         ),
     ]
 }
-
-
-
 
 lazy_static! {
     pub static ref CONSTRAINT_LIST: Vec<ConstraintDef> = constraint_list();
@@ -541,7 +547,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         // TODO: CT_GACSCHEMA
 
-            // TODO: CT_GCC, CT_GCCWEAK
+        // TODO: CT_GCC, CT_GCCWEAK
         ConstraintDef::new(
             "occurrencegeq", // CT_GEQ_OCCURRENCE
             vec![List(Discrete), Var(Constant), Var(Constant)],
@@ -619,7 +625,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
             "max", // CT_MAX
             vec![List(Discrete), Var(Discrete)],
             |v| (v[0].iter().cloned().max() == Some(v[1][0])),
-false,
+            false,
             false,
         ),
         // TODO: CT_MDDC
@@ -627,7 +633,7 @@ false,
             "min", // CT_MIN
             vec![List(Discrete), Var(Discrete)],
             |v| (v[0].iter().cloned().min() == Some(v[1][0])),
-false,
+            false,
             false,
         ),
         // MINUSEQ_REIFY handled by CT_MINUSEQ
@@ -719,7 +725,6 @@ false,
             false,
             |v| v.vars()[0].len() == v.vars()[1].len(),
         ),
-
         // TODO: CT_SHORTSTR_TUPLE, CT_SHORTSTR, CT_STR
         ConstraintDef::new(
             "true", // CT_TRUEArc
@@ -815,7 +820,6 @@ false,
                 vals.len() == 2 && vals[0] <= vals[1]
             },
         ),
-
         ConstraintDef::new_with_validator(
             "w-inset", // CT_WATCHED_INSET
             vec![Var(Discrete), List(Constant)],
@@ -827,21 +831,21 @@ false,
                 vals.windows(2).all(|s| s[0] < s[1])
             },
         ),
-              ConstraintDef::new(
+        ConstraintDef::new(
             "watchsumleq", // CT_WATCHED_LEQSUM
             vec![List(Bool), Var(Constant)],
             |v| v[0].iter().cloned().sum::<i64>() <= v[1][0],
             true,
             true,
         ),
-         ConstraintDef::new(
+        ConstraintDef::new(
             "watchless", // CT_WATCHED_LESS
             vec![Var(Discrete), Var(Discrete)],
             |v| (v[0][0] < v[1][0]),
             true,
             true,
         ),
-         ConstraintDef::new(
+        ConstraintDef::new(
             "w-literal", // CT_WATCHED_LIT
             vec![Var(Discrete), Var(Constant)],
             |v| (v[0][0] == v[1][0]),
@@ -851,26 +855,20 @@ false,
         ConstraintDef::new_with_validator(
             "litsumgeq", // CT_WATCHED_LITSUM
             vec![List(Discrete), List(Constant), Var(Constant)],
-            |v|
-             v[0].iter().zip(v[1]).filter(|(a,b)| *a == *b).count() as i64 >= v[2][0]
-            ,
+            |v| v[0].iter().zip(v[1]).filter(|(a, b)| *a == *b).count() as i64 >= v[2][0],
             true,
             true,
-            |c|
-                c.vars()[0].len() == c.vars()[1].len()
-            ,
+            |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
         // TODO: CT_WATCHED_NEGATIVE_TABLE
-ConstraintDef::new(
+        ConstraintDef::new(
             "watchneq", // CT_WATCHED_NEQ
             vec![Var(Discrete), Var(Discrete)],
             |v| (v[0][0] != v[1][0]),
             true,
             true,
         ),
-
         // TODO: WATCHED_NEW_AND, WATCHED_NEW_OR
-
         ConstraintDef::new_with_validator(
             "not-hamming", // CT_WATCHED_NOT_HAMMING
             vec![List(Discrete), List(Discrete), Var(Constant)],
@@ -879,8 +877,7 @@ ConstraintDef::new(
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
-
-      ConstraintDef::new_with_validator(
+        ConstraintDef::new_with_validator(
             "w-notinrange", // CT_WATCHED_NOT_INRANGE
             vec![Var(Discrete), List(Constant)],
             |v| !(v[1][0] <= v[0][0] && v[0][0] <= v[1][1]),
@@ -891,7 +888,6 @@ ConstraintDef::new(
                 vals.len() == 2 && vals[0] <= vals[1]
             },
         ),
-
         ConstraintDef::new_with_validator(
             "w-notinset", // CT_WATCHED_NOT_INSET
             vec![Var(Discrete), List(Constant)],
@@ -903,7 +899,7 @@ ConstraintDef::new(
                 vals.windows(2).all(|s| s[0] < s[1])
             },
         ),
-            ConstraintDef::new(
+        ConstraintDef::new(
             "w-notliteral", // CT_WATCHED_NOTLIT
             vec![Var(Discrete), Var(Constant)],
             |v| !(v[0][0] == v[1][0]),
@@ -911,8 +907,7 @@ ConstraintDef::new(
             true,
         ),
         // TODO: CT_WATCHED_TABLE
-
-              ConstraintDef::new_with_validator(
+        ConstraintDef::new_with_validator(
             "watchvecexists_less", // CT_WATCHED_VEC_OR_LESS
             vec![List(Discrete), List(Discrete)],
             |v| v[0].iter().zip(v[1]).any(|(a, b)| *a < *b),
@@ -920,7 +915,7 @@ ConstraintDef::new(
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
-              ConstraintDef::new_with_validator(
+        ConstraintDef::new_with_validator(
             "watchvecneq", // CT_WATCHED_VECNEQ
             vec![List(Discrete), List(Discrete)],
             |v| v[0].iter().zip(v[1]).any(|(a, b)| *a != *b),
@@ -928,8 +923,7 @@ ConstraintDef::new(
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
-
-              ConstraintDef::new_with_validator(
+        ConstraintDef::new_with_validator(
             "weightedsumgeq", // CT_WEIGHTGEQSUM
             vec![List(Constant), List(Discrete), Var(Discrete)],
             |v| v[0].iter().zip(v[1]).map(|(a, b)| *a * *b).sum::<i64>() >= v[2][0],
@@ -937,7 +931,7 @@ ConstraintDef::new(
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
-              ConstraintDef::new_with_validator(
+        ConstraintDef::new_with_validator(
             "weightedsumleq", // CT_WEIGHTLEQSUM
             vec![List(Constant), List(Discrete), Var(Discrete)],
             |v| v[0].iter().zip(v[1]).map(|(a, b)| *a * *b).sum::<i64>() <= v[2][0],
@@ -945,6 +939,5 @@ ConstraintDef::new(
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
-
     ]
 }

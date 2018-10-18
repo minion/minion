@@ -32,45 +32,44 @@ mod test_types;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
 struct Opt {
-
     #[structopt(short = "v", long = "verbose")]
-    verbose : bool,
+    verbose: bool,
 
     #[structopt(name = "constraints")]
-    constraints : Vec<String>,
+    constraints: Vec<String>,
 
-    #[structopt(short = "c", long = "count", default_value = "10")]
-    count : u64,
+    #[structopt(short = "c", long = "count", default_value = "30")]
+    count: u64,
 }
 
 fn main() -> Result<(), simple_error::SimpleError> {
-
     let opt = Opt::from_args();
     println!("{:?}", opt);
 
     let mut v;
     if opt.constraints.is_empty() {
         v = constraint_def::CONSTRAINT_LIST.clone();
-    }
-    else {
+    } else {
         v = Vec::new();
         for c in opt.constraints.clone() {
             let con = constraint_def::CONSTRAINT_LIST.iter().find(|x| x.name == c);
             match con {
                 None => panic!("Unimplemented constraint: {}", c),
-                Some(con) => v.push(con.clone())
+                Some(con) => v.push(con.clone()),
             }
         }
     }
 
-    v.into_par_iter().try_for_each( |ref c| {
+    v.into_par_iter().try_for_each(|ref c| {
         try_with!(
-            (0..opt.count).into_par_iter()
+            (0..opt.count)
+                .into_par_iter()
                 .try_for_each(|_| test_types::test_constraint(&c)),
             format!("failure in {}", c.name)
         );
         try_with!(
-            (0..opt.count).into_par_iter()
+            (0..opt.count)
+                .into_par_iter()
                 .try_for_each(|_| test_types::test_constraint_nested(&c)),
             format!("failure in {} with nesting", c.name)
         );

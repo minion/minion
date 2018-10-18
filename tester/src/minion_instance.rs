@@ -2,11 +2,9 @@ extern crate itertools;
 
 use std::io::prelude::*;
 use std::io::Result;
-use std::sync::Arc;
 
 use self::itertools::Itertools;
 use constraint_def::*;
-
 
 fn print_minion_tuples<F: Write>(f: &mut F, tuples: &Tuples) -> Result<()> {
     f.write_all(b"**TUPLELIST**\n")?;
@@ -32,11 +30,10 @@ fn print_minion_constraint_tuples<F: Write>(f: &mut F, con: &ConstraintInstance)
     }
 
     Ok(())
-
 }
 
 fn print_minion_constraint_contents<F: Write>(f: &mut F, con: &ConstraintInstance) -> Result<()> {
-    let mut i : usize = 0;
+    let mut i: usize = 0;
 
     let varlist = (0..con.constraint.arg.len())
         .map(|list| match con.constraint.arg[list] {
@@ -122,16 +119,13 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
     Ok(())
 }
 
-fn print_variables_def<F: Write>(
-    f: &mut F,
-    con: &ConstraintInstance,
-) -> Result<()> {
+fn print_variables_def<F: Write>(f: &mut F, con: &ConstraintInstance) -> Result<()> {
     for list in con.vars().iter() {
         for item in list.iter() {
             print_variable_def(f, item)?;
         }
     }
-    
+
     Ok(())
 }
 

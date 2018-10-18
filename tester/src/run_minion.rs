@@ -18,6 +18,45 @@ pub struct MinionOutput {
     pub filename: String,
 }
 
+pub fn Nodes_more(orig: i64, new: i64) -> SimpleResult<()> {
+    if orig > new {
+        Err(SimpleError::new("Number of nodes has decreased!"))
+    } else {
+        Ok(())
+    }
+}
+pub fn Nodes_equal(orig: i64, new: i64) -> SimpleResult<()> {
+    if orig != new {
+        Err(SimpleError::new("Node counts not equal"))
+    } else {
+        Ok(())
+    }
+}
+pub fn Nodes_nocompare(_orig: i64, _new: i64) -> SimpleResult<()> {
+    Ok(())
+}
+
+pub fn Solutions_equal(orig: Vec<Vec<i64>>, new: Vec<Vec<i64>>) -> SimpleResult<()> {
+    if orig != new {
+        Err(SimpleError::new("Solutions not equal as ordered list"))
+    } else {
+        Ok(())
+    }
+}
+pub fn Solutions_unorderedequal(
+    mut orig: Vec<Vec<i64>>,
+    mut new: Vec<Vec<i64>>,
+) -> SimpleResult<()> {
+    if orig.sort() != new.sort() {
+        Err(SimpleError::new("Solutions not equal as unordered list"))
+    } else {
+        Ok(())
+    }
+}
+
+pub type NodeCheck = fn(i64, i64) -> SimpleResult<()>;
+pub type SolCheck = fn(Vec<Vec<i64>>, Vec<Vec<i64>>) -> SimpleResult<()>;
+
 // We only have to put here what we care about
 #[derive(Deserialize)]
 struct MinionJsonOut {
