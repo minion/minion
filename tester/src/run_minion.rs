@@ -9,13 +9,16 @@ use std::fs;
 use std::io::*;
 use std::process::{Command, Stdio};
 
+use counter::get_unique_value;
+
 extern crate serde_json;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct MinionOutput {
     pub solutions: Vec<Vec<i64>>,
     pub nodes: i64,
     pub filename: String,
+    pub cleanup: CleanupFiles,
 }
 
 pub fn Nodes_more(orig: i64, new: i64) -> SimpleResult<()> {
@@ -57,6 +60,19 @@ pub fn Solutions_unorderedequal(
 pub type NodeCheck = fn(i64, i64) -> SimpleResult<()>;
 pub type SolCheck = fn(Vec<Vec<i64>>, Vec<Vec<i64>>) -> SimpleResult<()>;
 
+#[derive(Debug, PartialEq, Eq)]
+pub struct CleanupFiles {
+    files: Vec<String>,
+}
+
+impl CleanupFiles {
+    pub fn cleanup(&self) {
+        for file in &self.files {
+            let _ = fs::remove_file(file);
+        }
+    }
+}
+
 // We only have to put here what we care about
 #[derive(Deserialize)]
 struct MinionJsonOut {
@@ -71,8 +87,8 @@ pub fn get_minion_solutions(
 ) -> SimpleResult<MinionOutput> {
     let nameid = format!(
         "{:?}_{}_{}",
-        std::thread::current().id(),
         std::process::id(),
+        get_unique_value(),
         testname
     );
     try_with!(fs::create_dir_all("tempdir"), "Failed to create 'tempdir'");
@@ -80,10 +96,6 @@ pub fn get_minion_solutions(
     let minout = format!("tempdir/input{}.minion", nameid);
     let solsout = format!("tempdir/sols{}.out", nameid);
     let tableout = format!("tempdir/jsontable{}.out", nameid);
-
-    let _ = fs::remove_file(&solsout);
-    let _ = fs::remove_file(&minout);
-    let _ = fs::remove_file(&tableout);
 
     let mut args: Vec<String> = minionargs.iter().map(|x| x.to_string()).collect();
     args.push("-solsout".to_string());
@@ -159,6 +171,9 @@ pub fn get_minion_solutions(
     Ok(MinionOutput {
         solutions,
         nodes,
-        filename: minout,
+        filename: minout.clone(),
+        cleanup: CleanupFiles {
+            files: vec![minout, solsout, tableout],
+        },
     })
 }

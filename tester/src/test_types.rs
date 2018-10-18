@@ -39,6 +39,8 @@ pub fn test_constraint_with_flags(
         ret2.filename
     );
 
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
     Ok(())
 }
 
@@ -69,6 +71,10 @@ pub fn test_constraint(c: &constraint_def::ConstraintDef) -> Result<(), SimpleEr
             ret.filename, ret2.filename
         )));
     }
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
+
     Ok(())
 }
 
@@ -102,5 +108,8 @@ pub fn test_constraint_nested(c: &constraint_def::ConstraintDef) -> Result<(), S
             ret.filename, ret2.filename
         )));
     }
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
     Ok(())
 }
