@@ -153,7 +153,10 @@ struct Forward_Checking : public AbstractConstraint {
     for(SysInt i = 0; i < size; ++i)
       b.push_back((*vars)[i].getAssignedValue());
 
-    if(!check_assignment(&b[0], size)) {
+    DomainInt* varptr = 0;
+    if(b.size() != 0) { varptr = &b[0]; }
+
+    if(!check_assignment(varptr, size)) {
       return true; // true means failed.
     } else {
       return false;

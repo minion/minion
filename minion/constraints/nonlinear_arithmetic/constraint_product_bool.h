@@ -44,7 +44,7 @@ struct BoolProdConstraint : public AbstractConstraint {
   BoolProdConstraint(ProdVarRef1 _v1, ProdVarRef2 _v2, ProdVarRef3 _v3) :
   var1(_v1), var2(_v2), var3(_v3)
   { 
-    if(var1.getMin() < 0 || var1.getMax() > 1) {
+    if(var1.getInitialMin() < 0 || var1.getInitialMax() > 1) {
       D_FATAL_ERROR("Internal error in BoolProdConstraint");
     }
   }
