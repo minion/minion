@@ -223,7 +223,10 @@ struct StandardSearchManager : public SearchManager{
               //std::cerr << branches << "\n";
               while(branches.size() > steal + 1) {
                 //std::cerr << "right branch: " << branches << "\n";
-                D_ASSERT(branch_right());
+                int ret = branch_right();
+                if(!ret) {
+                  D_FATAL_ERROR("Error in parallel forking");
+                }
               }
               D_ASSERT(branches.size() == steal + 1);
               prop->prop(var_array);
