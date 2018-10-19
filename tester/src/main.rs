@@ -40,6 +40,9 @@ struct Opt {
 
     #[structopt(short = "c", long = "count", default_value = "30")]
     count: u64,
+
+    #[structopt(short = "m", long = "minion", default_value = "minion")]
+    minion: String,
 }
 
 fn main() -> Result<(), simple_error::SimpleError> {
@@ -64,13 +67,13 @@ fn main() -> Result<(), simple_error::SimpleError> {
         try_with!(
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint(&c)),
+                .try_for_each(|_| test_types::test_constraint(&opt.minion, &c)),
             format!("failure in {}", c.name)
         );
         try_with!(
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint_nested(&c)),
+                .try_for_each(|_| test_types::test_constraint_nested(&opt.minion, &c)),
             format!("failure in {} with nesting", c.name)
         );
         println!("Tested {}", c.name);

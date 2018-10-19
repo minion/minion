@@ -102,6 +102,7 @@ pub fn get_minion_solutions(
     args.push(solsout.clone());
     args.push("-jsontableout".to_string());
     args.push(tableout.clone());
+    args.push("-noprintsols".to_string());
     args.push(minout.clone());
 
     {

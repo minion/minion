@@ -344,7 +344,7 @@ fn check_element(v: &[&[i64]], offset: i64, undefzero: bool) -> bool {
 lazy_static! {
     pub static ref STANDARD_TABLE_CONSTRAINT: ConstraintDef = {
         ConstraintDef {
-            name: "table".to_string(),
+            name: "str2plus".to_string(),
             arg: vec![List(Discrete), Tuples],
             checker: Arc::new(|_, __| unimplemented!()),
             gac: true,
