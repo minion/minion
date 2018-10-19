@@ -42,7 +42,7 @@ struct RestartSearchManager : public Controller::SearchManager {
     } catch(EndOfSearch&) {
     } catch(TimeoutException&) { timeout = true; }
 
-    if(getState().isCtrlcPressed()
+    if(Parallel::isCtrlCPressed()
        //||  (getOptions().timeout_active &&
        //    globalStats.getTotalTimeTaken() >= getOptions().time_limit)
     ) {

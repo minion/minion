@@ -67,6 +67,9 @@ int main(int argc, char** argv) {
   // as windows gets really annoyed when that happens.
   try {
 
+    // Force parallel data to be created
+    Parallel::getParallelData();
+
     getState().getOldTimer().startClock();
 
     getOptions().printLine("# " + std::string(MinionVersion));
@@ -112,9 +115,8 @@ int main(int argc, char** argv) {
     }
 
     if(!getOptions().noTimers) {
-      getState().setupAlarm(getOptions().timeout_active, getOptions().time_limit,
+      Parallel::setupAlarm(getOptions().timeout_active, getOptions().time_limit,
                             getOptions().time_limit_is_CPU_time);
-      getState().setupCtrlc();
     }
 
     vector<string> files(1, getOptions().instance_name);

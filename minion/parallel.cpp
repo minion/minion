@@ -29,18 +29,71 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+#include <atomic>
+
+namespace Parallel {
 
 struct ParallelData {
     sem_t processCount;
     sem_t outputLock;
+    std::atomic<bool> fatal_error_occurred;
+    std::atomic<bool> process_should_exit;
+    std::atomic<int> solutions;
+    std::atomic<int> nodes;
+    pid_t parent_process_id;
+    std::atomic<bool> ctrl_c_pressed;
+    std::atomic<bool> alarm_trigger;
 };
 
+static bool is_a_child_process;
+static bool fork_ever_called;
+
+// This pipe is just to figure out when all children have exited, because
+// when all children exit, the pipe will automatically close
+static int child_tracking_pipe[2];
+
+bool isAChildProcess() {
+    return !is_a_child_process;
+}
+
+bool isCtrlCPressed() {
+    std::cerr << getpid() << "checking ctrl+c" << getParallelData().ctrl_c_pressed << "\n";
+    return getParallelData().ctrl_c_pressed;
+}
+
 void endParallelMinion() {
+    if(!fork_ever_called) return;
+
     sem_post(&(getParallelData().processCount));
-    while (wait(0) > 0);
+    if(!is_a_child_process) {
+        std::cout << "Waiting for all child processes to exit.." << std::endl;
+        // Don't close until now, so all children have this pipe
+        close(child_tracking_pipe[1]);
+
+        signal(SIGPIPE, SIG_IGN);
+        int ret = 1;
+        while(ret != 0) {
+            char buf[1024];
+            //std::cout << getpid() << " reading 0" << std::endl;
+            ret = read(child_tracking_pipe[0], buf, 1024);
+            //std::cout << ret << std::endl;
+            //perror("Error:");
+            //std::cerr << "Ready loop" << std::endl;
+        }
+        if(getParallelData().fatal_error_occurred) {
+            std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
+            exit(1);
+        }
+    }
 }
 
 ParallelData* setupParallelData() {
+    // Setup a pipe so parent can track if children are alive
+    pipe(child_tracking_pipe);
+
     ParallelData* pd;
     pd = (ParallelData*)mmap(NULL, sizeof(ParallelData), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
     if(pd == MAP_FAILED) {
@@ -57,6 +110,11 @@ ParallelData* setupParallelData() {
     if(sem_init(&(pd->outputLock), 1, 1) != 0) {
         D_FATAL_ERROR("Setup outputLock semaphore fail");
     }
+
+    install_ctrlc_trigger(&(pd->ctrl_c_pressed));
+
+    pd->parent_process_id = getpid();
+
 
     atexit(endParallelMinion);
 
@@ -75,7 +133,7 @@ void unlockSolsout() {
     }
 }
 
-bool shouldDoParallelFork() {
+bool shouldDoFork() {
     if(!getOptions().parallel)
         return false;
     //int val = -2;
@@ -86,9 +144,40 @@ bool shouldDoParallelFork() {
     return ret;
 }
 
+int doFork() {
+    fork_ever_called = true;
+    int f = fork();
+    if(f < 0) {
+        D_FATAL_ERROR("Fork fail!\n");
+        getParallelData().fatal_error_occurred = true;
+    }
+    else if(f == 0) {
+        if(!is_a_child_process) {
+            is_a_child_process = true;
+            close(child_tracking_pipe[0]);
+            //std::cout << getpid() << " closing 0" << std::endl;
+            //int devNull = open("/dev/null", O_WRONLY);
+            //dup2(devNull, 1);
+            //devNull = open("/dev/null", O_RDONLY);
+            //dup2(devNull, 0);
+        }
+    }
+    return f;
+}
 
+bool isAlarmActivated() {
+    return getParallelData().alarm_trigger;
+}
+
+  void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time) {
+    activate_trigger(&(getParallelData().alarm_trigger), alarm_active, timeout, CPU_time);
+  }
+
+
+}
 #else
 
+namespace Parallel {
 struct ParallelData {
 
 };
@@ -97,5 +186,5 @@ ParallelData* setupParallelData() {
     static ParallelData dummy;
     return &dummy;
 }
-
+}
 #endif

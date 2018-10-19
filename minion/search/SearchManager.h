@@ -198,7 +198,7 @@ struct StandardSearchManager : public SearchManager{
 
       if(getOptions().parallel && !getState().isFailed() && !in_aux_vars()) {
         if(getOptions().parallelStealHigh) {
-          bool doFork = shouldDoParallelFork();
+          bool doFork = Parallel::shouldDoFork();
 
           int steal = steal_work();
             
@@ -208,7 +208,7 @@ struct StandardSearchManager : public SearchManager{
           if(doFork) {
             //std::cerr << "Yes, do a fork!\n";
 
-            isParent = fork();
+            isParent = Parallel::doFork();
 
             if(isParent) {
               if(steal != -1) {
@@ -233,11 +233,11 @@ struct StandardSearchManager : public SearchManager{
           }
         }
         else {
-          bool doFork = shouldDoParallelFork();
+          bool doFork = Parallel::shouldDoFork();
           if(doFork) {
             //std::cerr << "Yes, do a fork!\n";
 
-            int isParent = fork();
+            int isParent = Parallel::doFork();
             D_CHECK(isParent >= 0);
             if(isParent) {
               // Force to ignore left branch

@@ -231,7 +231,7 @@ struct NeighbourhoodState {
                              highestNeighbourhoodSize);
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);
 
-    if(getState().isAlarmActivated()) {
+    if(Parallel::isAlarmActivated()) {
       Controller::world_pop_to_depth(depth);
       throw EndOfSearch();
     }

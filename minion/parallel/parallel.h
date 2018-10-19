@@ -18,8 +18,16 @@
  * USA.
  */
 
+namespace Parallel {
 struct ParallelData;
 ParallelData* setupParallelData();
 void lockSolsout();
 void unlockSolsout();
-bool shouldDoParallelFork();
+bool shouldDoFork();
+int doFork();
+bool isAChildProcess();
+bool isCtrlCPressed();
+bool isAlarmActivated();
+void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time);
+
+}

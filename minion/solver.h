@@ -72,8 +72,6 @@ class SearchState {
 
   volatile bool alarm_trigger;
 
-  volatile bool ctrl_c_pressed;
-
   GenericBacktracker generic_backtracker;
 
 public:
@@ -221,8 +219,7 @@ public:
         finished(false),
         failed(false),
         is_locked(false),
-        alarm_trigger(false),
-        ctrl_c_pressed(false) {}
+        alarm_trigger(false) {}
 
   // Must be defined later.
   ~SearchState();
@@ -235,25 +232,7 @@ public:
     return is_locked;
   }
 
-  bool isAlarmActivated() {
-    return alarm_trigger;
-  }
 
-  void clearAlarm() {
-    alarm_trigger = false;
-  }
-
-  void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time) {
-    activate_trigger(&alarm_trigger, alarm_active, timeout, CPU_time);
-  }
-
-  bool isCtrlcPressed() {
-    return ctrl_c_pressed;
-  }
-
-  void setupCtrlc() {
-    install_ctrlc_trigger(&ctrl_c_pressed);
-  }
 };
 
 struct NhConfig;

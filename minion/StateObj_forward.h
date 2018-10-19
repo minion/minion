@@ -27,7 +27,6 @@ class SearchState;
 class Queues;
 class Memory;
 class VariableContainer;
-struct ParallelData;
 
 inline BoolContainer& getBools();
 inline SearchOptions& getOptions();
@@ -35,5 +34,9 @@ inline SearchState& getState();
 inline Queues& getQueue();
 inline Memory& getMemory();
 inline VariableContainer& getVars();
+
+namespace Parallel {
+struct ParallelData;
 inline ParallelData& getParallelData();
+}
 #endif

@@ -115,7 +115,7 @@ inline void check_sol_is_correct() {
   getState().incrementSolutionCount();
 
   if(getOptions().solsoutWrite) {
-    lockSolsout();
+    Parallel::lockSolsout();
 
     vector<vector<AnyVarRef>> print_matrix = getState().getPrintMatrix();
     for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
@@ -127,7 +127,7 @@ inline void check_sol_is_correct() {
     solsoutFile << "\n";
     solsoutFile.flush();
 
-    unlockSolsout();
+    Parallel::unlockSolsout();
   }
 
   if(getOptions().print_solution) {
@@ -295,10 +295,10 @@ inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& var_array,
     throw EndOfSearch();
   }
 
-  if(getState().isAlarmActivated()) { // Either a timeout has occurred, or
+  if(Parallel::isAlarmActivated()) { // Either a timeout has occurred, or
                                       // ctrl+c has been pressed.
     generateRestartFile(var_array, branches);
-    if(getState().isCtrlcPressed()) {
+    if(Parallel::isCtrlCPressed()) {
       throw EndOfSearch();
     }
 

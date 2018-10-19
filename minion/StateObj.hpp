@@ -30,7 +30,7 @@ VARDEF(SearchState state_m);
 VARDEF(Queues queues_m);
 VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
-VARDEF(ParallelData* parData_m);
+
 
 inline BoolContainer& getBools() {
   return bools_m;
@@ -51,13 +51,16 @@ inline VariableContainer& getVars() {
   return varContainer_m;
 }
 
+namespace Parallel {
+VARDEF(ParallelData* parData_m);
+
 inline ParallelData& getParallelData() {
   if(parData_m == 0) {
     parData_m = setupParallelData();
   }
   return *parData_m;
 }
-
+}
 
 template <typename DomType>
 inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static() {

@@ -52,8 +52,8 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
 }
 
 inline bool check_sac_timeout() {
-  if(getState().isAlarmActivated()) {
-    if(getState().isCtrlcPressed()) {
+  if(Parallel::isAlarmActivated()) {
+    if(Parallel::isCtrlCPressed()) {
       getState().setFailed(true);
       return true;
     } else {
