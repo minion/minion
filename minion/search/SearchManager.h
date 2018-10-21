@@ -143,7 +143,7 @@ struct StandardSearchManager : public SearchManager{
   }
 
   inline bool in_aux_vars() {
-    return !branches.empty() && branches.back().var >= var_order->auxVarStart();
+    return var_order->hasAuxVars() && !branches.empty() && branches.back().var >= var_order->auxVarStart();
   }
 
   inline void jump_out_aux_vars() {

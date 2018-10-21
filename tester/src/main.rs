@@ -29,6 +29,7 @@ mod minion_instance;
 mod run_minion;
 mod test_types;
 
+
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
 struct Opt {
@@ -43,6 +44,11 @@ struct Opt {
 
     #[structopt(short = "m", long = "minion", default_value = "minion")]
     minion: String,
+
+    #[structopt(short = "t", long = "maxtuples", default_value = "10000")]
+    maxtuples: usize,
+    
+
 }
 
 fn main() -> Result<(), simple_error::SimpleError> {
@@ -63,22 +69,38 @@ fn main() -> Result<(), simple_error::SimpleError> {
         }
     }
 
-    v.into_par_iter().try_for_each(|ref c| {
+    let config = test_types::MinionConfig { minionexec: &opt.minion, maxtuples: opt.maxtuples };
+
+    v.clone().into_par_iter().try_for_each(|ref c| {
         try_with!(
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint(&opt.minion, &c)),
+                .try_for_each(|_| test_types::test_constraint(&config, &c)),
             format!("failure in {}", c.name)
         );
         try_with!(
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint_nested(&opt.minion, &c)),
+                .try_for_each(|_| test_types::test_constraint_nested(&config, &c)),
             format!("failure in {} with nesting", c.name)
         );
         println!("Tested {}", c.name);
         Ok(())
     })?;
+
+    println!("Parallel tests\n");
+    v.clone().into_par_iter().try_for_each(|ref c| {
+        try_with!(
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_constraint_par(&config, &c)),
+            format!("failure in {}", c.name)
+        );
+
+        println!("Tested {}", c.name);
+        Ok(())
+    })?;
+
 
     Ok(())
 }

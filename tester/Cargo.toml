@@ -16,3 +16,4 @@ serde = "1.0"
 rayon = "1.0"
 num-integer = "0.1"
 structopt = "0.2"
+

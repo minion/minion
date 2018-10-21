@@ -248,17 +248,22 @@ impl ConstraintInstance {
             .collect();
     }
 
-    pub fn tableise(&self) -> ConstraintInstance {
-        ConstraintInstance {
+    pub fn tableise(&self, limit: usize) -> Option<ConstraintInstance> {
+        let tuples = self.build_tuples();
+        if tuples.len() > limit {
+            return None;
+        }
+
+        Some(ConstraintInstance {
             constraint: STANDARD_TABLE_CONSTRAINT.clone(),
             varlist: {
                 let vars: Vec<Arc<MinionVariable>> =
                     self.vars().iter().cloned().into_iter().flatten().collect();
                 Arc::new(vec![vars])
             },
-            tuples: Some(Tuples::new(self.build_tuples())),
+            tuples: Some(Tuples::new(tuples)),
             child_constraints: vec![],
-        }
+        })
     }
     /*
     pub fn variables(&self) -> usize {
@@ -873,8 +878,8 @@ fn constraint_list() -> Vec<ConstraintDef> {
             "not-hamming", // CT_WATCHED_NOT_HAMMING
             vec![List(Discrete), List(Discrete), Var(Constant)],
             |v| (v[0].iter().zip(v[1]).filter(|(a, b)| *a != *b).count() as i64) < v[2][0],
-            true,
-            true,
+            false,
+            false,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
         ConstraintDef::new_with_validator(
