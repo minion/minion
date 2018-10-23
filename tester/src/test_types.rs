@@ -10,7 +10,7 @@ use run_minion::{NodeCheck, SolCheck};
 
 pub struct MinionConfig<'a> {
     pub minionexec: &'a str,
-    pub maxtuples: usize
+    pub maxtuples: usize,
 }
 
 pub fn test_constraint_with_flags(
@@ -21,8 +21,12 @@ pub fn test_constraint_with_flags(
     sol_check: SolCheck,
 ) -> Result<(), SimpleError> {
     let instance = constraint_def::build_random_instance(c);
-    let ret =
-        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &instance, "original")?;
+    let ret = run_minion::get_minion_solutions(
+        config.minionexec,
+        &["-findallsols"],
+        &instance,
+        "original",
+    )?;
 
     let mut args = flags.to_vec();
     args.push("-findallsols");
@@ -61,9 +65,14 @@ pub fn test_constraint(
         }
     }
 
-    let ret =
-        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &instance, "original")?;
-    let ret2 = run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
+    let ret = run_minion::get_minion_solutions(
+        config.minionexec,
+        &["-findallsols"],
+        &instance,
+        "original",
+    )?;
+    let ret2 =
+        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
     if ret.solutions != ret2.solutions {
         return Err(SimpleError::new(format!(
             "Solutions not equal in {} vs {}",
@@ -88,9 +97,18 @@ pub fn test_constraint_par(
     c: &constraint_def::ConstraintDef,
 ) -> Result<(), SimpleError> {
     let instance = constraint_def::build_random_instance(c);
-    let ret =
-        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &instance, "original")?;
-    let ret2 = run_minion::get_minion_solutions(config.minionexec, &["-findallsols","-parallel"], &instance, "parallel")?;
+    let ret = run_minion::get_minion_solutions(
+        config.minionexec,
+        &["-findallsols"],
+        &instance,
+        "original",
+    )?;
+    let ret2 = run_minion::get_minion_solutions(
+        config.minionexec,
+        &["-findallsols", "-parallel"],
+        &instance,
+        "parallel",
+    )?;
     let mut sortsols = ret.solutions.clone();
     let mut sortsols2 = ret2.solutions.clone();
     sortsols.sort();
@@ -100,13 +118,14 @@ pub fn test_constraint_par(
             "Solutions not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
-    }/*
+    }
+
     if instance.constraint.gac && ret.nodes != ret2.nodes {
         return Err(SimpleError::new(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
-    }*/
+    }
 
     ret.cleanup.cleanup();
     ret2.cleanup.cleanup();
@@ -132,9 +151,14 @@ pub fn test_constraint_nested(
         }
     }
 
-    let ret =
-        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &instance, "original")?;
-    let ret2 = run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
+    let ret = run_minion::get_minion_solutions(
+        config.minionexec,
+        &["-findallsols"],
+        &instance,
+        "original",
+    )?;
+    let ret2 =
+        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
     if ret.solutions != ret2.solutions {
         return Err(SimpleError::new(format!(
             "Solutions not equal in {} vs {}",

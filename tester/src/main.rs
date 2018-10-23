@@ -29,7 +29,6 @@ mod minion_instance;
 mod run_minion;
 mod test_types;
 
-
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
 struct Opt {
@@ -47,8 +46,6 @@ struct Opt {
 
     #[structopt(short = "t", long = "maxtuples", default_value = "10000")]
     maxtuples: usize,
-    
-
 }
 
 fn main() -> Result<(), simple_error::SimpleError> {
@@ -69,7 +66,10 @@ fn main() -> Result<(), simple_error::SimpleError> {
         }
     }
 
-    let config = test_types::MinionConfig { minionexec: &opt.minion, maxtuples: opt.maxtuples };
+    let config = test_types::MinionConfig {
+        minionexec: &opt.minion,
+        maxtuples: opt.maxtuples,
+    };
 
     v.clone().into_par_iter().try_for_each(|ref c| {
         try_with!(
@@ -100,7 +100,6 @@ fn main() -> Result<(), simple_error::SimpleError> {
         println!("Tested {}", c.name);
         Ok(())
     })?;
-
 
     Ok(())
 }

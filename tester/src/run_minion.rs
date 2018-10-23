@@ -81,6 +81,7 @@ impl CleanupFiles {
 #[derive(Deserialize)]
 struct MinionJsonOut {
     Nodes: String,
+    SolutionsFound: String,
 }
 
 pub fn get_minion_solutions(
@@ -131,7 +132,11 @@ pub fn get_minion_solutions(
         format!("Failed to start '{}'", minionexec)
     );
 
-    let output = try_with!(child.wait_with_output(), "failed to capture Minion output: {}", minioncmd);
+    let output = try_with!(
+        child.wait_with_output(),
+        "failed to capture Minion output: {}",
+        minioncmd
+    );
 
     if !output.status.success() {
         print!(
@@ -139,11 +144,18 @@ pub fn get_minion_solutions(
             String::from_utf8_lossy(&output.stdout),
             String::from_utf8_lossy(&output.stderr)
         );
-        return Err(SimpleError::new(format!("Minion returned non-zero value: {}", minioncmd)));
+        return Err(SimpleError::new(format!(
+            "Minion returned non-zero value: {}",
+            minioncmd
+        )));
     }
 
     let solutions = {
-        let f = try_with!(fs::File::open(&solsout), "failed to open solution file: {}", minioncmd);
+        let f = try_with!(
+            fs::File::open(&solsout),
+            "failed to open solution file: {}",
+            minioncmd
+        );
 
         let reader = BufReader::new(f);
 
@@ -162,17 +174,34 @@ pub fn get_minion_solutions(
     let nodes = {
         let f = try_with!(
             fs::File::open(&tableout),
-            "failed to open jsontableout file: {}", minioncmd
+            "failed to open jsontableout file: {}",
+            minioncmd
         );
 
         let reader = BufReader::new(f);
 
         let v: MinionJsonOut = try_with!(
             serde_json::from_reader(reader),
-            "jsontableout not valid json!: {}", minioncmd
+            "jsontableout not valid json!: {}",
+            minioncmd
         );
 
-        try_with!(v.Nodes.parse::<i64>(), "invalid node count: {}", minioncmd)
+        let nodes = try_with!(v.Nodes.parse::<i64>(), "invalid node count: {}", minioncmd);
+        let solcount = try_with!(
+            v.SolutionsFound.parse::<i64>(),
+            "invalid solution count: {}",
+            minioncmd
+        );
+
+        if solcount != solutions.len() as i64 {
+            return Err(SimpleError::new(format!(
+                "Solutions files contains {} solutions, but SolutionsFound is {}",
+                solutions.len(),
+                solcount
+            )));
+        }
+
+        nodes
     };
 
     Ok(MinionOutput {

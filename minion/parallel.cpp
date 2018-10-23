@@ -43,6 +43,7 @@ struct ParallelData {
     std::atomic<bool> process_should_exit;
     std::atomic<long long> solutions;
     std::atomic<long long> nodes;
+    std::atomic<long long> children;
     pid_t parent_process_id;
     std::atomic<bool> ctrl_c_pressed;
     std::atomic<bool> alarm_trigger;
@@ -72,6 +73,7 @@ void endParallelMinion() {
     if(is_a_child_process) {
         atomic_fetch_add(&(getParallelData().solutions), getState().getSolutionCount());
         atomic_fetch_add(&(getParallelData().nodes), getState().getNodeCount());
+        atomic_fetch_add(&(getParallelData().children), (long long)1);
     }
 
     if(!is_a_child_process) {
@@ -93,6 +95,7 @@ void endParallelMinion() {
             std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
             exit(1);
         }
+        std::cout << "A total of " << getParallelData().children << " children were used" << std::endl;
 
         getState().incrementSolutionCount(getParallelData().solutions);
         getState().incrementNodeCount(getParallelData().nodes);
@@ -158,10 +161,10 @@ int doFork() {
         getParallelData().fatal_error_occurred = true;
     }
     else if(f == 0) {
+        getState().resetSearchCounters();
         if(!is_a_child_process) {
             is_a_child_process = true;
             close(child_tracking_pipe[0]);
-            getState().resetSearchCounters();
             //std::cout << getpid() << " closing 0" << std::endl;
             //int devNull = open("/dev/null", O_WRONLY);
             //dup2(devNull, 1);
