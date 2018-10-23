@@ -106,11 +106,17 @@ public:
   void setNodeCount(long long _nodes) {
     nodes = _nodes;
   }
-  void incrementNodeCount() {
-    nodes++;
+  void incrementNodeCount(long long n = 1) {
+    nodes += n;
   }
   void incrementBacktrackCount() {
     backtracks++;
+  }
+
+  void resetSearchCounters() {
+    nodes = 0;
+    backtracks = 0;
+    solutions = 0;
   }
 
   AnyVarRef* getOptimiseVar() {
@@ -159,11 +165,12 @@ public:
   long long int getSolutionCount() {
     return solutions;
   }
+
   void setSolutionCount(long long int _sol) {
     solutions = _sol;
   }
-  void incrementSolutionCount() {
-    solutions++;
+  void incrementSolutionCount(long long int inc = 1) {
+    solutions += inc;
   }
 
   bool isFinished() {

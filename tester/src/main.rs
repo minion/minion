@@ -42,7 +42,7 @@ struct Opt {
     #[structopt(short = "c", long = "count", default_value = "30")]
     count: u64,
 
-    #[structopt(short = "m", long = "minion", default_value = "minion")]
+    #[structopt(short = "m", long = "minion")]
     minion: String,
 
     #[structopt(short = "t", long = "maxtuples", default_value = "10000")]

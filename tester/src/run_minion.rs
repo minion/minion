@@ -4,6 +4,7 @@ use constraint_def::ConstraintInstance;
 use minion_instance::print_minion_file_pair;
 use simple_error::SimpleError;
 use simple_error::SimpleResult;
+
 use std;
 use std::fs;
 use std::io::*;
@@ -12,6 +13,9 @@ use std::process::{Command, Stdio};
 use counter::get_unique_value;
 
 extern crate serde_json;
+
+extern crate itertools;
+use self::itertools::Itertools;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct MinionOutput {
@@ -116,6 +120,8 @@ pub fn get_minion_solutions(
         );
     }
 
+    let minioncmd = format!("{} {}", minionexec, args.iter().join(" "));
+
     let child = try_with!(
         Command::new(minionexec)
             .args(args)
@@ -125,7 +131,7 @@ pub fn get_minion_solutions(
         format!("Failed to start '{}'", minionexec)
     );
 
-    let output = try_with!(child.wait_with_output(), "failed to capture Minion output");
+    let output = try_with!(child.wait_with_output(), "failed to capture Minion output: {}", minioncmd);
 
     if !output.status.success() {
         print!(
@@ -133,17 +139,17 @@ pub fn get_minion_solutions(
             String::from_utf8_lossy(&output.stdout),
             String::from_utf8_lossy(&output.stderr)
         );
-        return Err(SimpleError::new("Minion returned non-zero value"));
+        return Err(SimpleError::new(format!("Minion returned non-zero value: {}", minioncmd)));
     }
 
     let solutions = {
-        let f = try_with!(fs::File::open(&solsout), "failed to open solution file");
+        let f = try_with!(fs::File::open(&solsout), "failed to open solution file: {}", minioncmd);
 
         let reader = BufReader::new(f);
 
         let mut solutions: Vec<Vec<i64>> = Vec::new();
         for tryline in reader.lines() {
-            let line = try_with!(tryline, "failure reading solutions");
+            let line = try_with!(tryline, "failure reading solutions: {}", minioncmd);
             solutions.push(
                 line.split_whitespace()
                     .map(|x| x.parse::<i64>().unwrap())
@@ -156,17 +162,17 @@ pub fn get_minion_solutions(
     let nodes = {
         let f = try_with!(
             fs::File::open(&tableout),
-            "failed to open jsontableout file"
+            "failed to open jsontableout file: {}", minioncmd
         );
 
         let reader = BufReader::new(f);
 
         let v: MinionJsonOut = try_with!(
             serde_json::from_reader(reader),
-            "jsontableout not valid json!"
+            "jsontableout not valid json!: {}", minioncmd
         );
 
-        try_with!(v.Nodes.parse::<i64>(), "invalid node count")
+        try_with!(v.Nodes.parse::<i64>(), "invalid node count: {}", minioncmd)
     };
 
     Ok(MinionOutput {

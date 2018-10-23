@@ -21,7 +21,7 @@
 #include "minion.h"
 
 #include "preprocess.h"
-
+#include "parallel/parallel.h"
 #include "search/search_control.h"
 
 #include "search/SearchStrategies.h"
@@ -172,6 +172,8 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
     cout << getState().storedSolution;
   }
 
+  Parallel::endParallelMinion();
+
   getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
                                                         getTableOut(), !getOptions().silent);
   getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
@@ -185,7 +187,8 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
   getTableOut().set("SolutionsFound", getState().getSolutionCount());
 
-  if(getOptions().tableout) {
+  
+  if(getOptions().tableout && !Parallel::isAChildProcess()) {
     getTableOut().print_line(); // Outputs a line to the table file.
   }
 
