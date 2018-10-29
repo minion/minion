@@ -217,7 +217,10 @@ struct StandardSearchManager : public SearchManager{
             }
             else {
               // Todo, avoid this process creation?
-              if(steal == -1) exit(0);
+              if(steal == -1) {
+                Parallel::endParallelMinion();
+                exit(0);
+              }
               //lockSolsout();
               //std::cerr << "stealing " << steal << "\n";
               //std::cerr << branches << "\n";

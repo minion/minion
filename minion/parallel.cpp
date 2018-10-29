@@ -37,8 +37,11 @@
 namespace Parallel {
 
 struct ParallelData {
-    sem_t processCount;
+
+    std::atomic<int> processCount;
+    
     sem_t outputLock;
+    
     std::atomic<bool> fatal_error_occurred;
     std::atomic<bool> process_should_exit;
     std::atomic<long long> solutions;
@@ -67,8 +70,7 @@ bool isCtrlCPressed() {
 
 void endParallelMinion() {
     if(!fork_ever_called) return;
-
-    sem_post(&(getParallelData().processCount));
+    atomic_fetch_add(&(getParallelData().processCount), 1);
 
     if(is_a_child_process) {
         atomic_fetch_add(&(getParallelData().solutions), getState().getSolutionCount());
@@ -102,6 +104,7 @@ void endParallelMinion() {
     }
 }
 
+
 ParallelData* setupParallelData() {
     // Setup a pipe so parent can track if children are alive
     pipe(child_tracking_pipe);
@@ -115,9 +118,7 @@ ParallelData* setupParallelData() {
     if(cores < 1) {
         cores = sysconf( _SC_NPROCESSORS_ONLN );
     }
-    if(sem_init(&(pd->processCount), 1, cores) != 0) {
-        D_FATAL_ERROR("Setup semaphore fail");
-    }
+    pd->processCount = cores;
 
     if(sem_init(&(pd->outputLock), 1, 1) != 0) {
         D_FATAL_ERROR("Setup outputLock semaphore fail");
@@ -145,12 +146,18 @@ void unlockSolsout() {
 bool shouldDoFork() {
     if(!getOptions().parallel)
         return false;
-    //int val = -2;
-    //sem_getvalue(&(getParallelData().processCount), &val);
-    //std::cout << "semaphore:" << val << "\n";
-    bool ret = (sem_trywait(&(getParallelData().processCount)) == 0);
-    //std::cout << "Checking semaphore:" << ret << strerror(errno) << "\n";
-    return ret;
+    if(getParallelData().processCount > 0)
+    {
+        int old = atomic_fetch_sub(&(getParallelData().processCount), 1);
+        if(old < 0) {
+            atomic_fetch_add(&(getParallelData().processCount), 1);
+            return false;
+        } 
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 int doFork() {

@@ -171,7 +171,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   if(getOptions().printonlyoptimal) {
     cout << getState().storedSolution;
   }
-
+  
   Parallel::endParallelMinion();
 
   getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
