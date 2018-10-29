@@ -39,8 +39,7 @@ namespace Parallel {
 struct ParallelData {
 
     std::atomic<int> processCount;
-    
-    sem_t outputLock;
+    pthread_mutex_t outputLock;
     
     std::atomic<bool> fatal_error_occurred;
     std::atomic<bool> process_should_exit;
@@ -120,9 +119,14 @@ ParallelData* setupParallelData() {
     }
     pd->processCount = cores;
 
-    if(sem_init(&(pd->outputLock), 1, 1) != 0) {
-        D_FATAL_ERROR("Setup outputLock semaphore fail");
+    {
+        pthread_mutexattr_t mutexAttr;
+        pthread_mutexattr_setpshared(&mutexAttr, PTHREAD_PROCESS_SHARED);
+        if(pthread_mutex_init(&(pd->outputLock), &mutexAttr) < 0) {
+            D_FATAL_ERROR("Setup outputLock mutex fail");
+        }
     }
+
 
     install_ctrlc_trigger(&(pd->ctrl_c_pressed));
 
@@ -133,13 +137,13 @@ ParallelData* setupParallelData() {
 
 void lockSolsout() {
     if(getOptions().parallel) {
-        sem_wait(&(getParallelData().outputLock));
+        pthread_mutex_lock(&(getParallelData().outputLock));
     }
 }
 
 void unlockSolsout() {
     if(getOptions().parallel) {
-        sem_post(&(getParallelData().outputLock));
+        pthread_mutex_unlock(&(getParallelData().outputLock));
     }
 }
 
