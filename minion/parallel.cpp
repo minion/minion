@@ -63,7 +63,6 @@ bool isAChildProcess() {
 }
 
 bool isCtrlCPressed() {
-    std::cerr << getpid() << "checking ctrl+c" << getParallelData().ctrl_c_pressed << "\n";
     return getParallelData().ctrl_c_pressed;
 }
 
