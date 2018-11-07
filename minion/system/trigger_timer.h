@@ -21,6 +21,8 @@
 #ifndef TRIG_TIMER_H
 #define TRIG_TIMER_H
 
+#include <atomic>
+
 /// This function will cause the boolean passed to be set to 'true' after
 /// timeout.
 void activate_trigger(std::atomic<bool>*, bool timeout_active, int timeout, bool CPU_time);
