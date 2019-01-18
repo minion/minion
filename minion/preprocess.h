@@ -46,10 +46,10 @@ inline string getNameFromVar(const T& v) {
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop, bool amo) {
   Controller::world_push();
-  bool doamo=(var.getMin()==0 && var.getMax()==1);
+  bool doamo=amo && var.getMin()==0 && var.getMax()==1;
   
-  Vars listbools;
-  if(amo && doamo && lowval==1 && highval==1) {
+  Vars listbools;   // Need to store this between calls!
+  if(doamo) {
       //std::cout << "setting up for var:" << getNameFromVar(var) <<std::endl;
       for(int i=0; i<vars.size(); i++) {
           if(vars[i].getMin()==0 && vars[i].getMax()==1) {
@@ -65,16 +65,17 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   bool check_failed = getState().isFailed();
   getState().setFailed(false);
   
-  if(amo && doamo && lowval==1 && highval==1) {
+  if(doamo) {
       for(int i=0; i<listbools.size(); i++) {
-          if(listbools[i].getMax()==0) {
-              std::cout << "AMO " << getNameFromVar(var) << " " << getNameFromVar(listbools[i]) << std::endl;
+          if(listbools[i].isAssigned()) {
+              // numbers represent the value of the assignments that are mutex.
+              std::cout << "AMO " << getNameFromVar(var) << " " << var.getMin() << " " << getNameFromVar(listbools[i]) << " " << (1-listbools[i].getMin()) << std::endl;
           }
       }
   }
   
   Controller::world_pop();
-
+  
   return check_failed;
 }
 
