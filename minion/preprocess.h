@@ -65,7 +65,8 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   bool check_failed = getState().isFailed();
   getState().setFailed(false);
   
-  if(doamo) {
+  if(doamo && !check_failed) {
+      //  If it has failed, the value of var will be removed anyway so no need to output mutexes. 
       for(int i=0; i<listbools.size(); i++) {
           if(listbools[i].isAssigned()) {
               // numbers represent the value of the assignments that are mutex.
