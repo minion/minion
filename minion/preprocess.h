@@ -68,7 +68,7 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   if(doamo && !check_failed) {
       //  If it has failed, the value of var will be removed anyway so no need to output mutexes. 
       for(int i=0; i<listbools.size(); i++) {
-          if(listbools[i].isAssigned()) {
+          if(listbools[i].isAssigned() && var!=listbools[i]) {
               // numbers represent the value of the assignments that are mutex.
               std::cout << "AMO " << getNameFromVar(var) << " " << var.getMin() << " " << getNameFromVar(listbools[i]) << " " << (1-listbools[i].getMin()) << std::endl;
           }
