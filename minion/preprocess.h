@@ -46,11 +46,10 @@ inline string getNameFromVar(const T& v) {
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop, bool amo) {
   Controller::world_push();
-  bool doamo=amo && var.getMin()==0 && var.getMax()==1;
+  bool doamo=amo && (var.getMin()==0) && (var.getMax()==1);
   
   Vars listbools;   // Need to store this between calls!
   if(doamo) {
-      //std::cout << "setting up for var:" << getNameFromVar(var) <<std::endl;
       for(int i=0; i<vars.size(); i++) {
           if(vars[i].getMin()==0 && vars[i].getMax()==1) {
               listbools.push_back(vars[i]);
@@ -150,7 +149,7 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     DomainInt minval = var.getMin();
     DomainInt step = minval + gallop;
-    bool check = check_fail_range(var, minval, step-1, vararray, prop, false);
+    bool check = check_fail_range(var, minval, step-1, vararray, prop, true);
     if(check) {
       pruned = true;
       var.setMin(step);
