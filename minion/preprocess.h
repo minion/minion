@@ -42,20 +42,9 @@ inline string getNameFromVar(const T& v) {
   return getState().getInstance()->vars.getName(v.getBaseVar());
 }
 
-
 template <typename Var, typename Vars, typename Prop>
-bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop, bool amo) {
+bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop) {
   Controller::world_push();
-  bool doamo=amo && (var.getMin()==0) && (var.getMax()==1);
-  
-  Vars listbools;   // Need to store this between calls!
-  if(doamo) {
-      for(int i=0; i<vars.size(); i++) {
-          if(vars[i].getMin()==0 && vars[i].getMax()==1) {
-              listbools.push_back(vars[i]);
-          }
-      }
-  }
   
   var.setMin(lowval);
   var.setMax(highval);
@@ -63,16 +52,6 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   
   bool check_failed = getState().isFailed();
   getState().setFailed(false);
-  
-  if(doamo && !check_failed) {
-      //  If it has failed, the value of var will be removed anyway so no need to output mutexes. 
-      for(int i=0; i<listbools.size(); i++) {
-          if(listbools[i].isAssigned() && var!=listbools[i]) {
-              // numbers represent the value of the assignments that are mutex.
-              std::cout << "AMO " << getNameFromVar(var) << " " << var.getMin() << " " << getNameFromVar(listbools[i]) << " " << (1-listbools[i].getMin()) << std::endl;
-          }
-      }
-  }
   
   Controller::world_pop();
   
@@ -107,7 +86,7 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     DomainInt maxval = var.getMax();
     DomainInt step = maxval - gallop;
-    bool check = check_fail_range(var, step+1, maxval, vararray, prop, true);
+    bool check = check_fail_range(var, step+1, maxval, vararray, prop);
     if(check) {
       pruned = true;
       var.setMax(step);
@@ -149,7 +128,7 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
     }
     DomainInt minval = var.getMin();
     DomainInt step = minval + gallop;
-    bool check = check_fail_range(var, minval, step-1, vararray, prop, true);
+    bool check = check_fail_range(var, minval, step-1, vararray, prop);
     if(check) {
       pruned = true;
       var.setMin(step);
@@ -184,16 +163,19 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
     return;
   bool reduced = true;
   int loops = 0;
+  
+  int upperlimit=std::min(5, (int)log2(vararray.size()));
+  
   while(reduced) {
     // First loop around bounds as long as possible
     while(reduced) {
       if(limit) {
         loops++;
-        if(loops > std::min(5, (int)log2(vararray.size()))) {
+        if(loops > upperlimit) {
           return;
         }
-      } 
-
+      }
+      
       reduced = false;
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
         Var& var = vararray[i];
@@ -232,6 +214,53 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
     }
   }
+  
+  // Extra pass to collect the mutexes.
+  // Populate listbools.
+  //  Extra stuff for mutexes
+    std::vector<Var> listbools;
+  
+    for(int i=0; i<vararray.size(); i++) {
+      if(vararray[i].getMin()==0 && vararray[i].getMax()==1) {
+          listbools.push_back(vararray[i]);
+      }
+    }
+    
+    for(SysInt i = 0; i < (SysInt)listbools.size(); ++i) {
+        Var& var = listbools[i];
+        
+        Controller::world_push();
+        
+        var.setMax(0);
+        prop(vararray);
+        
+        for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
+            if(listbools[j].isAssigned()) {
+                std::cout << "AMO " << getNameFromVar(var) << " " << 0 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
+            }
+        }
+        
+        bool check_failed = getState().isFailed();
+        getState().setFailed(false);
+        
+        Controller::world_pop();
+        
+        Controller::world_push();
+        
+        var.setMin(1);
+        prop(vararray);
+        
+        for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
+            if(listbools[j].isAssigned()) {
+                std::cout << "AMO " << getNameFromVar(var) << " " << 1 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
+            }
+        }
+        
+        check_failed = getState().isFailed();
+        getState().setFailed(false);
+        
+        Controller::world_pop();
+    }
 }
 
 struct PropagateGAC {
