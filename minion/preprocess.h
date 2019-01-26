@@ -234,9 +234,10 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         var.setMax(0);
         prop(vararray);
         
+        string vname1=getNameFromVar(var);
         for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
             if(listbools[j].isAssigned()) {
-                std::cout << "AMO " << getNameFromVar(var) << " " << 0 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
+                std::cout << "AMO " << vname1 << " " << 0 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
             }
         }
         
@@ -252,7 +253,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         
         for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
             if(listbools[j].isAssigned()) {
-                std::cout << "AMO " << getNameFromVar(var) << " " << 1 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
+                std::cout << "AMO " << vname1 << " " << 1 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
             }
         }
         
