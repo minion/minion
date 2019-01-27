@@ -156,6 +156,8 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
   }
 }
 
+#include "constraints/constraint_collect_events.h"
+
 template <typename Var, typename Prop>
 void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBounds, bool limit) {
   getQueue().propagateQueue();
@@ -226,8 +228,16 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
     }
     
+    //  Make a 'collect events' constraint and attach it to listbools.
+    CollectEvents<std::vector<Var>>* c=new CollectEvents<std::vector<Var>>(listbools);
+    getState().addConstraintMidsearch((AbstractConstraint*) c);
+    
+    std::vector<std::pair<int,int>>& assignments=c->assignments;
+    
     for(SysInt i = 0; i < (SysInt)listbools.size(); ++i) {
         Var& var = listbools[i];
+        
+        c->liftTriggersLessEqual(i);
         
         Controller::world_push();
         
@@ -235,11 +245,15 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         prop(vararray);
         
         string vname1=getNameFromVar(var);
-        for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
+        /*for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
             if(listbools[j].isAssigned()) {
                 std::cout << "AMO " << vname1 << " " << 0 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
             }
+        }*/
+        for(int j=0; j<assignments.size(); j++) {
+            std::cout << "AMO " << vname1 << " " << 0 << " " << getNameFromVar(listbools[assignments[j].first]) << " " << (1-assignments[j].second) << std::endl;
         }
+        assignments.clear();
         
         bool check_failed = getState().isFailed();
         getState().setFailed(false);
@@ -251,11 +265,15 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         var.setMin(1);
         prop(vararray);
         
-        for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
+        /*for(SysInt j=i+1; j<(SysInt)listbools.size(); j++) {
             if(listbools[j].isAssigned()) {
                 std::cout << "AMO " << vname1 << " " << 1 << " " << getNameFromVar(listbools[j]) << " " << (1-listbools[j].getMin()) << std::endl;
             }
+        }*/
+        for(int j=0; j<assignments.size(); j++) {
+            std::cout << "AMO " << vname1 << " " << 1 << " " << getNameFromVar(listbools[assignments[j].first]) << " " << (1-assignments[j].second) << std::endl;
         }
+        assignments.clear();
         
         check_failed = getState().isFailed();
         getState().setFailed(false);
