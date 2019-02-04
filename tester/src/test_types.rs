@@ -1,12 +1,12 @@
-use constraint_def;
-use run_minion;
+use crate::constraint_def;
+use crate::run_minion;
 extern crate rand;
 
 use self::rand::Rng;
 
 use simple_error::SimpleError;
 
-use run_minion::{NodeCheck, SolCheck};
+use crate::run_minion::{NodeCheck, SolCheck};
 
 pub struct MinionConfig<'a> {
     pub minionexec: &'a str,

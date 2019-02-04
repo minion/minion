@@ -4,7 +4,7 @@ use std::io::prelude::*;
 use std::io::Result;
 
 use self::itertools::Itertools;
-use constraint_def::*;
+use crate::constraint_def::*;
 
 fn print_minion_tuples<F: Write>(f: &mut F, tuples: &Tuples) -> Result<()> {
     f.write_all(b"**TUPLELIST**\n")?;

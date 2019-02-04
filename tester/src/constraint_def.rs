@@ -3,7 +3,7 @@ extern crate rand;
 
 use num_integer::Integer;
 
-use counter::{get_unique_name, get_unique_value};
+use crate::counter::{get_unique_name, get_unique_value};
 use std::collections::HashSet;
 use std::fmt;
 use std::iter::FromIterator;

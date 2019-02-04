@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 
-use constraint_def::ConstraintInstance;
-use minion_instance::print_minion_file_pair;
+use crate::constraint_def::ConstraintInstance;
+use crate::minion_instance::print_minion_file_pair;
 use simple_error::SimpleError;
 use simple_error::SimpleResult;
 
@@ -10,7 +10,7 @@ use std::fs;
 use std::io::*;
 use std::process::{Command, Stdio};
 
-use counter::get_unique_value;
+use crate::counter::get_unique_value;
 
 extern crate serde_json;
 
