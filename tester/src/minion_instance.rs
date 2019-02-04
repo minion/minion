@@ -78,11 +78,11 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
     if doms.var_type == VarType::Constant {
         return Ok(());
     }
-    write!(f, "**VARIABLES**\n");
+    write!(f, "**VARIABLES**\n")?;
     match doms.var_type {
         VarType::Constant => {}
         VarType::Bool => {
-            write!(f, "BOOL {}\n", doms.name);
+            write!(f, "BOOL {}\n", doms.name)?;
         }
         VarType::Bound => {
             write!(
