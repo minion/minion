@@ -182,6 +182,7 @@ struct StandardSearchManager : public SearchManager{
       if(varval.first == -1) {
         // We have found a solution!
         check_sol_is_correct();
+        maybe_print_node(var_array, true);
         handle_sol_func();
         if(var_order->hasAuxVars()) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.

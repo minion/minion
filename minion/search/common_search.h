@@ -335,13 +335,16 @@ void inline standard_deal_with_solution() {
 }
 
 template <typename T>
-void inline maybe_print_node(T& vars) {
+void inline maybe_print_node(T& vars, bool isSolution = false) {
   if(getOptions().dumptree)
     cout << "Node: " << getState().getNodeCount() << "," << get_dom_as_string(vars) << endl;
   if(getOptions().dumptreejson.isActive()) {
     getOptions().dumptreejson.mapElement("Node", getState().getNodeCount());
     getOptions().dumptreejson.mapElement("Domains", get_dom_as_json(vars));
     getOptions().dumptreejson.newline();
+    if(isSolution) {
+      getOptions().dumptreejson.mapElement("solution", 1);
+    }
   }
 }
 
