@@ -169,7 +169,7 @@ struct StandardSearchManager : public SearchManager{
 
   // Most basic search procedure
   virtual void search() {
-    maybe_print_node(var_array);
+    maybe_print_node();
     while(true) {
       D_ASSERT(getQueue().isQueuesEmpty());
 
@@ -182,7 +182,7 @@ struct StandardSearchManager : public SearchManager{
       if(varval.first == -1) {
         // We have found a solution!
         check_sol_is_correct();
-        maybe_print_node(var_array, true);
+        maybe_print_node(true);
         handle_sol_func();
         if(var_order->hasAuxVars()) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.
@@ -192,7 +192,7 @@ struct StandardSearchManager : public SearchManager{
         // If we are not finished, then go into the loop below.
         getState().setFailed(true);
       } else {
-        maybe_print_node(var_array);
+        maybe_print_node();
         branch_left(varval);
         prop->prop(var_array);
       }

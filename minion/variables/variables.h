@@ -73,6 +73,12 @@ public:
     appendVarsFromContainer(bigRangeVarContainer, apply);
     appendVarsFromContainer(sparseBoundVarContainer, apply);
   }
+
+  inline std::vector<AnyVarRef> getAllVars() {
+    std::vector<AnyVarRef> v;
+    forAllVars([&v](const AnyVarRef& var){v.push_back(var);});
+    return v;
+  }
 };
 
 #include "mappings/variable_neg.h"
