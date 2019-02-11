@@ -354,7 +354,9 @@ minionsrclist = ['minion/BuildVariables.cpp',
 'minion/inputfile_parse/inputfile_parse.cpp',
 'minion/dump_state.cpp',
 'minion/parallel.cpp',
-'minion/search_dump.cpp']
+'minion/search_dump.cpp',
+'minion/search_dump_sql.cpp',
+]
 
 
 

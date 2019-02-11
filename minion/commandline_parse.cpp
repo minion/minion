@@ -334,6 +334,12 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       }
       getOptions().dumptreeobj = makeDumpTreeJson(outfile);
     }
+    else if(command == string("-dumptreesql")) {
+      if(getOptions().dumptree) {
+        output_fatal_error("Only one tree dumper active at once");
+      }
+      getOptions().dumptreeobj = makeDumpTreeSQL();
+    }
     /** @help switches;-nodelimit Description
     To stop search after N nodes, do
 

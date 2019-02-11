@@ -27,7 +27,7 @@ public:
     streamer.closeMap();
   }
 
-  void branch(const std::string& varname, DomainInt val, bool isLeft)
+  void branch(long long nodeCount, const std::string& varname, DomainInt val, bool isLeft)
   {
     if(isLeft) {
       streamer.mapElement("branchVar", varname);

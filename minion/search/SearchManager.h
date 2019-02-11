@@ -33,7 +33,7 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
     cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
   }
   if(getOptions().dumptreeobj) {
-    getOptions().dumptreeobj->branch(getBaseVarName(var), val, equal);
+    getOptions().dumptreeobj->branch(getState().getNodeCount(), getBaseVarName(var), val, equal);
   }
 }
 
