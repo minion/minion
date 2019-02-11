@@ -32,15 +32,8 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
   if(getOptions().dumptree) {
     cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
   }
-  if(getOptions().dumptreejson.isActive()) {
-    if(equal) {
-      getOptions().dumptreejson.mapElement("branchVar", getBaseVarName(var));
-      getOptions().dumptreejson.mapElement("branchVal", val);
-      getOptions().dumptreejson.openMapWithKey("left");
-    }
-    else {
-          getOptions().dumptreejson.openMapWithKey("right");
-    }
+  if(getOptions().dumptreeobj) {
+    getOptions().dumptreeobj->branch(getBaseVarName(var), val, equal);
   }
 }
 

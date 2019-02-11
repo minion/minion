@@ -29,6 +29,8 @@
 
 #include "memory_management/GenericBacktracker.h"
 
+#include "search_dump.hpp"
+
 // Some advanced definitions, we don't actually need to know anything about
 // these
 // types for SearchState, simply that they exist.
@@ -285,9 +287,8 @@ public:
 
   /// Denotes if the search tree should be printed.
   bool dumptree;
-  /// Store the current json search tree (and isActive if we should
-  /// output it
-  JSONStreamer dumptreejson;
+  /// Store the current search tree (if a non-zero pointer)
+  std::shared_ptr<SearchDumper> dumptreeobj;
   /// Gives the solutions which should be found.
   /// -1 denotes finding all solutions.
   long long sollimit;
@@ -361,7 +362,6 @@ public:
       : silent(false),
         printonlyoptimal(false),
         dumptree(false),
-        dumptreejson(),
         sollimit(1),
 #ifdef NO_DEBUG
         nocheck(true),

@@ -337,13 +337,8 @@ void inline standard_deal_with_solution() {
 void inline maybe_print_node(bool isSolution = false) {
   if(getOptions().dumptree)
     cout << "Node: " << getState().getNodeCount() << "," << get_dom_as_string(getVars().getAllVars()) << endl;
-  if(getOptions().dumptreejson.isActive()) {
-    getOptions().dumptreejson.mapElement("Node", getState().getNodeCount());
-    getOptions().dumptreejson.mapElement("Domains", get_dom_as_json(getVars().getAllVars()));
-    getOptions().dumptreejson.newline();
-    if(isSolution) {
-      getOptions().dumptreejson.mapElement("solution", 1);
-    }
+  if(getOptions().dumptreeobj) {
+    getOptions().dumptreeobj->output_node(getState().getNodeCount(), getVars().getAllVars(), isSolution);
   }
 }
 
@@ -351,18 +346,16 @@ void inline maybe_print_backtrack() {
   // used to print "bt" usually
   if(getOptions().dumptree)
     cout << "SearchAction: bt" << endl;
-  if(getOptions().dumptreejson.isActive()) {
-    getOptions().dumptreejson.closeMap();
-  }
+  if(getOptions().dumptreeobj)
+    getOptions().dumptreeobj->backtrack();
 }
 
 // This is a seperate method, as we don't print right backtracks
 // in dumptree, for historical reasons
 void inline maybe_print_right_backtrack() {
   // used to print "bt" usually
-  if(getOptions().dumptreejson.isActive()) {
-    getOptions().dumptreejson.closeMap();
-  }
+  if(getOptions().dumptreeobj)
+    getOptions().dumptreeobj->backtrack();
 }
 
 void inline initalise_search() {

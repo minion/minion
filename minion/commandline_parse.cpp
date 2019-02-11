@@ -84,6 +84,7 @@ Current orders are, ascend, descend and random.
 
 #include "commandline_parse.h"
 #include "search/nhConfig.h"
+#include "search_dump.hpp"
 
 #define INCREMENT_i(flag)                                                                          \
   {                                                                                                \
@@ -324,14 +325,14 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     */
     else if(command == string("-dumptreejson")) {
       INCREMENT_i(-dumptreejson);
-      if(getOptions().dumptreejson.isActive()) {
-        output_fatal_error("Only pass -dumptreejson at most once!");
+      if(getOptions().dumptree) {
+        output_fatal_error("Only one tree dumper active at once");
       }
       std::ostream* outfile = new std::ofstream(argv[i]);
       if(!outfile || !(*outfile)) {
         output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
       }
-      getOptions().dumptreejson = JSONStreamer(outfile);
+      getOptions().dumptreeobj = makeDumpTreeJson(outfile);
     }
     /** @help switches;-nodelimit Description
     To stop search after N nodes, do
