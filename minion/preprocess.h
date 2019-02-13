@@ -234,21 +234,16 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
     
     std::vector<std::pair<int,int>>& assignments=c->assignments;
     
-    std::vector<std::set<int>> edges;   //  mutexes: map from 2*var+val to set of same. Each mutex is inserted in both directions.
-    edges.resize(listbools.size()*2);
+    std::vector<int> listallpairs; 
     
-    bool directOutput=true;
-    
-    if(directOutput) {
-        std::cout << "BOOLNAMES ";
-        for(int i=0; i<listbools.size(); i++) {
-            std::cout << getNameFromVar(listbools[i]);
-            if(i<listbools.size()-1) {
-                std::cout << " ";
-            }
+    std::cout << "BOOLNAMES ";
+    for(int i=0; i<listbools.size(); i++) {
+        std::cout << getNameFromVar(listbools[i]);
+        if(i<listbools.size()-1) {
+            std::cout << " ";
         }
-        std::cout << std::endl;
     }
+    std::cout << std::endl;
     
     for(SysInt i = 0; i < (SysInt)listbools.size(); ++i) {
         Var& var = listbools[i];
@@ -262,14 +257,8 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         
         string vname1=getNameFromVar(var);
         for(int j=0; j<assignments.size(); j++) {
-            if(directOutput) {
-                //std::cout << "AMO " << vname1 << " " << 0 << " " << getNameFromVar(listbools[assignments[j].first]) << " " << (1-assignments[j].second) << std::endl;
-                std::cout << "AMO " << (-i-1) << " " << ( (assignments[j].second==1)?(-assignments[j].first-1):(assignments[j].first+1) ) << std::endl;
-            }
-            else {
-                edges[2*i+0].insert(2*assignments[j].first+(1-assignments[j].second));
-                edges[2*assignments[j].first+(1-assignments[j].second)].insert(2*i+0);
-            }
+            listallpairs.push_back(-i-1);
+            listallpairs.push_back( (assignments[j].second==1)?(-assignments[j].first-1):(assignments[j].first+1) );
         }
         assignments.clear();
         
@@ -284,14 +273,8 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         prop(vararray);
         
         for(int j=0; j<assignments.size(); j++) {
-            if(directOutput) {
-                //std::cout << "AMO " << vname1 << " " << 1 << " " << getNameFromVar(listbools[assignments[j].first]) << " " << (1-assignments[j].second) << std::endl;
-                std::cout << "AMO " << i+1 << " " << ( (assignments[j].second==1)?(-assignments[j].first-1):(assignments[j].first+1) ) << std::endl;
-            }
-            else {
-                edges[2*i+1].insert(2*assignments[j].first+(1-assignments[j].second));
-                edges[2*assignments[j].first+(1-assignments[j].second)].insert(2*i+1);
-            }
+            listallpairs.push_back(i+1);
+            listallpairs.push_back((assignments[j].second==1)?(-assignments[j].first-1):(assignments[j].first+1));
         }
         assignments.clear();
         
@@ -301,72 +284,14 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         Controller::world_pop();
     }
     
-    if(directOutput) {
-        return;
-    }
-    
-    //  Pack into clique cover for the transfer to SR. 
-    //  Clique cover must include each edge at least once. 
-    //  marks edges as used once they are in some clique, but the same edge can be used again. 
-    std::set<std::pair<int,int>> edgesUsed;
-    
-    for(int idx1 = 0; idx1 < (int)listbools.size()*2; idx1++) {
-        // Iterate through all edges involving idx1. 
-        std::set<int>& a=edges[idx1];
-        
-        for(auto it=a.begin(); it!=a.end(); ++it) {
-            int idx2=*it;
-            
-            if( edgesUsed.find(make_pair(idx1, idx2))==edgesUsed.end()) {
-                // Edge idx1, idx2 is the starting point of the clique
-                
-                std::vector<int> clique;
-                clique.push_back(idx1);
-                clique.push_back(idx2);
-                
-                //  Go through rest of indices adjacent to idx1. 
-                for(auto it2=std::next(it); it2!=a.end(); ++it2) {
-                    int idx3=*it2;
-                    
-                    bool newedgeseen=false;    //  Only add idx3 if it allows us to include a previously unseen edge into the clique.
-                    bool connected=true;
-                    for(int i=0; i<clique.size(); i++) {
-                        if(edges[clique[i]].find(idx3)!=edges[clique[i]].end()) {
-                            if( edgesUsed.find(make_pair(clique[i], idx3))==edgesUsed.end()) {
-                                newedgeseen=true;
-                            }
-                        }
-                        else {
-                            connected=false;
-                            break;
-                        }
-                    }
-                    
-                    if(connected && newedgeseen) {
-                        clique.push_back(idx3);
-                    }
-                }
-                
-                //  Add all edges covered by this clique into edgesUsed.
-                for(int i=0; i<clique.size(); i++) {
-                    for(int j=i+1; j<clique.size(); j++) {
-                        edgesUsed.insert(make_pair(clique[i], clique[j]));
-                        edgesUsed.insert(make_pair(clique[j], clique[i]));
-                    }
-                }
-                
-                //  Dump it.
-                std::cout << "AMO ";
-                for(int i=0; i<clique.size(); i++) {
-                    std::cout << clique[i];
-                    if(i<clique.size()-1) {
-                        std::cout << " ";
-                    }
-                }
-                std::cout << std::endl;
-            }
+    std::cout << "AMO " << listallpairs.size()/2 << " ";
+    for(int i=0; i<listallpairs.size(); i++) {
+        std::cout << listallpairs[i];
+        if(i<listallpairs.size()-1) {
+            std::cout << " ";
         }
     }
+    std::cout << std::endl;
 }
 
 struct PropagateGAC {
