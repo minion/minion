@@ -13,6 +13,9 @@ public:
   DumpTreeJson(std::ostream* o) : streamer(o)
   { }
 
+  void initial_variables(const std::vector<AnyVarRef>& vars)
+  { }
+
   void output_node(long long nodeCount, const std::vector<AnyVarRef>& vars, bool isSolution)
   {
     streamer.mapElement("Node", getState().getNodeCount());

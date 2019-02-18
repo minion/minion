@@ -63,6 +63,9 @@ void BuildCSP(CSPInstance& instance) {
   for(UnsignedSysInt i = 0; i < instance.print_matrix.size(); ++i)
     print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(instance.print_matrix[i]));
 
+  if(getOptions().dumptreeobj) {
+    getOptions().dumptreeobj->initial_variables(getVars().getAllVars());
+  }
   // Impose Constraints
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
       it != instance.constraints.end(); it++) {
