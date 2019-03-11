@@ -203,7 +203,7 @@ struct MDDC : public AbstractConstraint {
 
     gacvalues.resize(vars.size());
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
+      gacvalues[i].initialise(vars[i].initialMin(), vars[i].initialMax());
     }
   }
 
@@ -345,7 +345,7 @@ struct MDDC : public AbstractConstraint {
 
           curnode->type = 0; // make it an internal node.
 
-          for(DomainInt val = vars[i].getInitialMin(); val <= vars[i].getInitialMax(); val++) {
+          for(DomainInt val = vars[i].initialMin(); val <= vars[i].initialMax(); val++) {
             if(val == tupval) {
               // Make the next node in the tuple.
               newnode = new MDDNode(curnode, 0);
@@ -608,7 +608,7 @@ struct MDDC : public AbstractConstraint {
 
     // Prune the domains.
     for(SysInt var = 0; var < delta; var++) {
-      for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+      for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
         if(!gacvalues[var].in(val)) {
           vars[var].removeFromDomain(val);
         }
@@ -659,7 +659,7 @@ struct MDDC : public AbstractConstraint {
         if(returnvalue) {
           res = true;
           gacvalues[level].insert(val);
-          if(level + 1 == delta && gacvalues[level].size == vars[level].getDomSize()) {
+          if(level + 1 == delta && gacvalues[level].size == vars[level].domSize()) {
             delta = level;
             break; // for k loop.
           }

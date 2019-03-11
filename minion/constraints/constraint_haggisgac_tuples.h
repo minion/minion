@@ -57,10 +57,10 @@ struct HaggisGACTuples {
     tuple_list_cpy.resize(vars.size());
     for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
       SysInt domsize =
-          checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
+          checked_cast<SysInt>(vars[var].initialMax() - vars[var].initialMin() + 1);
       tuple_list_cpy[var].resize(domsize);
 
-      for(DomainInt val = vars[var].getInitialMin(); val <= vars[var].getInitialMax(); val++) {
+      for(DomainInt val = vars[var].initialMin(); val <= vars[var].initialMax(); val++) {
         // get short supports relevant to var,val.
         for(SysInt i = 0; i < (SysInt)shortsupports.size(); i++) {
           bool varin = false;
@@ -80,7 +80,7 @@ struct HaggisGACTuples {
           if(!varin || valmatches) {
             // If the support doesn't include the var, or it
             // does include var,val then add it to the list.
-            tuple_list_cpy[var][checked_cast<SysInt>(val - vars[var].getInitialMin())].push_back(
+            tuple_list_cpy[var][checked_cast<SysInt>(val - vars[var].initialMin())].push_back(
                 shortsupports[i]);
           }
         }
@@ -94,7 +94,7 @@ inline HaggisGACTuples* ShortTupleList::getHaggisData(const Vars& vars) {
   vector<pair<DomainInt, DomainInt>> doms;
 
   for(SysInt i = 0; i < (SysInt)vars.size(); ++i)
-    doms.push_back(std::make_pair(vars[i].getInitialMin(), vars[i].getInitialMax()));
+    doms.push_back(std::make_pair(vars[i].initialMin(), vars[i].initialMax()));
 
   if(hgt.count(doms) == 0) {
     hgt[doms] = new HaggisGACTuples(vars, this);

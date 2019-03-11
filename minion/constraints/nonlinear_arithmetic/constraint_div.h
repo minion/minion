@@ -259,9 +259,9 @@ struct DivConstraint : public AbstractConstraint {
       }
     }
 
-    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+    for(DomainInt v1 = var1.min(); v1 <= var1.max(); ++v1) {
       if(var1.inDomain(v1)) {
-        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
+        for(DomainInt v2 = var2.min(); v2 <= var2.max(); ++v2) {
           if(v2 != 0 && var2.inDomain(v2) && var3.inDomain(do_div<undef>(v1, v2))) {
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));

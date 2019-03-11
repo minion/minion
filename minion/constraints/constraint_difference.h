@@ -71,10 +71,10 @@ struct DifferenceConstraint : public AbstractConstraint {
       for(DomainInt i = low + 1; i < high; ++i)
         v.removeFromDomain(i);
     } else {
-      if(v.getMax() < high)
+      if(v.max() < high)
         v.setMax(low + 1);
 
-      if(v.getMin() > low)
+      if(v.min() > low)
         v.setMin(high - 1);
     }
   }
@@ -82,42 +82,42 @@ struct DifferenceConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt, DomainDelta) {
     PROP_INFO_ADDONE(Difference);
 
-    DomainInt var1_min = var1.getMin();
-    DomainInt var1_max = var1.getMax();
-    DomainInt var2_min = var2.getMin();
-    DomainInt var2_max = var2.getMax();
+    DomainInt var1_min = var1.min();
+    DomainInt var1_max = var1.max();
+    DomainInt var2_min = var2.min();
+    DomainInt var2_max = var2.max();
 
-    P(var1_min << var1_max << var2_min << var2_max << var3.getMin() << var3.getMax());
+    P(var1_min << var1_max << var2_min << var2_max << var3.min() << var3.max());
 
     var3.setMax(max(var2_max, var1_max) - min(var1_min, var2_min));
 
-    var1.setMin(var2.getMin() - var3.getMax());
-    var2.setMin(var1.getMin() - var3.getMax());
-    var1.setMax(var2.getMax() + var3.getMax());
-    P(var2.getMax());
-    var2.setMax(var1.getMax() + var3.getMax());
-    P(var2.getMax());
+    var1.setMin(var2.min() - var3.max());
+    var2.setMin(var1.min() - var3.max());
+    var1.setMax(var2.max() + var3.max());
+    P(var2.max());
+    var2.setMax(var1.max() + var3.max());
+    P(var2.max());
 
     if(var1_max < var2_min) {
       var3.setMin(var2_min - var1_max);
-      var2.setMin(var1.getMin() + var3.getMin());
-      var1.setMax(var2.getMax() - var3.getMin());
+      var2.setMin(var1.min() + var3.min());
+      var1.setMax(var2.max() - var3.min());
     }
 
     if(var2_max < var1_min) {
       var3.setMin(var1_min - var2_max);
-      var1.setMin(var2.getMin() + var3.getMin());
-      P(var2.getMax());
-      var2.setMax(var1.getMax() - var3.getMin());
-      P(var2.getMax());
+      var1.setMin(var2.min() + var3.min());
+      P(var2.max());
+      var2.setMax(var1.max() - var3.min());
+      P(var2.max());
     }
 
-    if(var1_max - var1_min < var3.getMin()) {
-      remove_range(var1_max - var3.getMin(), var1_min + var3.getMin(), var2);
+    if(var1_max - var1_min < var3.min()) {
+      remove_range(var1_max - var3.min(), var1_min + var3.min(), var2);
     }
 
-    if(var2_max - var2_min < var3.getMin()) {
-      remove_range(var2_max - var3.getMin(), var2_min + var3.getMin(), var1);
+    if(var2_max - var2_min < var3.min()) {
+      remove_range(var2_max - var3.min(), var2_min + var3.min(), var1);
     }
   }
 
@@ -145,9 +145,9 @@ struct DifferenceConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    for(DomainInt i = var1.getMin(); i <= var1.getMax(); ++i) {
+    for(DomainInt i = var1.min(); i <= var1.max(); ++i) {
       if(var1.inDomain(i)) {
-        for(DomainInt j = var2.getMin(); j <= var2.getMax(); ++j) {
+        for(DomainInt j = var2.min(); j <= var2.max(); ++j) {
           if(var2.inDomain(j) && var3.inDomain(abs(i - j))) {
             assignment.push_back(make_pair(0, i));
             assignment.push_back(make_pair(1, j));

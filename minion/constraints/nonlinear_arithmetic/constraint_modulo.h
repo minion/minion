@@ -183,7 +183,7 @@ struct ModConstraint : public AbstractConstraint {
         }
       } else {
         std::set<DomainInt> vals;
-        for(DomainInt d1 = var1.getMin(); d1 <= var1.getMax(); ++d1) {
+        for(DomainInt d1 = var1.min(); d1 <= var1.max(); ++d1) {
           if(var1.inDomain(d1)) {
             DomainInt modval = do_mod(d1, b2.min());
             if(!var3.inDomain(modval)) {
@@ -194,7 +194,7 @@ struct ModConstraint : public AbstractConstraint {
           }
         }
 
-        for(DomainInt d3 = var3.getMin(); d3 <= var3.getMax(); ++d3) {
+        for(DomainInt d3 = var3.min(); d3 <= var3.max(); ++d3) {
           if(vals.count(d3) == 0) {
             var3.removeFromDomain(d3);
           }
@@ -230,9 +230,9 @@ struct ModConstraint : public AbstractConstraint {
       }
     }
 
-    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+    for(DomainInt v1 = var1.min(); v1 <= var1.max(); ++v1) {
       if(var1.inDomain(v1)) {
-        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
+        for(DomainInt v2 = var2.min(); v2 <= var2.max(); ++v2) {
           if(v2 != 0 && var2.inDomain(v2) && var3.inDomain(do_mod(v1, v2))) {
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));

@@ -255,11 +255,11 @@ struct SparseBoundVarContainer {
     return upper_bound(d);
   }
 
-  DomainInt getInitialMin(SparseBoundVarRef_internal<BoundType> d) {
+  DomainInt initialMin(SparseBoundVarRef_internal<BoundType> d) {
     return get_domain_from_int(d.var_num).front();
   }
 
-  DomainInt getInitialMax(SparseBoundVarRef_internal<BoundType> d) {
+  DomainInt initialMax(SparseBoundVarRef_internal<BoundType> d) {
     return get_domain_from_int(d.var_num).back();
   }
 

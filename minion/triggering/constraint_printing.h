@@ -25,7 +25,7 @@ namespace ConOutput {
 template <typename T>
 string print_vars(const T& t) {
   if(t.isAssigned())
-    return tostring(t.getAssignedValue());
+    return tostring(t.assignedValue());
   else {
     vector<Mapper> m = t.getMapperStack();
     string prefix = "";
@@ -135,7 +135,7 @@ inline vector<DomainInt> filter_constants(T& vars) {
   vector<DomainInt> constants;
   for(size_t i = 0; i < vars.size(); ++i) {
     if(vars[i].isAssigned()) {
-      constants.push_back(vars[i].getAssignedValue());
+      constants.push_back(vars[i].assignedValue());
       vars.erase(vars.begin() + i);
       --i;
     }
@@ -152,7 +152,7 @@ inline void compress_arrays(string name, vector<AnyVarRef>& vars, AnyVarRef& res
 
     if(sum != 0) {
       if(result.isAssigned())
-        result = ConstantVar(result.getAssignedValue() - sum);
+        result = ConstantVar(result.assignedValue() - sum);
       else
         vars.push_back(ConstantVar(sum));
     }

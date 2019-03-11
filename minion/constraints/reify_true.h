@@ -60,7 +60,7 @@ struct reify_true : public ParentConstraint {
         rar_var(_rar_var),
         constraint_locked(false),
         full_propagate_called(false) {
-    CHECK(rar_var.getInitialMin() >= 0 && rar_var.getInitialMax() <= 1,
+    CHECK(rar_var.initialMin() >= 0 && rar_var.initialMax() <= 1,
           "reifyimply only works on Boolean variables");
   }
 
@@ -132,9 +132,9 @@ struct reify_true : public ParentConstraint {
   }
 
   void reify_var_pruned() {
-    if(!rar_var.isAssigned() || rar_var.getAssignedValue() == 0)
+    if(!rar_var.isAssigned() || rar_var.assignedValue() == 0)
       return;
-    D_ASSERT(rar_var.getAssignedValue() == 1);
+    D_ASSERT(rar_var.assignedValue() == 1);
     P("rarvar assigned to 1- Do full propagate");
     constraint_locked = true;
     getQueue().pushSpecialTrigger(this);
@@ -180,7 +180,7 @@ struct reify_true : public ParentConstraint {
 
     if(full_propagate_called) {
       P("Pass triggers to children");
-      D_ASSERT(rar_var.isAssigned() && rar_var.getAssignedValue() == 1);
+      D_ASSERT(rar_var.isAssigned() && rar_var.assignedValue() == 1);
       passDynTriggerToChild(trig, dd);
       // child_constraints[0]->propagateDynInt(trig);
     } else {
@@ -206,12 +206,12 @@ struct reify_true : public ParentConstraint {
     P("Full prop");
     D_ASSERT(!getState().isFailed());
     P(child_constraints[0]->constraint_name());
-    D_ASSERT(rar_var.getMin() >= 0);
-    D_ASSERT(rar_var.getMax() <= 1);
+    D_ASSERT(rar_var.min() >= 0);
+    D_ASSERT(rar_var.max() <= 1);
 
     moveTriggerInt(rar_var, reify_var_trigger(), LowerBound);
 
-    if(rar_var.isAssigned() && rar_var.getAssignedValue() == 1) {
+    if(rar_var.isAssigned() && rar_var.assignedValue() == 1) {
       child_constraints[0]->full_propagate();
       full_propagate_called = true;
       return;

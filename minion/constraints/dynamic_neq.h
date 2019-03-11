@@ -44,18 +44,18 @@ struct WatchNeqConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     if(var1.isAssigned() && var2.isAssigned() &&
-       var1.getAssignedValue() == var2.getAssignedValue()) {
+       var1.assignedValue() == var2.assignedValue()) {
       getState().setFailed(true);
       return;
     }
 
     if(var1.isAssigned()) {
-      var2.removeFromDomain(var1.getAssignedValue());
+      var2.removeFromDomain(var1.assignedValue());
       return;
     }
 
     if(var2.isAssigned()) {
-      var1.removeFromDomain(var2.getAssignedValue());
+      var1.removeFromDomain(var2.assignedValue());
       return;
     }
 
@@ -70,10 +70,10 @@ struct WatchNeqConstraint : public AbstractConstraint {
 
     if(dt == 0) {
       D_ASSERT(var1.isAssigned());
-      var2.removeFromDomain(var1.getAssignedValue());
+      var2.removeFromDomain(var1.assignedValue());
     } else {
       D_ASSERT(var2.isAssigned());
-      var1.removeFromDomain(var2.getAssignedValue());
+      var1.removeFromDomain(var2.assignedValue());
     }
   }
 
@@ -91,21 +91,21 @@ struct WatchNeqConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
+    if(var1.isAssigned() && var2.isAssigned() && var1.assignedValue() == var2.assignedValue())
       return false;
 
     if(var1.isAssigned()) {
-      assignment.push_back(make_pair(0, var1.getAssignedValue()));
-      if(var2.getMin() != var1.getAssignedValue())
-        assignment.push_back(make_pair(1, var2.getMin()));
+      assignment.push_back(make_pair(0, var1.assignedValue()));
+      if(var2.min() != var1.assignedValue())
+        assignment.push_back(make_pair(1, var2.min()));
       else
-        assignment.push_back(make_pair(1, var2.getMax()));
+        assignment.push_back(make_pair(1, var2.max()));
     } else {
-      assignment.push_back(make_pair(1, var2.getMin()));
-      if(var1.getMin() != var2.getMin())
-        assignment.push_back(make_pair(0, var1.getMin()));
+      assignment.push_back(make_pair(1, var2.min()));
+      if(var1.min() != var2.min())
+        assignment.push_back(make_pair(0, var1.min()));
       else
-        assignment.push_back(make_pair(0, var1.getMax()));
+        assignment.push_back(make_pair(0, var1.max()));
     }
     return true;
   }

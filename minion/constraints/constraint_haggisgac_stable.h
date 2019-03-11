@@ -249,7 +249,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
       SysInt var = literalsScratch[i].first;
       DomainInt valoriginal = literalsScratch[i].second;
       const SysInt lit =
-          checked_cast<SysInt>(firstLiteralPerVar[var] + valoriginal - vars[var].getInitialMin());
+          checked_cast<SysInt>(firstLiteralPerVar[var] + valoriginal - vars[var].initialMin());
       supCells[i].literal = lit;
     }
     // now have enough supCells, and sup and literal of each is correct

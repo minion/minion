@@ -297,7 +297,7 @@ struct CTupleSTR : public AbstractConstraint {
 
     gacvalues.resize(vars.size());
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
+      gacvalues[i].initialise(vars[i].initialMin(), vars[i].initialMax());
     }
 
     std::random_shuffle(tupindices.begin(), tupindices.end());
@@ -346,7 +346,7 @@ struct CTupleSTR : public AbstractConstraint {
   }
 
   virtual bool check_assignment(DomainInt* v, SysInt v_size) {
-    const vector<set<DomainInt>>& doms = shortTupleList->getInitialDomains();
+    const vector<set<DomainInt>>& doms = shortTupleList->initialDomains();
     if(doms.size() > 0) {
       for(SysInt i = 0; i < v_size; ++i) {
         if(doms[i].count(v[i]) == 0)
@@ -565,7 +565,7 @@ struct CTupleSTR : public AbstractConstraint {
             if(!gacvalues[var].in(tau[var][k]) && vars[var].inDomain(tau[var][k])) {
               gacvalues[var].insert(tau[var][k]);
 
-              if(gacvalues[var].size == vars[var].getDomSize() && ssup.in(var)) {
+              if(gacvalues[var].size == vars[var].domSize() && ssup.in(var)) {
                 // cout << "Filled var " << var;
                 ssup.remove(var);
                 j--;
@@ -581,7 +581,7 @@ struct CTupleSTR : public AbstractConstraint {
     // Prune the domains.
     for(SysInt j = 0; j < ssup.size; j++) {
       SysInt var = ssup.vals[j];
-      for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+      for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
         if(!gacvalues[var].in(val)) {
           vars[var].removeFromDomain(val);
         }

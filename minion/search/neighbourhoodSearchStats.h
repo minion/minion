@@ -119,7 +119,7 @@ struct NeighbourhoodSearchStats {
       // save assignment
       for(auto& varValuePair : bestCompleteSolutionAssignment) {
         assert(varValuePair.first.isAssigned());
-        varValuePair.second = varValuePair.first.getAssignedValue();
+        varValuePair.second = varValuePair.first.assignedValue();
       }
     }
   }
@@ -135,13 +135,13 @@ struct NeighbourhoodSearchStats {
   inline void notifyStartClimb() {
     numberHillClimbs += 1;
     hillClimberStartTime = getTotalTimeTaken();
-    nhLog("Start climb from value " << getState().getOptimiseVar()->getMin()
+    nhLog("Start climb from value " << getState().getOptimiseVar()->min()
                                     << ", number iterations = " << numberIterations);
   }
 
   inline void notifyEndClimb() {
     totalHillClimberTime += (getTotalTimeTaken() - hillClimberStartTime);
-    nhLog("End climb at value " << getState().getOptimiseVar()->getMin()
+    nhLog("End climb at value " << getState().getOptimiseVar()->min()
                                 << ", number iterations = " << numberIterations);
   }
 

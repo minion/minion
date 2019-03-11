@@ -471,13 +471,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       // Also check if bounds are well formed.
       for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
         if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
-          if(capacity_array[i].getMax() < 0 || capacity_array[i].getMin() > numvars) {
+          if(capacity_array[i].max() < 0 || capacity_array[i].min() > numvars) {
             return false;
           }
-          lower[val_array[i] - dom_min] = checked_cast<SysInt>(capacity_array[i].getMin());
-          upper[val_array[i] - dom_min] = checked_cast<SysInt>(capacity_array[i].getMax());
+          lower[val_array[i] - dom_min] = checked_cast<SysInt>(capacity_array[i].min());
+          upper[val_array[i] - dom_min] = checked_cast<SysInt>(capacity_array[i].max());
         } else {
-          if(capacity_array[i].getMin() > 0 || capacity_array[i].getMax() < 0) {
+          if(capacity_array[i].min() > 0 || capacity_array[i].max() < 0) {
             return false;
           }
         }
@@ -535,8 +535,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           assignment.push_back(make_pair(i + numvars, occ));
         } else {
           // push upper and lower bounds.
-          assignment.push_back(make_pair(i + numvars, capacity_array[i].getMin()));
-          assignment.push_back(make_pair(i + numvars, capacity_array[i].getMax()));
+          assignment.push_back(make_pair(i + numvars, capacity_array[i].min()));
+          assignment.push_back(make_pair(i + numvars, capacity_array[i].max()));
         }
       }
       return true;
@@ -569,8 +569,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
         lower[val_array[i] - dom_min] =
-            capacity_array[i].getMin(); // doesn't work with duplicate values in list.
-        upper[val_array[i] - dom_min] = capacity_array[i].getMax();
+            capacity_array[i].min(); // doesn't work with duplicate values in list.
+        upper[val_array[i] - dom_min] = capacity_array[i].max();
       }
     }
 
@@ -623,9 +623,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // populate lower and upper
     for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
-        lower[val_array[i] - dom_min] = capacity_array[i].getMin(); // not quite right in the
+        lower[val_array[i] - dom_min] = capacity_array[i].min(); // not quite right in the
                                                                     // presence of duplicate values.
-        upper[val_array[i] - dom_min] = capacity_array[i].getMax();
+        upper[val_array[i] - dom_min] = capacity_array[i].max();
       }
     }
     GCCPRINT("lower:" << lower);
@@ -649,7 +649,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // fill in the blanks in the matching
     for(SysInt i = 0; i < numvars; i++) {
       if(lbcmatching[i] == dom_min - 1) {
-        DomainInt minval = var_array[i].getMin();
+        DomainInt minval = var_array[i].min();
         lbcmatching[i] = minval;
         lbcusage[minval - dom_min]++;
       }
@@ -767,8 +767,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           SysInt validx = vals_in_scc[i] - dom_min;
           SysInt capi = val_to_cap_index[validx];
           if(capi > -1) {
-            lower[validx] = checked_cast<SysInt>(capacity_array[capi].getMin());
-            upper[validx] = checked_cast<SysInt>(capacity_array[capi].getMax());
+            lower[validx] = checked_cast<SysInt>(capacity_array[capi].min());
+            upper[validx] = checked_cast<SysInt>(capacity_array[capi].max());
           }
         }
 
@@ -1022,8 +1022,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
             if(curnode < numvars) { // it's a variable
 // follow all edges other than the matching edge.
 #if !UseIncGraph
-              for(DomainInt valtoqueue = var_array[curnode].getMin();
-                  valtoqueue <= var_array[curnode].getMax(); valtoqueue++) {
+              for(DomainInt valtoqueue = var_array[curnode].min();
+                  valtoqueue <= var_array[curnode].max(); valtoqueue++) {
 #else
               for(SysInt valtoqueuei = 0; valtoqueuei < adjlistlength[curnode]; valtoqueuei++) {
                 SysInt valtoqueue = adjlist[curnode][valtoqueuei];
@@ -1765,7 +1765,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       if(var_array[i].isAssigned()) {
-        DomainInt val = var_array[i].getAssignedValue();
+        DomainInt val = var_array[i].assignedValue();
         augpath[val - dom_min]++;
       }
     }
@@ -1801,7 +1801,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); i++) {
       SysInt var = vars_in_scc[i];
       if(var_array[var].isAssigned()) {
-        augpath[var_array[var].getAssignedValue() - dom_min]++;
+        augpath[var_array[var].assignedValue() - dom_min]++;
       }
     }
     // Set bounds
@@ -1842,7 +1842,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
       SysInt mincap = 0;
       for(SysInt vari = 0; vari < adjlistlength[val - dom_min + numvars]; vari++) {
         SysInt var = adjlist[val - dom_min + numvars][vari];
-        if(var_array[var].isAssigned() && var_array[var].getAssignedValue() == val)
+        if(var_array[var].isAssigned() && var_array[var].assignedValue() == val)
           mincap++;
       }
       capacity_array[i].setMin(mincap);
@@ -1882,7 +1882,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     SysInt newlb = bfsmatching_card_lowerbound(value, lower[value - dom_min]);
     GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
     SysInt validx = val_to_cap_index[value - dom_min];
-    if(newlb > capacity_array[validx].getMin()) {
+    if(newlb > capacity_array[validx].min()) {
       GCCPRINT("Improved lower bound " << newlb);
       capacity_array[validx].setMin(newlb);
       lower[value - dom_min] = newlb;
@@ -1892,7 +1892,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     SysInt newub = card_upperbound(value, upper[value - dom_min]);
     GCCPRINT("card_upperbound Returned " << newub);
 
-    if(newub < capacity_array[validx].getMax()) {
+    if(newub < capacity_array[validx].max()) {
       GCCPRINT("Improved upper bound " << newub);
       capacity_array[validx].setMax(newub);
       upper[value - dom_min] = newub;
@@ -1990,8 +1990,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
           if(curnode < numvars) { // it's a variable
 // follow all edges other than the matching edge.
 #if !UseIncGraph
-            for(DomainInt valtoqueue = var_array[curnode].getMin();
-                valtoqueue <= var_array[curnode].getMax(); valtoqueue++) {
+            for(DomainInt valtoqueue = var_array[curnode].min();
+                valtoqueue <= var_array[curnode].max(); valtoqueue++) {
 #else
             for(SysInt valtoqueuei = 0; valtoqueuei < adjlistlength[curnode]; valtoqueuei++) {
               SysInt valtoqueue = adjlist[curnode][valtoqueuei];

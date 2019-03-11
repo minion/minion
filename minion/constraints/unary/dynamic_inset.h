@@ -79,20 +79,20 @@ struct WatchInSetConstraint : public AbstractConstraint {
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());
     // This is basically lifted from "sparse SysInt bound vars"
-    vector<DomainInt>::iterator it_low = std::lower_bound(vals.begin(), vals.end(), var.getMin());
+    vector<DomainInt>::iterator it_low = std::lower_bound(vals.begin(), vals.end(), var.min());
     if(it_low == vals.end()) {
       getState().setFailed(true);
     } else {
       var.setMin(*it_low);
     }
 
-    vector<DomainInt>::iterator it_high = std::lower_bound(vals.begin(), vals.end(), var.getMax());
+    vector<DomainInt>::iterator it_high = std::lower_bound(vals.begin(), vals.end(), var.max());
     if(it_high == vals.end()) {
       var.setMax(*(it_high - 1)); // Wasn't this already done in full_propagate?
       return;
     }
 
-    if(*it_high == var.getMax())
+    if(*it_high == var.max())
       return;
 
     if(it_high == vals.begin()) {

@@ -53,8 +53,8 @@ struct WatchLessConstraint : public AbstractConstraint {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var2, 1, UpperBound);
 
-    var2.setMin(var1.getMin() + 1);
-    var1.setMax(var2.getMax() - 1);
+    var2.setMin(var1.min() + 1);
+    var1.setMax(var2.max() - 1);
   }
 
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
@@ -63,9 +63,9 @@ struct WatchLessConstraint : public AbstractConstraint {
     D_ASSERT(dt == 0 || dt == 1);
 
     if(dt == 0) {
-      var2.setMin(var1.getMin() + 1);
+      var2.setMin(var1.min() + 1);
     } else {
-      var1.setMax(var2.getMax() - 1);
+      var1.setMax(var2.max() - 1);
     }
   }
 
@@ -83,9 +83,9 @@ struct WatchLessConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    if(var1.getMin() < var2.getMax()) {
-      assignment.push_back(make_pair(0, var1.getMin()));
-      assignment.push_back(make_pair(1, var2.getMax()));
+    if(var1.min() < var2.max()) {
+      assignment.push_back(make_pair(0, var1.min()));
+      assignment.push_back(make_pair(1, var2.max()));
       return true;
     }
     return false;

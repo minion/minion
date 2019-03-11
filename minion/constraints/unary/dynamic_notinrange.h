@@ -66,12 +66,12 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     if(range_min > range_max)
       return;
 
-    if(var.getMax() <= range_max) {
+    if(var.max() <= range_max) {
       var.setMax(range_min - 1);
       return;
     }
 
-    if(var.getMin() >= range_min) {
+    if(var.min() >= range_min) {
       var.setMin(range_max + 1);
       return;
     }
@@ -89,12 +89,12 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     PROP_INFO_ADDONE(WatchNotInRange);
     D_ASSERT(var.isBound());
 
-    if(var.getMax() <= range_max) {
+    if(var.max() <= range_max) {
       var.setMax(range_min - 1);
       return;
     }
 
-    if(var.getMin() >= range_min) {
+    if(var.min() >= range_min) {
       var.setMin(range_max + 1);
       return;
     }
@@ -114,13 +114,13 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    if(var.getMin() < range_min || var.getMin() > range_max) {
-      assignment.push_back(make_pair(0, var.getMin()));
+    if(var.min() < range_min || var.min() > range_max) {
+      assignment.push_back(make_pair(0, var.min()));
       return true;
     }
 
-    if(var.getMax() < range_min || var.getMax() > range_max) {
-      assignment.push_back(make_pair(0, var.getMax()));
+    if(var.max() < range_min || var.max() > range_max) {
+      assignment.push_back(make_pair(0, var.max()));
       return true;
     }
     return false;

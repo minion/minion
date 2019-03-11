@@ -47,7 +47,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     BigInt accumulator = 0;
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       accumulator += checked_cast<SysInt>(
-          (DomainInt)max(abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin())));
+          (DomainInt)max(abs(var_array[i].initialMax()), abs(var_array[i].initialMin())));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
     }
     accumulator += checked_cast<SysInt>((DomainInt)abs(var_sum));
@@ -86,7 +86,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     typename VarArray::value_type* end_it = it + var_array.size();
     for(; it < end_it; ++it) {
       if(it->isAssigned()) {
-        if(it->getAssignedValue() == VarToCount)
+        if(it->assignedValue() == VarToCount)
           ++one_vars;
       } else {
         it->uncheckedAssign(1 - VarToCount);
@@ -99,8 +99,8 @@ struct BoolLessSumConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(BoolSum);
-    D_ASSERT(var_array[checked_cast<SysInt>(i)].getAssignedValue() == 0 ||
-             var_array[checked_cast<SysInt>(i)].getAssignedValue() == 1);
+    D_ASSERT(var_array[checked_cast<SysInt>(i)].assignedValue() == 0 ||
+             var_array[checked_cast<SysInt>(i)].assignedValue() == 1);
     SysInt c = count + 1;
     count = c;
     if(c == occ_count())
@@ -142,8 +142,8 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     {
       for(SysInt i = 0; i < v_size; ++i)
       {
-        assignment.push_back(make_pair(i, var_array[i].getMin()));
-        sum_value += var_array[i].getMin();
+        assignment.push_back(make_pair(i, var_array[i].min()));
+        sum_value += var_array[i].min();
       }
       return (sum_value <= var_sum);
     }
@@ -151,8 +151,8 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     {
       for(SysInt i = 0; i < v_size; ++i)
       {
-        assignment.push_back(make_pair(i, var_array[i].getMax()));
-        sum_value += var_array[i].getMax();
+        assignment.push_back(make_pair(i, var_array[i].max()));
+        sum_value += var_array[i].max();
       }
       return (sum_value >= var_sum);
     }

@@ -45,12 +45,12 @@ struct ShiftVar {
     return data.isAssigned();
   }
 
-  DomainInt getAssignedValue() const {
-    return data.getAssignedValue() + shift;
+  DomainInt assignedValue() const {
+    return data.assignedValue() + shift;
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return data.getAssignedValue() == i - shift;
+    return data.assignedValue() == i - shift;
   }
 
   BOOL inDomain(DomainInt i) const {
@@ -61,24 +61,24 @@ struct ShiftVar {
     return data.inDomain(i - shift);
   }
 
-  DomainInt getDomSize() const {
-    return data.getDomSize();
+  DomainInt domSize() const {
+    return data.domSize();
   }
 
-  DomainInt getMax() const {
-    return data.getMax() + shift;
+  DomainInt max() const {
+    return data.max() + shift;
   }
 
-  DomainInt getMin() const {
-    return data.getMin() + shift;
+  DomainInt min() const {
+    return data.min() + shift;
   }
 
-  DomainInt getInitialMax() const {
-    return data.getInitialMax() + shift;
+  DomainInt initialMax() const {
+    return data.initialMax() + shift;
   }
 
-  DomainInt getInitialMin() const {
-    return data.getInitialMin() + shift;
+  DomainInt initialMin() const {
+    return data.initialMin() + shift;
   }
 
   void setMax(DomainInt i) {

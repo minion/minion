@@ -186,11 +186,11 @@ struct NeighbourhoodContainer {
     }
     for(auto nhIter2 = nhIter + 1; nhIter2 != neighbourhoods.end(); ++nhIter2) {
       if(nhIter2->type == Neighbourhood::STANDARD &&
-         nhIter2->deviation.getMax() > nhIter->deviation.getMax()) {
+         nhIter2->deviation.max() > nhIter->deviation.max()) {
         nhIter = nhIter2;
       }
     }
-    return checked_cast<int>(nhIter->deviation.getMax());
+    return checked_cast<int>(nhIter->deviation.max());
   }
 };
 

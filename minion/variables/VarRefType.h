@@ -51,7 +51,7 @@ struct VarRefType {
     return GET_CONTAINER().isAssigned(data);
   }
 
-  DomainInt getAssignedValue() const {
+  DomainInt assignedValue() const {
     return GET_CONTAINER().getAssignedValue(data);
   }
 
@@ -67,24 +67,24 @@ struct VarRefType {
     return GET_CONTAINER().inDomain_noBoundCheck(data, b);
   }
 
-  DomainInt getDomSize() const {
+  DomainInt domSize() const {
     return GET_CONTAINER().getDomSize(data);
   }
 
-  DomainInt getMax() const {
+  DomainInt max() const {
     return GET_CONTAINER().getMax(data);
   }
 
-  DomainInt getMin() const {
+  DomainInt min() const {
     return GET_CONTAINER().getMin(data);
   }
 
-  DomainInt getInitialMax() const {
-    return GET_CONTAINER().getInitialMax(data);
+  DomainInt initialMax() const {
+    return GET_CONTAINER().initialMax(data);
   }
 
-  DomainInt getInitialMin() const {
-    return GET_CONTAINER().getInitialMin(data);
+  DomainInt initialMin() const {
+    return GET_CONTAINER().initialMin(data);
   }
 
   void setMax(DomainInt i) {
@@ -175,12 +175,12 @@ struct QuickVarRefType {
     return data.isAssigned();
   }
 
-  DomainInt getAssignedValue() const {
-    return data.getAssignedValue();
+  DomainInt assignedValue() const {
+    return data.assignedValue();
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return data.isAssigned() && data.getAssignedValue() == i;
+    return data.isAssigned() && data.assignedValue() == i;
   }
   BOOL inDomain(DomainInt b) const {
     return data.inDomain(b);
@@ -190,24 +190,24 @@ struct QuickVarRefType {
     return data.inDomain_noBoundCheck(b);
   }
 
-  DomainInt getDomSize() const {
-    return data.getDomSize();
+  DomainInt domSize() const {
+    return data.domSize();
   }
 
-  DomainInt getMax() const {
-    return data.getMax();
+  DomainInt max() const {
+    return data.max();
   }
 
-  DomainInt getMin() const {
-    return data.getMin();
+  DomainInt min() const {
+    return data.min();
   }
 
-  DomainInt getInitialMax() const {
-    return data.getInitialMax();
+  DomainInt initialMax() const {
+    return data.initialMax();
   }
 
-  DomainInt getInitialMin() const {
-    return data.getInitialMin();
+  DomainInt initialMin() const {
+    return data.initialMin();
   }
 
   void setMax(DomainInt i) {

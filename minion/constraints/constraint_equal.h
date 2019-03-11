@@ -113,11 +113,11 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
 
   ReifiedEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2, BoolVarRef _var3)
       : var1(_var1), var2(_var2), var3(_var3) {
-    CHECK(var3.getInitialMin() >= 0 && var3.getInitialMax() <= 1,
+    CHECK(var3.initialMin() >= 0 && var3.initialMax() <= 1,
           "reify only works on Boolean variables");
-    // CHECK(var3.getInitialMin() < 0, "Reification variables must have domain
+    // CHECK(var3.initialMin() < 0, "Reification variables must have domain
     // within {0,1}");
-    // CHECK(var3.getInitialMax() > 1, "Reification variables must have domain
+    // CHECK(var3.initialMax() > 1, "Reification variables must have domain
     // within {0,1}");
   }
 
@@ -137,10 +137,10 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
   virtual void full_propagate() {
     trigger_setup();
 
-    D_ASSERT(var3.getMin() >= 0);
-    D_ASSERT(var3.getMax() <= 1);
+    D_ASSERT(var3.min() >= 0);
+    D_ASSERT(var3.max() <= 1);
     if(var3.isAssigned()) {
-      if(var3.getAssignedValue() == true_value())
+      if(var3.assignedValue() == true_value())
         eqprop();
       else {
         if(var1.isAssigned()) {
@@ -161,8 +161,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     case 0:
       // var1 lower bound has moved
       if(var3.isAssigned()) {
-        if(var3.getAssignedValue() == true_value()) {
-          var2.setMin(var1.getMin());
+        if(var3.assignedValue() == true_value()) {
+          var2.setMin(var1.min());
         } else { // not equal.
           diseq();
         }
@@ -174,8 +174,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     case 1:
       // var1 upper bound has moved.
       if(var3.isAssigned()) {
-        if(var3.getAssignedValue() == true_value()) {
-          var2.setMax(var1.getMax());
+        if(var3.assignedValue() == true_value()) {
+          var2.setMax(var1.max());
         } else { // not equal.
           diseq();
         }
@@ -187,8 +187,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     case 2:
       // var2 lower bound has moved.
       if(var3.isAssigned()) {
-        if(var3.getAssignedValue() == true_value()) {
-          var1.setMin(var2.getMin());
+        if(var3.assignedValue() == true_value()) {
+          var1.setMin(var2.min());
         } else {
           diseq();
         }
@@ -200,8 +200,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     case 3:
       // var2 upper bound has moved.
       if(var3.isAssigned()) {
-        if(var3.getAssignedValue() == true_value()) {
-          var1.setMax(var2.getMax());
+        if(var3.assignedValue() == true_value()) {
+          var1.setMax(var2.max());
         } else {
           diseq();
         }
@@ -211,7 +211,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       break;
 
     case 4:
-      DomainInt assigned_val = var3.getAssignedValue();
+      DomainInt assigned_val = var3.assignedValue();
       if(assigned_val == true_value()) {
         eqprop();
       } else if(assigned_val == false_value()) {
@@ -224,28 +224,28 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
   }
 
   inline void eqprop() {
-    var1.setMin(var2.getMin());
-    var1.setMax(var2.getMax());
-    var2.setMin(var1.getMin());
-    var2.setMax(var1.getMax());
+    var1.setMin(var2.min());
+    var1.setMax(var2.max());
+    var2.setMin(var1.min());
+    var2.setMax(var1.max());
   }
 
   inline void check() { // var1 or var2 has changed, so check
-    if(var1.getMax() < var2.getMin() || var1.getMin() > var2.getMax()) { // not equal
+    if(var1.max() < var2.min() || var1.min() > var2.max()) { // not equal
       var3.assign(false_value());
     }
     if(var1.isAssigned() && var2.isAssigned() &&
-       var1.getAssignedValue() == var2.getAssignedValue()) { // equal
+       var1.assignedValue() == var2.assignedValue()) { // equal
       var3.assign(true_value());
     }
   }
 
   inline void diseqvar1assigned() {
-    DomainInt remove_val = var1.getAssignedValue();
+    DomainInt remove_val = var1.assignedValue();
     if(var2.isBound()) {
-      if(var2.getMin() == remove_val)
+      if(var2.min() == remove_val)
         var2.setMin(remove_val + 1);
-      if(var2.getMax() == remove_val)
+      if(var2.max() == remove_val)
         var2.setMax(remove_val - 1);
     } else {
       var2.removeFromDomain(remove_val);
@@ -253,11 +253,11 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
   }
 
   inline void diseqvar2assigned() {
-    DomainInt remove_val = var2.getAssignedValue();
+    DomainInt remove_val = var2.assignedValue();
     if(var1.isBound()) {
-      if(var1.getMin() == remove_val)
+      if(var1.min() == remove_val)
         var1.setMin(remove_val + 1);
-      if(var1.getMax() == remove_val)
+      if(var1.max() == remove_val)
         var1.setMax(remove_val - 1);
     } else {
       var1.removeFromDomain(remove_val);
@@ -277,32 +277,32 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     bool hasTrue = var3.inDomain(true_value());
     // D_ASSERT(hasFalse || hasTrue); No longer true
     if(hasFalse) {
-      if(var1.getMin() != var2.getMax()) {
-        assignment.push_back(make_pair(0, var1.getMin()));
-        assignment.push_back(make_pair(1, var2.getMax()));
+      if(var1.min() != var2.max()) {
+        assignment.push_back(make_pair(0, var1.min()));
+        assignment.push_back(make_pair(1, var2.max()));
         assignment.push_back(make_pair(2, false_value()));
         return true;
       }
 
-      if(var1.getMax() != var2.getMin()) {
-        assignment.push_back(make_pair(0, var1.getMax()));
-        assignment.push_back(make_pair(1, var2.getMin()));
+      if(var1.max() != var2.min()) {
+        assignment.push_back(make_pair(0, var1.max()));
+        assignment.push_back(make_pair(1, var2.min()));
         assignment.push_back(make_pair(2, false_value()));
         return true;
       }
 
       D_ASSERT(var1.isAssigned() && var2.isAssigned());
-      D_ASSERT(var1.getAssignedValue() == var2.getAssignedValue());
+      D_ASSERT(var1.assignedValue() == var2.assignedValue());
       if(hasTrue) {
-        assignment.push_back(make_pair(0, var1.getAssignedValue()));
-        assignment.push_back(make_pair(1, var2.getAssignedValue()));
+        assignment.push_back(make_pair(0, var1.assignedValue()));
+        assignment.push_back(make_pair(1, var2.assignedValue()));
         assignment.push_back(make_pair(2, true_value()));
         return true;
       }
     }
     if(hasTrue) {
-      DomainInt dom_min = max(var1.getMin(), var2.getMin());
-      DomainInt dom_max = min(var1.getMax(), var2.getMax());
+      DomainInt dom_min = max(var1.min(), var2.min());
+      DomainInt dom_max = min(var1.max(), var2.max());
       for(DomainInt i = dom_min; i <= dom_max; ++i) {
         if(var1.inDomain(i) && var2.inDomain(i)) {
           assignment.push_back(make_pair(0, i));
@@ -351,46 +351,46 @@ struct NeqConstraintBinary : public AbstractConstraint {
   virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(BinaryNeq);
     if(prop_val == 1) {
-      DomainInt remove_val = var1.getAssignedValue();
+      DomainInt remove_val = var1.assignedValue();
       if(var2.isBound()) {
-        if(var2.getMin() == remove_val)
+        if(var2.min() == remove_val)
           var2.setMin(remove_val + 1);
-        if(var2.getMax() == remove_val)
+        if(var2.max() == remove_val)
           var2.setMax(remove_val - 1);
       } else {
         var2.removeFromDomain(remove_val);
       }
     } else if(prop_val == 3) { // ub moved var1
-      if(var2.isAssigned() && var2.getAssignedValue() == var1.getMax())
-        var1.setMax(var1.getMax() - 1);
+      if(var2.isAssigned() && var2.assignedValue() == var1.max())
+        var1.setMax(var1.max() - 1);
       if(var1.isAssigned()) {
         var1assigned();
       }
     } else if(prop_val == 4) { // lb moved var1
-      if(var2.isAssigned() && var2.getAssignedValue() == var1.getMin())
-        var1.setMin(var1.getMin() + 1);
+      if(var2.isAssigned() && var2.assignedValue() == var1.min())
+        var1.setMin(var1.min() + 1);
       if(var1.isAssigned()) {
         var1assigned();
       }
     } else if(prop_val == 5) { // ub moved var2
-      if(var1.isAssigned() && var1.getAssignedValue() == var2.getMax())
-        var2.setMax(var2.getMax() - 1);
+      if(var1.isAssigned() && var1.assignedValue() == var2.max())
+        var2.setMax(var2.max() - 1);
       if(var2.isAssigned()) {
         var2assigned();
       }
     } else if(prop_val == 0) { // lb moved var2
-      if(var1.isAssigned() && var1.getAssignedValue() == var2.getMin())
-        var2.setMin(var2.getMin() + 1);
+      if(var1.isAssigned() && var1.assignedValue() == var2.min())
+        var2.setMin(var2.min() + 1);
       if(var2.isAssigned()) {
         var2assigned();
       }
     } else {
       D_ASSERT(prop_val == 2);
-      DomainInt remove_val = var2.getAssignedValue();
+      DomainInt remove_val = var2.assignedValue();
       if(var1.isBound()) {
-        if(var1.getMin() == remove_val)
+        if(var1.min() == remove_val)
           var1.setMin(remove_val + 1);
-        if(var1.getMax() == remove_val)
+        if(var1.max() == remove_val)
           var1.setMax(remove_val - 1);
       } else {
         var1.removeFromDomain(remove_val);
@@ -399,11 +399,11 @@ struct NeqConstraintBinary : public AbstractConstraint {
   }
 
   inline void var1assigned() {
-    DomainInt remove_val = var1.getAssignedValue();
+    DomainInt remove_val = var1.assignedValue();
     if(var2.isBound()) {
-      if(var2.getMin() == remove_val)
+      if(var2.min() == remove_val)
         var2.setMin(remove_val + 1);
-      if(var2.getMax() == remove_val)
+      if(var2.max() == remove_val)
         var2.setMax(remove_val - 1);
     } else {
       var2.removeFromDomain(remove_val);
@@ -411,11 +411,11 @@ struct NeqConstraintBinary : public AbstractConstraint {
   }
 
   inline void var2assigned() {
-    DomainInt remove_val = var2.getAssignedValue();
+    DomainInt remove_val = var2.assignedValue();
     if(var1.isBound()) {
-      if(var1.getMin() == remove_val)
+      if(var1.min() == remove_val)
         var1.setMin(remove_val + 1);
-      if(var1.getMax() == remove_val)
+      if(var1.max() == remove_val)
         var1.setMax(remove_val - 1);
     } else {
       var1.removeFromDomain(remove_val);
@@ -442,22 +442,22 @@ struct NeqConstraintBinary : public AbstractConstraint {
     trigger_setup();
 
     if(var1.isAssigned()) {
-      DomainInt remove_val = var1.getAssignedValue();
+      DomainInt remove_val = var1.assignedValue();
       if(var2.isBound()) {
-        if(var2.getMin() == remove_val)
+        if(var2.min() == remove_val)
           var2.setMin(remove_val + 1);
-        if(var2.getMax() == remove_val)
+        if(var2.max() == remove_val)
           var2.setMax(remove_val - 1);
       } else {
         var2.removeFromDomain(remove_val);
       }
     }
     if(var2.isAssigned()) {
-      DomainInt remove_val = var2.getAssignedValue();
+      DomainInt remove_val = var2.assignedValue();
       if(var1.isBound()) {
-        if(var1.getMin() == remove_val)
+        if(var1.min() == remove_val)
           var1.setMin(remove_val + 1);
-        if(var1.getMax() == remove_val)
+        if(var1.max() == remove_val)
           var1.setMax(remove_val - 1);
       } else {
         var1.removeFromDomain(remove_val);
@@ -473,22 +473,22 @@ struct NeqConstraintBinary : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    D_ASSERT(var1.getMin() <= var1.getMax());
-    D_ASSERT(var2.getMin() <= var2.getMax());
-    if(var1.getMin() != var2.getMax()) {
-      assignment.push_back(make_pair(0, var1.getMin()));
-      assignment.push_back(make_pair(1, var2.getMax()));
+    D_ASSERT(var1.min() <= var1.max());
+    D_ASSERT(var2.min() <= var2.max());
+    if(var1.min() != var2.max()) {
+      assignment.push_back(make_pair(0, var1.min()));
+      assignment.push_back(make_pair(1, var2.max()));
       return true;
     }
 
-    if(var1.getMax() != var2.getMin()) {
-      assignment.push_back(make_pair(0, var1.getMax()));
-      assignment.push_back(make_pair(1, var2.getMin()));
+    if(var1.max() != var2.min()) {
+      assignment.push_back(make_pair(0, var1.max()));
+      assignment.push_back(make_pair(1, var2.min()));
       return true;
     }
 
     D_ASSERT(var1.isAssigned() && var2.isAssigned());
-    D_ASSERT(var1.getAssignedValue() == var2.getAssignedValue());
+    D_ASSERT(var1.assignedValue() == var2.assignedValue());
     return false;
   }
 
@@ -541,10 +541,10 @@ struct EqualConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(Equal);
     switch(checked_cast<SysInt>(i)) {
-    case 0: var2.setMax(var1.getMax()); return;
-    case 1: var2.setMin(var1.getMin()); return;
-    case 2: var1.setMax(var2.getMax()); return;
-    case 3: var1.setMin(var2.getMin()); return;
+    case 0: var2.setMax(var1.max()); return;
+    case 1: var2.setMin(var1.min()); return;
+    case 2: var1.setMax(var2.max()); return;
+    case 3: var1.setMin(var2.min()); return;
     }
   }
 
@@ -562,8 +562,8 @@ struct EqualConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt min_val = max(var1.getMin(), var2.getMin());
-    DomainInt max_val = min(var1.getMax(), var2.getMax());
+    DomainInt min_val = max(var1.min(), var2.min());
+    DomainInt max_val = min(var1.max(), var2.max());
 
     for(DomainInt i = min_val; i <= max_val; ++i) {
       if(var1.inDomain(i) && var2.inDomain(i)) {

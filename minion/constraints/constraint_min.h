@@ -69,9 +69,9 @@ struct MinConstraint : public AbstractConstraint {
       bool found_lesser_value = false;
       for(size_t i = 0; i < var_array.size(); ++i) {
         if(var_array[i].isAssigned() &&
-           min_var.getAssignedValue() == var_array[i].getAssignedValue())
+           min_var.assignedValue() == var_array[i].assignedValue())
           found_assigned_min = true;
-        if(var_array[i].getMin() < min_var.getMin())
+        if(var_array[i].min() < min_var.min())
           found_lesser_value = true;
       }
       if(found_assigned_min && !found_lesser_value)
@@ -111,17 +111,17 @@ struct MinConstraint : public AbstractConstraint {
     if(prop_val <= v_size) { // Lower Bound Changed
       // Had to add 1 to fix "0th array" problem.
       if(prop_val == v_size) {
-        DomainInt new_min = min_var.getMin();
+        DomainInt new_min = min_var.min();
         typename VarArray::iterator end = var_array.end();
         for(typename VarArray::iterator it = var_array.begin(); it < end; ++it)
           (*it).setMin(new_min);
       } else {
         typename VarArray::iterator it = var_array.begin();
         typename VarArray::iterator end = var_array.end();
-        DomainInt min = it->getMin();
+        DomainInt min = it->min();
         ++it;
         for(; it < end; ++it) {
-          DomainInt it_min = it->getMin();
+          DomainInt it_min = it->min();
           if(it_min < min)
             min = it_min;
         }
@@ -131,8 +131,8 @@ struct MinConstraint : public AbstractConstraint {
       prop_val -= (v_size + 1);
       if(prop_val == v_size) {
         typename VarArray::iterator it = var_array.begin();
-        DomainInt minvar_max = min_var.getMax();
-        while(it != var_array.end() && (*it).getMin() > minvar_max)
+        DomainInt minvar_max = min_var.max();
+        while(it != var_array.end() && (*it).min() > minvar_max)
           ++it;
         if(it == var_array.end()) {
           getState().setFailed(true);
@@ -141,14 +141,14 @@ struct MinConstraint : public AbstractConstraint {
         // Possibly this variable is the only one that can be the minimum
         typename VarArray::iterator it_copy(it);
         ++it;
-        while(it != var_array.end() && (*it).getMin() > minvar_max)
+        while(it != var_array.end() && (*it).min() > minvar_max)
           ++it;
         if(it != var_array.end()) { // No, another variable can be the minimum
           return;
         }
         it_copy->setMax(minvar_max);
       } else {
-        min_var.setMax(var_array[checked_cast<SysInt>(prop_val)].getMax());
+        min_var.setMax(var_array[checked_cast<SysInt>(prop_val)].max());
       }
     }
   }
@@ -178,7 +178,7 @@ struct MinConstraint : public AbstractConstraint {
 
   // Bah: This could be much better!
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    for(DomainInt i = min_var.getMin(); i <= min_var.getMax(); ++i) {
+    for(DomainInt i = min_var.min(); i <= min_var.max(); ++i) {
       if(min_var.inDomain(i)) {
         bool flag_domain = false;
         for(SysInt j = 0; j < (SysInt)var_array.size(); ++j) {
@@ -186,11 +186,11 @@ struct MinConstraint : public AbstractConstraint {
             flag_domain = true;
             assignment.push_back(make_pair(j, i));
           } else {
-            if(var_array[j].getMax() < i) {
+            if(var_array[j].max() < i) {
               return false;
             }
-            if(var_array[j].getInitialMin() < i)
-              assignment.push_back(make_pair(j, var_array[j].getMax()));
+            if(var_array[j].initialMin() < i)
+              assignment.push_back(make_pair(j, var_array[j].max()));
           }
         }
 

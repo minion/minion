@@ -74,14 +74,14 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     // lower loop
     SysInt lower_index = 0;
 
-    while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.getMin()) {
+    while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.min()) {
       var.setMin(vals[lower_index] + 1);
       lower_index++;
     }
 
     SysInt upper_index = (SysInt)vals.size() - 1;
 
-    while(upper_index > 0 && vals[upper_index] >= var.getMax()) {
+    while(upper_index > 0 && vals[upper_index] >= var.max()) {
       var.setMax(vals[upper_index] - 1);
       upper_index--;
     }
@@ -101,7 +101,7 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    for(DomainInt i = var.getMin(); i <= var.getMax(); ++i) {
+    for(DomainInt i = var.min(); i <= var.max(); ++i) {
       if(var.inDomain(i) && !binary_search(vals.begin(), vals.end(), i)) {
         assignment.push_back(make_pair(0, i));
         return true;

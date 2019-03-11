@@ -42,16 +42,16 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     BigInt accumulator = 0;
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       accumulator += checked_cast<SysInt>(
-          max(abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin())));
+          max(abs(var_array[i].initialMax()), abs(var_array[i].initialMin())));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
     }
     accumulator +=
-        checked_cast<SysInt>(max(abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin())));
+        checked_cast<SysInt>(max(abs(var_sum.initialMax()), abs(var_sum.initialMin())));
     CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
 
     no_negatives = true;
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if(var_array[i].getInitialMin() < 0) {
+      if(var_array[i].initialMin() < 0) {
         no_negatives = false;
         return;
       }
@@ -74,23 +74,23 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     SysInt v_size = var_array.size();
 
     if(no_negatives) {
-      DomainInt max_sum = var_sum.getMax();
+      DomainInt max_sum = var_sum.max();
       assignment.push_back(make_pair(v_size, max_sum));
       for(SysInt i = 0; i < v_size && sum_value <= max_sum; ++i) {
-        DomainInt min_val = var_array[i].getMin();
+        DomainInt min_val = var_array[i].min();
         assignment.push_back(make_pair(i, min_val));
         sum_value += min_val;
       }
       return (sum_value <= max_sum);
     } else {
       for(SysInt i = 0; i < v_size; ++i) {
-        assignment.push_back(make_pair(i, var_array[i].getMin()));
-        sum_value += var_array[i].getMin();
+        assignment.push_back(make_pair(i, var_array[i].min()));
+        sum_value += var_array[i].min();
       }
-      if(sum_value > var_sum.getMax())
+      if(sum_value > var_sum.max())
         return false;
       else
-        assignment.push_back(make_pair(v_size, var_sum.getMax()));
+        assignment.push_back(make_pair(v_size, var_sum.max()));
       return true;
     }
   }
@@ -99,15 +99,15 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
     for(UnsignedSysInt i = 0; i < size; ++i)
-      min_sum += var_array[i].getMin();
+      min_sum += var_array[i].min();
 
     if(prop_val != var_array.size()) {
       var_sum.setMin(min_sum);
     }
 
-    DomainInt slack = var_sum.getMax() - min_sum;
+    DomainInt slack = var_sum.max() - min_sum;
     for(UnsignedSysInt i = 0; i < size; ++i)
-      var_array[i].setMax(var_array[i].getMin() + slack);
+      var_array[i].setMax(var_array[i].min() + slack);
   }
 
   virtual void full_propagate() {

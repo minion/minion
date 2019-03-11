@@ -28,8 +28,8 @@
 template <typename T>
 DomainInt chooseVal(T& var, ValOrder vo) {
   switch(vo.type) {
-  case VALORDER_ASCEND: return var.getMin();
-  case VALORDER_DESCEND: return var.getMax();
+  case VALORDER_ASCEND: return var.min();
+  case VALORDER_DESCEND: return var.max();
 
   case VALORDER_RANDOM: {
     uniform_int_distribution<int> dist100(0, 100);
@@ -37,23 +37,23 @@ DomainInt chooseVal(T& var, ValOrder vo) {
     if(vo.bias != 0) {
       if(vo.bias > 0) {
         if(dist100(global_random_gen) <= vo.bias) {
-          return var.getMax();
+          return var.max();
         }
       } else {
         if(dist100(global_random_gen) <= -vo.bias) {
-          return var.getMin();
+          return var.min();
         }
       }
     }
     if(var.isBound()) {
       switch(dist2(global_random_gen)) {
-      case 0: return var.getMin();
-      case 1: return var.getMax();
+      case 0: return var.min();
+      case 1: return var.max();
       default: abort();
       }
     }
-    DomainInt min_val = var.getMin();
-    DomainInt max_val = var.getMax();
+    DomainInt min_val = var.min();
+    DomainInt max_val = var.max();
     uniform_int_distribution<int> distdom(0, checked_cast<SysInt>(max_val - min_val));
     DomainInt val = distdom(global_random_gen) + min_val;
     D_ASSERT(val >= min_val);
@@ -228,8 +228,8 @@ struct SDFBranch : public VariableOrder {
     DomainInt dom_size = DomainInt_Max;
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt maxval = var_order[i].getMax();
-      DomainInt minval = var_order[i].getMin();
+      DomainInt maxval = var_order[i].max();
+      DomainInt minval = var_order[i].min();
 
       if((maxval != minval) && ((maxval - minval) < dom_size)) {
         dom_size = maxval - minval;
@@ -366,7 +366,7 @@ struct DomOverWdegBranch : VariableOrder {
         best = i;
         anyUnassigned = true;
       }
-      const SysInt dom_size_approx = checked_cast<SysInt>(v.getMax() - v.getMin() + 1);
+      const SysInt dom_size_approx = checked_cast<SysInt>(v.max() - v.min() + 1);
       DomainInt base_wdeg = v.getBaseWdeg();
       // cout << "basewdeg=" << base_wdeg << endl;
       if((float)dom_size_approx / checked_cast<SysInt>(base_wdeg) >= best_score) {
@@ -431,11 +431,11 @@ struct SRFBranch : VariableOrder {
     float ratio = 2;
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt maxval = var_order[i].getMax();
-      DomainInt minval = var_order[i].getMin();
+      DomainInt maxval = var_order[i].max();
+      DomainInt minval = var_order[i].min();
 
-      DomainInt original_minval = var_order[i].getInitialMin();
-      DomainInt original_maxval = var_order[i].getInitialMax();
+      DomainInt original_minval = var_order[i].initialMin();
+      DomainInt original_maxval = var_order[i].initialMax();
 
       float new_ratio = (checked_cast<float>(maxval - minval) * 1.0) /
                         checked_cast<float>(original_maxval - original_minval);
@@ -470,13 +470,13 @@ struct LDFBranch : VariableOrder {
     }
 
     SysInt largest_dom = pos;
-    DomainInt dom_size = var_order[pos].getMax() - var_order[pos].getMin();
+    DomainInt dom_size = var_order[pos].max() - var_order[pos].min();
 
     ++pos;
 
     for(; pos < length; ++pos) {
-      DomainInt maxval = var_order[pos].getMax();
-      DomainInt minval = var_order[pos].getMin();
+      DomainInt maxval = var_order[pos].max();
+      DomainInt minval = var_order[pos].min();
 
       if(maxval - minval > dom_size) {
         dom_size = maxval - minval;

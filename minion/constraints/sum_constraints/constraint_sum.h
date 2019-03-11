@@ -74,7 +74,7 @@ AbstractConstraint* BuildCT_LEQSUM(const VarArray& _var_array, const vector<VarS
 
 inline AbstractConstraint* BuildCT_LEQSUM(const vector<BoolVarRef>& var_array,
                                           const vector<ConstantVar>& var_sum, ConstraintBlob&) {
-  SysInt t2(checked_cast<SysInt>(var_sum[0].getAssignedValue()));
+  SysInt t2(checked_cast<SysInt>(var_sum[0].assignedValue()));
   return BoolLessEqualSumCon(var_array, t2);
 }
 
@@ -103,7 +103,7 @@ AbstractConstraint* BuildCT_GEQSUM(const vector<VarArray>& _var_array,
 
 inline AbstractConstraint* BuildCT_GEQSUM(const vector<BoolVarRef>& var_array,
                                           const vector<ConstantVar>& var_sum, ConstraintBlob&) {
-  SysInt t2(checked_cast<SysInt>(var_sum[0].getAssignedValue()));
+  SysInt t2(checked_cast<SysInt>(var_sum[0].assignedValue()));
   return BoolGreaterEqualSumCon(var_array, t2);
 }
 

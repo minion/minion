@@ -79,51 +79,51 @@ struct GACEqualConstraint : public AbstractConstraint {
   GACEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : var1(_var1), var2(_var2) {}
 
   SysInt dynamic_trigger_count() {
-    return checked_cast<SysInt>(var1.getInitialMax() - var1.getInitialMin() + var2.getInitialMax() -
-                                var2.getInitialMin() + 2);
+    return checked_cast<SysInt>(var1.initialMax() - var1.initialMin() + var2.initialMax() -
+                                var2.initialMin() + 2);
   }
 
   virtual void full_propagate() {
-    dvar2 = checked_cast<SysInt>(var1.getInitialMax() - var1.getInitialMin() + 1);
+    dvar2 = checked_cast<SysInt>(var1.initialMax() - var1.initialMin() + 1);
 
-    DomainInt maxlim = min(var1.getMax(), var2.getMax());
-    DomainInt minlim = max(var1.getMin(), var2.getMin());
+    DomainInt maxlim = min(var1.max(), var2.max());
+    DomainInt minlim = max(var1.min(), var2.min());
     var1.setMax(maxlim);
     var2.setMax(maxlim);
     var1.setMin(minlim);
     var2.setMin(minlim);
 
-    for(DomainInt val = var1.getMin(); val <= var1.getMax(); val++) {
+    for(DomainInt val = var1.min(); val <= var1.max(); val++) {
       if(!var2.inDomain(val)) {
         var1.removeFromDomain(val);
       }
     }
-    for(DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
+    for(DomainInt val = var2.min(); val <= var2.max(); val++) {
       if(!var1.inDomain(val)) {
         var2.removeFromDomain(val);
       }
     }
 
-    for(DomainInt val = var1.getMin(); val <= var1.getMax(); val++) {
+    for(DomainInt val = var1.min(); val <= var1.max(); val++) {
       if(var1.inDomain(val)) {
-        moveTriggerInt(var1, val - var1.getInitialMin(), DomainRemoval, val);
+        moveTriggerInt(var1, val - var1.initialMin(), DomainRemoval, val);
       }
     }
 
-    for(DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
+    for(DomainInt val = var2.min(); val <= var2.max(); val++) {
       if(var2.inDomain(val)) {
-        moveTriggerInt(var2, dvar2 + val - var2.getInitialMin(), DomainRemoval, val);
+        moveTriggerInt(var2, dvar2 + val - var2.initialMin(), DomainRemoval, val);
       }
     }
   }
 
   virtual void propagateDynInt(SysInt pos, DomainDelta) {
     if(pos < dvar2) {
-      DomainInt val = pos + var1.getInitialMin();
+      DomainInt val = pos + var1.initialMin();
       D_ASSERT(!var1.inDomain(val));
       var2.removeFromDomain(val);
     } else {
-      DomainInt val = pos - dvar2 + var2.getInitialMin();
+      DomainInt val = pos - dvar2 + var2.initialMin();
       D_ASSERT(!var2.inDomain(val));
       var1.removeFromDomain(val);
     }
@@ -143,8 +143,8 @@ struct GACEqualConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt min_val = max(var1.getMin(), var2.getMin());
-    DomainInt max_val = min(var1.getMax(), var2.getMax());
+    DomainInt min_val = max(var1.min(), var2.min());
+    DomainInt max_val = min(var1.max(), var2.max());
 
     for(DomainInt i = min_val; i <= max_val; ++i) {
       if(var1.inDomain(i) && var2.inDomain(i)) {

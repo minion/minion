@@ -80,10 +80,10 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
   while(true) {
     if(check_sac_timeout())
       throw EndOfSearch();
-    if(var.getMin() == var.getMax()) {
+    if(var.min() == var.max()) {
       return pruned;
     }
-    DomainInt maxval = var.getMax();
+    DomainInt maxval = var.max();
     DomainInt step = maxval - gallop;
     bool check = check_fail_range(var, step + 1, maxval, vararray, prop);
     if(check) {
@@ -97,7 +97,7 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
       } else {
         gallop *= 2;
       }
-      DomainInt maxstep = var.getMax() - var.getMin();
+      DomainInt maxstep = var.max() - var.min();
       if(maxstep == 0)
         return pruned;
       gallop = min(gallop, maxstep);
@@ -119,10 +119,10 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
   while(true) {
     if(check_sac_timeout())
       throw EndOfSearch();
-    if(var.getMin() == var.getMax()) {
+    if(var.min() == var.max()) {
       return pruned;
     }
-    DomainInt minval = var.getMin();
+    DomainInt minval = var.min();
     DomainInt step = minval + gallop;
     bool check = check_fail_range(var, minval, step - 1, vararray, prop);
     if(check) {
@@ -136,7 +136,7 @@ bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit)
       } else {
         gallop *= 2;
       }
-      DomainInt maxstep = var.getMax() - var.getMin();
+      DomainInt maxstep = var.max() - var.min();
       if(maxstep == 0)
         return pruned;
       gallop = min(gallop, maxstep);
@@ -195,7 +195,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
         Var& var = vararray[i];
         if(!var.isBound()) {
-          for(DomainInt val = var.getMin() + 1; val <= var.getMax() - 1; ++val) {
+          for(DomainInt val = var.min() + 1; val <= var.max() - 1; ++val) {
             if(check_sac_timeout())
               throw EndOfSearch();
             if(var.inDomain(val) && check_fail(var, val, vararray, prop)) {
@@ -218,7 +218,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
     std::vector<Var> listbools;
 
     for(int i = 0; i < vararray.size(); i++) {
-      if(vararray[i].getMin() == 0 && vararray[i].getMax() == 1) {
+      if(vararray[i].min() == 0 && vararray[i].max() == 1) {
         listbools.push_back(vararray[i]);
       }
     }

@@ -227,7 +227,7 @@ struct STR : public AbstractConstraint {
 
     gacvalues.resize(vars.size());
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      gacvalues[i].initialise(vars[i].getInitialMin(), vars[i].getInitialMax());
+      gacvalues[i].initialise(vars[i].initialMin(), vars[i].initialMax());
     }
 
     std::random_shuffle(tupindices.begin(), tupindices.end());
@@ -290,7 +290,7 @@ struct STR : public AbstractConstraint {
 
   virtual bool check_assignment(DomainInt* v, SysInt v_size) {
     if(UseShort) {
-      const vector<set<DomainInt>>& doms = shortTupleList->getInitialDomains();
+      const vector<set<DomainInt>>& doms = shortTupleList->initialDomains();
       if(doms.size() > 0) {
         for(SysInt i = 0; i < v_size; ++i) {
           if(doms[i].count(v[i]) == 0)
@@ -485,7 +485,7 @@ struct STR : public AbstractConstraint {
         } else if(!gacvalues[var].in(tau[var])) {
           gacvalues[var].unsafe_insert(tau[var]);
 
-          if(gacvalues[var].size == vars[var].getDomSize()) {
+          if(gacvalues[var].size == vars[var].domSize()) {
             ssup.unsafe_remove(var);
             j--;
             // if(vars[var].isAssigned()) ssup_permanent.remove(var);
@@ -498,7 +498,7 @@ struct STR : public AbstractConstraint {
     // Prune the domains.
     for(SysInt j = 0; j < ssup.size; j++) {
       SysInt var = ssup.vals[j];
-      for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+      for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
         if(!gacvalues[var].in(val)) {
           vars[var].removeFromDomain(val);
         }

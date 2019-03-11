@@ -113,7 +113,7 @@ struct LightTableConstraint : public AbstractConstraint {
   void propagate_var(SysInt varidx) {
     VarRef var = vars[varidx];
 
-    for(DomainInt val = var.getMin(); val <= var.getMax(); val++) {
+    for(DomainInt val = var.min(); val <= var.max(); val++) {
       if(var.inDomain(val)) {
         // find the right trie first.
 

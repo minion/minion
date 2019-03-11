@@ -120,7 +120,7 @@ struct NeighbourhoodState {
         nhc(std::move(_nhc)),
         globalStats(
             nhc.neighbourhoodCombinations.size(),
-            make_pair(getState().getOptimiseVar()->getMin(), getState().getOptimiseVar()->getMax()),
+            make_pair(getState().getOptimiseVar()->min(), getState().getOptimiseVar()->max()),
             nhc.maxNeighbourhoodSize) {}
   template <typename ContinueSearchFunc = DefaultContinueSearchFunc>
   inline NeighbourhoodStats
@@ -159,8 +159,8 @@ struct NeighbourhoodState {
       if(searchParams.mode == SearchParams::STANDARD_SEARCH) {
         D_FATAL_ERROR("Problem unsatisfiable with all neighbourhoods turned off");
       } else {
-        NeighbourhoodStats stats(getState().getOptimiseVar()->getMin(),
-                                 getState().getOptimiseVar()->getMin(), 0, false, false);
+        NeighbourhoodStats stats(getState().getOptimiseVar()->min(),
+                                 getState().getOptimiseVar()->min(), 0, false, false);
 
         globalStats.reportnewStats(searchParams.combinationToActivate, stats);
         Controller::world_pop_to_depth(depth);
@@ -168,7 +168,7 @@ struct NeighbourhoodState {
       }
     }
 
-    DomainInt highestNeighbourhoodSize, oldMinValue = getState().getOptimiseVar()->getMin(),
+    DomainInt highestNeighbourhoodSize, oldMinValue = getState().getOptimiseVar()->min(),
                                         newOptMinTarget = oldMinValue, lastOptVal = oldMinValue;
     std::shared_ptr<Controller::StandardSearchManager> sm;
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
@@ -177,24 +177,24 @@ struct NeighbourhoodState {
       if(alarmTriggered) {
         if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
           highestNeighbourhoodSize =
-              nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.getMin();
+              nhc.neighbourhoods[searchParams.neighbourhoodsToActivate[0]].deviation.min();
         }
         throw TimeoutException();
       }
     };
 
     auto solutionHandler = [&]() {
-      lastOptVal = getState().getOptimiseVar()->getMin();
+      lastOptVal = getState().getOptimiseVar()->min();
       solution.clear();
       for(const auto& var : this->nhc.shadow_mapping[0]) {
-        solution.push_back(var.getAssignedValue());
+        solution.push_back(var.assignedValue());
       }
-      globalStats.foundSolution(getState().getOptimiseVar()->getMin());
+      globalStats.foundSolution(getState().getOptimiseVar()->min());
       if(searchParams.stopAtFirstSolution || !continueSearch(solution)) {
         throw EndOfSearch();
       }
       if(searchParams.optimiseMode) {
-        newOptMinTarget = getState().getOptimiseVar()->getMin() + 1;
+        newOptMinTarget = getState().getOptimiseVar()->min() + 1;
       }
       if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
         jumpBacktToPrimaryNeighbourhood(*sm, *((MultiBranch*)vo.get()), bottomOfPrimaryNhIndex);
@@ -271,16 +271,16 @@ struct NeighbourhoodState {
 
   void printWorld() {
     cout << "---------------" << endl;
-    cout << "Optimise Variable bound: " << getState().getOptimiseVar()->getMin() << "->"
-         << getState().getOptimiseVar()->getMax() << endl;
+    cout << "Optimise Variable bound: " << getState().getOptimiseVar()->min() << "->"
+         << getState().getOptimiseVar()->max() << endl;
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
-      cout << "Variable " << nhc.shadow_mapping[0][i] << " : " << nhc.shadow_mapping[0][i].getMin()
-           << "->" << nhc.shadow_mapping[0][i].getMax() << endl;
+      cout << "Variable " << nhc.shadow_mapping[0][i] << " : " << nhc.shadow_mapping[0][i].min()
+           << "->" << nhc.shadow_mapping[0][i].max() << endl;
     }
 
     for(int i = 0; i < nhc.shadow_mapping[0].size(); i++) {
       cout << "Shadow Variable " << nhc.shadow_mapping[1][i] << " : "
-           << nhc.shadow_mapping[1][i].getMin() << "->" << nhc.shadow_mapping[0][i].getMax()
+           << nhc.shadow_mapping[1][i].min() << "->" << nhc.shadow_mapping[0][i].max()
            << endl;
     }
 
@@ -290,8 +290,8 @@ struct NeighbourhoodState {
         cout << endl;
         continue;
       }
-      cout << " With domain: " << nhc.neighbourhoods[i].activation.getMin() << " -> "
-           << nhc.neighbourhoods[i].activation.getMax() << endl;
+      cout << " With domain: " << nhc.neighbourhoods[i].activation.min() << " -> "
+           << nhc.neighbourhoods[i].activation.max() << endl;
     }
     cout << "---------------" << endl;
   }
@@ -409,7 +409,7 @@ private:
         }
       } else if(nh.type == Neighbourhood::CLOSED) {
         for(AnyVarRef& varRef : nh.group->vars) {
-          varRef.assign(nhc.shadowLookup[varRef].getAssignedValue());
+          varRef.assign(nhc.shadowLookup[varRef].assignedValue());
         }
       }
     }

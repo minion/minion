@@ -210,7 +210,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
     SysInt propval = triggerInfo(dt);
-    D_ASSERT(var_array[propval].getAssignedValue() == VarToCount);
+    D_ASSERT(var_array[propval].assignedValue() == VarToCount);
     // should generalise
     // and will need to loop round for watched lits
 
@@ -313,7 +313,7 @@ AbstractConstraint* BoolGreaterEqualSumConDynamic(const VarArray& _var_array, Va
 template <typename T>
 inline AbstractConstraint* BuildCT_WATCHED_GEQSUM(const vector<T>& t1, ConstraintBlob& b) {
   for(SysInt i = 0; i < (SysInt)t1.size(); ++i) {
-    if(t1[i].getInitialMin() < 0 || t1[i].getInitialMax() > 1)
+    if(t1[i].initialMin() < 0 || t1[i].initialMax() > 1)
       FAIL_EXIT("watched geqsum only works on Boolean variables!");
   }
 
@@ -338,7 +338,7 @@ inline AbstractConstraint* BuildCT_WATCHED_GEQSUM(const vector<T>& t1, Constrain
 template <typename T>
 inline AbstractConstraint* BuildCT_WATCHED_LEQSUM(const vector<T>& t1, ConstraintBlob& b) {
   for(SysInt i = 0; i < (SysInt)t1.size(); ++i) {
-    if(t1[i].getInitialMin() < 0 || t1[i].getInitialMax() > 1)
+    if(t1[i].initialMin() < 0 || t1[i].initialMax() > 1)
       FAIL_EXIT("watched leqsum only works on Boolean variables!");
   }
 

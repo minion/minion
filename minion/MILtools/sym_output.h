@@ -1053,7 +1053,7 @@ struct InstanceStats {
       vector<AnyVarRef>& all_vars = *cons[con]->get_vars_singleton();
       for(size_t var = 0; var < all_vars.size(); var++) {
         Var vv = all_vars[var].getBaseVar();
-        for(DomainInt val = all_vars[var].getInitialMin(); val <= all_vars[var].getInitialMax();
+        for(DomainInt val = all_vars[var].initialMin(); val <= all_vars[var].initialMax();
             val++) {
           scores_for_varval[make_pair(vv, val)].push_back(
               cons[con]->getTightnessEstimateVarVal(var, val));

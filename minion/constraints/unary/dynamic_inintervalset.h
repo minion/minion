@@ -90,14 +90,14 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     D_ASSERT(var.isBound());
     // This is basically lifted from "sparse SysInt bound vars"
     vector<std::pair<DomainInt, DomainInt>>::iterator it_low = std::lower_bound(
-        intervals.begin(), intervals.end(), std::make_pair(var.getMin(), var.getMin()));
+        intervals.begin(), intervals.end(), std::make_pair(var.min(), var.min()));
     if(it_low == intervals.end()) {
       // we must have reached the lower bound of the last interval, in which
       // case nothing more needs to be done.
       return;
     } else {
       // Check if the lower bound is in the interval below the one found.
-      if(it_low != intervals.begin() && (*(it_low - 1)).second < var.getMin()) {
+      if(it_low != intervals.begin() && (*(it_low - 1)).second < var.min()) {
         // Lower bound of var is not in the interval below it_low. Prune it to
         // the bottom of it_low.
         var.setMin((*it_low).first);
@@ -105,7 +105,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     }
 
     vector<std::pair<DomainInt, DomainInt>>::iterator it_high = std::lower_bound(
-        intervals.begin(), intervals.end(), std::make_pair(var.getMax(), var.getMax()));
+        intervals.begin(), intervals.end(), std::make_pair(var.max(), var.max()));
     if(it_high == intervals.end()) {
       // var.setMax(*(it_high - 1).second);  // didn't we already do this in
       // full prop?
@@ -161,11 +161,11 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     // It is its own reverse.
     vector<DomainInt> negintervals;
 
-    DomainInt lowerbound = var.getInitialMin() < intervals.front().first - 1
-                               ? var.getInitialMin()
+    DomainInt lowerbound = var.initialMin() < intervals.front().first - 1
+                               ? var.initialMin()
                                : intervals.front().first - 1;
-    DomainInt upperbound = var.getInitialMax() > intervals.back().second + 1
-                               ? var.getInitialMax()
+    DomainInt upperbound = var.initialMax() > intervals.back().second + 1
+                               ? var.initialMax()
                                : intervals.back().second + 1;
 
     negintervals.push_back(lowerbound); // first interval starts at lowerbound

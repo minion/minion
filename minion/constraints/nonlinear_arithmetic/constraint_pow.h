@@ -60,9 +60,9 @@ struct PowConstraint : public AbstractConstraint {
 
   PowConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3)
       : var1(_var1), var2(_var2), var3(_var3) {
-    CHECK((var1.getInitialMin() >= 0 && var2.getInitialMin() >= 0 && var3.getInitialMin() >= 0),
+    CHECK((var1.initialMin() >= 0 && var2.initialMin() >= 0 && var3.initialMin() >= 0),
           "The 'pow' constraint only supports non-negative numbers at present.");
-    CHECK(var2.getInitialMin() != 0, "The 'pow' constraint (x^y = z) does not "
+    CHECK(var2.initialMin() != 0, "The 'pow' constraint (x^y = z) does not "
                                      "allow y to contain 0, to avoid the case "
                                      "0^0.");
 
@@ -70,8 +70,8 @@ struct PowConstraint : public AbstractConstraint {
     // propagator
     // uses doubles anyway so integer overflow is not the problem.
     // BigInt pow=1;
-    // for(SysInt i=0; i<var2.getInitialMax(); i++) {
-    //    pow=pow*var1.getInitialMax();
+    // for(SysInt i=0; i<var2.initialMax(); i++) {
+    //    pow=pow*var1.initialMax();
     //    CHECKSIZE(pow, "Magnitude of domain bounds is too large in 'pow'
     //    constraint.");
     //}
@@ -125,45 +125,45 @@ struct PowConstraint : public AbstractConstraint {
     switch(checked_cast<SysInt>(flag)) {
     case 3: {
       // var3 >= min(var1) ^ min(var2)
-      var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
-      DomainInt var1_min = var1.getMin();
+      var3.setMin(LRINT(my_pow(var1.min(), var2.min())));
+      DomainInt var1_min = var1.min();
       if(var1_min > 1)
         // var2 <= log base max(var3) of min(var1)
-        var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
+        var2.setMax(LRINT(my_y(var1_min, var3.max())));
       break;
     }
     case 4:
       // var3>= min(var1) ^ min(var2)
-      var3.setMin(LRINT(my_pow(var1.getMin(), var2.getMin())));
-      var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
+      var3.setMin(LRINT(my_pow(var1.min(), var2.min())));
+      var1.setMax(LRINT(my_x(var2.min(), var3.max())));
       break;
 
     case 5: {
-      var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
-      DomainInt var1_max = var1.getMax();
+      var1.setMin(LRINT(my_x(var2.max(), var3.min())));
+      DomainInt var1_max = var1.max();
       if(var1_max > 1)
-        var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
+        var2.setMin(LRINT(my_y(var1_max, var3.min())));
       break;
     }
     case 0: {
       var3.setMax(
-          rounddown(my_pow(var1.getMax(),
-                           var2.getMax()))); // wraparound was occurring here, so use rounddown
-      DomainInt var1_max = var1.getMax();
+          rounddown(my_pow(var1.max(),
+                           var2.max()))); // wraparound was occurring here, so use rounddown
+      DomainInt var1_max = var1.max();
       if(var1_max > 1)
-        var2.setMin(LRINT(my_y(var1_max, var3.getMin())));
+        var2.setMin(LRINT(my_y(var1_max, var3.min())));
       break;
     }
     case 1:
-      var3.setMax(rounddown(my_pow(var1.getMax(), var2.getMax()))); // wraparound here.
-      var1.setMin(LRINT(my_x(var2.getMax(), var3.getMin())));
+      var3.setMax(rounddown(my_pow(var1.max(), var2.max()))); // wraparound here.
+      var1.setMin(LRINT(my_x(var2.max(), var3.min())));
       break;
 
     case 2: {
-      var1.setMax(LRINT(my_x(var2.getMin(), var3.getMax())));
-      DomainInt var1_min = var1.getMin();
+      var1.setMax(LRINT(my_x(var2.min(), var3.max())));
+      DomainInt var1_min = var1.min();
       if(var1_min > 1)
-        var2.setMax(LRINT(my_y(var1_min, var3.getMax())));
+        var2.setMax(LRINT(my_y(var1_min, var3.max())));
       break;
     }
     }
@@ -189,9 +189,9 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+    for(DomainInt v1 = var1.min(); v1 <= var1.max(); ++v1) {
       if(var1.inDomain(v1)) {
-        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
+        for(DomainInt v2 = var2.min(); v2 <= var2.max(); ++v2) {
           if(var2.inDomain(v2) && var3.inDomain(my_pow(v1, v2))) // implicit conversion here causes
           // a warning -- perh use roundup or
           // rounddown

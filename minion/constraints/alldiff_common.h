@@ -243,7 +243,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     //  save work in Tarjan's by reducing the number of variables in to_process.
     {
       SysInt count = 0;
-      for(DomainInt i = var_array[prop_var].getMin(); i <= var_array[prop_var].getMax(); i++) {
+      for(DomainInt i = var_array[prop_var].min(); i <= var_array[prop_var].max(); i++) {
         if(var_array[prop_var].inDomain(i)) {
           count++;
         }
@@ -256,7 +256,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 
 #ifdef STAGED
     if(var_array[prop_var].isAssigned()) {
-      DomainInt assignedval = var_array[prop_var].getAssignedValue();
+      DomainInt assignedval = var_array[prop_var].assignedValue();
       for(SysInt i = 0; i < numvars; i++) {
         if(i != prop_var && var_array[i].inDomain(assignedval)) {
           var_array[i].removeFromDomain(assignedval);
@@ -342,7 +342,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     // WHY IS THIS HERE WHEN checkdomsize and dynamic triggers don't work
     // together??
     SysInt count = 0;
-    for(DomainInt i = var_array[prop_var].getMin(); i <= var_array[prop_var].getMax(); i++) {
+    for(DomainInt i = var_array[prop_var].min(); i <= var_array[prop_var].max(); i++) {
       if(var_array[prop_var].inDomain(i)) {
         count++;
       }
@@ -353,7 +353,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 
 #ifdef STAGED
     if(var_array[prop_var].isAssigned()) {
-      DomainInt assignedval = var_array[prop_var].getAssignedValue();
+      DomainInt assignedval = var_array[prop_var].assignedValue();
       for(SysInt i = 0; i < numvars; i++) {
         if(i != prop_var && var_array[i].inDomain(assignedval)) {
           var_array[i].removeFromDomain(assignedval);
@@ -521,7 +521,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
             SCCSplit.remove(sccindex_start);
 
             sccindex_start++;
-            DomainInt tempval = var_array[tempvar].getAssignedValue();
+            DomainInt tempval = var_array[tempvar].assignedValue();
 
             // Now remove the value from the reduced SCC
             for(SysInt i = sccindex_start; i <= sccindex_end; i++) {
@@ -867,14 +867,14 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   void tarjan_recursive(SysInt sccindex_start) {
     valinlocalmatching.clear();
 
-    DomainInt localmax = var_array[var_indices[0]].getMax();
-    DomainInt localmin = var_array[var_indices[0]].getMin();
+    DomainInt localmax = var_array[var_indices[0]].max();
+    DomainInt localmin = var_array[var_indices[0]].min();
     valinlocalmatching.insert(varvalmatching[var_indices[0]] - dom_min);
 
     for(SysInt i = 1; i < (SysInt)var_indices.size(); i++) {
       SysInt tempvar = var_indices[i];
-      DomainInt tempmax = var_array[tempvar].getMax();
-      DomainInt tempmin = var_array[tempvar].getMin();
+      DomainInt tempmax = var_array[tempvar].max();
+      DomainInt tempmin = var_array[tempvar].min();
       if(tempmax > localmax)
         localmax = tempmax;
       if(tempmin < localmin)
@@ -1251,7 +1251,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 // put all corresponding values in the fifo.
 // Need to check if we are completing an even alternating path.
 #if !UseIncGraph
-            for(DomainInt val = var_array[curnode].getMin(); val <= var_array[curnode].getMax();
+            for(DomainInt val = var_array[curnode].min(); val <= var_array[curnode].max();
                 val++) {
 #else
             for(SysInt vali = 0; vali < adjlistlength[curnode]; vali++) {

@@ -63,7 +63,7 @@ void check_constraint(T* con) {
            << "left them out, have a look." << endl;
       return;
     }
-    values[loop] = variables[loop].getAssignedValue();
+    values[loop] = variables[loop].assignedValue();
   }
 
   if(!con->check_assignment(values, vec_size)) {
@@ -90,9 +90,9 @@ void print_solution(Stream& sout, const PrintMatrix& print_matrix) {
         sout << "Sol: ";
       for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j) {
         if(!print_matrix[i][j].isAssigned())
-          sout << "[" << print_matrix[i][j].getMin() << "," << print_matrix[i][j].getMax() << "]";
+          sout << "[" << print_matrix[i][j].min() << "," << print_matrix[i][j].max() << "]";
         else
-          sout << print_matrix[i][j].getAssignedValue() << " ";
+          sout << print_matrix[i][j].assignedValue() << " ";
       }
       sout << endl;
     }
@@ -122,7 +122,7 @@ inline void check_sol_is_correct() {
       for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j) {
         if(!print_matrix[i][j].isAssigned())
           INPUT_ERROR("Some variable was unassigned while writing solution to file.");
-        solsoutFile << print_matrix[i][j].getAssignedValue() << " ";
+        solsoutFile << print_matrix[i][j].assignedValue() << " ";
       }
     solsoutFile << "\n";
     solsoutFile.flush();
@@ -199,8 +199,8 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
       typedef typename VarArray::value_type VarRef;
       const VarRef& var = var_array[branches.back().var];
       curvar = getState().getInstance()->vars.getName(var.getBaseVar());
-      DomainInt min = var.getMin();
-      DomainInt max = var.getMax();
+      DomainInt min = var.min();
+      DomainInt max = var.max();
       DomainInt med = (min + max) / 2;
       string left("ineq(");
       left += curvar + string(", ") + tostring(med) + string(", 0)\n");
@@ -318,14 +318,14 @@ void inline standard_deal_with_solution() {
 
     if(getOptions().printonlyoptimal) {
       getState().storedSolution += "Solution found with Value: " +
-                                   tostring(getState().getRawOptimiseVar()->getAssignedValue()) +
+                                   tostring(getState().getRawOptimiseVar()->assignedValue()) +
                                    "\n";
     } else {
-      cout << "Solution found with Value: " << getState().getRawOptimiseVar()->getAssignedValue()
+      cout << "Solution found with Value: " << getState().getRawOptimiseVar()->assignedValue()
            << endl;
     }
 
-    getState().setOptimiseValue(getState().getOptimiseVar()->getAssignedValue() + 1);
+    getState().setOptimiseValue(getState().getOptimiseVar()->assignedValue() + 1);
   }
   // Note that sollimit = -1 if all solutions should be found.
   if(getState().getSolutionCount() == getOptions().sollimit)

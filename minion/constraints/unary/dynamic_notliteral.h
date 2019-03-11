@@ -53,9 +53,9 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
 
   virtual void full_propagate() {
     if(var.isBound()) {
-      if(var.getMin() == val)
+      if(var.min() == val)
         var.setMin(val + 1);
-      else if(var.getMax() == val)
+      else if(var.max() == val)
         var.setMax(val - 1);
       else
         moveTriggerInt(var, 0, DomainChanged);
@@ -66,9 +66,9 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(WatchInRange);
     if(var.isBound()) {
-      if(var.getMin() == val)
+      if(var.min() == val)
         var.setMin(val + 1);
-      else if(var.getMax() == val)
+      else if(var.max() == val)
         var.setMax(val - 1);
     } else
       var.removeFromDomain(val);
@@ -87,12 +87,12 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    D_ASSERT(var.inDomain(var.getMin()) && var.inDomain(var.getMax()));
+    D_ASSERT(var.inDomain(var.min()) && var.inDomain(var.max()));
     DomainInt tmp;
-    if((tmp = var.getMin()) != val) {
+    if((tmp = var.min()) != val) {
       assignment.push_back(make_pair(0, tmp));
       return true;
-    } else if((tmp = var.getMax()) != val) {
+    } else if((tmp = var.max()) != val) {
       assignment.push_back(make_pair(0, tmp));
       return true;
     }
@@ -144,12 +144,12 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    if(var.getMin() != val) {
-      assignment.push_back(make_pair(0, var.getMin()));
+    if(var.min() != val) {
+      assignment.push_back(make_pair(0, var.min()));
       return true;
     }
-    if(var.getMax() != val) {
-      assignment.push_back(make_pair(0, var.getMax()));
+    if(var.max() != val) {
+      assignment.push_back(make_pair(0, var.max()));
       return true;
     }
     return false;

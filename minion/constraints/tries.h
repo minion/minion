@@ -278,7 +278,7 @@ struct TupleTrie {
     obj_list[depth] = obj_list[depth - 1]->offset_ptr;
 
     SysInt dep = map_depth(depth);
-    for(DomainInt i = vars[dep].getMin(); i <= vars[dep].getMax(); ++i) {
+    for(DomainInt i = vars[dep].min(); i <= vars[dep].max(); ++i) {
       if(vars[dep].inDomain(i)) {
         while(obj_list[depth]->val < i)
           obj_list[depth]++;
@@ -290,7 +290,7 @@ struct TupleTrie {
           // Is there any need to search from the previous position?? Yes. But
           // not doing so yet.
           for(SysInt depth2 = checked_cast<SysInt>(depth) + 1; depth2 < arity; depth2++)
-            returnTuple[map_depth(depth2)] = vars[map_depth(depth2)].getMin();
+            returnTuple[map_depth(depth2)] = vars[map_depth(depth2)].min();
           return true;
         } else {
           if(search_trie_negative(_vars, obj_list, depth + 1, returnTuple))
@@ -401,7 +401,7 @@ struct TupleTrie {
     if(first_ptr == NULL) {
       // Hang on a minute. How do we ever get here? Should only be at root node.
       for(DomainInt depth2 = 1; depth2 < arity; ++depth2)
-        recycTuple[map_depth(depth2)] = vars[map_depth(depth2)].getMin();
+        recycTuple[map_depth(depth2)] = vars[map_depth(depth2)].min();
       return 0;
     }
 

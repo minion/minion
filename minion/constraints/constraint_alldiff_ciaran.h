@@ -111,7 +111,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     for(SysInt i = 1; i < (SysInt)var_array.size(); i++) {
       for(SysInt j = i - 1; j >= 0; j--) {
 
-        if(var_array[sortedvars[j + 1]].getDomSize() < var_array[sortedvars[j]].getDomSize()) {
+        if(var_array[sortedvars[j + 1]].domSize() < var_array[sortedvars[j]].domSize()) {
           // swap
           SysInt tmp = sortedvars[j + 1];
           sortedvars[j + 1] = sortedvars[j];
@@ -132,12 +132,12 @@ struct AlldiffCiaran : public AbstractConstraint {
     for(unsigned int i = 0; i < sortedvars.size(); i++) {
       SysInt var = sortedvars[i];
 
-      // std::cout << "Processing variable :" << var << " ("<< var_array[var].getMin() << " ," <<
-      // var_array[var].getMax() << ")" <<std::endl;
+      // std::cout << "Processing variable :" << var << " ("<< var_array[var].min() << " ," <<
+      // var_array[var].max() << ")" <<std::endl;
 
       //  D gets D \ H (remove previously seen Hall sets from D)
       D.clear();
-      for(DomainInt j = var_array[var].getMin(); j <= var_array[var].getMax(); j++) {
+      for(DomainInt j = var_array[var].min(); j <= var_array[var].max(); j++) {
         if(var_array[var].inDomain(j)) {
           if(!H.in(checked_cast<SysInt>(j - dom_min))) {
             D.insert(checked_cast<SysInt>(j - dom_min));
@@ -185,13 +185,13 @@ struct AlldiffCiaran : public AbstractConstraint {
     if(var_array.size() == 0)
       return;
 
-    dom_min = var_array[0].getMin();
-    dom_max = var_array[0].getMax();
+    dom_min = var_array[0].min();
+    dom_max = var_array[0].max();
     for(unsigned int i = 1; i < var_array.size(); i++) {
-      if(var_array[i].getMin() < dom_min)
-        dom_min = var_array[i].getMin();
-      if(var_array[i].getMax() > dom_max)
-        dom_max = var_array[i].getMax();
+      if(var_array[i].min() < dom_min)
+        dom_min = var_array[i].min();
+      if(var_array[i].max() > dom_max)
+        dom_max = var_array[i].max();
     }
 
     //  Set up the smallsets
@@ -205,8 +205,8 @@ struct AlldiffCiaran : public AbstractConstraint {
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       if(!var_array[i].isAssigned()) {
-        assignment.push_back(make_pair(i, var_array[i].getMin()));
-        assignment.push_back(make_pair(i, var_array[i].getMax()));
+        assignment.push_back(make_pair(i, var_array[i].min()));
+        assignment.push_back(make_pair(i, var_array[i].max()));
         return true;
       }
     }
@@ -214,7 +214,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     // Otherwise, check pairwise assignments
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       for(SysInt j = i + 1; j < (SysInt)var_array.size(); j++) {
-        if(var_array[i].getAssignedValue() == var_array[j].getAssignedValue()) {
+        if(var_array[i].assignedValue() == var_array[j].assignedValue()) {
           return false;
         }
       }

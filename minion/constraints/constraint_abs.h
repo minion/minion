@@ -91,28 +91,28 @@ struct AbsConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
     // Assume this in the algorithm.
-    D_ASSERT(var1.getMin() >= 0);
+    D_ASSERT(var1.min() >= 0);
 
     PROP_INFO_ADDONE(Abs);
     switch(i) {
     case 0: // var1 upper
-      var2.setMax(var1.getMax());
-      var2.setMin(-var1.getMax());
+      var2.setMax(var1.max());
+      var2.setMin(-var1.max());
       return;
     case 1: // var1 lower
-      if(var2.getMax() < var1.getMin())
-        var2.setMax(-var1.getMin());
-      if(var2.getMin() > -var1.getMin())
-        var2.setMin(var1.getMin());
+      if(var2.max() < var1.min())
+        var2.setMax(-var1.min());
+      if(var2.min() > -var1.min())
+        var2.setMin(var1.min());
       else
-        var2.setMin(-var1.getMax());
+        var2.setMin(-var1.max());
       return;
     case 2: // var 2 upper
     case 3: // var 2 lower
-      var1.setMax(absmax(var2.getMin(), var2.getMax()));
-      var1.setMin(absmin(var2.getMin(), var2.getMax()));
-      if(var2.getMin() > -var1.getMin())
-        var2.setMin(var1.getMin());
+      var1.setMax(absmax(var2.min(), var2.max()));
+      var1.setMin(absmin(var2.min(), var2.max()));
+      if(var2.min() > -var1.min())
+        var2.setMin(var1.min());
       return;
     }
   }
@@ -126,10 +126,10 @@ struct AbsConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt x_dom_max = var1.getMax();
-    DomainInt y_dom_max = max(abs(var2.getMin()), abs(var2.getMax()));
+    DomainInt x_dom_max = var1.max();
+    DomainInt y_dom_max = max(abs(var2.min()), abs(var2.max()));
     DomainInt dom_max = min(x_dom_max, y_dom_max);
-    DomainInt dom_min = max(DomainInt(0), max(var1.getMin(), var2.getMin()));
+    DomainInt dom_min = max(DomainInt(0), max(var1.min(), var2.min()));
 
     for(DomainInt i = dom_min; i <= dom_max; ++i) {
       if(var1.inDomain(i)) {

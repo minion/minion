@@ -266,8 +266,8 @@ struct GACTableConstraint : public AbstractConstraint {
       if(getState().isFailed())
         return;
 
-      DomainInt max = vars[varIndex].getMax();
-      for(DomainInt i = vars[varIndex].getMin(); i <= max; ++i) {
+      DomainInt max = vars[varIndex].max();
+      for(DomainInt i = vars[varIndex].min(); i <= max; ++i) {
         if(i >= (tuples->dom_smallest)[varIndex] &&
            i < (tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]) {
           const SysInt literal = checked_cast<SysInt>(tuples->get_literal(varIndex, i));
@@ -308,8 +308,8 @@ struct GACTableConstraint : public AbstractConstraint {
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     D_ASSERT(!getState().isFailed());
-    DomainInt max = vars[0].getMax();
-    for(DomainInt i = vars[0].getMin(); i <= max; ++i) {
+    DomainInt max = vars[0].max();
+    for(DomainInt i = vars[0].min(); i <= max; ++i) {
       if(vars[0].inDomain(i)) {
         DomainInt sup = -1;
         DomainInt literal = 0xdeadbeef;
@@ -331,7 +331,7 @@ struct GACTableConstraint : public AbstractConstraint {
           if(negative) {
             assignment.push_back(make_pair(0, i));
             for(SysInt varidx = 1; varidx < (SysInt)vars.size(); ++varidx) {
-              assignment.push_back(make_pair(varidx, vars[varidx].getMin()));
+              assignment.push_back(make_pair(varidx, vars[varidx].min()));
             }
             return true;
           }

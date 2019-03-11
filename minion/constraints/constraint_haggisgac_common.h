@@ -23,7 +23,7 @@ struct Literal {
 
 virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
   D_ASSERT(vars.size() > 0);
-  for(DomainInt i = vars[0].getMin(); i <= vars[0].getMax(); ++i) {
+  for(DomainInt i = vars[0].min(); i <= vars[0].max(); ++i) {
     literalsScratch.clear();
     if(findNewSupport<true>(0, i)) {
       for(SysInt j = 0; j < (SysInt)literalsScratch.size(); ++j)
@@ -36,13 +36,13 @@ virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment)
 
 virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
   D_ASSERT(vars.size() > 0);
-  if(v[0] < vars[0].getInitialMin())
+  if(v[0] < vars[0].initialMin())
     return false;
 
-  if(v[0] > vars[0].getInitialMax())
+  if(v[0] > vars[0].initialMax())
     return false;
 
-  const SysInt val_offset = checked_cast<SysInt>(v[0] - vars[0].getInitialMin());
+  const SysInt val_offset = checked_cast<SysInt>(v[0] - vars[0].initialMin());
   const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->get_tl()[0][val_offset];
 
   for(SysInt i = 0; i < (SysInt)tuple_list->get_tl()[0][val_offset].size(); i++) {
@@ -71,9 +71,9 @@ virtual ~CLASSNAME() {
 
   /*
   for(SysInt i=0; i<(SysInt)vars.size(); i++) {
-      cout << "     i " << i << " Initial Max " << vars[i].getInitialMax() <<
+      cout << "     i " << i << " Initial Max " << vars[i].initialMax() <<
   endl ;
-      SysInt numvals_i = vars[i].getInitialMax()-vars[i].getInitialMin()+1;
+      SysInt numvals_i = vars[i].initialMax()-vars[i].initialMin()+1;
       for(SysInt j=0; j<numvals_i; j++) {
         cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j
   << " " << supportListPerLit[i][j].next << endl ;
@@ -139,7 +139,7 @@ void full_prop_init() {
     for(SysInt i = 0; i < numvars; i++) {
 
       firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter);
-      DomainInt numvals_i = vars[i].getInitialMax() - vars[i].getInitialMin() + 1;
+      DomainInt numvals_i = vars[i].initialMax() - vars[i].initialMin() + 1;
       if(numvals_i > numvals)
         numvals = checked_cast<SysInt>(numvals_i);
       litCounter += numvals_i;
@@ -150,8 +150,8 @@ void full_prop_init() {
   {
     SysInt litCounter = 0;
     for(SysInt i = 0; i < numvars; i++) {
-      DomainInt thisvalmin = vars[i].getInitialMin();
-      DomainInt numvals_i = vars[i].getInitialMax() - thisvalmin + 1;
+      DomainInt thisvalmin = vars[i].initialMin();
+      DomainInt numvals_i = vars[i].initialMax() - thisvalmin + 1;
       for(DomainInt j = 0; j < numvals_i; j++) {
         literalList[litCounter].var = i;
         literalList[litCounter].val = j + thisvalmin;
@@ -166,7 +166,7 @@ void full_prop_init() {
   zeroLits.resize(numvars);
   for(SysInt i = 0; i < numvars; i++) {
     const SysInt numvals_i =
-        checked_cast<SysInt>(vars[i].getInitialMax() - vars[i].getInitialMin() + 1);
+        checked_cast<SysInt>(vars[i].initialMax() - vars[i].initialMin() + 1);
     zeroLits[i].reserve(numvals_i); // reserve the maximum length.
     zeroLits[i].resize(0);
     SysInt thisvarstart = firstLiteralPerVar[i];
@@ -204,7 +204,7 @@ void full_prop_init() {
   tuple_list_pos.resize(vars.size());
   for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
     SysInt domsize =
-        checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
+        checked_cast<SysInt>(vars[var].initialMax() - vars[var].initialMin() + 1);
     tuple_list_pos[var].clear();
     tuple_list_pos[var].resize(domsize, 0);
   }
@@ -237,7 +237,7 @@ void init() {
     for(SysInt i = 0; i < numvars; i++) {
 
       firstLiteralPerVar[i] = checked_cast<SysInt>(litCounter);
-      DomainInt numvals_i = vars[i].getInitialMax() - vars[i].getInitialMin() + 1;
+      DomainInt numvals_i = vars[i].initialMax() - vars[i].initialMin() + 1;
       if(numvals_i > numvals)
         numvals = checked_cast<SysInt>(numvals_i);
       litCounter += numvals_i;
@@ -248,8 +248,8 @@ void init() {
   {
     SysInt litCounter = 0;
     for(SysInt i = 0; i < numvars; i++) {
-      DomainInt thisvalmin = vars[i].getInitialMin();
-      DomainInt numvals_i = vars[i].getInitialMax() - thisvalmin + 1;
+      DomainInt thisvalmin = vars[i].initialMin();
+      DomainInt numvals_i = vars[i].initialMax() - thisvalmin + 1;
       for(DomainInt j = 0; j < numvals_i; j++) {
         literalList[litCounter].var = i;
         literalList[litCounter].val = j + thisvalmin;
@@ -265,7 +265,7 @@ void init() {
   zeroLits.resize(numvars);
   for(SysInt i = 0; i < numvars; i++) {
     const SysInt numvals_i =
-        checked_cast<SysInt>(vars[i].getInitialMax() - vars[i].getInitialMin() + 1);
+        checked_cast<SysInt>(vars[i].initialMax() - vars[i].initialMin() + 1);
     zeroLits[i].reserve(numvals_i); // reserve the maximum length.
     zeroLits[i].resize(0);
     SysInt thisvarstart = firstLiteralPerVar[i];
@@ -298,7 +298,7 @@ void init() {
   tuple_list_pos.resize(vars.size());
   for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
     SysInt domsize =
-        checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
+        checked_cast<SysInt>(vars[var].initialMax() - vars[var].initialMin() + 1);
     tuple_list_pos[var].resize(domsize, 0);
   }
 
@@ -388,7 +388,7 @@ void partition_swap(SysInt xi, SysInt xj) {
 template <bool keepassigned>
 bool findNewSupport(SysInt var, DomainInt val) {
   D_ASSERT(tuple_list->get_tl().size() == vars.size());
-  const SysInt val_offset = checked_cast<SysInt>(val - vars[var].getInitialMin());
+  const SysInt val_offset = checked_cast<SysInt>(val - vars[var].initialMin());
   const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->get_tl()[var][val_offset];
 
   SysInt listsize = tuplist.size();

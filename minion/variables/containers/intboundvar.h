@@ -78,10 +78,10 @@ struct BoundVarRef_internal {
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return isAssigned() && getAssignedValue() == i;
+    return isAssigned() && assignedValue() == i;
   }
 
-  DomainInt getAssignedValue() const {
+  DomainInt assignedValue() const {
     D_ASSERT(isAssigned());
     return lower_bound();
   }
@@ -98,24 +98,24 @@ struct BoundVarRef_internal {
     return true;
   }
 
-  DomainInt getDomSize() const {
-    return getMax() - getMin() + 1;
+  DomainInt domSize() const {
+    return max() - min() + 1;
   }
 
-  DomainInt getMin() const {
+  DomainInt min() const {
     return lower_bound();
   }
 
-  DomainInt getMax() const {
+  DomainInt max() const {
     return upper_bound();
   }
 
-  DomainInt getInitialMax() const {
-    return GET_LOCAL_CON().getInitialMax(*this);
+  DomainInt initialMax() const {
+    return GET_LOCAL_CON().initialMax(*this);
   }
 
-  DomainInt getInitialMin() const {
-    return GET_LOCAL_CON().getInitialMin(*this);
+  DomainInt initialMin() const {
+    return GET_LOCAL_CON().initialMin(*this);
   }
 
   void setMax(DomainInt i) {
@@ -263,11 +263,11 @@ struct BoundVarContainer {
     return upper_bound(d);
   }
 
-  DomainInt getInitialMin(const BoundVarRef_internal<BoundType>& d) const {
+  DomainInt initialMin(const BoundVarRef_internal<BoundType>& d) const {
     return initial_bounds[checked_cast<SysInt>(d.var_num)].first;
   }
 
-  DomainInt getInitialMax(const BoundVarRef_internal<BoundType>& d) const {
+  DomainInt initialMax(const BoundVarRef_internal<BoundType>& d) const {
     return initial_bounds[checked_cast<SysInt>(d.var_num)].second;
   }
 

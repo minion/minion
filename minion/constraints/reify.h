@@ -120,7 +120,7 @@ struct reify : public ParentConstraint {
         reify_var(_rar_var),
         constraint_locked(false),
         full_propagate_called(false) {
-    CHECK(reify_var.getInitialMin() >= 0 && reify_var.getInitialMax() <= 1,
+    CHECK(reify_var.initialMin() >= 0 && reify_var.initialMax() <= 1,
           "reify only works on Boolean variables");
 #ifdef NODETRICK
     numeric_limits<unsigned long long> ull;
@@ -199,7 +199,7 @@ struct reify : public ParentConstraint {
     P("Special Check!");
     constraint_locked = false;
     D_ASSERT(reify_var.isAssigned() &&
-             (reify_var.getAssignedValue() == 0 || reify_var.getAssignedValue() == 1));
+             (reify_var.assignedValue() == 0 || reify_var.assignedValue() == 1));
     if(reify_var.inDomain(0)) {
       child_constraints[1]->full_propagate();
     } else {
@@ -303,7 +303,7 @@ struct reify : public ParentConstraint {
       D_ASSERT(reify_var.isAssigned());
 
       SysInt child = getChildDynamicTrigger(trig);
-      if(reify_var.getAssignedValue() == child) {
+      if(reify_var.assignedValue() == child) {
         P("Removing leftover trigger from other child constraint");
         releaseTriggerInt(trig);
         return;
@@ -342,15 +342,15 @@ struct reify : public ParentConstraint {
     P("reify " << child_constraints[0]->constraint_name());
     P("negation: " << child_constraints[1]->constraint_name());
 
-    D_ASSERT(reify_var.getMin() >= 0);
-    D_ASSERT(reify_var.getMax() <= 1);
+    D_ASSERT(reify_var.min() >= 0);
+    D_ASSERT(reify_var.max() <= 1);
     if(getState().isFailed())
       return;
 
     moveTriggerInt(reify_var, dtcount, Assigned);
 
     if(reify_var.isAssigned()) {
-      if(reify_var.getAssignedValue() == 1) {
+      if(reify_var.assignedValue() == 1) {
         child_constraints[0]->full_propagate();
       } else {
         child_constraints[1]->full_propagate();

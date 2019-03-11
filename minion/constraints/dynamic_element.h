@@ -144,8 +144,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     CheckNotBound(var_array, "watchelement", "element");
     CheckNotBoundSingle(indexvar, "watchelement", "element");
     CheckNotBoundSingle(resultvar, "watchelement", "element");
-    initial_result_dom_min = std::min<DomainInt>(0, resultvar.getInitialMin());
-    initial_result_dom_max = std::max<DomainInt>(0, resultvar.getInitialMax());
+    initial_result_dom_min = std::min<DomainInt>(0, resultvar.initialMin());
+    initial_result_dom_max = std::max<DomainInt>(0, resultvar.initialMax());
   }
 
   virtual SysInt dynamic_trigger_count() {
@@ -165,14 +165,14 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       return;
 
     if(undef_maps_zero && realj == 0) {
-      if(indexvar.getMin() < 0) {
-        moveTriggerInt(indexvar, 2 * j, DomainRemoval, indexvar.getMin());
+      if(indexvar.min() < 0) {
+        moveTriggerInt(indexvar, 2 * j, DomainRemoval, indexvar.min());
         releaseTriggerInt(2 * j + 1);
         return;
       }
 
-      if(indexvar.getMax() >= (SysInt)var_array.size()) {
-        moveTriggerInt(indexvar, 2 * j, DomainRemoval, indexvar.getMax());
+      if(indexvar.max() >= (SysInt)var_array.size()) {
+        moveTriggerInt(indexvar, 2 * j, DomainRemoval, indexvar.max());
         releaseTriggerInt(2 * j + 1);
         return;
       }
@@ -180,8 +180,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     SysInt array_size = var_array.size();
 
-    DomainInt indexvar_min = indexvar.getMin();
-    DomainInt indexvar_max = indexvar.getMax();
+    DomainInt indexvar_min = indexvar.min();
+    DomainInt indexvar_max = indexvar.max();
 
     if(undef_maps_zero) {
       indexvar_min = std::max<DomainInt>(indexvar_min, 0);
@@ -228,8 +228,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     if(!indexvar.inDomain(i))
       return;
 
-    DomainInt resultvarmin = resultvar.getMin();
-    DomainInt resultvarmax = resultvar.getMax();
+    DomainInt resultvarmin = resultvar.min();
+    DomainInt resultvarmax = resultvar.max();
     DomainInt trig_pos = (initial_result_dom_max - initial_result_dom_min + 1) * 2;
 
     if(resultvarmin == resultvarmax) {
@@ -273,7 +273,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
   void deal_with_assigned_index() {
     D_ASSERT(indexvar.isAssigned());
-    SysInt indexval = checked_cast<SysInt>(indexvar.getAssignedValue());
+    SysInt indexval = checked_cast<SysInt>(indexvar.assignedValue());
     if(undef_maps_zero) {
       if(indexval < 0 || indexval >= (SysInt)var_array.size()) {
         resultvar.assign(0);
@@ -283,14 +283,14 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     VarRef& var = var_array[indexval];
 
-    DomainInt lower = resultvar.getMin();
-    if(lower > var.getMin()) {
+    DomainInt lower = resultvar.min();
+    if(lower > var.min()) {
       var.setMin(lower);
       ++lower; // do not need to check lower bound, we know it's in resultvar
     }
 
-    DomainInt upper = resultvar.getMax();
-    if(upper < var.getMax()) {
+    DomainInt upper = resultvar.max();
+    if(upper < var.max()) {
       var.setMax(upper);
       --upper; // do not need to check upper bound, we know it's in resultvar
     }
@@ -436,18 +436,18 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt array_start = max(DomainInt(0), indexvar.getMin());
-    DomainInt array_end = min(DomainInt(var_array.size()) - 1, indexvar.getMax());
+    DomainInt array_start = max(DomainInt(0), indexvar.min());
+    DomainInt array_end = min(DomainInt(var_array.size()) - 1, indexvar.max());
 
     if(undef_maps_zero) {
       if(resultvar.inDomain(0)) {
-        if(indexvar.getMin() < 0) {
-          assignment.push_back(make_pair(var_array.size(), indexvar.getMin()));
+        if(indexvar.min() < 0) {
+          assignment.push_back(make_pair(var_array.size(), indexvar.min()));
           assignment.push_back(make_pair(var_array.size() + 1, 0));
           return true;
         }
-        if(indexvar.getMax() >= (SysInt)var_array.size()) {
-          assignment.push_back(make_pair(var_array.size(), indexvar.getMax()));
+        if(indexvar.max() >= (SysInt)var_array.size()) {
+          assignment.push_back(make_pair(var_array.size(), indexvar.max()));
           assignment.push_back(make_pair(var_array.size() + 1, 0));
           return true;
         }
@@ -456,8 +456,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     for(SysInt i = checked_cast<SysInt>(array_start); i <= checked_cast<SysInt>(array_end); ++i) {
       if(indexvar.inDomain(i)) {
-        DomainInt dom_start = max(resultvar.getMin(), var_array[i].getMin());
-        DomainInt dom_end = min(resultvar.getMax(), var_array[i].getMax());
+        DomainInt dom_start = max(resultvar.min(), var_array[i].min());
+        DomainInt dom_end = min(resultvar.max(), var_array[i].max());
         for(DomainInt domval = dom_start; domval <= dom_end; ++domval) {
           if(var_array[i].inDomain(domval) && resultvar.inDomain(domval)) {
             // indexvar = i

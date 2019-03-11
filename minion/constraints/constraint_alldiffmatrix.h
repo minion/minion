@@ -113,7 +113,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   inline bool assignedValue(int row, int col) {
     return var_array[row * squaresize + col].isAssigned() &&
-           var_array[row * squaresize + col].getAssignedValue() == value;
+           var_array[row * squaresize + col].assignedValue() == value;
   }
 
   typedef typename VarArrayType::value_type VarRef;
@@ -172,7 +172,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
       // In the second block. Something was assigned.
       SysInt vidx = checked_cast<SysInt>(trig) - (SysInt)var_array.size();
 
-      if(var_array[vidx].getAssignedValue() == value) {
+      if(var_array[vidx].assignedValue() == value) {
         SysInt row = vidx / squaresize;
         SysInt col = vidx % squaresize;
 
@@ -219,7 +219,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         moveTriggerInt(var_array[i], i + var_array.size(), Assigned);
       }
 
-      if(var_array[i].isAssigned() && var_array[i].getAssignedValue() == value) {
+      if(var_array[i].isAssigned() && var_array[i].assignedValue() == value) {
         SysInt row = i / squaresize;
         SysInt col = i % squaresize;
 
@@ -632,12 +632,12 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         if(rowcolmatching[row] == col) {
           assignment.push_back(make_pair((row * squaresize) + col, value));
         } else {
-          if(var_array[row * squaresize + col].getMax() != value) {
+          if(var_array[row * squaresize + col].max() != value) {
             assignment.push_back(
-                make_pair((row * squaresize) + col, var_array[row * squaresize + col].getMax()));
+                make_pair((row * squaresize) + col, var_array[row * squaresize + col].max()));
           } else {
             assignment.push_back(
-                make_pair((row * squaresize) + col, var_array[row * squaresize + col].getMin()));
+                make_pair((row * squaresize) + col, var_array[row * squaresize + col].min()));
           }
         }
       }

@@ -189,12 +189,12 @@ struct VecCountDynamic : public AbstractConstraint {
     printf("\n");
 
     for(SysInt i = 0; i < var_array1.size(); ++i)
-      cout << var_array1[i].getMin() << ":" << var_array1[i].getMax() << ",";
+      cout << var_array1[i].min() << ":" << var_array1[i].max() << ",";
 
     cout << endl;
 
     for(SysInt i = 0; i < var_array2.size(); ++i)
-      cout << var_array2[i].getMin() << ":" << var_array2[i].getMax() << ",";
+      cout << var_array2[i].min() << ":" << var_array2[i].max() << ",";
 
     cout << endl;*/
 

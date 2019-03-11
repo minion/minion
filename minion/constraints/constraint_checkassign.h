@@ -73,7 +73,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
     MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     for(UnsignedSysInt i = 0; i < variables.size(); ++i) {
       D_ASSERT(variables[i].isAssigned());
-      assignment.push_back(variables[i].getAssignedValue());
+      assignment.push_back(variables[i].assignedValue());
     }
     if(assignment.size() == 0)
       return !check_assignment(NULL, 0);
@@ -146,16 +146,16 @@ struct CheckAssignConstraint : public AbstractConstraint {
     for(UnsignedSysInt i = 0; i < variables.size(); ++i) {
       if(!variables[i].isAssigned()) {
         if(free_var != -1) {
-          D_ASSERT(variables[i].getMin() != variables[i].getMax());
-          ret_box.push_back(make_pair(i, variables[i].getMin()));
-          ret_box.push_back(make_pair(i, variables[i].getMax()));
+          D_ASSERT(variables[i].min() != variables[i].max());
+          ret_box.push_back(make_pair(i, variables[i].min()));
+          ret_box.push_back(make_pair(i, variables[i].max()));
           return true;
         } else {
           free_var = i;
           c.push_back(-9999); // this value should never be used
         }
       } else
-        c.push_back(variables[i].getAssignedValue());
+        c.push_back(variables[i].assignedValue());
     }
 
     if(free_var == -1) {
@@ -165,19 +165,19 @@ struct CheckAssignConstraint : public AbstractConstraint {
         return false;
     } else {
       D_ASSERT(c[free_var] == -9999);
-      D_ASSERT(variables[free_var].getMin() != variables[free_var].getMax());
+      D_ASSERT(variables[free_var].min() != variables[free_var].max());
 
-      DomainInt free_min = variables[free_var].getMin();
+      DomainInt free_min = variables[free_var].min();
       c[free_var] = free_min;
       if(try_assignment(ret_box, c))
         return true;
-      DomainInt free_max = variables[free_var].getMax();
+      DomainInt free_max = variables[free_var].max();
       c[free_var] = free_max;
       if(try_assignment(ret_box, c))
         return true;
 
       if(!variables[free_var].isBound()) {
-        for(DomainInt i = variables[free_var].getMin() + 1; i < variables[free_var].getMax(); ++i) {
+        for(DomainInt i = variables[free_var].min() + 1; i < variables[free_var].max(); ++i) {
           if(variables[free_var].inDomain(i)) {
             c[free_var] = i;
             if(try_assignment(ret_box, c))

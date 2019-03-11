@@ -279,7 +279,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     for(SysInt i = 0; i < newsize; i++) {
       SysInt var = literalsScratch[i].first;
       DomainInt valoriginal = literalsScratch[i].second;
-      DomainInt lit = firstLiteralPerVar[var] + valoriginal - vars[var].getInitialMin();
+      DomainInt lit = firstLiteralPerVar[var] + valoriginal - vars[var].initialMin();
       supCells[i].literal = checked_cast<SysInt>(lit);
     }
     // now have enough supCells, and sup and literal of each is correct
@@ -516,8 +516,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
       if(supportsPerVar[var] == supports) { // otherwise has found implicit support in the meantime
 #if !SupportsGACUseZeroVals
-        for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
-          SysInt lit = firstLiteralPerVar[var] + val - vars[var].getInitialMin();
+        for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
+          SysInt lit = firstLiteralPerVar[var] + val - vars[var].initialMin();
 #else
         for(SysInt j = 0; j < (SysInt)zeroLits[var].size() && supportsPerVar[var] == supports;
             j++) {

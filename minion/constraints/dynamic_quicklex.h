@@ -81,11 +81,11 @@ struct QuickLexDynamic : public AbstractConstraint {
     alpha = 0;
 
     if(Less && var_array1.size() == 1) {
-      var_array2[0].setMin(var_array1[0].getMin() + 1);
-      var_array1[0].setMax(var_array2[0].getMax() - 1);
+      var_array2[0].setMin(var_array1[0].min() + 1);
+      var_array1[0].setMax(var_array2[0].max() - 1);
     } else {
-      var_array2[0].setMin(var_array1[0].getMin());
-      var_array1[0].setMax(var_array2[0].getMax());
+      var_array2[0].setMin(var_array1[0].min());
+      var_array1[0].setMax(var_array2[0].max());
     }
 
     // Set these up, just so they are stored.
@@ -93,7 +93,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     moveTriggerInt(var_array2[0], 1, UpperBound, NoDomainValue, TO_Store);
 
     if(var_array1[0].isAssigned() && var_array2[0].isAssigned() &&
-       var_array1[0].getAssignedValue() == var_array2[0].getAssignedValue()) {
+       var_array1[0].assignedValue() == var_array2[0].assignedValue()) {
       progress();
     }
   }
@@ -103,21 +103,21 @@ struct QuickLexDynamic : public AbstractConstraint {
     SysInt n = var_array1.size();
     D_ASSERT(var_array1[a].isAssigned());
     D_ASSERT(var_array2[a].isAssigned());
-    D_ASSERT(var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue());
+    D_ASSERT(var_array1[a].assignedValue() == var_array2[a].assignedValue());
 
     a++;
 
     while(a < n) {
       if(Less && a >= n - 1) {
-        var_array2[a].setMin(var_array1[a].getMin() + 1);
-        var_array1[a].setMax(var_array2[a].getMax() - 1);
+        var_array2[a].setMin(var_array1[a].min() + 1);
+        var_array1[a].setMax(var_array2[a].max() - 1);
       } else {
-        var_array1[a].setMax(var_array2[a].getMax());
-        var_array2[a].setMin(var_array1[a].getMin());
+        var_array1[a].setMax(var_array2[a].max());
+        var_array2[a].setMin(var_array1[a].min());
       }
 
       if(var_array1[a].isAssigned() && var_array2[a].isAssigned() &&
-         var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue()) {
+         var_array1[a].assignedValue() == var_array2[a].assignedValue()) {
         a++;
       } else {
         attach_triggers(a);
@@ -139,21 +139,21 @@ struct QuickLexDynamic : public AbstractConstraint {
 
     if(0 == dt) { // X triggered
       if(Less && a >= (SysInt)var_array1.size() - 1)
-        var_array2[a].setMin(var_array1[a].getMin() + 1);
+        var_array2[a].setMin(var_array1[a].min() + 1);
       else
-        var_array2[a].setMin(var_array1[a].getMin());
+        var_array2[a].setMin(var_array1[a].min());
     } else { // Y triggered
       if(Less && a >= (SysInt)var_array1.size() - 1)
-        var_array1[a].setMax(var_array2[a].getMax() - 1);
+        var_array1[a].setMax(var_array2[a].max() - 1);
       else
-        var_array1[a].setMax(var_array2[a].getMax());
+        var_array1[a].setMax(var_array2[a].max());
     }
 
     if(var_array1[a].isAssigned() && var_array2[a].isAssigned() &&
-       var_array1[a].getAssignedValue() == var_array2[a].getAssignedValue()) {
+       var_array1[a].assignedValue() == var_array2[a].assignedValue()) {
       progress();
     } else {
-      // if(var_array1[a].getMax() < var_array2[a].getMin())
+      // if(var_array1[a].max() < var_array2[a].min())
       //    detach_triggers();
     }
   }
@@ -176,8 +176,8 @@ struct QuickLexDynamic : public AbstractConstraint {
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     size_t array_size = var_array1.size();
     for(size_t i = 0; i < array_size; ++i) {
-      DomainInt x_i_min = var_array1[i].getMin();
-      DomainInt y_i_max = var_array2[i].getMax();
+      DomainInt x_i_min = var_array1[i].min();
+      DomainInt y_i_max = var_array2[i].max();
 
       if(x_i_min > y_i_max) {
         return false;

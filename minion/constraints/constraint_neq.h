@@ -83,14 +83,14 @@ struct NeqConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt prop_val_in, DomainDelta) {
     const SysInt prop_val = checked_cast<SysInt>(prop_val_in);
     PROP_INFO_ADDONE(ArrayNeq);
-    DomainInt remove_val = var_array[prop_val].getAssignedValue();
+    DomainInt remove_val = var_array[prop_val].assignedValue();
     SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i) {
       if(i != prop_val) {
         if(var_array[i].isBound()) {
-          if(var_array[i].getMin() == remove_val)
+          if(var_array[i].min() == remove_val)
             var_array[i].setMin(remove_val + 1);
-          if(var_array[i].getMax() == remove_val)
+          if(var_array[i].max() == remove_val)
             var_array[i].setMax(remove_val - 1);
         } else {
           var_array[i].removeFromDomain(remove_val);
@@ -104,13 +104,13 @@ struct NeqConstraint : public AbstractConstraint {
     SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
       if(var_array[i].isAssigned()) {
-        DomainInt remove_val = var_array[i].getAssignedValue();
+        DomainInt remove_val = var_array[i].assignedValue();
         for(SysInt j = 0; j < array_size; ++j) {
           if(i != j) {
             if(var_array[j].isBound()) {
-              if(var_array[j].getMin() == remove_val)
+              if(var_array[j].min() == remove_val)
                 var_array[j].setMin(remove_val + 1);
-              if(var_array[j].getMax() == remove_val)
+              if(var_array[j].max() == remove_val)
                 var_array[j].setMax(remove_val - 1);
             } else {
               var_array[j].removeFromDomain(remove_val);
@@ -145,11 +145,11 @@ struct NeqConstraint : public AbstractConstraint {
 
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i) {
       if(!var_array[i].isAssigned()) {
-        assignment.push_back(make_pair(i, var_array[i].getMin()));
-        assignment.push_back(make_pair(i, var_array[i].getMax()));
+        assignment.push_back(make_pair(i, var_array[i].min()));
+        assignment.push_back(make_pair(i, var_array[i].max()));
         return true;
       } else
-        c.push_back(var_array[i].getAssignedValue());
+        c.push_back(var_array[i].assignedValue());
     }
 
     if(check_assignment(c.begin(), c.size())) { // Put the complete assignment in the box.

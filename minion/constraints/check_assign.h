@@ -86,7 +86,7 @@ struct Check_Assign : public AbstractConstraint {
 
     MAKE_STACK_BOX(b, DomainInt, size);
     for(SysInt i = 0; i < size; ++i)
-      b.push_back((*vars)[i].getAssignedValue());
+      b.push_back((*vars)[i].assignedValue());
 
     DomainInt* varptr = 0;
     if(b.size() != 0) {

@@ -76,19 +76,19 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].isAssigned()) {
-        assigned.insert(vars[i].getAssignedValue());
+        assigned.insert(vars[i].assignedValue());
       }
     }
 
     result.setMin(assigned.size());
 
-    if((DomainInt)assigned.size() == result.getMax() && assigned.size() > 0) {
+    if((DomainInt)assigned.size() == result.max() && assigned.size() > 0) {
       for(unsigned i = 0; i < vars.size(); ++i) {
         if(!vars[i].isAssigned()) {
           vars[i].setMin(*assigned.begin());
           vars[i].setMax(*(--assigned.end()));
           if(!vars[i].isBound()) {
-            for(DomainInt d = vars[i].getMin(); d <= vars[i].getMax(); ++d) {
+            for(DomainInt d = vars[i].min(); d <= vars[i].max(); ++d) {
               if(assigned.count(d) == 0)
                 vars[i].removeFromDomain(d);
             }
@@ -116,28 +116,28 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(unsigned i = 0; i < vars.size(); ++i) {
-      if(vars[i].getMin() != vars[i].getMax()) {
+      if(vars[i].min() != vars[i].max()) {
         assignment.clear();
-        assignment.push_back(make_pair(i, vars[i].getMin()));
-        assignment.push_back(make_pair(i, vars[i].getMax()));
+        assignment.push_back(make_pair(i, vars[i].min()));
+        assignment.push_back(make_pair(i, vars[i].max()));
         return true;
       } else
-        assignment.push_back(make_pair(i, vars[i].getAssignedValue()));
+        assignment.push_back(make_pair(i, vars[i].assignedValue()));
     }
 
-    if(result.getMin() != result.getMax()) {
+    if(result.min() != result.max()) {
       assignment.clear();
-      assignment.push_back(make_pair(vars.size(), result.getMin()));
-      assignment.push_back(make_pair(vars.size(), result.getMax()));
+      assignment.push_back(make_pair(vars.size(), result.min()));
+      assignment.push_back(make_pair(vars.size(), result.max()));
       return true;
     } else
-      assignment.push_back(make_pair(vars.size(), result.getAssignedValue()));
+      assignment.push_back(make_pair(vars.size(), result.assignedValue()));
 
     std::set<DomainInt> values;
     for(unsigned i = 0; i < vars.size(); ++i)
-      values.insert(vars[i].getAssignedValue());
+      values.insert(vars[i].assignedValue());
 
-    return (DomainInt)values.size() <= result.getAssignedValue();
+    return (DomainInt)values.size() <= result.assignedValue();
   }
 
   // Function to make it reifiable in the lousiest way.
@@ -187,11 +187,11 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     DomainInt unassigned_count = 0;
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].isAssigned()) {
-        assigned.insert(vars[i].getAssignedValue());
+        assigned.insert(vars[i].assignedValue());
       } else {
         unassigned_count++;
-        min_unassigned = std::min(min_unassigned, vars[i].getMin());
-        max_unassigned = std::max(max_unassigned, vars[i].getMax());
+        min_unassigned = std::min(min_unassigned, vars[i].min());
+        max_unassigned = std::max(max_unassigned, vars[i].max());
       }
     }
 
@@ -249,28 +249,28 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(unsigned i = 0; i < vars.size(); ++i) {
-      if(vars[i].getMin() != vars[i].getMax()) {
+      if(vars[i].min() != vars[i].max()) {
         assignment.clear();
-        assignment.push_back(make_pair(i, vars[i].getMin()));
-        assignment.push_back(make_pair(i, vars[i].getMax()));
+        assignment.push_back(make_pair(i, vars[i].min()));
+        assignment.push_back(make_pair(i, vars[i].max()));
         return true;
       } else
-        assignment.push_back(make_pair(i, vars[i].getAssignedValue()));
+        assignment.push_back(make_pair(i, vars[i].assignedValue()));
     }
 
-    if(result.getMin() != result.getMax()) {
+    if(result.min() != result.max()) {
       assignment.clear();
-      assignment.push_back(make_pair(vars.size(), result.getMin()));
-      assignment.push_back(make_pair(vars.size(), result.getMax()));
+      assignment.push_back(make_pair(vars.size(), result.min()));
+      assignment.push_back(make_pair(vars.size(), result.max()));
       return true;
     } else
-      assignment.push_back(make_pair(vars.size(), result.getAssignedValue()));
+      assignment.push_back(make_pair(vars.size(), result.assignedValue()));
 
     std::set<DomainInt> values;
     for(unsigned i = 0; i < vars.size(); ++i)
-      values.insert(vars[i].getAssignedValue());
+      values.insert(vars[i].assignedValue());
 
-    return (DomainInt)values.size() >= result.getAssignedValue();
+    return (DomainInt)values.size() >= result.assignedValue();
   }
 
   // Function to make it reifiable in the lousiest way.

@@ -42,12 +42,12 @@ struct AndConstraint : public AbstractConstraint {
   VarRef3 var3;
   AndConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3)
       : var1(_var1), var2(_var2), var3(_var3) {
-    CHECK(var1.getInitialMin() == 0, "The 'and' constraint works only Booleans");
-    CHECK(var1.getInitialMax() == 1, "The 'and' constraint works only Booleans");
-    CHECK(var2.getInitialMin() == 0, "The 'and' constraint works only Booleans");
-    CHECK(var2.getInitialMax() == 1, "The 'and' constraint works only Booleans");
-    CHECK(var3.getInitialMin() == 0, "The 'and' constraint works only Booleans");
-    CHECK(var3.getInitialMax() == 1, "The 'and' constraint works only Booleans");
+    CHECK(var1.initialMin() == 0, "The 'and' constraint works only Booleans");
+    CHECK(var1.initialMax() == 1, "The 'and' constraint works only Booleans");
+    CHECK(var2.initialMin() == 0, "The 'and' constraint works only Booleans");
+    CHECK(var2.initialMax() == 1, "The 'and' constraint works only Booleans");
+    CHECK(var3.initialMin() == 0, "The 'and' constraint works only Booleans");
+    CHECK(var3.initialMax() == 1, "The 'and' constraint works only Booleans");
   }
 
   virtual SysInt dynamic_trigger_count() {
@@ -130,8 +130,8 @@ struct AndConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    if(var3.getMax() == 1) {
-      if(var1.getMax() == 1 && var2.getMax() == 1) {
+    if(var3.max() == 1) {
+      if(var1.max() == 1 && var2.max() == 1) {
         assignment.push_back(make_pair(0, 1));
         assignment.push_back(make_pair(1, 1));
         assignment.push_back(make_pair(2, 1));
@@ -139,14 +139,14 @@ struct AndConstraint : public AbstractConstraint {
       }
     }
 
-    if(var3.getMin() == 0) {
-      if(var2.getMin() == 0) {
+    if(var3.min() == 0) {
+      if(var2.min() == 0) {
         assignment.push_back(make_pair(1, 0));
         assignment.push_back(make_pair(2, 0));
         return true;
       }
 
-      if(var1.getMin() == 0) {
+      if(var1.min() == 0) {
         assignment.push_back(make_pair(0, 0));
         assignment.push_back(make_pair(2, 0));
         return true;

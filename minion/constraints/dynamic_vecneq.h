@@ -62,20 +62,20 @@ struct EqIterated {
 
   template <typename VarType1, typename VarType2>
   static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
-    return var1.getMin() > var2.getMax() || var1.getMax() < var2.getMin();
+    return var1.min() > var2.max() || var1.max() < var2.min();
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     // just do bounds for the time being
-    var2.setMin(var1.getMin());
-    var2.setMax(var1.getMax());
+    var2.setMin(var1.min());
+    var2.setMax(var1.max());
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var2(VarType1& var1, VarType2& var2) {
-    var1.setMin(var2.getMin());
-    var1.setMax(var2.getMax());
+    var1.setMin(var2.min());
+    var1.setMax(var2.max());
   }
 
   template <typename VarType1, typename VarType2>
@@ -89,12 +89,12 @@ struct EqIterated {
   template <typename Var1, typename Var2>
   static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
-    DomainInt min = var1.getMin();
-    if(var2.getMin() > min)
-      min = var2.getMin();
-    DomainInt max = var1.getMax();
-    if(var2.getMax() < max)
-      max = var2.getMax();
+    DomainInt min = var1.min();
+    if(var2.min() > min)
+      min = var2.min();
+    DomainInt max = var1.max();
+    if(var2.max() < max)
+      max = var2.max();
     for(DomainInt i = min; i <= max; i++) {
       if(var1.inDomain(i) && var2.inDomain(i)) {
         assign = make_pair(i, i);
@@ -129,19 +129,19 @@ struct NeqIterated {
   template <typename VarType1, typename VarType2>
   static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
     return var1.isAssigned() && var2.isAssigned() &&
-           var1.getAssignedValue() == var2.getAssignedValue();
+           var1.assignedValue() == var2.assignedValue();
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     if(var1.isAssigned())
-      remove_value(var1.getAssignedValue(), var2);
+      remove_value(var1.assignedValue(), var2);
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var2(VarType1& var1, VarType2& var2) {
     if(var2.isAssigned())
-      remove_value(var2.getAssignedValue(), var1);
+      remove_value(var2.assignedValue(), var1);
   }
 
   template <typename VarType1, typename VarType2>
@@ -153,9 +153,9 @@ struct NeqIterated {
   template <typename Var>
   static void remove_value(DomainInt val, Var& var) {
     if(var.isBound()) {
-      if(var.getMin() == val)
+      if(var.min() == val)
         var.setMin(val + 1);
-      else if(var.getMax() == val)
+      else if(var.max() == val)
         var.setMax(val - 1);
     } else {
       var.removeFromDomain(val);
@@ -165,19 +165,19 @@ struct NeqIterated {
   template <typename Var1, typename Var2>
   static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
-    if(var1.isAssigned() && var2.isAssigned() && var1.getAssignedValue() == var2.getAssignedValue())
+    if(var1.isAssigned() && var2.isAssigned() && var1.assignedValue() == var2.assignedValue())
       return false;
 
     if(var1.isAssigned()) {
-      if(var2.getMin() != var1.getAssignedValue())
-        assign = make_pair(var1.getAssignedValue(), var2.getMin());
+      if(var2.min() != var1.assignedValue())
+        assign = make_pair(var1.assignedValue(), var2.min());
       else
-        assign = make_pair(var1.getAssignedValue(), var2.getMax());
+        assign = make_pair(var1.assignedValue(), var2.max());
     } else {
-      if(var1.getMin() != var2.getMin())
-        assign = make_pair(var1.getMin(), var2.getMin());
+      if(var1.min() != var2.min())
+        assign = make_pair(var1.min(), var2.min());
       else
-        assign = make_pair(var1.getMax(), var2.getMin());
+        assign = make_pair(var1.max(), var2.min());
     }
     return true;
   }
@@ -202,17 +202,17 @@ struct LessIterated {
 
   template <typename VarType1, typename VarType2>
   static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
-    return var1.getMin() >= var2.getMax();
+    return var1.min() >= var2.max();
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var1(VarType1& var1, VarType2& var2) {
-    var2.setMin(var1.getMin() + 1);
+    var2.setMin(var1.min() + 1);
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var2(VarType1& var1, VarType2& var2) {
-    var1.setMax(var2.getMax() - 1);
+    var1.setMax(var2.max() - 1);
   }
 
   template <typename VarType1, typename VarType2>
@@ -224,8 +224,8 @@ struct LessIterated {
   template <typename Var1, typename Var2>
   static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
-    if(var1.getMin() < var2.getMax()) {
-      assign = make_pair(var1.getMin(), var2.getMax());
+    if(var1.min() < var2.max()) {
+      assign = make_pair(var1.min(), var2.max());
       return true;
     } else
       return false;
@@ -251,7 +251,7 @@ struct BothNonZeroIterated {
 
   template <typename VarType1, typename VarType2>
   static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
-    return var1.getMax() <= 0 || var2.getMax() <= 0;
+    return var1.max() <= 0 || var2.max() <= 0;
   }
 
   template <typename VarType1, typename VarType2>
@@ -273,8 +273,8 @@ struct BothNonZeroIterated {
   template <typename Var1, typename Var2>
   static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
-    if(var1.getMax() > 0 && var2.getMax() > 0) {
-      assign = make_pair(var1.getMax(), var2.getMax());
+    if(var1.max() > 0 && var2.max() > 0) {
+      assign = make_pair(var1.max(), var2.max());
       return true;
     } else
       return false;

@@ -44,7 +44,7 @@ vector<vector<AnyVarRef>> get_AnyVarRef_from_Var(const vector<vector<Var>>& vec)
 
 template <typename V>
 std::pair<DomainInt, DomainInt> get_initialBounds(const V& v) {
-  return std::make_pair(v.getInitialMin(), v.getInitialMax());
+  return std::make_pair(v.initialMin(), v.initialMax());
 }
 
 std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v) {

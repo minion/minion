@@ -95,7 +95,7 @@ inline AbstractConstraint* BuildCT_POW(const V1& vars, const V2& var2, Constrain
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
   // vars1 is special to avoid 0^0
-  if(vars[0].getInitialMin() < 0 || vars[1].getInitialMin() <= 0 || var2[0].getInitialMin() < 0) {
+  if(vars[0].initialMin() < 0 || vars[1].initialMin() <= 0 || var2[0].initialMin() < 0) {
     typedef PowConstraint_Check<typename V1::value_type, typename V1::value_type,
                                 typename V2::value_type, false>
         PowConC;

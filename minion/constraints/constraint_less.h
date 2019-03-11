@@ -67,9 +67,9 @@ struct LeqConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(BinaryLeq);
     if(checked_cast<SysInt>(prop_val)) { // y changed
-      x.setMax(y.getMax() + offset);
+      x.setMax(y.max() + offset);
     } else { // x changed
-      y.setMin(x.getMin() - offset);
+      y.setMin(x.min() - offset);
     }
   }
 
@@ -87,8 +87,8 @@ struct LeqConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt x_min = x.getMin();
-    DomainInt y_max = y.getMax();
+    DomainInt x_min = x.min();
+    DomainInt y_max = y.max();
 
     if(x_min <= y_max + offset) {
       assignment.push_back(make_pair(0, x_min));

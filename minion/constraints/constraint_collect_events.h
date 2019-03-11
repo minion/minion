@@ -43,7 +43,7 @@ public:
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
     //  Trig is the assigned variable.
-    assignments.push_back(std::make_pair(trig, var_array[trig].getAssignedValue()));
+    assignments.push_back(std::make_pair(trig, var_array[trig].assignedValue()));
   }
 
   virtual void full_propagate() {

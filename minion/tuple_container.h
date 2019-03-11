@@ -304,7 +304,7 @@ public:
   HaggisGACTuples* getHaggisData(const Vars& vars);
 
   // NOTE: initial domains may be empty, in which case they should be ignored.
-  vector<set<DomainInt>> getInitialDomains() {
+  vector<set<DomainInt>> initialDomains() {
     return initial_domains;
   }
 

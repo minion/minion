@@ -33,12 +33,12 @@ template <typename Var>
 void add_var_dom_to_json(const Var& v, std::ostream& s) {
   s << '"' << getBaseVarName(v) << "\":";
   if(v.isAssigned() || v.isBound()) {
-    s << "[ [" << v.getMin() << "," << v.getMax() << "] ]";
+    s << "[ [" << v.min() << "," << v.max() << "] ]";
   } else {
     s << "[ ";
-    DomainInt lower_range = v.getMin();
+    DomainInt lower_range = v.min();
     bool in_range = true;
-    for(DomainInt i = v.getMin() + 1; i < v.getMax(); ++i) {
+    for(DomainInt i = v.min() + 1; i < v.max(); ++i) {
       if(in_range) {
         if(!v.inDomain(i)) {
           s << "[" << lower_range << "," << i - 1 << "],";
@@ -53,9 +53,9 @@ void add_var_dom_to_json(const Var& v, std::ostream& s) {
     }
 
     if(in_range) {
-      s << "[" << lower_range << "," << v.getMax() << "] ]";
+      s << "[" << lower_range << "," << v.max() << "] ]";
     } else {
-      s << "[" << v.getMax() << "," << v.getMax() << "] ]";
+      s << "[" << v.max() << "," << v.max() << "] ]";
     }
   }
 }
@@ -79,13 +79,13 @@ template <typename Var>
 string get_dom_as_string(const Var& v) {
   ostringstream s;
   if(v.isAssigned()) {
-    s << v.getAssignedValue();
+    s << v.assignedValue();
   } else {
     if(v.isBound()) {
-      s << "[" << v.getMin() << "," << v.getMax() << "]";
+      s << "[" << v.min() << "," << v.max() << "]";
     } else {
-      s << "{" << v.getMin();
-      for(DomainInt i = v.getMin() + 1; i <= v.getMax(); ++i)
+      s << "{" << v.min();
+      for(DomainInt i = v.min() + 1; i <= v.max(); ++i)
         if(v.inDomain(i))
           s << "," << i;
       s << "}";
@@ -114,9 +114,9 @@ DomainInt lit_count(Vars& v) {
   DomainInt lits = 0;
   for(SysInt i = 0; i < (SysInt)v.size(); ++i) {
     if(v[i].isBound()) {
-      lits += v[i].getMax() - v[i].getMin() + 1;
+      lits += v[i].max() - v[i].min() + 1;
     } else {
-      for(DomainInt j = v[i].getMin(); j <= v[i].getMax(); ++j)
+      for(DomainInt j = v[i].min(); j <= v[i].max(); ++j)
         if(v[i].inDomain(j))
           lits++;
     }

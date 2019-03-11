@@ -58,9 +58,9 @@ struct InfoRefType {
     return assign;
   }
 
-  DomainInt getAssignedValue() const {
+  DomainInt assignedValue() const {
     VAR_INFO_ADDONE(VAR_TYPE, getAssignedValue);
-    DomainInt assignValue = data.getAssignedValue();
+    DomainInt assignValue = data.assignedValue();
     VAR_INFO_PRINT_0("isAssignedValue", assignValue);
     return assignValue;
   }
@@ -86,37 +86,37 @@ struct InfoRefType {
     return indom_noBC;
   }
 
-  DomainInt getDomSize() const {
+  DomainInt domSize() const {
     VAR_INFO_ADDONE(VAR_TYPE, getDomSize);
-    DomainInt domval = data.getDomSize();
+    DomainInt domval = data.domSize();
     VAR_INFO_PRINT_0("GetDomSize", domval);
     return domval;
   }
 
-  DomainInt getMax() const {
+  DomainInt max() const {
     VAR_INFO_ADDONE(VAR_TYPE, getMax);
-    DomainInt maxval = data.getMax();
+    DomainInt maxval = data.max();
     VAR_INFO_PRINT_0("GetMax", maxval);
     return maxval;
   }
 
-  DomainInt getMin() const {
+  DomainInt min() const {
     VAR_INFO_ADDONE(VAR_TYPE, getMin);
-    DomainInt minval = data.getMin();
+    DomainInt minval = data.min();
     VAR_INFO_PRINT_0("GetMin", minval);
     return minval;
   }
 
-  DomainInt getInitialMax() const {
-    VAR_INFO_ADDONE(VAR_TYPE, getInitialMax);
-    DomainInt initialMax = data.getInitialMax();
+  DomainInt initialMax() const {
+    VAR_INFO_ADDONE(VAR_TYPE, initialMax);
+    DomainInt initialMax = data.initialMax();
     VAR_INFO_PRINT_0("InitialMax", initialMax);
     return initialMax;
   }
 
-  DomainInt getInitialMin() const {
-    VAR_INFO_ADDONE(VAR_TYPE, getInitialMin);
-    DomainInt initialMin = data.getInitialMin();
+  DomainInt initialMin() const {
+    VAR_INFO_ADDONE(VAR_TYPE, initialMin);
+    DomainInt initialMin = data.initialMin();
     VAR_INFO_PRINT_0("InitialMin", initialMin);
     return initialMin;
   }

@@ -54,12 +54,12 @@ struct VarNeg {
     return data.isAssigned();
   }
 
-  DomainInt getAssignedValue() const {
-    return -data.getAssignedValue();
+  DomainInt assignedValue() const {
+    return -data.assignedValue();
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return data.isAssigned() && data.getAssignedValue() == -i;
+    return data.isAssigned() && data.assignedValue() == -i;
   }
 
   BOOL inDomain(DomainInt b) const {
@@ -70,24 +70,24 @@ struct VarNeg {
     return data.inDomain(-b);
   }
 
-  DomainInt getDomSize() const {
-    return data.getDomSize();
+  DomainInt domSize() const {
+    return data.domSize();
   }
 
-  DomainInt getMax() const {
-    return -data.getMin();
+  DomainInt max() const {
+    return -data.min();
   }
 
-  DomainInt getMin() const {
-    return -data.getMax();
+  DomainInt min() const {
+    return -data.max();
   }
 
-  DomainInt getInitialMax() const {
-    return -data.getInitialMin();
+  DomainInt initialMax() const {
+    return -data.initialMin();
   }
 
-  DomainInt getInitialMin() const {
-    return -data.getInitialMax();
+  DomainInt initialMin() const {
+    return -data.initialMax();
   }
 
   void setMax(DomainInt i) {

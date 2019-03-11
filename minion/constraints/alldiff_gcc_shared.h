@@ -253,14 +253,14 @@ protected:
 #endif
         constraint_locked(false) {
     if(var_array.size() > 0) {
-      dom_min = checked_cast<SysInt>(var_array[0].getInitialMin());
-      dom_max = checked_cast<SysInt>(var_array[0].getInitialMax());
+      dom_min = checked_cast<SysInt>(var_array[0].initialMin());
+      dom_max = checked_cast<SysInt>(var_array[0].initialMax());
     }
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if(var_array[i].getInitialMin() < dom_min)
-        dom_min = checked_cast<SysInt>(var_array[i].getInitialMin());
-      if(var_array[i].getInitialMax() > dom_max)
-        dom_max = checked_cast<SysInt>(var_array[i].getInitialMax());
+      if(var_array[i].initialMin() < dom_min)
+        dom_min = checked_cast<SysInt>(var_array[i].initialMin());
+      if(var_array[i].initialMax() > dom_max)
+        dom_max = checked_cast<SysInt>(var_array[i].initialMax());
     }
     numvars = var_array.size(); // number of variables in the constraint
     numvals = dom_max - dom_min + 1;
@@ -355,8 +355,8 @@ protected:
 
   void check_adjlists() {
     for(SysInt i = 0; i < numvars; i++) {
-      D_ASSERT(var_array[i].getMin() >= dom_min);
-      D_ASSERT(var_array[i].getMax() <= dom_max);
+      D_ASSERT(var_array[i].min() >= dom_min);
+      D_ASSERT(var_array[i].max() <= dom_max);
       for(SysInt j = dom_min; j <= dom_max; j++) {
         D_DATA(bool in = adjlistpos[i][j - dom_min] < adjlistlength[i]);
         D_DATA(bool in2 =
@@ -563,8 +563,8 @@ protected:
           for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
             // cout<<"Layer item: "<<(*setit)<<endl;
             SysInt tempvar = toiterate[i];
-            for(DomainInt realval = var_array[tempvar].getMin();
-                realval <= var_array[tempvar].getMax(); realval++) {
+            for(DomainInt realval = var_array[tempvar].min();
+                realval <= var_array[tempvar].max(); realval++) {
               if(var_array[tempvar].inDomain(realval)) {
                 SysInt tempval = realval - dom_min;
 

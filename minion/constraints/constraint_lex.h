@@ -121,7 +121,7 @@ struct LexLeqConstraint : public AbstractConstraint {
         return;
       }
       if(!x[i].isAssigned() || !y[i].isAssigned() ||
-         x[i].getAssignedValue() != y[i].getAssignedValue()) {
+         x[i].assignedValue() != y[i].assignedValue()) {
         alpha = i;
         propagateDynInt(i * 4, DomainDelta::empty());
       } else
@@ -129,7 +129,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     } else {
       while(i < n) {
         if(!x[i].isAssigned() || !y[i].isAssigned() ||
-           x[i].getAssignedValue() != y[i].getAssignedValue()) {
+           x[i].assignedValue() != y[i].assignedValue()) {
           alpha = i;
           propagateDynInt(i * 4, DomainDelta::empty());
           return;
@@ -145,9 +145,9 @@ struct LexLeqConstraint : public AbstractConstraint {
   void updateBeta(SysInt i) {
     SysInt a = alpha;
     while(i >= a) {
-      if(x[i].getMin() < y[i].getMax()) {
+      if(x[i].min() < y[i].max()) {
         beta = i + 1;
-        if(!(x[i].getMax() < y[i].getMin()))
+        if(!(x[i].max() < y[i].min()))
           propagateDynInt(i * 4, DomainDelta::empty());
         return;
       }
@@ -179,37 +179,37 @@ struct LexLeqConstraint : public AbstractConstraint {
     }
 
     if(i == a && i + 1 == b) {
-      x[i].setMax(y[i].getMax() - 1);
-      y[i].setMin(x[i].getMin() + 1);
+      x[i].setMax(y[i].max() - 1);
+      y[i].setMin(x[i].min() + 1);
       if(checkLex(i)) {
         F = true;
         return;
       }
     } else if(i == a && i + 1 < b) {
-      x[i].setMax(y[i].getMax());
-      y[i].setMin(x[i].getMin());
+      x[i].setMax(y[i].max());
+      y[i].setMin(x[i].min());
       if(checkLex(i)) {
         F = true;
         return;
       }
       if(x[i].isAssigned() && y[i].isAssigned() &&
-         x[i].getAssignedValue() == y[i].getAssignedValue())
+         x[i].assignedValue() == y[i].assignedValue())
         updateAlpha(i + 1);
     } else if(a < i && i < b) {
-      if((i == b - 1 && x[i].getMin() == y[i].getMax()) || x[i].getMin() > y[i].getMax())
+      if((i == b - 1 && x[i].min() == y[i].max()) || x[i].min() > y[i].max())
         updateBeta(i - 1);
     }
   }
 
   BOOL checkLex(SysInt i) {
     if(Less) {
-      return x[i].getMax() < y[i].getMin();
+      return x[i].max() < y[i].min();
     } else {
       SysInt n = x.size();
       if(i == n - 1)
-        return (x[i].getMax() <= y[i].getMin());
+        return (x[i].max() <= y[i].min());
       else
-        return (x[i].getMax() < y[i].getMin());
+        return (x[i].max() < y[i].min());
     }
   }
 
@@ -221,7 +221,7 @@ struct LexLeqConstraint : public AbstractConstraint {
         break;
       if(!y[i].isAssigned())
         break;
-      if(x[i].getAssignedValue() != y[i].getAssignedValue())
+      if(x[i].assignedValue() != y[i].assignedValue())
         break;
     }
     if(i < n) {
@@ -232,9 +232,9 @@ struct LexLeqConstraint : public AbstractConstraint {
       }
       SysInt betaBound = -1;
       for(; i < n; i++) {
-        if(x[i].getMin() > y[i].getMax())
+        if(x[i].min() > y[i].max())
           break;
-        if(x[i].getMin() == y[i].getMax()) {
+        if(x[i].min() == y[i].max()) {
           if(betaBound == -1)
             betaBound = i;
         } else
@@ -286,8 +286,8 @@ struct LexLeqConstraint : public AbstractConstraint {
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     size_t x_size = x.size();
     for(size_t i = 0; i < x_size; ++i) {
-      DomainInt x_i_min = x[i].getMin();
-      DomainInt y_i_max = y[i].getMax();
+      DomainInt x_i_min = x[i].min();
+      DomainInt y_i_max = y[i].max();
 
       if(x_i_min > y_i_max) {
         return false;

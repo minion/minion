@@ -129,13 +129,13 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     getState().getGenericBacktracker().add(this);
 
     if(vars.size() > 0) {
-      dom_max = vars[0].getInitialMax();
-      dom_min = vars[0].getInitialMin();
+      dom_max = vars[0].initialMax();
+      dom_min = vars[0].initialMin();
       for(SysInt i = 1; i < (SysInt)vars.size(); i++) {
-        if(vars[i].getInitialMin() < dom_min)
-          dom_min = vars[i].getInitialMin();
-        if(vars[i].getInitialMax() > dom_max)
-          dom_max = vars[i].getInitialMax();
+        if(vars[i].initialMin() < dom_min)
+          dom_min = vars[i].initialMin();
+        if(vars[i].initialMax() > dom_max)
+          dom_max = vars[i].initialMax();
       }
       numvals = checked_cast<SysInt>(dom_max - dom_min + 1);
     }
@@ -154,7 +154,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     tuple_lists.resize(vars.size());
     for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
       const SysInt domsize =
-          checked_cast<SysInt>(vars[var].getInitialMax() - vars[var].getInitialMin() + 1);
+          checked_cast<SysInt>(vars[var].initialMax() - vars[var].initialMin() + 1);
       tuple_list_pos[var] = getMemory().backTrack().template requestArray<UnsignedSysInt>(domsize);
       for(SysInt validx = 0; validx < domsize; validx++) {
         tuple_list_pos[var][validx] = 0;
@@ -169,8 +169,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
       for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
         DomainInt val = (*tup)[var];
-        if(val >= vars[var].getInitialMin() && val <= vars[var].getInitialMax()) {
-          tuple_lists[var][checked_cast<SysInt>(val - vars[var].getInitialMin())].push_back(tup);
+        if(val >= vars[var].initialMin() && val <= vars[var].initialMax()) {
+          tuple_lists[var][checked_cast<SysInt>(val - vars[var].initialMin())].push_back(tup);
         }
       }
 
@@ -538,7 +538,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   if(var == vartopad)                                                                              \
     assignment.push_back(make_pair(var, val));                                                     \
   else                                                                                             \
-    assignment.push_back(make_pair(vartopad, vars[vartopad].getMin()));
+    assignment.push_back(make_pair(vartopad, vars[vartopad].min()));
 
 #define ADDTOASSIGNMENTFL(var, val) assignment.push_back(make_pair(var, val));
 
@@ -546,9 +546,9 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     D_ASSERT(vars[var].inDomain(val));
 
     vector<vector<DomainInt>*>& tups =
-        tuple_lists[var][checked_cast<SysInt>(val - vars[var].getInitialMin())];
+        tuple_lists[var][checked_cast<SysInt>(val - vars[var].initialMin())];
 
-    SysInt cur = tuple_list_pos[var][checked_cast<SysInt>(val - vars[var].getInitialMin())];
+    SysInt cur = tuple_list_pos[var][checked_cast<SysInt>(val - vars[var].initialMin())];
     SysInt numtups = tups.size();
     SysInt numvars = vars.size();
     for(; cur < numtups; cur++) {
@@ -565,7 +565,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
         for(SysInt i = 0; i < numvars; i++) {
           assignment.push_back(make_pair(i, tup[i]));
         }
-        tuple_list_pos[var][checked_cast<SysInt>(val - vars[var].getInitialMin())] = cur;
+        tuple_list_pos[var][checked_cast<SysInt>(val - vars[var].initialMin())] = cur;
         return true;
       }
     }
@@ -609,7 +609,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
     // For each literal, find a support for it or delete it.
     for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
-      for(DomainInt val = vars[var].getMin(); val <= vars[var].getMax(); val++) {
+      for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
         if(vars[var].inDomain(val)) {
 
           // From here is cut-and-paste from propagate.

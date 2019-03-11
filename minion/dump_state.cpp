@@ -73,7 +73,7 @@ void dump_searchorder(const SearchOrder& order, ostream& os) {
     else
       os << ",";
     if(v.isAssigned())
-      os << v.getAssignedValue();
+      os << v.assignedValue();
     else
       os << getNameFromVar(v);
   }
@@ -120,11 +120,11 @@ void just_domain_dump(ostream& os) {
 
     if(!getState().isFailed()) {
       if(vars[i].isBound()) {
-        os << vars[i].getMin() << ".." << vars[i].getMax();
+        os << vars[i].min() << ".." << vars[i].max();
       } else {
         bool first = true;
 
-        for(DomainInt val = vars[i].getMin(); val <= vars[i].getMax(); ++val) {
+        for(DomainInt val = vars[i].min(); val <= vars[i].max(); ++val) {
           if(vars[i].inDomain(val)) {
             if(first)
               first = false;
@@ -166,7 +166,7 @@ void dump_solver(ostream& os, bool just_domains) {
     BoundVarRef bv = vc.boundVarContainer.get_var_num(i);
     if(!bv.isAssigned()) {
       os << "BOUND " << getNameFromVar(bv) << " ";
-      os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
+      os << "{" << bv.min() << ".." << bv.max() << "}" << endl;
     }
   }
 
@@ -175,16 +175,16 @@ void dump_solver(ostream& os, bool just_domains) {
     BigRangeVarRef bv = vc.bigRangeVarContainer.get_var_num(i);
     if(!bv.isAssigned()) {
       os << "DISCRETE " << getNameFromVar(bv) << " ";
-      os << "{" << bv.getMin() << ".." << bv.getMax() << "}" << endl;
+      os << "{" << bv.min() << ".." << bv.max() << "}" << endl;
     }
     vector<DomainInt> deleted_values;
-    for(DomainInt i = bv.getMin() + 1; i < bv.getMax(); ++i) {
+    for(DomainInt i = bv.min() + 1; i < bv.max(); ++i) {
       if(!bv.inDomain(i))
         deleted_values.push_back(i);
     }
     if(!deleted_values.empty()) {
       os << "**CONSTRAINTS**" << endl;
-      if((DomainInt)deleted_values.size() < bv.getMax() - bv.getMin() + 1) {
+      if((DomainInt)deleted_values.size() < bv.max() - bv.min() + 1) {
         os << "w-notinset(" << getNameFromVar(bv) << ", [";
         bool first = true;
         for(size_t i = 0; i < deleted_values.size(); ++i) {
@@ -197,8 +197,8 @@ void dump_solver(ostream& os, bool just_domains) {
         os << "])" << endl;
       } else {
         os << "w-inset(" << getNameFromVar(bv) << ", [";
-        os << bv.getMin();
-        for(DomainInt i = bv.getMin() + 1; i <= bv.getMax(); ++i) {
+        os << bv.min();
+        for(DomainInt i = bv.min() + 1; i <= bv.max(); ++i) {
           if(bv.inDomain(i))
             os << "," << i;
         }
@@ -274,7 +274,7 @@ void dump_solver(ostream& os, bool just_domains) {
     else
       os << "MINIMISING ";
     if(getState().getRawOptimiseVar()->isAssigned())
-      os << getState().getRawOptimiseVar()->getAssignedValue() << "\n";
+      os << getState().getRawOptimiseVar()->assignedValue() << "\n";
     else
       os << getNameFromVar(*getState().getRawOptimiseVar()) << "\n";
   }

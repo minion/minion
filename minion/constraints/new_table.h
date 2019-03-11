@@ -225,7 +225,7 @@ struct NewTableConstraint : public AbstractConstraint {
       if(getState().isFailed())
         return;
 
-      for(DomainInt x = vars[i].getMin(); x <= vars[i].getMax(); ++x) {
+      for(DomainInt x = vars[i].min(); x <= vars[i].max(); ++x) {
         vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(i, x));
         if(support) {
           setup_watches(Literal(i, x), data->getLiteralPos(Literal(i, x)), *support);
@@ -242,8 +242,8 @@ struct NewTableConstraint : public AbstractConstraint {
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     pair<DomainInt, DomainInt> bounds = data->getDomainBounds(0);
 
-    for(DomainInt x = max(vars[0].getMin(), bounds.first);
-        x <= min(vars[0].getMax(), bounds.second); ++x) {
+    for(DomainInt x = max(vars[0].min(), bounds.first);
+        x <= min(vars[0].max(), bounds.second); ++x) {
       if(vars[0].inDomain(x)) {
         vector<DomainInt>* support = state.findSupportingTuple(vars, Literal(0, x));
         if(support) {

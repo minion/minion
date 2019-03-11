@@ -161,15 +161,15 @@ struct AnyVarRef_Abstract {
   virtual BOOL isBound() const = 0;
   virtual AnyVarRef popOneMapper() const = 0;
   virtual BOOL isAssigned() const = 0;
-  virtual DomainInt getAssignedValue() const = 0;
+  virtual DomainInt assignedValue() const = 0;
   virtual BOOL isAssignedValue(DomainInt i) const = 0;
   virtual BOOL inDomain(DomainInt b) const = 0;
   virtual BOOL inDomain_noBoundCheck(DomainInt b) const = 0;
-  virtual DomainInt getDomSize() const = 0;
-  virtual DomainInt getMax() const = 0;
-  virtual DomainInt getMin() const = 0;
-  virtual DomainInt getInitialMax() const = 0;
-  virtual DomainInt getInitialMin() const = 0;
+  virtual DomainInt domSize() const = 0;
+  virtual DomainInt max() const = 0;
+  virtual DomainInt min() const = 0;
+  virtual DomainInt initialMax() const = 0;
+  virtual DomainInt initialMin() const = 0;
   virtual void setMax(DomainInt i) = 0;
   virtual void setMin(DomainInt i) = 0;
   virtual void uncheckedAssign(DomainInt b) = 0;
@@ -215,8 +215,8 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
     return data.isAssigned();
   }
 
-  virtual DomainInt getAssignedValue() const {
-    return data.getAssignedValue();
+  virtual DomainInt assignedValue() const {
+    return data.assignedValue();
   }
 
   virtual BOOL isAssignedValue(DomainInt i) const {
@@ -231,24 +231,24 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
     return data.inDomain_noBoundCheck(b);
   }
 
-  virtual DomainInt getDomSize() const {
-    return data.getDomSize();
+  virtual DomainInt domSize() const {
+    return data.domSize();
   }
 
-  virtual DomainInt getMax() const {
-    return data.getMax();
+  virtual DomainInt max() const {
+    return data.max();
   }
 
-  virtual DomainInt getMin() const {
-    return data.getMin();
+  virtual DomainInt min() const {
+    return data.min();
   }
 
-  virtual DomainInt getInitialMax() const {
-    return data.getInitialMax();
+  virtual DomainInt initialMax() const {
+    return data.initialMax();
   }
 
-  virtual DomainInt getInitialMin() const {
-    return data.getInitialMin();
+  virtual DomainInt initialMin() const {
+    return data.initialMin();
   }
 
   virtual void setMax(DomainInt i) {
@@ -350,12 +350,12 @@ public:
     return data->isAssigned();
   }
 
-  DomainInt getAssignedValue() const {
-    return data->getAssignedValue();
+  DomainInt assignedValue() const {
+    return data->assignedValue();
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return data->isAssigned() && data->getAssignedValue() == i;
+    return data->isAssigned() && data->assignedValue() == i;
   }
 
   BOOL inDomain(DomainInt b) const {
@@ -366,24 +366,24 @@ public:
     return data->inDomain_noBoundCheck(b);
   }
 
-  DomainInt getDomSize() const {
-    return data->getDomSize();
+  DomainInt domSize() const {
+    return data->domSize();
   }
 
-  DomainInt getMax() const {
-    return data->getMax();
+  DomainInt max() const {
+    return data->max();
   }
 
-  DomainInt getMin() const {
-    return data->getMin();
+  DomainInt min() const {
+    return data->min();
   }
 
-  DomainInt getInitialMax() const {
-    return data->getInitialMax();
+  DomainInt initialMax() const {
+    return data->initialMax();
   }
 
-  DomainInt getInitialMin() const {
-    return data->getInitialMin();
+  DomainInt initialMin() const {
+    return data->initialMin();
   }
 
   void setMax(DomainInt i) {

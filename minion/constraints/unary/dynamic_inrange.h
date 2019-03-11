@@ -82,8 +82,8 @@ struct WatchInRangeConstraint : public AbstractConstraint {
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    DomainInt min_val = max(range_min, var.getMin());
-    DomainInt max_val = min(range_max, var.getMax());
+    DomainInt min_val = max(range_min, var.min());
+    DomainInt max_val = min(range_max, var.max());
     for(DomainInt i = min_val; i <= max_val; ++i) {
       if(var.inDomain(i)) {
         assignment.push_back(make_pair(0, i));

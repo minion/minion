@@ -136,7 +136,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     idx_target_set.clear();
 
     for(unsigned i = 0; i < idx_source.size(); ++i) {
-      DomainInt val = idx_source[i].getAssignedValue();
+      DomainInt val = idx_source[i].assignedValue();
       if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size()) {
         getState().setFailed(true);
         return false;
@@ -144,7 +144,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       idx_source_set.insert(val);
     }
     for(unsigned i = 0; i < idx_target.size(); ++i) {
-      DomainInt val = idx_target[i].getAssignedValue();
+      DomainInt val = idx_target[i].assignedValue();
       if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size()) {
         getState().setFailed(true);
         return false;
@@ -194,8 +194,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       SysInt targetpos = source_to_target_map[block] * blocksize + blockpos;
       D_ASSERT(targetpos >= 0 && targetpos < target.size());
       D_ASSERT(i >= 0 && i < source.size());
-      target[targetpos].setMax(source[i].getMax());
-      target[targetpos].setMin(source[i].getMin());
+      target[targetpos].setMax(source[i].max());
+      target[targetpos].setMin(source[i].min());
     }
   }
 
@@ -206,8 +206,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       SysInt sourcepos = target_to_source_map[block] * blocksize + blockpos;
       D_ASSERT(sourcepos >= 0 && sourcepos < source.size());
       D_ASSERT(i >= 0 && i < target.size());
-      source[sourcepos].setMax(target[i].getMax());
-      source[sourcepos].setMin(target[i].getMin());
+      source[sourcepos].setMax(target[i].max());
+      source[sourcepos].setMin(target[i].min());
     }
   }
 
@@ -313,32 +313,32 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(unsigned i = 0; i < idx_source.size(); ++i) {
       if(!idx_source[i].isAssigned()) {
-        assignment.push_back(make_pair(i, idx_source[i].getMax()));
-        assignment.push_back(make_pair(i, idx_source[i].getMin()));
+        assignment.push_back(make_pair(i, idx_source[i].max()));
+        assignment.push_back(make_pair(i, idx_source[i].min()));
         return true;
       }
     }
     SysInt skip = idx_source.size();
     for(unsigned i = 0; i < idx_target.size(); ++i) {
       if(!idx_target[i].isAssigned()) {
-        assignment.push_back(make_pair(i + skip, idx_target[i].getMax()));
-        assignment.push_back(make_pair(i + skip, idx_target[i].getMin()));
+        assignment.push_back(make_pair(i + skip, idx_target[i].max()));
+        assignment.push_back(make_pair(i + skip, idx_target[i].min()));
         return true;
       }
     }
     skip = skip + idx_target.size();
     for(unsigned i = 0; i < source.size(); ++i) {
       if(!source[i].isAssigned()) {
-        assignment.push_back(make_pair(i + skip, source[i].getMax()));
-        assignment.push_back(make_pair(i + skip, source[i].getMin()));
+        assignment.push_back(make_pair(i + skip, source[i].max()));
+        assignment.push_back(make_pair(i + skip, source[i].min()));
         return true;
       }
     }
     skip = skip + source.size();
     for(unsigned i = 0; i < target.size(); ++i) {
       if(!target[i].isAssigned()) {
-        assignment.push_back(make_pair(i + skip, target[i].getMax()));
-        assignment.push_back(make_pair(i + skip, target[i].getMin()));
+        assignment.push_back(make_pair(i + skip, target[i].max()));
+        assignment.push_back(make_pair(i + skip, target[i].min()));
         return true;
       }
     }
@@ -348,13 +348,13 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     std::set<DomainInt> idx_target_set;
 
     for(unsigned i = 0; i < idx_source.size(); ++i) {
-      DomainInt val = idx_source[i].getAssignedValue();
+      DomainInt val = idx_source[i].assignedValue();
       if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size())
         return false;
       idx_source_set.insert(val);
     }
     for(unsigned i = 0; i < idx_target.size(); ++i) {
-      DomainInt val = idx_target[i].getAssignedValue();
+      DomainInt val = idx_target[i].assignedValue();
       if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size())
         return false;
       idx_target_set.insert(val);
@@ -374,8 +374,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       if(idxsource <= numblocks && idxtarget <= numblocks) {
         // Copy a block over.
         for(SysInt i = 0; i < blocksize; i++) {
-          if(target[(idxtarget - 1) * blocksize + i].getAssignedValue() !=
-             source[(idxsource - 1) * blocksize + i].getAssignedValue()) {
+          if(target[(idxtarget - 1) * blocksize + i].assignedValue() !=
+             source[(idxsource - 1) * blocksize + i].assignedValue()) {
             return false;
           }
         }

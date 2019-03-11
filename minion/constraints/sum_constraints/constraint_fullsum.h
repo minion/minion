@@ -72,16 +72,16 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     BigInt accumulator = 0;
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       accumulator += checked_cast<SysInt>(
-          max(abs(var_array[i].getInitialMax()), abs(var_array[i].getInitialMin())));
+          max(abs(var_array[i].initialMax()), abs(var_array[i].initialMin())));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
     }
     accumulator +=
-        checked_cast<SysInt>(max(abs(var_sum.getInitialMax()), abs(var_sum.getInitialMin())));
+        checked_cast<SysInt>(max(abs(var_sum.initialMax()), abs(var_sum.initialMin())));
     CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
 
     no_negatives = true;
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if(var_array[i].getInitialMin() < 0) {
+      if(var_array[i].initialMin() < 0) {
         no_negatives = false;
         return;
       }
@@ -102,7 +102,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
   DomainInt get_real_min_sum() {
     DomainInt min_sum = 0;
     for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
-      min_sum += it->getMin();
+      min_sum += it->min();
     return min_sum;
   }
 
@@ -123,7 +123,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       return;
     D_ASSERT(sum <= get_real_min_sum());
 
-    DomainInt looseness = var_sum.getMax() - sum;
+    DomainInt looseness = var_sum.max() - sum;
     if(looseness < 0) {
       getState().setFailed(true);
       return;
@@ -131,7 +131,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
     if(looseness < max_looseness) {
       for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it)
-        it->setMax(it->getMin() + looseness);
+        it->setMax(it->min() + looseness);
     }
   }
 
@@ -141,8 +141,8 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     DomainInt min_sum = 0;
     DomainInt max_diff = 0;
     for(typename VarArray::iterator it = var_array.begin(); it != var_array.end(); ++it) {
-      min_sum += it->getMin();
-      max_diff = max(max_diff, it->getMax() - it->getMin());
+      min_sum += it->min();
+      max_diff = max(max_diff, it->max() - it->min());
     }
 
     var_array_min_sum = min_sum;
@@ -169,10 +169,10 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
     if(no_negatives) // How are the two cases different? They look identical.
     {
-      DomainInt max_sum = var_sum.getMax();
+      DomainInt max_sum = var_sum.max();
       assignment.push_back(make_pair(v_size, max_sum));
       for(SysInt i = 0; i < v_size && sum_value <= max_sum; ++i) {
-        DomainInt min_val = var_array[i].getMin();
+        DomainInt min_val = var_array[i].min();
         assignment.push_back(make_pair(i, min_val));
         sum_value += min_val;
       }
@@ -180,14 +180,14 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       return (sum_value <= max_sum);
     } else {
       for(SysInt i = 0; i < v_size; ++i) {
-        assignment.push_back(make_pair(i, var_array[i].getMin()));
-        sum_value += var_array[i].getMin();
+        assignment.push_back(make_pair(i, var_array[i].min()));
+        sum_value += var_array[i].min();
       }
-      P("B" << (sum_value <= var_sum.getMax()));
-      if(sum_value > var_sum.getMax())
+      P("B" << (sum_value <= var_sum.max()));
+      if(sum_value > var_sum.max())
         return false;
       else
-        assignment.push_back(make_pair(v_size, var_sum.getMax()));
+        assignment.push_back(make_pair(v_size, var_sum.max()));
       return true;
     }
   }

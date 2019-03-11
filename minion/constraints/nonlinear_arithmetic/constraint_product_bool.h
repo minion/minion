@@ -41,14 +41,14 @@ struct BoolProdConstraint : public AbstractConstraint {
 
   BoolProdConstraint(ProdVarRef1 _v1, ProdVarRef2 _v2, ProdVarRef3 _v3)
       : var1(_v1), var2(_v2), var3(_v3) {
-    if(var1.getInitialMin() < 0 || var1.getInitialMax() > 1) {
+    if(var1.initialMin() < 0 || var1.initialMax() > 1) {
       D_FATAL_ERROR("Internal error in BoolProdConstraint");
     }
   }
 
   SysInt dynamic_trigger_count() {
-    return checked_cast<SysInt>(var2.getInitialMax() - var2.getInitialMin() + 1 +
-                                var3.getInitialMax() - var3.getInitialMin() + 1 + 2 + 2);
+    return checked_cast<SysInt>(var2.initialMax() - var2.initialMin() + 1 +
+                                var3.initialMax() - var3.initialMin() + 1 + 2 + 2);
   }
 
   void full_check() {
@@ -66,16 +66,16 @@ struct BoolProdConstraint : public AbstractConstraint {
       var3.removeFromDomain(0);
     }
 
-    for(DomainInt val = var3.getMin(); val <= var3.getMax(); val++) {
+    for(DomainInt val = var3.min(); val <= var3.max(); val++) {
       if(!var2.inDomain(val) && val != 0) {
         var3.removeFromDomain(val);
       }
     }
 
-    if(var1.getMin() > 0) {
-      var2.setMin(var3.getMin());
-      var2.setMax(var3.getMax());
-      for(DomainInt val = var2.getMin(); val <= var2.getMax(); ++val) {
+    if(var1.min() > 0) {
+      var2.setMin(var3.min());
+      var2.setMax(var3.max());
+      for(DomainInt val = var2.min(); val <= var2.max(); ++val) {
         if(!var3.inDomain(val)) {
           var2.removeFromDomain(val);
         }
@@ -90,8 +90,8 @@ struct BoolProdConstraint : public AbstractConstraint {
       return;
     }
 
-    DomainInt minval = std::max(var2.getMin(), var3.getMin());
-    DomainInt maxval = std::min(var2.getMax(), var3.getMax());
+    DomainInt minval = std::max(var2.min(), var3.min());
+    DomainInt maxval = std::min(var2.max(), var3.max());
     for(DomainInt val = minval; val <= maxval; ++val) {
       if(var2.inDomain(val) && var3.inDomain(val)) {
         moveTriggerInt(var2, dvarequalval, DomainRemoval, val);
@@ -104,21 +104,21 @@ struct BoolProdConstraint : public AbstractConstraint {
   }
 
   virtual void full_propagate() {
-    dvar3 = checked_cast<SysInt>(var2.getInitialMax() - var2.getInitialMin() + 1);
-    dvarbool = dvar3 + checked_cast<SysInt>(var3.getInitialMax() - var3.getInitialMin() + 1);
+    dvar3 = checked_cast<SysInt>(var2.initialMax() - var2.initialMin() + 1);
+    dvarbool = dvar3 + checked_cast<SysInt>(var3.initialMax() - var3.initialMin() + 1);
     dvarequalval = dvarbool + 2;
 
     full_check();
 
-    for(DomainInt val = var2.getMin(); val <= var2.getMax(); val++) {
+    for(DomainInt val = var2.min(); val <= var2.max(); val++) {
       if(var2.inDomain(val)) {
-        moveTriggerInt(var2, val - var2.getInitialMin(), DomainRemoval, val);
+        moveTriggerInt(var2, val - var2.initialMin(), DomainRemoval, val);
       }
     }
 
-    for(DomainInt val = var3.getMin(); val <= var3.getMax(); val++) {
+    for(DomainInt val = var3.min(); val <= var3.max(); val++) {
       if(var3.inDomain(val)) {
-        moveTriggerInt(var3, dvar3 + val - var3.getInitialMin(), DomainRemoval, val);
+        moveTriggerInt(var3, dvar3 + val - var3.initialMin(), DomainRemoval, val);
       }
     }
 
@@ -131,7 +131,7 @@ struct BoolProdConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt pos, DomainDelta) {
     if(pos < dvar3) {
-      DomainInt domval = pos + var2.getInitialMin();
+      DomainInt domval = pos + var2.initialMin();
       D_ASSERT(!var2.inDomain(domval));
       if(domval != 0) {
         var3.removeFromDomain(domval);
@@ -142,10 +142,10 @@ struct BoolProdConstraint : public AbstractConstraint {
       }
     } else if(pos < dvarbool) {
       pos -= dvar3;
-      DomainInt domval = pos + var3.getInitialMin();
+      DomainInt domval = pos + var3.initialMin();
       D_ASSERT(!var3.inDomain(domval));
       if(domval != 0) {
-        if(var1.getMin() > 0) {
+        if(var1.min() > 0) {
           var2.removeFromDomain(domval);
         }
       } else {
@@ -183,9 +183,9 @@ struct BoolProdConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+    for(DomainInt v1 = var1.min(); v1 <= var1.max(); ++v1) {
       if(var1.inDomain(v1)) {
-        for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
+        for(DomainInt v2 = var2.min(); v2 <= var2.max(); ++v2) {
           if(var2.inDomain(v2) && var3.inDomain(v1 * v2)) {
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));

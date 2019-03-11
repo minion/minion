@@ -151,7 +151,7 @@ struct Forward_Checking : public AbstractConstraint {
   bool full_assignment_failed(SysInt size, vector<AnyVarRef>* vars) {
     MAKE_STACK_BOX(b, DomainInt, size);
     for(SysInt i = 0; i < size; ++i)
-      b.push_back((*vars)[i].getAssignedValue());
+      b.push_back((*vars)[i].assignedValue());
 
     DomainInt* varptr = 0;
     if(b.size() != 0) {
@@ -206,15 +206,15 @@ struct Forward_Checking : public AbstractConstraint {
     for(SysInt i = 0; i < size; ++i) {
       if(i != var) {
         D_ASSERT((*vars)[i].isAssigned());
-        b.push_back((*vars)[i].getAssignedValue());
+        b.push_back((*vars)[i].assignedValue());
       } else {
         b.push_back(DomainInt_Skip);
       }
     }
 
-    DomainInt maxval = v.getMax();
+    DomainInt maxval = v.max();
 
-    for(DomainInt value = v.getMin(); value <= maxval; value++) {
+    for(DomainInt value = v.min(); value <= maxval; value++) {
       if(v.inDomain(value)) {
         b[var] = value;
         if(!check_assignment(&b[0], size)) {
@@ -232,16 +232,16 @@ struct Forward_Checking : public AbstractConstraint {
     for(SysInt i = 0; i < size; ++i) {
       if(i != var) {
         D_ASSERT((*vars)[i].isAssigned());
-        b.push_back((*vars)[i].getAssignedValue());
+        b.push_back((*vars)[i].assignedValue());
       } else {
         b.push_back(DomainInt_Skip);
       }
     }
 
-    DomainInt maxval = v.getMax();
+    DomainInt maxval = v.max();
 
     // Scan up from lower bound.
-    for(DomainInt value = v.getMin(); value <= maxval; value++) {
+    for(DomainInt value = v.min(); value <= maxval; value++) {
       b[var] = value;
       if(!check_assignment(&b[0], size)) {
         v.setMin(value + 1);
@@ -250,10 +250,10 @@ struct Forward_Checking : public AbstractConstraint {
       }
     }
 
-    DomainInt minval = v.getMin();
+    DomainInt minval = v.min();
 
     // Scan down from upper bound
-    for(DomainInt value = v.getMax(); value >= minval; value--) {
+    for(DomainInt value = v.max(); value >= minval; value--) {
       b[var] = value;
       if(!check_assignment(&b[0], size)) {
         v.setMax(value - 1);

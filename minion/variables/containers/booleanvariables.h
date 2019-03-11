@@ -98,7 +98,7 @@ struct BoolVarRef_internal {
     return assign_ptr() & shift_offset;
   }
 
-  DomainInt getAssignedValue() const {
+  DomainInt assignedValue() const {
     D_ASSERT(isAssigned());
     return (bool)(value_ptr() & shift_offset);
   }
@@ -106,38 +106,38 @@ struct BoolVarRef_internal {
   BOOL inDomain(DomainInt b) const {
     if((checked_cast<SysInt>(b) | 1) != 1)
       return false;
-    return (!isAssigned()) || (b == getAssignedValue());
+    return (!isAssigned()) || (b == assignedValue());
   }
 
   BOOL inDomain_noBoundCheck(DomainInt b) const {
     D_ASSERT(b == 0 || b == 1);
-    return (!isAssigned()) || (b == getAssignedValue());
+    return (!isAssigned()) || (b == assignedValue());
   }
 
-  DomainInt getMin() const {
+  DomainInt min() const {
     if(!isAssigned())
       return 0;
-    return getAssignedValue();
+    return assignedValue();
   }
 
-  DomainInt getDomSize() const {
+  DomainInt domSize() const {
     if(isAssigned())
       return 1;
     else
       return 2;
   }
 
-  DomainInt getMax() const {
+  DomainInt max() const {
     if(!isAssigned())
       return 1;
-    return getAssignedValue();
+    return assignedValue();
   }
 
-  DomainInt getInitialMin() const {
+  DomainInt initialMin() const {
     return 0;
   }
 
-  DomainInt getInitialMax() const {
+  DomainInt initialMax() const {
     return 1;
   }
 
@@ -268,7 +268,7 @@ struct BoolVarContainer {
       return;
 
     if(d.isAssigned()) {
-      if(b == d.getAssignedValue())
+      if(b == d.assignedValue())
         getState().setFailed(true);
     } else
       uncheckedAssign(d, 1 - b);
@@ -304,7 +304,7 @@ struct BoolVarContainer {
     if(!d.isAssigned())
       internalAssign(d, b);
     else {
-      if(d.getAssignedValue() != b)
+      if(d.assignedValue() != b)
         getState().setFailed(true);
     }
   }

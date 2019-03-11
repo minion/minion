@@ -50,7 +50,7 @@ struct ConstantVar {
     return true;
   }
 
-  DomainInt getAssignedValue() const {
+  DomainInt assignedValue() const {
     return val;
   }
 
@@ -67,23 +67,23 @@ struct ConstantVar {
     return true;
   }
 
-  DomainInt getDomSize() const {
+  DomainInt domSize() const {
     return 1;
   }
 
-  DomainInt getMax() const {
+  DomainInt max() const {
     return val;
   }
 
-  DomainInt getMin() const {
+  DomainInt min() const {
     return val;
   }
 
-  DomainInt getInitialMax() const {
+  DomainInt initialMax() const {
     return val;
   }
 
-  DomainInt getInitialMin() const {
+  DomainInt initialMin() const {
     return val;
   }
 

@@ -51,8 +51,8 @@ struct VarNot {
   }
 
   VarNot(const VarRef& _data) : data(_data) {
-    // D_ASSERT(data.getInitialMin() == 0);
-    // D_ASSERT(data.getInitialMax() == 1);
+    // D_ASSERT(data.initialMin() == 0);
+    // D_ASSERT(data.initialMax() == 1);
   }
 
   VarNot() : data() {}
@@ -72,12 +72,12 @@ struct VarNot {
     return data.isAssigned();
   }
 
-  DomainInt getAssignedValue() const {
-    return swap(data.getAssignedValue());
+  DomainInt assignedValue() const {
+    return swap(data.assignedValue());
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return data.isAssigned() && swap(data.getAssignedValue()) == i;
+    return data.isAssigned() && swap(data.assignedValue()) == i;
   }
 
   BOOL inDomain(DomainInt b) const {
@@ -88,24 +88,24 @@ struct VarNot {
     return data.inDomain(swap(b));
   }
 
-  DomainInt getDomSize() const {
-    return data.getDomSize();
+  DomainInt domSize() const {
+    return data.domSize();
   }
 
-  DomainInt getMax() const {
-    return swap(data.getMin());
+  DomainInt max() const {
+    return swap(data.min());
   }
 
-  DomainInt getMin() const {
-    return swap(data.getMax());
+  DomainInt min() const {
+    return swap(data.max());
   }
 
-  DomainInt getInitialMax() const {
-    return swap(data.getInitialMin());
+  DomainInt initialMax() const {
+    return swap(data.initialMin());
   }
 
-  DomainInt getInitialMin() const {
-    return swap(data.getInitialMax());
+  DomainInt initialMin() const {
+    return swap(data.initialMax());
   }
 
   void setMax(DomainInt i) {

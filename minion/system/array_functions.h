@@ -51,7 +51,7 @@ inline Bounds emptyBounds() {
 
 template <typename T>
 inline Bounds getBounds(const T& t) {
-  return Bounds(t.getMin(), t.getMax());
+  return Bounds(t.min(), t.max());
 }
 
 inline Bounds addValue(Bounds b, DomainInt d) {

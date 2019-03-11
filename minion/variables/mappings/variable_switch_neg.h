@@ -47,12 +47,12 @@ struct SwitchNeg {
     return data.isAssigned();
   }
 
-  DomainInt getAssignedValue() const {
-    return multiplier * data.getAssignedValue();
+  DomainInt assignedValue() const {
+    return multiplier * data.assignedValue();
   }
 
   BOOL isAssignedValue(DomainInt i) const {
-    return data.isAssigned() && data.getAssignedValue() == i * multiplier;
+    return data.isAssigned() && data.assignedValue() == i * multiplier;
   }
 
   BOOL inDomain(DomainInt b) const {
@@ -63,36 +63,36 @@ struct SwitchNeg {
     return data.inDomain(b * multiplier);
   }
 
-  DomainInt getDomSize() const {
-    return data.getDomSize();
+  DomainInt domSize() const {
+    return data.domSize();
   }
 
-  DomainInt getMax() const {
+  DomainInt max() const {
     if(multiplier == 1)
-      return data.getMax();
+      return data.max();
     else
-      return -data.getMin();
+      return -data.min();
   }
 
-  DomainInt getMin() const {
+  DomainInt min() const {
     if(multiplier == 1)
-      return data.getMin();
+      return data.min();
     else
-      return -data.getMax();
+      return -data.max();
   }
 
-  DomainInt getInitialMax() const {
+  DomainInt initialMax() const {
     if(multiplier == 1)
-      return data.getInitialMax();
+      return data.initialMax();
     else
-      return -data.getInitialMin();
+      return -data.initialMin();
   }
 
-  DomainInt getInitialMin() const {
+  DomainInt initialMin() const {
     if(multiplier == 1)
-      return data.getInitialMin();
+      return data.initialMin();
     else
-      return -data.getInitialMax();
+      return -data.initialMax();
   }
 
   void setMax(DomainInt i) {

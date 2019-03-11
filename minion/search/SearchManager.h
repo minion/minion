@@ -115,9 +115,9 @@ struct StandardSearchManager : public SearchManager {
 
     // special case the upper and lower bounds to make it work for bound
     // variables
-    if(var_array[var].getMin() == val) {
+    if(var_array[var].min() == val) {
       var_array[var].setMin(val + 1);
-    } else if(var_array[var].getMax() == val) {
+    } else if(var_array[var].max() == val) {
       var_array[var].setMax(val - 1);
     } else {
       var_array[var].removeFromDomain(val);
