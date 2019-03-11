@@ -600,6 +600,9 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       std::cerr << "Use -solsout to store the solutions";
       getOptions().parallel = true;
     }
+    else if(command == string("-X-AMO")) {
+      getOptions().gatherAMOs = true;
+    }
     else if(command == string("-cores")) {
       INCREMENT_i(-cores);
       getOptions().parallelcores = atoi(argv[i]);

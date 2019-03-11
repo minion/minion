@@ -216,7 +216,9 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
     }
   }
-  
+
+
+    if(getOptions().gatherAMOs) {
   // Extra pass to collect the mutexes.
   // Populate listbools.
   //  Extra stuff for mutexes
@@ -292,6 +294,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         }
     }
     std::cout << std::endl;
+    }
 }
 
 struct PropagateGAC {

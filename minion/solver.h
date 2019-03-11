@@ -353,6 +353,9 @@ public:
   int parallelcores = 0;
   bool parallelStealHigh = true;
 
+  // Gather AMOs
+  bool gatherAMOs = false;
+
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
 
