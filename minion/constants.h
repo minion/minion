@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef _CONSTANTS_H
 #define _CONSTANTS_H
@@ -41,42 +41,35 @@ enum PropagationType {
   PropLevel_SSAC
 };
 
-inline std::ostream& operator<<(std::ostream& o, PropagationType p)
-{
+inline std::ostream& operator<<(std::ostream& o, PropagationType p) {
   switch(p) {
-    case PropLevel_None: o << "none"; break;
-    case PropLevel_GAC: o << "GAC"; break;
-    case PropLevel_SACBounds: o << "SACBounds"; break;
-    case PropLevel_SAC: o << "SAC"; break;
-    case PropLevel_SSACBounds: o << "SSACBounds"; break;
-    case PropLevel_SSAC: o << "SSAC"; break;
+  case PropLevel_None: o << "none"; break;
+  case PropLevel_GAC: o << "GAC"; break;
+  case PropLevel_SACBounds: o << "SACBounds"; break;
+  case PropLevel_SAC: o << "SAC"; break;
+  case PropLevel_SSACBounds: o << "SSACBounds"; break;
+  case PropLevel_SSAC: o << "SSAC"; break;
   }
   return o;
 }
-
 
 struct PropagationLevel {
   PropagationType type;
   bool limit;
 
-  PropagationLevel(PropagationType _t = PropLevel_GAC, bool _l = false)
-  : type(_t), limit(_l)
-  { }
+  PropagationLevel(PropagationType _t = PropLevel_GAC, bool _l = false) : type(_t), limit(_l) {}
 };
 
-inline std::ostream& operator<<(std::ostream& o, PropagationLevel pl)
-{
+inline std::ostream& operator<<(std::ostream& o, PropagationLevel pl) {
   o << pl.type;
   if(pl.limit)
     o << "_limit";
   return o;
 }
 
-inline bool operator<(PropagationLevel lhs, PropagationLevel rhs)
-{
+inline bool operator<(PropagationLevel lhs, PropagationLevel rhs) {
   return std::make_pair(lhs.type, lhs.limit) < std::make_pair(rhs.type, rhs.limit);
 }
-
 
 inline PropagationLevel GetPropMethodFromString(std::string instring) {
   int find_split = instring.find('_');
@@ -108,7 +101,7 @@ inline PropagationLevel GetPropMethodFromString(std::string instring) {
 
   bool limit = false;
   if(find_split != string::npos) {
-    string subtype = instring.substr(find_split+1, instring.size());
+    string subtype = instring.substr(find_split + 1, instring.size());
     if(subtype != "limit") {
       output_fatal_error(instring + " is not a valid propagation method");
     }

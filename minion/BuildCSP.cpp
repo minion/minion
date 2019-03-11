@@ -1,34 +1,33 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #include "minion.h"
 
-#include "preprocess.h"
 #include "parallel/parallel.h"
+#include "preprocess.h"
 #include "search/search_control.h"
 
 #include "search/SearchStrategies.h"
 #include "search/neighbourhood-search.h"
-#include "search/restartSearchManager.h"
 #include "search/restartNewSearchManager.h"
-
+#include "search/restartSearchManager.h"
 
 #include "dump_state.hpp"
 
@@ -36,7 +35,6 @@ using namespace ProbSpec;
 std::shared_ptr<NhConfig> makeNhConfig() {
   return make_shared<NhConfig>();
 }
-
 
 void BuildCSP(CSPInstance& instance) {
   getState().setTupleListContainer(instance.tupleListContainer);
@@ -132,17 +130,16 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
 
   if(instance.neighbourhoodContainer) {
 
-     sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order, *instance.neighbourhoodContainer);
-  }
-  else {
+    sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order,
+                                 *instance.neighbourhoodContainer);
+  } else {
     if(getOptions().restart.active) {
       if(getOptions().sollimit != 1) {
         D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
       }
-      //sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
+      // sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
       sm = Controller::make_restart_new_search_manager(args.prop_method, instance.search_order);
-    }
-    else {
+    } else {
       sm = Controller::make_search_manager(args.prop_method, instance.search_order);
     }
   }
@@ -174,7 +171,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   if(getOptions().printonlyoptimal) {
     cout << getState().storedSolution;
   }
-  
+
   Parallel::endParallelMinion();
 
   getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
@@ -183,14 +180,12 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   getOptions().printLine(string("Problem solvable?: ") +
                          (getState().getSolutionCount() == 0 ? "no" : "yes"));
 
-
   getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
 
   getTableOut().set("Nodes", tostring(getState().getNodeCount()));
   getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
   getTableOut().set("SolutionsFound", getState().getSolutionCount());
 
-  
   if(getOptions().tableout && !Parallel::isAChildProcess()) {
     getTableOut().print_line(); // Outputs a line to the table file.
   }

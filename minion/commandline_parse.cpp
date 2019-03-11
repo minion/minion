@@ -333,8 +333,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
       }
       getOptions().dumptreeobj = makeDumpTreeJson(outfile);
-    }
-    else if(command == string("-dumptreesql")) {
+    } else if(command == string("-dumptreesql")) {
       if(getOptions().dumptree) {
         output_fatal_error("Only one tree dumper active at once");
       }
@@ -501,19 +500,16 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         oss << "I do not understand the order:" << order;
         output_fatal_error(oss.str());
       }
-    }
-    else if(command == string("-valorder")) {
+    } else if(command == string("-valorder")) {
       INCREMENT_i(-valorder);
-      
+
       string order(argv[i]);
 
       if(order == "ascend") {
         args.valorder = VALORDER_ASCEND;
-      }
-      else if(order == "descend") {
+      } else if(order == "descend") {
         args.valorder = VALORDER_DESCEND;
-      }
-      else if(order == "random") {
+      } else if(order == "random") {
         args.valorder = VALORDER_RANDOM;
       }
     }
@@ -594,20 +590,16 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-gap")) {
       INCREMENT_i(-gap);
       getOptions().gapname = argv[i];
-    }
-    else if(command == string("-parallel")) {
+    } else if(command == string("-parallel")) {
       std::cerr << "Warning: parallel is beta\n";
       std::cerr << "Use -solsout to store the solutions";
       getOptions().parallel = true;
-    }
-    else if(command == string("-X-AMO")) {
+    } else if(command == string("-X-AMO")) {
       getOptions().gatherAMOs = true;
-    }
-    else if(command == string("-cores")) {
+    } else if(command == string("-cores")) {
       INCREMENT_i(-cores);
       getOptions().parallelcores = atoi(argv[i]);
-    }
-    else if(command == string("-steallow")) {
+    } else if(command == string("-steallow")) {
       getOptions().parallelStealHigh = false;
     }
     /** @help switches;-split Description
@@ -674,17 +666,16 @@ specified. Options are "meta" (default) or "hillclimbing".
         getOptions().neighbourhoodSearchStrategy =
             SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING;
       } else if(argv[i] == string("metawithlahc")) {
-          getOptions().neighbourhoodSearchStrategy =
-              SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC;
+        getOptions().neighbourhoodSearchStrategy =
+            SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC;
       } else if(argv[i] == string("metawithsa")) {
-          getOptions().neighbourhoodSearchStrategy =
-              SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANNEALING;
+        getOptions().neighbourhoodSearchStrategy =
+            SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANNEALING;
       } else if(argv[i] == string("hillclimbing")) {
         getOptions().neighbourhoodSearchStrategy =
             SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING;
       } else if(argv[i] == string("lahc")) {
-        getOptions().neighbourhoodSearchStrategy =
-            SearchOptions::NeighbourhoodSearchStrategy::LAHC;
+        getOptions().neighbourhoodSearchStrategy = SearchOptions::NeighbourhoodSearchStrategy::LAHC;
       } else if(argv[i] == string("sa")) {
         getOptions().neighbourhoodSearchStrategy =
             SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING;
@@ -696,31 +687,39 @@ specified. Options are "meta" (default) or "hillclimbing".
 
       // read parameters of the search algorithm
       auto& nhConfig = getOptions().nhConfig;
-      try{
-        if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING
-            || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING){
-            INCREMENT_i("number for hill climber min iterations to spend at peak");
-            nhConfig->hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
-            INCREMENT_i("number for hill climber initial local max probability");
-            nhConfig->hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
-            INCREMENT_i("number for hill climber increment multiplier");
-            nhConfig->hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
-        } else if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC
-                    || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::LAHC){
-            INCREMENT_i("LAHC list size");
-            nhConfig->lahcQueueSize = fromstring<int>(argv[i]);
-            INCREMENT_i("LAHC stoplimit ratio");
-            nhConfig->lahcStoppingLimitRatio = fromstring<double>(argv[i]);
-        } else if (getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANNEALING
-                    || getOptions().neighbourhoodSearchStrategy == SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING){
-            INCREMENT_i("SA initial acceptance probability");
-            nhConfig->simulatedAnnealingTargetProbabilityForInitialTemperature = fromstring<double>(argv[i]);
-            INCREMENT_i("SA number of iterations per temperature");
-            nhConfig->simulatedAnnealingIterationsBetweenCool = fromstring<int>(argv[i]);
-            INCREMENT_i("SA cooling factor");
-            nhConfig->simulatedAnnealingTemperatureCoolingFactor = fromstring<double>(argv[i]);
-            INCREMENT_i("SA ratio for stopping (algorithm stops after n consecutive non-improving iterations, where n = this ratio * number of iteration per temperature)");
-            nhConfig->simulatedAnnealingRatioForStopping = fromstring<double>(argv[i]);
+      try {
+        if(getOptions().neighbourhoodSearchStrategy ==
+               SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING ||
+           getOptions().neighbourhoodSearchStrategy ==
+               SearchOptions::NeighbourhoodSearchStrategy::HILL_CLIMBING) {
+          INCREMENT_i("number for hill climber min iterations to spend at peak");
+          nhConfig->hillClimberMinIterationsToSpendAtPeak = fromstring<int>(argv[i]);
+          INCREMENT_i("number for hill climber initial local max probability");
+          nhConfig->hillClimberInitialLocalMaxProbability = fromstring<double>(argv[i]);
+          INCREMENT_i("number for hill climber increment multiplier");
+          nhConfig->hillClimberProbabilityIncrementMultiplier = fromstring<double>(argv[i]);
+        } else if(getOptions().neighbourhoodSearchStrategy ==
+                      SearchOptions::NeighbourhoodSearchStrategy::META_WITH_LAHC ||
+                  getOptions().neighbourhoodSearchStrategy ==
+                      SearchOptions::NeighbourhoodSearchStrategy::LAHC) {
+          INCREMENT_i("LAHC list size");
+          nhConfig->lahcQueueSize = fromstring<int>(argv[i]);
+          INCREMENT_i("LAHC stoplimit ratio");
+          nhConfig->lahcStoppingLimitRatio = fromstring<double>(argv[i]);
+        } else if(getOptions().neighbourhoodSearchStrategy ==
+                      SearchOptions::NeighbourhoodSearchStrategy::META_WITH_SIMULATED_ANNEALING ||
+                  getOptions().neighbourhoodSearchStrategy ==
+                      SearchOptions::NeighbourhoodSearchStrategy::SIMULATED_ANNEALING) {
+          INCREMENT_i("SA initial acceptance probability");
+          nhConfig->simulatedAnnealingTargetProbabilityForInitialTemperature =
+              fromstring<double>(argv[i]);
+          INCREMENT_i("SA number of iterations per temperature");
+          nhConfig->simulatedAnnealingIterationsBetweenCool = fromstring<int>(argv[i]);
+          INCREMENT_i("SA cooling factor");
+          nhConfig->simulatedAnnealingTemperatureCoolingFactor = fromstring<double>(argv[i]);
+          INCREMENT_i("SA ratio for stopping (algorithm stops after n consecutive non-improving "
+                      "iterations, where n = this ratio * number of iteration per temperature)");
+          nhConfig->simulatedAnnealingRatioForStopping = fromstring<double>(argv[i]);
         }
       } catch(...) {
         cout << "Could not read argument " << argv[i] << endl;
@@ -817,15 +816,12 @@ When Allows values used during neighbourhood search to be configured.
 
     else if(command == string("-restarts")) {
       getOptions().restart.active = true;
-    }
-    else if(command == string("-restarts-multiplier")) {
+    } else if(command == string("-restarts-multiplier")) {
       INCREMENT_i("restarts multiplier");
       getOptions().restart.multiplier = fromstring<double>(argv[i]);
-    }
-    else if(command == string("-no-restarts-bias")) {
+    } else if(command == string("-no-restarts-bias")) {
       getOptions().restart.bias = false;
-    }
-    else if(command[0] == '-' && command != string("--")) {
+    } else if(command[0] == '-' && command != string("--")) {
       cout << "I don't understand '" << command << "'. Sorry. " << endl;
       exit(1);
     } else {

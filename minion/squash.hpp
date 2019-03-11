@@ -1,8 +1,8 @@
 
-#include <vector>
-#include <set>
-#include <numeric>
 #include <limits>
+#include <numeric>
+#include <set>
+#include <vector>
 
 static const DomainInt free_value = std::numeric_limits<SysInt>::max();
 

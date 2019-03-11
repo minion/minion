@@ -1,29 +1,29 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #include "minion.h"
 
 #include "BuildVariables.h"
 
-#include "inputfile_parse/inputfile_parse.h"
 #include "commandline_parse.h"
+#include "inputfile_parse/inputfile_parse.h"
 
 #include "MILtools/print_CSP.h"
 
@@ -53,7 +53,6 @@ void print_default_help(char** argv) {
 #endif
 
   cout << endl;
-
 }
 
 void worker() {
@@ -96,11 +95,10 @@ int main(int argc, char** argv) {
     CSPInstance instance;
     SearchMethod args;
 
-
     parse_command_line(args, argc, argv);
 
     global_random_gen.seed(args.random_seed);
-    
+
     if(!getOptions().silent) {
       time_t rawtime;
       time(&rawtime);
@@ -116,45 +114,41 @@ int main(int argc, char** argv) {
 
     if(!getOptions().noTimers) {
       Parallel::setupAlarm(getOptions().timeout_active, getOptions().time_limit,
-                            getOptions().time_limit_is_CPU_time);
+                           getOptions().time_limit_is_CPU_time);
     }
 
     vector<string> files(1, getOptions().instance_name);
     readInputFromFiles(instance, files, getOptions().parser_verbose, getOptions().map_long_short,
                        getOptions().ensure_branch_on_all_vars);
 
-    
-      if(getOptions().graph)
-      {
-        GraphBuilder graph(instance);
-        //graph.g.output_graph();
-        graph.g.output_nauty_graph(instance);
-        exit(0);
+    if(getOptions().graph) {
+      GraphBuilder graph(instance);
+      // graph.g.output_graph();
+      graph.g.output_nauty_graph(instance);
+      exit(0);
+    }
+
+    if(getOptions().instance_stats) {
+      InstanceStats s(instance);
+      s.output_stats();
+
+      // Do the minimal amount of setting up to create the constraint objects
+      getState().setTupleListContainer(instance.tupleListContainer);
+      getState().setShortTupleListContainer(instance.shortTupleListContainer);
+
+      BuildCon::build_variables(instance.vars);
+
+      // Create Constraints
+      vector<AbstractConstraint*> cons;
+      while(!instance.constraints.empty()) {
+        cons.push_back(build_constraint(instance.constraints.front()));
+        instance.constraints.pop_front();
       }
 
-      if(getOptions().instance_stats)
-      {
-          InstanceStats s(instance);
-          s.output_stats();
+      s.output_stats_tightness(cons);
+      exit(0);
+    }
 
-          // Do the minimal amount of setting up to create the constraint objects
-          getState().setTupleListContainer(instance.tupleListContainer);
-          getState().setShortTupleListContainer(instance.shortTupleListContainer);
-
-          BuildCon::build_variables(instance.vars);
-
-          // Create Constraints
-          vector<AbstractConstraint*> cons;
-          while(!instance.constraints.empty())
-          {
-             cons.push_back(build_constraint(instance.constraints.front()));
-             instance.constraints.pop_front();
-          }
-
-          s.output_stats_tightness(cons);
-          exit(0);
-      }
-    
     if(getOptions().redump) {
       MinionInstancePrinter printer(instance);
       printer.build_instance();

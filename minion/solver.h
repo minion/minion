@@ -240,8 +240,6 @@ public:
   bool isLocked() {
     return is_locked;
   }
-
-
 };
 
 struct NhConfig;
@@ -252,7 +250,6 @@ std::shared_ptr<NhConfig> makeNhConfig();
 class SearchOptions {
 
 public:
-
   enum class NeighbourhoodSearchStrategy {
     META_WITH_HILLCLIMBING,
     META_WITH_LAHC,

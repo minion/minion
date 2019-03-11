@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #include "minion.h"
 
@@ -42,22 +42,22 @@ vector<vector<AnyVarRef>> get_AnyVarRef_from_Var(const vector<vector<Var>>& vec)
   return ret_vec;
 }
 
-template<typename V>
-std::pair<DomainInt, DomainInt> get_initialBounds(const V& v)
-{
+template <typename V>
+std::pair<DomainInt, DomainInt> get_initialBounds(const V& v) {
   return std::make_pair(v.getInitialMin(), v.getInitialMax());
 }
 
-std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v)
-{
+std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v) {
   switch(v.type()) {
   case VAR_BOOL: return get_initialBounds(getVars().boolVarContainer.get_var_num(v.pos()));
-  case VAR_NOTBOOL: return get_initialBounds(VarNotRef(getVars().boolVarContainer.get_var_num(v.pos())));
+  case VAR_NOTBOOL:
+    return get_initialBounds(VarNotRef(getVars().boolVarContainer.get_var_num(v.pos())));
   case VAR_BOUND: return get_initialBounds(getVars().boundVarContainer.get_var_num(v.pos()));
-  case VAR_SPARSEBOUND: return get_initialBounds(getVars().sparseBoundVarContainer.get_var_num(v.pos()));
+  case VAR_SPARSEBOUND:
+    return get_initialBounds(getVars().sparseBoundVarContainer.get_var_num(v.pos()));
   case VAR_DISCRETE: return get_initialBounds(getVars().bigRangeVarContainer.get_var_num(v.pos()));
   case VAR_SPARSEDISCRETE: INPUT_ERROR("Sparse Discrete not supported at present");
-  case VAR_CONSTANT: return get_initialBounds(ConstantVar(v.pos()));    
+  case VAR_CONSTANT: return get_initialBounds(ConstantVar(v.pos()));
   default: INPUT_ERROR("Unknown variable type " << v.type() << ".");
   }
 }
@@ -86,11 +86,10 @@ void build_variables(const ProbSpec::VarContainer& vars) {
   for(int i = 0; i < vars.sparse_bound.size(); ++i)
     getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound[i], 1);
 
-
   getVars().bigRangeVarContainer.addVariables(vars.discrete);
 
   for(SysInt i = 0; i < (SysInt)vars.sparse_discrete.size(); ++i) {
     INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry.");
   }
 }
-}
+} // namespace BuildCon
