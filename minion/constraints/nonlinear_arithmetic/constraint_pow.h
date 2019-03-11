@@ -175,8 +175,8 @@ struct PowConstraint : public AbstractConstraint {
       propagateDynInt(i, DomainDelta::empty());
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 3);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 3);
     return my_pow(v[0], v[1]) == v[2];
   }
 

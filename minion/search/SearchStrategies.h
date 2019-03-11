@@ -103,9 +103,9 @@ public:
                                getOptions().nhConfig->hillClimberProbabilityIncrementMultiplier;
         ++iterationsSpentAtPeak;
         uniform_real_distribution<double> dist(0.0, 1.0);
-        double random_number = dist(global_random_gen);
+        double randomNumber = dist(global_random_gen);
         if(iterationsSpentAtPeak > getOptions().nhConfig->hillClimberMinIterationsToSpendAtPeak &&
-           random_number < localMaxProbability) {
+           randomNumber < localMaxProbability) {
           nhState.globalStats.notifyEndClimb();
           cout << "numberIterations: "
                << (nhState.globalStats.numberIterations - numberIterationsAtStart) << std::endl;

@@ -157,9 +157,9 @@ struct GACTableConstraint : public AbstractConstraint {
   GACTableConstraint(const VarArray& _vars, TupleList* _tuples) : vars(_vars), tuples(_tuples) {
     CheckNotBound(vars, "table constraints", "");
     tupleTrieArrayptr = tuples->getTries();
-    const SysInt arity = checked_cast<SysInt>(tuples->tuple_size());
+    const SysInt arity = checked_cast<SysInt>(tuples->tupleSize());
     D_ASSERT((SysInt)_vars.size() == arity);
-    const SysInt litnum = checked_cast<SysInt>(tuples->literal_num);
+    const SysInt litnum = checked_cast<SysInt>(tuples->literalNum);
     trie_current_support.resize(litnum);
     for(SysInt i = 0; i < litnum; ++i) {
       trie_current_support[i] = new TrieObj*[arity];
@@ -177,7 +177,7 @@ struct GACTableConstraint : public AbstractConstraint {
   }
 
   SysInt dynamicTriggerCount() {
-    return checked_cast<SysInt>(tuples->literal_num * ((SysInt)vars.size() - 1));
+    return checked_cast<SysInt>(tuples->literalNum * ((SysInt)vars.size() - 1));
   }
 
   BOOL find_new_support(DomainInt literal) {
@@ -190,7 +190,7 @@ struct GACTableConstraint : public AbstractConstraint {
           val, vars, trie_current_support[sysLiteral]);
       if(new_support < 0) { // cout << "find_new_support failed literal: " <<
                             // literal << " var: " << varIndex << " val: " <<
-                            // get_val_from_literal(literal) << endl ;
+                            // getVal_from_literal(literal) << endl ;
         return false;
       }
     } else {
@@ -198,12 +198,12 @@ struct GACTableConstraint : public AbstractConstraint {
           val, vars, trie_current_support[sysLiteral], recyclableTuple);
       if(new_support < 0) { // cout << "find_new_support failed literal: " <<
                             // literal << " var: " << varIndex << " val: " <<
-                            // get_val_from_literal(literal) << endl ;
+                            // getVal_from_literal(literal) << endl ;
         return false;
       }
     }
     // cout << "find_new_support sup= "<< new_support << " literal: " << literal
-    // << " var: " << varIndex << " val: " << get_val_from_literal(literal) <<
+    // << " var: " << varIndex << " val: " << getVal_from_literal(literal) <<
     // endl;
     // trie_current_support[literal] = new_support;
     return true;
@@ -239,9 +239,9 @@ struct GACTableConstraint : public AbstractConstraint {
     // for(SysInt z = 0; z < (SysInt)vars.size(); ++z) cout <<
     // recyclableTuple[z] << " "; cout << endl;
 
-    const SysInt vars_size = vars.size();
-    SysInt dt = checked_cast<SysInt>(lit * (vars_size - 1));
-    for(SysInt v = 0; v < vars_size; ++v) {
+    const SysInt varsSize = vars.size();
+    SysInt dt = checked_cast<SysInt>(lit * (varsSize - 1));
+    for(SysInt v = 0; v < varsSize; ++v) {
       if(v != var) {
         D_ASSERT(vars[v].inDomain(recyclableTuple[v]));
         moveTriggerInt(vars[v], dt, DomainRemoval, recyclableTuple[v]);
@@ -259,8 +259,8 @@ struct GACTableConstraint : public AbstractConstraint {
     }
     for(SysInt varIndex = 0; varIndex < (SysInt)vars.size(); ++varIndex) {
       if(negative == 0) {
-        vars[varIndex].setMin((tuples->dom_smallest)[varIndex]);
-        vars[varIndex].setMax((tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]);
+        vars[varIndex].setMin((tuples->domSmallest)[varIndex]);
+        vars[varIndex].setMax((tuples->domSmallest)[varIndex] + (tuples->domSize)[varIndex]);
       }
 
       if(getState().isFailed())
@@ -268,9 +268,9 @@ struct GACTableConstraint : public AbstractConstraint {
 
       DomainInt max = vars[varIndex].max();
       for(DomainInt i = vars[varIndex].min(); i <= max; ++i) {
-        if(i >= (tuples->dom_smallest)[varIndex] &&
-           i < (tuples->dom_smallest)[varIndex] + (tuples->dom_size)[varIndex]) {
-          const SysInt literal = checked_cast<SysInt>(tuples->get_literal(varIndex, i));
+        if(i >= (tuples->domSmallest)[varIndex] &&
+           i < (tuples->domSmallest)[varIndex] + (tuples->domSize)[varIndex]) {
+          const SysInt literal = checked_cast<SysInt>(tuples->getLiteral(varIndex, i));
 
           DomainInt sup;
           if(negative == 0) {
@@ -314,9 +314,9 @@ struct GACTableConstraint : public AbstractConstraint {
         DomainInt sup = -1;
         DomainInt literal = 0xdeadbeef;
 
-        if(i >= (tuples->dom_smallest)[0] &&
-           i < (tuples->dom_smallest)[0] + (tuples->dom_size)[0]) {
-          literal = tuples->get_literal(0, i);
+        if(i >= (tuples->domSmallest)[0] &&
+           i < (tuples->domSmallest)[0] + (tuples->domSize)[0]) {
+          literal = tuples->getLiteral(0, i);
           if(negative) {
             sup = tupleTrieArrayptr->getTrie(0).nextSupportingTupleNegative(
                 i, vars, trie_current_support[checked_cast<SysInt>(literal)], recyclableTuple);
@@ -355,16 +355,16 @@ struct GACTableConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     if(negative == 0) {
       for(SysInt i = 0; i < tuples->size(); ++i) {
-        if(std::equal(v, v + checked_cast<SysInt>(v_size), (*tuples)[i]))
+        if(std::equal(v, v + checked_cast<SysInt>(vSize), (*tuples)[i]))
           return true;
       }
       return false;
     } else {
       for(SysInt i = 0; i < tuples->size(); ++i) {
-        if(std::equal(v, v + checked_cast<SysInt>(v_size), (*tuples)[i]))
+        if(std::equal(v, v + checked_cast<SysInt>(vSize), (*tuples)[i]))
           return false;
       }
       return true;

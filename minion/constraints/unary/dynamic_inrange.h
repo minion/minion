@@ -68,8 +68,8 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     D_FATAL_ERROR("Propagation is never called for 'in range'");
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 1);
     return (v[0] >= range_min && v[0] <= range_max);
   }
 
@@ -82,9 +82,9 @@ struct WatchInRangeConstraint : public AbstractConstraint {
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    DomainInt min_val = max(range_min, var.min());
-    DomainInt max_val = min(range_max, var.max());
-    for(DomainInt i = min_val; i <= max_val; ++i) {
+    DomainInt minVal = max(range_min, var.min());
+    DomainInt maxVal = min(range_max, var.max());
+    for(DomainInt i = minVal; i <= maxVal; ++i) {
       if(var.inDomain(i)) {
         assignment.push_back(make_pair(0, i));
         return true;

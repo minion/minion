@@ -194,7 +194,7 @@ struct InfoRefType {
 
   DomainInt getDomainChange(DomainDelta d) {
     VAR_INFO_ADDONE(VAR_TYPE, getDomainChange);
-    return d.XXX_get_domain_diff();
+    return d.XXX_getDomain_diff();
   }
 
   void addDynamicTrigger(Trig_ConRef tcr, TrigType type, DomainInt pos = NoDomainValue,

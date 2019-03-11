@@ -52,12 +52,12 @@ void optimise_minimise_var(VarRef var) {
 template <typename T>
 void check_constraint(T* con) {
   vector<AnyVarRef>& variables = *(con->getVarsSingleton());
-  UnsignedSysInt vec_size = variables.size();
+  UnsignedSysInt vecSize = variables.size();
 
-  DomainInt* values = (DomainInt*)alloca(vec_size * sizeof(DomainInt));
-  // vector<DomainInt> values(vec_size);
+  DomainInt* values = (DomainInt*)alloca(vecSize * sizeof(DomainInt));
+  // vector<DomainInt> values(vecSize);
 
-  for(UnsignedSysInt loop = 0; loop < vec_size; ++loop) {
+  for(UnsignedSysInt loop = 0; loop < vecSize; ++loop) {
     if(!variables[loop].isAssigned()) {
       cerr << "Some variables are unassigned. Unless you purposefully "
            << "left them out, have a look." << endl;
@@ -66,14 +66,14 @@ void check_constraint(T* con) {
     values[loop] = variables[loop].assignedValue();
   }
 
-  if(!con->checkAssignment(values, vec_size)) {
+  if(!con->checkAssignment(values, vecSize)) {
     cerr << "A " << con->extendedName() << " constraint is not satisfied by this sol!" << endl;
     cerr << "The constraint is over the following variables:" << endl;
-    for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
+    for(UnsignedSysInt loop = 0; loop < vecSize; ++loop)
       cerr << variables[loop] << ",";
     cerr << endl;
     cerr << "Variables were assigned:" << endl;
-    for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
+    for(UnsignedSysInt loop = 0; loop < vecSize; ++loop)
       cerr << values[loop] << ",";
     cerr << endl;
     cerr << "This is an internal bug. It shouldn't happen!!" << endl;

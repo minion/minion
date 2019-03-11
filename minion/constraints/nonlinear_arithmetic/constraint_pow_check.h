@@ -73,8 +73,8 @@ public:
     return pow(checked_cast<double>(x), checked_cast<double>(y));
   }
 
-  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 3);
+  virtual bool checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 3);
     if(v[0] == 0) {
       if(v[1] == 0)
         return v[2] == 1;

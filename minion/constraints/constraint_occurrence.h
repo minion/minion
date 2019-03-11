@@ -84,50 +84,50 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
   typedef typename VarArray::value_type VarRef;
 
-  ReversibleInt occurrences_count;
-  ReversibleInt not_occurrences_count;
+  ReversibleInt occurrencesCount;
+  ReversibleInt not_occurrencesCount;
   VarArray var_array;
 
-  ValCount val_count;
+  ValCount valCount;
   Val value;
 
-  CONSTRAINT_ARG_LIST3(var_array, value, val_count);
+  CONSTRAINT_ARG_LIST3(var_array, value, valCount);
 
   NotOccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value,
-                               const ValCount& _val_count)
-      : occurrences_count(),
-        not_occurrences_count(),
+                               const ValCount& _valCount)
+      : occurrencesCount(),
+        not_occurrencesCount(),
         var_array(_var_array),
-        val_count(_val_count),
+        valCount(_valCount),
         value(_value),
         trigger1index(-1),
         trigger2index(-1) {
     CheckNotBound(var_array, "occurrence");
-    CheckNotBoundSingle(val_count, "occurrence");
+    CheckNotBoundSingle(valCount, "occurrence");
   }
 
-  // Put two assignment triggers on the vector, and one on val_count.
-  // When all vars in X are assigned, remove count(X=v) from val_count
+  // Put two assignment triggers on the vector, and one on valCount.
+  // When all vars in X are assigned, remove count(X=v) from valCount
 
-  // When val_count is assigned and all but one of the vector are assigned,
+  // When valCount is assigned and all but one of the vector are assigned,
   // consider the remaining one in the vector, and either fix it to v or
-  // remove v from its domain to avoid the value of val_count.
+  // remove v from its domain to avoid the value of valCount.
 
   virtual SysInt dynamicTriggerCount() { // two moving assignment triggers.
     return 3;
   }
 
   void trigger_setup() {
-    moveTriggerInt(val_count, 2, Assigned);
+    moveTriggerInt(valCount, 2, Assigned);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     ;
-    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
+    D_ASSERT(vSize == (SysInt)var_array.size() + 1);
     DomainInt count = 0;
-    for(SysInt i = 0; i < v_size - 1; ++i)
+    for(SysInt i = 0; i < vSize - 1; ++i)
       count += (*(v + i) == value);
-    return count != *(v + v_size - 1);
+    return count != *(v + vSize - 1);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -135,12 +135,12 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     vars.reserve(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
-    vars.push_back(AnyVarRef(val_count));
+    vars.push_back(AnyVarRef(valCount));
     return vars;
   }
 
   void propagateValCount() {
-    // val_count has been assigned.
+    // valCount has been assigned.
     if(trigger1index == -1 || var_array[trigger1index].isAssigned()) {
       trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
       if(trigger1index == -1) {
@@ -164,7 +164,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     }
 
     if(trig == 0 || trigger1index == -1) {
-      if(val_count.isAssigned()) {
+      if(valCount.isAssigned()) {
         // make sure both triggers are in place.
         trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
         if(trigger1index == -1) {
@@ -188,7 +188,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
       return;
     }
     D_ASSERT(trig == 1);
-    if(!val_count.isAssigned()) { // don't need two triggers.
+    if(!valCount.isAssigned()) { // don't need two triggers.
       releaseTriggerInt(1);
       trigger2index = -1;
       return;
@@ -241,8 +241,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
       if(var_array[i].assignedValue() == value)
         occ++;
     }
-    if(val_count.inDomain(occ)) {
-      val_count.removeFromDomain(occ);
+    if(valCount.inDomain(occ)) {
+      valCount.removeFromDomain(occ);
     }
   }
 
@@ -251,7 +251,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     // count occurrences of val
     SysInt occ = 0;
     SysInt unassigned = -1;
-    D_ASSERT(val_count.isAssigned());
+    D_ASSERT(valCount.isAssigned());
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       if(var_array[i].isAssigned()) {
         if(var_array[i].assignedValue() == value) {
@@ -266,13 +266,13 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     // and the rest.
     if(unassigned == -1) {
       // just check, everything is assigned.
-      if(occ == val_count.assignedValue()) {
+      if(occ == valCount.assignedValue()) {
         getState().setFailed(true);
       }
     } else {
-      if(occ == val_count.assignedValue()) { // need another occurrence of the value
+      if(occ == valCount.assignedValue()) { // need another occurrence of the value
         var_array[unassigned].assign(value);
-      } else if(occ + 1 == val_count.assignedValue()) { // not allowed to
+      } else if(occ + 1 == valCount.assignedValue()) { // not allowed to
                                                            // have another
                                                            // value.
         var_array[unassigned].removeFromDomain(value);
@@ -289,7 +289,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
       return;
     }
 
-    if(val_count.isAssigned()) {
+    if(valCount.isAssigned()) {
       // watch a second place in the vector.
       trigger2index = watch_unassigned_in_vector(trigger1index, trigger1index, 1);
       if(trigger2index == -1) {
@@ -313,12 +313,12 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
         c.push_back(var_array[i].assignedValue());
     }
 
-    if(!val_count.isAssigned()) {
-      assignment.push_back(make_pair(var_array.size(), val_count.min()));
-      assignment.push_back(make_pair(var_array.size(), val_count.max()));
+    if(!valCount.isAssigned()) {
+      assignment.push_back(make_pair(var_array.size(), valCount.min()));
+      assignment.push_back(make_pair(var_array.size(), valCount.max()));
       return true;
     } else
-      c.push_back(val_count.assignedValue());
+      c.push_back(valCount.assignedValue());
 
     if(checkAssignment(c.begin(), c.size())) { // Put the complete assignment in the box.
       for(SysInt i = 0; i < (SysInt)var_array.size() + 1; ++i)
@@ -338,34 +338,34 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual string fullOutputName() {
-    if(val_count_min == 0) {
-      return ConOutput::print_con("occurrenceleq", var_array, value, val_count_max);
+    if(valCount_min == 0) {
+      return ConOutput::print_con("occurrenceleq", var_array, value, valCount_max);
     } else {
-      D_ASSERT(val_count_max == (SysInt)var_array.size());
-      return ConOutput::print_con("occurrencegeq", var_array, value, val_count_min);
+      D_ASSERT(valCount_max == (SysInt)var_array.size());
+      return ConOutput::print_con("occurrencegeq", var_array, value, valCount_min);
     }
   }
 
   typedef typename VarArray::value_type VarRef;
 
-  ReversibleInt occurrences_count;
-  ReversibleInt not_occurrences_count;
+  ReversibleInt occurrencesCount;
+  ReversibleInt not_occurrencesCount;
   VarArray var_array;
 
-  DomainInt val_count_min;
-  DomainInt val_count_max;
+  DomainInt valCount_min;
+  DomainInt valCount_max;
   Val value;
 
   ConstantOccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value,
-                                    DomainInt _val_count_min, DomainInt _val_count_max)
-      : occurrences_count(),
-        not_occurrences_count(),
+                                    DomainInt _valCount_min, DomainInt _valCount_max)
+      : occurrencesCount(),
+        not_occurrencesCount(),
         var_array(_var_array),
-        val_count_min(_val_count_min),
-        val_count_max(_val_count_max),
+        valCount_min(_valCount_min),
+        valCount_max(_valCount_max),
         value(_value) {
-    occurrences_count = 0;
-    not_occurrences_count = 0;
+    occurrencesCount = 0;
+    not_occurrencesCount = 0;
   }
 
   virtual SysInt dynamicTriggerCount() {
@@ -378,7 +378,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   void occurrence_limit_reached() {
-    D_ASSERT(val_count_max <= occurrences_count);
+    D_ASSERT(valCount_max <= occurrencesCount);
     DomainInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it = var_array.begin(); it < end_it; ++it) {
@@ -389,13 +389,13 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
         it->removeFromDomain(value);
       }
     }
-    if(val_count_max < occs)
+    if(valCount_max < occs)
       getState().setFailed(true);
   }
 
   void not_occurrence_limit_reached() {
-    D_ASSERT(not_occurrences_count >=
-             checked_cast<SysInt>((SysInt)var_array.size() - val_count_min));
+    D_ASSERT(not_occurrencesCount >=
+             checked_cast<SysInt>((SysInt)var_array.size() - valCount_min));
     SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it = var_array.begin(); it < end_it; ++it) {
@@ -406,7 +406,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
         it->assign(value);
       }
     }
-    if(val_count_min > static_cast<SysInt>(var_array.size()) - occs)
+    if(valCount_min > static_cast<SysInt>(var_array.size()) - occs)
       getState().setFailed(true);
   }
 
@@ -416,21 +416,21 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     D_ASSERT(i >= 0);
 
     if(var_array[i].assignedValue() == (DomainInt)value) {
-      ++occurrences_count;
-      if(val_count_max < occurrences_count)
+      ++occurrencesCount;
+      if(valCount_max < occurrencesCount)
         getState().setFailed(true);
-      if(occurrences_count == val_count_max)
+      if(occurrencesCount == valCount_max)
         occurrence_limit_reached();
     } else {
-      ++not_occurrences_count;
-      if(val_count_min > static_cast<SysInt>(var_array.size()) - not_occurrences_count)
+      ++not_occurrencesCount;
+      if(valCount_min > static_cast<SysInt>(var_array.size()) - not_occurrencesCount)
         getState().setFailed(true);
-      if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count_min)
+      if(not_occurrencesCount == static_cast<SysInt>(var_array.size()) - valCount_min)
         not_occurrence_limit_reached();
     }
   }
 
-  void setup_counters() {
+  void setupCounters() {
     SysInt occs = 0;
     SysInt not_occs = 0;
     typename VarArray::iterator end_it(var_array.end());
@@ -442,34 +442,34 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
           ++not_occs;
       }
     }
-    occurrences_count = occs;
-    not_occurrences_count = not_occs;
+    occurrencesCount = occs;
+    not_occurrencesCount = not_occs;
   }
 
   virtual void fullPropagate() {
     trigger_setup();
-    if(val_count_max < 0 || val_count_min > (SysInt)var_array.size())
+    if(valCount_max < 0 || valCount_min > (SysInt)var_array.size())
       getState().setFailed(true);
-    setup_counters();
+    setupCounters();
 
-    if(val_count_max < occurrences_count)
-      getState().setFailed(true);
-
-    if(val_count_min > static_cast<SysInt>(var_array.size()) - not_occurrences_count)
+    if(valCount_max < occurrencesCount)
       getState().setFailed(true);
 
-    if(occurrences_count == val_count_max)
+    if(valCount_min > static_cast<SysInt>(var_array.size()) - not_occurrencesCount)
+      getState().setFailed(true);
+
+    if(occurrencesCount == valCount_max)
       occurrence_limit_reached();
-    if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count_min)
+    if(not_occurrencesCount == static_cast<SysInt>(var_array.size()) - valCount_min)
       not_occurrence_limit_reached();
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size());
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size());
     DomainInt count = 0;
-    for(SysInt i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < vSize; ++i)
       count += (*(v + i) == (DomainInt)value);
-    return (count >= val_count_min) && (count <= val_count_max);
+    return (count >= valCount_min) && (count <= valCount_max);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -485,8 +485,8 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
-    if(val_count_min == 0) {
-      DomainInt need_vars = (DomainInt)var_array.size() - val_count_max;
+    if(valCount_min == 0) {
+      DomainInt need_vars = (DomainInt)var_array.size() - valCount_max;
       if(need_vars <= 0)
         return true;
       for(int i = 0; i < (SysInt)var_array.size(); ++i) {
@@ -503,8 +503,8 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       }
       assignment.clear();
       return false;
-    } else if(val_count_max == (SysInt)var_array.size()) {
-      DomainInt need_vars = val_count_min;
+    } else if(valCount_max == (SysInt)var_array.size()) {
+      DomainInt need_vars = valCount_min;
       if(need_vars <= 0)
         return true;
       for(int i = 0; i < (SysInt)var_array.size(); ++i) {
@@ -526,17 +526,17 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   AbstractConstraint* reverseConstraint() {
     // This constraint actually constrains the occurrences of value to an an
     // interval
-    // [val_count_min, val_count_max]. But it's apparently only used for
+    // [valCount_min, valCount_max]. But it's apparently only used for
     // less-than
     // and greater-than. So identify the less-than case and make a greater-than,
     // etc.
-    if(val_count_min == 0) {
+    if(valCount_min == 0) {
       return new ConstantOccurrenceEqualConstraint<VarArray, Val>(
-          var_array, value, val_count_max + 1, var_array.size());
+          var_array, value, valCount_max + 1, var_array.size());
     }
-    if(val_count_max == (SysInt)var_array.size()) {
+    if(valCount_max == (SysInt)var_array.size()) {
       return new ConstantOccurrenceEqualConstraint<VarArray, Val>(var_array, value, 0,
-                                                                  val_count_min - 1);
+                                                                  valCount_min - 1);
     }
     FAIL_EXIT("Unable to negate an occurrence-interval constraint, sorry.");
     return NULL;
@@ -549,26 +549,26 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     return "occurrence";
   }
 
-  CONSTRAINT_ARG_LIST3(var_array, value, val_count);
+  CONSTRAINT_ARG_LIST3(var_array, value, valCount);
 
   typedef typename VarArray::value_type VarRef;
 
-  ReversibleInt occurrences_count;
-  ReversibleInt not_occurrences_count;
+  ReversibleInt occurrencesCount;
+  ReversibleInt not_occurrencesCount;
   VarArray var_array;
 
-  ValCount val_count;
+  ValCount valCount;
   Val value;
 
   OccurrenceEqualConstraint(const VarArray& _var_array, const Val& _value,
-                            const ValCount& _val_count)
-      : occurrences_count(),
-        not_occurrences_count(),
+                            const ValCount& _valCount)
+      : occurrencesCount(),
+        not_occurrencesCount(),
         var_array(_var_array),
-        val_count(_val_count),
+        valCount(_valCount),
         value(_value) {
-    occurrences_count = 0;
-    not_occurrences_count = 0;
+    occurrencesCount = 0;
+    not_occurrencesCount = 0;
   }
 
   virtual SysInt dynamicTriggerCount() {
@@ -576,7 +576,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   void occurrence_limit_reached() {
-    D_ASSERT(val_count.max() <= occurrences_count);
+    D_ASSERT(valCount.max() <= occurrencesCount);
     SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it = var_array.begin(); it < end_it; ++it) {
@@ -587,11 +587,11 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
         it->removeFromDomain(value);
       }
     }
-    val_count.setMin(occs);
+    valCount.setMin(occs);
   }
 
   void not_occurrence_limit_reached() {
-    D_ASSERT(not_occurrences_count >= static_cast<SysInt>(var_array.size()) - val_count.min());
+    D_ASSERT(not_occurrencesCount >= static_cast<SysInt>(var_array.size()) - valCount.min());
     SysInt occs = 0;
     typename VarArray::iterator end_it(var_array.end());
     for(typename VarArray::iterator it = var_array.begin(); it < end_it; ++it) {
@@ -602,33 +602,33 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
         it->assign(value);
       }
     }
-    val_count.setMax(static_cast<SysInt>(var_array.size()) - occs);
+    valCount.setMax(static_cast<SysInt>(var_array.size()) - occs);
   }
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(OccEqual);
-    if(i >= var_array.size()) { // val_count changed
-      if(occurrences_count == val_count.max())
+    if(i >= var_array.size()) { // valCount changed
+      if(occurrencesCount == valCount.max())
         occurrence_limit_reached();
-      if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count.min())
+      if(not_occurrencesCount == static_cast<SysInt>(var_array.size()) - valCount.min())
         not_occurrence_limit_reached();
       return;
     }
 
     if(var_array[checked_cast<SysInt>(i)].assignedValue() == value) {
-      ++occurrences_count;
-      val_count.setMin((DomainInt)occurrences_count);
-      if(occurrences_count == val_count.max())
+      ++occurrencesCount;
+      valCount.setMin((DomainInt)occurrencesCount);
+      if(occurrencesCount == valCount.max())
         occurrence_limit_reached();
     } else {
-      ++not_occurrences_count;
-      val_count.setMax(static_cast<SysInt>(var_array.size()) - not_occurrences_count);
-      if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count.min())
+      ++not_occurrencesCount;
+      valCount.setMax(static_cast<SysInt>(var_array.size()) - not_occurrencesCount);
+      if(not_occurrencesCount == static_cast<SysInt>(var_array.size()) - valCount.min())
         not_occurrence_limit_reached();
     }
   }
 
-  void setup_counters() {
+  void setupCounters() {
     SysInt occs = 0;
     SysInt not_occs = 0;
     typename VarArray::iterator end_it(var_array.end());
@@ -640,38 +640,38 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
           ++not_occs;
       }
     }
-    occurrences_count = occs;
-    not_occurrences_count = not_occs;
+    occurrencesCount = occs;
+    not_occurrencesCount = not_occs;
   }
 
   void trigger_setup() {
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       moveTriggerInt(var_array[i], i, Assigned);
-    moveTriggerInt(val_count, var_array.size(), UpperBound);
-    moveTriggerInt(val_count, var_array.size() + 1, LowerBound);
+    moveTriggerInt(valCount, var_array.size(), UpperBound);
+    moveTriggerInt(valCount, var_array.size() + 1, LowerBound);
   }
 
   virtual void fullPropagate() {
     trigger_setup();
 
-    val_count.setMin(0);
-    val_count.setMax(var_array.size());
-    setup_counters();
-    val_count.setMin((DomainInt)occurrences_count);
-    val_count.setMax((DomainInt)var_array.size() - not_occurrences_count);
+    valCount.setMin(0);
+    valCount.setMax(var_array.size());
+    setupCounters();
+    valCount.setMin((DomainInt)occurrencesCount);
+    valCount.setMax((DomainInt)var_array.size() - not_occurrencesCount);
 
-    if(occurrences_count == val_count.max())
+    if(occurrencesCount == valCount.max())
       occurrence_limit_reached();
-    if(not_occurrences_count == static_cast<SysInt>(var_array.size()) - val_count.min())
+    if(not_occurrencesCount == static_cast<SysInt>(var_array.size()) - valCount.min())
       not_occurrence_limit_reached();
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size() + 1);
     DomainInt count = 0;
-    for(SysInt i = 0; i < v_size - 1; ++i)
+    for(SysInt i = 0; i < vSize - 1; ++i)
       count += (*(v + i) == value);
-    return count == *(v + v_size - 1);
+    return count == *(v + vSize - 1);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -679,7 +679,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     vars.reserve(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       vars.push_back(AnyVarRef(var_array[i]));
-    vars.push_back(AnyVarRef(val_count));
+    vars.push_back(AnyVarRef(valCount));
     return vars;
   }
 
@@ -697,12 +697,12 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
         c.push_back(var_array[i].assignedValue());
     }
 
-    if(!val_count.isAssigned()) {
-      assignment.push_back(make_pair(var_array.size(), val_count.min()));
-      assignment.push_back(make_pair(var_array.size(), val_count.max()));
+    if(!valCount.isAssigned()) {
+      assignment.push_back(make_pair(var_array.size(), valCount.min()));
+      assignment.push_back(make_pair(var_array.size(), valCount.max()));
       return true;
     } else
-      c.push_back(val_count.assignedValue());
+      c.push_back(valCount.assignedValue());
 
     if(checkAssignment(c.begin(), c.size())) { // Put the complete assignment in the box.
       for(SysInt i = 0; i < (SysInt)var_array.size() + 1; ++i)
@@ -713,33 +713,33 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   AbstractConstraint* reverseConstraint() {
-    return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, val_count);
+    return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, valCount);
   }
 };
 
 template <typename VarArray, typename Val, typename ValCount>
 AbstractConstraint* NotOccurrenceEqualConstraint<VarArray, Val, ValCount>::reverseConstraint() {
-  return new OccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, val_count);
+  return new OccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, valCount);
 }
 
 template <typename VarArray, typename Val, typename ValCount>
 AbstractConstraint* OccEqualCon(const VarArray& _var_array, const Val& _value,
-                                const ValCount& _val_count) {
-  return (new OccurrenceEqualConstraint<VarArray, Val, ValCount>(_var_array, _value, _val_count));
+                                const ValCount& _valCount) {
+  return (new OccurrenceEqualConstraint<VarArray, Val, ValCount>(_var_array, _value, _valCount));
 }
 
 template <typename VarArray, typename Val>
 AbstractConstraint* ConstantOccEqualCon(const VarArray& _var_array, const Val& _value,
-                                        DomainInt _val_count_min, DomainInt _val_count_max) {
-  return (new ConstantOccurrenceEqualConstraint<VarArray, Val>(_var_array, _value, _val_count_min,
-                                                               _val_count_max));
+                                        DomainInt _valCount_min, DomainInt _valCount_max) {
+  return (new ConstantOccurrenceEqualConstraint<VarArray, Val>(_var_array, _value, _valCount_min,
+                                                               _valCount_max));
 }
 
 template <typename T1>
 AbstractConstraint* BuildCT_GEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
-  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
+  const SysInt val_toCount = checked_cast<SysInt>(b.constants[0][0]);
   DomainInt occs = b.constants[1][0];
-  { return ConstantOccEqualCon(t1, val_to_count, occs, t1.size()); }
+  { return ConstantOccEqualCon(t1, val_toCount, occs, t1.size()); }
 }
 
 /* JSON
@@ -752,9 +752,9 @@ AbstractConstraint* BuildCT_GEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
 
 template <typename T1>
 AbstractConstraint* BuildCT_LEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
-  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
+  const SysInt val_toCount = checked_cast<SysInt>(b.constants[0][0]);
   DomainInt occs = b.constants[1][0];
-  return ConstantOccEqualCon(t1, val_to_count, 0, occs);
+  return ConstantOccEqualCon(t1, val_toCount, 0, occs);
 }
 
 /* JSON
@@ -767,8 +767,8 @@ AbstractConstraint* BuildCT_LEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
 
 template <typename T1, typename T3>
 AbstractConstraint* BuildCT_OCCURRENCE(const T1& t1, const T3& t3, ConstraintBlob& b) {
-  const SysInt val_to_count = checked_cast<SysInt>(b.constants[0][0]);
-  return OccEqualCon(t1, val_to_count, t3[0]);
+  const SysInt val_toCount = checked_cast<SysInt>(b.constants[0][0]);
+  return OccEqualCon(t1, val_toCount, t3[0]);
 }
 
 /* JSON

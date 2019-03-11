@@ -31,9 +31,9 @@ void ReadCSP(Reader& reader, ConcreteFileReader<Stream>* infile) {
 }
 
 void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose,
-                        MapLongTuplesToShort mltts, bool ensure_branch_on_all_vars) {
+                        MapLongTuplesToShort mltts, bool ensure_branch_on_allVars) {
   MinionThreeInputReader<ConcreteFileReader<CheapStream>> readerThree(parser_verbose, mltts,
-                                                                      ensure_branch_on_all_vars);
+                                                                      ensure_branch_on_allVars);
 
   bool needs_finalise_three = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
@@ -66,7 +66,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 
     try {
       {
-        string test_name = infile.get_string();
+        string test_name = infile.getString();
         if(test_name != "MINION")
           INPUT_ERROR("All Minion input files must begin 'MINION'");
 
@@ -84,20 +84,20 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
       cerr << "Error in input!" << endl;
       cerr << s.what() << endl;
 
-      SysInt pos = cs.get_raw_pos();
+      SysInt pos = cs.getRawPos();
       cs.reset_stream();
 
       string current_line;
       SysInt start_of_line = 0;
-      SysInt line_count = -1;
+      SysInt lineCount = -1;
 
       do {
-        line_count++;
-        start_of_line = cs.get_raw_pos();
+        lineCount++;
+        start_of_line = cs.getRawPos();
         current_line = cs.getline();
-      } while(cs.get_raw_pos() < pos);
+      } while(cs.getRawPos() < pos);
 
-      cerr << "Error occurred on line " << line_count << endl;
+      cerr << "Error occurred on line " << lineCount << endl;
       cerr << "Parser gave up around:" << endl;
       cerr << current_line << endl;
       for(SysInt i = 0; i < pos - start_of_line - 1; ++i)

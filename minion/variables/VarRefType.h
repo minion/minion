@@ -138,11 +138,11 @@ struct VarRefType {
 #endif
 
   friend std::ostream& operator<<(std::ostream& o, const VarRefType& v) {
-    return o << InternalRefType::name() << v.data.var_num;
+    return o << InternalRefType::name() << v.data.varNum;
   }
 
   DomainInt getDomainChange(DomainDelta d) {
-    return d.XXX_get_domain_diff();
+    return d.XXX_getDomain_diff();
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
@@ -265,7 +265,7 @@ struct QuickVarRefType {
   }
 
   DomainInt getDomainChange(DomainDelta d) {
-    return d.XXX_get_domain_diff();
+    return d.XXX_getDomain_diff();
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,

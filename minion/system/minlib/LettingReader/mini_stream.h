@@ -58,7 +58,7 @@ class MiniStream {
     }
   }
 
-  bool get_string(string& s) {
+  bool getString(string& s) {
     skip_space();
     char buffer[1000];
     int pos = 0;
@@ -118,7 +118,7 @@ class MiniStream {
     p_error(error, charnum);
   }
 
-  void p_error(const string error, int c_num) {
+  void p_error(const string error, int cNum) {
     cerr << "Error occurred on line " << linenum << ":" << endl;
     cerr << error << endl;
 
@@ -129,7 +129,7 @@ class MiniStream {
     }
     cerr << s.substr(p, s.find_first_of('\n', p + 1) - p) << endl;
 
-    for(int i = 1; i < c_num; i++) // draw the fancy arrow
+    for(int i = 1; i < cNum; i++) // draw the fancy arrow
       cerr << '-';
     cerr << '^' << endl;
 
@@ -170,10 +170,10 @@ public:
     linenum = charnum = 1;
 
     string var_name;
-    int var_value;
+    int varValue;
 
     while(!eof()) {
-      if(!get_string(var_name)) { // fails if file contains only
+      if(!getString(var_name)) { // fails if file contains only
         linenum--;                // spaces +/ comments
         p_error("No 'letting's found.");
       }
@@ -181,7 +181,7 @@ public:
         p_error("Expected 'letting' here:", charnum - var_name.length());
       }
 
-      if(!get_string(var_name)) { // var name
+      if(!getString(var_name)) { // var name
         p_error("Expected a variable name here:");
       }
 
@@ -230,14 +230,14 @@ public:
               array_pointer[c_lvl] = 0;
           }
 
-          else if(!needcomma && get_int(var_value)) { // add value
+          else if(!needcomma && get_int(varValue)) { // add value
             if(depth == 0) {
               depth = (int)array_pointer.size() - 1;
             }
             if(c_lvl != depth) {
               p_error("Array dimensions do not match:", charnum - 1);
             }
-            storage[array_pointer] = var_value;
+            storage[array_pointer] = varValue;
             needcomma = true;
           }
 
@@ -254,11 +254,11 @@ public:
       }
 
       else { // simple value
-        if(!get_int(var_value)) {
+        if(!get_int(varValue)) {
           p_error("Expected integer value or '[' here:");
         } else {
 
-          add_var(var_name, var_value);
+          add_var(var_name, varValue);
         }
       }
 

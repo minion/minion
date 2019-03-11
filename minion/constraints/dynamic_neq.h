@@ -77,8 +77,8 @@ struct WatchNeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 2);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 2);
     return v[0] != v[1];
   }
 

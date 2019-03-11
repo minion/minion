@@ -102,13 +102,13 @@ struct reify_true : public ParentConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    DomainInt back_val = *(v + checked_cast<SysInt>(v_size - 1));
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    DomainInt backVal = *(v + checked_cast<SysInt>(vSize - 1));
     // v.pop_back();
-    if(back_val == 1)
-      return child_constraints[0]->checkAssignment(v, v_size - 1);
+    if(backVal == 1)
+      return child_constraints[0]->checkAssignment(v, vSize - 1);
     else
-      return (back_val == 0);
+      return (backVal == 0);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -218,9 +218,9 @@ struct reify_true : public ParentConstraint {
     }
 
     const SysInt dt = 0;
-    SysInt dt_count = dynamicTriggerCount();
+    SysInt dtCount = dynamicTriggerCount();
     // Clean up triggers (skip the one watching the reification variable)
-    for(SysInt i = 0; i < dt_count - 1; ++i)
+    for(SysInt i = 0; i < dtCount - 1; ++i)
       releaseTriggerInt(i);
 
     if(DoWatchAssignment && !rar_var.isAssigned()) // don't place when rar_var=0

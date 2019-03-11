@@ -110,7 +110,7 @@ string get_dom_as_string(const vector<T>& vec) {
 
 // Count number of literals present in an array of variables.
 template <typename Vars>
-DomainInt lit_count(Vars& v) {
+DomainInt litCount(Vars& v) {
   DomainInt lits = 0;
   for(SysInt i = 0; i < (SysInt)v.size(); ++i) {
     if(v[i].isBound()) {

@@ -34,7 +34,7 @@ public:
     _internal_cpu_start_time = get_cpu_time();
     _internal_sys_start_time = get_sys_time();
     _last_check_time = _internal_cpu_start_time;
-    start_wallclock = get_raw_wall_time();
+    start_wallclock = getRaw_wall_time();
   }
 
   bool checkTimeout(unsigned seconds) {
@@ -60,7 +60,7 @@ public:
   template <typename Stream>
   void maybePrintFinaltimestepStore(Stream& sout, const char* time_name, const char* store_name,
                                     TableOut& tableout, bool toprint) {
-    double time_wallclock = get_raw_wall_time() - start_wallclock;
+    double time_wallclock = getRaw_wall_time() - start_wallclock;
 
     double end_cpu_time = get_cpu_time();
     double end_sys_time = get_sys_time();

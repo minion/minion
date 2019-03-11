@@ -118,7 +118,7 @@ class BackTrackMemory {
   struct BacktrackData {
     size_t total_stored_bytes;
     size_t allocated_extendable_bytes;
-    vector<size_t> extendable_blocks_size;
+    vector<size_t> extendable_blocksSize;
 
     char* data;
     size_t total_bytes() const {
@@ -130,7 +130,7 @@ class BackTrackMemory {
     BacktrackData(size_t t, size_t a, vector<size_t> v, char* d)
         : total_stored_bytes(t),
           allocated_extendable_bytes(a),
-          extendable_blocks_size(v),
+          extendable_blocksSize(v),
           data(d) {}
   };
 
@@ -144,18 +144,18 @@ class BackTrackMemory {
 #endif
 
 public:
-  void copyIntoPtr(char* store_ptr) {
-    P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
+  void copyIntoPtr(char* storePtr) {
+    P("StoreMem: " << (void*)this << " : " << (void*)storePtr);
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      P((void*)(store_ptr + current_offset)
+      P((void*)(storePtr + current_offset)
         << " " << (void*)stored_blocks[i].base << " " << stored_blocks[i].size);
-      memcpy(store_ptr + current_offset, stored_blocks[i].base, stored_blocks[i].size);
+      memcpy(storePtr + current_offset, stored_blocks[i].base, stored_blocks[i].size);
       current_offset += stored_blocks[i].size;
     }
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(store_ptr + current_offset, extendable_blocks[i].base, extendable_blocks[i].size);
+      memcpy(storePtr + current_offset, extendable_blocks[i].base, extendable_blocks[i].size);
       current_offset += extendable_blocks[i].size;
     }
 
@@ -179,16 +179,16 @@ private:
   }
 
 public:
-  void retrieveFromPtr(const BacktrackData& store_ptr) {
+  void retrieveFromPtr(const BacktrackData& storePtr) {
     P("RetrieveMem: ");
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      copyMemBlock(stored_blocks[i].base, store_ptr, current_offset, stored_blocks[i].size);
+      copyMemBlock(stored_blocks[i].base, storePtr, current_offset, stored_blocks[i].size);
       current_offset += stored_blocks[i].size;
     }
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(extendable_blocks[i].base, store_ptr.data + current_offset, extendable_blocks[i].size);
+      memcpy(extendable_blocks[i].base, storePtr.data + current_offset, extendable_blocks[i].size);
       current_offset += extendable_blocks[i].size;
     }
 
@@ -213,15 +213,15 @@ public:
 
   /// Copies the current state of backtrackable memory.
   void world_push() {
-    UnsignedSysInt data_size = this->getDataSize();
-    char* tmp = (char*)block_cache.do_malloc(data_size); // calloc(data_size, sizeof(char));
+    UnsignedSysInt dataSize = this->getDataSize();
+    char* tmp = (char*)block_cache.do_malloc(dataSize); // calloc(dataSize, sizeof(char));
     this->copyIntoPtr(tmp);
-    vector<size_t> extendable_blocks_size;
+    vector<size_t> extendable_blocksSize;
     for(int i = 0; i < extendable_blocks.size(); ++i) {
-      extendable_blocks_size.push_back(extendable_blocks[i].size);
+      extendable_blocksSize.push_back(extendable_blocks[i].size);
     }
 
-    BacktrackData bd{total_stored_bytes, allocated_extendable_bytes, extendable_blocks_size, tmp};
+    BacktrackData bd{total_stored_bytes, allocated_extendable_bytes, extendable_blocksSize, tmp};
     backtrack_stack.push_back(bd);
   }
 
@@ -242,11 +242,11 @@ public:
       }
       if(total_stored_bytes > bd.total_stored_bytes) {
         D_ASSERT(total_stored_bytes - stored_blocks.back().size <= bd.total_stored_bytes);
-        size_t old_size = stored_blocks.back().size;
+        size_t oldSize = stored_blocks.back().size;
         size_t diff = total_stored_bytes - bd.total_stored_bytes;
-        size_t new_size = old_size - diff;
-        memset(stored_blocks.back().base + new_size, 0, diff);
-        stored_blocks.back().size = new_size;
+        size_t newSize = oldSize - diff;
+        memset(stored_blocks.back().base + newSize, 0, diff);
+        stored_blocks.back().size = newSize;
         total_stored_bytes -= diff;
       }
     }
@@ -254,12 +254,12 @@ public:
     D_ASSERT(total_stored_bytes == bd.total_stored_bytes);
 
     // If you trigger this, ask Chris and we can generalise!
-    D_ASSERT(extendable_blocks.size() == bd.extendable_blocks_size.size());
+    D_ASSERT(extendable_blocks.size() == bd.extendable_blocksSize.size());
     for(int i = 0; i < extendable_blocks.size(); ++i) {
-      if(bd.extendable_blocks_size[i] != extendable_blocks[i].size) {
-        D_ASSERT(bd.extendable_blocks_size[i] < extendable_blocks[i].size);
-        size_t diff = extendable_blocks[i].size - bd.extendable_blocks_size[i];
-        extendable_blocks[i].size = bd.extendable_blocks_size[i];
+      if(bd.extendable_blocksSize[i] != extendable_blocks[i].size) {
+        D_ASSERT(bd.extendable_blocksSize[i] < extendable_blocks[i].size);
+        size_t diff = extendable_blocks[i].size - bd.extendable_blocksSize[i];
+        extendable_blocks[i].size = bd.extendable_blocksSize[i];
         memset(extendable_blocks[i].base + extendable_blocks[i].size, 0, diff);
         allocated_extendable_bytes -= diff;
       }
@@ -284,47 +284,47 @@ public:
   }
 
   /// Request a new block of memory and returns a \ref void* to it's start.
-  void* request_bytes(DomainInt byte_count) {
-    P("Request: " << (void*)this << " : " << byte_count);
-    if(byte_count == 0)
+  void* request_bytes(DomainInt byteCount) {
+    P("Request: " << (void*)this << " : " << byteCount);
+    if(byteCount == 0)
       return NULL;
 
     // TODO: is the following line necessary?
-    if(byte_count % sizeof(SysInt) != 0)
-      byte_count += sizeof(SysInt) - (byte_count % sizeof(SysInt));
+    if(byteCount % sizeof(SysInt) != 0)
+      byteCount += sizeof(SysInt) - (byteCount % sizeof(SysInt));
 
-    total_stored_bytes += checked_cast<size_t>(byte_count);
+    total_stored_bytes += checked_cast<size_t>(byteCount);
 
-    if(stored_blocks.back().remaining_capacity() < byte_count) {
-      reallocate(byte_count);
+    if(stored_blocks.back().remaining_capacity() < byteCount) {
+      reallocate(byteCount);
     }
 
-    D_ASSERT(stored_blocks.back().remaining_capacity() >= byte_count);
-    void* return_val = stored_blocks.back().base + stored_blocks.back().size;
+    D_ASSERT(stored_blocks.back().remaining_capacity() >= byteCount);
+    void* returnVal = stored_blocks.back().base + stored_blocks.back().size;
     P("Return val:" << (void*)stored_blocks.back().base);
-    stored_blocks.back().size += checked_cast<size_t>(byte_count);
-    return return_val;
+    stored_blocks.back().size += checked_cast<size_t>(byteCount);
+    return returnVal;
   }
 
-  ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size) {
-    const SysInt max_size = 10 * 1024 * 1024;
-    char* block = (char*)calloc(max_size, 1);
-    extendable_blocks.push_back(BlockDef{block, base_size, max_size});
-    allocated_extendable_bytes += base_size;
+  ExtendableBlock requestBytesExtendable(UnsignedSysInt baseSize) {
+    const SysInt maxSize = 10 * 1024 * 1024;
+    char* block = (char*)calloc(maxSize, 1);
+    extendable_blocks.push_back(BlockDef{block, baseSize, maxSize});
+    allocated_extendable_bytes += baseSize;
     return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
   }
 
-  void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size) {
-    UnsignedSysInt old_size = extendable_blocks[block.getPos()].size;
+  void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt newSize) {
+    UnsignedSysInt oldSize = extendable_blocks[block.getPos()].size;
     D_ASSERT(block() == extendable_blocks[block.getPos()].base);
-    D_ASSERT(new_size >= old_size);
-    D_ASSERT(new_size <= extendable_blocks[block.getPos()].capacity);
-    D_ASSERT(checkAllZero(block() + old_size, block() + new_size));
+    D_ASSERT(newSize >= oldSize);
+    D_ASSERT(newSize <= extendable_blocks[block.getPos()].capacity);
+    D_ASSERT(checkAllZero(block() + oldSize, block() + newSize));
 
-    allocated_extendable_bytes += (new_size - old_size);
+    allocated_extendable_bytes += (newSize - oldSize);
 
-    extendable_blocks[block.getPos()].size = new_size;
-    // block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
+    extendable_blocks[block.getPos()].size = newSize;
+    // block_resizes.back().push_back(make_tuple(block.getPos(), oldSize, newSize));
   }
 
   /// Request a \ref MoveableArray.
@@ -334,12 +334,12 @@ public:
   }
 
 private:
-  void reallocate(DomainInt byte_count_new_request) {
-    P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
+  void reallocate(DomainInt byteCount_new_request) {
+    P("Reallocate: " << (void*)this << " : " << byteCount_new_request);
     D_ASSERT(stored_blocks.size() == 0 ||
-             (stored_blocks.back().remaining_capacity() < byte_count_new_request));
+             (stored_blocks.back().remaining_capacity() < byteCount_new_request));
 
-    size_t new_block_capacity = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
+    size_t new_block_capacity = max(BLOCK_SIZE, checked_cast<size_t>(byteCount_new_request));
     char* base = (char*)calloc(new_block_capacity, sizeof(char));
     if(base == NULL) {
       D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting.");

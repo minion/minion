@@ -40,8 +40,8 @@ struct ConstantConstraint : public AbstractConstraint {
       getState().setFailed(true);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 0);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 0);
     return truth;
   }
 

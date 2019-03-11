@@ -73,7 +73,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
       return new BoolLessSumConstraint<VarArray, SysInt, 1>(var_array, var_sum - 1);
   }
 
-  DomainInt occ_count() {
+  DomainInt occCount() {
     if(VarToCount)
       return var_sum;
     else
@@ -92,8 +92,8 @@ struct BoolLessSumConstraint : public AbstractConstraint {
         it->uncheckedAssign(1 - VarToCount);
       }
     }
-    // D_ASSERT(one_vars >= occ_count());
-    if(one_vars > occ_count())
+    // D_ASSERT(one_vars >= occCount());
+    if(one_vars > occCount())
       getState().setFailed(true);
   }
 
@@ -103,32 +103,32 @@ struct BoolLessSumConstraint : public AbstractConstraint {
              var_array[checked_cast<SysInt>(i)].assignedValue() == 1);
     SysInt c = count + 1;
     count = c;
-    if(c == occ_count())
+    if(c == occCount())
       limit_reached();
   }
 
   virtual void fullPropagate() {
     setup_triggers();
     SysInt occs = 0;
-    SysInt array_size = var_array.size();
-    for(SysInt i = 0; i < array_size; ++i)
+    SysInt arraySize = var_array.size();
+    for(SysInt i = 0; i < arraySize; ++i)
       if(var_array[i].isAssignedValue(VarToCount))
         occs++;
     count = occs;
-    if(occs > occ_count())
+    if(occs > occCount())
       getState().setFailed(true);
-    if(occs == occ_count())
+    if(occs == occCount())
       limit_reached();
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size());
-    for(SysInt i = 0; i < v_size; i++)
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size());
+    for(SysInt i = 0; i < vSize; i++)
       D_ASSERT(v[i] == 0 || v[i] == 1);
     if(VarToCount)
-      return std::accumulate(v, v + v_size, DomainInt(0)) <= var_sum;
+      return std::accumulate(v, v + vSize, DomainInt(0)) <= var_sum;
     else
-      return std::accumulate(v, v + v_size, DomainInt(0)) >= var_sum;
+      return std::accumulate(v, v + vSize, DomainInt(0)) >= var_sum;
   }
 
   /*
@@ -136,32 +136,32 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   virtual bool getSatisfyingAssignment(box<pair<SysInt,DomainInt> >&
   assignment)
   {
-    SysInt sum_value = 0;
-    SysInt v_size = var_array.size();
+    SysInt sumValue = 0;
+    SysInt vSize = var_array.size();
     if(VarToCount)
     {
-      for(SysInt i = 0; i < v_size; ++i)
+      for(SysInt i = 0; i < vSize; ++i)
       {
         assignment.push_back(make_pair(i, var_array[i].min()));
-        sum_value += var_array[i].min();
+        sumValue += var_array[i].min();
       }
-      return (sum_value <= var_sum);
+      return (sumValue <= var_sum);
     }
     else
     {
-      for(SysInt i = 0; i < v_size; ++i)
+      for(SysInt i = 0; i < vSize; ++i)
       {
         assignment.push_back(make_pair(i, var_array[i].max()));
-        sum_value += var_array[i].max();
+        sumValue += var_array[i].max();
       }
-      return (sum_value >= var_sum);
+      return (sumValue >= var_sum);
     }
   }
   */
 
   // TODO : Optimise for booleans
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    SysInt v_size = var_array.size();
+    SysInt vSize = var_array.size();
     DomainInt sum_limit;
     if(VarToCount)
       sum_limit = (SysInt)var_array.size() - var_sum;
@@ -170,15 +170,15 @@ struct BoolLessSumConstraint : public AbstractConstraint {
 
     SysInt ValToFind = 1 - VarToCount;
 
-    SysInt val_count = 0;
+    SysInt valCount = 0;
 
-    for(SysInt i = 0; i < v_size && val_count < sum_limit; ++i) {
+    for(SysInt i = 0; i < vSize && valCount < sum_limit; ++i) {
       if(var_array[i].inDomain(ValToFind)) {
-        val_count++;
+        valCount++;
         assignment.push_back(make_pair(i, ValToFind));
       }
     }
-    return val_count >= sum_limit;
+    return valCount >= sum_limit;
   }
 
   virtual vector<AnyVarRef> getVars() {

@@ -122,10 +122,10 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       earliest_occurrence_y.push_back(pos);
     }
 
-    SysInt x_size = x.size();
+    SysInt xSize = x.size();
     alpha = 0;
     if(Less)
-      beta = x_size;
+      beta = xSize;
     else
       beta = 100000;
     F = 0;
@@ -136,14 +136,14 @@ struct GacLexLeqConstraint : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    SysInt x_size = x.size();
-    for(SysInt i = 0; i < x_size; ++i) {
+    SysInt xSize = x.size();
+    for(SysInt i = 0; i < xSize; ++i) {
       moveTriggerInt(x[i], i * 4, LowerBound);
       moveTriggerInt(x[i], i * 4 + 1, UpperBound);
     }
 
-    SysInt y_size = y.size();
-    for(SysInt i = 0; i < y_size; ++i) {
+    SysInt ySize = y.size();
+    for(SysInt i = 0; i < ySize; ++i) {
       moveTriggerInt(y[i], i * 4 + 2, LowerBound);
       moveTriggerInt(y[i], i * 4 + 3, UpperBound);
     }
@@ -251,28 +251,28 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     if(x[a].max() == y[a].max()) {
       // We need to find support for x[a] = max.
       for(SysInt i = a + 1; i < n; ++i) {
-        DomainInt x_val;
-        DomainInt y_val;
+        DomainInt xVal;
+        DomainInt yVal;
         if(earliest_occurrence_x[i].second != a) {
           if(earliest_occurrence_x[i].first == 0)
-            x_val = x[i].min();
+            xVal = x[i].min();
           else
-            x_val = x[i].max();
+            xVal = x[i].max();
         } else
-          x_val = x[i].max();
+          xVal = x[i].max();
 
         if(earliest_occurrence_y[i].second != a) {
           if(earliest_occurrence_y[i].first == 0)
-            y_val = y[i].min();
+            yVal = y[i].min();
           else
-            y_val = y[i].max();
+            yVal = y[i].max();
         } else
-          y_val = y[i].max();
+          yVal = y[i].max();
 
-        if(x_val < y_val)
+        if(xVal < yVal)
           goto y_case;
 
-        if(x_val > y_val) {
+        if(xVal > yVal) {
           x[a].setMax(y[a].max() - 1);
           goto y_case;
         }
@@ -285,32 +285,32 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     if(x[a].min() == y[a].min()) {
       // We need to find support for y[a] = min.
       for(SysInt i = a + 1; i < n; ++i) {
-        DomainInt x_val;
-        DomainInt y_val;
+        DomainInt xVal;
+        DomainInt yVal;
         if(earliest_occurrence_x[i].second != a) {
           if(earliest_occurrence_x[i].first == 0)
-            x_val = x[i].min();
+            xVal = x[i].min();
           else
-            x_val = x[i].max();
+            xVal = x[i].max();
         } else
-          x_val = x[i].min();
+          xVal = x[i].min();
 
         if(earliest_occurrence_y[i].second != a) {
           if(earliest_occurrence_y[i].first == 0)
-            y_val = y[i].min();
+            yVal = y[i].min();
           else
-            y_val = y[i].max();
+            yVal = y[i].max();
         } else
-          y_val = y[i].min();
+          yVal = y[i].min();
 
-        // cout << x_val << "." << y_val << endl;
+        // cout << xVal << "." << yVal << endl;
         // cout << earliest_occurrence_x[i] << "." << earliest_occurrence_y[i]
         // << endl;
 
-        if(x_val < y_val)
+        if(xVal < yVal)
           return;
 
-        if(x_val > y_val) {
+        if(xVal > yVal) {
           // cout << "Prop trigger!" << endl;
           // cout << a << ":" << i << ":" << (SysInt)(beta) << endl;
           y[a].setMin(x[a].min() + 1);
@@ -386,14 +386,14 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)x.size() + (SysInt)y.size());
-    size_t x_size = x.size();
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)x.size() + (SysInt)y.size());
+    size_t xSize = x.size();
 
-    for(size_t i = 0; i < x_size; i++) {
-      if(v[i] < v[i + x_size])
+    for(size_t i = 0; i < xSize; i++) {
+      if(v[i] < v[i + xSize])
         return true;
-      if(v[i] > v[i + x_size])
+      if(v[i] > v[i + xSize])
         return false;
     }
     if(Less)
@@ -403,8 +403,8 @@ struct GacLexLeqConstraint : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    size_t x_size = x.size();
-    for(size_t i = 0; i < x_size; ++i) {
+    size_t xSize = x.size();
+    for(size_t i = 0; i < xSize; ++i) {
       DomainInt x_i_min = x[i].min();
       DomainInt y_i_max = y[i].max();
 
@@ -413,7 +413,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       }
 
       assignment.push_back(make_pair(i, x_i_min));
-      assignment.push_back(make_pair(i + x_size, y_i_max));
+      assignment.push_back(make_pair(i + xSize, y_i_max));
       if(x_i_min < y_i_max)
         return true;
     }

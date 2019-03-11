@@ -43,7 +43,7 @@ struct TriggerObj {
     return &_dynamic_triggers[checked_cast<SysInt>(type)];
   }
 
-  DynamicTriggerList* domain_val(DomainInt val) {
+  DynamicTriggerList* domainVal(DomainInt val) {
     D_ASSERT(val >= min && val <= max);
     return &_dynamic_triggers[checked_cast<SysInt>(val - min + 4)];
   }
@@ -58,56 +58,56 @@ class TriggerList {
 
 public:
   TriggerList(bool _only_bounds) : only_bounds(_only_bounds) {
-    var_count_m = 0;
+    varCount_m = 0;
   }
 
   vector<TriggerObj> dyn_triggers;
 
   //  vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
-  //  vector<vector<DynamicTriggerList>> dynamic_triggers_domain_vec;
+  //  vector<vector<DynamicTriggerList>> dynamic_triggersDomain_vec;
 
   // void* dynamic_triggers;
 
-  SysInt var_count_m;
+  SysInt varCount_m;
 
-  //  std::vector<std::pair<DomainInt, DomainInt> > vars_domain;
+  //  std::vector<std::pair<DomainInt, DomainInt> > varsDomain;
 
-  void lock(SysInt size, DomainInt min_domain_val, DomainInt max_domain_val) {
+  void lock(SysInt size, DomainInt minDomainVal, DomainInt maxDomainVal) {
     std::vector<std::pair<DomainInt, DomainInt>> doms(size,
-                                                      make_pair(min_domain_val, max_domain_val));
+                                                      make_pair(minDomainVal, maxDomainVal));
     addVariables(doms);
   }
 
   void addVariables(const std::vector<pair<DomainInt, DomainInt>>& doms) {
-    SysInt old_var_count = var_count_m;
-    var_count_m += doms.size();
-    CHECK(var_count_m < MAX_VARS, "Too many variables... increase MAX_VARS");
-    dyn_triggers.resize(var_count_m);
+    SysInt old_varCount = varCount_m;
+    varCount_m += doms.size();
+    CHECK(varCount_m < MAX_VARS, "Too many variables... increase MAX_VARS");
+    dyn_triggers.resize(varCount_m);
     for(int i = 0; i < doms.size(); ++i) {
-      dyn_triggers[old_var_count + i].min = doms[i].first;
-      dyn_triggers[old_var_count + i].max = doms[i].second;
+      dyn_triggers[old_varCount + i].min = doms[i].first;
+      dyn_triggers[old_varCount + i].max = doms[i].second;
       if(only_bounds)
-        dyn_triggers[old_var_count + i]._dynamic_triggers.resize(4);
+        dyn_triggers[old_varCount + i]._dynamic_triggers.resize(4);
       else
-        dyn_triggers[old_var_count + i]._dynamic_triggers.resize(
+        dyn_triggers[old_varCount + i]._dynamic_triggers.resize(
             checked_cast<SysInt>(4 + (doms[i].second - doms[i].first + 1)));
     }
   }
 
-  void dynamic_propagate(DomainInt _var_num, TrigType type, DomainInt domain_delta,
+  void dynamic_propagate(DomainInt _varNum, TrigType type, DomainInt domain_delta,
                          DomainInt val_removed = NoDomainValue) {
-    const SysInt var_num = checked_cast<SysInt>(_var_num);
+    const SysInt varNum = checked_cast<SysInt>(_varNum);
     D_ASSERT(val_removed == NoDomainValue ||
              (type == DomainRemoval && val_removed != NoDomainValue));
     D_ASSERT(!only_bounds || type != DomainRemoval);
     DynamicTriggerList* trig;
     if(type != DomainRemoval) {
-      trig = dyn_triggers[var_num].trigger_type(type);
+      trig = dyn_triggers[varNum].trigger_type(type);
     } else {
       D_ASSERT(!only_bounds);
-      D_ASSERT(dyn_triggers[var_num].min <= val_removed);
-      D_ASSERT(dyn_triggers[var_num].max >= val_removed);
-      trig = dyn_triggers[var_num].domain_val(val_removed);
+      D_ASSERT(dyn_triggers[varNum].min <= val_removed);
+      D_ASSERT(dyn_triggers[varNum].max >= val_removed);
+      trig = dyn_triggers[varNum].domainVal(val_removed);
     }
 
     // This is an optimisation, no need to push empty lists.
@@ -115,27 +115,27 @@ public:
       getQueue().pushDynamicTriggers(DynamicTriggerEvent(trig, checked_cast<SysInt>(domain_delta)));
   }
 
-  void push_upper(DomainInt var_num, DomainInt upper_delta) {
+  void push_upper(DomainInt varNum, DomainInt upper_delta) {
     D_ASSERT(upper_delta > 0 || getState().isFailed());
-    dynamic_propagate(var_num, UpperBound, upper_delta);
+    dynamic_propagate(varNum, UpperBound, upper_delta);
   }
 
-  void push_lower(DomainInt var_num, DomainInt lower_delta) {
+  void push_lower(DomainInt varNum, DomainInt lower_delta) {
     D_ASSERT(lower_delta > 0 || getState().isFailed());
-    dynamic_propagate(var_num, LowerBound, lower_delta);
+    dynamic_propagate(varNum, LowerBound, lower_delta);
   }
 
-  void push_assign(DomainInt var_num, DomainInt) {
-    dynamic_propagate(var_num, Assigned, -1);
+  void push_assign(DomainInt varNum, DomainInt) {
+    dynamic_propagate(varNum, Assigned, -1);
   }
 
-  void push_domain_changed(DomainInt var_num) {
-    dynamic_propagate(var_num, DomainChanged, -1);
+  void pushDomain_changed(DomainInt varNum) {
+    dynamic_propagate(varNum, DomainChanged, -1);
   }
 
-  void push_domain_removal(DomainInt var_num, DomainInt val_removed) {
+  void pushDomain_removal(DomainInt varNum, DomainInt val_removed) {
     D_ASSERT(!only_bounds);
-    dynamic_propagate(var_num, DomainRemoval, -1, val_removed);
+    dynamic_propagate(varNum, DomainRemoval, -1, val_removed);
   }
 
   void addDynamicTrigger(DomainInt _b, Trig_ConRef t, TrigType type, DomainInt val,
@@ -152,7 +152,7 @@ public:
       D_ASSERT(!only_bounds);
       D_ASSERT(dyn_triggers[b].min <= val);
       D_ASSERT(dyn_triggers[b].max >= val);
-      queue = dyn_triggers[b].domain_val(val);
+      queue = dyn_triggers[b].domainVal(val);
     }
 
     D_ASSERT(queue->sanity_check_list());

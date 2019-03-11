@@ -40,7 +40,7 @@ public:
   /// This function shouldn't be called directly. This object should be passed
   /// to a variables, which will do any "massaging" which
   /// is required.
-  DomainInt XXX_get_domain_diff() {
+  DomainInt XXX_getDomain_diff() {
     return domain_change;
   }
 

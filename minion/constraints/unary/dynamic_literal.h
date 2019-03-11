@@ -61,8 +61,8 @@ struct WatchLiteralConstraint : public AbstractConstraint {
     var.assign(val);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 1);
     return (v[0] == val);
   }
 

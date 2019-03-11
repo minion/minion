@@ -24,7 +24,7 @@ There are two ways to use the pull (DOM-like) interface of picojson.  One is to 
 std::cin& gt;
 &gt;
 v;
-std::string err = picojson::get_last_error();
+std::string err = picojson::getLast_error();
 if(!err.empty()) {
   std::cerr& lt;
   &lt;
@@ -160,7 +160,7 @@ if(!err.empty()) {
 std::cin& gt;
 &gt;
 v;
-std::string err = picojson::get_last_error();
+std::string err = picojson::getLast_error();
 if(!err.empty()) {
   std::cerr& lt;
   &lt;

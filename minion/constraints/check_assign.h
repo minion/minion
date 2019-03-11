@@ -65,8 +65,8 @@ struct Check_Assign : public AbstractConstraint {
     return child->getSatisfyingAssignment(assignment);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    return child->checkAssignment(v, v_size);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    return child->checkAssignment(v, vSize);
   }
 
   virtual vector<AnyVarRef> getVars() {

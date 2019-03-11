@@ -34,15 +34,15 @@ private:
 
 public:
   // The constructor must be called before the monotonicset is locked.
-  ReversibleMonotonicSet(DomainInt _size)
+  ReversibleMonotonicSet(DomainInt Size)
       : MS(getMemory().monotonicSet())
 #ifndef NO_DEBUG
         ,
-        size(_size)
+        size(Size)
 #endif
   {
     D_ASSERT(size >= 0);
-    offset = MS.request_storage(_size);
+    offset = MS.request_storage(Size);
   }
 
   bool isMember(DomainInt ref) {

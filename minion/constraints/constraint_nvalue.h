@@ -98,7 +98,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i)
       assigned.insert(v[i]);
@@ -184,18 +184,18 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     std::set<DomainInt> assigned;
     DomainInt min_unassigned = INT_MAX;
     DomainInt max_unassigned = INT_MIN;
-    DomainInt unassigned_count = 0;
+    DomainInt unassignedCount = 0;
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].isAssigned()) {
         assigned.insert(vars[i].assignedValue());
       } else {
-        unassigned_count++;
+        unassignedCount++;
         min_unassigned = std::min(min_unassigned, vars[i].min());
         max_unassigned = std::max(max_unassigned, vars[i].max());
       }
     }
 
-    if(unassigned_count == 0) {
+    if(unassignedCount == 0) {
       result.setMax(assigned.size());
       return;
     }
@@ -226,12 +226,12 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
       }
     }
 
-    DomainInt unassigned_estimate = std::min(unassigned_count, (DomainInt)unassigned_appear.size());
+    DomainInt unassigned_estimate = std::min(unassignedCount, (DomainInt)unassigned_appear.size());
 
     result.setMax(assigned.size() + unassigned_estimate);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i)
       assigned.insert(v[i]);

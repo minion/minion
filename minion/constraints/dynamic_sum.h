@@ -110,14 +110,14 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     // == Number of 1's is >=K         // this is the one I want to do
     // == Number of 0's is <= N-K
 
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
 
-    if(var_sum >= array_size || var_sum < 0) {
+    if(var_sum >= arraySize || var_sum < 0) {
       // In these cases the constraints are all set before search.
       // This will happen before triggers set up in fullPropagate
       // Thus zero triggers are needed
     } else {
-      num_unwatched = checked_cast<SysInt>(array_size - var_sum - 1);
+      num_unwatched = checked_cast<SysInt>(arraySize - var_sum - 1);
       D_ASSERT(num_unwatched >= 0);
       unwatched_indexes = checked_malloc(sizeof(UnsignedSysInt) * num_unwatched);
     }
@@ -137,11 +137,11 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       // Constraint trivially satisfied
       return;
 
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
     DomainInt triggers_wanted = var_sum + 1;
     SysInt index;
 
-    for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) {
+    for(index = 0; (index < arraySize) && (triggers_wanted > 0); ++index) {
       if(var_array[index].inDomain(1 - VarToCount)) {
         // delay setting up triggers in case we don't need to
         --triggers_wanted;
@@ -156,7 +156,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       return;
     } else if(triggers_wanted == 1) // Then we can propagate
     {                               // We never even set up triggers
-      for(SysInt i = 0; i < array_size; ++i) {
+      for(SysInt i = 0; i < arraySize; ++i) {
         if(var_array[i].inDomain(1 - VarToCount)) {
           if(VarToCount)
             var_array[i].setMax(0);
@@ -188,7 +188,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
         }
       }
 
-      for(SysInt i = index; i < array_size; ++i) {
+      for(SysInt i = index; i < arraySize; ++i) {
         unwatched(j) = i;
         ++j;
       }
@@ -257,10 +257,10 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size());
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size());
     SysInt count = 0;
-    for(SysInt i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < vSize; ++i)
       count += (v[i] != VarToCount);
     return count >= var_sum;
   }

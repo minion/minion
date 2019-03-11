@@ -47,9 +47,9 @@ struct CheckAssignConstraint : public AbstractConstraint {
     return new CheckAssignConstraint<OriginalConstraint, !negate>(originalcon);
   }
 
-  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(CheckAssign);
-    if(check_unsat(prop_val, DomainDelta::empty()))
+    if(check_unsat(propVal, DomainDelta::empty()))
       getState().setFailed(true);
   }
 
@@ -59,10 +59,10 @@ struct CheckAssignConstraint : public AbstractConstraint {
     SysInt count = assigned_vars;
     ++count;
     assigned_vars = count;
-    SysInt v_size = variables.size();
-    D_ASSERT(count <= v_size);
+    SysInt vSize = variables.size();
+    D_ASSERT(count <= vSize);
 
-    if(count == v_size)
+    if(count == vSize)
       return check_full_assignment();
     return false;
   }
@@ -112,14 +112,14 @@ struct CheckAssignConstraint : public AbstractConstraint {
       getState().setFailed(true);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     typename OriginalConstraint::var_type& variables = originalcon.getVars();
     (void)variables;
-    D_ASSERT(v_size == (SysInt)variables.size());
+    D_ASSERT(vSize == (SysInt)variables.size());
     if(negate)
-      return !originalcon.checkAssignment(v, v_size);
+      return !originalcon.checkAssignment(v, vSize);
     else
-      return originalcon.checkAssignment(v, v_size);
+      return originalcon.checkAssignment(v, vSize);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -226,8 +226,8 @@ public:
     return *(c->getVarsSingleton());
   }
 
-  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
-    return c->checkAssignment(v, v_size);
+  virtual bool checkAssignment(DomainInt* v, SysInt vSize) {
+    return c->checkAssignment(v, vSize);
   }
 };
 

@@ -246,7 +246,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     std::set<DomainInt> idx_source_set;
     std::set<DomainInt> idx_target_set;
 

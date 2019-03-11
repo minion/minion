@@ -95,17 +95,17 @@ using namespace std;
 
 struct arrayset_boundscheck {
   vector<SysInt> vals;
-  vector<SysInt> vals_pos;
+  vector<SysInt> valsPos;
   DomainInt size;
   DomainInt minval;
 
   void initialise(DomainInt low, DomainInt high) {
     minval = low;
-    vals_pos.resize(checked_cast<SysInt>(high - low + 1));
+    valsPos.resize(checked_cast<SysInt>(high - low + 1));
     vals.resize(checked_cast<SysInt>(high - low + 1));
     for(SysInt i = 0; i < checked_cast<SysInt>(high - low + 1); i++) {
       vals[i] = checked_cast<SysInt>(i + low);
-      vals_pos[i] = i;
+      valsPos[i] = i;
     }
     size = 0;
   }
@@ -116,13 +116,13 @@ struct arrayset_boundscheck {
 
   bool out_of_bounds(DomainInt val) {
     DomainInt pos = val - minval;
-    return (pos < 0 || pos >= vals_pos.size());
+    return (pos < 0 || pos >= valsPos.size());
   }
 
   bool in(DomainInt val) {
     if(out_of_bounds(val))
       return false;
-    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+    return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
 
 private:
@@ -136,12 +136,12 @@ private:
     const SysInt validx = checked_cast<SysInt>(val - minval_cpy);
     const SysInt size_cpy = checked_cast<SysInt>(size);
     const SysInt swapval = vals[size_cpy];
-    const SysInt vpvx = vals_pos[validx];
+    const SysInt vpvx = valsPos[validx];
     vals[vpvx] = swapval;
     vals[size_cpy] = checked_cast<SysInt>(val);
 
-    vals_pos[checked_cast<SysInt>(swapval - minval_cpy)] = vpvx;
-    vals_pos[validx] = size_cpy;
+    valsPos[checked_cast<SysInt>(swapval - minval_cpy)] = vpvx;
+    valsPos[validx] = size_cpy;
 
     size++;
   }
@@ -160,11 +160,11 @@ private:
     D_ASSERT(in(val));
     const SysInt validx = checked_cast<SysInt>(val - minval);
     const SysInt swapval = vals[checked_cast<SysInt>(size - 1)];
-    vals[vals_pos[validx]] = swapval;
+    vals[valsPos[validx]] = swapval;
     vals[checked_cast<SysInt>(size - 1)] = checked_cast<SysInt>(val);
 
-    vals_pos[checked_cast<SysInt>(swapval - minval)] = vals_pos[validx];
-    vals_pos[validx] = checked_cast<SysInt>(size - 1);
+    valsPos[checked_cast<SysInt>(swapval - minval)] = valsPos[validx];
+    valsPos[validx] = checked_cast<SysInt>(size - 1);
 
     size--;
   }
@@ -184,7 +184,7 @@ public:
 struct ReversibleArrayset_boundscheck {
   // Only allows deletion.
   vector<SysInt> vals;
-  vector<SysInt> vals_pos;
+  vector<SysInt> valsPos;
   ReversibleInt size;
   SysInt minval;
 
@@ -194,24 +194,24 @@ struct ReversibleArrayset_boundscheck {
     const SysInt low = checked_cast<SysInt>(low_);
     const SysInt high = checked_cast<SysInt>(high_);
     minval = low;
-    vals_pos.resize(high - low + 1);
+    valsPos.resize(high - low + 1);
     vals.resize(high - low + 1);
     for(SysInt i = 0; i < high - low + 1; i++) {
       vals[i] = i + low;
-      vals_pos[i] = i;
+      valsPos[i] = i;
     }
     size = vals.size();
   }
 
   bool out_of_bounds(DomainInt val) {
     DomainInt pos = val - minval;
-    return (pos < 0 || pos >= vals_pos.size());
+    return (pos < 0 || pos >= valsPos.size());
   }
 
   bool in(DomainInt val) {
     if(out_of_bounds(val))
       return false;
-    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+    return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
 
   void remove(DomainInt val) {
@@ -221,11 +221,11 @@ struct ReversibleArrayset_boundscheck {
     if(in(val)) {
       const SysInt validx = checked_cast<SysInt>(val - minval);
       const SysInt swapval = vals[size - 1];
-      vals[vals_pos[validx]] = swapval;
+      vals[valsPos[validx]] = swapval;
       vals[size - 1] = checked_cast<SysInt>(val);
 
-      vals_pos[swapval - minval] = vals_pos[validx];
-      vals_pos[validx] = size - 1;
+      valsPos[swapval - minval] = valsPos[validx];
+      valsPos[validx] = size - 1;
 
       size = size - 1;
     }
@@ -345,10 +345,10 @@ struct CTupleSTR : public AbstractConstraint {
     return ret;
   }
 
-  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt vSize) {
     const vector<set<DomainInt>>& doms = shortTupleList->initialDomains();
     if(doms.size() > 0) {
-      for(SysInt i = 0; i < v_size; ++i) {
+      for(SysInt i = 0; i < vSize; ++i) {
         if(doms[i].count(v[i]) == 0)
           return false;
       }
@@ -603,7 +603,7 @@ struct CTupleSTR : public AbstractConstraint {
 
 template <typename T>
 AbstractConstraint* BuildCT_SHORTSTR_CTUPLE(const T& t1, ConstraintBlob& b) {
-  return new CTupleSTR<T, true>(t1, b.short_tuples);
+  return new CTupleSTR<T, true>(t1, b.shortTuples);
 }
 
 /* JSON

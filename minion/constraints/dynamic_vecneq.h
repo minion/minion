@@ -135,13 +135,13 @@ struct NeqIterated {
   template <typename VarType1, typename VarType2>
   static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     if(var1.isAssigned())
-      remove_value(var1.assignedValue(), var2);
+      removeValue(var1.assignedValue(), var2);
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var2(VarType1& var1, VarType2& var2) {
     if(var2.isAssigned())
-      remove_value(var2.assignedValue(), var1);
+      removeValue(var2.assignedValue(), var1);
   }
 
   template <typename VarType1, typename VarType2>
@@ -151,7 +151,7 @@ struct NeqIterated {
   }
 
   template <typename Var>
-  static void remove_value(DomainInt val, Var& var) {
+  static void removeValue(DomainInt val, Var& var) {
     if(var.isBound()) {
       if(var.min() == val)
         var.setMin(val + 1);
@@ -233,9 +233,9 @@ struct LessIterated {
 
   template <typename Var1, typename Var2>
   static AbstractConstraint* reverseConstraint(const Var1& var1, const Var2& var2) {
-    LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>>* t =
-        new LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>>(var2, var1,
-                                                                  compiletime_val<SysInt, 0>());
+    LeqConstraint<Var2, Var1, compiletimeVal<SysInt, 0>>* t =
+        new LeqConstraint<Var2, Var1, compiletimeVal<SysInt, 0>>(var2, var1,
+                                                                  compiletimeVal<SysInt, 0>());
     return (AbstractConstraint*)t;
   }
 };
@@ -452,10 +452,10 @@ struct VecNeqDynamic : public AbstractConstraint {
     add_triggers(index, triggerpair * 2);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    SysInt v_size1 = var_array1.size();
-    for(SysInt i = 0; i < v_size1; ++i)
-      if(Operator::checkAssignment(v[i], v[i + v_size1]))
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    SysInt vSize1 = var_array1.size();
+    for(SysInt i = 0; i < vSize1; ++i)
+      if(Operator::checkAssignment(v[i], v[i + vSize1]))
         return true;
     return false;
   }

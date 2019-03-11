@@ -69,8 +69,8 @@ struct WatchLessConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 2);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 2);
     return v[0] < v[1];
   }
 
@@ -93,20 +93,20 @@ struct WatchLessConstraint : public AbstractConstraint {
 
   template <bool b, typename T>
   typename std::enable_if<b, AbstractConstraint*>::type
-  rev_implement(const ShiftVar<T, compiletime_val<SysInt, 1>>& var2) {
+  rev_implement(const ShiftVar<T, compiletimeVal<SysInt, 1>>& var2) {
     return new WatchLessConstraint<T, Var1, false>(var2.data, var1);
   }
 
   template <bool b, typename T>
   typename std::enable_if<b, AbstractConstraint*>::type rev_implement(const T& var2) {
     return new WatchLessConstraint<AnyVarRef, AnyVarRef, true>(
-        var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>(var1, compiletime_val<SysInt, 1>()));
+        var2, ShiftVar<Var1, compiletimeVal<SysInt, 1>>(var1, compiletimeVal<SysInt, 1>()));
   }
 
   template <bool b, typename T>
   typename std::enable_if<!b, AbstractConstraint*>::type rev_implement(const T& var2) {
-    return new WatchLessConstraint<Var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>, true>(
-        var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>(var1, compiletime_val<SysInt, 1>()));
+    return new WatchLessConstraint<Var2, ShiftVar<Var1, compiletimeVal<SysInt, 1>>, true>(
+        var2, ShiftVar<Var1, compiletimeVal<SysInt, 1>>(var1, compiletimeVal<SysInt, 1>()));
   }
 
   virtual AbstractConstraint* reverseConstraint() {

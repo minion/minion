@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 
-static const DomainInt free_value = std::numeric_limits<SysInt>::max();
+static const DomainInt freeValue = std::numeric_limits<SysInt>::max();
 
 typedef std::vector<DomainInt> Vint;
 
@@ -21,7 +21,7 @@ squeeze_tuples(const TupleCon& tuples, const std::vector<std::set<DomainInt>>& d
         if(used_tuples.count(tuple) > 0 && eager_prune)
           break;
 
-        if(tuple[i] == free_value)
+        if(tuple[i] == freeValue)
           continue;
 
         Vint tuple_copy = tuple;
@@ -40,7 +40,7 @@ squeeze_tuples(const TupleCon& tuples, const std::vector<std::set<DomainInt>>& d
             tuple_copy[i] = j;
             used_tuples.insert(tuple_copy);
           }
-          tuple_copy[i] = free_value;
+          tuple_copy[i] = freeValue;
           // std::cout << tuple_copy << std::endl;
           ret_tuples.insert(tuple_copy);
         }
@@ -57,7 +57,7 @@ squeeze_tuples(const TupleCon& tuples, const std::vector<std::set<DomainInt>>& d
 }
 
 template <typename Tuples>
-std::vector<std::set<DomainInt>> gather_domains(const Tuples& tuples) {
+std::vector<std::set<DomainInt>> gatherDomains(const Tuples& tuples) {
   if(tuples.size() == 0)
     return std::vector<std::set<DomainInt>>();
 
@@ -90,13 +90,13 @@ inline std::vector<std::vector<std::pair<SysInt, DomainInt>>>
 makeShortTupleList(const std::set<Vint>& tuples) {
   std::vector<std::vector<std::pair<SysInt, DomainInt>>> out;
   for(std::set<Vint>::const_iterator it = tuples.begin(); it != tuples.end(); ++it) {
-    std::vector<std::pair<SysInt, DomainInt>> short_tup;
+    std::vector<std::pair<SysInt, DomainInt>> shortTup;
     for(SysInt i = 0; i < (SysInt)it->size(); ++i) {
-      if((*it)[i] != free_value) {
-        short_tup.push_back(std::make_pair(i, (*it)[i]));
+      if((*it)[i] != freeValue) {
+        shortTup.push_back(std::make_pair(i, (*it)[i]));
       }
     }
-    out.push_back(short_tup);
+    out.push_back(shortTup);
   }
   return out;
 }

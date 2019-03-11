@@ -73,7 +73,7 @@ inline bool check_sac_timeout() {
 }
 
 template <typename Var, typename Prop>
-bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
+bool pruneDomain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
   bool pruned = false;
   bool everfailed = false;
   DomainInt gallop = 1;
@@ -112,7 +112,7 @@ bool prune_domain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
 }
 
 template <typename Var, typename Prop>
-bool prune_domain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
+bool pruneDomain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
   bool pruned = false;
   bool everfailed = false;
   DomainInt gallop = 1;
@@ -176,11 +176,11 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
         Var& var = vararray[i];
         if(!var.isAssigned()) {
-          if(prune_domain_bottom(var, vararray, prop, limit))
+          if(pruneDomain_bottom(var, vararray, prop, limit))
             reduced = true;
           if(getState().isFailed())
             return;
-          if(prune_domain_top(var, vararray, prop, limit))
+          if(pruneDomain_top(var, vararray, prop, limit))
             reduced = true;
           if(getState().isFailed())
             return;

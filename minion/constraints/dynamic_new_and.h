@@ -70,7 +70,7 @@ struct Dynamic_AND : public ParentConstraint {
   Dynamic_AND(vector<AbstractConstraint*> _con)
       : ParentConstraint(_con), constraint_locked(false) {}
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       if(!child_constraints[i]->checkAssignment(
              v + checked_cast<SysInt>(start_of_constraint[i]),
@@ -112,8 +112,8 @@ struct Dynamic_AND : public ParentConstraint {
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vecs;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      vector<AnyVarRef>* var_ptr = child_constraints[i]->getVarsSingleton();
-      vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
+      vector<AnyVarRef>* varPtr = child_constraints[i]->getVarsSingleton();
+      vecs.insert(vecs.end(), varPtr->begin(), varPtr->end());
     }
     return vecs;
   }

@@ -38,7 +38,7 @@ vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var>& v);
 vector<vector<AnyVarRef>> get_AnyVarRef_from_Var(const vector<vector<Var>>& v);
 
 /// Create all the variables used in the CSP.
-void build_variables(const ProbSpec::VarContainer& vars);
+void buildVariables(const ProbSpec::VarContainer& vars);
 } // namespace BuildCon
 
 #endif

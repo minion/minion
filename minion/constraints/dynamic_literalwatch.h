@@ -77,9 +77,9 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
   LiteralSumConstraintDynamic(const VarArray& _var_array, ValueArray _val_array, VarSum _var_sum)
       : var_array(_var_array), value_array(_val_array), var_sum(_var_sum) {
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
 
-    num_unwatched = array_size - var_sum - 1;
+    num_unwatched = arraySize - var_sum - 1;
     if(num_unwatched < 0)
       num_unwatched = 0;
     if(num_unwatched > (SysInt)var_array.size())
@@ -105,11 +105,11 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
     DomainInt trig_pos = 0;
 
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
     DomainInt triggers_wanted = var_sum + 1;
     SysInt index;
 
-    for(index = 0; (index < array_size) && (triggers_wanted > 0); ++index) {
+    for(index = 0; (index < arraySize) && (triggers_wanted > 0); ++index) {
       if(var_array[index].inDomain(value_array[index])) {
         // delay setting up triggers in case we don't need to
         --triggers_wanted;
@@ -124,7 +124,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
       return;
     } else if(triggers_wanted == 1) // Then we can propagate
     {                               // We never even set up triggers
-      for(SysInt i = 0; i < array_size; ++i) {
+      for(SysInt i = 0; i < arraySize; ++i) {
         if(var_array[i].inDomain(value_array[i])) {
           var_array[i].assign(value_array[i]);
         }
@@ -153,7 +153,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
         }
       }
 
-      for(SysInt i = index; i < array_size; ++i) {
+      for(SysInt i = index; i < arraySize; ++i) {
         unwatched(j) = i;
         ++j;
       }
@@ -220,10 +220,10 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size());
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size());
     SysInt count = 0;
-    for(SysInt i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < vSize; ++i)
       count += (v[i] == value_array[i]);
     return count >= var_sum;
   }
@@ -239,13 +239,13 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var_sum <= 0)
       return true;
-    SysInt lit_match_count = 0;
+    SysInt lit_matchCount = 0;
 
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
       if(var_array[i].inDomain(value_array[i])) {
         assignment.push_back(make_pair(i, value_array[i]));
-        lit_match_count++;
-        if(lit_match_count == var_sum)
+        lit_matchCount++;
+        if(lit_matchCount == var_sum)
           return true;
       }
     }

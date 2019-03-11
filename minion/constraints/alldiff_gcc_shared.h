@@ -944,13 +944,13 @@ protected:
   }
 };
 
-struct deque_fixed_size {
+struct deque_fixedSize {
   // replacement for stl deque. This one is a fixed size circular array.
   // pluggable for deque in gcc_common.h -- no faster.
   vector<SysInt> list;
   SysInt head, tail;
 
-  deque_fixed_size() {
+  deque_fixedSize() {
     head = tail = 0;
   }
 

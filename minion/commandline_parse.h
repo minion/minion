@@ -23,6 +23,6 @@
 
 #include "minion.h"
 
-void parse_command_line(SearchMethod& args, SysInt argc, char** argv);
+void parseCommandLine(SearchMethod& args, SysInt argc, char** argv);
 
 #endif

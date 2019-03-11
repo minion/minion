@@ -727,10 +727,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
-    D_ASSERT(array_size == (SysInt)var_array.size());
-    for(SysInt i = 0; i < array_size; i++)
-      for(SysInt j = i + 1; j < array_size; j++)
+  virtual BOOL checkAssignment(DomainInt* v, SysInt arraySize) {
+    D_ASSERT(arraySize == (SysInt)var_array.size());
+    for(SysInt i = 0; i < arraySize; i++)
+      for(SysInt j = i + 1; j < arraySize; j++)
         if(v[i] == v[j])
           return false;
     return true;
@@ -837,7 +837,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 
   SysInt max_dfs;
 
-  vector<SysInt> spare_values;
+  vector<SysInt> spareValues;
   bool include_sink;
   vector<SysInt> var_indices; // Should be a pointer so it can be changed.
 
@@ -891,25 +891,25 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     }
 #endif
 
-    // spare_values
+    // spareValues
     // This should be computed somehow on demand because it might not be used.
     // Actually it should be used exactly once.
-    spare_values.clear();
+    spareValues.clear();
     for(DomainInt val = localmin; val <= localmax; ++val) {
       if(!valinlocalmatching.in(checked_cast<SysInt>(val - dom_min))) {
         for(SysInt j = 0; j < (SysInt)var_indices.size(); j++) {
           if(var_array[var_indices[j]].inDomain(val)) {
-            spare_values.push_back(checked_cast<SysInt>(val - dom_min + numvars));
+            spareValues.push_back(checked_cast<SysInt>(val - dom_min + numvars));
             break;
           }
         }
       }
     }
-    // cout << "With spare values "<< spare_values <<endl;
+    // cout << "With spare values "<< spareValues <<endl;
 
-    include_sink = ((SysInt)spare_values.size() > 0); // This should be in the TMS.
+    include_sink = ((SysInt)spareValues.size() > 0); // This should be in the TMS.
 
-    // Just generate the spare_values if no empty sets have been seen above
+    // Just generate the spareValues if no empty sets have been seen above
     // in this branch.
 
     tstack.clear();
@@ -946,8 +946,8 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       D_ASSERT(include_sink);
       // It's the sink so it links to all spare values.
 
-      for(SysInt i = 0; i < (SysInt)spare_values.size(); ++i) {
-        SysInt newnode = spare_values[i];
+      for(SysInt i = 0; i < (SysInt)spareValues.size(); ++i) {
+        SysInt newnode = spareValues[i];
         // cout << "About to visit spare value: " << newnode-numvars+dom_min
         // <<endl;
         if(!visited.in(newnode)) {

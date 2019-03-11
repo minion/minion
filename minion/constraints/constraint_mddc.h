@@ -68,7 +68,7 @@ using namespace std;
 // Backtracking version of above. Used for gno set.
 struct arrayset_bt {
   vector<SysInt> vals;
-  vector<SysInt> vals_pos;
+  vector<SysInt> valsPos;
   ReversibleInt size;
   DomainInt minval;
 
@@ -76,11 +76,11 @@ struct arrayset_bt {
 
   void initialise(DomainInt low, DomainInt high) {
     minval = low;
-    vals_pos.resize(checked_cast<SysInt>(high - low + 1));
+    valsPos.resize(checked_cast<SysInt>(high - low + 1));
     vals.resize(checked_cast<SysInt>(high - low + 1));
     for(SysInt i = 0; i < checked_cast<SysInt>(high - low + 1); i++) {
       vals[i] = checked_cast<SysInt>(i + low);
-      vals_pos[i] = i;
+      valsPos[i] = i;
     }
     size = 0;
   }
@@ -90,7 +90,7 @@ struct arrayset_bt {
   }
 
   bool in(DomainInt val) {
-    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+    return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
 
   // This method looks a bit messy, due to stupid C++ optimisers not being
@@ -102,12 +102,12 @@ struct arrayset_bt {
     const SysInt validx = checked_cast<SysInt>(val - minval_cpy);
     const SysInt size_cpy = checked_cast<SysInt>(size);
     const SysInt swapval = vals[size_cpy];
-    const SysInt vpvx = vals_pos[validx];
+    const SysInt vpvx = valsPos[validx];
     vals[vpvx] = swapval;
     vals[size_cpy] = checked_cast<SysInt>(val);
 
-    vals_pos[checked_cast<SysInt>(swapval - minval_cpy)] = vpvx;
-    vals_pos[validx] = size_cpy;
+    valsPos[checked_cast<SysInt>(swapval - minval_cpy)] = vpvx;
+    valsPos[validx] = size_cpy;
 
     size = size + 1;
   }
@@ -123,11 +123,11 @@ struct arrayset_bt {
     D_ASSERT(in(val));
     const SysInt validx = checked_cast<SysInt>(val - minval);
     const SysInt swapval = vals[checked_cast<SysInt>(size - 1)];
-    vals[vals_pos[validx]] = swapval;
+    vals[valsPos[validx]] = swapval;
     vals[checked_cast<SysInt>(size - 1)] = checked_cast<SysInt>(val);
 
-    vals_pos[checked_cast<SysInt>(swapval - minval)] = vals_pos[validx];
-    vals_pos[validx] = checked_cast<SysInt>(size - 1);
+    valsPos[checked_cast<SysInt>(swapval - minval)] = valsPos[validx];
+    valsPos[validx] = checked_cast<SysInt>(size - 1);
 
     size = size - 1;
   }
@@ -213,7 +213,7 @@ struct MDDC : public AbstractConstraint {
       // convert tuples into mdd nodes
       int tlsize=tuples->size();
 
-      int tuplelen=tuples->tuple_size();
+      int tuplelen=tuples->tupleSize();
 
       DomainInt* tupdata=tuples->getPointer();
 
@@ -257,7 +257,7 @@ struct MDDC : public AbstractConstraint {
 
     SysInt tlsize = checked_cast<SysInt>(tuples->size());
 
-    SysInt tuplelen = checked_cast<SysInt>(tuples->tuple_size());
+    SysInt tuplelen = checked_cast<SysInt>(tuples->tupleSize());
 
     DomainInt* tupdata = tuples->getPointer();
 
@@ -314,7 +314,7 @@ struct MDDC : public AbstractConstraint {
 
     SysInt tlsize = checked_cast<SysInt>(tuples->size());
 
-    SysInt tuplelen = checked_cast<SysInt>(tuples->tuple_size());
+    SysInt tuplelen = checked_cast<SysInt>(tuples->tupleSize());
 
     DomainInt* tupdata = tuples->getPointer();
 
@@ -509,9 +509,9 @@ struct MDDC : public AbstractConstraint {
     return ret;
   }
 
-  virtual bool checkAssignment(DomainInt* tup, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* tup, SysInt vSize) {
     MDDNode* curnode = top;
-    for(SysInt i = 0; i < v_size; i++) {
+    for(SysInt i = 0; i < vSize; i++) {
 
       if(curnode->type == -1) {
         // tt node.

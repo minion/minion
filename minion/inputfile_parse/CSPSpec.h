@@ -150,7 +150,7 @@ struct ConstraintBlob {
   TupleList* tuples;
 
   /// Pointer to a list of short tuples. Only used in Short Table constraints.
-  ShortTupleList* short_tuples;
+  ShortTupleList* shortTuples;
 
   TupleList* tuples2;
 
@@ -176,7 +176,7 @@ struct ConstraintBlob {
   ConstraintBlob(ConstraintDef* _con) : constraint(_con), tuples(0), tuples2(0) {}
 
   ConstraintBlob(ConstraintDef* _con, const vector<vector<Var>>& _vars)
-      : constraint(_con), vars(_vars), tuples(0), short_tuples(0), tuples2(0) {}
+      : constraint(_con), vars(_vars), tuples(0), shortTuples(0), tuples2(0) {}
 
   /// A helper constructor for when only a SingleVar is passed.
   ConstraintBlob(ConstraintDef* _con, vector<Var>& _var) : constraint(_con), tuples(0), tuples2(0) {
@@ -333,7 +333,7 @@ struct VarContainer {
   }
 
   // Returns a bool, where the first element is if these are bounds.
-  pair<BoundType, vector<DomainInt>> get_domain(Var v) const {
+  pair<BoundType, vector<DomainInt>> getDomain(Var v) const {
     vector<DomainInt> dom;
     switch(v.type()) {
     case VAR_CONSTANT: dom.push_back(v.pos()); return make_pair(Bound_No, dom);
@@ -416,7 +416,7 @@ struct VarContainer {
     throw parse_exception("Var Out of Range!");
   }
 
-  vector<Var> all_vars;
+  vector<Var> allVars;
 
   Var getNewVar(VariableType type, vector<DomainInt> bounds) {
     Var v;
@@ -427,7 +427,7 @@ struct VarContainer {
     case VAR_DISCRETE: v = _getNewDiscreteVar(bounds[0], bounds[1]); break;
     default: D_FATAL_ERROR("Internal error");
     }
-    all_vars.push_back(v);
+    allVars.push_back(v);
     return v;
   }
 
@@ -455,7 +455,7 @@ private:
 
 public:
   vector<Var> getAllVars() const {
-    return all_vars;
+    return allVars;
   }
 };
 
@@ -504,7 +504,7 @@ struct CSPInstance {
   vector<vector<Var>> print_matrix;
 
   /// A complete list of variables in the order they are defined.
-  vector<vector<Var>> all_vars_list;
+  vector<vector<Var>> allVars_list;
 
   map<string, TupleList*> table_symboltable;
   map<TupleList*, string> table_nametable;
@@ -641,10 +641,10 @@ public:
   void add_variable_names() {
     if(vars.symbol_table.empty()) {
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
-      vector<Var> all_vars = vars.getAllVars();
+      vector<Var> allVars = vars.getAllVars();
 
-      for(SysInt i = 0; i < (SysInt)all_vars.size(); ++i)
-        vars.addSymbol("x" + tostring(i), all_vars[i]);
+      for(SysInt i = 0; i < (SysInt)allVars.size(); ++i)
+        vars.addSymbol("x" + tostring(i), allVars[i]);
     }
 
     if(sym_order.empty())
@@ -654,10 +654,10 @@ public:
 } // namespace ProbSpec
 
 extern ConstraintDef constraint_list[]; // why is this here twice?
-extern SysInt num_of_constraints;
+extern SysInt numOfConstraints;
 
 inline ConstraintDef* get_constraint(ConstraintType t) {
-  for(SysInt i = 0; i < num_of_constraints; ++i) {
+  for(SysInt i = 0; i < numOfConstraints; ++i) {
     if(constraint_list[i].type == t)
       return constraint_list + i;
   }

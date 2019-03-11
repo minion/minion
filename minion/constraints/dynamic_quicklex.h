@@ -158,15 +158,15 @@ struct QuickLexDynamic : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array1.size() + (SysInt)var_array2.size());
-    size_t x_size = var_array1.size();
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array1.size() + (SysInt)var_array2.size());
+    size_t xSize = var_array1.size();
 
     P("Check Assignment: " << (SysInt)alpha);
-    for(size_t i = 0; i < x_size; i++) {
-      if(v[i] < v[i + x_size])
+    for(size_t i = 0; i < xSize; i++) {
+      if(v[i] < v[i + xSize])
         return true;
-      if(v[i] > v[i + x_size])
+      if(v[i] > v[i + xSize])
         return false;
     }
 
@@ -174,8 +174,8 @@ struct QuickLexDynamic : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    size_t array_size = var_array1.size();
-    for(size_t i = 0; i < array_size; ++i) {
+    size_t arraySize = var_array1.size();
+    for(size_t i = 0; i < arraySize; ++i) {
       DomainInt x_i_min = var_array1[i].min();
       DomainInt y_i_max = var_array2[i].max();
 
@@ -184,7 +184,7 @@ struct QuickLexDynamic : public AbstractConstraint {
       }
 
       assignment.push_back(make_pair(i, x_i_min));
-      assignment.push_back(make_pair(i + array_size, y_i_max));
+      assignment.push_back(make_pair(i + arraySize, y_i_max));
       if(x_i_min < y_i_max)
         return true;
     }

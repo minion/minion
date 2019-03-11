@@ -76,7 +76,7 @@ public:
     return dynamic_trigger_list.empty() && special_triggers.empty();
   }
 
-  // next_queue_ptr is defined in constraint_dynamic.
+  // next_queuePtr is defined in constraint_dynamic.
   // It is used if pointers are moved around.
 
   // Subclass this class and change the following three methods.

@@ -186,11 +186,11 @@ struct is_interval<INTERVAL<T>> {
 };
 
 template <typename T>
-INTERVAL<T> clamp_interval(INTERVAL<T> t, T min_val, T max_val) {
+INTERVAL<T> clamp_interval(INTERVAL<T> t, T minVal, T maxVal) {
   if(first(t) == std::numeric_limits<T>::min())
-    t = make_interval(min_val, last(t));
+    t = make_interval(minVal, last(t));
   if(last(t) == std::numeric_limits<T>::max())
-    t = make_interval(first(t), max_val);
+    t = make_interval(first(t), maxVal);
   return t;
 }
 

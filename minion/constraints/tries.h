@@ -50,7 +50,7 @@ struct TupleComparator {
 
 struct TrieObj {
   DomainInt val;
-  TrieObj* offset_ptr;
+  TrieObj* offsetPtr;
 };
 
 struct TupleTrie {
@@ -77,7 +77,7 @@ struct TupleTrie {
   }
 
   TupleTrie(DomainInt _significantIndex, TupleList* tuplelist)
-      : arity(checked_cast<SysInt>(tuplelist->tuple_size())),
+      : arity(checked_cast<SysInt>(tuplelist->tupleSize())),
         sigIndex(checked_cast<SysInt>(_significantIndex)) {
     // TODO : Fix this hard limit.
     D_ASSERT(arity < 100);
@@ -98,7 +98,7 @@ struct TupleTrie {
   struct EarlyTrieObj {
     DomainInt val;
     DomainInt depth;
-    DomainInt offset_ptr;
+    DomainInt offsetPtr;
   };
 
   vector<EarlyTrieObj> initial_trie;
@@ -110,10 +110,10 @@ struct TupleTrie {
     trie_data = new TrieObj[size];
     for(SysInt i = 0; i < size; ++i) {
       trie_data[i].val = initial_trie[i].val;
-      if(initial_trie[i].offset_ptr == -1)
-        trie_data[i].offset_ptr = NULL;
+      if(initial_trie[i].offsetPtr == -1)
+        trie_data[i].offsetPtr = NULL;
       else
-        trie_data[i].offset_ptr = trie_data + checked_cast<SysInt>(initial_trie[i].offset_ptr);
+        trie_data[i].offsetPtr = trie_data + checked_cast<SysInt>(initial_trie[i].offsetPtr);
     }
 
     // Little C++ trick to remove all the memory used by the initial_trie
@@ -126,7 +126,7 @@ struct TupleTrie {
     for(UnsignedSysInt i = 0; i < initial_trie.size(); ++i) {
       printf("%ld,%ld,%ld\n", checked_cast<long>(initial_trie[i].depth),
              checked_cast<long>(initial_trie[i].val),
-             checked_cast<long>(initial_trie[i].offset_ptr));
+             checked_cast<long>(initial_trie[i].offsetPtr));
     }
   }
 
@@ -136,73 +136,73 @@ struct TupleTrie {
       return;
 
     assert(start_pos <= end_pos);
-    DomainInt values = get_distinct_values(start_pos, end_pos, depth);
+    DomainInt values = get_distinctValues(start_pos, end_pos, depth);
 
     SysInt start_section = initial_trie.size();
     // Make space for this list of values.
     // '+1' is for end marker.
     initial_trie.resize(checked_cast<SysInt>(initial_trie.size() + values + 1));
 
-    DomainInt current_val = tuples(start_pos, depth);
+    DomainInt currentVal = tuples(start_pos, depth);
     DomainInt current_start = start_pos;
     // I trust this not to overflow, and can't be bothered with all the required
     // casts
-    SysInt num_of_val = 0;
+    SysInt num_ofVal = 0;
 
     for(DomainInt i = start_pos; i < end_pos; ++i) {
-      if(current_val != tuples(i, depth)) {
-        initial_trie[start_section + num_of_val].val = current_val;
-        initial_trie[start_section + num_of_val].depth = depth;
+      if(currentVal != tuples(i, depth)) {
+        initial_trie[start_section + num_ofVal].val = currentVal;
+        initial_trie[start_section + num_ofVal].depth = depth;
         if(last_stage) {
-          initial_trie[start_section + num_of_val].offset_ptr = -1;
+          initial_trie[start_section + num_ofVal].offsetPtr = -1;
         } else {
-          initial_trie[start_section + num_of_val].offset_ptr = initial_trie.size();
+          initial_trie[start_section + num_ofVal].offsetPtr = initial_trie.size();
           build_trie(current_start, i, depth + 1);
         }
-        current_val = tuples(i, depth);
+        currentVal = tuples(i, depth);
         current_start = i;
-        num_of_val++;
+        num_ofVal++;
       }
     }
 
     // Also have to cover last stretch of values.
-    initial_trie[start_section + num_of_val].val = current_val;
-    initial_trie[start_section + num_of_val].depth = depth;
+    initial_trie[start_section + num_ofVal].val = currentVal;
+    initial_trie[start_section + num_ofVal].depth = depth;
     if(last_stage)
-      initial_trie[start_section + num_of_val].offset_ptr = -1;
+      initial_trie[start_section + num_ofVal].offsetPtr = -1;
     else
-      initial_trie[start_section + num_of_val].offset_ptr = initial_trie.size();
+      initial_trie[start_section + num_ofVal].offsetPtr = initial_trie.size();
 
     build_trie(current_start, end_pos, depth + 1);
 
-    assert(num_of_val + 1 == values);
+    assert(num_ofVal + 1 == values);
     SysInt checkValues = checked_cast<SysInt>(values);
     initial_trie[start_section + checkValues].val = DomainInt_Max;
     initial_trie[start_section + checkValues].depth = depth;
-    initial_trie[start_section + checkValues].offset_ptr = -1;
+    initial_trie[start_section + checkValues].offsetPtr = -1;
   }
 
   // Find how many values there are for index 'depth' between tuples
   // start_pos and end_pos.
-  DomainInt get_distinct_values(const DomainInt start_pos, const DomainInt end_pos,
+  DomainInt get_distinctValues(const DomainInt start_pos, const DomainInt end_pos,
                                 DomainInt depth) {
-    DomainInt current_val = tuples(start_pos, depth);
-    DomainInt found_values = 1;
+    DomainInt currentVal = tuples(start_pos, depth);
+    DomainInt foundValues = 1;
     for(DomainInt i = start_pos; i < end_pos; ++i) {
-      if(current_val != tuples(i, depth)) {
-        current_val = tuples(i, depth);
-        ++found_values;
+      if(currentVal != tuples(i, depth)) {
+        currentVal = tuples(i, depth);
+        ++foundValues;
       }
     }
-    return found_values;
+    return foundValues;
   }
 
   // Starting from the start of an array of TrieObjs, find the
-  // values which is find_val
-  TrieObj* get_next_ptr(TrieObj* obj, DomainInt find_val) {
-    while(obj->val < find_val)
+  // values which is findVal
+  TrieObj* get_nextPtr(TrieObj* obj, DomainInt findVal) {
+    while(obj->val < findVal)
       ++obj;
-    if(obj->val == find_val)
+    if(obj->val == findVal)
       return obj;
     else
       return NULL;
@@ -216,7 +216,7 @@ struct TupleTrie {
     if(depth == arity)
       return true;
 
-    obj_list[depth] = obj_list[depth - 1]->offset_ptr;
+    obj_list[depth] = obj_list[depth - 1]->offsetPtr;
     while(obj_list[depth]->val != DomainInt_Max) {
       if(vars[map_depth(depth)].inDomain(obj_list[depth]->val)) {
         if(search_trie(_vars, obj_list, depth + 1))
@@ -229,15 +229,15 @@ struct TupleTrie {
 
   // Variant for the lightweight table constraint.
   template <typename VarArray>
-  bool search_trie_nostate(DomainInt domain_val, const VarArray& _vars) {
+  bool search_trie_nostate(DomainInt domainVal, const VarArray& _vars) {
     MAKE_STACK_BOX(obj_list, TrieObj*, _vars.size());
     if(trie_data == NULL)
       return false;
-    TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
-    if(first_ptr == NULL)
+    TrieObj* firstPtr = get_nextPtr(trie_data, domainVal);
+    if(firstPtr == NULL)
       return false;
     obj_list.resize(_vars.size());
-    obj_list[0] = first_ptr;
+    obj_list[0] = firstPtr;
 
     return search_trie_nostate_internal(_vars, obj_list, 1);
   }
@@ -252,7 +252,7 @@ struct TupleTrie {
     if(depth == arity)
       return true;
 
-    obj_list[depth] = obj_list[depth - 1]->offset_ptr;
+    obj_list[depth] = obj_list[depth - 1]->offsetPtr;
     while(obj_list[depth]->val != DomainInt_Max) {
       if(vars[map_depth(depth)].inDomain(obj_list[depth]->val)) {
         if(search_trie_nostate_internal(_vars, obj_list, depth + 1))
@@ -275,7 +275,7 @@ struct TupleTrie {
     if(depth == arity)
       return false;
 
-    obj_list[depth] = obj_list[depth - 1]->offset_ptr;
+    obj_list[depth] = obj_list[depth - 1]->offsetPtr;
 
     SysInt dep = map_depth(depth);
     for(DomainInt i = vars[dep].min(); i <= vars[dep].max(); ++i) {
@@ -334,7 +334,7 @@ struct TupleTrie {
       obj_list[depth]++;
     }
 
-    obj_list[depth] = obj_list[depth - 1]->offset_ptr;
+    obj_list[depth] = obj_list[depth - 1]->offsetPtr;
 
     while(obj_list[depth] != initial_pos) {
       if(vars[map_depth(depth)].inDomain(obj_list[depth]->val)) {
@@ -349,18 +349,18 @@ struct TupleTrie {
   // Find support for domain value i. This will be the value used by
   // the first variable.
   template <typename VarArray>
-  DomainInt nextSupportingTuple(DomainInt domain_val, const VarArray& _vars, TrieObj** obj_list) {
+  DomainInt nextSupportingTuple(DomainInt domainVal, const VarArray& _vars, TrieObj** obj_list) {
     if(trie_data == NULL)
       return -1;
 
     VarArray& vars = const_cast<VarArray&>(_vars);
 
     if(obj_list[0] == NULL) {
-      TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
-      if(first_ptr == NULL)
+      TrieObj* firstPtr = get_nextPtr(trie_data, domainVal);
+      if(firstPtr == NULL)
         return -1;
 
-      obj_list[0] = first_ptr;
+      obj_list[0] = firstPtr;
       if(search_trie(vars, obj_list, 1))
         return obj_list[arity - 1] - obj_list[0];
       else
@@ -370,7 +370,7 @@ struct TupleTrie {
         return obj_list[arity - 1] - obj_list[0];
       else
         return -1;
-      /*    D_ASSERT(obj_list[0] == get_next_ptr(trie_data, domain_val));
+      /*    D_ASSERT(obj_list[0] == get_nextPtr(trie_data, domainVal));
             SysInt OK_depth = 1;
             while(OK_depth < arity &&
          vars[map_depth(OK_depth)].inDomain(obj_list[OK_depth]->val))
@@ -390,22 +390,22 @@ struct TupleTrie {
   // Find support for domain value i. This will be the value used by
   // the first variable.
   template <typename VarArray>
-  DomainInt nextSupportingTupleNegative(DomainInt domain_val, const VarArray& _vars,
+  DomainInt nextSupportingTupleNegative(DomainInt domainVal, const VarArray& _vars,
                                         TrieObj** obj_list, DomainInt* recycTuple) {
     VarArray& vars = const_cast<VarArray&>(_vars);
 
     // Starts from scratch each time
-    TrieObj* first_ptr = get_next_ptr(trie_data, domain_val);
+    TrieObj* firstPtr = get_nextPtr(trie_data, domainVal);
 
-    recycTuple[map_depth(0)] = domain_val;
-    if(first_ptr == NULL) {
+    recycTuple[map_depth(0)] = domainVal;
+    if(firstPtr == NULL) {
       // Hang on a minute. How do we ever get here? Should only be at root node.
       for(DomainInt depth2 = 1; depth2 < arity; ++depth2)
         recycTuple[map_depth(depth2)] = vars[map_depth(depth2)].min();
       return 0;
     }
 
-    obj_list[0] = first_ptr;
+    obj_list[0] = firstPtr;
 
     bool flag = search_trie_negative(vars, obj_list, 1, recycTuple);
 
@@ -435,8 +435,8 @@ public:
 
   TupleTrieArray(TupleList* _tuplelist) : tuplelist(_tuplelist) {
     tuplelist->finalise_tuples();
-    arity = checked_cast<SysInt>(tuplelist->tuple_size());
-    vector<DomainInt> dom_size(arity);
+    arity = checked_cast<SysInt>(tuplelist->tupleSize());
+    vector<DomainInt> domSize(arity);
     vector<DomainInt> offset(arity);
 
     // create one trie for each element of scope.

@@ -70,38 +70,38 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt sum_value = 0;
-    SysInt v_size = var_array.size();
+    DomainInt sumValue = 0;
+    SysInt vSize = var_array.size();
 
     if(no_negatives) {
       DomainInt max_sum = var_sum.max();
-      assignment.push_back(make_pair(v_size, max_sum));
-      for(SysInt i = 0; i < v_size && sum_value <= max_sum; ++i) {
-        DomainInt min_val = var_array[i].min();
-        assignment.push_back(make_pair(i, min_val));
-        sum_value += min_val;
+      assignment.push_back(make_pair(vSize, max_sum));
+      for(SysInt i = 0; i < vSize && sumValue <= max_sum; ++i) {
+        DomainInt minVal = var_array[i].min();
+        assignment.push_back(make_pair(i, minVal));
+        sumValue += minVal;
       }
-      return (sum_value <= max_sum);
+      return (sumValue <= max_sum);
     } else {
-      for(SysInt i = 0; i < v_size; ++i) {
+      for(SysInt i = 0; i < vSize; ++i) {
         assignment.push_back(make_pair(i, var_array[i].min()));
-        sum_value += var_array[i].min();
+        sumValue += var_array[i].min();
       }
-      if(sum_value > var_sum.max())
+      if(sumValue > var_sum.max())
         return false;
       else
-        assignment.push_back(make_pair(v_size, var_sum.max()));
+        assignment.push_back(make_pair(vSize, var_sum.max()));
       return true;
     }
   }
 
-  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(LightSum);
     DomainInt min_sum = 0;
     for(UnsignedSysInt i = 0; i < size; ++i)
       min_sum += var_array[i].min();
 
-    if(prop_val != var_array.size()) {
+    if(propVal != var_array.size()) {
       var_sum.setMin(min_sum);
     }
 
@@ -116,12 +116,12 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size() + 1);
     DomainInt sum = 0;
-    for(SysInt i = 0; i < v_size - 1; i++)
+    for(SysInt i = 0; i < vSize - 1; i++)
       sum += v[i];
-    return sum <= *(v + v_size - 1);
+    return sum <= *(v + vSize - 1);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -144,9 +144,9 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
-    typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1>>::type
+    typedef typename ShiftType<typename NegType<VarSum>::type, compiletimeVal<SysInt, -1>>::type
         SumType;
-    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
+    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletimeVal<SysInt, -1>());
 
     return new LightLessEqualSumConstraint<typename NegType<VarRef>::type, size, SumType, true>(
         new_var_array, new_sum);
@@ -159,9 +159,9 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
-    typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1>>::type
+    typedef typename ShiftType<typename NegType<VarSum>::type, compiletimeVal<SysInt, -1>>::type
         SumType;
-    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
+    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletimeVal<SysInt, -1>());
 
     return new LightLessEqualSumConstraint<AnyVarRef, size, AnyVarRef, true>(new_var_array,
                                                                              new_sum);

@@ -96,23 +96,23 @@ void dump_searchorder(const SearchOrder& order, ostream& os) {
   os << "]\n";
 }
 
-void just_domain_dump(ostream& os) {
+void justDomain_dump(ostream& os) {
   VariableContainer& vc = getVars();
   vector<AnyVarRef> vars;
   // booleans;
-  for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i)
+  for(UnsignedSysInt i = 0; i < vc.boolVarContainer.varCount(); ++i)
     vars.push_back(vc.boolVarContainer.getVarNum(i));
 
   // bound vars
-  for(UnsignedSysInt i = 0; i < vc.boundVarContainer.var_count(); ++i)
+  for(UnsignedSysInt i = 0; i < vc.boundVarContainer.varCount(); ++i)
     vars.push_back(vc.boundVarContainer.getVarNum(i));
 
   // bigRangeVar
-  for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.var_count(); ++i)
+  for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.varCount(); ++i)
     vars.push_back(vc.bigRangeVarContainer.getVarNum(i));
 
   // sparseBound
-  for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i)
+  for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.varCount(); ++i)
     vars.push_back(vc.sparseBoundVarContainer.getVarNum(i));
 
   for(UnsignedSysInt i = 0; i < vars.size(); ++i) {
@@ -144,9 +144,9 @@ void just_domain_dump(ostream& os) {
   }
 }
 
-void dump_solver(ostream& os, bool just_domains) {
-  if(just_domains) {
-    just_domain_dump(os);
+void dump_solver(ostream& os, bool justDomains) {
+  if(justDomains) {
+    justDomain_dump(os);
     return;
   }
   os << "# Redumped during search" << endl;
@@ -155,14 +155,14 @@ void dump_solver(ostream& os, bool just_domains) {
   VariableContainer& vc = getVars();
 
   // booleans;
-  for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i) {
+  for(UnsignedSysInt i = 0; i < vc.boolVarContainer.varCount(); ++i) {
     BoolVarRef bv = vc.boolVarContainer.getVarNum(i);
     if(!bv.isAssigned())
       os << "BOOL " << getNameFromVar(bv) << endl;
   }
 
   // bound vars
-  for(UnsignedSysInt i = 0; i < vc.boundVarContainer.var_count(); ++i) {
+  for(UnsignedSysInt i = 0; i < vc.boundVarContainer.varCount(); ++i) {
     BoundVarRef bv = vc.boundVarContainer.getVarNum(i);
     if(!bv.isAssigned()) {
       os << "BOUND " << getNameFromVar(bv) << " ";
@@ -171,28 +171,28 @@ void dump_solver(ostream& os, bool just_domains) {
   }
 
   // bigRangeVar
-  for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.var_count(); ++i) {
+  for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.varCount(); ++i) {
     BigRangeVarRef bv = vc.bigRangeVarContainer.getVarNum(i);
     if(!bv.isAssigned()) {
       os << "DISCRETE " << getNameFromVar(bv) << " ";
       os << "{" << bv.min() << ".." << bv.max() << "}" << endl;
     }
-    vector<DomainInt> deleted_values;
+    vector<DomainInt> deletedValues;
     for(DomainInt i = bv.min() + 1; i < bv.max(); ++i) {
       if(!bv.inDomain(i))
-        deleted_values.push_back(i);
+        deletedValues.push_back(i);
     }
-    if(!deleted_values.empty()) {
+    if(!deletedValues.empty()) {
       os << "**CONSTRAINTS**" << endl;
-      if((DomainInt)deleted_values.size() < bv.max() - bv.min() + 1) {
+      if((DomainInt)deletedValues.size() < bv.max() - bv.min() + 1) {
         os << "w-notinset(" << getNameFromVar(bv) << ", [";
         bool first = true;
-        for(size_t i = 0; i < deleted_values.size(); ++i) {
+        for(size_t i = 0; i < deletedValues.size(); ++i) {
           if(first)
             first = false;
           else
             os << ",";
-          os << deleted_values[i];
+          os << deletedValues[i];
         }
         os << "])" << endl;
       } else {
@@ -209,9 +209,9 @@ void dump_solver(ostream& os, bool just_domains) {
   }
 
   // sparseBound
-  for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i) {
+  for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.varCount(); ++i) {
     SparseBoundVarRef bv = vc.sparseBoundVarContainer.getVarNum(i);
-    vector<DomainInt> dom = vc.sparseBoundVarContainer.get_raw_domain(i);
+    vector<DomainInt> dom = vc.sparseBoundVarContainer.getRawDomain(i);
     if(!bv.isAssigned()) {
 
       os << "SPARSEBOUND " << getNameFromVar(bv) << " ";
@@ -236,8 +236,8 @@ void dump_solver(ostream& os, bool just_domains) {
 
   for(SysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i) {
     TupleList* tl = search_state.getTupleListContainer()->getTupleList(i);
-    os << tl->getName() << " " << tl->size() << " " << tl->tuple_size() << "\n";
-    for(SysInt i = 0; i < tl->size() * tl->tuple_size(); ++i) {
+    os << tl->getName() << " " << tl->size() << " " << tl->tupleSize() << "\n";
+    for(SysInt i = 0; i < tl->size() * tl->tupleSize(); ++i) {
       os << (tl->getPointer())[i] << " ";
     }
     os << endl;
@@ -303,12 +303,12 @@ void dump_solver(ostream& os, bool just_domains) {
   os << "**EOF**" << endl;
 }
 
-void dump_solver(string filename, bool just_domains) {
+void dump_solver(string filename, bool justDomains) {
   if(filename == "" || filename == "--") {
-    dump_solver(cout, just_domains);
+    dump_solver(cout, justDomains);
   } else {
     ofstream ofs(filename.c_str());
-    dump_solver(ofs, just_domains);
+    dump_solver(ofs, justDomains);
   }
   exit(0);
 }

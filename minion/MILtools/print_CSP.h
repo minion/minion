@@ -92,7 +92,7 @@ struct MinionInstancePrinter {
       case read_constant: print_instance(blob.constants[const_pos++][0]); break;
       case read_constant_list: print_instance(blob.constants[const_pos++]); break;
       case read_tuples: oss << blob.tuples->getName(); break;
-      case read_short_tuples: oss << blob.short_tuples->getName(); break;
+      case read_short_tuples: oss << blob.shortTuples->getName(); break;
       case read_constraint:
         print_instance(blob.internal_constraints[constraint_child_pos]);
         constraint_child_pos++;
@@ -128,7 +128,7 @@ struct MinionInstancePrinter {
       case VAR_BOUND: {
         oss << "BOUND ";
         print_instance(varlist[i]);
-        pair<BoundType, vector<DomainInt>> bound = vars.get_domain(varlist[i]);
+        pair<BoundType, vector<DomainInt>> bound = vars.getDomain(varlist[i]);
         D_ASSERT(bound.first == Bound_Yes);
         D_ASSERT((SysInt)bound.second.size() == 2);
         oss << "{" << bound.second[0] << ".." << bound.second[1] << "}" << endl;
@@ -137,7 +137,7 @@ struct MinionInstancePrinter {
       case VAR_SPARSEBOUND: {
         oss << "SPARSEBOUND ";
         print_instance(varlist[i]);
-        pair<BoundType, vector<DomainInt>> bound = vars.get_domain(varlist[i]);
+        pair<BoundType, vector<DomainInt>> bound = vars.getDomain(varlist[i]);
         D_ASSERT(bound.first == Bound_No);
         print_instance(bound.second, '{', '}');
         oss << endl;
@@ -146,7 +146,7 @@ struct MinionInstancePrinter {
       case VAR_DISCRETE: {
         oss << "DISCRETE ";
         print_instance(varlist[i]);
-        pair<BoundType, vector<DomainInt>> bound = vars.get_domain(varlist[i]);
+        pair<BoundType, vector<DomainInt>> bound = vars.getDomain(varlist[i]);
         D_ASSERT(bound.first == Bound_Yes);
         D_ASSERT((SysInt)bound.second.size() == 2);
         oss << "{" << bound.second[0] << ".." << bound.second[1] << "}" << endl;
@@ -157,7 +157,7 @@ struct MinionInstancePrinter {
     }
   }
 
-  void print_short_tuples() {
+  void print_shortTuples() {
     typedef map<string, ShortTupleList*>::const_iterator it_type;
 
     for(it_type it = csp.shorttable_symboltable.begin(); it != csp.shorttable_symboltable.end();
@@ -189,13 +189,13 @@ struct MinionInstancePrinter {
 
     for(it_type it = csp.table_symboltable.begin(); it != csp.table_symboltable.end(); ++it) {
       oss << it->first << " ";
-      DomainInt tuple_size = it->second->tuple_size();
+      DomainInt tupleSize = it->second->tupleSize();
       DomainInt num_tuples = it->second->size();
-      DomainInt* tuple_ptr = it->second->getPointer();
-      oss << num_tuples << " " << tuple_size << endl;
+      DomainInt* tuplePtr = it->second->getPointer();
+      oss << num_tuples << " " << tupleSize << endl;
       for(DomainInt i = 0; i < num_tuples; ++i) {
-        for(DomainInt j = 0; j < tuple_size; ++j)
-          oss << *(tuple_ptr + checked_cast<SysInt>((i * tuple_size) + j)) << " ";
+        for(DomainInt j = 0; j < tupleSize; ++j)
+          oss << *(tuplePtr + checked_cast<SysInt>((i * tupleSize) + j)) << " ";
         oss << endl;
       }
       oss << endl;
@@ -326,7 +326,7 @@ struct MinionInstancePrinter {
     print_tuples();
 
     oss << "**SHORTTUPLELIST**" << endl;
-    print_short_tuples();
+    print_shortTuples();
 
     oss << "**CONSTRAINTS**" << endl;
     for(list<ConstraintBlob>::const_iterator it = constraints.begin(); it != constraints.end();

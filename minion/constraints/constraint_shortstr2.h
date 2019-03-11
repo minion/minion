@@ -108,7 +108,7 @@ using namespace std;
 struct ReversibleArrayset {
   // Only allows deletion.
   vector<SysInt> vals;
-  vector<SysInt> vals_pos;
+  vector<SysInt> valsPos;
   ReversibleInt size;
   SysInt minval;
 
@@ -118,17 +118,17 @@ struct ReversibleArrayset {
     const SysInt low = checked_cast<SysInt>(low_);
     const SysInt high = checked_cast<SysInt>(high_);
     minval = low;
-    vals_pos.resize(high - low + 1);
+    valsPos.resize(high - low + 1);
     vals.resize(high - low + 1);
     for(SysInt i = 0; i < high - low + 1; i++) {
       vals[i] = i + low;
-      vals_pos[i] = i;
+      valsPos[i] = i;
     }
     size = vals.size();
   }
 
   bool in(DomainInt val) {
-    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+    return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
 
   void remove(DomainInt val) {
@@ -136,11 +136,11 @@ struct ReversibleArrayset {
     if(in(val)) {
       const SysInt validx = checked_cast<SysInt>(val - minval);
       const SysInt swapval = vals[size - 1];
-      vals[vals_pos[validx]] = swapval;
+      vals[valsPos[validx]] = swapval;
       vals[size - 1] = checked_cast<SysInt>(val);
 
-      vals_pos[swapval - minval] = vals_pos[validx];
-      vals_pos[validx] = size - 1;
+      valsPos[swapval - minval] = valsPos[validx];
+      valsPos[validx] = size - 1;
 
       size = size - 1;
     }
@@ -165,8 +165,8 @@ struct STRData {
   }
 
   STRData(TupleList* _tuples, size_t varsize) {
-    DomainInt tuple_count = _tuples->size();
-    for(SysInt i = 0; i < tuple_count; ++i) {
+    DomainInt tupleCount = _tuples->size();
+    for(SysInt i = 0; i < tupleCount; ++i) {
       vector<DomainInt> t = _tuples->getVector(i);
       vector<pair<SysInt, DomainInt>> comp;
       for(int j = 0; j < (SysInt)t.size(); ++j)
@@ -288,11 +288,11 @@ struct STR : public AbstractConstraint {
     return ret;
   }
 
-  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt vSize) {
     if(UseShort) {
       const vector<set<DomainInt>>& doms = shortTupleList->initialDomains();
       if(doms.size() > 0) {
-        for(SysInt i = 0; i < v_size; ++i) {
+        for(SysInt i = 0; i < vSize; ++i) {
           if(doms[i].count(v[i]) == 0)
             return false;
         }
@@ -520,7 +520,7 @@ struct STR : public AbstractConstraint {
 
 template <typename T>
 AbstractConstraint* BuildCT_SHORTSTR(const T& t1, ConstraintBlob& b) {
-  return new STR<T, true>(t1, b.short_tuples);
+  return new STR<T, true>(t1, b.shortTuples);
 }
 
 /* JSON

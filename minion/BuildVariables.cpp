@@ -77,7 +77,7 @@ AnyVarRef get_AnyVarRef_from_Var(Var v) {
 }
 
 /// Create all the variables used in the CSP.
-void build_variables(const ProbSpec::VarContainer& vars) {
+void buildVariables(const ProbSpec::VarContainer& vars) {
   for(int i = 0; i < vars.BOOLs; ++i)
     getVars().boolVarContainer.addVariables(1);
   for(int i = 0; i < vars.bound.size(); ++i)

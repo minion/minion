@@ -66,15 +66,15 @@ struct MinConstraint : public AbstractConstraint {
     // to see if it is true.
     if(min_var.isAssigned()) {
       bool found_assigned_min = false;
-      bool found_lesser_value = false;
+      bool found_lesserValue = false;
       for(size_t i = 0; i < var_array.size(); ++i) {
         if(var_array[i].isAssigned() &&
            min_var.assignedValue() == var_array[i].assignedValue())
           found_assigned_min = true;
         if(var_array[i].min() < min_var.min())
-          found_lesser_value = true;
+          found_lesserValue = true;
       }
-      if(found_assigned_min && !found_lesser_value)
+      if(found_assigned_min && !found_lesserValue)
         return "true()";
     }
 
@@ -96,21 +96,21 @@ struct MinConstraint : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    SysInt v_size = var_array.size();
-    for(SysInt i = 0; i < v_size; ++i) {
+    SysInt vSize = var_array.size();
+    for(SysInt i = 0; i < vSize; ++i) {
       moveTriggerInt(var_array[i], i, LowerBound);
-      moveTriggerInt(var_array[i], i + v_size + 1, UpperBound);
+      moveTriggerInt(var_array[i], i + vSize + 1, UpperBound);
     }
-    moveTriggerInt(min_var, v_size, LowerBound);
-    moveTriggerInt(min_var, v_size * 2 + 1, UpperBound);
+    moveTriggerInt(min_var, vSize, LowerBound);
+    moveTriggerInt(min_var, vSize * 2 + 1, UpperBound);
   }
 
-  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(Min);
-    SysInt v_size = var_array.size();
-    if(prop_val <= v_size) { // Lower Bound Changed
+    SysInt vSize = var_array.size();
+    if(propVal <= vSize) { // Lower Bound Changed
       // Had to add 1 to fix "0th array" problem.
-      if(prop_val == v_size) {
+      if(propVal == vSize) {
         DomainInt new_min = min_var.min();
         typename VarArray::iterator end = var_array.end();
         for(typename VarArray::iterator it = var_array.begin(); it < end; ++it)
@@ -128,8 +128,8 @@ struct MinConstraint : public AbstractConstraint {
         min_var.setMin(min);
       }
     } else { // Upper Bound Changed
-      prop_val -= (v_size + 1);
-      if(prop_val == v_size) {
+      propVal -= (vSize + 1);
+      if(propVal == vSize) {
         typename VarArray::iterator it = var_array.begin();
         DomainInt minvar_max = min_var.max();
         while(it != var_array.end() && (*it).min() > minvar_max)
@@ -148,42 +148,42 @@ struct MinConstraint : public AbstractConstraint {
         }
         it_copy->setMax(minvar_max);
       } else {
-        min_var.setMax(var_array[checked_cast<SysInt>(prop_val)].max());
+        min_var.setMax(var_array[checked_cast<SysInt>(propVal)].max());
       }
     }
   }
 
   virtual void fullPropagate() {
     setup_triggers();
-    SysInt array_size = var_array.size();
-    if(array_size == 0) {
+    SysInt arraySize = var_array.size();
+    if(arraySize == 0) {
       getState().setFailed(true);
     } else {
-      for(SysInt i = 0; i < (array_size + 1) * 2; ++i) {
+      for(SysInt i = 0; i < (arraySize + 1) * 2; ++i) {
         propagateDynInt(i, DomainDelta::empty());
       }
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
-    if(v_size == 1)
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size() + 1);
+    if(vSize == 1)
       return false;
 
-    DomainInt min_val = v[0];
-    for(SysInt i = 1; i < v_size - 1; i++)
-      min_val = min(min_val, v[i]);
-    return min_val == *(v + v_size - 1);
+    DomainInt minVal = v[0];
+    for(SysInt i = 1; i < vSize - 1; i++)
+      minVal = min(minVal, v[i]);
+    return minVal == *(v + vSize - 1);
   }
 
   // Bah: This could be much better!
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(DomainInt i = min_var.min(); i <= min_var.max(); ++i) {
       if(min_var.inDomain(i)) {
-        bool flag_domain = false;
+        bool flagDomain = false;
         for(SysInt j = 0; j < (SysInt)var_array.size(); ++j) {
           if(var_array[j].inDomain(i)) {
-            flag_domain = true;
+            flagDomain = true;
             assignment.push_back(make_pair(j, i));
           } else {
             if(var_array[j].max() < i) {
@@ -194,7 +194,7 @@ struct MinConstraint : public AbstractConstraint {
           }
         }
 
-        if(flag_domain) {
+        if(flagDomain) {
           assignment.push_back(make_pair(var_array.size(), i));
           return true;
         } else

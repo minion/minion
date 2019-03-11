@@ -115,8 +115,8 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     var.setMax((*it_high).second);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 1);
     vector<std::pair<DomainInt, DomainInt>>::iterator it_high =
         std::lower_bound(intervals.begin(), intervals.end(), std::make_pair(v[0], v[0]));
     // We really need to test two intervals

@@ -58,8 +58,8 @@ struct AlldiffCiaran : public AbstractConstraint {
 
   virtual triggerCollection setup_internal() {
     triggerCollection t;
-    SysInt array_size = var_array.size();
-    for(SysInt i = 0; i < array_size; ++i)
+    SysInt arraySize = var_array.size();
+    for(SysInt i = 0; i < arraySize; ++i)
       t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
     return t;
   }
@@ -222,10 +222,10 @@ struct AlldiffCiaran : public AbstractConstraint {
     return true;
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
-    D_ASSERT(array_size == (SysInt)var_array.size());
-    for(SysInt i = 0; i < array_size; i++)
-      for(SysInt j = i + 1; j < array_size; j++)
+  virtual BOOL checkAssignment(DomainInt* v, SysInt arraySize) {
+    D_ASSERT(arraySize == (SysInt)var_array.size());
+    for(SysInt i = 0; i < arraySize; i++)
+      for(SysInt j = i + 1; j < arraySize; j++)
         if(v[i] == v[j])
           return false;
     return true;

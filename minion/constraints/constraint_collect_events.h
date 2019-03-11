@@ -53,7 +53,7 @@ public:
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt arraySize) {
     return true;
   }
 

@@ -267,14 +267,14 @@ struct LexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)x.size() + (SysInt)y.size());
-    size_t x_size = x.size();
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)x.size() + (SysInt)y.size());
+    size_t xSize = x.size();
 
-    for(size_t i = 0; i < x_size; i++) {
-      if(v[i] < v[i + x_size])
+    for(size_t i = 0; i < xSize; i++) {
+      if(v[i] < v[i + xSize])
         return true;
-      if(v[i] > v[i + x_size])
+      if(v[i] > v[i + xSize])
         return false;
     }
     if(Less)
@@ -284,8 +284,8 @@ struct LexLeqConstraint : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    size_t x_size = x.size();
-    for(size_t i = 0; i < x_size; ++i) {
+    size_t xSize = x.size();
+    for(size_t i = 0; i < xSize; ++i) {
       DomainInt x_i_min = x[i].min();
       DomainInt y_i_max = y[i].max();
 
@@ -294,7 +294,7 @@ struct LexLeqConstraint : public AbstractConstraint {
       }
 
       assignment.push_back(make_pair(i, x_i_min));
-      assignment.push_back(make_pair(i + x_size, y_i_max));
+      assignment.push_back(make_pair(i + xSize, y_i_max));
       if(x_i_min < y_i_max)
         return true;
     }

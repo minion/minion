@@ -48,28 +48,28 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
     SysInt trig1, trig2;
     SysInt index = 0;
 
-    while(index < array_size && !var_array[index].inDomain(1))
+    while(index < arraySize && !var_array[index].inDomain(1))
       ++index;
 
     trig1 = index;
 
-    if(index == array_size) { // Not enough triggers
+    if(index == arraySize) { // Not enough triggers
       getState().setFailed(true);
       return;
     }
 
     ++index;
 
-    while(index < array_size && !var_array[index].inDomain(1))
+    while(index < arraySize && !var_array[index].inDomain(1))
       ++index;
 
     trig2 = index;
 
-    if(index >= array_size) { // Only one valid variable.
+    if(index >= arraySize) { // Only one valid variable.
       var_array[trig1].assign(1);
       return;
     }
@@ -85,7 +85,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
     PROP_INFO_ADDONE(DynSumSat);
-    SysInt var_size = var_array.size();
+    SysInt varSize = var_array.size();
 
     SysInt other_propval;
 
@@ -102,7 +102,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
 
     SysInt loop = last;
 
-    while(loop < var_size && !found_new_support) {
+    while(loop < varSize && !found_new_support) {
       if(loop != other_propval && var_array[loop].inDomain(1))
         found_new_support = true;
       else
@@ -131,10 +131,10 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     moveTriggerInt(var_array[loop], dt, UpperBound);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size());
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size());
     SysInt count = 0;
-    for(SysInt i = 0; i < v_size; ++i)
+    for(SysInt i = 0; i < vSize; ++i)
       count += (v[i] == 1);
     return count > 0;
   }

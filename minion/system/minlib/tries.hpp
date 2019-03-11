@@ -19,16 +19,16 @@ struct earlyTrieObj {
 // Find how many values there are for index 'depth' between tuples
 // start_pos and end_pos.
 template <typename Tuples>
-int get_distinct_values(const Tuples& tuples, int start_pos, int end_pos, int depth) {
-  int current_val = tuples[start_pos][depth];
-  int found_values = 1;
+int get_distinctValues(const Tuples& tuples, int start_pos, int end_pos, int depth) {
+  int currentVal = tuples[start_pos][depth];
+  int foundValues = 1;
   for(int i = start_pos; i < end_pos; ++i) {
-    if(current_val != tuples[i][depth]) {
-      current_val = tuples[i][depth];
-      found_values++;
+    if(currentVal != tuples[i][depth]) {
+      currentVal = tuples[i][depth];
+      foundValues++;
     }
   }
-  return found_values;
+  return foundValues;
 }
 
 template <typename Value, typename Tuples>
@@ -37,42 +37,42 @@ void build_early_trie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tupl
   const bool last_stage = (depth == (int)tuples[0].size() - 1);
   assert(depth <= (int)tuples[0].size() - 1);
   assert(start_pos <= end_pos);
-  int values = get_distinct_values(tuples, start_pos, end_pos, depth);
+  int values = get_distinctValues(tuples, start_pos, end_pos, depth);
 
   int start_section = initial_trie.size();
   // Make space for this list of values.
   // '+1' is for end marker.
   initial_trie.resize(initial_trie.size() + values + 1);
 
-  int current_val = tuples[start_pos][depth];
+  int currentVal = tuples[start_pos][depth];
   int current_start = start_pos;
-  int num_of_val = 0;
+  int num_ofVal = 0;
 
   for(int i = start_pos; i < end_pos; ++i) {
-    if(current_val != tuples[i][depth]) {
-      initial_trie[start_section + num_of_val].val = current_val;
+    if(currentVal != tuples[i][depth]) {
+      initial_trie[start_section + num_ofVal].val = currentVal;
       if(last_stage) {
-        initial_trie[start_section + num_of_val].offset = -1;
+        initial_trie[start_section + num_ofVal].offset = -1;
       } else {
-        initial_trie[start_section + num_of_val].offset = initial_trie.size();
+        initial_trie[start_section + num_ofVal].offset = initial_trie.size();
         build_early_trie(initial_trie, tuples, current_start, i, depth + 1);
       }
-      current_val = tuples[i][depth];
+      currentVal = tuples[i][depth];
       current_start = i;
-      num_of_val++;
+      num_ofVal++;
     }
   }
 
   // Also have to cover last stretch of values.
-  initial_trie[start_section + num_of_val].val = current_val;
+  initial_trie[start_section + num_ofVal].val = currentVal;
   if(last_stage)
-    initial_trie[start_section + num_of_val].offset = -1;
+    initial_trie[start_section + num_ofVal].offset = -1;
   else {
-    initial_trie[start_section + num_of_val].offset = initial_trie.size();
+    initial_trie[start_section + num_ofVal].offset = initial_trie.size();
     build_early_trie(initial_trie, tuples, current_start, end_pos, depth + 1);
   }
 
-  assert(num_of_val + 1 == values);
+  assert(num_ofVal + 1 == values);
   initial_trie[start_section + values].val = std::numeric_limits<Value>::max();
   initial_trie[start_section + values].offset = -1;
 }

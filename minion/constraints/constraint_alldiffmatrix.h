@@ -240,8 +240,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     do_prop();
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
-    D_ASSERT(array_size == (SysInt)var_array.size());
+  virtual BOOL checkAssignment(DomainInt* v, SysInt arraySize) {
+    D_ASSERT(arraySize == (SysInt)var_array.size());
     for(SysInt i = 0; i < squaresize; i++) {
       SysInt count = 0;
       for(SysInt j = 0; j < squaresize; j++)

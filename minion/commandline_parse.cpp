@@ -95,7 +95,7 @@ Current orders are, ascend, descend and random.
     }                                                                                              \
   }
 
-void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
+void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
   for(SysInt i = 1; i < argc; ++i) {
     const string command(argv[i]);
     if(command == string("-findallsols")) {
@@ -427,7 +427,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
               "produced\n";
       cout << "# WARNING: This is by design, but use this option with extreme "
               "care\n";
-      getOptions().ensure_branch_on_all_vars = false;
+      getOptions().ensure_branch_on_allVars = false;
     }
     /** @help switches;-cpulimit Description
     To stop search after N seconds (CPU time), do
@@ -476,19 +476,19 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         args.limit = tmp;
       } else if(order == "srf-random") {
         args.order = ORDER_SRF;
-        getOptions().randomise_valvarorder = true;
+        getOptions().randomiseValvarorder = true;
       } else if(order == "sdf")
         args.order = ORDER_SDF;
       else if(order == "sdf-random") {
         args.order = ORDER_SDF;
-        getOptions().randomise_valvarorder = true;
+        getOptions().randomiseValvarorder = true;
       } else if(order == "ldf")
         args.order = ORDER_LDF;
       else if(order == "ldf-random") {
         args.order = ORDER_LDF;
-        getOptions().randomise_valvarorder = true;
+        getOptions().randomiseValvarorder = true;
       } else if(order == "random")
-        getOptions().randomise_valvarorder = true;
+        getOptions().randomiseValvarorder = true;
       else if(order == "conflict")
         args.order = ORDER_CONFLICT;
       else if(order == "wdeg") {
@@ -521,7 +521,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     specified a random permutation of all the variables is used.
     */
     else if(command == string("-randomiseorder")) {
-      getOptions().randomise_valvarorder = true;
+      getOptions().randomiseValvarorder = true;
     }
     /** @help switches;-randomseed Description
     Set the pseudorandom seed to N. This allows 'random' behaviour to be

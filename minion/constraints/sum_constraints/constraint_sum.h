@@ -133,15 +133,15 @@ AbstractConstraint* BuildCT_WEIGHTGEQSUM(vector<T1> vec, const vector<T2>& t2, C
     }
   }
 
-  BOOL multipliers_size_one = true;
+  BOOL multipliersSize_one = true;
   for(UnsignedSysInt i = 0; i < scale.size(); ++i) {
     if(scale[i] != 1 && scale[i] != -1) {
-      multipliers_size_one = false;
+      multipliersSize_one = false;
       i = scale.size();
     }
   }
 
-  if(multipliers_size_one) {
+  if(multipliersSize_one) {
     vector<SwitchNeg<T1>> mult_vars(vec.size());
     for(UnsignedSysInt i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);
@@ -179,15 +179,15 @@ AbstractConstraint* BuildCT_WEIGHTLEQSUM(vector<T1> vec, const vector<T2>& t2, C
     }
   }
 
-  BOOL multipliers_size_one = true;
+  BOOL multipliersSize_one = true;
   for(UnsignedSysInt i = 0; i < scale.size(); ++i) {
     if(scale[i] != 1 && scale[i] != -1) {
-      multipliers_size_one = false;
+      multipliersSize_one = false;
       i = scale.size();
     }
   }
 
-  if(multipliers_size_one) {
+  if(multipliersSize_one) {
     vector<SwitchNeg<T1>> mult_vars(vec.size());
     for(UnsignedSysInt i = 0; i < vec.size(); ++i)
       mult_vars[i] = SwitchNeg<T1>(vec[i], scale[i]);

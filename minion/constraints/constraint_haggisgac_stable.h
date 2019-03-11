@@ -373,7 +373,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
             // We have lost the last support for lit
             //
             // I believe that each literal can only be marked once here in a
-            // call to update_counters.
+            // call to updateCounters.
             // so we should be able to push it onto a list
             //
             // As long as we do not actually call find_new_support.
@@ -440,7 +440,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
       //
       //
       // Similarly to the above, each var can only be added to this list once
-      // per call to update_counters
+      // per call to updateCounters
       // Because it can only lose its last implicit support once since we are
       // only deleting supports.
       //
@@ -481,7 +481,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
             // We have lost the last support for lit
             //
             // I believe that each literal can only be marked once here in a
-            // call to update_counters.
+            // call to updateCounters.
             // so we should be able to push it onto a list
             //
             // As long as we do not actually call find_new_support.
@@ -753,7 +753,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
 
 template <typename T>
 AbstractConstraint* BuildCT_HAGGISGAC_STABLE(const T& t1, ConstraintBlob& b) {
-  return new HaggisGACStable<T>(t1, b.short_tuples);
+  return new HaggisGACStable<T>(t1, b.shortTuples);
 }
 
 /* JSON

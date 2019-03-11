@@ -3,17 +3,17 @@
 
 struct arrayset {
   vector<SysInt> vals;
-  vector<SysInt> vals_pos;
+  vector<SysInt> valsPos;
   DomainInt size;
   DomainInt minval;
 
   void initialise(DomainInt low, DomainInt high) {
     minval = low;
-    vals_pos.resize(checked_cast<SysInt>(high - low + 1));
+    valsPos.resize(checked_cast<SysInt>(high - low + 1));
     vals.resize(checked_cast<SysInt>(high - low + 1));
     for(SysInt i = 0; i < checked_cast<SysInt>(high - low + 1); i++) {
       vals[i] = checked_cast<SysInt>(i + low);
-      vals_pos[i] = i;
+      valsPos[i] = i;
     }
     size = 0;
   }
@@ -23,7 +23,7 @@ struct arrayset {
   }
 
   bool in(DomainInt val) {
-    return vals_pos[checked_cast<SysInt>(val - minval)] < size;
+    return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
 
   // This method looks a bit messy, due to stupid C++ optimisers not being
@@ -35,12 +35,12 @@ struct arrayset {
     const SysInt validx = checked_cast<SysInt>(val - minval_cpy);
     const SysInt size_cpy = checked_cast<SysInt>(size);
     const SysInt swapval = vals[size_cpy];
-    const SysInt vpvx = vals_pos[validx];
+    const SysInt vpvx = valsPos[validx];
     vals[vpvx] = swapval;
     vals[size_cpy] = checked_cast<SysInt>(val);
 
-    vals_pos[checked_cast<SysInt>(swapval - minval_cpy)] = vpvx;
-    vals_pos[validx] = size_cpy;
+    valsPos[checked_cast<SysInt>(swapval - minval_cpy)] = vpvx;
+    valsPos[validx] = size_cpy;
 
     size++;
   }
@@ -56,11 +56,11 @@ struct arrayset {
     D_ASSERT(in(val));
     const SysInt validx = checked_cast<SysInt>(val - minval);
     const SysInt swapval = vals[checked_cast<SysInt>(size - 1)];
-    vals[vals_pos[validx]] = swapval;
+    vals[valsPos[validx]] = swapval;
     vals[checked_cast<SysInt>(size - 1)] = checked_cast<SysInt>(val);
 
-    vals_pos[checked_cast<SysInt>(swapval - minval)] = vals_pos[validx];
-    vals_pos[validx] = checked_cast<SysInt>(size - 1);
+    valsPos[checked_cast<SysInt>(swapval - minval)] = valsPos[validx];
+    valsPos[validx] = checked_cast<SysInt>(size - 1);
 
     size--;
   }

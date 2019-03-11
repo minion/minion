@@ -31,13 +31,13 @@
 
 class TableData : public BaseTableData {
 public:
-  TableData(TupleList* _tuple_data) : BaseTableData(_tuple_data) {}
+  TableData(TupleList* _tupleData) : BaseTableData(_tupleData) {}
 
   // TODO : Optimise possibly?
-  bool checkTuple(DomainInt* tuple, SysInt tuple_size) {
-    D_ASSERT(tuple_size == getVarCount());
+  bool checkTuple(DomainInt* tuple, SysInt tupleSize) {
+    D_ASSERT(tupleSize == getVarCount());
     for(SysInt i = 0; i < checked_cast<SysInt>(getNumOfTuples()); ++i) {
-      if(std::equal(tuple, tuple + tuple_size, tuple_data->get_tupleptr(i)))
+      if(std::equal(tuple, tuple + tupleSize, tupleData->getTupleptr(i)))
         return true;
     }
     return false;
@@ -63,9 +63,9 @@ public:
 
   template <typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit) {
-    // SysInt tuple_size = data->getVarCount();
+    // SysInt tupleSize = data->getVarCount();
     // SysInt length = data->getNumOfTuples();
-    // SysInt* tuple_data = data->getPointer();
+    // SysInt* tupleData = data->getPointer();
 
     SysInt varIndex = lit.var;
     DomainInt val = lit.val;
@@ -101,21 +101,21 @@ public:
   /// state, and need not be thread-safe.
   template <typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit) {
-    SysInt tuple_size = checked_cast<SysInt>(data->getVarCount());
+    SysInt tupleSize = checked_cast<SysInt>(data->getVarCount());
     SysInt length = checked_cast<SysInt>(data->getNumOfTuples());
-    DomainInt* tuple_data = data->getPointer();
+    DomainInt* tupleData = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt* tuple_start = tuple_data + i * tuple_size;
+      DomainInt* tuple_start = tupleData + i * tupleSize;
       bool success = true;
       if(tuple_start[checked_cast<SysInt>(lit.var)] != lit.val)
         success = false;
-      for(SysInt j = 0; j < tuple_size && success; ++j) {
+      for(SysInt j = 0; j < tupleSize && success; ++j) {
         if(!vars[j].inDomain(tuple_start[j]))
           success = false;
       }
       if(success) {
-        std::copy(tuple_start, tuple_start + tuple_size, scratch_tuple.begin());
+        std::copy(tuple_start, tuple_start + tupleSize, scratch_tuple.begin());
         return &scratch_tuple;
       }
     }
@@ -148,9 +148,9 @@ struct NewTableConstraint : public AbstractConstraint {
   NewTableConstraint(const VarArray& _vars, TupleList* _tuples)
       : vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples) {
     CheckNotBound(vars, "table constraint");
-    if(_tuples->tuple_size() != (SysInt)_vars.size()) {
+    if(_tuples->tupleSize() != (SysInt)_vars.size()) {
       cout << "Table constraint: Number of variables " << _vars.size()
-           << " does not match length of tuples " << _tuples->tuple_size() << "." << endl;
+           << " does not match length of tuples " << _tuples->tupleSize() << "." << endl;
       FAIL_EXIT();
     }
   }
@@ -190,9 +190,9 @@ struct NewTableConstraint : public AbstractConstraint {
 
   void setup_watches(Literal lit, DomainInt lit_pos, const vector<DomainInt>& support) {
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
-    SysInt vars_size = vars.size();
-    DomainInt trig_pos = checked_cast<SysInt>(lit_pos * (vars_size - 1));
-    for(SysInt v = 0; v < vars_size; ++v) {
+    SysInt varsSize = vars.size();
+    DomainInt trig_pos = checked_cast<SysInt>(lit_pos * (varsSize - 1));
+    for(SysInt v = 0; v < varsSize; ++v) {
       if(v != lit.var) {
         P(vars.size() << ".Watching " << v << "." << support[v] << " for " << lit.var << "."
                       << lit.val);
@@ -206,9 +206,9 @@ struct NewTableConstraint : public AbstractConstraint {
 
   void clear_watches(Literal lit, SysInt lit_pos) {
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
-    SysInt vars_size = vars.size();
-    SysInt pos = lit_pos * (vars_size - 1);
-    for(SysInt v = 0; v < vars_size; ++v) {
+    SysInt varsSize = vars.size();
+    SysInt pos = lit_pos * (varsSize - 1);
+    for(SysInt v = 0; v < varsSize; ++v) {
       releaseTriggerInt(pos, TO_Backtrack);
       ++pos;
     }
@@ -263,8 +263,8 @@ struct NewTableConstraint : public AbstractConstraint {
     return GACNegativeTableCon(vars, tuples);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    return data->checkTuple(v, v_size);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    return data->checkTuple(v, vSize);
   }
 
   virtual vector<AnyVarRef> getVars() {

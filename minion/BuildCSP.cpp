@@ -41,7 +41,7 @@ void BuildCSP(CSPInstance& instance) {
   getState().setShortTupleListContainer(instance.shortTupleListContainer);
 
   // Set up variables
-  BuildCon::build_variables(instance.vars);
+  BuildCon::buildVariables(instance.vars);
   getState().setInstance(&instance);
 
   // Set up optimisation
@@ -84,7 +84,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   // varorder block, not just the ones in the 'current' block
 
   // Set up variable and value ordering
-  // Strange that when using randomise_valvarorder, the variables are
+  // Strange that when using randomiseValvarorder, the variables are
   // only shuffled within the VARORDER blocks from the input file.
   // Likewise, using a dynamic variable ordering, it only applies within
   // the VARORDER blocks.
@@ -112,7 +112,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
       preprocess_vars.push_back(get_AnyVarRef_from_Var(instance.search_order[i].var_order[j]));
     }
 
-    if(getOptions().randomise_valvarorder) {
+    if(getOptions().randomiseValvarorder) {
 
       std::random_shuffle(instance.search_order[i].var_order.begin(),
                           instance.search_order[i].var_order.end());

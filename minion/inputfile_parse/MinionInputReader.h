@@ -32,10 +32,10 @@ struct ConcreteFileReader {
   /// Removes all comments after the current place in the file.
   // Returns peeked char.
   void check_for_comments() {
-    char peek = simplepeek_char();
+    char peek = simplepeekChar();
     while(peek == '#') {
       simplegetline();
-      peek = simplepeek_char();
+      peek = simplepeekChar();
     }
   }
 
@@ -45,44 +45,44 @@ struct ConcreteFileReader {
     return !infile;
   }
 
-  string get_string() {
+  string getString() {
     char buffer[1000];
     SysInt pos = 0;
-    char next_char = get_char();
-    while(isalnum(next_char) || next_char == '_') {
-      buffer[pos] = next_char;
+    char nextChar = getChar();
+    while(isalnum(nextChar) || nextChar == '_') {
+      buffer[pos] = nextChar;
       pos++;
       if(pos >= 999) {
         D_FATAL_ERROR("Identifer too long!");
       }
-      next_char = infile.get();
+      nextChar = infile.get();
     }
 
-    putback(next_char);
+    putback(nextChar);
     buffer[pos] = '\0';
     return string(buffer);
   }
 
-  void check_string(const string& string_in) {
-    string s = get_string();
+  void checkString(const string& string_in) {
+    string s = getString();
     if(s != string_in) {
       throw parse_exception("Expected " + string_in + ", recieved '" + s + "'");
     }
   }
 
-  string get_asciistring() {
+  string getAsciiString() {
     string s;
-    char next_char = get_char();
-    while(!isspace(next_char) && !infile.eof()) {
-      s += next_char;
-      next_char = infile.get();
+    char nextChar = getChar();
+    while(!isspace(nextChar) && !infile.eof()) {
+      s += nextChar;
+      nextChar = infile.get();
     }
 
     // Fix for nasty windows issue -- long term we should clean this up.
-    if(infile.eof() && !isspace(next_char))
-      s += next_char;
+    if(infile.eof() && !isspace(nextChar))
+      s += nextChar;
 
-    putback(next_char);
+    putback(nextChar);
     return s;
   }
 
@@ -94,11 +94,11 @@ struct ConcreteFileReader {
     return i;
   }
 
-  DomainInt read_num() {
+  DomainInt readNum() {
     return this->read_int();
   }
 
-  char simplepeek_char() {
+  char simplepeekChar() {
     char peek = infile.peek();
     while(isspace(peek)) {
       infile.get();
@@ -107,18 +107,18 @@ struct ConcreteFileReader {
     return peek;
   }
 
-  char peek_char() {
-    char peek = simplepeek_char();
+  char peekChar() {
+    char peek = simplepeekChar();
     while(peek == '#') {
       simplegetline();
-      peek = simplepeek_char();
+      peek = simplepeekChar();
     }
     return peek;
   }
 
   /// Check if the next character from infile is sym.
-  void check_sym(char sym) {
-    char idChar = get_char();
+  void checkSym(char sym) {
+    char idChar = getChar();
     if(idChar != sym) {
       throw parse_exception(string("Expected '") + sym + "'. Received '" + idChar + "'.");
     }
@@ -152,16 +152,16 @@ struct ConcreteFileReader {
     return string(s.begin() + pos, s.end());
   }
 
-  char get_char() {
-    char peek = simpleget_char();
+  char getChar() {
+    char peek = simplegetChar();
     while(peek == '#') {
       simplegetline();
-      peek = simpleget_char();
+      peek = simplegetChar();
     }
     return peek;
   }
 
-  char simpleget_char() {
+  char simplegetChar() {
     char k;
     infile >> k;
     return k;
@@ -226,10 +226,10 @@ public:
 
   ProbSpec::CSPInstance* instance;
   bool parser_verbose;
-  bool print_all_vars;
+  bool print_allVars;
   MapLongTuplesToShort map_long_short_mode;
 
-  bool ensure_branch_on_all_vars;
+  bool ensure_branch_on_allVars;
 
   bool isGadgetReader_m;
 
@@ -242,9 +242,9 @@ public:
 
   MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls, bool _e)
       : parser_verbose(_parser_verbose),
-        print_all_vars(true),
+        print_allVars(true),
         map_long_short_mode(mls),
-        ensure_branch_on_all_vars(_e),
+        ensure_branch_on_allVars(_e),
         isGadgetReader_m(false) {}
 };
 

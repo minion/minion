@@ -64,8 +64,8 @@ struct VecCountDynamic : public AbstractConstraint {
   VarArray2 var_array2;
   DomainInt num_to_watch;
   DomainInt hamming_distance;
-  vector<DomainInt> watched_values;
-  vector<DomainInt> unwatched_values;
+  vector<DomainInt> watchedValues;
+  vector<DomainInt> unwatchedValues;
 
   Reversible<bool> propagate_mode;
   DomainInt index_to_not_propagate;
@@ -102,7 +102,7 @@ struct VecCountDynamic : public AbstractConstraint {
     if(num_to_watch <= 1)
       return;
 
-    watched_values.resize(checked_cast<SysInt>(num_to_watch));
+    watchedValues.resize(checked_cast<SysInt>(num_to_watch));
 
     SysInt size = var_array1.size();
     SysInt index = 0;
@@ -114,7 +114,7 @@ struct VecCountDynamic : public AbstractConstraint {
         ++index;
       }
       if(index != size) {
-        watched_values[found_matches] = index;
+        watchedValues[found_matches] = index;
         ++found_matches;
         ++index;
       }
@@ -131,35 +131,35 @@ struct VecCountDynamic : public AbstractConstraint {
       index_to_not_propagate = -1;
       propagate_mode = true;
       for(SysInt i = 0; i < num_to_watch - 1; ++i) {
-        propagate_from_var1(watched_values[i]);
-        propagate_from_var2(watched_values[i]);
-        add_triggers(watched_values[i], Operator::dynamicTriggerCount() * i);
+        propagate_from_var1(watchedValues[i]);
+        propagate_from_var2(watchedValues[i]);
+        add_triggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
       }
       return;
     }
 
     // Found enough values to watch, no propagation yet!
     for(SysInt i = 0; i < num_to_watch; ++i) {
-      add_triggers(watched_values[i], Operator::dynamicTriggerCount() * i);
+      add_triggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
     }
 
     // Setup the 'unwatched values' array.
-    initalise_unwatched_values();
+    initalise_unwatchedValues();
   }
 
-  void initalise_unwatched_values() {
-    unwatched_values.resize(0);
+  void initalise_unwatchedValues() {
+    unwatchedValues.resize(0);
     for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
       bool found = false;
-      for(SysInt j = 0; j < (SysInt)watched_values.size(); ++j) {
-        if(i == watched_values[j])
+      for(SysInt j = 0; j < (SysInt)watchedValues.size(); ++j) {
+        if(i == watchedValues[j])
           found = true;
       }
       if(!found)
-        unwatched_values.push_back(i);
+        unwatchedValues.push_back(i);
     }
 
-    random_shuffle(unwatched_values.begin(), unwatched_values.end());
+    random_shuffle(unwatchedValues.begin(), unwatchedValues.end());
   }
 
   void propagate_from_var1(DomainInt index_in) {
@@ -180,12 +180,12 @@ struct VecCountDynamic : public AbstractConstraint {
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
       (SysInt)propagate_mode, (SysInt)triggerpair, (SysInt)trigger_activated);
 
-    for(SysInt i = 0; i < (SysInt)watched_values.size(); ++i)
-      printf("%d,", watched_values[i]);
+    for(SysInt i = 0; i < (SysInt)watchedValues.size(); ++i)
+      printf("%d,", watchedValues[i]);
 
     printf(":");
-    for(SysInt i = 0; i < (SysInt)unwatched_values.size(); ++i)
-      printf("%d,", unwatched_values[i]);
+    for(SysInt i = 0; i < (SysInt)unwatchedValues.size(); ++i)
+      printf("%d,", unwatchedValues[i]);
     printf("\n");
 
     for(SysInt i = 0; i < var_array1.size(); ++i)
@@ -199,58 +199,58 @@ struct VecCountDynamic : public AbstractConstraint {
     cout << endl;*/
 
     if(propagate_mode) {
-      if(index_to_not_propagate == watched_values[triggerpair])
+      if(index_to_not_propagate == watchedValues[triggerpair])
         return;
 
       // assumes that the first set of Operator::dynamicTriggerCount()/2
       // triggers are on var1, and the other set are on var2.
       if(trigger_activated % Operator::dynamicTriggerCount() <
          Operator::dynamicTriggerCount() / 2) {
-        propagate_from_var1(watched_values[triggerpair]);
+        propagate_from_var1(watchedValues[triggerpair]);
       } else {
-        propagate_from_var2(watched_values[triggerpair]);
+        propagate_from_var2(watchedValues[triggerpair]);
       }
       return;
     }
 
     // Check if propagation has caused a loss of support.
-    if(!no_support_for_index(watched_values[triggerpair]))
+    if(!no_support_for_index(watchedValues[triggerpair]))
       return;
 
     SysInt index = 0;
-    SysInt unwatched_size = unwatched_values.size();
-    while(index < unwatched_size && no_support_for_index(unwatched_values[index]))
+    SysInt unwatchedSize = unwatchedValues.size();
+    while(index < unwatchedSize && no_support_for_index(unwatchedValues[index]))
       index++;
 
-    if(index == unwatched_size) {
+    if(index == unwatchedSize) {
       // This is the only possible non-equal index.
       propagate_mode = true;
-      index_to_not_propagate = watched_values[triggerpair];
+      index_to_not_propagate = watchedValues[triggerpair];
 
       //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d,
       //     nopropindex=%d\n",
       //        (SysInt)propagate_mode, (SysInt)triggerpair,
       //        (SysInt)trigger_activated, (SysInt)index_to_not_propagate);
 
-      for(SysInt i = 0; i < (SysInt)watched_values.size(); ++i) {
+      for(SysInt i = 0; i < (SysInt)watchedValues.size(); ++i) {
         if(i != triggerpair) {
-          propagate_from_var1(watched_values[i]);
-          propagate_from_var2(watched_values[i]);
+          propagate_from_var1(watchedValues[i]);
+          propagate_from_var2(watchedValues[i]);
         }
       }
       return;
     }
 
-    swap(watched_values[triggerpair], unwatched_values[index]);
+    swap(watchedValues[triggerpair], unwatchedValues[index]);
 
-    add_triggers(watched_values[triggerpair], triggerpair * Operator::dynamicTriggerCount());
+    add_triggers(watchedValues[triggerpair], triggerpair * Operator::dynamicTriggerCount());
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    UnsignedSysInt v_size1 = var_array1.size();
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    UnsignedSysInt vSize1 = var_array1.size();
     SysInt count = 0;
-    for(UnsignedSysInt i = 0; i < v_size1; ++i)
-      if(Operator::checkAssignment(v[i], v[i + v_size1]))
+    for(UnsignedSysInt i = 0; i < vSize1; ++i)
+      if(Operator::checkAssignment(v[i], v[i + vSize1]))
         count++;
     return (count >= hamming_distance);
   }

@@ -237,8 +237,8 @@ struct DivConstraint : public AbstractConstraint {
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 3);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 3);
     return check_div_result<undef>(v[0], v[1], v[2]);
   }
 

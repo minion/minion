@@ -10,7 +10,7 @@ inline long double get_wall_time() {
   return 0;
 }
 
-inline long double get_raw_wall_time() {
+inline long double getRaw_wall_time() {
   return 0;
 }
 
@@ -37,7 +37,7 @@ inline long double get_wall_time() {
   return (long double)(clock()) / CLOCKS_PER_SEC;
 }
 
-inline long double get_raw_wall_time() {
+inline long double getRaw_wall_time() {
   return get_wall_time();
 }
 
@@ -100,7 +100,7 @@ inline long double get_wall_time() {
   return current_time - init_start_wall_time(1);
 }
 
-inline long double get_raw_wall_time() {
+inline long double getRaw_wall_time() {
   timeval t;
   gettimeofday(&t, NULL);
   long double current_time =

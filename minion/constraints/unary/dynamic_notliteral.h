@@ -74,8 +74,8 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
       var.removeFromDomain(val);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 1);
     return (v[0] != val);
   }
 
@@ -131,8 +131,8 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
     var.removeFromDomain(val);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 1);
     return (v[0] != val);
   }
 

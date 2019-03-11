@@ -100,7 +100,7 @@ struct reify : public ParentConstraint {
   CONSTRAINT_ARG_LIST2(child_constraints[0], reify_var);
 
   BoolVar reify_var;
-  SysInt reify_var_num;
+  SysInt reify_varNum;
 
   bool constraint_locked;
   Reversible<bool> fullPropagate_called;
@@ -128,7 +128,7 @@ struct reify : public ParentConstraint {
 #endif
     // assume for the time being that the two child constraints have the same
     // number of vars.
-    reify_var_num = child_constraints[0]->getVarsSingleton()->size() +
+    reify_varNum = child_constraints[0]->getVarsSingleton()->size() +
                     child_constraints[1]->getVarsSingleton()->size();
     // dtcount=dynamicTriggerCount();
     dtcount = child_constraints[0]->getVarsSingleton()->size() * 2 +
@@ -152,7 +152,7 @@ struct reify : public ParentConstraint {
     if(reify_var.inDomain(1)) {
       bool flag = child_constraints[0]->getSatisfyingAssignment(assignment);
       if(flag) {
-        assignment.push_back(make_pair(reify_var_num, 1));
+        assignment.push_back(make_pair(reify_varNum, 1));
         return true;
       }
     }
@@ -162,18 +162,18 @@ struct reify : public ParentConstraint {
       if(flag) {
         for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           assignment[i].first += c0vars;
-        assignment.push_back(make_pair(reify_var_num, 0));
+        assignment.push_back(make_pair(reify_varNum, 0));
         return true;
       }
     }
     return false;
   }
 
-  virtual BOOL checkAssignment(DomainInt* vals, SysInt v_size) {
-    DomainInt back_val = *(vals + v_size - 1);
-    if(back_val == 1) {
+  virtual BOOL checkAssignment(DomainInt* vals, SysInt vSize) {
+    DomainInt backVal = *(vals + vSize - 1);
+    if(backVal == 1) {
       return child_constraints[0]->checkAssignment(vals, c0vars);
-    } else if(back_val == 0) {
+    } else if(backVal == 0) {
       vals += c0vars;
       return child_constraints[1]->checkAssignment(vals, (dtcount / 2) - c0vars);
     } else

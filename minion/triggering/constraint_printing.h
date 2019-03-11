@@ -61,7 +61,7 @@ inline string print_vars(const SysInt& i) {
 #endif
 
 template <typename T, T i>
-string print_vars(const compiletime_val<T, i>) {
+string print_vars(const compiletimeVal<T, i>) {
   return tostring(i);
 }
 

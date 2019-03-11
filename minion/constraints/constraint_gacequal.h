@@ -129,8 +129,8 @@ struct GACEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 2);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 2);
     return (v[0] == v[1]);
   }
 
@@ -143,10 +143,10 @@ struct GACEqualConstraint : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt min_val = max(var1.min(), var2.min());
-    DomainInt max_val = min(var1.max(), var2.max());
+    DomainInt minVal = max(var1.min(), var2.min());
+    DomainInt maxVal = min(var1.max(), var2.max());
 
-    for(DomainInt i = min_val; i <= max_val; ++i) {
+    for(DomainInt i = minVal; i <= maxVal; ++i) {
       if(var1.inDomain(i) && var2.inDomain(i)) {
         assignment.push_back(make_pair(0, i));
         assignment.push_back(make_pair(1, i));

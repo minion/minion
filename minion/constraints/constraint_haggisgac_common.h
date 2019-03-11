@@ -34,7 +34,7 @@ virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
   return false;
 }
 
-virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
   D_ASSERT(vars.size() > 0);
   if(v[0] < vars[0].initialMin())
     return false;

@@ -40,12 +40,12 @@ inline bool DynamicTriggerList::sanity_check_list() {
 inline void DynamicTriggerList::verify_slack() const {
 // Note: In non-debug mode, this does nothing
 #ifdef MINION_DEBUG
-  size_t slack_debug_count = 0;
+  size_t slack_debugCount = 0;
   for(int i = 0; i < elems.size(); ++i) {
     if(elems[i].empty())
-      slack_debug_count++;
+      slack_debugCount++;
   }
-  D_ASSERT(slack.size() == slack_debug_count);
+  D_ASSERT(slack.size() == slack_debugCount);
 #endif
 }
 

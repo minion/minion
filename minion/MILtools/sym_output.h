@@ -27,19 +27,19 @@
 std::vector<std::vector<DomainInt>> build_graph(std::vector<std::set<SysInt>> graph,
                                                 const std::vector<std::set<SysInt>>& partition);
 
-SysInt repartition(const std::vector<std::set<SysInt>>& graph, std::vector<SysInt> partition_num) {
+SysInt repartition(const std::vector<std::set<SysInt>>& graph, std::vector<SysInt> partitionNum) {
   std::vector<std::multiset<SysInt>> partition_loop(graph.size());
   for(SysInt i = 0; i < (SysInt)graph.size(); ++i)
     for(set<SysInt>::const_iterator it = graph[i].begin(); it != graph[i].end(); ++it) {
-      partition_loop[i].insert(partition_num[*it]);
-      partition_loop[*it].insert(partition_num[i]);
+      partition_loop[i].insert(partitionNum[*it]);
+      partition_loop[*it].insert(partitionNum[i]);
     }
 
   std::set<std::multiset<SysInt>> partition_set(partition_loop.begin(), partition_loop.end());
   std::vector<std::multiset<SysInt>> partition_vec(partition_set.begin(), partition_set.end());
 
   for(SysInt i = 0; i < (SysInt)graph.size(); ++i) {
-    partition_num[i] =
+    partitionNum[i] =
         find(partition_vec.begin(), partition_vec.end(), partition_loop[i]) - partition_vec.begin();
   }
 
@@ -53,29 +53,29 @@ partition_graph(const std::tuple<SysInt, vector<set<SysInt>>, vector<set<SysInt>
   SysInt blank;
   std::tie(blank, graph, partition) = graph_tuple;
 
-  std::vector<SysInt> partition_num(graph.size());
+  std::vector<SysInt> partitionNum(graph.size());
 
   for(SysInt i = 0; i < (SysInt)partition.size(); ++i) {
     for(std::set<SysInt>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
-      partition_num[*it] = i;
+      partitionNum[*it] = i;
   }
 
-  SysInt partition_count = 0;
+  SysInt partitionCount = 0;
   bool done = false;
   while(!done) {
-    SysInt new_partition_count = repartition(graph, partition_num);
-    if(partition_count == new_partition_count)
+    SysInt new_partitionCount = repartition(graph, partitionNum);
+    if(partitionCount == new_partitionCount)
       done = true;
-    partition_count = new_partition_count;
+    partitionCount = new_partitionCount;
   }
 
-  SysInt diff_count = 0;
-  for(SysInt i = 0; i < (SysInt)partition_num.size(); ++i)
-    for(SysInt j = 0; j < (SysInt)partition_num.size(); ++j)
-      if(partition_num[i] != partition_num[j])
-        diff_count++;
+  SysInt diffCount = 0;
+  for(SysInt i = 0; i < (SysInt)partitionNum.size(); ++i)
+    for(SysInt j = 0; j < (SysInt)partitionNum.size(); ++j)
+      if(partitionNum[i] != partitionNum[j])
+        diffCount++;
 
-  return (double)(diff_count) / (double)(partition_num.size() * partition_num.size());
+  return (double)(diffCount) / (double)(partitionNum.size() * partitionNum.size());
 }
 
 template <typename Name = string, typename Colour = string>
@@ -126,27 +126,27 @@ struct Graph {
   std::tuple<SysInt, vector<set<SysInt>>, vector<set<SysInt>>>
   build_graph_info(CSPInstance& csp, bool print_names = true) {
 
-    map<string, SysInt> v_num;
+    map<string, SysInt> vNum;
 
-    SysInt var_vertex_count = 0, aux_vertex_count = 0;
+    SysInt var_vertexCount = 0, aux_vertexCount = 0;
     for(map<string, set<string>>::iterator it = var_vertex_colour.begin();
         it != var_vertex_colour.end(); ++it)
-      var_vertex_count += it->second.size();
+      var_vertexCount += it->second.size();
 
     for(map<string, set<string>>::iterator it = aux_vertex_colour.begin();
         it != aux_vertex_colour.end(); ++it)
-      aux_vertex_count += it->second.size();
+      aux_vertexCount += it->second.size();
 
     if(print_names)
       cout << "varnames := [";
     for(SysInt i = 0; i < (SysInt)csp.sym_order.size(); ++i) {
       if(print_names)
         cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
-      v_num[name(csp.sym_order[i], csp)] = i + 1;
+      vNum[name(csp.sym_order[i], csp)] = i + 1;
     }
     if(print_names)
       cout << "];" << endl;
-    SysInt vertex_counter = v_num.size() + 1;
+    SysInt vertexCounter = vNum.size() + 1;
 
     // Now output partitions
 
@@ -161,7 +161,7 @@ struct Graph {
       D_ASSERT(it->second.size() > 0);
       set<SysInt> partition;
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        partition.insert(v_num[*it2]);
+        partition.insert(vNum[*it2]);
 
       partitions.push_back(partition);
     }
@@ -171,35 +171,35 @@ struct Graph {
       set<SysInt> partition;
       D_ASSERT(it->second.size() > 0);
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++) {
-        v_num[*it2] = vertex_counter;
-        partition.insert(vertex_counter);
-        vertex_counter++;
+        vNum[*it2] = vertexCounter;
+        partition.insert(vertexCounter);
+        vertexCounter++;
       }
 
       partitions.push_back(partition);
     }
 
-    vector<set<SysInt>> edges(var_vertex_count + aux_vertex_count + 1);
+    vector<set<SysInt>> edges(var_vertexCount + aux_vertexCount + 1);
 
     for(set<pair<string, string>>::iterator it = graph.begin(); it != graph.end(); ++it) {
       // cout << it->first << ":" << it->second << endl;
-      D_ASSERT(v_num.count(it->first) == 1);
-      D_ASSERT(v_num.count(it->second) == 1);
-      SysInt first_v = v_num[it->first];
-      SysInt second_v = v_num[it->second];
+      D_ASSERT(vNum.count(it->first) == 1);
+      D_ASSERT(vNum.count(it->second) == 1);
+      SysInt first_v = vNum[it->first];
+      SysInt second_v = vNum[it->second];
       D_ASSERT(first_v != 0 && second_v != 0 && first_v != second_v);
       edges[first_v].insert(second_v);
     }
 
-    return std::make_tuple(var_vertex_count, edges, partitions);
+    return std::make_tuple(var_vertexCount, edges, partitions);
   }
 
   void output_nauty_graph(CSPInstance& csp) {
-    SysInt var_vertex_count;
+    SysInt var_vertexCount;
     vector<set<SysInt>> edges;
     vector<set<SysInt>> partitions;
 
-    std::tie(var_vertex_count, edges, partitions) = build_graph_info(csp);
+    std::tie(var_vertexCount, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
     vector<vector<DomainInt>> perms = build_graph(edges, partitions);
     cout << "generators := [()" << endl;
@@ -207,8 +207,8 @@ struct Graph {
       cout << ", PermList([";
       bool first_pass = true;
       D_ASSERT(perms[i][0] == 0);
-      for(SysInt j = 1; j <= var_vertex_count; ++j) {
-        D_ASSERT(perms[i][j] <= var_vertex_count);
+      for(SysInt j = 1; j <= var_vertexCount; ++j) {
+        D_ASSERT(perms[i][j] <= var_vertexCount);
         if(first_pass) {
           first_pass = false;
           cout << perms[i][j];
@@ -256,7 +256,7 @@ struct GraphBuilder {
   void colour_vertices() {
     vector<Var> vars = csp.vars.getAllVars();
     for(SysInt i = 0; i < (SysInt)vars.size(); ++i) {
-      g.var_vertex_colour[tostring(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
+      g.var_vertex_colour[tostring(csp.vars.getDomain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }
   }
 
@@ -812,17 +812,17 @@ struct InstanceStats {
       domain_product += log((double)2);
     }
     for(SysInt i = 0; i < (SysInt)v.bound.size(); i++) {
-      SysInt dom_size = checked_cast<SysInt>(v.bound[i].upper_bound - v.bound[i].lower_bound + 1);
-      domsizes.push_back(dom_size);
+      SysInt domSize = checked_cast<SysInt>(v.bound[i].upper_bound - v.bound[i].lower_bound + 1);
+      domsizes.push_back(domSize);
       var_memory_usage += 64;
-      domain_product += log((double)dom_size);
+      domain_product += log((double)domSize);
     }
     for(SysInt i = 0; i < (SysInt)v.discrete.size(); i++) {
-      SysInt dom_size =
+      SysInt domSize =
           checked_cast<SysInt>(v.discrete[i].upper_bound - v.discrete[i].lower_bound + 1);
-      domsizes.push_back(dom_size);
-      var_memory_usage += dom_size;
-      domain_product += log((double)dom_size);
+      domsizes.push_back(domSize);
+      var_memory_usage += domSize;
+      domain_product += log((double)domSize);
     }
     for(SysInt i = 0; i < (SysInt)v.sparse_bound.size(); i++) {
       domsizes.push_back(v.sparse_bound[i].size());
@@ -927,31 +927,31 @@ struct InstanceStats {
     output_stat << "alldiffdomovervars_mean:"
                 << (alldiffdomovervarstotal) / (double)alldiffdomovervars.size() << endl;
 
-    output_stat << "alldiff_count:" << alldiff << endl;
+    output_stat << "alldiffCount:" << alldiff << endl;
     output_stat << "alldiff_proportion:" << ((double)alldiff) / (double)c.size() << endl;
-    output_stat << "sums_count:" << sums << endl;
+    output_stat << "sumsCount:" << sums << endl;
     output_stat << "sums_proportion:" << ((double)sums) / (double)c.size() << endl;
-    output_stat << "or_atleastk_count:" << or_atleastk << endl;
+    output_stat << "or_atleastkCount:" << or_atleastk << endl;
     output_stat << "or_atleastk_proportion:" << ((double)or_atleastk) / (double)c.size() << endl;
-    output_stat << "ternary_count:" << ternary << endl;
+    output_stat << "ternaryCount:" << ternary << endl;
     output_stat << "ternary_proportion:" << ((double)ternary) / (double)c.size() << endl;
-    output_stat << "binary_count:" << binary << endl;
+    output_stat << "binaryCount:" << binary << endl;
     output_stat << "binary_proportion:" << ((double)binary) / (double)c.size() << endl;
-    output_stat << "reify_count:" << reify << endl;
+    output_stat << "reifyCount:" << reify << endl;
     output_stat << "reify_proportion:" << ((double)reify) / (double)c.size() << endl;
-    output_stat << "table_count:" << table << endl;
+    output_stat << "tableCount:" << table << endl;
     output_stat << "table_proportion:" << ((double)table) / (double)c.size() << endl;
-    output_stat << "lex_count:" << lex << endl;
+    output_stat << "lexCount:" << lex << endl;
     output_stat << "lex_proportion:" << ((double)lex) / (double)c.size() << endl;
-    output_stat << "unary_count:" << unary << endl;
+    output_stat << "unaryCount:" << unary << endl;
     output_stat << "unary_proportion:" << ((double)unary) / (double)c.size() << endl;
-    output_stat << "nullary_count:" << nullary << endl;
+    output_stat << "nullaryCount:" << nullary << endl;
     output_stat << "nullary_proportion:" << ((double)nullary) / (double)c.size() << endl;
-    output_stat << "element_count:" << element << endl;
+    output_stat << "elementCount:" << element << endl;
     output_stat << "element_proportion:" << ((double)element) / (double)c.size() << endl;
-    output_stat << "minmax_count:" << minmax << endl;
+    output_stat << "minmaxCount:" << minmax << endl;
     output_stat << "minmax_proportion:" << ((double)minmax) / (double)c.size() << endl;
-    output_stat << "occurrence_count:" << occurrence << endl;
+    output_stat << "occurrenceCount:" << occurrence << endl;
     output_stat << "occurrence_proportion:" << ((double)occurrence) / (double)c.size() << endl;
 
     // Count the number of pairs of constraints that overlap by two or more
@@ -962,7 +962,7 @@ struct InstanceStats {
     vector<vector<Var>> var_sets;
 
     for(list<ConstraintBlob>::iterator i = c.begin(); i != c.end(); ++i) {
-      set<Var> v = find_all_vars(*i);
+      set<Var> v = find_allVars(*i);
       var_sets.push_back(vector<Var>(v.begin(), v.end()));
     }
 
@@ -1050,10 +1050,10 @@ struct InstanceStats {
     // iterate over constraints, collecting all available tightnesses for
     // varvals involved in con
     for(SysInt con = 0; con < (SysInt)cons.size(); con++) {
-      vector<AnyVarRef>& all_vars = *cons[con]->getVarsSingleton();
-      for(size_t var = 0; var < all_vars.size(); var++) {
-        Var vv = all_vars[var].getBaseVar();
-        for(DomainInt val = all_vars[var].initialMin(); val <= all_vars[var].initialMax();
+      vector<AnyVarRef>& allVars = *cons[con]->getVarsSingleton();
+      for(size_t var = 0; var < allVars.size(); var++) {
+        Var vv = allVars[var].getBaseVar();
+        for(DomainInt val = allVars[var].initialMin(); val <= allVars[var].initialMax();
             val++) {
           scores_for_varval[make_pair(vv, val)].push_back(
               cons[con]->getTightnessEstimateVarVal(var, val));
@@ -1091,10 +1091,10 @@ struct InstanceStats {
   }
 
   SysInt arity(ConstraintBlob& ct) {
-    return find_all_vars(ct).size();
+    return find_allVars(ct).size();
   }
 
-  set<Var> find_all_vars(ConstraintBlob& ct) {
+  set<Var> find_allVars(ConstraintBlob& ct) {
     set<Var> t2;
     for(SysInt i = 0; i < (SysInt)ct.vars.size(); ++i) {
       for(SysInt j = 0; j < (SysInt)ct.vars[i].size(); j++) {
@@ -1103,7 +1103,7 @@ struct InstanceStats {
     }
 
     for(SysInt i = 0; i < (SysInt)ct.internal_constraints.size(); i++) {
-      set<Var> t3 = find_all_vars(ct.internal_constraints[i]);
+      set<Var> t3 = find_allVars(ct.internal_constraints[i]);
       for(set<Var>::iterator j = t3.begin(); j != t3.end(); ++j) {
         t2.insert(*j);
       }

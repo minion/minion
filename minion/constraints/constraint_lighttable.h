@@ -45,19 +45,19 @@ template <typename VarArray, typename TableDataType = TrieData>
 struct LightTableConstraint : public AbstractConstraint {
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    const SysInt tuple_size = checked_cast<SysInt>(data->getVarCount());
+    const SysInt tupleSize = checked_cast<SysInt>(data->getVarCount());
     const SysInt length = checked_cast<SysInt>(data->getNumOfTuples());
-    DomainInt* tuple_data = data->getPointer();
+    DomainInt* tupleData = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt* tuple_start = tuple_data + i * tuple_size;
+      DomainInt* tuple_start = tupleData + i * tupleSize;
       bool success = true;
-      for(SysInt j = 0; j < tuple_size && success; ++j) {
+      for(SysInt j = 0; j < tupleSize && success; ++j) {
         if(!vars[j].inDomain(tuple_start[j]))
           success = false;
       }
       if(success) {
-        for(SysInt i = 0; i < tuple_size; ++i)
+        for(SysInt i = 0; i < tupleSize; ++i)
           assignment.push_back(make_pair(i, tuple_start[i]));
         return true;
       }
@@ -84,9 +84,9 @@ struct LightTableConstraint : public AbstractConstraint {
   LightTableConstraint(const VarArray& _vars, TupleList* _tuples)
       : vars(_vars), tuples(_tuples), data(new TableDataType(_tuples)) {
     CheckNotBound(vars, "table constraints", "");
-    if(_tuples->tuple_size() != (SysInt)_vars.size()) {
+    if(_tuples->tupleSize() != (SysInt)_vars.size()) {
       cout << "Table constraint: Number of variables " << _vars.size()
-           << " does not match length of tuples " << _tuples->tuple_size() << "." << endl;
+           << " does not match length of tuples " << _tuples->tupleSize() << "." << endl;
       FAIL_EXIT();
     }
   }
@@ -135,8 +135,8 @@ struct LightTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    return data->checkTuple(v, v_size);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    return data->checkTuple(v, vSize);
   }
 
   virtual vector<AnyVarRef> getVars() {

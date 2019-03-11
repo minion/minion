@@ -57,7 +57,7 @@ struct Dynamic_OR : public ParentConstraint {
   Reversible<bool> fullPropagate_called;
   bool constraint_locked;
 
-  SysInt assign_size;
+  SysInt assignSize;
 
   SysInt propagated_constraint;
 
@@ -67,15 +67,15 @@ struct Dynamic_OR : public ParentConstraint {
       : ParentConstraint(_con),
         fullPropagate_called(false),
         constraint_locked(false),
-        assign_size(-1),
+        assignSize(-1),
         propagated_constraint(-1) {
-    size_t max_size = 0;
+    size_t maxSize = 0;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
-      max_size = max(max_size, child_constraints[i]->getVarsSingleton()->size());
-    assign_size = max_size * 2;
+      maxSize = max(maxSize, child_constraints[i]->getVarsSingleton()->size());
+    assignSize = maxSize * 2;
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       if(child_constraints[i]->checkAssignment(v + checked_cast<SysInt>(start_of_constraint[i]),
                                                 child_constraints[i]->getVarsSingleton()->size()))
@@ -109,14 +109,14 @@ struct Dynamic_OR : public ParentConstraint {
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vecs;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      vector<AnyVarRef>* var_ptr = child_constraints[i]->getVarsSingleton();
-      vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
+      vector<AnyVarRef>* varPtr = child_constraints[i]->getVarsSingleton();
+      vecs.insert(vecs.end(), varPtr->begin(), varPtr->end());
     }
     return vecs;
   }
 
   virtual SysInt dynamicTriggerCount() {
-    return assign_size * 2;
+    return assignSize * 2;
   }
 
   virtual void specialCheck() {
@@ -141,11 +141,11 @@ struct Dynamic_OR : public ParentConstraint {
     if(constraint_locked)
       return;
 
-    if(trig >= 0 && trig < assign_size * 2) {
+    if(trig >= 0 && trig < assignSize * 2) {
       if(fullPropagate_called)
         return;
 
-      SysInt tripped_constraint = checked_cast<SysInt>(trig / assign_size);
+      SysInt tripped_constraint = checked_cast<SysInt>(trig / assignSize);
       SysInt other_constraint = checked_cast<SysInt>(1 - tripped_constraint);
       P("Tripped: " << tripped_constraint << ":" << watched_constraint[tripped_constraint]);
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
@@ -154,7 +154,7 @@ struct Dynamic_OR : public ParentConstraint {
       GET_ASSIGNMENT(assignment_try, child_constraints[watched_constraint[tripped_constraint]]);
       if(flag) { // Found new support without having to move.
         watch_assignment(child_constraints[watched_constraint[tripped_constraint]],
-                         tripped_constraint * assign_size, assignment_try);
+                         tripped_constraint * assignSize, assignment_try);
         for(SysInt i = 0; i < (SysInt)assignment_try.size(); ++i)
           P(assignment_try[i].first << "." << assignment_try[i].second << "  ");
         P(" -- Fixed, returning");
@@ -170,7 +170,7 @@ struct Dynamic_OR : public ParentConstraint {
         if(i != skip_pos) {
           GET_ASSIGNMENT(assignment, child_constraints[i]);
           if(flag) {
-            watch_assignment(child_constraints[i], tripped_constraint * assign_size, assignment);
+            watch_assignment(child_constraints[i], tripped_constraint * assignSize, assignment);
             watched_constraint[tripped_constraint] = i;
             P("New support. Switch " << tripped_constraint << " to " << i);
             return;
@@ -182,7 +182,7 @@ struct Dynamic_OR : public ParentConstraint {
         if(i != skip_pos) {
           GET_ASSIGNMENT(assignment, child_constraints[i]);
           if(flag) {
-            watch_assignment(child_constraints[i], tripped_constraint * assign_size, assignment);
+            watch_assignment(child_constraints[i], tripped_constraint * assignSize, assignment);
             watched_constraint[tripped_constraint] = i;
             P("New support. Switch " << tripped_constraint << " to " << i);
             return;
@@ -213,7 +213,7 @@ struct Dynamic_OR : public ParentConstraint {
   void watch_assignment(AbstractConstraint* con, DomainInt dt,
                         box<pair<SysInt, DomainInt>>& assignment) {
     vector<AnyVarRef>& vars = *(con->getVarsSingleton());
-    D_ASSERT((SysInt)assignment.size() <= assign_size);
+    D_ASSERT((SysInt)assignment.size() <= assignSize);
     for(SysInt i = 0; i < (SysInt)assignment.size(); ++i) {
       const SysInt af = checked_cast<SysInt>(assignment[i].first);
       if(vars[af].isBound())
@@ -226,7 +226,7 @@ struct Dynamic_OR : public ParentConstraint {
   virtual void fullPropagate() {
     P("Full Propagate")
     // Clean up triggers
-    for(SysInt i = 0; i < assign_size * 2; ++i)
+    for(SysInt i = 0; i < assignSize * 2; ++i)
       releaseTriggerInt(i);
 
     SysInt loop = 0;
@@ -262,7 +262,7 @@ struct Dynamic_OR : public ParentConstraint {
       if(flag) {
         found_watch = true;
         watched_constraint[1] = loop;
-        watch_assignment(child_constraints[loop], assign_size, assignment);
+        watch_assignment(child_constraints[loop], assignSize, assignment);
         for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           P(assignment[i].first << "." << assignment[i].second << "  ");
         P(" -- Found watch 1: " << loop);

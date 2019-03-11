@@ -148,7 +148,7 @@ struct ConstantVar {
 #endif
 
   DomainInt getDomainChange(DomainDelta d) {
-    D_ASSERT(d.XXX_get_domain_diff() == 0);
+    D_ASSERT(d.XXX_getDomain_diff() == 0);
     return 0;
   }
 

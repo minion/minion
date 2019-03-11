@@ -2291,7 +2291,7 @@ void help(string request) {
          << "TuplelistSection::= **TUPLELIST**" << endl
          << " <Tuplelist>*" << endl
          << "" << endl
-         << "Tuplelist::= <name> <num_tuples> <tuple_length> <numbers>+" << endl
+         << "Tuplelist::= <name> <num_tuples> <tupleLength> <numbers>+" << endl
          << endl
          << endl;
     cout << "Example"
@@ -2322,9 +2322,9 @@ void help(string request) {
          << "TuplelistSection::= **TUPLELIST**" << endl
          << " <Tuplelist>*" << endl
          << "" << endl
-         << "Tuplelist::= <name> <num_tuples> <short_tuple>+" << endl
+         << "Tuplelist::= <name> <num_tuples> <shortTuple>+" << endl
          << "" << endl
-         << "short_tuple ::= [ <literal>*, ]" << endl
+         << "shortTuple ::= [ <literal>*, ]" << endl
          << "" << endl
          << "literal ::= (<num>, <num>)" << endl
          << endl
@@ -2545,7 +2545,7 @@ void help(string request) {
          << "lexleq( [bm], [bm] ) # This is OK!" << endl
          << "" << endl
          << "# Can give tuplelists, which can have names!" << endl
-         << "# The input is: <name> <num_of_tuples> <tuple_length> <numbers...>" << endl
+         << "# The input is: <name> <num_of_tuples> <tupleLength> <numbers...>" << endl
          << "# The formatting can be about anything.." << endl
          << "" << endl
          << "**TUPLELIST**" << endl

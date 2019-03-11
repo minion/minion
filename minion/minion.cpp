@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     CSPInstance instance;
     SearchMethod args;
 
-    parse_command_line(args, argc, argv);
+    parseCommandLine(args, argc, argv);
 
     global_random_gen.seed(args.random_seed);
 
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 
     vector<string> files(1, getOptions().instance_name);
     readInputFromFiles(instance, files, getOptions().parser_verbose, getOptions().map_long_short,
-                       getOptions().ensure_branch_on_all_vars);
+                       getOptions().ensure_branch_on_allVars);
 
     if(getOptions().graph) {
       GraphBuilder graph(instance);
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
       getState().setTupleListContainer(instance.tupleListContainer);
       getState().setShortTupleListContainer(instance.shortTupleListContainer);
 
-      BuildCon::build_variables(instance.vars);
+      BuildCon::buildVariables(instance.vars);
 
       // Create Constraints
       vector<AbstractConstraint*> cons;

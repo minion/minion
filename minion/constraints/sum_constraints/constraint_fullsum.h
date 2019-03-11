@@ -106,12 +106,12 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return min_sum;
   }
 
-  virtual void propagateDynInt(SysInt prop_val, DomainDelta domain_change) {
-    P("Prop: " << prop_val);
+  virtual void propagateDynInt(SysInt propVal, DomainDelta domain_change) {
+    P("Prop: " << propVal);
     PROP_INFO_ADDONE(FullSum);
     DomainInt sum = var_array_min_sum;
-    if(prop_val != var_array.size()) { // One of the array changed
-      DomainInt change = var_array[checked_cast<SysInt>(prop_val)].getDomainChange(domain_change);
+    if(propVal != var_array.size()) { // One of the array changed
+      DomainInt change = var_array[checked_cast<SysInt>(propVal)].getDomainChange(domain_change);
       P(" Change: " << change);
       D_ASSERT(change >= 0);
       sum += change;
@@ -154,40 +154,40 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       var_sum.setMin(0);
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size() + 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size() + 1);
     DomainInt sum = 0;
-    for(SysInt i = 0; i < v_size - 1; i++)
+    for(SysInt i = 0; i < vSize - 1; i++)
       sum += v[i];
-    return sum <= *(v + v_size - 1);
+    return sum <= *(v + vSize - 1);
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     P("GSA");
-    DomainInt sum_value = 0;
-    SysInt v_size = var_array.size();
+    DomainInt sumValue = 0;
+    SysInt vSize = var_array.size();
 
     if(no_negatives) // How are the two cases different? They look identical.
     {
       DomainInt max_sum = var_sum.max();
-      assignment.push_back(make_pair(v_size, max_sum));
-      for(SysInt i = 0; i < v_size && sum_value <= max_sum; ++i) {
-        DomainInt min_val = var_array[i].min();
-        assignment.push_back(make_pair(i, min_val));
-        sum_value += min_val;
+      assignment.push_back(make_pair(vSize, max_sum));
+      for(SysInt i = 0; i < vSize && sumValue <= max_sum; ++i) {
+        DomainInt minVal = var_array[i].min();
+        assignment.push_back(make_pair(i, minVal));
+        sumValue += minVal;
       }
-      P("A" << (sum_value <= max_sum));
-      return (sum_value <= max_sum);
+      P("A" << (sumValue <= max_sum));
+      return (sumValue <= max_sum);
     } else {
-      for(SysInt i = 0; i < v_size; ++i) {
+      for(SysInt i = 0; i < vSize; ++i) {
         assignment.push_back(make_pair(i, var_array[i].min()));
-        sum_value += var_array[i].min();
+        sumValue += var_array[i].min();
       }
-      P("B" << (sum_value <= var_sum.max()));
-      if(sum_value > var_sum.max())
+      P("B" << (sumValue <= var_sum.max()));
+      if(sumValue > var_sum.max())
         return false;
       else
-        assignment.push_back(make_pair(v_size, var_sum.max()));
+        assignment.push_back(make_pair(vSize, var_sum.max()));
       return true;
     }
   }
@@ -210,9 +210,9 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
-    typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1>>::type
+    typedef typename ShiftType<typename NegType<VarSum>::type, compiletimeVal<SysInt, -1>>::type
         SumType;
-    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
+    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletimeVal<SysInt, -1>());
 
     return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>(
         new_var_array, new_sum);
@@ -224,9 +224,9 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       new_var_array[i] = VarNegRef(var_array[i]);
 
-    typedef typename ShiftType<typename NegType<VarSum>::type, compiletime_val<SysInt, -1>>::type
+    typedef typename ShiftType<typename NegType<VarSum>::type, compiletimeVal<SysInt, -1>>::type
         SumType;
-    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletime_val<SysInt, -1>());
+    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletimeVal<SysInt, -1>());
 
     return new LessEqualSumConstraint<vector<AnyVarRef>, AnyVarRef, true>(new_var_array, new_sum);
   }

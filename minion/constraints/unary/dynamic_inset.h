@@ -103,8 +103,8 @@ struct WatchInSetConstraint : public AbstractConstraint {
     var.setMax(*(it_high - 1));
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 1);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 1);
     return binary_search(vals.begin(), vals.end(), v[0]);
   }
 

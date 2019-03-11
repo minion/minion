@@ -315,7 +315,7 @@ public:
 
   /// Denotes if the variable and value orderings should be randomised.
   /// Initialised to false.
-  bool randomise_valvarorder;
+  bool randomiseValvarorder;
 
   /// Denotes if parser should output verbosely
   bool parser_verbose;
@@ -356,7 +356,7 @@ public:
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
 
-  bool ensure_branch_on_all_vars;
+  bool ensure_branch_on_allVars;
 
   SearchOptions()
       : silent(false),
@@ -375,7 +375,7 @@ public:
         timeout_active(false),
         time_limit(0),
         time_limit_is_CPU_time(false),
-        randomise_valvarorder(false),
+        randomiseValvarorder(false),
         parser_verbose(false),
         redump(false),
         graph(false),
@@ -386,7 +386,7 @@ public:
         noTimers(false),
         gapname("gap.sh"),
         map_long_short(MLTTS_NoMap),
-        ensure_branch_on_all_vars(true) {
+        ensure_branch_on_allVars(true) {
   }
 
   /// Denotes all solutions should be found, by setting sollimit to -1.

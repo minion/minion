@@ -136,12 +136,12 @@ struct DifferenceConstraint : public AbstractConstraint {
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 3);
-    DomainInt abs_val = v[0] - v[1];
-    if(abs_val < 0)
-      abs_val = -abs_val;
-    return abs_val == v[2];
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 3);
+    DomainInt absVal = v[0] - v[1];
+    if(absVal < 0)
+      absVal = -absVal;
+    return absVal == v[2];
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {

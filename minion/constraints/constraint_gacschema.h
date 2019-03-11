@@ -50,19 +50,19 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   CONSTRAINT_ARG_LIST2(vars, data);
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
+    const SysInt tupleSize = checked_cast<SysInt>(data->tupleSize());
     const SysInt length = checked_cast<SysInt>(data->size());
-    DomainInt* tuple_data = data->getPointer();
+    DomainInt* tupleData = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt* tuple_start = tuple_data + i * tuple_size;
+      DomainInt* tuple_start = tupleData + i * tupleSize;
       bool success = true;
-      for(SysInt j = 0; j < tuple_size && success; ++j) {
+      for(SysInt j = 0; j < tupleSize && success; ++j) {
         if(!vars[j].inDomain(tuple_start[j]))
           success = false;
       }
       if(success) {
-        for(SysInt i = 0; i < tuple_size; ++i)
+        for(SysInt i = 0; i < tupleSize; ++i)
           assignment.push_back(make_pair(i, tuple_start[i]));
         return true;
       }
@@ -572,9 +572,9 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     return false;
   }
 
-  virtual bool checkAssignment(DomainInt* v, SysInt array_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt arraySize) {
     for(SysInt i = 0; i < checked_cast<SysInt>(data->size()); ++i) {
-      if(std::equal(v, v + array_size, data->get_tupleptr(i)))
+      if(std::equal(v, v + arraySize, data->getTupleptr(i)))
         return true;
     }
     return false;

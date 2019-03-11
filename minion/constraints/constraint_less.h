@@ -64,9 +64,9 @@ struct LeqConstraint : public AbstractConstraint {
   // Needs to be at end of file
   virtual AbstractConstraint* reverseConstraint();
 
-  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(BinaryLeq);
-    if(checked_cast<SysInt>(prop_val)) { // y changed
+    if(checked_cast<SysInt>(propVal)) { // y changed
       x.setMax(y.max() + offset);
     } else { // x changed
       y.setMin(x.min() - offset);
@@ -81,8 +81,8 @@ struct LeqConstraint : public AbstractConstraint {
     propagateDynInt(1, DomainDelta::empty());
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 2);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 2);
     return v[0] <= (v[1] + offset);
   }
 
@@ -114,14 +114,14 @@ AbstractConstraint* LeqCon(VarRef1 v1, VarRef2 v2, Offset o) {
 
 template <typename VarRef1, typename VarRef2>
 AbstractConstraint* LeqCon(VarRef1 v1, VarRef2 v2) {
-  return new LeqConstraint<VarRef1, VarRef2, compiletime_val<SysInt, 0>>(
-      v1, v2, compiletime_val<SysInt, 0>());
+  return new LeqConstraint<VarRef1, VarRef2, compiletimeVal<SysInt, 0>>(
+      v1, v2, compiletimeVal<SysInt, 0>());
 }
 
 template <typename VarRef>
 AbstractConstraint* ImpliesCon(VarRef v1, VarRef v2) {
-  return new LeqConstraint<VarRef, VarRef, compiletime_val<SysInt, 0>>(
-      v1, v2, compiletime_val<SysInt, 0>());
+  return new LeqConstraint<VarRef, VarRef, compiletimeVal<SysInt, 0>>(
+      v1, v2, compiletimeVal<SysInt, 0>());
 }
 
 // This is mainly inline to avoid multiple definitions.

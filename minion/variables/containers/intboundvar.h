@@ -57,7 +57,7 @@ struct BoundVarRef_internal {
   }
 
   void* var_bound_data;
-  DomainInt var_num;
+  DomainInt varNum;
 
   const DomType& lower_bound() const {
     return *static_cast<DomType*>(var_bound_data);
@@ -68,10 +68,10 @@ struct BoundVarRef_internal {
   }
 
   static BoundVarContainer<DomType>& getCon_Static();
-  BoundVarRef_internal() : var_num(-1) {}
+  BoundVarRef_internal() : varNum(-1) {}
 
   explicit BoundVarRef_internal(BoundVarContainer<DomType>*, DomainInt i, DomType* ptr)
-      : var_bound_data(ptr), var_num(i) {}
+      : var_bound_data(ptr), varNum(i) {}
 
   BOOL isAssigned() const {
     return lower_bound() == upper_bound();
@@ -152,7 +152,7 @@ struct BoundVarRef_internal {
   }
 
   Var getBaseVar() const {
-    return Var(VAR_BOUND, var_num);
+    return Var(VAR_BOUND, varNum);
   }
 
   vector<Mapper> getMapperStack() const {
@@ -170,11 +170,11 @@ struct BoundVarRef_internal {
 #endif
 
   friend std::ostream& operator<<(std::ostream& o, const BoundVarRef_internal& v) {
-    return o << "BoundVar:" << v.var_num;
+    return o << "BoundVar:" << v.varNum;
   }
 
   DomainInt getDomainChange(DomainDelta d) {
-    return d.XXX_get_domain_diff();
+    return d.XXX_getDomain_diff();
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType type, DomainInt pos = NoDomainValue,
@@ -192,7 +192,7 @@ typedef BoundVarRef_internal<> BoundVarRef;
 template <typename BoundType = DomainInt>
 struct BoundVarContainer {
 
-  BoundVarContainer() : trigger_list(true), var_count_m(0), lock_m(0) {}
+  BoundVarContainer() : trigger_list(true), varCount_m(0), lock_m(0) {}
 
   ExtendableBlock bound_data;
   TriggerList trigger_list;
@@ -201,23 +201,23 @@ struct BoundVarContainer {
 #ifdef WDEG
   vector<UnsignedSysInt> wdegs;
 #endif
-  UnsignedSysInt var_count_m;
+  UnsignedSysInt varCount_m;
   BOOL lock_m;
 
   const BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) const {
-    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2)];
   }
 
   const BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) const {
-    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2 + 1)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2 + 1)];
   }
 
   BoundType& lower_bound(const BoundVarRef_internal<BoundType>& i) {
-    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2)];
   }
 
   BoundType& upper_bound(const BoundVarRef_internal<BoundType>& i) {
-    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.var_num * 2 + 1)];
+    return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2 + 1)];
   }
 
   void lock() {
@@ -264,11 +264,11 @@ struct BoundVarContainer {
   }
 
   DomainInt initialMin(const BoundVarRef_internal<BoundType>& d) const {
-    return initial_bounds[checked_cast<SysInt>(d.var_num)].first;
+    return initial_bounds[checked_cast<SysInt>(d.varNum)].first;
   }
 
   DomainInt initialMax(const BoundVarRef_internal<BoundType>& d) const {
-    return initial_bounds[checked_cast<SysInt>(d.var_num)].second;
+    return initial_bounds[checked_cast<SysInt>(d.varNum)].second;
   }
 
   void removeFromDomain(const BoundVarRef_internal<BoundType>&, DomainInt) {
@@ -277,25 +277,25 @@ struct BoundVarContainer {
   }
 
   void internalAssign(const BoundVarRef_internal<BoundType>& d, DomainInt i) {
-    DomainInt min_val = getMin(d);
-    DomainInt max_val = getMax(d);
-    if(min_val > i || max_val < i) {
+    DomainInt minVal = getMin(d);
+    DomainInt maxVal = getMax(d);
+    if(minVal > i || maxVal < i) {
       getState().setFailed(true);
       return;
     }
 
-    if(min_val == max_val)
+    if(minVal == maxVal)
       return;
 
-    trigger_list.push_domain_changed(d.var_num);
-    trigger_list.push_assign(d.var_num, i);
+    trigger_list.pushDomain_changed(d.varNum);
+    trigger_list.push_assign(d.varNum, i);
 
-    if(min_val != i) {
-      trigger_list.push_lower(d.var_num, i - min_val);
+    if(minVal != i) {
+      trigger_list.push_lower(d.varNum, i - minVal);
     }
 
-    if(max_val != i) {
-      trigger_list.push_upper(d.var_num, max_val - i);
+    if(maxVal != i) {
+      trigger_list.push_upper(d.varNum, maxVal - i);
     }
 
     upper_bound(d) = i;
@@ -322,11 +322,11 @@ struct BoundVarContainer {
     }
 
     if(i < up_bound) {
-      trigger_list.push_upper(d.var_num, up_bound - i);
-      trigger_list.push_domain_changed(d.var_num);
+      trigger_list.push_upper(d.varNum, up_bound - i);
+      trigger_list.pushDomain_changed(d.varNum);
       upper_bound(d) = i;
       if(low_bound == i) {
-        trigger_list.push_assign(d.var_num, i);
+        trigger_list.push_assign(d.varNum, i);
       }
     }
   }
@@ -341,17 +341,17 @@ struct BoundVarContainer {
     }
 
     if(i > low_bound) {
-      trigger_list.push_lower(d.var_num, i - low_bound);
-      trigger_list.push_domain_changed(d.var_num);
+      trigger_list.push_lower(d.varNum, i - low_bound);
+      trigger_list.pushDomain_changed(d.varNum);
       lower_bound(d) = i;
       if(up_bound == i) {
-        trigger_list.push_assign(d.var_num, i);
+        trigger_list.push_assign(d.varNum, i);
       }
     }
   }
 
-  UnsignedSysInt var_count() {
-    return var_count_m;
+  UnsignedSysInt varCount() {
+    return varCount_m;
   }
 
   //  BoundVarRef get_new_var();
@@ -361,66 +361,66 @@ struct BoundVarContainer {
   void addVariables(Bounds bounds, SysInt count = 1) {
     D_ASSERT(!lock_m);
     D_ASSERT(count > 0);
-    SysInt old_var_count = var_count_m;
+    SysInt old_varCount = varCount_m;
 
     D_ASSERT(bounds.lower_bound >= DomainInt_Min);
     D_ASSERT(bounds.upper_bound <= DomainInt_Max);
     for(SysInt j = 0; j < count; ++j) {
-      var_count_m++;
+      varCount_m++;
       initial_bounds.push_back(make_pair(bounds.lower_bound, bounds.upper_bound));
     }
 
-    constraints.resize(var_count_m);
+    constraints.resize(varCount_m);
 #ifdef WDEG
-    wdegs.resize(var_count_m);
+    wdegs.resize(varCount_m);
 #endif
 
     if(bound_data.empty()) {
       bound_data =
-          getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+          getMemory().backTrack().requestBytesExtendable(varCount_m * 2 * sizeof(BoundType));
     } else {
       getMemory().backTrack().resizeExtendableBlock(bound_data,
-                                                    var_count_m * 2 * sizeof(BoundType));
+                                                    varCount_m * 2 * sizeof(BoundType));
     }
     BoundType* bound_ptr = (BoundType*)(bound_data());
-    for(UnsignedSysInt i = old_var_count; i < var_count_m; ++i) {
+    for(UnsignedSysInt i = old_varCount; i < varCount_m; ++i) {
       bound_ptr[2 * i] = initial_bounds[i].first;
       bound_ptr[2 * i + 1] = initial_bounds[i].second;
     }
 
-    DomainInt min_domain_val = 0;
-    DomainInt max_domain_val = 0;
+    DomainInt minDomainVal = 0;
+    DomainInt maxDomainVal = 0;
     if(!initial_bounds.empty()) {
-      min_domain_val = initial_bounds[0].first;
-      max_domain_val = initial_bounds[0].second;
-      for(UnsignedSysInt i = old_var_count; i < var_count_m; ++i) {
+      minDomainVal = initial_bounds[0].first;
+      maxDomainVal = initial_bounds[0].second;
+      for(UnsignedSysInt i = old_varCount; i < varCount_m; ++i) {
         bound_ptr[2 * i] = initial_bounds[i].first;
         bound_ptr[2 * i + 1] = initial_bounds[i].second;
 
-        min_domain_val = mymin(initial_bounds[i].first, min_domain_val);
-        max_domain_val = mymax(initial_bounds[i].second, max_domain_val);
+        minDomainVal = mymin(initial_bounds[i].first, minDomainVal);
+        maxDomainVal = mymax(initial_bounds[i].second, maxDomainVal);
       }
     }
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b) {
-    return &constraints[checked_cast<SysInt>(b.var_num)];
+    return &constraints[checked_cast<SysInt>(b.varNum)];
   }
 
   void addConstraint(const BoundVarRef_internal<BoundType>& b, AbstractConstraint* c) {
-    constraints[checked_cast<SysInt>(b.var_num)].push_back(c);
+    constraints[checked_cast<SysInt>(b.varNum)].push_back(c);
 #ifdef WDEG
-    wdegs[checked_cast<SysInt>(b.var_num)] += c->getWdeg(); // add constraint score to base var wdeg
+    wdegs[checked_cast<SysInt>(b.varNum)] += c->getWdeg(); // add constraint score to base var wdeg
 #endif
   }
 
 #ifdef WDEG
   DomainInt getBaseWdeg(const BoundVarRef_internal<BoundType>& b) {
-    return wdegs[checked_cast<SysInt>(b.var_num)];
+    return wdegs[checked_cast<SysInt>(b.varNum)];
   }
 
   void incWdeg(const BoundVarRef_internal<BoundType>& b) {
-    wdegs[checked_cast<SysInt>(b.var_num)]++;
+    wdegs[checked_cast<SysInt>(b.varNum)]++;
   }
 #endif
 
@@ -431,21 +431,21 @@ struct BoundVarContainer {
       USER_ERROR("Some constraint you are using does not work with BOUND variables\n"
                  "Unfortunatly we cannot tell you which one. Sorry!");
     }
-    trigger_list.addDynamicTrigger(b.var_num, t, type, pos, op);
+    trigger_list.addDynamicTrigger(b.varNum, t, type, pos, op);
   }
 
   operator std::string() {
     D_ASSERT(lock_m);
     stringstream s;
-    SysInt char_count = 0;
-    for(UnsignedSysInt i = 0; i < var_count_m; i++) {
+    SysInt charCount = 0;
+    for(UnsignedSysInt i = 0; i < varCount_m; i++) {
       if(!isAssigned(BoundVarRef_internal<BoundType>(i)))
         s << "X";
       else {
         s << (getAssignedValue(BoundVarRef_internal<BoundType>(i)) ? 1 : 0);
       }
-      char_count++;
-      if(char_count % 7 == 0)
+      charCount++;
+      if(charCount % 7 == 0)
         s << endl;
     }
     return s.str();
@@ -458,13 +458,13 @@ inline BoundVarRef
 BoundVarContainer<T>::get_new_var(SysInt i, SysInt j)
 {
 
-  return BoundVarRef(BoundVarRef_internal<BoundType>(var_count_m++));
+  return BoundVarRef(BoundVarRef_internal<BoundType>(varCount_m++));
 }
 */
 
 template <typename T>
 inline BoundVarRef BoundVarContainer<T>::getVarNum(DomainInt i) {
-  D_ASSERT(i < (DomainInt)var_count_m);
+  D_ASSERT(i < (DomainInt)varCount_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after
   // lower_bound(i)...
   return BoundVarRef(

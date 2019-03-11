@@ -71,22 +71,22 @@ Container cross_prod(const Container& con) {
   if(con.empty())
     return outcon;
 
-  std::vector<int> max_counter;
+  std::vector<int> maxCounter;
   for(auto it = con.begin(); it != con.end(); ++it) {
     if(it->size() == 0)
       return outcon;
-    max_counter.push_back(it->size());
+    maxCounter.push_back(it->size());
   }
 
-  std::vector<int> size_counter(max_counter.size(), 0);
+  std::vector<int> sizeCounter(maxCounter.size(), 0);
 
   do {
     typename Container::value_type inner_con;
-    inner_con.reserve(max_counter.size());
-    for(unsigned i = 0; i < max_counter.size(); ++i)
-      inner_con.push_back(con[i][size_counter[i]]);
+    inner_con.reserve(maxCounter.size());
+    for(unsigned i = 0; i < maxCounter.size(); ++i)
+      inner_con.push_back(con[i][sizeCounter[i]]);
     outcon.push_back(inner_con);
-  } while(increment_vector(size_counter, max_counter));
+  } while(increment_vector(sizeCounter, maxCounter));
 
   return outcon;
 }

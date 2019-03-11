@@ -80,20 +80,20 @@ struct NeqConstraint : public AbstractConstraint {
     return forward_check_negation(this);
   }
 
-  virtual void propagateDynInt(SysInt prop_val_in, DomainDelta) {
-    const SysInt prop_val = checked_cast<SysInt>(prop_val_in);
+  virtual void propagateDynInt(SysInt propVal_in, DomainDelta) {
+    const SysInt propVal = checked_cast<SysInt>(propVal_in);
     PROP_INFO_ADDONE(ArrayNeq);
-    DomainInt remove_val = var_array[prop_val].assignedValue();
-    SysInt array_size = var_array.size();
-    for(SysInt i = 0; i < array_size; ++i) {
-      if(i != prop_val) {
+    DomainInt removeVal = var_array[propVal].assignedValue();
+    SysInt arraySize = var_array.size();
+    for(SysInt i = 0; i < arraySize; ++i) {
+      if(i != propVal) {
         if(var_array[i].isBound()) {
-          if(var_array[i].min() == remove_val)
-            var_array[i].setMin(remove_val + 1);
-          if(var_array[i].max() == remove_val)
-            var_array[i].setMax(remove_val - 1);
+          if(var_array[i].min() == removeVal)
+            var_array[i].setMin(removeVal + 1);
+          if(var_array[i].max() == removeVal)
+            var_array[i].setMax(removeVal - 1);
         } else {
-          var_array[i].removeFromDomain(remove_val);
+          var_array[i].removeFromDomain(removeVal);
         }
       }
     }
@@ -101,30 +101,30 @@ struct NeqConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     setup_triggers();
-    SysInt array_size = var_array.size();
-    for(SysInt i = 0; i < array_size; ++i)
+    SysInt arraySize = var_array.size();
+    for(SysInt i = 0; i < arraySize; ++i)
       if(var_array[i].isAssigned()) {
-        DomainInt remove_val = var_array[i].assignedValue();
-        for(SysInt j = 0; j < array_size; ++j) {
+        DomainInt removeVal = var_array[i].assignedValue();
+        for(SysInt j = 0; j < arraySize; ++j) {
           if(i != j) {
             if(var_array[j].isBound()) {
-              if(var_array[j].min() == remove_val)
-                var_array[j].setMin(remove_val + 1);
-              if(var_array[j].max() == remove_val)
-                var_array[j].setMax(remove_val - 1);
+              if(var_array[j].min() == removeVal)
+                var_array[j].setMin(removeVal + 1);
+              if(var_array[j].max() == removeVal)
+                var_array[j].setMax(removeVal - 1);
             } else {
-              var_array[j].removeFromDomain(remove_val);
+              var_array[j].removeFromDomain(removeVal);
             }
           }
         }
       }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size());
-    SysInt array_size = checked_cast<SysInt>(v_size);
-    for(SysInt i = 0; i < array_size; i++)
-      for(SysInt j = i + 1; j < array_size; j++)
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size());
+    SysInt arraySize = checked_cast<SysInt>(vSize);
+    for(SysInt i = 0; i < arraySize; i++)
+      for(SysInt j = i + 1; j < arraySize; j++)
         if(v[i] == v[j])
           return false;
     return true;

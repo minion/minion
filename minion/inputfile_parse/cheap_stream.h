@@ -43,11 +43,11 @@ class CheapStream {
 public:
   bool fail_flag;
 
-  SysInt get_raw_pos() {
+  SysInt getRawPos() {
     return stream_pos - stream_start;
   }
 
-  const std::string& get_raw_string() {
+  const std::string& getRaw_string() {
     return s;
   }
 
@@ -120,7 +120,7 @@ public:
 };
 
 template <typename T>
-void get_num(CheapStream& cs, T& ret) {
+void getNum(CheapStream& cs, T& ret) {
   SysInt neg_flag = 1;
 
   long long i = 1;
@@ -159,7 +159,7 @@ void get_num(CheapStream& cs, T& ret) {
 }
 
 inline CheapStream& operator>>(CheapStream& cs, SysInt& si) {
-  get_num(cs, si);
+  getNum(cs, si);
   return cs;
 }
 

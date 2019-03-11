@@ -234,7 +234,7 @@ public:
   /// Checks if an assignment is satisfied.
   /** This takes the variable order returned by, and is mainly only used by,
    * get_table_constraint() */
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) = 0;
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) = 0;
 
   virtual ~AbstractConstraint() {}
 
@@ -375,49 +375,49 @@ public:
   }
 
   ParentConstraint(const vector<AbstractConstraint*> _children) : child_constraints(_children) {
-    SysInt var_count = 0;
+    SysInt varCount = 0;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       child_constraints[i]->_setParent(this, i);
-      start_of_constraint.push_back(var_count);
-      SysInt con_size = child_constraints[i]->getVarsSingleton()->size();
-      for(SysInt j = 0; j < con_size; ++j) {
+      start_of_constraint.push_back(varCount);
+      SysInt conSize = child_constraints[i]->getVarsSingleton()->size();
+      for(SysInt j = 0; j < conSize; ++j) {
         variable_to_constraint.push_back(i);
       }
-      var_count += con_size;
+      varCount += conSize;
     }
   }
 
   virtual SysInt dynamicTriggerCountWithChildren() {
-    SysInt trigger_count = dynamicTriggerCount();
+    SysInt triggerCount = dynamicTriggerCount();
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
-      trigger_count += child_constraints[i]->dynamicTriggerCountWithChildren();
-    return trigger_count;
+      triggerCount += child_constraints[i]->dynamicTriggerCountWithChildren();
+    return triggerCount;
   }
 
   virtual void setupDynamicTriggerDatastructures() {
-    SysInt current_trigger_count = dynamicTriggerCount();
+    SysInt current_triggerCount = dynamicTriggerCount();
 
-    for(SysInt count = 0; count < current_trigger_count; ++count)
+    for(SysInt count = 0; count < current_triggerCount; ++count)
       _dynamic_trigger_to_constraint.push_back(child_constraints.size());
 
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      _dynamic_trigger_child_offset.push_back(current_trigger_count);
+      _dynamic_trigger_child_offset.push_back(current_triggerCount);
       // We need this check to ensure we don't try constructing a "start of
       // trigger" block one off the
       // the end of memory array.
-      if(current_trigger_count == dynamicTriggerCountWithChildren())
+      if(current_triggerCount == dynamicTriggerCountWithChildren())
         return;
 
       // Get start child's dynamic triggers.
       child_constraints[i]->setupDynamicTriggerDatastructures();
 
-      SysInt child_trig_count = child_constraints[i]->dynamicTriggerCountWithChildren();
+      SysInt child_trigCount = child_constraints[i]->dynamicTriggerCountWithChildren();
 
-      for(SysInt count = current_trigger_count; count < current_trigger_count + child_trig_count;
+      for(SysInt count = current_triggerCount; count < current_triggerCount + child_trigCount;
           ++count)
         _dynamic_trigger_to_constraint.push_back(i);
 
-      current_trigger_count += child_trig_count;
+      current_triggerCount += child_trigCount;
     }
   }
 

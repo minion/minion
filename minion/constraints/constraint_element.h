@@ -132,19 +132,19 @@ struct ElementConstraint : public AbstractConstraint {
   }
 
   void setup_triggers() {
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
     DomainInt loop_start = std::max(DomainInt(0), indexvar.initialMin());
-    DomainInt loop_max = std::min(DomainInt(array_size), indexvar.initialMax() + 1);
+    DomainInt loop_max = std::min(DomainInt(arraySize), indexvar.initialMax() + 1);
     for(DomainInt i = loop_start; i < loop_max; ++i)
       moveTriggerInt(var_array[checked_cast<SysInt>(i)], i, Assigned);
 
-    moveTriggerInt(indexvar, array_size, Assigned);
-    moveTriggerInt(resultvar, array_size + 1, Assigned);
+    moveTriggerInt(indexvar, arraySize, Assigned);
+    moveTriggerInt(resultvar, arraySize + 1, Assigned);
   }
 
-  virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
+  virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(NonGACElement);
-    SysInt var_size = var_array.size();
+    SysInt varSize = var_array.size();
     if(indexvar.isAssigned()) {
       SysInt index = checked_cast<SysInt>(indexvar.assignedValue());
       if(index < 0 || index >= (SysInt)var_array.size()) {
@@ -166,29 +166,29 @@ struct ElementConstraint : public AbstractConstraint {
       resultvar.setMax(val_max);
       var_array[index].setMax(val_max);
     } else {
-      if(prop_val < var_size) {
-        DomainInt assigned_val = var_array[checked_cast<SysInt>(prop_val)].assignedValue();
-        if(indexvar.inDomain(prop_val) &&
-           !resultvar.inDomain(assigned_val)) // perhaps the check if prop_val
+      if(propVal < varSize) {
+        DomainInt assignedVal = var_array[checked_cast<SysInt>(propVal)].assignedValue();
+        if(indexvar.inDomain(propVal) &&
+           !resultvar.inDomain(assignedVal)) // perhaps the check if propVal
                                               // is indomain of indexvar is not
                                               // necessary.
         {
           if(indexvar.isBound()) {
-            if(prop_val == indexvar.max())
-              indexvar.setMax(prop_val - 1);
-            if(prop_val == indexvar.min())
-              indexvar.setMin(prop_val + 1);
+            if(propVal == indexvar.max())
+              indexvar.setMax(propVal - 1);
+            if(propVal == indexvar.min())
+              indexvar.setMin(propVal + 1);
           } else {
-            indexvar.removeFromDomain(prop_val);
+            indexvar.removeFromDomain(propVal);
           }
         }
 
       } else {
-        D_ASSERT(prop_val == var_size + 1);
-        DomainInt assigned_val = resultvar.assignedValue();
-        SysInt array_size = var_array.size();
-        for(SysInt i = 0; i < array_size; ++i) {
-          if(indexvar.inDomain(i) && !var_array[i].inDomain(assigned_val)) // fixed here.
+        D_ASSERT(propVal == varSize + 1);
+        DomainInt assignedVal = resultvar.assignedValue();
+        SysInt arraySize = var_array.size();
+        for(SysInt i = 0; i < arraySize; ++i) {
+          if(indexvar.inDomain(i) && !var_array[i].inDomain(assignedVal)) // fixed here.
           {
             if(indexvar.isBound()) {
               if(i == indexvar.max())
@@ -230,14 +230,14 @@ struct ElementConstraint : public AbstractConstraint {
       var_array[index].setMax(val_max);
     }
 
-    SysInt array_size = var_array.size();
+    SysInt arraySize = var_array.size();
     // Constrain the index variable to have only indices in range, if
     // undef_maps_zero is false.
     if(indexvar.min() < 0 && !undef_maps_zero) {
       indexvar.setMin(0);
     }
-    if(indexvar.max() >= array_size && !undef_maps_zero) {
-      indexvar.setMax(array_size - 1);
+    if(indexvar.max() >= arraySize && !undef_maps_zero) {
+      indexvar.setMax(arraySize - 1);
     }
     if(getState().isFailed())
       return;
@@ -248,14 +248,14 @@ struct ElementConstraint : public AbstractConstraint {
     if(!resultvar.isBound()) {
       for(DomainInt i = resultvar.min(); i <= resultvar.max(); i++) {
         if(i == 0 && undef_maps_zero &&
-           (indexvar.min() < 0 || indexvar.max() >= array_size)) {
+           (indexvar.min() < 0 || indexvar.max() >= arraySize)) {
           // 0 is supported.
           continue;
         }
         if(resultvar.inDomain(i)) {
           BOOL supported = false;
           for(DomainInt j = max(indexvar.min(), (DomainInt)0);
-              j <= min(indexvar.max(), (DomainInt)array_size - 1); j++) {
+              j <= min(indexvar.max(), (DomainInt)arraySize - 1); j++) {
             if(var_array[checked_cast<SysInt>(j)].inDomain(i)) {
               supported = true;
               break;
@@ -272,14 +272,14 @@ struct ElementConstraint : public AbstractConstraint {
         DomainInt i = resultvar.min();
         BOOL supported = false;
         for(DomainInt j = max(indexvar.min(), (DomainInt)0);
-            j <= min(indexvar.max(), (DomainInt)array_size - 1); j++) {
+            j <= min(indexvar.max(), (DomainInt)arraySize - 1); j++) {
           if(var_array[checked_cast<SysInt>(j)].inDomain(i)) {
             supported = true;
             break;
           }
         }
         if(i == 0 && undef_maps_zero &&
-           (indexvar.min() < 0 || indexvar.max() >= array_size)) {
+           (indexvar.min() < 0 || indexvar.max() >= arraySize)) {
           // 0 is supported.
           supported = true;
         }
@@ -293,14 +293,14 @@ struct ElementConstraint : public AbstractConstraint {
         DomainInt i = resultvar.max();
         BOOL supported = false;
         for(DomainInt j = max(indexvar.min(), (DomainInt)0);
-            j <= min(indexvar.max(), (DomainInt)array_size - 1); j++) {
+            j <= min(indexvar.max(), (DomainInt)arraySize - 1); j++) {
           if(var_array[checked_cast<SysInt>(j)].inDomain(i)) {
             supported = true;
             break;
           }
         }
         if(i == 0 && undef_maps_zero &&
-           (indexvar.min() < 0 || indexvar.max() >= array_size)) {
+           (indexvar.min() < 0 || indexvar.max() >= arraySize)) {
           // 0 is supported.
           supported = true;
         }
@@ -316,10 +316,10 @@ struct ElementConstraint : public AbstractConstraint {
 
     // Check values of index variable for support.
     for(DomainInt i = max(indexvar.min(), (DomainInt)0);
-        i <= min(indexvar.max(), (DomainInt)array_size - 1); i++) {
+        i <= min(indexvar.max(), (DomainInt)arraySize - 1); i++) {
       if(indexvar.inDomain(i) && var_array[checked_cast<SysInt>(i)].isAssigned()) {
-        DomainInt assigned_val = var_array[checked_cast<SysInt>(i)].assignedValue();
-        if(!resultvar.inDomain(assigned_val)) {
+        DomainInt assignedVal = var_array[checked_cast<SysInt>(i)].assignedValue();
+        if(!resultvar.inDomain(assignedVal)) {
           if(indexvar.isBound()) {
             if(i == indexvar.max())
               indexvar.setMax(i - 1);
@@ -334,9 +334,9 @@ struct ElementConstraint : public AbstractConstraint {
     }
 
     if(resultvar.isAssigned()) {
-      DomainInt assigned_val = resultvar.assignedValue();
-      for(SysInt i = 0; i < array_size; ++i) {
-        if(indexvar.inDomain(i) && !var_array[i].inDomain(assigned_val)) {
+      DomainInt assignedVal = resultvar.assignedValue();
+      for(SysInt i = 0; i < arraySize; ++i) {
+        if(indexvar.inDomain(i) && !var_array[i].inDomain(assignedVal)) {
           if(indexvar.isBound()) {
             if(i == indexvar.max())
               indexvar.setMax(i - 1);
@@ -350,11 +350,11 @@ struct ElementConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == (SysInt)var_array.size() + 2);
-    DomainInt resultvariable = v[v_size - 1];
-    DomainInt indexvariable = v[v_size - 2];
-    if(indexvariable < 0 || indexvariable >= (SysInt)v_size - 2) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == (SysInt)var_array.size() + 2);
+    DomainInt resultvariable = v[vSize - 1];
+    DomainInt indexvariable = v[vSize - 2];
+    if(indexvariable < 0 || indexvariable >= (SysInt)vSize - 2) {
       if(undef_maps_zero)
         return resultvariable == 0;
       else
@@ -478,9 +478,9 @@ inline AbstractConstraint* BuildCT_ELEMENT(Var1 vararray, const Var2& v1, const 
 template <typename Var1, typename Var2, typename Var3>
 AbstractConstraint* BuildCT_ELEMENT_ONE(const Var1& vararray, const Var2& v1, const Var3& v2,
                                         ConstraintBlob& b) {
-  typedef typename ShiftType<typename Var2::value_type, compiletime_val<SysInt, -1>>::type ShiftVal;
+  typedef typename ShiftType<typename Var2::value_type, compiletimeVal<SysInt, -1>>::type ShiftVal;
   vector<ShiftVal> replace_v1;
-  replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<SysInt, -1>()));
+  replace_v1.push_back(ShiftVarRef(v1[0], compiletimeVal<SysInt, -1>()));
   return BuildCT_ELEMENT(vararray, replace_v1, v2, b);
 }
 

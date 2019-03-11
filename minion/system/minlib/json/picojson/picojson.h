@@ -562,7 +562,7 @@ inline bool _parse_object(Context& ctx, input<Iter>& in) {
 }
 
 template <typename Iter>
-inline bool _parse_number(double& out, input<Iter>& in) {
+inline bool _parseNumber(double& out, input<Iter>& in) {
   std::string num_str;
   while(1) {
     int ch = in.getc();
@@ -601,8 +601,8 @@ inline bool _parse(Context& ctx, input<Iter>& in) {
     if(('0' <= ch && ch <= '9') || ch == '-') {
       in.ungetc();
       double f;
-      if(_parse_number(f, in)) {
-        ctx.set_number(f);
+      if(_parseNumber(f, in)) {
+        ctx.setNumber(f);
         return true;
       } else {
         return false;
@@ -622,7 +622,7 @@ public:
   bool set_bool(bool) {
     return false;
   }
-  bool set_number(double) {
+  bool setNumber(double) {
     return false;
   }
   template <typename Iter>
@@ -659,7 +659,7 @@ public:
     *out_ = value(b);
     return true;
   }
-  bool set_number(double f) {
+  bool setNumber(double f) {
     *out_ = value(f);
     return true;
   }
@@ -709,7 +709,7 @@ public:
   bool set_bool(bool) {
     return true;
   }
-  bool set_number(double) {
+  bool setNumber(double) {
     return true;
   }
   template <typename Iter>
@@ -787,7 +787,7 @@ inline void set_last_error(const std::string& s) {
   last_error_t<bool>::s = s;
 }
 
-inline const std::string& get_last_error() {
+inline const std::string& getLast_error() {
   return last_error_t<bool>::s;
 }
 

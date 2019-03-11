@@ -228,7 +228,7 @@ inline picojson::value readJSON(std::string s) {
   iss >> v;
 
   if(iss.fail()) {
-    std::cerr << picojson::get_last_error() << std::endl;
+    std::cerr << picojson::getLast_error() << std::endl;
     abort();
   }
 

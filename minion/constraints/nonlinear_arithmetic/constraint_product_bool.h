@@ -82,10 +82,10 @@ struct BoolProdConstraint : public AbstractConstraint {
       }
     }
 
-    find_any_equal_value();
+    find_any_equalValue();
   }
 
-  void find_any_equal_value() {
+  void find_any_equalValue() {
     if(!var1.inDomain(1)) {
       return;
     }
@@ -164,12 +164,12 @@ struct BoolProdConstraint : public AbstractConstraint {
       }
     } else {
       D_ASSERT(pos == dvarequalval || pos == dvarequalval + 1);
-      find_any_equal_value();
+      find_any_equalValue();
     }
   }
 
-  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
-    D_ASSERT(v_size == 3);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
+    D_ASSERT(vSize == 3);
     return (v[0] * v[1] == v[2]);
   }
 

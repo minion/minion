@@ -81,8 +81,8 @@ T const_negminusone(T t) {
 }
 
 template <typename T, T i>
-inline compiletime_val<T, -1 - i> const_negminusone(compiletime_val<T, i>) {
-  return compiletime_val<T, -1 - i>();
+inline compiletimeVal<T, -1 - i> const_negminusone(compiletimeVal<T, i>) {
+  return compiletimeVal<T, -1 - i>();
 }
 
 template <typename T>
@@ -91,8 +91,8 @@ T const_neg(T t) {
 }
 
 template <typename T, T i>
-inline compiletime_val<T, (T)0 - i> const_neg(compiletime_val<T, i>) {
-  return compiletime_val<T, (T)0 - i>();
+inline compiletimeVal<T, (T)0 - i> const_neg(compiletimeVal<T, i>) {
+  return compiletimeVal<T, (T)0 - i>();
 }
 
 template <typename T>

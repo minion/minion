@@ -96,12 +96,12 @@ public:
     //                    this->get_allocator());
   }
 
-  box(T* start_p, size_t _size, IsFull isFull = StartEmpty)
-      : M_start(start_p), M_end_of_storage(start_p + _size) {
+  box(T* start_p, size_t Size, IsFull isFull = StartEmpty)
+      : M_start(start_p), M_end_of_storage(start_p + Size) {
     if(isFull == StartEmpty)
       M_finish = start_p;
     else
-      M_finish = start_p + _size;
+      M_finish = start_p + Size;
     //    std::uninitialized_fill_n_a(M_start, n, value,
     //                      this->get_allocator());
   }
@@ -162,22 +162,22 @@ public:
     return size_type(end() - begin());
   }
 
-  size_type max_size() const {
+  size_type maxSize() const {
     return M_end_of_storage - M_start;
   }
 
-  void resize(size_type new_size, const value_type& x) {
-    if(new_size < size())
-      erase(begin() + new_size, end());
+  void resize(size_type newSize, const value_type& x) {
+    if(newSize < size())
+      erase(begin() + newSize, end());
     else {
-      D_ASSERT(new_size <= capacity());
-      std::uninitialized_fill_n(M_finish, new_size - size(), x);
-      M_finish += new_size - size();
+      D_ASSERT(newSize <= capacity());
+      std::uninitialized_fill_n(M_finish, newSize - size(), x);
+      M_finish += newSize - size();
     }
   }
 
-  void resize(size_type new_size) {
-    resize(new_size, value_type());
+  void resize(size_type newSize) {
+    resize(newSize, value_type());
   }
 
   size_type capacity() const {
