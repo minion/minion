@@ -56,19 +56,19 @@ struct RestartSearchManager : public Controller::SearchManager {
       : prop_method(_prop_method), initial_order(_order) {}
 
   virtual void search() {
-    std::uniform_int_distribution<int> order(1,7);
+    std::uniform_int_distribution<int> order(1, 7);
     for(int i = 1; i < 10000000; i *= 10) {
-        vector<SearchOrder> new_order = initial_order;
-        for(int j = 0; j < new_order.size(); ++j) {
-            new_order[j].order = (VarOrderEnum)(order(global_random_gen));
-        }
+      vector<SearchOrder> new_order = initial_order;
+      for(int j = 0; j < new_order.size(); ++j) {
+        new_order[j].order = (VarOrderEnum)(order(global_random_gen));
+      }
       doASearch(new_order, i);
     }
   }
 };
 
 shared_ptr<Controller::SearchManager> make_restart_search_manager(PropagationLevel prop_method,
-                                                      vector<SearchOrder> order) {
+                                                                  vector<SearchOrder> order) {
   return shared_ptr<Controller::SearchManager>(new RestartSearchManager(prop_method, order));
 }
 } // namespace Controller

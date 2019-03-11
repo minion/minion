@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints Description
   Minion supports many constraints and these are regularly being
@@ -41,8 +41,11 @@
 #define ABSTRACT_CONSTRAINT_H
 
 #include "../system/system.h"
+
 #include "../solver.h"
+
 #include "../variables/AnyVarRef.h"
+
 #include <vector>
 
 using namespace std;
@@ -141,16 +144,16 @@ public:
   }
 
   /// Iterative propagation function.
-/** Can assume full_propagate is always called at least once before propagate
+  /** Can assume full_propagate is always called at least once before propagate
    */
   virtual void propagateDynInt(SysInt, DomainDelta) {
     D_FATAL_ERROR("Fatal error in 'Dynamic Propagate' in " + extended_name());
   }
 
   /// Looks for a valid partial assignment to a constraint.
-/** The return value (in the box) is pairs of <varnum, domain value>, where
-  * varnum is in the same position
-  *  as returned by get_vars.
+  /** The return value (in the box) is pairs of <varnum, domain value>, where
+   * varnum is in the same position
+   *  as returned by get_vars.
    */
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     ostringstream oss;
@@ -161,7 +164,7 @@ public:
   }
 
   /// Returns the reverse of the current constraint
-/** Used by rarification */
+  /** Used by rarification */
   virtual AbstractConstraint* reverse_constraint() {
     ostringstream oss;
     oss << "Negation is not supported by the " << extended_name() << " constraint. Sorry" << endl;
@@ -189,7 +192,7 @@ public:
 
   /// Performs a full round of propagation and sets up any data needs by
   /// propagateDynInt().
-/** This function can be called during search if the function is reified */
+  /** This function can be called during search if the function is reified */
   virtual void full_propagate() = 0;
 
   // Returns the variables of the constraint
@@ -229,7 +232,7 @@ public:
   }
 
   /// Checks if an assignment is satisfied.
-/** This takes the variable order returned by, and is mainly only used by,
+  /** This takes the variable order returned by, and is mainly only used by,
    * get_table_constraint() */
   virtual BOOL check_assignment(DomainInt* v, SysInt v_size) = 0;
 
@@ -340,7 +343,6 @@ protected:
   vector<DomainInt> start_of_constraint;
 
 public:
-
   SysInt getChildDynamicTrigger(DomainInt p) {
     return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
   }
@@ -450,6 +452,6 @@ namespace ConOutput {
 inline string print_vars(AbstractConstraint* const& c) {
   return c->full_output_name();
 }
-}
+} // namespace ConOutput
 
 #endif

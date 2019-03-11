@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #include "BuildConstraintConstructs.h"
 
@@ -30,15 +30,16 @@ using namespace BuildCon;
   namespace BuildCon {                                                                             \
   template <>                                                                                      \
   struct BuildConObj<CT_NAME, 0> {                                                                 \
-    template <typename T1, typename T2, typename T3, typename T4>                                               \
+    template <typename T1, typename T2, typename T3, typename T4>                                  \
     static AbstractConstraint*                                                                     \
-    build(const pair<pair<pair<pair<EmptyType, vector<T1>*>, vector<T2>*>, vector<T3>*>, vector<T4>*>& vars,          \
+    build(const pair<pair<pair<pair<EmptyType, vector<T1>*>, vector<T2>*>, vector<T3>*>,           \
+                     vector<T4>*>& vars,                                                           \
           ConstraintBlob& b, SysInt) {                                                             \
-      return Build##CT_NAME(*(vars.first.first.first.second), *(vars.first.first.second), *(vars.first.second), *(vars.second), b);  \
+      return Build##CT_NAME(*(vars.first.first.first.second), *(vars.first.first.second),          \
+                            *(vars.first.second), *(vars.second), b);                              \
     }                                                                                              \
   };                                                                                               \
   }
-
 
 #define TERMINATE_BUILDCON3(CT_NAME)                                                               \
   namespace BuildCon {                                                                             \
@@ -87,10 +88,8 @@ using namespace BuildCon;
   };                                                                                               \
   }
 
-#define BUILD_CT(CT_NAME, COUNT)                                                                                        \
-  MERGE(TERMINATE_BUILDCON, COUNT)(CT_NAME) \
-AbstractConstraint* \
-build_constraint_ ## CT_NAME(ConstraintBlob& b) \
-{ \
-    return BuildConObj<CT_NAME, COUNT>::build(EmptyType(), b, 0);                                                       \
+#define BUILD_CT(CT_NAME, COUNT)                                                                   \
+  MERGE(TERMINATE_BUILDCON, COUNT)                                                                 \
+  (CT_NAME) AbstractConstraint* build_constraint_##CT_NAME(ConstraintBlob& b) {                    \
+    return BuildConObj<CT_NAME, COUNT>::build(EmptyType(), b, 0);                                  \
   }

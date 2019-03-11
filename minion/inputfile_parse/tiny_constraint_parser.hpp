@@ -1,6 +1,6 @@
 #include "../minion.h"
-#include "cheap_stream.h"
 #include "../tuple_container.h"
+#include "cheap_stream.h"
 
 inline TupleList* grab_tuplelist(CheapStream& cs) {
   std::string name;

@@ -53,7 +53,6 @@ class Var {
   SysInt pos_m;
 
 public:
-
   bool isValid() const {
     return type_m != VAR_INVALID;
   }
@@ -111,19 +110,18 @@ public:
   }
 };
 
-}
+} // namespace ProbSpec
 
 namespace std {
-  template <> struct hash<ProbSpec::Var>
-  {
-    size_t operator()(const ProbSpec::Var & x) const
-    {
-      if(!x.isValid())
-        return 0;
-      return hashCombine(x.pos(), (SysInt)x.type());
-    }
-  };
-}
+template <>
+struct hash<ProbSpec::Var> {
+  size_t operator()(const ProbSpec::Var& x) const {
+    if(!x.isValid())
+      return 0;
+    return hashCombine(x.pos(), (SysInt)x.type());
+  }
+};
+} // namespace std
 
 using namespace ProbSpec;
 

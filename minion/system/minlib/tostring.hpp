@@ -1,12 +1,12 @@
 #ifndef TOSTRING_DSCDSCDS
 #define TOSTRING_DSCDSCDS
 
-#include <string>
-#include <sstream>
-#include <ostream>
 #include "basic_sys.hpp"
-#include "tiny-templatelib.hpp"
 #include "printing_containers.hpp"
+#include "tiny-templatelib.hpp"
+#include <ostream>
+#include <sstream>
+#include <string>
 
 template <typename T>
 T fromstring(const std::string& str) {

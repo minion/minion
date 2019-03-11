@@ -1,28 +1,28 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef COMMON_SEARCH_H
 #define COMMON_SEARCH_H
 
-#include "../system/system.h"
 #include "../solver.h"
+#include "../system/system.h"
 #include "../variables/AnyVarRef.h"
 #include "../variables/mappings/variable_neg.h"
 
@@ -145,8 +145,8 @@ inline void check_sol_is_correct() {
   }
 }
 
-#include <fstream>
 #include "../MILtools/print_CSP.h"
+#include <fstream>
 
 // repeat declaration
 struct triple {
@@ -156,16 +156,14 @@ struct triple {
   bool stolen;
 
   triple(bool _isLeft, SysInt _var, DomainInt _val)
-  : isLeft(_isLeft), var(_var), val(_val), stolen(false) {}
+      : isLeft(_isLeft), var(_var), val(_val), stolen(false) {}
   friend std::ostream& operator<<(std::ostream& o, const triple& t) {
-    o << "(" << t.isLeft << "," << t.var << "," << t.val <<  ":" << t.stolen << ")";
+    o << "(" << t.isLeft << "," << t.var << "," << t.val << ":" << t.stolen << ")";
     return o;
   }
 
   friend bool operator==(triple lhs, triple rhs) {
-    return lhs.isLeft == rhs.isLeft &&
-           lhs.var == rhs.var &&
-           lhs.val == rhs.val &&
+    return lhs.isLeft == rhs.isLeft && lhs.var == rhs.var && lhs.val == rhs.val &&
            lhs.stolen == rhs.stolen;
   }
 };
@@ -296,7 +294,7 @@ inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& var_array,
   }
 
   if(Parallel::isAlarmActivated()) { // Either a timeout has occurred, or
-                                      // ctrl+c has been pressed.
+                                     // ctrl+c has been pressed.
     generateRestartFile(var_array, branches);
     if(Parallel::isCtrlCPressed()) {
       throw EndOfSearch();
@@ -336,9 +334,11 @@ void inline standard_deal_with_solution() {
 
 void inline maybe_print_node(bool isSolution = false) {
   if(getOptions().dumptree)
-    cout << "Node: " << getState().getNodeCount() << "," << get_dom_as_string(getVars().getAllVars()) << endl;
+    cout << "Node: " << getState().getNodeCount() << ","
+         << get_dom_as_string(getVars().getAllVars()) << endl;
   if(getOptions().dumptreeobj) {
-    getOptions().dumptreeobj->output_node(getState().getNodeCount(), getVars().getAllVars(), isSolution);
+    getOptions().dumptreeobj->output_node(getState().getNodeCount(), getVars().getAllVars(),
+                                          isSolution);
   }
 }
 
@@ -369,6 +369,6 @@ void inline initalise_search() {
   if(getState().isOptimisationProblem())
     getState().setOptimiseValue(DomainInt_Min);
 }
-}
+} // namespace Controller
 
 #endif

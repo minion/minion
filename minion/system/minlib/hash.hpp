@@ -22,6 +22,6 @@ public:
     return hashCombine(p.first, p.second);
   }
 };
-}
+} // namespace std
 
 #endif

@@ -23,9 +23,11 @@ struct NhConfig {
   int hillClimberMinIterationsToSpendAtPeak = 4;
   double hillClimberInitialLocalMaxProbability = 0.001;
   double hillClimberProbabilityIncrementMultiplier = 1.0 / 16;
-  double simulatedAnnealingTemperatureCoolingFactor = 0.995; 
+  double simulatedAnnealingTemperatureCoolingFactor = 0.995;
   int simulatedAnnealingIterationsBetweenCool = 5;
-  double simulatedAnnealingRatioForStopping = 100; //SA will stop after simulatedAnnealingIterationsBetweenCool * simulatedAnnealingRatioForStopping consecutive non-improving iteration
+  double simulatedAnnealingRatioForStopping =
+      100; // SA will stop after simulatedAnnealingIterationsBetweenCool *
+           // simulatedAnnealingRatioForStopping consecutive non-improving iteration
   double simulatedAnnealingTargetProbabilityForInitialTemperature = 0.8;
   double ucbExplorationBias = 2;
   double learningAutomatonRate = 0.1;
@@ -55,12 +57,12 @@ inline std::ostream& operator<<(std::ostream& os, NhConfig& nhConfig) {
      << nhConfig.simulatedAnnealingTemperatureCoolingFactor << ",\n";
   os << "simulatedAnnealingIterationsBetweenCool = "
      << nhConfig.simulatedAnnealingIterationsBetweenCool << ",\n";
-  os << "simulatedAnnealingRatioForStopping = "
-     << nhConfig.simulatedAnnealingRatioForStopping << ",\n";
+  os << "simulatedAnnealingRatioForStopping = " << nhConfig.simulatedAnnealingRatioForStopping
+     << ",\n";
   os << "simulatedAnnealingTargetProbabilityForInitialTemperature = "
      << nhConfig.simulatedAnnealingTargetProbabilityForInitialTemperature << ",\n";
   os << "ucbExplorationBias = " << nhConfig.ucbExplorationBias << ",\n";
- os << "learningAutomatonRate = " << nhConfig.learningAutomatonRate << ",\n";
+  os << "learningAutomatonRate = " << nhConfig.learningAutomatonRate << ",\n";
   os << "}\n";
   return os;
 }

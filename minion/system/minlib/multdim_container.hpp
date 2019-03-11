@@ -8,8 +8,8 @@
 #include "basic_sys.hpp"
 #include "containers.hpp"
 #include "interval.hpp"
-#include "tostring.hpp"
 #include "macros.hpp"
+#include "tostring.hpp"
 
 /// Thrown when a \ref MultiDimCon is dereferenced in an invalid way.
 class InvalidDerefException : public std::exception {
@@ -116,7 +116,7 @@ struct MultiDimCon {
     indices.insert(make_pair(index, result));
   }
 
-/** @brief Get value at index.
+  /** @brief Get value at index.
    *  @param indices The index to retrieve
    *  Throws an exception if the index does not exist.
    */
@@ -134,7 +134,7 @@ struct MultiDimCon {
     return indices.count(index);
   }
 
-/** @brief Destructively removes indices from the map.
+  /** @brief Destructively removes indices from the map.
    *  @param indices A boolean array, which is false on those arrays to remove.
    *  Asserts if this results in two values mapping to the same reduction.
    */
@@ -170,7 +170,7 @@ struct MultiDimCon {
     indices = new_map;
   }
 
-/** @brief Project out not required values
+  /** @brief Project out not required values
    *  @param ind	   A range for each index, which tells us which values
    * to
    * keep.

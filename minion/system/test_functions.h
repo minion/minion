@@ -1,33 +1,32 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef TEST_FUNCTIONS_H
 #define TEST_FUNCTIONS_H
 
-#include <string>
 #include <sstream>
+#include <string>
 
 #include <vector>
 
-
-template<typename T>
+template <typename T>
 std::string getBaseVarName(const T& t);
 
 template <typename Var>
@@ -36,30 +35,28 @@ void add_var_dom_to_json(const Var& v, std::ostream& s) {
   if(v.isAssigned() || v.isBound()) {
     s << "[ [" << v.getMin() << "," << v.getMax() << "] ]";
   } else {
-      s << "[ ";
-      DomainInt lower_range = v.getMin();
-      bool in_range = true;
-      for(DomainInt i = v.getMin() + 1; i < v.getMax(); ++i) {
-        if(in_range) {
-          if(!v.inDomain(i)) {
-            s << "[" << lower_range << "," << i-1 << "],";
-            in_range = false;
-          }
-        }
-        else {
-          if(v.inDomain(i)) {
-            lower_range = i;
-            in_range = true;
-          }
-        }
-      }
-      
+    s << "[ ";
+    DomainInt lower_range = v.getMin();
+    bool in_range = true;
+    for(DomainInt i = v.getMin() + 1; i < v.getMax(); ++i) {
       if(in_range) {
-        s << "[" << lower_range << "," << v.getMax() << "] ]";
+        if(!v.inDomain(i)) {
+          s << "[" << lower_range << "," << i - 1 << "],";
+          in_range = false;
+        }
+      } else {
+        if(v.inDomain(i)) {
+          lower_range = i;
+          in_range = true;
+        }
       }
-      else {
-        s << "[" << v.getMax() << "," << v.getMax() << "] ]";
-      }
+    }
+
+    if(in_range) {
+      s << "[" << lower_range << "," << v.getMax() << "] ]";
+    } else {
+      s << "[" << v.getMax() << "," << v.getMax() << "] ]";
+    }
   }
 }
 

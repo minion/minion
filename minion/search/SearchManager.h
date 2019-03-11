@@ -1,29 +1,29 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef SEARCHMANAGER_H
 #define SEARCHMANAGER_H
 
-#include "variable_orderings.h"
-#include "common_search.h"
 #include "../preprocess.h"
+#include "common_search.h"
+#include "variable_orderings.h"
 
 namespace Controller {
 
@@ -41,13 +41,12 @@ void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
 // pos in it as a reversible<SysInt>.
 
 struct SearchManager {
- inline virtual ~SearchManager() {}
+  inline virtual ~SearchManager() {}
 
- virtual void search() = 0;
-
+  virtual void search() = 0;
 };
 
-struct StandardSearchManager : public SearchManager{
+struct StandardSearchManager : public SearchManager {
 
   inline virtual ~StandardSearchManager() {}
 
@@ -57,28 +56,27 @@ struct StandardSearchManager : public SearchManager{
   vector<AnyVarRef> var_array;
   shared_ptr<VariableOrder> var_order;
 
-
   shared_ptr<Propagate> prop; // Propagate is the type of the base class. Method
                               // prop->prop(var_array)
 
   vector<Controller::triple> branches; // L & R branches so far (isLeftBranch?,var,value)
 
-  StandardSearchManager(shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
-                std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> _check_func,
-                std::function<void(void)> _handle_sol_func, std::function<void(void)> _handle_opt_func)
-      :
-      check_func(_check_func), handle_sol_func(_handle_sol_func),
-      handle_opt_func(_handle_opt_func),
-      var_order(_var_order), prop(_prop) {
+  StandardSearchManager(
+      shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
+      std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> _check_func,
+      std::function<void(void)> _handle_sol_func, std::function<void(void)> _handle_opt_func)
+      : check_func(_check_func),
+        handle_sol_func(_handle_sol_func),
+        handle_opt_func(_handle_opt_func),
+        var_order(_var_order),
+        prop(_prop) {
     var_array = var_order->getVars();
     branches.reserve(var_array.size());
   }
 
   void reset() {
     branches.clear();
-   
   }
-
 
   // returns false if left branch not possible.
   inline void branch_left(pair<SysInt, DomainInt> picked) {
@@ -136,7 +134,8 @@ struct StandardSearchManager : public SearchManager{
   }
 
   inline bool in_aux_vars() {
-    return var_order->hasAuxVars() && !branches.empty() && branches.back().var >= var_order->auxVarStart();
+    return var_order->hasAuxVars() && !branches.empty() &&
+           branches.back().var >= var_order->auxVarStart();
   }
 
   inline void jump_out_aux_vars() {
@@ -195,12 +194,12 @@ struct StandardSearchManager : public SearchManager{
           bool doFork = Parallel::shouldDoFork();
 
           int steal = steal_work();
-            
+
           int isParent = 0;
 
-          //std::cerr << "Fork?" << getState().isFailed() << "\n";;
+          // std::cerr << "Fork?" << getState().isFailed() << "\n";;
           if(doFork) {
-            //std::cerr << "Yes, do a fork!\n";
+            // std::cerr << "Yes, do a fork!\n";
 
             isParent = Parallel::doFork();
 
@@ -208,18 +207,17 @@ struct StandardSearchManager : public SearchManager{
               if(steal != -1) {
                 branches[steal].stolen = true;
               }
-            }
-            else {
+            } else {
               // Todo, avoid this process creation?
               if(steal == -1) {
                 Parallel::endParallelMinion();
                 exit(0);
               }
-              //lockSolsout();
-              //std::cerr << "stealing " << steal << "\n";
-              //std::cerr << branches << "\n";
+              // lockSolsout();
+              // std::cerr << "stealing " << steal << "\n";
+              // std::cerr << branches << "\n";
               while(branches.size() > steal + 1) {
-                //std::cerr << "right branch: " << branches << "\n";
+                // std::cerr << "right branch: " << branches << "\n";
                 int ret = branch_right();
                 if(!ret) {
                   D_FATAL_ERROR("Error in parallel forking");
@@ -227,23 +225,21 @@ struct StandardSearchManager : public SearchManager{
               }
               D_ASSERT(branches.size() == steal + 1);
               prop->prop(var_array);
-              //std::cerr << branches << "\n";
-              //unlockSolsout();
+              // std::cerr << branches << "\n";
+              // unlockSolsout();
             }
           }
-        }
-        else {
+        } else {
           bool doFork = Parallel::shouldDoFork();
           if(doFork) {
-            //std::cerr << "Yes, do a fork!\n";
+            // std::cerr << "Yes, do a fork!\n";
 
             int isParent = Parallel::doFork();
             D_CHECK(isParent >= 0);
             if(isParent) {
               // Force to ignore left branch
               getState().setFailed(true);
-            }
-            else {
+            } else {
               // Force to stay in left branch
               reset();
             }
@@ -270,6 +266,6 @@ struct StandardSearchManager : public SearchManager{
     }
   }
 };
-}
+} // namespace Controller
 
 #endif

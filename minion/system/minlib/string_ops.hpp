@@ -5,10 +5,10 @@
 #ifndef STRING_OPS_CDS
 #define STRING_OPS_CDS
 
-#include <string>
-#include <fstream>
-#include <exception>
 #include "tostring.hpp"
+#include <exception>
+#include <fstream>
+#include <string>
 
 /// Read file into a std::string
 inline std::string readFile(std::string fileName) {

@@ -1,28 +1,28 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef _MEMORYBLOCK_H
 #define _MEMORYBLOCK_H
 
-#include "../system/system.h"
 #include "../system/block_cache.h"
+#include "../system/system.h"
 
 #ifdef P
 #undef P
@@ -65,23 +65,25 @@ class ExtendableBlock {
   char* ptr;
   // Position in BackTrackMemory of this block
   SysInt pos;
-public:
-  ExtendableBlock() : ptr(NULL), pos(-1)
-  { }
 
-  ExtendableBlock(char* _ptr, SysInt _pos) : ptr(_ptr), pos(_pos)
-  { }
+public:
+  ExtendableBlock() : ptr(NULL), pos(-1) {}
+
+  ExtendableBlock(char* _ptr, SysInt _pos) : ptr(_ptr), pos(_pos) {}
 
   ExtendableBlock(const ExtendableBlock&) = default;
 
-  char* operator()() const
-  { return ptr; }
+  char* operator()() const {
+    return ptr;
+  }
 
-  SysInt getPos() const
-  { return pos; }
+  SysInt getPos() const {
+    return pos;
+  }
 
-  bool empty() const
-  { return ptr == nullptr; }
+  bool empty() const {
+    return ptr == nullptr;
+  }
 };
 
 class BackTrackMemory {
@@ -90,23 +92,18 @@ class BackTrackMemory {
   /// Forbid copying.
   void operator=(const BackTrackMemory&);
 
-
-
-  struct BlockDef
-  {
+  struct BlockDef {
     char* base;
     size_t size;
     size_t capacity;
 
-    BlockDef() : base(0), size(0), capacity(0)
-    { }
+    BlockDef() : base(0), size(0), capacity(0) {}
 
-    BlockDef(char* b, size_t s, size_t c)
-    : base(b), size(s), capacity(c)
-    { }
+    BlockDef(char* b, size_t s, size_t c) : base(b), size(s), capacity(c) {}
 
-    size_t remaining_capacity() const
-    { return capacity - size; }
+    size_t remaining_capacity() const {
+      return capacity - size;
+    }
   };
 
   // previous, filled blocks
@@ -114,49 +111,45 @@ class BackTrackMemory {
   // byte inside stored_blocks
   size_t total_stored_bytes;
 
-
   vector<BlockDef> extendable_blocks;
   size_t allocated_extendable_bytes;
 
   // Store information about backtracking.
-  struct BacktrackData
-  {
+  struct BacktrackData {
     size_t total_stored_bytes;
     size_t allocated_extendable_bytes;
     vector<size_t> extendable_blocks_size;
-    
-    char* data;
-    size_t total_bytes() const
-    { return total_stored_bytes + allocated_extendable_bytes; }
 
-    BacktrackData()
-    : total_stored_bytes(0), allocated_extendable_bytes(0),
-      data(0)
-    { }
+    char* data;
+    size_t total_bytes() const {
+      return total_stored_bytes + allocated_extendable_bytes;
+    }
+
+    BacktrackData() : total_stored_bytes(0), allocated_extendable_bytes(0), data(0) {}
 
     BacktrackData(size_t t, size_t a, vector<size_t> v, char* d)
-    : total_stored_bytes(t), allocated_extendable_bytes(a),
-      extendable_blocks_size(v), data(d)
-    { }
+        : total_stored_bytes(t),
+          allocated_extendable_bytes(a),
+          extendable_blocks_size(v),
+          data(d) {}
   };
 
-    // Variables for backtracking
+  // Variables for backtracking
   BlockCache block_cache;
-  //vector<pair<char*, UnsignedSysInt>> backtrack_data;
+  // vector<pair<char*, UnsignedSysInt>> backtrack_data;
   vector<BacktrackData> backtrack_stack;
 
 #ifndef BLOCK_SIZE
 #define BLOCK_SIZE (size_t)(64 * 1024 * 1024)
 #endif
 
-
 public:
   void copyIntoPtr(char* store_ptr) {
     P("StoreMem: " << (void*)this << " : " << (void*)store_ptr);
     UnsignedSysInt current_offset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      P((void*)(store_ptr + current_offset) << " " << (void*)stored_blocks[i].base << " "
-                                            << stored_blocks[i].size);
+      P((void*)(store_ptr + current_offset)
+        << " " << (void*)stored_blocks[i].base << " " << stored_blocks[i].size);
       memcpy(store_ptr + current_offset, stored_blocks[i].base, stored_blocks[i].size);
       current_offset += stored_blocks[i].size;
     }
@@ -207,15 +200,11 @@ public:
     return total_stored_bytes + allocated_extendable_bytes;
   }
 
-  BackTrackMemory()
-      : total_stored_bytes(0), 
-        allocated_extendable_bytes(0),
-        block_cache(100)
-      {
-        // Force at least one block to exist
-        reallocate(0);
-        backtrack_stack.push_back(BacktrackData{});
-      }
+  BackTrackMemory() : total_stored_bytes(0), allocated_extendable_bytes(0), block_cache(100) {
+    // Force at least one block to exist
+    reallocate(0);
+    backtrack_stack.push_back(BacktrackData{});
+  }
 
   ~BackTrackMemory() {
     for(SysInt i = 0; i < (SysInt)backtrack_stack.size(); ++i)
@@ -228,11 +217,11 @@ public:
     char* tmp = (char*)block_cache.do_malloc(data_size); // calloc(data_size, sizeof(char));
     this->copyIntoPtr(tmp);
     vector<size_t> extendable_blocks_size;
-    for(int i = 0; i < extendable_blocks.size(); ++i)
-    { extendable_blocks_size.push_back(extendable_blocks[i].size); }
+    for(int i = 0; i < extendable_blocks.size(); ++i) {
+      extendable_blocks_size.push_back(extendable_blocks[i].size);
+    }
 
-    BacktrackData bd{total_stored_bytes, allocated_extendable_bytes,
-                     extendable_blocks_size, tmp};
+    BacktrackData bd{total_stored_bytes, allocated_extendable_bytes, extendable_blocks_size, tmp};
     backtrack_stack.push_back(bd);
   }
 
@@ -244,17 +233,14 @@ public:
     D_ASSERT(total_stored_bytes >= bd.total_stored_bytes);
 
     // Clean up stored_blocks
-    if(total_stored_bytes > bd.total_stored_bytes)
-    {
-      while(total_stored_bytes - stored_blocks.back().size > bd.total_stored_bytes)
-      {
+    if(total_stored_bytes > bd.total_stored_bytes) {
+      while(total_stored_bytes - stored_blocks.back().size > bd.total_stored_bytes) {
         BlockDef block = stored_blocks.back();
         stored_blocks.pop_back();
         free(block.base);
         total_stored_bytes -= block.size;
       }
-      if(total_stored_bytes > bd.total_stored_bytes)
-      {
+      if(total_stored_bytes > bd.total_stored_bytes) {
         D_ASSERT(total_stored_bytes - stored_blocks.back().size <= bd.total_stored_bytes);
         size_t old_size = stored_blocks.back().size;
         size_t diff = total_stored_bytes - bd.total_stored_bytes;
@@ -269,10 +255,8 @@ public:
 
     // If you trigger this, ask Chris and we can generalise!
     D_ASSERT(extendable_blocks.size() == bd.extendable_blocks_size.size());
-    for(int i = 0; i < extendable_blocks.size(); ++i)
-    {
-      if(bd.extendable_blocks_size[i] != extendable_blocks[i].size)
-      {
+    for(int i = 0; i < extendable_blocks.size(); ++i) {
+      if(bd.extendable_blocks_size[i] != extendable_blocks[i].size) {
         D_ASSERT(bd.extendable_blocks_size[i] < extendable_blocks[i].size);
         size_t diff = extendable_blocks[i].size - bd.extendable_blocks_size[i];
         extendable_blocks[i].size = bd.extendable_blocks_size[i];
@@ -287,7 +271,7 @@ public:
     block_cache.do_free(bd.data);
   }
 
-    /// Returns the current number of stored copies of the state.
+  /// Returns the current number of stored copies of the state.
   SysInt current_depth() {
     return backtrack_stack.size();
   }
@@ -298,7 +282,6 @@ public:
       world_pop();
     D_ASSERT(current_depth() == depth);
   }
-
 
   /// Request a new block of memory and returns a \ref void* to it's start.
   void* request_bytes(DomainInt byte_count) {
@@ -312,8 +295,7 @@ public:
 
     total_stored_bytes += checked_cast<size_t>(byte_count);
 
-    if(stored_blocks.back().remaining_capacity() < byte_count)
-    {
+    if(stored_blocks.back().remaining_capacity() < byte_count) {
       reallocate(byte_count);
     }
 
@@ -324,17 +306,15 @@ public:
     return return_val;
   }
 
-  ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size)
-  {
-    const SysInt max_size = 10*1024*1024;
+  ExtendableBlock requestBytesExtendable(UnsignedSysInt base_size) {
+    const SysInt max_size = 10 * 1024 * 1024;
     char* block = (char*)calloc(max_size, 1);
     extendable_blocks.push_back(BlockDef{block, base_size, max_size});
     allocated_extendable_bytes += base_size;
     return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
   }
 
-  void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size)
-  {
+  void resizeExtendableBlock(ExtendableBlock block, UnsignedSysInt new_size) {
     UnsignedSysInt old_size = extendable_blocks[block.getPos()].size;
     D_ASSERT(block() == extendable_blocks[block.getPos()].base);
     D_ASSERT(new_size >= old_size);
@@ -344,8 +324,7 @@ public:
     allocated_extendable_bytes += (new_size - old_size);
 
     extendable_blocks[block.getPos()].size = new_size;
-    //block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
-
+    // block_resizes.back().push_back(make_tuple(block.getPos(), old_size, new_size));
   }
 
   /// Request a \ref MoveableArray.
@@ -357,9 +336,8 @@ public:
 private:
   void reallocate(DomainInt byte_count_new_request) {
     P("Reallocate: " << (void*)this << " : " << byte_count_new_request);
-    D_ASSERT(stored_blocks.size() == 0 || \
-             (stored_blocks.back().remaining_capacity() < byte_count_new_request) );
-
+    D_ASSERT(stored_blocks.size() == 0 ||
+             (stored_blocks.back().remaining_capacity() < byte_count_new_request));
 
     size_t new_block_capacity = max(BLOCK_SIZE, checked_cast<size_t>(byte_count_new_request));
     char* base = (char*)calloc(new_block_capacity, sizeof(char));

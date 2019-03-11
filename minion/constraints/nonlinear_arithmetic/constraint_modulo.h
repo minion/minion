@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;modulo Description
 The constraint
@@ -81,8 +81,7 @@ struct ModConstraint : public AbstractConstraint {
   CONSTRAINT_ARG_LIST3(var1, var2, var3);
 
   ModConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3)
-      : var1(_var1), var2(_var2), var3(_var3) {
-  }
+      : var1(_var1), var2(_var2), var3(_var3) {}
 
   virtual SysInt dynamic_trigger_count() {
     return 6;
@@ -120,21 +119,20 @@ struct ModConstraint : public AbstractConstraint {
   // 2) Abstract checking mod_undefzero
   bool check_mod_result(DomainInt i, DomainInt j, DomainInt k) {
     if(j == 0) {
-      return (undef && k==0);
+      return (undef && k == 0);
     }
 
-    return do_mod(i,j) == k;
+    return do_mod(i, j) == k;
   }
-
 
   virtual void propagateDynInt(SysInt, DomainDelta) {
     PROP_INFO_ADDONE(Product);
     Bounds b1 = getBounds(var1);
     Bounds b2 = getBounds(var2);
     Bounds b3 = getBounds(var3);
-    
+
     int assigedcount = b1.hasSingleValue() + b2.hasSingleValue() + b3.hasSingleValue();
-    
+
     if(assigedcount == 3) {
       if(!check_mod_result(b1.min(), b2.min(), b3.min())) {
         getState().setFailed(true);
@@ -170,21 +168,20 @@ struct ModConstraint : public AbstractConstraint {
     }
 
     if(b1.hasSingleValue() && b2.hasSingleValue()) {
-      var3.assign(do_mod(b1.min(),b2.min()));
+      var3.assign(do_mod(b1.min(), b2.min()));
       return;
     }
 
     if(b2.hasSingleValue()) {
       if(var3.isBound() || var1.isBound()) {
-        if(do_div<undef>(b1.min(),b2.min()) == do_div<undef>(b1.max(),b2.min())) {
+        if(do_div<undef>(b1.min(), b2.min()) == do_div<undef>(b1.max(), b2.min())) {
           Bounds b = emptyBounds();
           b = addValue(b, do_mod(b1.min(), b2.min()));
           b = addValue(b, do_mod(b1.max(), b2.min()));
           var3.setMin(b.min());
           var3.setMax(b.max());
         }
-      }
-      else {
+      } else {
         std::set<DomainInt> vals;
         for(DomainInt d1 = var1.getMin(); d1 <= var1.getMax(); ++d1) {
           if(var1.inDomain(d1)) {
@@ -204,8 +201,6 @@ struct ModConstraint : public AbstractConstraint {
         }
       }
     }
-
-
   }
 
   virtual void full_propagate() {
@@ -229,19 +224,19 @@ struct ModConstraint : public AbstractConstraint {
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(undef) {
       if(var2.inDomain(0) && var3.inDomain(0)) {
-        assignment.push_back(make_pair(1,0));
-        assignment.push_back(make_pair(2,0));
+        assignment.push_back(make_pair(1, 0));
+        assignment.push_back(make_pair(2, 0));
         return true;
       }
     }
-    
+
     for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
       if(var1.inDomain(v1)) {
         for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
           if(v2 != 0 && var2.inDomain(v2) && var3.inDomain(do_mod(v1, v2))) {
             assignment.push_back(make_pair(0, v1));
             assignment.push_back(make_pair(1, v2));
-            assignment.push_back(make_pair(2, do_mod(v1,v2) ));
+            assignment.push_back(make_pair(2, do_mod(v1, v2)));
             return true;
           }
         }
@@ -257,11 +252,12 @@ struct ModConstraint : public AbstractConstraint {
 };
 
 template <typename VarRef1, typename VarRef2>
-inline AbstractConstraint* BuildCT_MODULO(const vector<VarRef1>& vars, const vector<VarRef2>& var2, ConstraintBlob&) {
+inline AbstractConstraint* BuildCT_MODULO(const vector<VarRef1>& vars, const vector<VarRef2>& var2,
+                                          ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
 
-  return new ModConstraint<VarRef1, VarRef1, VarRef2, false>(vars[0],vars[1],var2[0]);
+  return new ModConstraint<VarRef1, VarRef1, VarRef2, false>(vars[0], vars[1], var2[0]);
 }
 /* JSON
 { "type": "constraint",
@@ -272,13 +268,13 @@ inline AbstractConstraint* BuildCT_MODULO(const vector<VarRef1>& vars, const vec
 */
 
 template <typename VarRef1, typename VarRef2>
-inline AbstractConstraint* BuildCT_MODULO_UNDEFZERO(const vector<VarRef1>& vars, const vector<VarRef2>& var2, ConstraintBlob&) {
+inline AbstractConstraint* BuildCT_MODULO_UNDEFZERO(const vector<VarRef1>& vars,
+                                                    const vector<VarRef2>& var2, ConstraintBlob&) {
   D_ASSERT(vars.size() == 2);
   D_ASSERT(var2.size() == 1);
 
-  return new ModConstraint<VarRef1, VarRef1, VarRef2, true>(vars[0],vars[1],var2[0]);
+  return new ModConstraint<VarRef1, VarRef1, VarRef2, true>(vars[0], vars[1], var2[0]);
 }
-
 
 /* JSON
 { "type": "constraint",

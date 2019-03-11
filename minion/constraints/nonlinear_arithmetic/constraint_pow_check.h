@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /*****
 
@@ -87,8 +87,8 @@ public:
   }
 };
 
-#include "constraint_pow.h"
 #include "../forward_checking.h"
+#include "constraint_pow.h"
 
 template <typename V1, typename V2>
 inline AbstractConstraint* BuildCT_POW(const V1& vars, const V2& var2, ConstraintBlob&) {
@@ -97,7 +97,8 @@ inline AbstractConstraint* BuildCT_POW(const V1& vars, const V2& var2, Constrain
   // vars1 is special to avoid 0^0
   if(vars[0].getInitialMin() < 0 || vars[1].getInitialMin() <= 0 || var2[0].getInitialMin() < 0) {
     typedef PowConstraint_Check<typename V1::value_type, typename V1::value_type,
-                                typename V2::value_type, false> PowConC;
+                                typename V2::value_type, false>
+        PowConC;
     AbstractConstraint* pow =
         new CheckAssignConstraint<PowConC, false>(PowConC(vars[0], vars[1], var2[0]));
     // Now wrap it in new FC thing. Horrible hackery.

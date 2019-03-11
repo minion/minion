@@ -1,30 +1,30 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef TRIGGERLIST_H
 #define TRIGGERLIST_H
 
-#include "system/system.h"
 #include "solver.h"
-#include "triggering/triggers.h"
+#include "system/system.h"
 #include "triggering/constraint_abstract.h"
+#include "triggering/triggers.h"
 
 #include "memory_management/MemoryBlock.h"
 #include "memory_management/nonbacktrack_memory.h"
@@ -36,17 +36,14 @@ struct TriggerObj {
   DomainInt max;
   vector<DynamicTriggerList> _dynamic_triggers;
 
-  TriggerObj() : min(-1), max(-1)
-  { }
+  TriggerObj() : min(-1), max(-1) {}
 
-  DynamicTriggerList* trigger_type(DomainInt type)
-  {
+  DynamicTriggerList* trigger_type(DomainInt type) {
     D_ASSERT(type >= 0 && type < 4);
     return &_dynamic_triggers[checked_cast<SysInt>(type)];
   }
 
-  DynamicTriggerList* domain_val(DomainInt val)
-  {
+  DynamicTriggerList* domain_val(DomainInt val) {
     D_ASSERT(val >= min && val <= max);
     return &_dynamic_triggers[checked_cast<SysInt>(val - min + 4)];
   }
@@ -66,33 +63,34 @@ public:
 
   vector<TriggerObj> dyn_triggers;
 
-//  vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
-//  vector<vector<DynamicTriggerList>> dynamic_triggers_domain_vec;
+  //  vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
+  //  vector<vector<DynamicTriggerList>> dynamic_triggers_domain_vec;
 
   // void* dynamic_triggers;
 
   SysInt var_count_m;
 
-//  std::vector<std::pair<DomainInt, DomainInt> > vars_domain;
+  //  std::vector<std::pair<DomainInt, DomainInt> > vars_domain;
 
   void lock(SysInt size, DomainInt min_domain_val, DomainInt max_domain_val) {
-    std::vector<std::pair<DomainInt, DomainInt> > doms(size, make_pair(min_domain_val, max_domain_val));
+    std::vector<std::pair<DomainInt, DomainInt>> doms(size,
+                                                      make_pair(min_domain_val, max_domain_val));
     addVariables(doms);
   }
 
-  void addVariables(const std::vector<pair<DomainInt, DomainInt> >& doms) {
+  void addVariables(const std::vector<pair<DomainInt, DomainInt>>& doms) {
     SysInt old_var_count = var_count_m;
     var_count_m += doms.size();
     CHECK(var_count_m < MAX_VARS, "Too many variables... increase MAX_VARS");
     dyn_triggers.resize(var_count_m);
-    for(int i = 0; i < doms.size(); ++i)
-    {
+    for(int i = 0; i < doms.size(); ++i) {
       dyn_triggers[old_var_count + i].min = doms[i].first;
       dyn_triggers[old_var_count + i].max = doms[i].second;
       if(only_bounds)
         dyn_triggers[old_var_count + i]._dynamic_triggers.resize(4);
       else
-        dyn_triggers[old_var_count + i]._dynamic_triggers.resize(checked_cast<SysInt>(4 + (doms[i].second - doms[i].first + 1)));
+        dyn_triggers[old_var_count + i]._dynamic_triggers.resize(
+            checked_cast<SysInt>(4 + (doms[i].second - doms[i].first + 1)));
     }
   }
 

@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;mddc Description
 MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It enforces GAC
@@ -51,11 +51,11 @@ This constraint enforces generalized arc consistency.
 #ifndef CONSTRAINT_MDDC_H
 #define CONSTRAINT_MDDC_H
 
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <algorithm>
 #include "constraint_checkassign.h"
+#include <algorithm>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
 
 using namespace std;
 
@@ -172,7 +172,7 @@ struct MDDC : public AbstractConstraint {
   arrayset_bt gno;
 
   TupleList* tuples;
-  
+
   // All nodes of the mdd, used for freeing.
   vector<MDDNode*> mddnodes;
 
@@ -183,7 +183,7 @@ struct MDDC : public AbstractConstraint {
 
   MDDC(const VarArray& _var_array, TupleList* _tuples)
       :
-      
+
         vars(_var_array),
         constraint_locked(false),
         gno(),

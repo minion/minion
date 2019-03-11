@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help variables;bounds Description
 Bounds variables, where only the upper and lower bounds of the domain
@@ -376,10 +376,11 @@ struct BoundVarContainer {
 #endif
 
     if(bound_data.empty()) {
-      bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
-    }
-    else {
-      getMemory().backTrack().resizeExtendableBlock(bound_data, var_count_m * 2 * sizeof(BoundType));
+      bound_data =
+          getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    } else {
+      getMemory().backTrack().resizeExtendableBlock(bound_data,
+                                                    var_count_m * 2 * sizeof(BoundType));
     }
     BoundType* bound_ptr = (BoundType*)(bound_data());
     for(UnsignedSysInt i = old_var_count; i < var_count_m; ++i) {
@@ -466,6 +467,6 @@ inline BoundVarRef BoundVarContainer<T>::get_var_num(DomainInt i) {
   D_ASSERT(i < (DomainInt)var_count_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after
   // lower_bound(i)...
-  return BoundVarRef(BoundVarRef_internal<>(this, i, (DomainInt*)(bound_data()) +
-                                                         checked_cast<SysInt>(i) * 2));
+  return BoundVarRef(
+      BoundVarRef_internal<>(this, i, (DomainInt*)(bound_data()) + checked_cast<SysInt>(i) * 2));
 }

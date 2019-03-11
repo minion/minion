@@ -1,34 +1,35 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef CSPSPEC_H
 #define CSPSPEC_H
 
-#include <vector>
 #include <list>
-#include <utility>
 #include <map>
+#include <utility>
+#include <vector>
 
 using namespace std;
 
 #include "../system/system.h"
+
 #include "../constants.h"
 
 #include "InputVariableDef.h"
@@ -48,8 +49,7 @@ inline string to_var_name(const vector<DomainInt>& params) {
   return s.str();
 }
 
-struct ParsedNeighbourhood
-{
+struct ParsedNeighbourhood {
   std::string name;
   std::string groupName;
   Var activation;
@@ -61,9 +61,8 @@ struct ParsedNeighbourhoodGroup {
   std::vector<Var> vars;
 };
 
-struct ParsedNeighbourhoodContainer
-{
-  std::vector<std::vector<Var> > shadow_mapping;
+struct ParsedNeighbourhoodContainer {
+  std::vector<std::vector<Var>> shadow_mapping;
   Var shadow_disable;
   std::unordered_map<std::string, ParsedNeighbourhoodGroup> neighbourhoodGroups;
   std::vector<ParsedNeighbourhood> neighbourhoods;
@@ -98,16 +97,16 @@ enum VarOrderEnum {
 
 inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
   switch(voe) {
-    case ORDER_NONE: return o << "NONE";
-    case ORDER_STATIC: return o << "STATIC";
-    case ORDER_SDF: return o << "SDF";
-    case ORDER_SRF: return o << "SRF";
-    case ORDER_LDF: return o << "LDF";
-    case ORDER_ORIGINAL: return o << "ORIGINAL";
-    case ORDER_STATIC_LIMITED: return o << "STATIC_LIMITED";
-    case ORDER_WDEG: return o << "WDEG";
-    case ORDER_DOMOVERWDEG: return o << "DOMOVERWDEG";
-    case ORDER_CONFLICT: return o << "CONFLICT";
+  case ORDER_NONE: return o << "NONE";
+  case ORDER_STATIC: return o << "STATIC";
+  case ORDER_SDF: return o << "SDF";
+  case ORDER_SRF: return o << "SRF";
+  case ORDER_LDF: return o << "LDF";
+  case ORDER_ORIGINAL: return o << "ORIGINAL";
+  case ORDER_STATIC_LIMITED: return o << "STATIC_LIMITED";
+  case ORDER_WDEG: return o << "WDEG";
+  case ORDER_DOMOVERWDEG: return o << "DOMOVERWDEG";
+  case ORDER_CONFLICT: return o << "CONFLICT";
   }
   abort();
 }
@@ -118,8 +117,7 @@ struct ValOrder {
   ValOrderEnum type;
   int bias;
 
-  ValOrder(ValOrderEnum t, int b = 0) : type(t), bias(b)
-  { }
+  ValOrder(ValOrderEnum t, int b = 0) : type(t), bias(b) {}
 
   friend bool operator==(const ValOrder& lhs, const ValOrder& rhs) {
     return std::make_tuple(lhs.type, lhs.bias) == std::make_tuple(rhs.type, rhs.bias);
@@ -653,7 +651,7 @@ public:
       sym_order = vars.get_all_vars();
   }
 };
-}
+} // namespace ProbSpec
 
 extern ConstraintDef constraint_list[]; // why is this here twice?
 extern SysInt num_of_constraints;
@@ -666,7 +664,6 @@ inline ConstraintDef* get_constraint(ConstraintType t) {
 
   D_FATAL_ERROR("Constraint not found");
 }
-
 
 using namespace ProbSpec;
 

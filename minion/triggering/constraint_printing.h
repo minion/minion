@@ -1,25 +1,25 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-12
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-12
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
-#include "../variables/mappings/variable_constant.h"
 #include "../inputfile_parse/CSPSpec.h"
+#include "../variables/mappings/variable_constant.h"
 
 namespace ConOutput {
 template <typename T>
@@ -215,7 +215,8 @@ string print_con(string name, const T1& args1, const T2& args2, const T3& args3)
 }
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
-string print_con(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4, const T5& args5) {
+string print_con(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4,
+                 const T5& args5) {
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
   string s3 = print_vars(args3);
@@ -288,7 +289,7 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
     return print_weighted_con(weight, name, vars, res);
   }
 }
-}
+} // namespace ConOutput
 
 #define CONSTRAINT_ARG_LIST0()                                                                     \
   virtual string full_output_name() {                                                              \
@@ -305,12 +306,11 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
     return ConOutput::print_con(constraint_name(), x, y);                                          \
   }
 
-#define CONSTRAINT_ARG_LIST5(a, b, c, d, e)                                                                 \
+#define CONSTRAINT_ARG_LIST5(a, b, c, d, e)                                                        \
   virtual string full_output_name() {                                                              \
-    return ConOutput::print_con(constraint_name(), a, b, c, d, e);                                          \
+    return ConOutput::print_con(constraint_name(), a, b, c, d, e);                                 \
   }
 
-  
 #define CONSTRAINT_REVERSIBLE_ARG_LIST2(name, revname, x, y)                                       \
   virtual string full_output_name() {                                                              \
     return ConOutput::print_reversible_con(name, revname, x, y);                                   \

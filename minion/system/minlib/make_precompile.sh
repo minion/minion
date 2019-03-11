@@ -1,6 +1,7 @@
 #!/ bin / bash
 rm -
-    rf minlib.hpp.gch
+    rf minlib.hpp
+            .gch
 
             ../
         dominion_build minlib.hpp -

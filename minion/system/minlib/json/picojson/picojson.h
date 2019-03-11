@@ -828,14 +828,14 @@ inline std::ostream& operator<<(std::ostream& os, const picojson::value& x) {
   x.serialize(std::ostream_iterator<char>(os));
   return os;
 }
-}
+} // namespace picojson
 
 namespace std {
 template <>
 inline void swap(picojson::value& x, picojson::value& y) {
   x.swap(y);
 }
-}
+} // namespace std
 
 #ifdef _MSC_VER
 #pragma warning(pop)
@@ -872,9 +872,9 @@ void is(const T& x, const T& y, const char* name = "") {
 }
 
 #include <algorithm>
-#include <sstream>
 #include <float.h>
 #include <limits.h>
+#include <sstream>
 
 int main(void) {
   plan(85);

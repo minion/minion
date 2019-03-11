@@ -79,11 +79,11 @@ A million repetitions of "a"
 // Do not modify original data.
 #define SHA1HANDSOFF
 
+#include <iostream>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <stdint.h>
 #include <string>
-#include <iostream>
 
 typedef struct {
   uint32_t state[5];

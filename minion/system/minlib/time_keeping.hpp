@@ -66,9 +66,9 @@ inline long get_max_rss() {
 
 #else
 
-#include <sys/time.h>
-#include <sys/resource.h>
 #include <assert.h>
+#include <sys/resource.h>
+#include <sys/time.h>
 #include <time.h>
 
 // This function is a horrible hack, to let us avoid nasty global variables

@@ -142,7 +142,7 @@ struct NeighbourhoodSearchStats {
   inline void notifyEndClimb() {
     totalHillClimberTime += (getTotalTimeTaken() - hillClimberStartTime);
     nhLog("End climb at value " << getState().getOptimiseVar()->getMin()
-                                  << ", number iterations = " << numberIterations);
+                                << ", number iterations = " << numberIterations);
   }
 
   inline void notifyStartExploration() {

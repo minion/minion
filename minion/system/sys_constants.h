@@ -1,42 +1,42 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef _SYS_CONSTANTS_H
 #define _SYS_CONSTANTS_H
 
 // Check windows
 #if _WIN32 || _WIN64
-   #if _WIN64
-     #define ENV64BIT
-  #else
-    #define ENV32BIT
-  #endif
+#if _WIN64
+#define ENV64BIT
+#else
+#define ENV32BIT
+#endif
 #endif
 
 // Check GCC
 #if __GNUC__
-  #if __x86_64__ || __ppc64__
-    #define ENV64BIT
-  #else
-    #define ENV32BIT
-  #endif
+#if __x86_64__ || __ppc64__
+#define ENV64BIT
+#else
+#define ENV32BIT
+#endif
 #endif
 
 #ifdef DOMAINS64

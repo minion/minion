@@ -1,42 +1,42 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;table Description
 An extensional constraint that enforces GAC. The constraint is
@@ -107,8 +107,8 @@ help input tuplelist
 #ifndef CONSTRAINT_GACTABLE_TRIES_H
 #define CONSTRAINT_GACTABLE_TRIES_H
 
-#include "tries.h"
 #include "constraint_checkassign.h"
+#include "tries.h"
 
 template <typename VarArray, SysInt negative>
 struct GACTableConstraint : public AbstractConstraint {
@@ -186,8 +186,8 @@ struct GACTableConstraint : public AbstractConstraint {
     DomainInt varIndex = varval.first;
     DomainInt val = varval.second;
     if(negative == 0) {
-      DomainInt new_support = tupleTrieArrayptr->getTrie(varIndex)
-                                  .nextSupportingTuple(val, vars, trie_current_support[sysLiteral]);
+      DomainInt new_support = tupleTrieArrayptr->getTrie(varIndex).nextSupportingTuple(
+          val, vars, trie_current_support[sysLiteral]);
       if(new_support < 0) { // cout << "find_new_support failed literal: " <<
                             // literal << " var: " << varIndex << " val: " <<
                             // get_val_from_literal(literal) << endl ;
@@ -230,8 +230,8 @@ struct GACTableConstraint : public AbstractConstraint {
     // cout << "setup_watches lit= "<< lit << endl ; cout << "calling
     // reconstructTuple from setup_watches" << endl ;
     if(negative == 0) {
-      tupleTrieArrayptr->getTrie(var)
-          .reconstructTuple(recyclableTuple, trie_current_support[checked_cast<SysInt>(lit)]);
+      tupleTrieArrayptr->getTrie(var).reconstructTuple(
+          recyclableTuple, trie_current_support[checked_cast<SysInt>(lit)]);
     }
     // otherwise, the support is already in recyclableTuple.
 
@@ -274,8 +274,8 @@ struct GACTableConstraint : public AbstractConstraint {
 
           DomainInt sup;
           if(negative == 0) {
-            sup = tupleTrieArrayptr->getTrie(varIndex)
-                      .nextSupportingTuple(i, vars, trie_current_support[literal]);
+            sup = tupleTrieArrayptr->getTrie(varIndex).nextSupportingTuple(
+                i, vars, trie_current_support[literal]);
           } else {
             sup = tupleTrieArrayptr->getTrie(varIndex).nextSupportingTupleNegative(
                 i, vars, trie_current_support[literal], recyclableTuple);

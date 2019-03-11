@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #include "../system/system.h"
 #include "SearchManager.h"
@@ -92,8 +92,7 @@ shared_ptr<VariableOrder> make_search_order_multiple(const vector<SearchOrder>& 
   return vo;
 }
 
-shared_ptr<Propagate> make_propagator(PropagationLevel prop_method)
-{
+shared_ptr<Propagate> make_propagator(PropagationLevel prop_method) {
   shared_ptr<Propagate> p;
   switch(prop_method.type) { // doesn't cover the PropLevel_None case.
   case PropLevel_GAC: p = shared_ptr<Propagate>(new PropGAC(prop_method)); break;
@@ -118,18 +117,15 @@ shared_ptr<SearchManager> make_search_manager(PropagationLevel prop_method,
 
   std::function<void(void)> opt_handler;
   if(getState().isOptimisationProblem()) {
-     opt_handler = [](){getState().getOptimiseVar()->setMin(getState().getOptimiseValue());};
-  }
-  else {
-    opt_handler = [](){};
+    opt_handler = []() { getState().getOptimiseVar()->setMin(getState().getOptimiseValue()); };
+  } else {
+    opt_handler = []() {};
   }
 
   // need to switch here for different search algorthms. plain, parallel, group
-  shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p,
-                                                         standard_time_ctrlc_checks,
-                                                         standard_deal_with_solution,
-                                                         opt_handler));
+  shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p, standard_time_ctrlc_checks,
+                                                         standard_deal_with_solution, opt_handler));
 
   return sm;
 }
-}
+} // namespace Controller

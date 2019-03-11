@@ -1,29 +1,29 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
-#include "dynamic_new_and.h"
-#include "unary/dynamic_literal.h"
-#include "constraint_less.h"
-#include "constraint_equal.h"
-#include "nonlinear_arithmetic/constraint_product.h"
 #include "constraint_checkassign.h"
+#include "constraint_equal.h"
+#include "constraint_less.h"
+#include "dynamic_new_and.h"
+#include "nonlinear_arithmetic/constraint_product.h"
+#include "unary/dynamic_literal.h"
 
 /** @help constraints;watchvecneq Description
 The constraint
@@ -289,9 +289,9 @@ struct BothNonZeroIterated {
 };
 
 /** Constraints two vectors of variables to be not equal.
-  *
-  *  \ingroup Constraints
-*/
+ *
+ *  \ingroup Constraints
+ */
 template <typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
 struct VecNeqDynamic : public AbstractConstraint {
   virtual string constraint_name() {

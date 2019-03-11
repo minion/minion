@@ -1,26 +1,25 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef CONSTRAINT_PROD_BOOL_H
 #define CONSTRAINT_PROD_BOOL_H
-
 
 // calculates x*y=z, when x is a boolean.
 
@@ -40,21 +39,17 @@ struct BoolProdConstraint : public AbstractConstraint {
   SysInt dvarbool;
   SysInt dvarequalval;
 
-
-  BoolProdConstraint(ProdVarRef1 _v1, ProdVarRef2 _v2, ProdVarRef3 _v3) :
-  var1(_v1), var2(_v2), var3(_v3)
-  { 
+  BoolProdConstraint(ProdVarRef1 _v1, ProdVarRef2 _v2, ProdVarRef3 _v3)
+      : var1(_v1), var2(_v2), var3(_v3) {
     if(var1.getInitialMin() < 0 || var1.getInitialMax() > 1) {
       D_FATAL_ERROR("Internal error in BoolProdConstraint");
     }
   }
-  
+
   SysInt dynamic_trigger_count() {
     return checked_cast<SysInt>(var2.getInitialMax() - var2.getInitialMin() + 1 +
-                                var3.getInitialMax() - var3.getInitialMin() + 1 +
-                                2 + 2);
+                                var3.getInitialMax() - var3.getInitialMin() + 1 + 2 + 2);
   }
-
 
   void full_check() {
     if(!var3.inDomain(0)) {
@@ -90,21 +85,19 @@ struct BoolProdConstraint : public AbstractConstraint {
     find_any_equal_value();
   }
 
-  void find_any_equal_value()
-  {
+  void find_any_equal_value() {
     if(!var1.inDomain(1)) {
       return;
     }
 
     DomainInt minval = std::max(var2.getMin(), var3.getMin());
     DomainInt maxval = std::min(var2.getMax(), var3.getMax());
-    for(DomainInt val = minval; val <= maxval; ++val)
-    {
+    for(DomainInt val = minval; val <= maxval; ++val) {
       if(var2.inDomain(val) && var3.inDomain(val)) {
         moveTriggerInt(var2, dvarequalval, DomainRemoval, val);
         moveTriggerInt(var3, dvarequalval + 1, DomainRemoval, val);
       }
-        return;
+      return;
     }
     var1.removeFromDomain(1);
     var3.assign(0);
@@ -142,14 +135,12 @@ struct BoolProdConstraint : public AbstractConstraint {
       D_ASSERT(!var2.inDomain(domval));
       if(domval != 0) {
         var3.removeFromDomain(domval);
-      }
-      else {
+      } else {
         if(!var1.inDomain(0)) {
           var3.removeFromDomain(0);
         }
       }
-    }
-    else if(pos < dvarbool) {
+    } else if(pos < dvarbool) {
       pos -= dvar3;
       DomainInt domval = pos + var3.getInitialMin();
       D_ASSERT(!var3.inDomain(domval));
@@ -157,25 +148,21 @@ struct BoolProdConstraint : public AbstractConstraint {
         if(var1.getMin() > 0) {
           var2.removeFromDomain(domval);
         }
-      }
-      else {
+      } else {
         var1.removeFromDomain(0);
         var2.removeFromDomain(0);
       }
-    }
-    else if(pos < dvarequalval) {
-      D_ASSERT(pos == dvarbool || pos == dvarbool+1);
+    } else if(pos < dvarequalval) {
+      D_ASSERT(pos == dvarbool || pos == dvarbool + 1);
       if(pos == dvarbool + 1) {
         D_ASSERT(var1.isAssignedValue(0));
         var3.assign(0);
-      }
-      else {
+      } else {
         D_ASSERT(var1.isAssignedValue(1));
         // var1 has changed, do a full pass
         full_check();
       }
-    }
-    else {
+    } else {
       D_ASSERT(pos == dvarequalval || pos == dvarequalval + 1);
       find_any_equal_value();
     }
@@ -196,7 +183,7 @@ struct BoolProdConstraint : public AbstractConstraint {
   }
 
   virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-   for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
+    for(DomainInt v1 = var1.getMin(); v1 <= var1.getMax(); ++v1) {
       if(var1.inDomain(v1)) {
         for(DomainInt v2 = var2.getMin(); v2 <= var2.getMax(); ++v2) {
           if(var2.inDomain(v2) && var3.inDomain(v1 * v2)) {

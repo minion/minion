@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help variables General
 Minion supports 4 different variable types, namely
@@ -141,11 +141,17 @@ ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
 #ifndef _ANYVARREF_H
 #define _ANYVARREF_H
 
-#include "../inputfile_parse/InputVariableDef.h"
-#include "../constants.h"
+
 #include "../system/system.h"
+
 #include "../solver.h"
+
+#include "../constants.h"
+
+#include "../inputfile_parse/InputVariableDef.h"
+
 #include "../triggering/triggers.h"
+
 #include "../triggering/dynamic_trigger.h"
 
 class AbstractConstraint;
@@ -443,26 +449,27 @@ public:
     data->addDynamicTrigger(t, type, pos, op);
   }
 
-  friend bool operator==(const AnyVarRef& lhs, const AnyVarRef& rhs)
-  { return lhs.getBaseVar() == rhs.getBaseVar(); }
+  friend bool operator==(const AnyVarRef& lhs, const AnyVarRef& rhs) {
+    return lhs.getBaseVar() == rhs.getBaseVar();
+  }
 
-  friend bool operator!=(const AnyVarRef& lhs, const AnyVarRef& rhs)
-  { return lhs.getBaseVar() != rhs.getBaseVar(); }
+  friend bool operator!=(const AnyVarRef& lhs, const AnyVarRef& rhs) {
+    return lhs.getBaseVar() != rhs.getBaseVar();
+  }
 
-  friend bool operator<(const AnyVarRef& lhs, const AnyVarRef& rhs)
-  { return lhs.getBaseVar() < rhs.getBaseVar(); }
-
+  friend bool operator<(const AnyVarRef& lhs, const AnyVarRef& rhs) {
+    return lhs.getBaseVar() < rhs.getBaseVar();
+  }
 };
 
 namespace std {
-  template <> struct hash<AnyVarRef>
-  {
-    size_t operator()(const AnyVarRef & avr) const
-    {
-      return getHash(avr.getBaseVar());
-    }
-  };
-}
+template <>
+struct hash<AnyVarRef> {
+  size_t operator()(const AnyVarRef& avr) const {
+    return getHash(avr.getBaseVar());
+  }
+};
+} // namespace std
 
 template <typename VarRef>
 AnyVarRef AnyVarRef_Concrete<VarRef>::popOneMapper() const {

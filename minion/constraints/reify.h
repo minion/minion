@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;reify References
 See
@@ -66,10 +66,10 @@ ALL constraints are reifyimplyable.
 #ifndef REIFY_H
 #define REIFY_H
 
-#include "../triggering/constraint_abstract.h"
-#include "../memory_management/reversible_vals.h"
 #include "../get_info/get_info.h"
+#include "../memory_management/reversible_vals.h"
 #include "../queue/standard_queue.h"
+#include "../triggering/constraint_abstract.h"
 
 #ifdef P
 #undef P
@@ -404,29 +404,29 @@ reify<BoolVar>* reifyCon(AbstractConstraint* c, BoolVar var) {
   return new reify<BoolVar>(&*c, var);
 }
 
-
 template <typename VarArray>
 inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& bl) {
   ConstraintType type = bl.internal_constraints[0].constraint->type;
   switch(type) {
-  case CT_GACEQ: case CT_EQ:
-  // Code just for GACEQ case
-  if (type == CT_GACEQ) {
-    ConstraintBlob blob(bl.internal_constraints[0]);
-    auto bound1 = get_initialBounds_from_Var(blob.vars[0][0]);
-    auto bound2 = get_initialBounds_from_Var(blob.vars[1][0]);
-    auto minbound = std::max(bound1.first, bound2.first);
-    auto maxbound = std::min(bound1.second, bound2.second);
-    if(minbound < 0 || maxbound > 1)
-      break;
-  }
-  // Common code for GACEQ and EQ
-  {
-    ConstraintBlob blob(bl.internal_constraints[0]);
-    blob.vars.push_back(make_vec(bl.vars[0][0]));
-    blob.constraint = get_constraint(CT_EQ_REIFY);
-    return build_constraint(blob);
-  }
+  case CT_GACEQ:
+  case CT_EQ:
+    // Code just for GACEQ case
+    if(type == CT_GACEQ) {
+      ConstraintBlob blob(bl.internal_constraints[0]);
+      auto bound1 = get_initialBounds_from_Var(blob.vars[0][0]);
+      auto bound2 = get_initialBounds_from_Var(blob.vars[1][0]);
+      auto minbound = std::max(bound1.first, bound2.first);
+      auto maxbound = std::min(bound1.second, bound2.second);
+      if(minbound < 0 || maxbound > 1)
+        break;
+    }
+    // Common code for GACEQ and EQ
+    {
+      ConstraintBlob blob(bl.internal_constraints[0]);
+      blob.vars.push_back(make_vec(bl.vars[0][0]));
+      blob.constraint = get_constraint(CT_EQ_REIFY);
+      return build_constraint(blob);
+    }
   case CT_DISEQ: {
     ConstraintBlob blob(bl.internal_constraints[0]);
     blob.vars.push_back(make_vec(bl.vars[0][0]));
@@ -442,7 +442,7 @@ inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& b
   default:; // to hide warnings
   }
 
-    return reifyCon(build_constraint(bl.internal_constraints[0]), vars[0]);
+  return reifyCon(build_constraint(bl.internal_constraints[0]), vars[0]);
 }
 
 /* JSON

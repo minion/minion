@@ -203,7 +203,6 @@ struct NeighbourhoodState {
     auto backtrackCountAtStart = getState().getBacktrackCount();
 
     auto optimisationHandler = [&]() {
-
       getState().getOptimiseVar()->setMin(newOptMinTarget);
       if(searchParams.backtrackInsteadOfTimeLimit && searchParams.backtrackLimit > 0 &&
          (getState().getBacktrackCount() - backtrackCountAtStart) > searchParams.backtrackLimit) {

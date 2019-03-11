@@ -110,6 +110,6 @@ public:
     return getHash(p.getStdString());
   }
 };
-}
+} // namespace std
 
 #endif

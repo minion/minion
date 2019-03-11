@@ -535,7 +535,7 @@ struct GraphBuilder {
 
     case CT_WATCHED_ELEMENT: return colour_element(b, "ELEMENT");
 
-    case CT_ELEMENT_UNDEFZERO : return colour_element(b, "ELEMENT_UNDEFZERO");
+    case CT_ELEMENT_UNDEFZERO: return colour_element(b, "ELEMENT_UNDEFZERO");
 
     case CT_WATCHED_ELEMENT_UNDEFZERO: return colour_element(b, "ELEMENT_UNDEFZERO");
 
@@ -553,7 +553,8 @@ struct GraphBuilder {
 
     case CT_DISEQ: return colour_eq(b, "DISEQ");
 
-    case CT_EQ: case CT_GACEQ: return colour_eq(b, "EQ");
+    case CT_EQ:
+    case CT_GACEQ: return colour_eq(b, "EQ");
 
     case CT_MINUSEQ: return colour_no_symmetry(b, "MINUSEQ");
 
@@ -599,9 +600,15 @@ struct GraphBuilder {
 
     case CT_WATCHED_LEQSUM: return colour_symmetric_constraint(b, "LEQSUM");
 
-    case CT_WATCHED_TABLE: case CT_MDDC: case CT_HAGGISGAC: case CT_HAGGISGAC_STABLE: case CT_LIGHTTABLE: case CT_STR: return colour_no_symmetry(b, "TABLE");
+    case CT_WATCHED_TABLE:
+    case CT_MDDC:
+    case CT_HAGGISGAC:
+    case CT_HAGGISGAC_STABLE:
+    case CT_LIGHTTABLE:
+    case CT_STR: return colour_no_symmetry(b, "TABLE");
 
-    case CT_WATCHED_NEGATIVE_TABLE: case CT_NEGATIVEMDDC: return colour_no_symmetry(b, "NEG_TABLE");
+    case CT_WATCHED_NEGATIVE_TABLE:
+    case CT_NEGATIVEMDDC: return colour_no_symmetry(b, "NEG_TABLE");
 
     case CT_WATCHED_VECNEQ: return colour_array_swap_each_index(b, "VECNEQ");
 
@@ -734,7 +741,8 @@ struct InstanceStats {
     case CT_GACSCHEMA:
     case CT_HAGGISGAC:
     case CT_HAGGISGAC_STABLE:
-    case CT_MDDC: case CT_NEGATIVEMDDC:
+    case CT_MDDC:
+    case CT_NEGATIVEMDDC:
     case CT_SHORTSTR:
     case CT_STR:
     case CT_SHORTSTR_CTUPLE:
@@ -768,14 +776,16 @@ struct InstanceStats {
     case CT_FRAMEUPDATE:
     case CT_FORWARD_CHECKING:
     case CT_CHECK_ASSIGN:
-    //default:
+      // default:
       cerr << "Stats: Uncategorised constraint:" << i.constraint->name << endl;
     }
   }
 
 #define START_CLOCK() start_time = get_cpu_time()
-#define END_CLOCK() measured_time = get_cpu_time() - start_time; cout << "TIME: " << measured_time << endl;
-#define output_stat cout << measured_time << " " << s 
+#define END_CLOCK()                                                                                \
+  measured_time = get_cpu_time() - start_time;                                                     \
+  cout << "TIME: " << measured_time << endl;
+#define output_stat cout << measured_time << " " << s
 
   void output_stats() {
     string s("stats_"); // common prefix
@@ -879,10 +889,10 @@ struct InstanceStats {
     output_stat << "TotalArity: " << totalarity << endl;
     output_stat << "arity_mean:" << ((double)totalarity) / (double)arities.size() << endl;
     output_stat << "arity_mean_normalised:"
-         << (((double)totalarity) / (double)arities.size()) / ((double)varcount) << endl;
+                << (((double)totalarity) / (double)arities.size()) / ((double)varcount) << endl;
     output_stat << "cts_per_var_mean:" << ((double)totalarity) / (double)varcount << endl;
     output_stat << "cts_per_var_mean_normalised:"
-         << (((double)totalarity) / ((double)varcount)) / ((double)c.size()) << endl;
+                << (((double)totalarity) / ((double)varcount)) / ((double)c.size()) << endl;
 
     START_CLOCK();
     // alldiff stats
@@ -905,17 +915,17 @@ struct InstanceStats {
 
     output_stat << "alldiffdomovervars_0:" << alldiffdomovervars[0] << endl;
     output_stat << "alldiffdomovervars_25:" << alldiffdomovervars[alldiffdomovervars.size() / 4]
-         << endl;
+                << endl;
     output_stat << "alldiffdomovervars_50:" << alldiffdomovervars[alldiffdomovervars.size() / 2]
-         << endl;
-    output_stat << "alldiffdomovervars_75:" << alldiffdomovervars[(alldiffdomovervars.size() * 3) / 4]
-         << endl;
+                << endl;
+    output_stat << "alldiffdomovervars_75:"
+                << alldiffdomovervars[(alldiffdomovervars.size() * 3) / 4] << endl;
     output_stat << "alldiffdomovervars_100:" << alldiffdomovervars.back() << endl;
 
     double alldiffdomovervarstotal =
         std::accumulate(alldiffdomovervars.begin(), alldiffdomovervars.end(), 0.0);
     output_stat << "alldiffdomovervars_mean:"
-         << (alldiffdomovervarstotal) / (double)alldiffdomovervars.size() << endl;
+                << (alldiffdomovervarstotal) / (double)alldiffdomovervars.size() << endl;
 
     output_stat << "alldiff_count:" << alldiff << endl;
     output_stat << "alldiff_proportion:" << ((double)alldiff) / (double)c.size() << endl;
@@ -1000,9 +1010,8 @@ struct InstanceStats {
       }
     }
     END_CLOCK();
-    output_stat
-         << "edge_density:" << ((double)count_pairs) / (((double)(varcount * (varcount - 1))) / 2.0)
-         << endl;
+    output_stat << "edge_density:"
+                << ((double)count_pairs) / (((double)(varcount * (varcount - 1))) / 2.0) << endl;
 
     START_CLOCK();
     GraphBuilder graph(csp);
@@ -1016,22 +1025,23 @@ struct InstanceStats {
 
     string s("stats_");
     {
-    START_CLOCK();
-    vector<DomainInt> tightness;
-    for(SysInt i = 0; i < (SysInt)cons.size(); i++) {
-      tightness.push_back(cons[i]->getTightnessEstimate());
-    }
-    std::sort(tightness.begin(), tightness.end());
-    END_CLOCK();
-    output_stat << "tightness_0:" << tightness[0] << endl;
-    output_stat << "tightness_25:" << tightness[tightness.size() / 4] << endl;
-    output_stat << "tightness_50:" << tightness[tightness.size() / 2] << endl;
-    output_stat << "tightness_75:" << tightness[(tightness.size() * 3) / 4] << endl;
-    output_stat << "tightness_100:" << tightness.back() << endl;
+      START_CLOCK();
+      vector<DomainInt> tightness;
+      for(SysInt i = 0; i < (SysInt)cons.size(); i++) {
+        tightness.push_back(cons[i]->getTightnessEstimate());
+      }
+      std::sort(tightness.begin(), tightness.end());
+      END_CLOCK();
+      output_stat << "tightness_0:" << tightness[0] << endl;
+      output_stat << "tightness_25:" << tightness[tightness.size() / 4] << endl;
+      output_stat << "tightness_50:" << tightness[tightness.size() / 2] << endl;
+      output_stat << "tightness_75:" << tightness[(tightness.size() * 3) / 4] << endl;
+      output_stat << "tightness_100:" << tightness.back() << endl;
 
-    const SysInt totaltightness =
-        checked_cast<SysInt>(std::accumulate(tightness.begin(), tightness.end(), (DomainInt)0));
-    output_stat << "tightness_mean:" << ((double)totaltightness) / (double)tightness.size() << endl;
+      const SysInt totaltightness =
+          checked_cast<SysInt>(std::accumulate(tightness.begin(), tightness.end(), (DomainInt)0));
+      output_stat << "tightness_mean:" << ((double)totaltightness) / (double)tightness.size()
+                  << endl;
     }
     START_CLOCK();
     // now literal tightness

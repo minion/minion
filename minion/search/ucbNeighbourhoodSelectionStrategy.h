@@ -84,7 +84,7 @@ public:
     return bestCombinations[dist(global_random_gen)];
   }
   /*
-  
+
     inline void readInitialValuesFromFile(std::istream& is, int numberNeighbourhoods) {
      static const char* NUMBER_ITERATIONS_KEY = "numberIterations:";
      static const char* NUMBER_ACTIVATIONS_KEY = "numberActivations:";

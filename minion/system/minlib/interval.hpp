@@ -59,7 +59,7 @@ template <typename T>
 bool operator==(const interval_set<T>& lhs, const interval_set<T>& rhs) {
   return lhs._s == rhs._s;
 }
-}
+} // namespace dom
 
 #define INTERVAL dom::interval
 #define INTERVAL_SET dom::interval_set
@@ -124,7 +124,7 @@ bool contains(const INTERVAL_SET<T>& t, const INTERVAL<T>& i) {
       return false;
   return true;
 }
-}
+} // namespace dom
 
 template <typename T>
 void is_insert(INTERVAL_SET<T>& is, INTERVAL<T> in) {

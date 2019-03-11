@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;shortctuplestr2 Description
 
@@ -63,34 +63,33 @@ help constraints haggisgac-stable
 help constraints shortstr2
 */
 
-
 #ifndef CONSTRAINT_CTUPLESTR2_H
 #define CONSTRAINT_CTUPLESTR2_H
 
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <algorithm>
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 #include "constraint_checkassign.h"
+#include <algorithm>
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
 
 using namespace std;
 
@@ -121,7 +120,8 @@ struct arrayset_boundscheck {
   }
 
   bool in(DomainInt val) {
-    if(out_of_bounds(val)) return false;
+    if(out_of_bounds(val))
+      return false;
     return vals_pos[checked_cast<SysInt>(val - minval)] < size;
   }
 
@@ -145,13 +145,14 @@ private:
 
     size++;
   }
+
 public:
-  
   void insert(DomainInt val) {
     if(!in(val)) {
       unsafe_insert(val);
     }
   }
+
 private:
   void unsafe_remove(DomainInt val) {
     D_ASSERT(!out_of_bounds(val));
@@ -167,6 +168,7 @@ private:
 
     size--;
   }
+
 public:
   void remove(DomainInt val) {
     if(in(val)) {
@@ -205,14 +207,16 @@ struct ReversibleArrayset_boundscheck {
     DomainInt pos = val - minval;
     return (pos < 0 || pos >= vals_pos.size());
   }
-  
+
   bool in(DomainInt val) {
-    if(out_of_bounds(val)) return false;
+    if(out_of_bounds(val))
+      return false;
     return vals_pos[checked_cast<SysInt>(val - minval)] < size;
   }
 
   void remove(DomainInt val) {
-    if(out_of_bounds(val)) return;
+    if(out_of_bounds(val))
+      return;
     // swap to posiition size-1 then reduce size
     if(in(val)) {
       const SysInt validx = checked_cast<SysInt>(val - minval);
@@ -241,8 +245,7 @@ struct CTupleSTRData {
       for(SysInt j = 0; j < (SysInt)compressed_tuples[i].size(); ++j) {
         temp[compressed_tuples[i][j].first].push_back(compressed_tuples[i][j].second);
       }
-      for(SysInt i = 0 ; i < varsize; ++i)
-      {
+      for(SysInt i = 0; i < varsize; ++i) {
         std::sort(temp[i].begin(), temp[i].end());
       }
       tuples.push_back(temp);
@@ -253,13 +256,13 @@ struct CTupleSTRData {
 template <typename VarArray, bool UseShort>
 struct CTupleSTR : public AbstractConstraint {
   virtual string constraint_name() {
-      return "shortctuplestr2";
+    return "shortctuplestr2";
   }
 
   //    CONSTRAINT_ARG_LIST2(vars, tupleList);
 
   virtual string full_output_name() {
-      return ConOutput::print_con(constraint_name(), vars, shortTupleList);
+    return ConOutput::print_con(constraint_name(), vars, shortTupleList);
   }
 
   ShortTupleList* shortTupleList;
@@ -381,7 +384,7 @@ struct CTupleSTR : public AbstractConstraint {
           bool found = false;
           for(SysInt k = 0; k < (SysInt)sct->tuples[i][j].size(); ++k) {
             if(vars[j].inDomain(sct->tuples[i][j][k])) {
-              assignment.push_back(std::make_pair(j,sct->tuples[i][j][k]));
+              assignment.push_back(std::make_pair(j, sct->tuples[i][j][k]));
               found = true;
               break;
             }
@@ -453,10 +456,10 @@ struct CTupleSTR : public AbstractConstraint {
     SysInt index = tupindices[i];
     const vector<vector<DomainInt>>& tau = sct->tuples[index];
     D_ASSERT(tau.size() == vars.size());
-    //cout << "Checking Tuple " << tau << "\n";
+    // cout << "Checking Tuple " << tau << "\n";
     for(SysInt j = 0; j < tau.size(); j++) {
       const std::vector<DomainInt>& tv = tau[j];
-      //cout << "Checking index " << j << "\n";
+      // cout << "Checking index " << j << "\n";
       if(tv.size() > 0) {
         bool found = false;
         for(SysInt k = 0; k < (SysInt)tv.size(); ++k) {
@@ -466,12 +469,12 @@ struct CTupleSTR : public AbstractConstraint {
           }
         }
         if(found == false) {
-          //cout << "pruned\n";
+          // cout << "pruned\n";
           return false;
         }
       }
     }
-    //cout << "fine\n";
+    // cout << "fine\n";
     return true;
   }
 
@@ -504,7 +507,7 @@ struct CTupleSTR : public AbstractConstraint {
           const vector<pair<SysInt, DomainInt>>& compressed_tau = sct->compressed_tuples[index];
           for(SysInt t = 0; t < (SysInt)compressed_tau.size(); ++t) {
             const SysInt ctf = compressed_tau[t].first;
-            //cout << "Considering var " << ctf << "\n";
+            // cout << "Considering var " << ctf << "\n";
             ssup.insert(ctf);
             gacvalues[ctf].clear();
           }
@@ -550,20 +553,20 @@ struct CTupleSTR : public AbstractConstraint {
 
         if(UseShort && tau[var].size() == 0) {
           if(ssup.in(var)) {
-            //cout << "ShortSkip " << var << "\n";
+            // cout << "ShortSkip " << var << "\n";
             ssup.remove(var);
             j--;
           }
           // if(vars[var].isAssigned()) ssup_permanent.remove(var);
         } else {
-          
+
           for(SysInt k = 0; k < tau[var].size(); ++k) {
-            //cout << "Considering " << var << ":" << tau[var][k] << "\n";
+            // cout << "Considering " << var << ":" << tau[var][k] << "\n";
             if(!gacvalues[var].in(tau[var][k]) && vars[var].inDomain(tau[var][k])) {
               gacvalues[var].insert(tau[var][k]);
 
               if(gacvalues[var].size == vars[var].getDomSize() && ssup.in(var)) {
-                //cout << "Filled var " << var;
+                // cout << "Filled var " << var;
                 ssup.remove(var);
                 j--;
                 // if(vars[var].isAssigned()) ssup_permanent.remove(var);
@@ -571,7 +574,6 @@ struct CTupleSTR : public AbstractConstraint {
             }
           }
         }
-        
       }
       i++;
     }
@@ -611,6 +613,5 @@ AbstractConstraint* BuildCT_SHORTSTR_CTUPLE(const T& t1, ConstraintBlob& b) {
     "args": [ "read_list", "read_short_tuples" ]
   }
   */
-
 
 #endif

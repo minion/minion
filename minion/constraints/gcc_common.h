@@ -1,33 +1,33 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef GCC_COMMON_H
 #define GCC_COMMON_H
 
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <deque>
-#include <algorithm>
-#include <utility>
 #include "alldiff_gcc_shared.h"
+#include <algorithm>
+#include <deque>
+#include <iostream>
+#include <stdlib.h>
+#include <utility>
+#include <vector>
 
 // for NotOccurrenceEqualConstraint, used in reverse_constraint,
 #include "constraint_occurrence.h"
@@ -204,7 +204,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     GCCPRINT("val_to_cap_index:" << val_to_cap_index);
 
     augpath.reserve(numvars + numvals + 1);
-// fifo.reserve(numvars+numvals);
+    // fifo.reserve(numvars+numvals);
 
 #ifdef CAPBOUNDSCACHE
     boundsupported.resize(numvals * 2, -1);
@@ -323,7 +323,6 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     return numvars * numvals + 2 * val_array.size() * (numvars + val_array.size());
 #endif
   }
-
 
   virtual void propagateFixedTriggers(SysInt prop_var) {
     D_ASSERT(!UseIncGraph || (prop_var >= numvars && prop_var < numvars + (numvals * 2)));
@@ -624,9 +623,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // populate lower and upper
     for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
-        lower[val_array[i] - dom_min] =
-            capacity_array[i].getMin(); // not quite right in the presence of
-                                        // duplicate values.
+        lower[val_array[i] - dom_min] = capacity_array[i].getMin(); // not quite right in the
+                                                                    // presence of duplicate values.
         upper[val_array[i] - dom_min] = capacity_array[i].getMax();
       }
     }
@@ -1276,12 +1274,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // but we define them always for simplicity.
     trigs += var_array.size();
 
-    trigs += numvals*2;
+    trigs += numvals * 2;
 
     return trigs;
   }
-
-
 
   void setup_triggers() {
     SysInt base = old_dynamic_triggers();
@@ -1299,7 +1295,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     for(SysInt i = 0; i < capacity_size; ++i) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
         this->moveTriggerInt(capacity_array[i], base + val_array[i] - dom_min, UpperBound);
-        this->moveTriggerInt(capacity_array[i], base + numvals + val_array[i] - dom_min, LowerBound);
+        this->moveTriggerInt(capacity_array[i], base + numvals + val_array[i] - dom_min,
+                             LowerBound);
       }
     }
   }
@@ -1943,27 +1940,27 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
                                                   // passes existinglb, we can
                                                   // stop.
 
-/*for(SysInt startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
-{
-    SysInt startvar=vars_in_scc[startvarscc];
-    if(varvalmatching[startvar]==forbiddenval)
+    /*for(SysInt startvarscc=0; startvarscc<vars_in_scc.size(); startvarscc++)
     {
-        varvalmatching[startvar]=dom_min-1;
-        usage[forbiddenval-dom_min]--;
-    }
-}*/
+        SysInt startvar=vars_in_scc[startvarscc];
+        if(varvalmatching[startvar]==forbiddenval)
+        {
+            varvalmatching[startvar]=dom_min-1;
+            usage[forbiddenval-dom_min]--;
+        }
+    }*/
 
-// Flip the graph around, so it's like the alldiff case now.
-// follow an edge in the matching from a value to a variable,
-// follow edges not in the matching from variables to values.
+    // Flip the graph around, so it's like the alldiff case now.
+    // follow an edge in the matching from a value to a variable,
+    // follow edges not in the matching from variables to values.
 
-// IMPROVE HERE: This implementation is time optimal O(r^2 d)
-// but it can duplicate work: if it looks for a path for x1, and
-// doesn't find one, then looks for a path for x2, it can revisit
-// nodes that were seen in the search for x1.
+    // IMPROVE HERE: This implementation is time optimal O(r^2 d)
+    // but it can duplicate work: if it looks for a path for x1, and
+    // doesn't find one, then looks for a path for x2, it can revisit
+    // nodes that were seen in the search for x1.
 
-// The comment above could perhaps be true for DFS where once a node is
-// expanded the subtree under it is explored for aug paths.
+    // The comment above could perhaps be true for DFS where once a node is
+    // expanded the subtree under it is explored for aug paths.
 
 #if UseIncGraph
     for(SysInt startvari = 0;

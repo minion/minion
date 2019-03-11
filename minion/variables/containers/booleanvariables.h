@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help variables;01 Description
 01 variables are used very commonly for logical expressions, and for
@@ -205,8 +205,8 @@ struct BoolVarContainer {
   void lock() {
     lock_m = true;
     // Min domain value = 0, max domain val = 1.
-    std::vector<std::pair<DomainInt, DomainInt> > doms(var_count_m,
-        make_pair(DomainInt(0), DomainInt(1)));
+    std::vector<std::pair<DomainInt, DomainInt>> doms(var_count_m,
+                                                      make_pair(DomainInt(0), DomainInt(1)));
     trigger_list.addVariables(doms);
   }
 
@@ -222,10 +222,9 @@ struct BoolVarContainer {
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     if(assign_offset.empty()) {
       assign_offset = getMemory().backTrack().requestBytesExtendable(required_mem);
-      values_mem = checked_malloc(10*1024*1024);
-      CHECK(required_mem < 10*1024*1024, "Bool mem overflow");
-    }
-    else {
+      values_mem = checked_malloc(10 * 1024 * 1024);
+      CHECK(required_mem < 10 * 1024 * 1024, "Bool mem overflow");
+    } else {
       getMemory().backTrack().resizeExtendableBlock(assign_offset, required_mem);
     }
     constraints.resize(var_count_m);

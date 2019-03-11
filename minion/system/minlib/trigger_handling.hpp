@@ -1,15 +1,15 @@
 #ifndef TRIGGER_HANDLING_HFPQWENMJFA
 #define TRIGGER_HANDLING_HFPQWENMJFA
 
-#include <ostream>
-#include <iostream>
-#include <sys/types.h>
-#include <sys/resource.h>
-#include <signal.h>
-#include <sys/time.h>
-#include <errno.h>
-#include <unistd.h>
 #include <assert.h>
+#include <errno.h>
+#include <iostream>
+#include <ostream>
+#include <signal.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 struct EndOfSearch {
   std::string reason;
@@ -33,7 +33,7 @@ void set_trigger(Event e) {
 Event get_trigger() {
   return trigger_event_X;
 }
-}
+} // namespace TriggerEvent
 
 void ctrlc_function_trigger(int /* signum */) {
   TriggerEvent::set_trigger(TriggerEvent::ctrl_c);

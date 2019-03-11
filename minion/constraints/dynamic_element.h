@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;watchelement_one Description
 This constraint is identical to watchelement, except the vector
@@ -99,8 +99,8 @@ when the array value is out of bounds.
 
 // for the reverse constraint.
 #include "constraint_equal.h"
-#include "dynamic_new_or.h"
 #include "dynamic_new_and.h"
+#include "dynamic_new_or.h"
 #include "unary/dynamic_literal.h"
 #include "unary/dynamic_notinrange.h"
 
@@ -204,9 +204,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     if(support > maxsupport) {
       support = indexvar_min;
       DomainInt max_check = min(oldsupport, maxsupport + 1);
-      while(
-          support < max_check &&
-          !(indexvar.inDomain(support) && var_array[checked_cast<SysInt>(support)].inDomain(realj)))
+      while(support < max_check && !(indexvar.inDomain(support) &&
+                                     var_array[checked_cast<SysInt>(support)].inDomain(realj)))
         ++support;
       if(support >= max_check) {
         resultvar.removeFromDomain(realj);
@@ -578,7 +577,7 @@ AbstractConstraint* BuildCT_WATCHED_ELEMENT_UNDEFZERO(Var1 vararray, const Var2&
 
 template <typename Var1, typename Var2, typename Var3>
 AbstractConstraint* BuildCT_WATCHED_ELEMENT_ONE_UNDEFZERO(const Var1& vararray, const Var2& v1,
-                                                const Var3& v2, ConstraintBlob& b) {
+                                                          const Var3& v2, ConstraintBlob& b) {
   typedef typename ShiftType<typename Var2::value_type, compiletime_val<SysInt, -1>>::type ShiftVal;
   vector<ShiftVal> replace_v1;
   replace_v1.push_back(ShiftVarRef(v1[0], compiletime_val<SysInt, -1>()));

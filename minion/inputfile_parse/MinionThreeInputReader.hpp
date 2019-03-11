@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help input Description
 
@@ -573,7 +573,7 @@ void MinionThreeInputReader<FileReader>::readNeighbourhood(FileReader* infile) {
   string shadowmap = infile->get_string();
   if(shadowmap != "INCUMBENTMAPPING")
     throw parse_exception("Expected INCUMBENTMAPPING");
-  
+
   nbhc.shadow_mapping = read2DMatrix(infile);
 
   while(infile->peek_char() != '*') {
@@ -688,8 +688,8 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
   // We already know there is at least one tuple
   if(con.vars[0].size() == 0) {
     if(def->read_types[1] == read_short_tuples && !(*con.short_tuples->tuplePtr())[0].empty())
-        throw parse_exception("Not a valid list of short tuples for a "
-                              "constraint with no variables!");
+      throw parse_exception("Not a valid list of short tuples for a "
+                            "constraint with no variables!");
     return ConstraintBlob(get_constraint(CT_TRUE));
   }
 

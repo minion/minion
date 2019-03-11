@@ -1,30 +1,30 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef FORWARD_CHECKING_H_HIUO
 #define FORWARD_CHECKING_H_HIUO
 
-#include "../triggering/constraint_abstract.h"
-#include "../memory_management/reversible_vals.h"
 #include "../get_info/get_info.h"
+#include "../memory_management/reversible_vals.h"
 #include "../queue/standard_queue.h"
+#include "../triggering/constraint_abstract.h"
 
 #ifdef P
 #undef P
@@ -154,7 +154,9 @@ struct Forward_Checking : public AbstractConstraint {
       b.push_back((*vars)[i].getAssignedValue());
 
     DomainInt* varptr = 0;
-    if(b.size() != 0) { varptr = &b[0]; }
+    if(b.size() != 0) {
+      varptr = &b[0];
+    }
 
     if(!check_assignment(varptr, size)) {
       return true; // true means failed.

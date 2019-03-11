@@ -5,31 +5,31 @@
 #define NOMINMAX
 #endif
 
-#include <string>
-#include <vector>
-#include <array>
 #include <algorithm>
-#include <iostream>
+#include <array>
+#include <exception>
 #include <fstream>
-#include <ostream>
+#include <functional>
+#include <iostream>
 #include <istream>
-#include <sstream>
-#include <set>
+#include <list>
 #include <map>
+#include <memory>
+#include <ostream>
+#include <set>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
-#include <list>
-#include <memory>
-#include <exception>
-#include <stdexcept>
-#include <tuple>
-#include <functional>
+#include <vector>
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
 #include <assert.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define SHARED_PTR std::shared_ptr
 #define TUPLE std::tuple

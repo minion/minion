@@ -1,37 +1,37 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
-#include <stdlib.h>
-#include <iostream>
-#include <vector>
-#include <deque>
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 #include <algorithm>
+#include <deque>
+#include <iostream>
+#include <stdlib.h>
 #include <utility>
+#include <vector>
 
 using namespace std;
 
 #include "alldiff_gcc_shared.h"
 
 // includes for reverse constraint.
+#include "constraint_checkassign.h"
 #include "constraint_equal.h"
 #include "dynamic_new_or.h"
-#include "constraint_checkassign.h"
 
 // Check domain size -- if it is greater than numvars, then no need to wake the
 // constraint.
@@ -164,14 +164,13 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     }
   }
 
-  SysInt old_dynamic_triggers()
-  {
+  SysInt old_dynamic_triggers() {
     // First an array of watches for the matching, then a 2d array of mixed
     // triggers
     // indexed by [var][count] where count is increased from 0 as the triggers
     // are used.
 
-    if (UseIncGraph)
+    if(UseIncGraph)
       return numvars * numvals; // one for each var-val pair so we know when it is removed.
     else
       return 0;
@@ -182,8 +181,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     return old_dynamic_triggers() + var_array.size();
   }
 
-  void setup_triggers()
-  {
+  void setup_triggers() {
     SysInt dom_change_trig_start = old_dynamic_triggers();
     for(SysInt i = 0; i < var_array.size(); ++i)
       this->moveTriggerInt(var_array[i], dom_change_trig_start + i, DomainChanged);
@@ -290,8 +288,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
-    if(trig >= old_dynamic_triggers())
-    {
+    if(trig >= old_dynamic_triggers()) {
       propagateDomChanged(trig - old_dynamic_triggers());
       return;
     }
@@ -656,10 +653,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 
     P("Fixed varvalmatching:" << varvalmatching);
 
-// now both varvalmatching and valvarmatching contain
-// a complete matching for the SCC.
-// Also, valinlocalmatching contains the domain values
-// used in this SCC.
+    // now both varvalmatching and valvarmatching contain
+    // a complete matching for the SCC.
+    // Also, valinlocalmatching contains the domain values
+    // used in this SCC.
 
 #ifndef NO_DEBUG
     // Check the matching is valid.
@@ -1264,7 +1261,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 #if !UseIncGraph
                  && var_array[curnode].inDomain(val)
 #endif
-                     ) {
+              ) {
                 if(!invprevious.in(checked_cast<SysInt>(val - dom_min))) {
                   // This vertex completes an even alternating path.
                   // Unwind and apply the path here
@@ -1334,7 +1331,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 #if !UseIncGraph
                  && var_array[vartoqueue].inDomain(stackval)
 #endif
-                     ) {
+              ) {
                 D_DATA(found = true);
                 break;
               }

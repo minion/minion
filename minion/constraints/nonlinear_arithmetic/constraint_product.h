@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help constraints;product Description
 The constraint
@@ -198,8 +198,6 @@ inline AbstractConstraint* BuildCT_PRODUCT2(const vector<BoolVarRef>& vars,
   return AndCon(vars[0], vars[1], var2[0]);
 }
 
-
-
 template <typename VarRef1, typename VarRef2>
 AbstractConstraint* BuildCT_PRODUCT2(const vector<VarRef1>& vars, const vector<VarRef2>& var2,
                                      ConstraintBlob&) {
@@ -209,7 +207,7 @@ AbstractConstraint* BuildCT_PRODUCT2(const vector<VarRef1>& vars, const vector<V
   if(!isBound && vars[0].getInitialMin() >= 0 && vars[0].getInitialMax() <= 1) {
     return new BoolProdConstraint<VarRef1, VarRef1, VarRef2>(vars[0], vars[1], var2[0]);
   }
-  
+
   if(!isBound && vars[1].getInitialMin() >= 0 && vars[1].getInitialMax() <= 1) {
     return new BoolProdConstraint<VarRef1, VarRef1, VarRef2>(vars[1], vars[0], var2[0]);
   }

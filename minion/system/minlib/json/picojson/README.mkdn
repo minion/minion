@@ -209,16 +209,15 @@ type& gt;
 
     ##Reading JSON using the streaming(event - driven) interface
 
-    Please refer to the implementation of
-    picojson::default_parse_context and picojson::null_parse_context.There is also an
-    example(examples / streaming.cc)
+    Please refer to the
+    implementation of picojson::default_parse_context and picojson::null_parse_context
+        .There is also an example(examples / streaming.cc)
         .
 
     ##Serializing to JSON
 
     Instances of the picojson::value class can be serialized in three ways,
-    to ostream, to std::string, or
-                                    to an output iterator.
+    to ostream, to std::string, or to an output iterator.
 
                                     <pre>picojson::value v;
 ... std::cout& lt;
@@ -236,4 +235,5 @@ v;
 
     ##Further reading
 
-        Examples can be found in the<i> examples</ i> directory.
+        Examples can be found in the<i>
+            examples</ i> directory.

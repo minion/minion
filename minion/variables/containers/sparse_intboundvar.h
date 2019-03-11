@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help variables;sparsebounds Description
 In sparse bounds variables the domain is composed of discrete values
@@ -162,7 +162,6 @@ struct SparseBoundVarContainer {
     DomainInt min_domain_val = DomainInt_Min;
     DomainInt max_domain_val = DomainInt_Max;
 
-
     D_ASSERT(bounds.front() >= DomainInt_Min);
     D_ASSERT(bounds.back() <= DomainInt_Max);
 
@@ -191,10 +190,11 @@ struct SparseBoundVarContainer {
 #endif
 
     if(bound_data.empty()) {
-      bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
-    }
-    else {
-      getMemory().backTrack().resizeExtendableBlock(bound_data, var_count_m * 2 * sizeof(BoundType));
+      bound_data =
+          getMemory().backTrack().requestBytesExtendable(var_count_m * 2 * sizeof(BoundType));
+    } else {
+      getMemory().backTrack().resizeExtendableBlock(bound_data,
+                                                    var_count_m * 2 * sizeof(BoundType));
     }
 
     BoundType* bound_ptr = (BoundType*)(bound_data());
@@ -203,8 +203,8 @@ struct SparseBoundVarContainer {
       bound_ptr[2 * i + 1] = get_domain_from_int(i).back();
     }
 
-
-    std::vector<std::pair<DomainInt, DomainInt> > trig_bounds(count, make_pair(bounds.front(), bounds.back()));
+    std::vector<std::pair<DomainInt, DomainInt>> trig_bounds(
+        count, make_pair(bounds.front(), bounds.back()));
     trigger_list.addVariables(trig_bounds);
   }
 

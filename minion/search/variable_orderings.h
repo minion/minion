@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef VARIABLE_ORDERINGS_H
 #define VARIABLE_ORDERINGS_H
@@ -39,8 +39,7 @@ DomainInt chooseVal(T& var, ValOrder vo) {
         if(dist100(global_random_gen) <= vo.bias) {
           return var.getMax();
         }
-      }
-      else {
+      } else {
         if(dist100(global_random_gen) <= -vo.bias) {
           return var.getMin();
         }
@@ -92,15 +91,18 @@ struct VariableOrder {
   // returning the variable index == -1 means no branch possible.
   virtual pair<SysInt, DomainInt> pickVarVal() = 0;
 
-  vector<AnyVarRef>& getVars()
-  { return var_order; }
+  vector<AnyVarRef>& getVars() {
+    return var_order;
+  }
 
-  virtual bool hasAuxVars() const
-  { return false; }
+  virtual bool hasAuxVars() const {
+    return false;
+  }
 
-  virtual DomainInt auxVarStart() const
-  { abort(); }
-  
+  virtual DomainInt auxVarStart() const {
+    abort();
+  }
+
   virtual ~VariableOrder() {}
 };
 
@@ -111,11 +113,11 @@ struct MultiBranch : public VariableOrder {
 
   bool hasAux;
 
-  virtual bool hasAuxVars() const
-  { return hasAux; }
+  virtual bool hasAuxVars() const {
+    return hasAux;
+  }
 
-  virtual DomainInt auxVarStart() const
-  {
+  virtual DomainInt auxVarStart() const {
     D_ASSERT(hasAuxVars());
     return variable_offset.back();
   }
@@ -124,8 +126,7 @@ struct MultiBranch : public VariableOrder {
   vector<DomainInt> variable_offset;
 
   MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector, bool _hasAux)
-      : vovector(_vovector), hasAux(_hasAux)
-  {
+      : vovector(_vovector), hasAux(_hasAux) {
     pos = 0;
     variable_offset.resize(vovector.size());
     variable_offset[0] = 0;

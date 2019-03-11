@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef DYN_TRIG_H_FFJJKKTEA
 #define DYN_TRIG_H_FFJJKKTEA
@@ -63,10 +63,9 @@ struct Trig_ConRef {
     return con == nullptr;
   }
 
-  AbstractConstraint* constraint()
-  { 
+  AbstractConstraint* constraint() {
     D_ASSERT(con);
-    return con; 
+    return con;
   }
 
   friend bool operator==(Trig_ConRef lhs, Trig_ConRef rhs) {
@@ -76,7 +75,6 @@ struct Trig_ConRef {
   friend std::ostream& operator<<(std::ostream& o, Trig_ConRef tcr) {
     return o << "tcr:(" << tcr.con << ":" << tcr.conListPos << ")";
   }
-
 };
 
 // forward declaration
@@ -135,9 +133,9 @@ public:
   }
 
   /// The domain delta from the domain change.
-/** This may not contain the actual delta, but contains data from which a
-   variable can
-   construct it, by passing it to getDomainChange. */
+  /** This may not contain the actual delta, but contains data from which a
+     variable can
+     construct it, by passing it to getDomainChange. */
   DomainInt data;
   DynamicTriggerEvent(DynamicTriggerList* t, DomainInt _data) : trigs(t), data(_data) {
     D_ASSERT(data >= DomainInt_Min);

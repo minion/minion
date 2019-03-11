@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 /** @help variables;discrete Description
 In discrete variables, the domain ranges between the specified lower and upper
@@ -65,7 +65,8 @@ struct BigRangeVarRef_internal_template {
 
 #ifdef MORE_SEARCH_INFO
 typedef InfoRefType<VarRefType<BigRangeVarRef_internal_template<UnsignedSysInt>>,
-                    VAR_INFO_BIGRANGEVAR> BigRangeVarRef;
+                    VAR_INFO_BIGRANGEVAR>
+    BigRangeVarRef;
 #else
 typedef VarRefType<BigRangeVarRef_internal_template<UnsignedSysInt>> BigRangeVarRef;
 #endif
@@ -176,20 +177,19 @@ struct BigRangeVarContainer {
   void addVariables(const vector<Bounds>& new_domains) {
     D_ASSERT(!lock_m);
     for(SysInt i = 0; i < (SysInt)new_domains.size(); ++i) {
-        initial_bounds.push_back(
-            make_pair(new_domains[i].lower_bound, new_domains[i].upper_bound));
-        DomainInt domain_size;
-        domain_size = new_domains[i].upper_bound - new_domains[i].lower_bound + 1;
-        var_offset.push_back(var_offset.back() + domain_size);
-        var_count_m++;
+      initial_bounds.push_back(make_pair(new_domains[i].lower_bound, new_domains[i].upper_bound));
+      DomainInt domain_size;
+      domain_size = new_domains[i].upper_bound - new_domains[i].lower_bound + 1;
+      var_offset.push_back(var_offset.back() + domain_size);
+      var_count_m++;
     }
-      constraints.resize(new_domains.size());
+    constraints.resize(new_domains.size());
 #ifdef WDEG
-      wdegs.resize(new_domains.size());
+    wdegs.resize(new_domains.size());
 #endif
 
     bound_data = getMemory().backTrack().requestBytesExtendable(var_count_m * BOUND_DATA_SIZE *
-                                                       sizeof(domain_bound_type));
+                                                                sizeof(domain_bound_type));
     DomainInt temp1 = bms_array->request_storage(var_offset.back());
 
     // correct var_offsets to start at the start of our block.

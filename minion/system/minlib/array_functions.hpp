@@ -1,8 +1,8 @@
 #ifndef _ARRAY_FUNCTIONS_HPP_CDSHUICDS
 #define _ARRAY_FUNCTIONS_HPP_CDSHUICDS
 
-#include <vector>
 #include "interval.hpp"
+#include <vector>
 
 /** \weakgroup MinLib
  * @{

@@ -30,4 +30,4 @@ bool isCtrlCPressed();
 bool isAlarmActivated();
 void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time);
 void endParallelMinion();
-}
+} // namespace Parallel

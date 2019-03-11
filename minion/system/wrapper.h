@@ -1,22 +1,22 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
 #ifndef _WRAPPER_H
 #define _WRAPPER_H
@@ -115,12 +115,12 @@ struct Wrapper {
     return t1.t op t2;                                                                             \
   }
 
-WRAP_BOOL_OPS(== )
-WRAP_BOOL_OPS(!= )
-WRAP_BOOL_OPS(< )
-WRAP_BOOL_OPS(> )
-WRAP_BOOL_OPS(<= )
-WRAP_BOOL_OPS(>= )
+WRAP_BOOL_OPS(==)
+WRAP_BOOL_OPS(!=)
+WRAP_BOOL_OPS(<)
+WRAP_BOOL_OPS(>)
+WRAP_BOOL_OPS(<=)
+WRAP_BOOL_OPS(>=)
 
 #ifdef WRAP_ARITHMETIC_OPS
 #undef WRAP_ARITHMETIC_OPS
@@ -145,8 +145,8 @@ WRAP_BOOL_OPS(>= )
 WRAP_ARITHMETIC_OPS(+)
 WRAP_ARITHMETIC_OPS(-)
 WRAP_ARITHMETIC_OPS(*)
-WRAP_ARITHMETIC_OPS(/ )
-WRAP_ARITHMETIC_OPS(% )
+WRAP_ARITHMETIC_OPS(/)
+WRAP_ARITHMETIC_OPS(%)
 
 template <typename T>
 Wrapper<T> abs(const Wrapper<T>& in) {
@@ -155,16 +155,15 @@ Wrapper<T> abs(const Wrapper<T>& in) {
 
 namespace std {
 
-  template <typename T> struct hash<Wrapper<T>>
-  {
-    size_t operator()(const Wrapper<T> & x) const
-    {
-      return getHash(x.t);
-    }
-  };
-}
+template <typename T>
+struct hash<Wrapper<T>> {
+  size_t operator()(const Wrapper<T>& x) const {
+    return getHash(x.t);
+  }
+};
+} // namespace std
 
-template<typename T>
+template <typename T>
 std::ostream& json_dump(const Wrapper<T>& t, std::ostream& o) {
   return json_dump(t.t, o);
 }

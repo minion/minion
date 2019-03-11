@@ -1,22 +1,20 @@
 #ifndef _GRASPJSON_PARSE_HPP_CAPQLCN
 #define _GRASPJSON_PARSE_HPP_CAPQLCN
 
-#include "picojson/picojson.h"
-#include "../optional.hpp"
 #include "../SimpleMap.hpp"
-#include "../optional.hpp"
 #include "../immutable_string.hpp"
+#include "../optional.hpp"
 #include "../string_ops.hpp"
+#include "picojson/picojson.h"
 
 // This class just provides a wrapper which lets a string pass through
 // json_dump without being escaped.
 class raw_json {
 public:
   std::string str;
-  raw_json(std::string s) : str(s)
-  { }
+  raw_json(std::string s) : str(s) {}
 };
-  
+
 // This allows us to assume missing booleans are false
 void inline try_json_fill(bool& ret, const picojson::object& o, const std::string& val) {
   if(o.count(val)) {

@@ -108,7 +108,7 @@ std::ostream& operator<<(std::ostream& o, const option<T>& t) {
     o << "<empty>";
   return o;
 }
-}
+} // namespace std
 
 template <typename T>
 void output_container(std::ostream& o, const T& t) {

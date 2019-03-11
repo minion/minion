@@ -1,15 +1,15 @@
 #ifndef MINIREADER_H
 #define MINIREADER_H
 
+#include "minlib/minlib.hpp"
 #include <fstream>  // reading file
 #include <iostream> // std::cerr
 #include <stdlib.h> // exit(1)
 #include <vector>
-#include "minlib/minlib.hpp"
 
-using std::string;
 using std::cerr;
 using std::endl;
+using std::string;
 using std::vector;
 
 typedef SimpleMap<string, MultiDimCon<int, int>> simmap;

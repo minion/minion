@@ -1,32 +1,32 @@
 /*
-* Minion http://minion.sourceforge.net
-* Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
-* USA.
-*/
+ * Minion http://minion.sourceforge.net
+ * Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
+ */
 
-#include <stdlib.h>
+#include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <set>
-#include <vector>
-#include <algorithm>
-#include <utility>
+#include <stdlib.h>
 #include <string>
-#include <fstream>
+#include <utility>
+#include <vector>
 
 using namespace std;
 
@@ -39,7 +39,7 @@ private:
   map<string, string> data;
   string tablefilename;
   string jsonfilename;
-  
+
   // Don't allow copying!
   TableOut(const TableOut& t);
 
@@ -51,7 +51,7 @@ public:
     // create a new, or overwrite the, entry with name propname
     data[propname] = tostring(value);
   }
-  
+
   void print_line() {
     if(tablefilename != "") {
       print_table_line();
@@ -60,7 +60,7 @@ public:
       print_table_json();
     }
   }
-  
+
   void print_table_json() {
     ofstream f;
     if(jsonfilename == "-") {
@@ -70,16 +70,15 @@ public:
     } else {
       f.open(jsonfilename.c_str(), ios::app | ios::out); // Open with append mode.
     }
-    
+
     JSONStreamer json(&f);
-    
+
     map<string, string>::iterator it;
     for(it = data.begin(); it != data.end(); it++) {
       json.mapElement(it->first, it->second);
     }
   }
 
-  
   void print_table_line() {
     // First version: this checks if we are at the top of a file. If so, prints
     // column headers.
@@ -133,7 +132,7 @@ public:
     }
     tablefilename = file;
   }
-  
+
   void set_json_filename(string file) {
     if(jsonfilename != "") {
       output_fatal_error("Can only set JSON output filename once");

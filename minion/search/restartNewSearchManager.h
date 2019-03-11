@@ -11,7 +11,6 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     int depth = Controller::get_world_depth();
     Controller::world_push();
 
-
     auto prop = Controller::make_propagator(prop_method);
     auto vo = Controller::make_search_order_multiple(order);
 
@@ -19,24 +18,27 @@ struct RestartNewSearchManager : public Controller::SearchManager {
 
     int initial_backtracks = getState().getBacktrackCount();
 
-    //std::cout << "Starting search\n";
+    // std::cout << "Starting search\n";
 
     auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
                               const vector<Controller::triple>& branches) {
-      try{
+      try {
         Controller::standard_time_ctrlc_checks(var_array, branches);
-      } catch(EndOfSearch&){
+      } catch(EndOfSearch&) {
         timeout = true;
         throw EndOfSearch();
       }
-      
+
       if(getState().getBacktrackCount() - initial_backtracks > backtracklimit)
         throw EndOfSearch();
     };
 
     bool solutionFound = false;
 
-    auto solutionHandler = [&]() { solutionFound=true; throw EndOfSearch();};
+    auto solutionHandler = [&]() {
+      solutionFound = true;
+      throw EndOfSearch();
+    };
 
     auto optimisationHandler = [&]() { /* insert optimisation handling here */ };
 
@@ -47,19 +49,18 @@ struct RestartNewSearchManager : public Controller::SearchManager {
       sm->search();
     } catch(EndOfSearch&) {}
 
-
-    //double cputime = get_cpu_time();
-    //double timelimit = getOptions().time_limit;
+    // double cputime = get_cpu_time();
+    // double timelimit = getOptions().time_limit;
 
     if(solutionFound) {
-        //cout << "Solution found, stop the search" << endl;
-         throw EndOfSearch();
-    } else if (timeout){
-        if (getOptions().timeout_active && get_cpu_time() > getOptions().time_limit)
-            cout << "Time limit is reached, stop the search" << endl;
-        else        
-            cout << "Node limit is reached, stop the search" << endl;
-        throw EndOfSearch();
+      // cout << "Solution found, stop the search" << endl;
+      throw EndOfSearch();
+    } else if(timeout) {
+      if(getOptions().timeout_active && get_cpu_time() > getOptions().time_limit)
+        cout << "Time limit is reached, stop the search" << endl;
+      else
+        cout << "Node limit is reached, stop the search" << endl;
+      throw EndOfSearch();
     }
 
     Controller::world_pop_to_depth(depth);
@@ -68,7 +69,7 @@ struct RestartNewSearchManager : public Controller::SearchManager {
   RestartNewSearchManager(PropagationLevel _prop_method, const vector<SearchOrder>& _order)
       : prop_method(_prop_method), initial_order(_order) {}
 
-vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
+  vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
     vector<SearchOrder> searchOrder(initial_order);
     for(auto& so : searchOrder) {
       for(int i = 0; i < so.val_order.size(); i++) {
@@ -86,7 +87,7 @@ vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
       cout << "Increasing backtrack limit to " << i << endl;
       int bias = 0;
       if(useBias)
-        bias = random()%200 - 100;
+        bias = random() % 200 - 100;
       vector<SearchOrder> new_order = makeRandomWalkSearchOrder(bias);
       doASearch(new_order, i);
     }
@@ -94,7 +95,7 @@ vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
 };
 
 shared_ptr<Controller::SearchManager> make_restart_new_search_manager(PropagationLevel prop_method,
-                                                      vector<SearchOrder> order) {
+                                                                      vector<SearchOrder> order) {
   return shared_ptr<Controller::SearchManager>(new RestartNewSearchManager(prop_method, order));
 }
 

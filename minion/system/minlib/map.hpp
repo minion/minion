@@ -1,10 +1,10 @@
 #ifndef MAPPER_HPP_CD
 #define MAPPER_HPP_CD
 
-#include "variadic.hpp"
-#include <vector>
-#include <set>
 #include "multdim_container.hpp"
+#include "variadic.hpp"
+#include <set>
+#include <vector>
 
 template <typename Map, typename V>
 std::vector<typename ObjectResult<Map, V>::type> doMap(Map m, const std::vector<V>& v) {

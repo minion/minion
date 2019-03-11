@@ -1,20 +1,20 @@
 /*
-* DoMinion - Copyright (C) 2006-09
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+ * DoMinion - Copyright (C) 2006-09
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #ifndef JSON_OUTPUT_CDSJ
 #define JSON_OUTPUT_CDSJ
@@ -28,8 +28,7 @@
 #include <mutex>
 #endif
 
-struct JSONStreamer
-{
+struct JSONStreamer {
   // This is the stack of currently open terms, telling us if they have had a member printed yet.
   std::vector<bool> element_printed;
   std::vector<std::string> element_type;
@@ -37,10 +36,8 @@ struct JSONStreamer
   std::ostream* stream;
 
 private:
-  void maybe_print_comma()
-  {
-    if(!element_printed.empty())
-    {
+  void maybe_print_comma() {
+    if(!element_printed.empty()) {
       if(element_printed.back())
         (*stream) << ", ";
       else
@@ -48,8 +45,7 @@ private:
     }
   }
 
-  void open_term_internal(std::string s)
-  {
+  void open_term_internal(std::string s) {
     element_printed.push_back(false);
     if(s == "{")
       element_type.push_back("}");
@@ -59,29 +55,26 @@ private:
       abort();
     (*stream) << s;
   }
-public:
 
+public:
   bool in_map() const {
     return element_type.size() > 0 && element_type.back() == "}";
   }
 
-  void openVec()
-  {
+  void openVec() {
     D_ASSERT(!in_map());
     maybe_print_comma();
     open_term_internal("[");
   }
 
-  void openMap()
-  {
+  void openMap() {
     D_ASSERT(!in_map());
     maybe_print_comma();
     open_term_internal("{");
   }
 
-  template<typename T>
-  void openVecWithKey(const T& t)
-  {
+  template <typename T>
+  void openVecWithKey(const T& t) {
     D_ASSERT(in_map());
     if(element_printed.back() == false)
       element_printed.back() = true;
@@ -91,9 +84,8 @@ public:
     open_term_internal("[");
   }
 
-  template<typename T>
-  void openMapWithKey(const T& t)
-  {
+  template <typename T>
+  void openMapWithKey(const T& t) {
     D_ASSERT(in_map());
     if(element_printed.back() == false)
       element_printed.back() = true;
@@ -103,8 +95,7 @@ public:
     open_term_internal("{");
   }
 
-  void closeTerm()
-  {
+  void closeTerm() {
     D_ASSERT(element_type.size() > 0);
     (*stream) << element_type.back();
     if(element_type.back() == "}")
@@ -115,53 +106,49 @@ public:
       element_printed.back() = true;
   }
 
-  void closeMap()
-  {
+  void closeMap() {
     D_ASSERT(element_type.size() > 0 && element_type.back() == "}");
     closeTerm();
   }
 
-  void closeVec()
-  {
+  void closeVec() {
     D_ASSERT(element_type.size() > 0 && element_type.back() == "]");
     closeTerm();
   }
-
 
   int depth() {
     return element_printed.size();
   }
 
-  void newline()
-  { (*stream) << "\n"; }
+  void newline() {
+    (*stream) << "\n";
+  }
 
-  JSONStreamer() : stream(nullptr)
-  { }
+  JSONStreamer() : stream(nullptr) {}
 
-  bool isActive() const
-  { return stream != nullptr; }
+  bool isActive() const {
+    return stream != nullptr;
+  }
 
-  JSONStreamer(std::ostream* o) : stream(o)
-  {
+  JSONStreamer(std::ostream* o) : stream(o) {
     openMap();
   }
 
 private:
   JSONStreamer(const JSONStreamer&);
   void operator=(const JSONStreamer&);
+
 public:
-  JSONStreamer(JSONStreamer&& js) :
-    element_printed(std::move(js.element_printed)),
-    element_type(std::move(js.element_type)),
-    stream(std::move(js.stream))
-  {
+  JSONStreamer(JSONStreamer&& js)
+      : element_printed(std::move(js.element_printed)),
+        element_type(std::move(js.element_type)),
+        stream(std::move(js.stream)) {
     js.element_printed.clear();
     js.element_type.clear();
     js.stream = nullptr;
   }
 
-  void operator=(JSONStreamer&& js)
-  {
+  void operator=(JSONStreamer&& js) {
     D_ASSERT(stream == nullptr);
     element_printed = std::move(js.element_printed);
     element_type = std::move(js.element_type);
@@ -171,18 +158,16 @@ public:
     js.stream = nullptr;
   }
 
-  ~JSONStreamer()
-  {
-        while(depth() > 0)
-            closeTerm();
-        if(stream) {
-          (*stream) << std::flush;
-        }
+  ~JSONStreamer() {
+    while(depth() > 0)
+      closeTerm();
+    if(stream) {
+      (*stream) << std::flush;
+    }
   }
 
-  template<typename T, typename U>
-  void mapElement(const T& t, const U& u)
-  {
+  template <typename T, typename U>
+  void mapElement(const T& t, const U& u) {
     D_ASSERT(element_type.back() == "}")
     maybe_print_comma();
     (*stream) << "\"" << t << "\" : ";
@@ -190,16 +175,12 @@ public:
     (*stream) << " ";
   }
 
-  template<typename T>
-  void vec_element(const T& t)
-  {
+  template <typename T>
+  void vec_element(const T& t) {
     D_ASSERT(element_type.back() == "]");
     maybe_print_comma();
     json_dump(t, *stream);
   }
-
-
 };
-
 
 #endif

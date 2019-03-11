@@ -40,9 +40,9 @@
 #ifndef BOX_H_FADS
 #define BOX_H_FADS
 
+#include "macros.hpp"
 #include <algorithm>
 #include <ostream>
-#include "macros.hpp"
 
 #ifdef _WIN32
 #include <malloc.h>

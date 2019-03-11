@@ -64,7 +64,6 @@ public:
   }
 };
 
-
 inline TupleTrieArray* TupleList::getTries() {
   if(triearray == NULL)
     triearray = new TupleTrieArray(this);
