@@ -115,7 +115,7 @@ public:
   }
 
   // This function is temporary while the new interface is being designed.
-  vector<DomainInt> get_vector(SysInt pos) const {
+  vector<DomainInt> getVector(SysInt pos) const {
     vector<DomainInt> vec(tuple_length);
     for(SysInt i = 0; i < tuple_length; ++i)
       vec[i] = tuple_data[pos * tuple_length + i];
@@ -318,7 +318,7 @@ public:
     set<vector<DomainInt>> tuple_set;
 
     for(SysInt i = 0; i < long_tuples->size(); ++i)
-      tuple_set.insert(long_tuples->get_vector(i));
+      tuple_set.insert(long_tuples->getVector(i));
 
     if(method == MLTTS_KeepLong) {
       short_tuples = makeShortTupleList(tuple_set);
@@ -442,7 +442,7 @@ public:
         vector<vector<DomainInt>> specific_tuples;
         for(SysInt k = 0; k < (*tuples).size(); ++k) {
           if((*tuples)[k][i] == j)
-            specific_tuples.push_back((*tuples).get_vector(k));
+            specific_tuples.push_back((*tuples).getVector(k));
         }
         literal_specific_tuples.push_back(specific_tuples);
         // D_ASSERT(literal_specific_tuples.size() - 1 == get_literal(i,j));

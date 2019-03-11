@@ -287,11 +287,11 @@ struct MinionInstancePrinter {
   }
 
   void build_instance() {
-    build_instance(csp.constraints, csp.vars.get_all_vars(), true);
+    build_instance(csp.constraints, csp.vars.getAllVars(), true);
   }
 
   void build_instance(bool printEof) {
-    build_instance(csp.constraints, csp.vars.get_all_vars(), printEof);
+    build_instance(csp.constraints, csp.vars.getAllVars(), printEof);
   }
 
   void build_instance(const vector<Var>& varlist_vec, bool printEof) {
@@ -302,7 +302,7 @@ struct MinionInstancePrinter {
     // set<Var> list_of_vars
     for(list<ConstraintBlob>::iterator it = csp.constraints.begin(); it != csp.constraints.end();
         ++it) {
-      set<Var> vars = it->get_all_vars();
+      set<Var> vars = it->getAllVars();
       if(includes(varlist.begin(), varlist.end(), vars.begin(), vars.end()))
         new_constraint_list.push_back(*it);
     }

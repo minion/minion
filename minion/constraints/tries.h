@@ -86,7 +86,7 @@ struct TupleTrie {
 
     // Need a copy so we can sort it and such things.
     for(SysInt i = 0; i < tuplelist->size(); ++i)
-      tuples_vector[i] = tuplelist->get_vector(i);
+      tuples_vector[i] = tuplelist->getVector(i);
 
     std::stable_sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
     if(tuplelist->size() > 0) {

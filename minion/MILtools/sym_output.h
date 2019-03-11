@@ -254,7 +254,7 @@ struct GraphBuilder {
   }
 
   void colour_vertices() {
-    vector<Var> vars = csp.vars.get_all_vars();
+    vector<Var> vars = csp.vars.getAllVars();
     for(SysInt i = 0; i < (SysInt)vars.size(); ++i) {
       g.var_vertex_colour[tostring(csp.vars.get_domain(vars[i]))].insert(csp.vars.getName(vars[i]));
     }

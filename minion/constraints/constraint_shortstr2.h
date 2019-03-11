@@ -167,7 +167,7 @@ struct STRData {
   STRData(TupleList* _tuples, size_t varsize) {
     DomainInt tuple_count = _tuples->size();
     for(SysInt i = 0; i < tuple_count; ++i) {
-      vector<DomainInt> t = _tuples->get_vector(i);
+      vector<DomainInt> t = _tuples->getVector(i);
       vector<pair<SysInt, DomainInt>> comp;
       for(int j = 0; j < (SysInt)t.size(); ++j)
         comp.push_back(std::make_pair(j, t[j]));

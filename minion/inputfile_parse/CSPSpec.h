@@ -183,7 +183,7 @@ struct ConstraintBlob {
     vars.push_back(_var);
   }
 
-  set<Var> get_all_vars() const {
+  set<Var> getAllVars() const {
     set<Var> return_vars;
     for(vector<vector<Var>>::const_iterator it = vars.begin(); it != vars.end(); ++it) {
       for(vector<Var>::const_iterator it2 = (*it).begin(); it2 != (*it).end(); ++it2) {
@@ -198,7 +198,7 @@ struct ConstraintBlob {
 
     for(vector<ConstraintBlob>::const_iterator it = internal_constraints.begin();
         it != internal_constraints.end(); ++it) {
-      set<Var> newvars = it->get_all_vars();
+      set<Var> newvars = it->getAllVars();
       return_vars.insert(newvars.begin(), newvars.end());
     }
 
@@ -454,7 +454,7 @@ private:
   }
 
 public:
-  vector<Var> get_all_vars() const {
+  vector<Var> getAllVars() const {
     return all_vars;
   }
 };
@@ -641,14 +641,14 @@ public:
   void add_variable_names() {
     if(vars.symbol_table.empty()) {
       // This was a MINION 1 or MINION 2 input file. Let's fix it!
-      vector<Var> all_vars = vars.get_all_vars();
+      vector<Var> all_vars = vars.getAllVars();
 
       for(SysInt i = 0; i < (SysInt)all_vars.size(); ++i)
         vars.addSymbol("x" + tostring(i), all_vars[i]);
     }
 
     if(sym_order.empty())
-      sym_order = vars.get_all_vars();
+      sym_order = vars.getAllVars();
   }
 };
 } // namespace ProbSpec

@@ -419,10 +419,10 @@ void MinionThreeInputReader<FileReader>::finalise() {
   // Fill in any missing defaults
   if(instance->search_order.empty()) {
     MAYBE_PARSER_INFO("No order generated, auto-generating complete order");
-    instance->search_order.push_back(instance->vars.get_all_vars());
+    instance->search_order.push_back(instance->vars.getAllVars());
   }
 
-  vector<Var> all_vars = instance->vars.get_all_vars();
+  vector<Var> all_vars = instance->vars.getAllVars();
   set<Var> unused_vars(all_vars.begin(), all_vars.end());
   for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i) {
     const vector<Var>& vars_ref = instance->search_order[i].var_order;
@@ -452,11 +452,11 @@ void MinionThreeInputReader<FileReader>::finalise() {
     instance->print_matrix = instance->all_vars_list;
 
   if(instance->sym_order.empty())
-    instance->sym_order = instance->vars.get_all_vars();
+    instance->sym_order = instance->vars.getAllVars();
 
-  if(instance->sym_order.size() != instance->vars.get_all_vars().size()) {
+  if(instance->sym_order.size() != instance->vars.getAllVars().size()) {
     MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
-    vector<Var> all_vars = instance->vars.get_all_vars();
+    vector<Var> all_vars = instance->vars.getAllVars();
     for(typename vector<Var>::iterator i = all_vars.begin(); i != all_vars.end(); ++i) {
       if(find(instance->sym_order.begin(), instance->sym_order.end(), *i) ==
          instance->sym_order.end())
@@ -468,7 +468,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
      set<Var>(instance->sym_order.begin(), instance->sym_order.end()).size())
     throw parse_exception("SYMORDER cannot contain any variable more than once");
 
-  if(instance->sym_order.size() != instance->vars.get_all_vars().size())
+  if(instance->sym_order.size() != instance->vars.getAllVars().size())
     throw parse_exception("SYMORDER must contain every variable");
 }
 
