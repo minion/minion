@@ -81,9 +81,12 @@ AbstractConstraint* BuildCT_COLLECTEVENTS(const VarArray& var_array, ConstraintB
   return new CollectEvents<VarArray>(var_array);
 }
 
+// This constraint purposefully has a name which is not legal input, to stop it being used
+// in input files
+
 /* JSON
 { "type": "constraint",
-  "name": "collectevents",
+  "name": "()()collectevents()()",
   "internal_name": "CT_COLLECTEVENTS",
   "args": [ "read_list" ]
 }
