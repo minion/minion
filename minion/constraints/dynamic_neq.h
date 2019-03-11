@@ -25,7 +25,7 @@
 
 template <typename Var1, typename Var2>
 struct WatchNeqConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "watchneq";
   }
 
@@ -38,11 +38,11 @@ struct WatchNeqConstraint : public AbstractConstraint {
     CheckNotBoundSingle(var1, "watchneq", "neq");
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(var1.isAssigned() && var2.isAssigned() &&
        var1.assignedValue() == var2.assignedValue()) {
       getState().setFailed(true);
@@ -77,12 +77,12 @@ struct WatchNeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return v[0] != v[1];
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(2);
     vars.push_back(var1);
@@ -90,7 +90,7 @@ struct WatchNeqConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var1.isAssigned() && var2.isAssigned() && var1.assignedValue() == var2.assignedValue())
       return false;
 
@@ -110,7 +110,7 @@ struct WatchNeqConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new EqualConstraint<Var1, Var2>(var1, var2);
   }
 };

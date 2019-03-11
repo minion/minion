@@ -235,7 +235,7 @@ struct BoolVarContainer {
 
   /// Returns a reference to the ith Boolean variable which was previously
   /// created.
-  BoolVarRef get_var_num(DomainInt i);
+  BoolVarRef getVarNum(DomainInt i);
 
   UnsignedSysInt var_count() {
     return var_count_m;
@@ -339,7 +339,7 @@ struct BoolVarContainer {
 #endif
 };
 
-inline BoolVarRef BoolVarContainer::get_var_num(DomainInt i) {
+inline BoolVarRef BoolVarContainer::getVarNum(DomainInt i) {
   D_ASSERT(i < (SysInt)var_count_m);
   return BoolVarRef(BoolVarRef_internal(i, this));
 }

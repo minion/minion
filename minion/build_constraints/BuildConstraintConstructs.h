@@ -59,31 +59,31 @@ AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_
     case VAR_BOOL: {
       vector<BoolVarRef> v(vars.size());
       for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().boolVarContainer.get_var_num(vars[i].pos());
+        v[i] = getVars().boolVarContainer.getVarNum(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_NOTBOOL: {
       vector<VarNot<BoolVarRef>> v(vars.size());
       for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = VarNotRef(getVars().boolVarContainer.get_var_num(vars[i].pos()));
+        v[i] = VarNotRef(getVars().boolVarContainer.getVarNum(vars[i].pos()));
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_BOUND: {
       vector<BoundVarRef> v(vars.size());
       for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().boundVarContainer.get_var_num(vars[i].pos());
+        v[i] = getVars().boundVarContainer.getVarNum(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_SPARSEBOUND: {
       vector<SparseBoundVarRef> v(vars.size());
       for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().sparseBoundVarContainer.get_var_num(vars[i].pos());
+        v[i] = getVars().sparseBoundVarContainer.getVarNum(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_DISCRETE: {
       vector<BigRangeVarRef> v(vars.size());
       for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().bigRangeVarContainer.get_var_num(vars[i].pos());
+        v[i] = getVars().bigRangeVarContainer.getVarNum(vars[i].pos());
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_SPARSEDISCRETE: INPUT_ERROR("Sparse Discrete Variables current broken. Sorry");

@@ -126,11 +126,11 @@ public:
 template <typename VarArray, typename TableDataType = TrieData, typename TableStateType = TrieState>
 struct NewTableConstraint : public AbstractConstraint {
 
-  virtual string extended_name() {
+  virtual string extendedName() {
     return "table(new)";
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "table";
   }
 
@@ -159,7 +159,7 @@ struct NewTableConstraint : public AbstractConstraint {
 
   void* _current_support;
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return checked_cast<SysInt>(data->getLiteralCount() * ((SysInt)vars.size() - 1));
   }
 
@@ -214,7 +214,7 @@ struct NewTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     D_ASSERT(!vars.empty());
 
     for(UnsignedSysInt i = 0; i < vars.size(); ++i) {
@@ -239,7 +239,7 @@ struct NewTableConstraint : public AbstractConstraint {
   //  inline DomainInt min(SysInt x, SysInt y) {return (x<y)?x:y; }
   //  inline DomainInt max(SysInt x, SysInt y) {return (x>y)?x:y; }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     pair<DomainInt, DomainInt> bounds = data->getDomainBounds(0);
 
     for(DomainInt x = max(vars[0].min(), bounds.first);
@@ -259,15 +259,15 @@ struct NewTableConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return GACNegativeTableCon(vars, tuples);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     return data->checkTuple(v, v_size);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> anyvars;
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);

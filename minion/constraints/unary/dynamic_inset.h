@@ -35,7 +35,7 @@ The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 // Checks if a variable is in a fixed set.
 template <typename Var>
 struct WatchInSetConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-inset";
   }
 
@@ -51,11 +51,11 @@ struct WatchInSetConstraint : public AbstractConstraint {
     stable_sort(vals.begin(), vals.end());
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   } // Only uses one!
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(vals.empty()) {
       getState().setFailed(true);
       return;
@@ -88,7 +88,7 @@ struct WatchInSetConstraint : public AbstractConstraint {
 
     vector<DomainInt>::iterator it_high = std::lower_bound(vals.begin(), vals.end(), var.max());
     if(it_high == vals.end()) {
-      var.setMax(*(it_high - 1)); // Wasn't this already done in full_propagate?
+      var.setMax(*(it_high - 1)); // Wasn't this already done in fullPropagate?
       return;
     }
 
@@ -103,19 +103,19 @@ struct WatchInSetConstraint : public AbstractConstraint {
     var.setMax(*(it_high - 1));
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return binary_search(vals.begin(), vals.end(), v[0]);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
     for(SysInt i = 0; i < (SysInt)vals.size(); ++i) {
       if(var.inDomain(vals[i])) {
@@ -126,10 +126,10 @@ struct WatchInSetConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverseConstraint();
 };
 
-// To get reverse_constraint
+// To get reverseConstraint
 #include "dynamic_notinset.h"
 
 template <typename VarArray1>

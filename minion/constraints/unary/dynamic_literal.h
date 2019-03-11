@@ -36,7 +36,7 @@
 // Checks if a variable is equal to a value.
 template <typename Var>
 struct WatchLiteralConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-literal";
   }
 
@@ -48,11 +48,11 @@ struct WatchLiteralConstraint : public AbstractConstraint {
   template <typename T>
   WatchLiteralConstraint(const Var& _var, const T& _val) : var(_var), val(_val) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 0;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     var.assign(val);
   }
 
@@ -61,19 +61,19 @@ struct WatchLiteralConstraint : public AbstractConstraint {
     var.assign(val);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] == val);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var.inDomain(val)) {
       assignment.push_back(make_pair(0, val));
       return true;
@@ -81,18 +81,18 @@ struct WatchLiteralConstraint : public AbstractConstraint {
       return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new WatchNotLiteralConstraint<Var>(var, val);
   }
 };
 
 // From dynamic_notliteral.h
 template <typename Var>
-AbstractConstraint* WatchNotLiteralConstraint<Var>::reverse_constraint() {
+AbstractConstraint* WatchNotLiteralConstraint<Var>::reverseConstraint() {
   return new WatchLiteralConstraint<Var>(var, val);
 }
 
-inline AbstractConstraint* WatchNotLiteralBoolConstraint::reverse_constraint() {
+inline AbstractConstraint* WatchNotLiteralBoolConstraint::reverseConstraint() {
   return new WatchLiteralConstraint<BoolVarRef>(var, val);
 }
 

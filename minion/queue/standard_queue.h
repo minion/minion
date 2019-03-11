@@ -99,7 +99,7 @@ public:
         }
 
         Trig_ConRef ref = dtl[pos];
-        if(!ref.empty() && (!is_root_node || ref.con->full_propagate_done)) {
+        if(!ref.empty() && (!is_root_node || ref.con->fullPropagate_done)) {
           ref.propagate(delta);
         }
 
@@ -130,7 +130,7 @@ public:
       special_triggers.queuePop();
 
       CON_INFO_ADDONE(SpecialTrigger);
-      trig->special_check();
+      trig->specialCheck();
 #ifdef WDEG
       if(getState().isFailed())
         trig->incWdeg();

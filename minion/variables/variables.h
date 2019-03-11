@@ -61,7 +61,7 @@ private:
   template <typename Container, typename Func>
   inline void appendVarsFromContainer(Container& container, const Func& apply) {
     for(UnsignedSysInt i = 0; i < container.var_count(); ++i) {
-      apply(container.get_var_num(i));
+      apply(container.getVarNum(i));
     }
   }
 

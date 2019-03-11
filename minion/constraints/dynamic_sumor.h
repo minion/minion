@@ -42,8 +42,8 @@ the size of the set {i | X[i] != y[i]} is greater than or equal to c.
 
 template <typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
 struct VecCountDynamic : public AbstractConstraint {
-  virtual string constraint_name() {
-    return Operator::constraint_name();
+  virtual string constraintName() {
+    return Operator::constraintName();
   }
 
   CONSTRAINT_ARG_LIST3(var_array1, var_array2, original_distance());
@@ -51,9 +51,9 @@ struct VecCountDynamic : public AbstractConstraint {
   // 10 - 3 + 1 = 8
   // 10 - 8 + 1 = 3
   DomainInt original_distance() {
-    if(constraint_name() == "hamming")
+    if(constraintName() == "hamming")
       return hamming_distance;
-    if(constraint_name() == "not-hamming")
+    if(constraintName() == "not-hamming")
       return (SysInt)var_array1.size() - hamming_distance + 1;
     abort();
   }
@@ -82,8 +82,8 @@ struct VecCountDynamic : public AbstractConstraint {
     D_ASSERT(var_array1.size() == var_array2.size());
   }
 
-  virtual SysInt dynamic_trigger_count() {
-    return checked_cast<SysInt>(Operator::dynamic_trigger_count() * num_to_watch);
+  virtual SysInt dynamicTriggerCount() {
+    return checked_cast<SysInt>(Operator::dynamicTriggerCount() * num_to_watch);
   }
 
   bool no_support_for_index(DomainInt index_in) {
@@ -96,7 +96,7 @@ struct VecCountDynamic : public AbstractConstraint {
     Operator::add_triggers(this, var_array1[index], var_array2[index], dt);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
 
     // Check if the constraint is trivial, if so just exit now.
     if(num_to_watch <= 1)
@@ -133,14 +133,14 @@ struct VecCountDynamic : public AbstractConstraint {
       for(SysInt i = 0; i < num_to_watch - 1; ++i) {
         propagate_from_var1(watched_values[i]);
         propagate_from_var2(watched_values[i]);
-        add_triggers(watched_values[i], Operator::dynamic_trigger_count() * i);
+        add_triggers(watched_values[i], Operator::dynamicTriggerCount() * i);
       }
       return;
     }
 
     // Found enough values to watch, no propagation yet!
     for(SysInt i = 0; i < num_to_watch; ++i) {
-      add_triggers(watched_values[i], Operator::dynamic_trigger_count() * i);
+      add_triggers(watched_values[i], Operator::dynamicTriggerCount() * i);
     }
 
     // Setup the 'unwatched values' array.
@@ -174,7 +174,7 @@ struct VecCountDynamic : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt trigger_activated, DomainDelta) {
     PROP_INFO_ADDONE(DynVecNeq);
-    SysInt triggerpair = trigger_activated / Operator::dynamic_trigger_count();
+    SysInt triggerpair = trigger_activated / Operator::dynamicTriggerCount();
     D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
 
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
@@ -202,10 +202,10 @@ struct VecCountDynamic : public AbstractConstraint {
       if(index_to_not_propagate == watched_values[triggerpair])
         return;
 
-      // assumes that the first set of Operator::dynamic_trigger_count()/2
+      // assumes that the first set of Operator::dynamicTriggerCount()/2
       // triggers are on var1, and the other set are on var2.
-      if(trigger_activated % Operator::dynamic_trigger_count() <
-         Operator::dynamic_trigger_count() / 2) {
+      if(trigger_activated % Operator::dynamicTriggerCount() <
+         Operator::dynamicTriggerCount() / 2) {
         propagate_from_var1(watched_values[triggerpair]);
       } else {
         propagate_from_var2(watched_values[triggerpair]);
@@ -243,19 +243,19 @@ struct VecCountDynamic : public AbstractConstraint {
 
     swap(watched_values[triggerpair], unwatched_values[index]);
 
-    add_triggers(watched_values[triggerpair], triggerpair * Operator::dynamic_trigger_count());
+    add_triggers(watched_values[triggerpair], triggerpair * Operator::dynamicTriggerCount());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     UnsignedSysInt v_size1 = var_array1.size();
     SysInt count = 0;
     for(UnsignedSysInt i = 0; i < v_size1; ++i)
-      if(Operator::check_assignment(v[i], v[i + v_size1]))
+      if(Operator::checkAssignment(v[i], v[i + v_size1]))
         count++;
     return (count >= hamming_distance);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
     for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
@@ -265,18 +265,18 @@ struct VecCountDynamic : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(num_to_watch <= 1)
       return true;
 
     pair<DomainInt, DomainInt> assign;
     SysInt found_satisfying = 0;
     for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
-      if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign)) {
+      if(Operator::getSatisfyingAssignment(var_array1[i], var_array2[i], assign)) {
         found_satisfying++;
         D_ASSERT(var_array1[i].inDomain(assign.first));
         D_ASSERT(var_array2[i].inDomain(assign.second));
-        D_ASSERT(Operator::check_assignment(assign.first, assign.second));
+        D_ASSERT(Operator::checkAssignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + var_array1.size(), assign.second));
         if(found_satisfying == hamming_distance)
@@ -287,7 +287,7 @@ struct VecCountDynamic : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator>(
         var_array1, var_array2, (SysInt)var_array1.size() - hamming_distance + 1);
   }

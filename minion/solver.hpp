@@ -50,7 +50,7 @@ inline void world_pop() {
   if((SysInt)constraintList.size() > propagateDepth) {
     for(set<AbstractConstraint*>::iterator it = constraintList[propagateDepth].begin();
         it != constraintList[propagateDepth].end(); it++) {
-      (*it)->full_propagate();
+      (*it)->fullPropagate();
     }
 
     if(propagateDepth > 0) {
@@ -79,7 +79,7 @@ inline void world_pop_all() {
 
 inline void SearchState::addConstraint(AbstractConstraint* c) {
   constraints.push_back(c);
-  vector<AnyVarRef>* vars = c->get_vars_singleton();
+  vector<AnyVarRef>* vars = c->getVarsSingleton();
   size_t vars_s = vars->size();
   for(size_t i = 0; i < vars_s; i++) // note all constraints the var is involved in
     (*vars)[i].addConstraint(c);
@@ -93,5 +93,5 @@ inline void SearchState::addConstraintMidsearch(AbstractConstraint* c) {
 
 inline void SearchState::redoFullPropagate(AbstractConstraint* c) {
   constraints_to_propagate[Controller::get_world_depth()].insert(c);
-  c->full_propagate();
+  c->fullPropagate();
 }

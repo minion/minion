@@ -35,11 +35,11 @@
 
 struct Check_Assign : public AbstractConstraint {
 
-  virtual string extended_name() {
-    return constraint_name() + ":" + child->extended_name();
+  virtual string extendedName() {
+    return constraintName() + ":" + child->extendedName();
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "check[assign]";
   }
 
@@ -49,33 +49,33 @@ struct Check_Assign : public AbstractConstraint {
 
   Check_Assign(AbstractConstraint* _con) : child(_con) {}
 
-  virtual AbstractConstraint* reverse_constraint() {
-    return new Check_Assign(child->reverse_constraint());
+  virtual AbstractConstraint* reverseConstraint() {
+    return new Check_Assign(child->reverseConstraint());
   }
 
   virtual ~Check_Assign() {
     delete child;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 1;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    return child->get_satisfying_assignment(assignment);
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
+    return child->getSatisfyingAssignment(assignment);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
-    return child->check_assignment(v, v_size);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+    return child->checkAssignment(v, v_size);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
-    return child->get_vars();
+  virtual vector<AnyVarRef> getVars() {
+    return child->getVars();
   }
 
   virtual void propagateDynInt(SysInt, DomainDelta) {
-    SysInt size = child->get_vars_singleton()->size();
-    vector<AnyVarRef>* vars = child->get_vars_singleton();
+    SysInt size = child->getVarsSingleton()->size();
+    vector<AnyVarRef>* vars = child->getVarsSingleton();
 
     for(SysInt i = 0; i < size; ++i) {
       if(!(*vars)[i].isAssigned()) {
@@ -93,11 +93,11 @@ struct Check_Assign : public AbstractConstraint {
       varptr = &b[0];
     }
 
-    if(!check_assignment(varptr, size))
+    if(!checkAssignment(varptr, size))
       getState().setFailed(true);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     propagateDynInt(0, DomainDelta::empty());
   }
 };

@@ -27,11 +27,11 @@
 template <typename VarRef1, typename VarRef2, typename VarRef3>
 struct AndConstraint : public AbstractConstraint {
 
-  virtual string extended_name() {
+  virtual string extendedName() {
     return "product: and";
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "product";
   }
 
@@ -50,7 +50,7 @@ struct AndConstraint : public AbstractConstraint {
     CHECK(var3.initialMax() == 1, "The 'and' constraint works only Booleans");
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 6;
   }
 
@@ -103,7 +103,7 @@ struct AndConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     if(var1.isAssignedValue(false) || var2.isAssignedValue(false))
       var3.assign(false);
@@ -124,12 +124,12 @@ struct AndConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     return ((v[0] != 0) && (v[1] != 0)) == (v[2] != 0);
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var3.max() == 1) {
       if(var1.max() == 1 && var2.max() == 1) {
         assignment.push_back(make_pair(0, 1));
@@ -155,7 +155,7 @@ struct AndConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     v.push_back(var1);
     v.push_back(var2);
@@ -164,7 +164,7 @@ struct AndConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };

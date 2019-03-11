@@ -57,11 +57,11 @@ for the opposite constraint.
 
 template <typename VarArray, typename MinVarRef>
 struct MinConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "min";
   }
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
     // We assume constraint is propagated here, we will do a simple check
     // to see if it is true.
     if(min_var.isAssigned()) {
@@ -91,7 +91,7 @@ struct MinConstraint : public AbstractConstraint {
   MinConstraint(const VarArray& _var_array, const MinVarRef& _min_var)
       : var_array(_var_array), min_var(_min_var) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return (var_array.size() + 1) * 2;
   }
 
@@ -153,7 +153,7 @@ struct MinConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     SysInt array_size = var_array.size();
     if(array_size == 0) {
@@ -165,7 +165,7 @@ struct MinConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     if(v_size == 1)
       return false;
@@ -177,7 +177,7 @@ struct MinConstraint : public AbstractConstraint {
   }
 
   // Bah: This could be much better!
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(DomainInt i = min_var.min(); i <= min_var.max(); ++i) {
       if(min_var.inDomain(i)) {
         bool flag_domain = false;
@@ -205,11 +205,11 @@ struct MinConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)

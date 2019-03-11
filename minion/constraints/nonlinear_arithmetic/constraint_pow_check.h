@@ -56,7 +56,7 @@ public:
     vars[2] = v3;
   }
 
-  string constraint_name() const {
+  string constraintName() const {
     if(undef_zero)
       return "pow_undefzero";
     else
@@ -65,7 +65,7 @@ public:
 
   CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
 
-  var_type& get_vars() {
+  var_type& getVars() {
     return vars;
   }
 
@@ -73,7 +73,7 @@ public:
     return pow(checked_cast<double>(x), checked_cast<double>(y));
   }
 
-  virtual bool check_assignment(DomainInt* v, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     if(v[0] == 0) {
       if(v[1] == 0)

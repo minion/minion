@@ -77,9 +77,9 @@ inline long get_max_rss() {
 // first, perferably
 // as close to the start of main as possible.
 
-inline long double init_start_wall_time(int special_check = 0) {
+inline long double init_start_wall_time(int specialCheck = 0) {
   static long double start_time = 0;
-  if(special_check == 0) {
+  if(specialCheck == 0) {
     assert(start_time == 0);
     timeval t;
     gettimeofday(&t, NULL);

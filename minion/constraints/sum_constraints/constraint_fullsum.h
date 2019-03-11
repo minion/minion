@@ -47,11 +47,11 @@ ensures that sum(vec) >= c.
 #define P(x)
 
 /// V1 + ... Vn <= X
-/// is_reversed checks if we are in the case where reverse_constraint was
+/// is_reversed checks if we are in the case where reverseConstraint was
 /// previously called.
 template <typename VarArray, typename VarSum, BOOL is_reversed = false>
 struct LessEqualSumConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "sumleq";
   }
 
@@ -88,7 +88,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size() + 1;
   }
 
@@ -135,7 +135,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     P("Full Prop");
     setup_triggers();
     DomainInt min_sum = 0;
@@ -154,7 +154,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       var_sum.setMin(0);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt sum = 0;
     for(SysInt i = 0; i < v_size - 1; i++)
@@ -162,7 +162,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return sum <= *(v + v_size - 1);
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     P("GSA");
     DomainInt sum_value = 0;
     SysInt v_size = var_array.size();
@@ -192,7 +192,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> array_copy(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
       array_copy[i] = var_array[i];
@@ -200,7 +200,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return array_copy;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return rev_implement<is_reversed>();
   }
 

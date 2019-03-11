@@ -38,7 +38,7 @@ help constraints abs
 // X = abs(Y)
 template <typename AbsVarRef1, typename AbsVarRef2>
 struct AbsConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "abs";
   }
 
@@ -48,7 +48,7 @@ struct AbsConstraint : public AbstractConstraint {
   AbsVarRef2 var2;
   AbsConstraint(AbsVarRef1 _var1, AbsVarRef2 _var2) : var1(_var1), var2(_var2) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 4;
   }
 
@@ -59,7 +59,7 @@ struct AbsConstraint : public AbstractConstraint {
     moveTriggerInt(var2, 3, LowerBound);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
     var1.setMin(0);
     for(SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
@@ -117,7 +117,7 @@ struct AbsConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     if(v[1] >= 0)
       return v[0] == v[1];
@@ -125,7 +125,7 @@ struct AbsConstraint : public AbstractConstraint {
       return v[0] == -v[1];
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt x_dom_max = var1.max();
     DomainInt y_dom_max = max(abs(var2.min()), abs(var2.max()));
     DomainInt dom_max = min(x_dom_max, y_dom_max);
@@ -147,7 +147,7 @@ struct AbsConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(2);
     vars.push_back(var1);
@@ -156,7 +156,7 @@ struct AbsConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };

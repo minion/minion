@@ -102,7 +102,7 @@ consistency.
 
 template <typename VarArray, typename Index, typename Result, bool undef_maps_zero = false>
 struct ElementConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "element";
   }
 
@@ -110,7 +110,7 @@ struct ElementConstraint : public AbstractConstraint {
   Index indexvar;
   Result resultvar;
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
     string undef_name = "";
     if(undef_maps_zero)
       undef_name = "_undefzero";
@@ -127,7 +127,7 @@ struct ElementConstraint : public AbstractConstraint {
   ElementConstraint(const VarArray& _var_array, const Index& _indexvar, const Result& _resultvar)
       : var_array(_var_array), indexvar(_indexvar), resultvar(_resultvar) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size() + 2;
   }
 
@@ -204,7 +204,7 @@ struct ElementConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     if(indexvar.isAssigned()) {
       SysInt index = checked_cast<SysInt>(indexvar.assignedValue());
@@ -350,7 +350,7 @@ struct ElementConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 2);
     DomainInt resultvariable = v[v_size - 1];
     DomainInt indexvariable = v[v_size - 2];
@@ -364,7 +364,7 @@ struct ElementConstraint : public AbstractConstraint {
     return v[checked_cast<SysInt>(indexvariable)] == resultvariable;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 2);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -374,7 +374,7 @@ struct ElementConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt array_start = max(DomainInt(0), indexvar.min());
     DomainInt array_end = min(DomainInt(var_array.size()) - 1, indexvar.max());
 
@@ -413,7 +413,7 @@ struct ElementConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     // This is a slow-ish temporary solution.
     // (i=1 and X[1]!=r) or (i=2 ...
     vector<AbstractConstraint*> con;

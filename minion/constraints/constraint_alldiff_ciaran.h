@@ -37,7 +37,7 @@ This constraint enforces an unknown consistency.
 
 template <typename VarArray>
 struct AlldiffCiaran : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "alldiffciaran";
   }
 
@@ -65,7 +65,7 @@ struct AlldiffCiaran : public AbstractConstraint {
   }
 
   typedef typename VarArray::value_type VarRef;
-  virtual AbstractConstraint* reverse_constraint() { // w-or of pairwise equality.
+  virtual AbstractConstraint* reverseConstraint() { // w-or of pairwise equality.
 
     /// solely for reify exps
     return forward_check_negation(stateObj, this);
@@ -181,7 +181,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(var_array.size() == 0)
       return;
 
@@ -202,7 +202,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     propagate(0, DomainDelta::empty());
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
       if(!var_array[i].isAssigned()) {
         assignment.push_back(make_pair(i, var_array[i].min()));
@@ -222,7 +222,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     return true;
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt array_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
     D_ASSERT(array_size == (SysInt)var_array.size());
     for(SysInt i = 0; i < array_size; i++)
       for(SysInt j = i + 1; j < array_size; j++)
@@ -231,7 +231,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)

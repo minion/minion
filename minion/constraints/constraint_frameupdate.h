@@ -87,7 +87,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     target_to_source_map.assign(target.size(), -1);
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "frameupdate";
   }
 
@@ -112,10 +112,10 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       moveTriggerInt(target[i], trig++, LowerBound);
       moveTriggerInt(target[i], trig++, UpperBound);
     }
-    D_ASSERT(trig == dynamic_trigger_count());
+    D_ASSERT(trig == dynamicTriggerCount());
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return idx_source.size() + idx_target.size() + (source.size() + target.size()) * 2;
   }
 
@@ -180,7 +180,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
 
     // -1 to force we check the indices
@@ -246,7 +246,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     std::set<DomainInt> idx_source_set;
     std::set<DomainInt> idx_target_set;
 
@@ -293,7 +293,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     for(unsigned i = 0; i < idx_source.size(); ++i) {
       v.push_back(idx_source[i]);
@@ -310,7 +310,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(unsigned i = 0; i < idx_source.size(); ++i) {
       if(!idx_source[i].isAssigned()) {
         assignment.push_back(make_pair(i, idx_source[i].max()));
@@ -388,7 +388,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };

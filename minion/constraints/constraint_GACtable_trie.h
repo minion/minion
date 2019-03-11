@@ -112,18 +112,18 @@ help input tuplelist
 
 template <typename VarArray, SysInt negative>
 struct GACTableConstraint : public AbstractConstraint {
-  virtual string extended_name() {
+  virtual string extendedName() {
     return "table(trie)";
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(negative)
       return "negativetable";
     else
       return "table";
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -176,7 +176,7 @@ struct GACTableConstraint : public AbstractConstraint {
       delete[] trie_current_support[i];
   }
 
-  SysInt dynamic_trigger_count() {
+  SysInt dynamicTriggerCount() {
     return checked_cast<SysInt>(tuples->literal_num * ((SysInt)vars.size() - 1));
   }
 
@@ -250,7 +250,7 @@ struct GACTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(negative == 0 && tuples->size() == 0) { // it seems to work without this
                                                // explicit check, but I put it
                                                // in anyway.
@@ -306,7 +306,7 @@ struct GACTableConstraint : public AbstractConstraint {
     // cout << endl; cout << "  fp: finished finding supports: " << endl ;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     D_ASSERT(!getState().isFailed());
     DomainInt max = vars[0].max();
     for(DomainInt i = vars[0].min(); i <= max; ++i) {
@@ -355,7 +355,7 @@ struct GACTableConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     if(negative == 0) {
       for(SysInt i = 0; i < tuples->size(); ++i) {
         if(std::equal(v, v + checked_cast<SysInt>(v_size), (*tuples)[i]))
@@ -371,7 +371,7 @@ struct GACTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> anyvars;
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);

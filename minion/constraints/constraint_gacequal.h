@@ -65,7 +65,7 @@ diseq(v0,v1)
 
 template <typename EqualVarRef1, typename EqualVarRef2>
 struct GACEqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "gaceq";
   }
 
@@ -78,12 +78,12 @@ struct GACEqualConstraint : public AbstractConstraint {
 
   GACEqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : var1(_var1), var2(_var2) {}
 
-  SysInt dynamic_trigger_count() {
+  SysInt dynamicTriggerCount() {
     return checked_cast<SysInt>(var1.initialMax() - var1.initialMin() + var2.initialMax() -
                                 var2.initialMin() + 2);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     dvar2 = checked_cast<SysInt>(var1.initialMax() - var1.initialMin() + 1);
 
     DomainInt maxlim = min(var1.max(), var2.max());
@@ -129,12 +129,12 @@ struct GACEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return (v[0] == v[1]);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(2);
     vars.push_back(var1);
@@ -142,7 +142,7 @@ struct GACEqualConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt min_val = max(var1.min(), var2.min());
     DomainInt max_val = min(var1.max(), var2.max());
 
@@ -156,7 +156,7 @@ struct GACEqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(var1, var2);
   }
 };

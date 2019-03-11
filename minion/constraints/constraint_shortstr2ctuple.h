@@ -255,14 +255,14 @@ struct CTupleSTRData {
 
 template <typename VarArray, bool UseShort>
 struct CTupleSTR : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "shortctuplestr2";
   }
 
   //    CONSTRAINT_ARG_LIST2(vars, tupleList);
 
-  virtual string full_output_name() {
-    return ConOutput::print_con(constraint_name(), vars, shortTupleList);
+  virtual string fullOutputName() {
+    return ConOutput::print_con(constraintName(), vars, shortTupleList);
   }
 
   ShortTupleList* shortTupleList;
@@ -316,7 +316,7 @@ struct CTupleSTR : public AbstractConstraint {
     init();
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return vars.size();
   }
 
@@ -326,7 +326,7 @@ struct CTupleSTR : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     limit = sct->tuples.size();
 
@@ -337,7 +337,7 @@ struct CTupleSTR : public AbstractConstraint {
     do_prop();
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
     for(unsigned i = 0; i < vars.size(); ++i)
@@ -345,7 +345,7 @@ struct CTupleSTR : public AbstractConstraint {
     return ret;
   }
 
-  virtual bool check_assignment(DomainInt* v, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
     const vector<set<DomainInt>>& doms = shortTupleList->initialDomains();
     if(doms.size() > 0) {
       for(SysInt i = 0; i < v_size; ++i) {
@@ -374,7 +374,7 @@ struct CTupleSTR : public AbstractConstraint {
     return false;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(SysInt i = 0; i < (SysInt)sct->tuples.size(); ++i) {
       bool sat = true;
       assignment.clear();
@@ -405,7 +405,7 @@ struct CTupleSTR : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -423,7 +423,7 @@ struct CTupleSTR : public AbstractConstraint {
     sval.clear();
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     constraint_locked = false;
     D_ASSERT(!getState().isFailed());
     do_prop();

@@ -49,13 +49,13 @@ std::pair<DomainInt, DomainInt> get_initialBounds(const V& v) {
 
 std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v) {
   switch(v.type()) {
-  case VAR_BOOL: return get_initialBounds(getVars().boolVarContainer.get_var_num(v.pos()));
+  case VAR_BOOL: return get_initialBounds(getVars().boolVarContainer.getVarNum(v.pos()));
   case VAR_NOTBOOL:
-    return get_initialBounds(VarNotRef(getVars().boolVarContainer.get_var_num(v.pos())));
-  case VAR_BOUND: return get_initialBounds(getVars().boundVarContainer.get_var_num(v.pos()));
+    return get_initialBounds(VarNotRef(getVars().boolVarContainer.getVarNum(v.pos())));
+  case VAR_BOUND: return get_initialBounds(getVars().boundVarContainer.getVarNum(v.pos()));
   case VAR_SPARSEBOUND:
-    return get_initialBounds(getVars().sparseBoundVarContainer.get_var_num(v.pos()));
-  case VAR_DISCRETE: return get_initialBounds(getVars().bigRangeVarContainer.get_var_num(v.pos()));
+    return get_initialBounds(getVars().sparseBoundVarContainer.getVarNum(v.pos()));
+  case VAR_DISCRETE: return get_initialBounds(getVars().bigRangeVarContainer.getVarNum(v.pos()));
   case VAR_SPARSEDISCRETE: INPUT_ERROR("Sparse Discrete not supported at present");
   case VAR_CONSTANT: return get_initialBounds(ConstantVar(v.pos()));
   default: INPUT_ERROR("Unknown variable type " << v.type() << ".");
@@ -65,11 +65,11 @@ std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v) {
 /// Helper function used in a few places.
 AnyVarRef get_AnyVarRef_from_Var(Var v) {
   switch(v.type()) {
-  case VAR_BOOL: return AnyVarRef(getVars().boolVarContainer.get_var_num(v.pos()));
-  case VAR_NOTBOOL: return AnyVarRef(VarNotRef(getVars().boolVarContainer.get_var_num(v.pos())));
-  case VAR_BOUND: return AnyVarRef(getVars().boundVarContainer.get_var_num(v.pos()));
-  case VAR_SPARSEBOUND: return AnyVarRef(getVars().sparseBoundVarContainer.get_var_num(v.pos()));
-  case VAR_DISCRETE: return AnyVarRef(getVars().bigRangeVarContainer.get_var_num(v.pos()));
+  case VAR_BOOL: return AnyVarRef(getVars().boolVarContainer.getVarNum(v.pos()));
+  case VAR_NOTBOOL: return AnyVarRef(VarNotRef(getVars().boolVarContainer.getVarNum(v.pos())));
+  case VAR_BOUND: return AnyVarRef(getVars().boundVarContainer.getVarNum(v.pos()));
+  case VAR_SPARSEBOUND: return AnyVarRef(getVars().sparseBoundVarContainer.getVarNum(v.pos()));
+  case VAR_DISCRETE: return AnyVarRef(getVars().bigRangeVarContainer.getVarNum(v.pos()));
   case VAR_SPARSEDISCRETE: INPUT_ERROR("Sparse Discrete not supported at present");
   case VAR_CONSTANT: return AnyVarRef(ConstantVar(v.pos()));
   default: INPUT_ERROR("Unknown variable type " << v.type() << ".");

@@ -75,10 +75,10 @@ help constraints occurrenceleq
 #ifndef CONSTRAINT_OCCURRENCE_H
 #define CONSTRAINT_OCCURRENCE_H
 
-// Negated occurrence; used in reverse_constraint for OccurrenceEqualConstraint
+// Negated occurrence; used in reverseConstraint for OccurrenceEqualConstraint
 template <typename VarArray, typename Val, typename ValCount>
 struct NotOccurrenceEqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "NotOccurrenceEqual";
   }
 
@@ -113,7 +113,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   // consider the remaining one in the vector, and either fix it to v or
   // remove v from its domain to avoid the value of val_count.
 
-  virtual SysInt dynamic_trigger_count() { // two moving assignment triggers.
+  virtual SysInt dynamicTriggerCount() { // two moving assignment triggers.
     return 3;
   }
 
@@ -121,7 +121,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     moveTriggerInt(val_count, 2, Assigned);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     ;
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt count = 0;
@@ -130,7 +130,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     return count != *(v + v_size - 1);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -280,7 +280,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
 
     trigger1index = watch_unassigned_in_vector(-1, -1, 0);
@@ -301,7 +301,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
   // Getting a satisfying assignment here is too hard, we don't want to have to
   // build a matching.
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
@@ -320,7 +320,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     } else
       c.push_back(val_count.assignedValue());
 
-    if(check_assignment(c.begin(), c.size())) { // Put the complete assignment in the box.
+    if(checkAssignment(c.begin(), c.size())) { // Put the complete assignment in the box.
       for(SysInt i = 0; i < (SysInt)var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
@@ -328,16 +328,16 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  AbstractConstraint* reverse_constraint();
+  AbstractConstraint* reverseConstraint();
 };
 
 template <typename VarArray, typename Val>
 struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "OccurrenceLeq/Geq";
   }
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
     if(val_count_min == 0) {
       return ConOutput::print_con("occurrenceleq", var_array, value, val_count_max);
     } else {
@@ -368,7 +368,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     not_occurrences_count = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size();
   }
 
@@ -446,7 +446,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     not_occurrences_count = not_occs;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
     if(val_count_max < 0 || val_count_min > (SysInt)var_array.size())
       getState().setFailed(true);
@@ -464,7 +464,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       not_occurrence_limit_reached();
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     DomainInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
@@ -472,7 +472,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     return (count >= val_count_min) && (count <= val_count_max);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -482,7 +482,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
   // Getting a satisfying assignment here is too hard, we don't want to have to
   // build a matching.
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
     if(val_count_min == 0) {
@@ -523,7 +523,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  AbstractConstraint* reverse_constraint() {
+  AbstractConstraint* reverseConstraint() {
     // This constraint actually constrains the occurrences of value to an an
     // interval
     // [val_count_min, val_count_max]. But it's apparently only used for
@@ -545,7 +545,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
 template <typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "occurrence";
   }
 
@@ -571,7 +571,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     not_occurrences_count = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size() + 2;
   }
 
@@ -651,7 +651,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     moveTriggerInt(val_count, var_array.size() + 1, LowerBound);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
 
     val_count.setMin(0);
@@ -666,7 +666,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
       not_occurrence_limit_reached();
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt count = 0;
     for(SysInt i = 0; i < v_size - 1; ++i)
@@ -674,7 +674,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     return count == *(v + v_size - 1);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -685,7 +685,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
 
   // Getting a satisfying assignment here is too hard, we don't want to have to
   // build a matching.
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     MAKE_STACK_BOX(c, DomainInt, var_array.size() + 1);
 
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
@@ -704,7 +704,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     } else
       c.push_back(val_count.assignedValue());
 
-    if(check_assignment(c.begin(), c.size())) { // Put the complete assignment in the box.
+    if(checkAssignment(c.begin(), c.size())) { // Put the complete assignment in the box.
       for(SysInt i = 0; i < (SysInt)var_array.size() + 1; ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
@@ -712,13 +712,13 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  AbstractConstraint* reverse_constraint() {
+  AbstractConstraint* reverseConstraint() {
     return new NotOccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, val_count);
   }
 };
 
 template <typename VarArray, typename Val, typename ValCount>
-AbstractConstraint* NotOccurrenceEqualConstraint<VarArray, Val, ValCount>::reverse_constraint() {
+AbstractConstraint* NotOccurrenceEqualConstraint<VarArray, Val, ValCount>::reverseConstraint() {
   return new OccurrenceEqualConstraint<VarArray, Val, ValCount>(var_array, value, val_count);
 }
 

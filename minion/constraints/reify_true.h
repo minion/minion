@@ -37,11 +37,11 @@
 
 template <typename BoolVar, bool DoWatchAssignment>
 struct reify_true : public ParentConstraint {
-  virtual string extended_name() {
-    return constraint_name() + ":" + child_constraints[0]->extended_name();
+  virtual string extendedName() {
+    return constraintName() + ":" + child_constraints[0]->extendedName();
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(DoWatchAssignment)
       return "reifyimply";
     else
@@ -53,76 +53,76 @@ struct reify_true : public ParentConstraint {
   BoolVar rar_var;
   bool constraint_locked;
 
-  Reversible<bool> full_propagate_called;
+  Reversible<bool> fullPropagate_called;
 
   reify_true(AbstractConstraint* _poscon, BoolVar _rar_var)
       : ParentConstraint({_poscon}),
         rar_var(_rar_var),
         constraint_locked(false),
-        full_propagate_called(false) {
+        fullPropagate_called(false) {
     CHECK(rar_var.initialMin() >= 0 && rar_var.initialMax() <= 1,
           "reifyimply only works on Boolean variables");
   }
 
   // (var -> C) is equiv to (!var \/ C), so reverse is (var /\ !C)
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     vector<AbstractConstraint*> con;
     con.push_back(new WatchLiteralConstraint<BoolVar>(rar_var, 1));
-    con.push_back(child_constraints[0]->reverse_constraint());
+    con.push_back(child_constraints[0]->reverseConstraint());
     return new Dynamic_AND(con);
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     if(DoWatchAssignment)
-      return child_constraints[0]->get_vars_singleton()->size() * 2 + 1;
+      return child_constraints[0]->getVarsSingleton()->size() * 2 + 1;
     else
       return 1;
   }
 
   SysInt reify_var_trigger() {
     if(DoWatchAssignment)
-      return child_constraints[0]->get_vars_singleton()->size() * 2;
+      return child_constraints[0]->getVarsSingleton()->size() * 2;
     else
       return 0;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(rar_var.inDomain(0)) {
-      D_ASSERT(get_vars()[child_constraints[0]->get_vars_singleton()->size()].inDomain(0));
-      assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 0));
+      D_ASSERT(getVars()[child_constraints[0]->getVarsSingleton()->size()].inDomain(0));
+      assignment.push_back(make_pair(child_constraints[0]->getVarsSingleton()->size(), 0));
       return true;
     } else {
       D_ASSERT(rar_var.inDomain(1));
-      bool ret = child_constraints[0]->get_satisfying_assignment(assignment);
+      bool ret = child_constraints[0]->getSatisfyingAssignment(assignment);
       if(ret) {
-        assignment.push_back(make_pair(child_constraints[0]->get_vars_singleton()->size(), 1));
+        assignment.push_back(make_pair(child_constraints[0]->getVarsSingleton()->size(), 1));
         return true;
       } else
         return false;
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     DomainInt back_val = *(v + checked_cast<SysInt>(v_size - 1));
     // v.pop_back();
     if(back_val == 1)
-      return child_constraints[0]->check_assignment(v, v_size - 1);
+      return child_constraints[0]->checkAssignment(v, v_size - 1);
     else
       return (back_val == 0);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
-    vector<AnyVarRef> vec = child_constraints[0]->get_vars();
+  virtual vector<AnyVarRef> getVars() {
+    vector<AnyVarRef> vec = child_constraints[0]->getVars();
     vec.push_back(rar_var);
     return vec;
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     D_ASSERT(constraint_locked);
     P("Special Check!");
     constraint_locked = false;
-    child_constraints[0]->full_propagate();
-    full_propagate_called = true;
+    child_constraints[0]->fullPropagate();
+    fullPropagate_called = true;
   }
 
   virtual void special_unlock() {
@@ -155,13 +155,13 @@ struct reify_true : public ParentConstraint {
     }
 
     if(DoWatchAssignment && trig >= dt &&
-       trig < dt + dynamic_trigger_count()) { // Lost assignment, but don't
+       trig < dt + dynamicTriggerCount()) { // Lost assignment, but don't
                                               // replace when rar_var=0
       P("Triggered on an assignment watch");
-      if(trig == dt + dynamic_trigger_count() - 1)
+      if(trig == dt + dynamicTriggerCount() - 1)
         abort();
 
-      if(!full_propagate_called && !rar_var.isAssigned()) {
+      if(!fullPropagate_called && !rar_var.isAssigned()) {
         bool flag;
         GET_ASSIGNMENT(assignment, child_constraints[0]);
         PROP_INFO_ADDONE(ReifyImplyGetSatAssg);
@@ -173,12 +173,12 @@ struct reify_true : public ParentConstraint {
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt);
+        watch_assignment(assignment, *(child_constraints[0]->getVarsSingleton()), dt);
       }
       return;
     }
 
-    if(full_propagate_called) {
+    if(fullPropagate_called) {
       P("Pass triggers to children");
       D_ASSERT(rar_var.isAssigned() && rar_var.assignedValue() == 1);
       passDynTriggerToChild(trig, dd);
@@ -202,23 +202,23 @@ struct reify_true : public ParentConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     P("Full prop");
     D_ASSERT(!getState().isFailed());
-    P(child_constraints[0]->constraint_name());
+    P(child_constraints[0]->constraintName());
     D_ASSERT(rar_var.min() >= 0);
     D_ASSERT(rar_var.max() <= 1);
 
     moveTriggerInt(rar_var, reify_var_trigger(), LowerBound);
 
     if(rar_var.isAssigned() && rar_var.assignedValue() == 1) {
-      child_constraints[0]->full_propagate();
-      full_propagate_called = true;
+      child_constraints[0]->fullPropagate();
+      fullPropagate_called = true;
       return;
     }
 
     const SysInt dt = 0;
-    SysInt dt_count = dynamic_trigger_count();
+    SysInt dt_count = dynamicTriggerCount();
     // Clean up triggers (skip the one watching the reification variable)
     for(SysInt i = 0; i < dt_count - 1; ++i)
       releaseTriggerInt(i);
@@ -233,7 +233,7 @@ struct reify_true : public ParentConstraint {
         rar_var.assign(0);
         return;
       }
-      watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), dt);
+      watch_assignment(assignment, *(child_constraints[0]->getVarsSingleton()), dt);
     }
   }
 };

@@ -109,7 +109,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
   using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper;
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "gacalldiff";
   }
 
@@ -177,7 +177,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   // only used in dynamic version.
-  SysInt dynamic_trigger_count() {
+  SysInt dynamicTriggerCount() {
     return old_dynamic_triggers() + var_array.size();
   }
 
@@ -188,7 +188,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   typedef typename VarArray::value_type VarRef;
-  virtual AbstractConstraint* reverse_constraint() { // w-or of pairwise equality.
+  virtual AbstractConstraint* reverseConstraint() { // w-or of pairwise equality.
 
     /// solely for reify exps
     return forward_check_negation(this);
@@ -388,7 +388,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     constraint_locked = false;
     to_process.clear();
   }
-  virtual void special_check() {
+  virtual void specialCheck() {
     constraint_locked = false; // should be above the if.
 
     if(getState().isFailed()) {
@@ -682,7 +682,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     return;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
 #if UseIncGraph
     {
@@ -727,7 +727,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt array_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
     D_ASSERT(array_size == (SysInt)var_array.size());
     for(SysInt i = 0; i < array_size; i++)
       for(SysInt j = i + 1; j < array_size; j++)
@@ -736,7 +736,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -744,7 +744,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     bool matchok = true;
     for(SysInt i = 0; i < numvars; i++) {
       if(!var_array[i].inDomain(varvalmatching[i])) {

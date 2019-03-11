@@ -65,7 +65,7 @@ for a similar constraint with strict lexicographic inequality.
 
 template <typename VarArray1, typename VarArray2, BOOL Less = false>
 struct LexLeqConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(Less)
       return "lexless";
     else
@@ -96,7 +96,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     F = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return x.size() * 4;
   }
 
@@ -109,7 +109,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new LexLeqConstraint<VarArray2, VarArray1, !Less>(y, x);
   }
 
@@ -213,7 +213,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     SysInt i, n = x.size();
     for(i = 0; i < n; i++) {
@@ -267,7 +267,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)x.size() + (SysInt)y.size());
     size_t x_size = x.size();
 
@@ -283,7 +283,7 @@ struct LexLeqConstraint : public AbstractConstraint {
       return true;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     size_t x_size = x.size();
     for(size_t i = 0; i < x_size; ++i) {
       DomainInt x_i_min = x[i].min();
@@ -304,7 +304,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> array_copy;
     for(UnsignedSysInt i = 0; i < x.size(); i++)
       array_copy.push_back(AnyVarRef(x[i]));

@@ -154,12 +154,12 @@ struct MDDNode {
 
 template <typename VarArray, bool isNegative = false>
 struct MDDC : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "mddc";
   }
 
-  virtual string full_output_name() {
-    return ConOutput::print_con(constraint_name(), vars, tuples);
+  virtual string fullOutputName() {
+    return ConOutput::print_con(constraintName(), vars, tuples);
   }
 
   VarArray vars;
@@ -485,7 +485,7 @@ struct MDDC : public AbstractConstraint {
     }
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return vars.size();
   }
 
@@ -495,13 +495,13 @@ struct MDDC : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     // Just propagate.
     do_prop();
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
     for(unsigned i = 0; i < vars.size(); ++i)
@@ -509,7 +509,7 @@ struct MDDC : public AbstractConstraint {
     return ret;
   }
 
-  virtual bool check_assignment(DomainInt* tup, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* tup, SysInt v_size) {
     MDDNode* curnode = top;
     for(SysInt i = 0; i < v_size; i++) {
 
@@ -560,7 +560,7 @@ struct MDDC : public AbstractConstraint {
     return -1;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     // Run a depth-first search that is similar to the propagator
 
     bool flag = mddcrecurse_assignment(top, 0, assignment);
@@ -568,7 +568,7 @@ struct MDDC : public AbstractConstraint {
     return flag;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -583,7 +583,7 @@ struct MDDC : public AbstractConstraint {
     constraint_locked = false;
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     constraint_locked = false;
     D_ASSERT(!getState().isFailed());
     do_prop();

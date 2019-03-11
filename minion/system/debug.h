@@ -23,7 +23,7 @@
 
 #include "basic_headers.h"
 
-void output_fatal_error(string s) DOM_NORETURN;
+void outputFatalError(string s) DOM_NORETURN;
 
 template <typename T>
 inline void CheckNotBound(const T& t, std::string s, std::string s2 = "") {
@@ -34,7 +34,7 @@ inline void CheckNotBound(const T& t, std::string s, std::string s2 = "") {
       if(s2 != "")
         oss << "Please use '" << s2 << "' as a replacement or";
       oss << "Please use DISCRETE variables instead.\n";
-      output_fatal_error(oss.str());
+      outputFatalError(oss.str());
     }
   }
 }
@@ -47,7 +47,7 @@ inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "") 
     if(s2 != "")
       oss << "Please use " << s2 << " as a replacement or ";
     oss << "Please use DISCRETE variables instead.\n";
-    output_fatal_error(oss.str());
+    outputFatalError(oss.str());
   }
 }
 

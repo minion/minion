@@ -30,7 +30,7 @@ intervals must be given in numerical order.
 // Checks if a variable is in a fixed set.
 template <typename Var>
 struct WatchInIntervalSetConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-inintervalset";
   }
 
@@ -60,11 +60,11 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     }
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 1;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(intervals.empty()) {
       getState().setFailed(true);
       return;
@@ -115,7 +115,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     var.setMax((*it_high).second);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     vector<std::pair<DomainInt, DomainInt>>::iterator it_high =
         std::lower_bound(intervals.begin(), intervals.end(), std::make_pair(v[0], v[0]));
@@ -137,14 +137,14 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
     for(SysInt i = 0; i < (SysInt)intervals.size(); ++i) {
       for(DomainInt d = intervals[i].first; d <= intervals[i].second; d++) {
@@ -157,7 +157,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     // It is its own reverse.
     vector<DomainInt> negintervals;
 

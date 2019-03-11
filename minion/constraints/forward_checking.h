@@ -37,11 +37,11 @@ struct Forward_Checking : public AbstractConstraint {
   ReversibleMonotonicSet FCPruning; // need one bit to support bound vars
   SysInt pruningvar;
 
-  virtual string extended_name() {
-    return constraint_name() + ":" + child->extended_name();
+  virtual string extendedName() {
+    return constraintName() + ":" + child->extendedName();
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "forwardchecking";
   }
 
@@ -52,35 +52,35 @@ struct Forward_Checking : public AbstractConstraint {
   Forward_Checking(AbstractConstraint* _con)
       : FCPruning(1), pruningvar(-1), child(_con), trig1(-1), trig2(-1) {}
 
-  virtual AbstractConstraint* reverse_constraint() {
-    return new Forward_Checking(child->reverse_constraint());
+  virtual AbstractConstraint* reverseConstraint() {
+    return new Forward_Checking(child->reverseConstraint());
   }
 
   virtual ~Forward_Checking() {
     delete child;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 3;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
-    return child->get_satisfying_assignment(assignment);
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
+    return child->getSatisfyingAssignment(assignment);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
-    return child->check_assignment(v, v_size);
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
+    return child->checkAssignment(v, v_size);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
-    return child->get_vars();
+  virtual vector<AnyVarRef> getVars() {
+    return child->getVars();
   }
 
   SysInt trig1, trig2;
 
-  virtual void full_propagate() {
-    SysInt size = child->get_vars_singleton()->size();
-    vector<AnyVarRef>* vars = child->get_vars_singleton();
+  virtual void fullPropagate() {
+    SysInt size = child->getVarsSingleton()->size();
+    vector<AnyVarRef>* vars = child->getVarsSingleton();
 
     trig1 = trig2 = -1;
 
@@ -106,8 +106,8 @@ struct Forward_Checking : public AbstractConstraint {
   }
 
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
-    SysInt size = child->get_vars_singleton()->size();
-    vector<AnyVarRef>* vars = child->get_vars_singleton();
+    SysInt size = child->getVarsSingleton()->size();
+    vector<AnyVarRef>* vars = child->getVarsSingleton();
 
     if(dt == 0) {
       // Find trigger 1 again.
@@ -158,7 +158,7 @@ struct Forward_Checking : public AbstractConstraint {
       varptr = &b[0];
     }
 
-    if(!check_assignment(varptr, size)) {
+    if(!checkAssignment(varptr, size)) {
       return true; // true means failed.
     } else {
       return false;
@@ -217,7 +217,7 @@ struct Forward_Checking : public AbstractConstraint {
     for(DomainInt value = v.min(); value <= maxval; value++) {
       if(v.inDomain(value)) {
         b[var] = value;
-        if(!check_assignment(&b[0], size)) {
+        if(!checkAssignment(&b[0], size)) {
           v.removeFromDomain(value);
         }
       }
@@ -243,7 +243,7 @@ struct Forward_Checking : public AbstractConstraint {
     // Scan up from lower bound.
     for(DomainInt value = v.min(); value <= maxval; value++) {
       b[var] = value;
-      if(!check_assignment(&b[0], size)) {
+      if(!checkAssignment(&b[0], size)) {
         v.setMin(value + 1);
       } else {
         break;
@@ -255,7 +255,7 @@ struct Forward_Checking : public AbstractConstraint {
     // Scan down from upper bound
     for(DomainInt value = v.max(); value >= minval; value--) {
       b[var] = value;
-      if(!check_assignment(&b[0], size)) {
+      if(!checkAssignment(&b[0], size)) {
         v.setMax(value - 1);
       } else {
         break;

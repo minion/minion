@@ -53,7 +53,7 @@ for the same constraint that enforces GAC.
 
 template <typename VarArray>
 struct NeqConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "alldiff";
   }
 
@@ -67,7 +67,7 @@ struct NeqConstraint : public AbstractConstraint {
 
   NeqConstraint(const VarArray& _var_array) : var_array(_var_array) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size();
   }
 
@@ -76,7 +76,7 @@ struct NeqConstraint : public AbstractConstraint {
       moveTriggerInt(var_array[i], i, Assigned);
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -99,7 +99,7 @@ struct NeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     SysInt array_size = var_array.size();
     for(SysInt i = 0; i < array_size; ++i)
@@ -120,7 +120,7 @@ struct NeqConstraint : public AbstractConstraint {
       }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     SysInt array_size = checked_cast<SysInt>(v_size);
     for(SysInt i = 0; i < array_size; i++)
@@ -130,7 +130,7 @@ struct NeqConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -140,7 +140,7 @@ struct NeqConstraint : public AbstractConstraint {
 
   // Getting a satisfying assignment here is too hard, we don't want to have to
   // build a matching.
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     MAKE_STACK_BOX(c, DomainInt, var_array.size());
 
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i) {
@@ -152,7 +152,7 @@ struct NeqConstraint : public AbstractConstraint {
         c.push_back(var_array[i].assignedValue());
     }
 
-    if(check_assignment(c.begin(), c.size())) { // Put the complete assignment in the box.
+    if(checkAssignment(c.begin(), c.size())) { // Put the complete assignment in the box.
       for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;

@@ -34,7 +34,7 @@
 // Checks if a variable is in a fixed Range.
 template <typename Var>
 struct WatchInRangeConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-inrange";
   }
 
@@ -47,18 +47,18 @@ struct WatchInRangeConstraint : public AbstractConstraint {
   template <typename T>
   WatchInRangeConstraint(const Var& _var, const T& _vals) : var(_var) {
     if(_vals.size() != 2) {
-      output_fatal_error("The range of an 'inrange' constraint must contain 2 values!");
+      outputFatalError("The range of an 'inrange' constraint must contain 2 values!");
     }
 
     range_min = _vals[0];
     range_max = _vals[1];
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     var.setMin(range_min);
     var.setMax(range_max);
   }
@@ -68,19 +68,19 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     D_FATAL_ERROR("Propagation is never called for 'in range'");
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] >= range_min && v[0] <= range_max);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
     DomainInt min_val = max(range_min, var.min());
     DomainInt max_val = min(range_max, var.max());
@@ -93,10 +93,10 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverseConstraint();
 };
 
-// To get reverse_constraint
+// To get reverseConstraint
 #include "dynamic_notinrange.h"
 
 template <typename VarArray1>

@@ -43,13 +43,13 @@ help input haggisgac
 template <typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable {
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "gacschema";
   }
 
   CONSTRAINT_ARG_LIST2(vars, data);
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     const SysInt tuple_size = checked_cast<SysInt>(data->tuple_size());
     const SysInt length = checked_cast<SysInt>(data->size());
     DomainInt* tuple_data = data->getPointer();
@@ -70,7 +70,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -471,7 +471,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     }
   }
 
-  SysInt dynamic_trigger_count() {
+  SysInt dynamicTriggerCount() {
     return vars.size() * numvals;
   }
 
@@ -572,7 +572,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     return false;
   }
 
-  virtual bool check_assignment(DomainInt* v, SysInt array_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt array_size) {
     for(SysInt i = 0; i < checked_cast<SysInt>(data->size()); ++i) {
       if(std::equal(v, v + array_size, data->get_tupleptr(i)))
         return true;
@@ -600,7 +600,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     // D_ASSERT(backtrack_stack.size()==0);
     if(data->size() == 0) {
       getState().setFailed(true);
@@ -643,7 +643,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     }
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
     for(unsigned i = 0; i < vars.size(); ++i)

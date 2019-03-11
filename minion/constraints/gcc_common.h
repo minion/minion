@@ -29,7 +29,7 @@
 #include <utility>
 #include <vector>
 
-// for NotOccurrenceEqualConstraint, used in reverse_constraint,
+// for NotOccurrenceEqualConstraint, used in reverseConstraint,
 #include "constraint_occurrence.h"
 #include "dynamic_new_or.h"
 
@@ -244,7 +244,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   InternalDynamicTriggers<VarArray> idt;
 #endif
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     for(SysInt i = 0; i < (SysInt)capacity_array.size(); i++) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
@@ -424,7 +424,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     constraint_locked = false;
     to_process.clear();
   }
-  virtual void special_check() {
+  virtual void specialCheck() {
     constraint_locked = false; // should be above the if.
 
     if(getState().isFailed()) {
@@ -438,7 +438,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     D_ASSERT(dom_max - dom_min + 1 == numvals);
     // Check if the matching is OK.
     bool matchok = true;
@@ -1258,7 +1258,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     GCCPRINT("varvalmatching:" << varvalmatching);
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(Strongcards)
       return "gcc";
     else
@@ -1267,7 +1267,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   CONSTRAINT_ARG_LIST3(var_array, val_array, capacity_array);
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     SysInt trigs = old_dynamic_triggers();
 
     // These are only for !UseIncGraph || !defined(ONECALL)
@@ -1301,7 +1301,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -1311,10 +1311,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     return vars;
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt vsize) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt vsize) {
     D_ASSERT(vsize == (SysInt)var_array.size() + (SysInt)capacity_array.size());
     // borrow augpath array
-    GCCPRINT("In check_assignment with array:[");
+    GCCPRINT("In checkAssignment with array:[");
     for(SysInt i = 0; i < vsize; i++) {
       GCCPRINT(v[i] << ",");
     }
@@ -2221,7 +2221,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   }
 
   typedef typename CapArray::value_type CapVarRef;
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of
     // occurrence
     vector<AbstractConstraint*> con;

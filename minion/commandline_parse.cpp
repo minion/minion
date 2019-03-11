@@ -203,7 +203,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       string prop_mode(argv[i]);
       args.prop_method = GetPropMethodFromString(prop_mode);
       if(args.prop_method.type == PropLevel_None) {
-        output_fatal_error("Cannot use 'None' for -prop-node, must propagate at each node!");
+        outputFatalError("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
     /** @help switches;-map-long-short Description
@@ -231,7 +231,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       else if(prop_mode == "lazy")
         getOptions().map_long_short = MLTTS_Lazy;
       else {
-        output_fatal_error(" -X-map-long-short <none|keeplong|eager|lazy>");
+        outputFatalError(" -X-map-long-short <none|keeplong|eager|lazy>");
       }
     }
     /** @help switches;-preprocess
@@ -326,16 +326,16 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-dumptreejson")) {
       INCREMENT_i(-dumptreejson);
       if(getOptions().dumptree) {
-        output_fatal_error("Only one tree dumper active at once");
+        outputFatalError("Only one tree dumper active at once");
       }
       std::ostream* outfile = new std::ofstream(argv[i]);
       if(!outfile || !(*outfile)) {
-        output_fatal_error("Could not open '" + std::string(argv[i]) + "' for writing");
+        outputFatalError("Could not open '" + std::string(argv[i]) + "' for writing");
       }
       getOptions().dumptreeobj = makeDumpTreeJson(outfile);
     } else if(command == string("-dumptreesql")) {
       if(getOptions().dumptree) {
-        output_fatal_error("Only one tree dumper active at once");
+        outputFatalError("Only one tree dumper active at once");
       }
       getOptions().dumptreeobj = makeDumpTreeSQL();
     }
@@ -471,7 +471,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
         unsigned int tmp;
         std::istringstream iss(argv[i]);
         if(!(iss >> tmp)) {
-          output_fatal_error("-varorder staticlimited requires a positive integer value");
+          outputFatalError("-varorder staticlimited requires a positive integer value");
         }
         args.limit = tmp;
       } else if(order == "srf-random") {
@@ -498,7 +498,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       } else {
         ostringstream oss;
         oss << "I do not understand the order:" << order;
-        output_fatal_error(oss.str());
+        outputFatalError(oss.str());
       }
     } else if(command == string("-valorder")) {
       INCREMENT_i(-valorder);
@@ -569,7 +569,7 @@ void parse_command_line(SearchMethod& args, SysInt argc, char** argv) {
       if(!solsoutFile) {
         ostringstream oss;
         oss << "Cannot open '" << argv[i] << "' for writing.";
-        output_fatal_error(oss.str());
+        outputFatalError(oss.str());
       }
     }
     /** @help switches;-makeresume Description
@@ -682,7 +682,7 @@ specified. Options are "meta" (default) or "hillclimbing".
       } else {
         ostringstream oss;
         oss << "I do not understand the neighbourhood search strategy: " << argv[i];
-        output_fatal_error(oss.str());
+        outputFatalError(oss.str());
       }
 
       // read parameters of the search algorithm
@@ -757,7 +757,7 @@ to be specified. Options are "ucb" (default), "la" (learning automaton), random"
       } else {
         ostringstream oss;
         oss << "I do not understand the neighbourhood selection strategy: " << argv[i];
-        output_fatal_error(oss.str());
+        outputFatalError(oss.str());
       }
     }
     /** @help switches;-ucbInit Description

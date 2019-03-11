@@ -64,7 +64,7 @@
 
 template <typename VarArray>
 struct HaggisGACStable : public AbstractConstraint, Backtrackable {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "haggisgac-stable";
   }
 
@@ -719,7 +719,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
     supportFreeList = sup;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     full_prop_init();
 
     // reset containers defined in constructor
@@ -729,7 +729,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
     lastSupportPerLit.resize(numlits, 0);
     deletedSupports.clear();
 
-    for(int i = 0; i < dynamic_trigger_count(); ++i)
+    for(int i = 0; i < dynamicTriggerCount(); ++i)
       detach_trigger(i);
 
     litsWithLostExplicitSupport.resize(0);
@@ -742,7 +742,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
     findSupportsInitial();
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
     for(unsigned i = 0; i < vars.size(); ++i)

@@ -34,7 +34,7 @@
 // Checks if a variable is equal to a value.
 template <typename Var>
 struct WatchNotLiteralConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-notliteral";
   }
 
@@ -47,11 +47,11 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
   template <typename T>
   WatchNotLiteralConstraint(const Var& _var, const T& _val) : var(_var), val(_val) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 1;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(var.isBound()) {
       if(var.min() == val)
         var.setMin(val + 1);
@@ -74,19 +74,19 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
       var.removeFromDomain(val);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] != val);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     D_ASSERT(var.inDomain(var.min()) && var.inDomain(var.max()));
     DomainInt tmp;
     if((tmp = var.min()) != val) {
@@ -99,11 +99,11 @@ struct WatchNotLiteralConstraint : public AbstractConstraint {
     return false;
   }
 
-  AbstractConstraint* reverse_constraint();
+  AbstractConstraint* reverseConstraint();
 };
 
 struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-notliteral";
   }
 
@@ -118,11 +118,11 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
     // cout << "using boolean specialisation" << endl;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 0;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     var.removeFromDomain(val);
   }
 
@@ -131,19 +131,19 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
     var.removeFromDomain(val);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] != val);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var.min() != val) {
       assignment.push_back(make_pair(0, var.min()));
       return true;
@@ -155,7 +155,7 @@ struct WatchNotLiteralBoolConstraint : public AbstractConstraint {
     return false;
   }
 
-  AbstractConstraint* reverse_constraint();
+  AbstractConstraint* reverseConstraint();
 };
 
 // For reverse constraint.

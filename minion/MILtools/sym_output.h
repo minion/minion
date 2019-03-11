@@ -1050,7 +1050,7 @@ struct InstanceStats {
     // iterate over constraints, collecting all available tightnesses for
     // varvals involved in con
     for(SysInt con = 0; con < (SysInt)cons.size(); con++) {
-      vector<AnyVarRef>& all_vars = *cons[con]->get_vars_singleton();
+      vector<AnyVarRef>& all_vars = *cons[con]->getVarsSingleton();
       for(size_t var = 0; var < all_vars.size(); var++) {
         Var vv = all_vars[var].getBaseVar();
         for(DomainInt val = all_vars[var].initialMin(); val <= all_vars[var].initialMax();

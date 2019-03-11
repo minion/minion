@@ -36,7 +36,7 @@
 // Checks if a variable is in a fixed Range.
 template <typename Var>
 struct WatchNotInRangeConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-notinrange";
   }
 
@@ -57,11 +57,11 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     range_max = _vals[1];
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     // Ignore empty ranges
     if(range_min > range_max)
       return;
@@ -100,19 +100,19 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return (v[0] < range_min || v[0] > range_max);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
     if(var.min() < range_min || var.min() > range_max) {
       assignment.push_back(make_pair(0, var.min()));
@@ -126,7 +126,7 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     std::array<DomainInt, 2> a = {{range_min, range_max}};
     return new WatchInRangeConstraint<Var>(var, a);
   }
@@ -134,7 +134,7 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 
 // From dynamic_inrange.h
 template <typename Var>
-AbstractConstraint* WatchInRangeConstraint<Var>::reverse_constraint() {
+AbstractConstraint* WatchInRangeConstraint<Var>::reverseConstraint() {
   std::array<DomainInt, 2> a = {{range_min, range_max}};
   return new WatchNotInRangeConstraint<Var>(var, a);
 }

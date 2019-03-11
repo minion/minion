@@ -24,7 +24,7 @@
 // VarToCount = 1 means leq, = 0 means geq.
 template <typename VarArray, typename VarSum, SysInt VarToCount = 1>
 struct BoolLessSumConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(VarToCount)
       return "sumleq";
     else
@@ -56,7 +56,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     count = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size();
   }
 
@@ -66,7 +66,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     if(VarToCount)
       return new BoolLessSumConstraint<VarArray, SysInt, 0>(var_array, var_sum + 1);
     else
@@ -107,7 +107,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
       limit_reached();
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     SysInt occs = 0;
     SysInt array_size = var_array.size();
@@ -121,7 +121,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
       limit_reached();
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     for(SysInt i = 0; i < v_size; i++)
       D_ASSERT(v[i] == 0 || v[i] == 1);
@@ -133,7 +133,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
 
   /*
   // TODO : Optimise for booleans
-  virtual bool get_satisfying_assignment(box<pair<SysInt,DomainInt> >&
+  virtual bool getSatisfyingAssignment(box<pair<SysInt,DomainInt> >&
   assignment)
   {
     SysInt sum_value = 0;
@@ -160,7 +160,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   */
 
   // TODO : Optimise for booleans
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     SysInt v_size = var_array.size();
     DomainInt sum_limit;
     if(VarToCount)
@@ -181,7 +181,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     return val_count >= sum_limit;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)

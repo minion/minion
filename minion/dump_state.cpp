@@ -21,7 +21,7 @@
 #include "minion.h"
 
 bool constraint_entailed(AbstractConstraint* c) {
-  AbstractConstraint* rev_c = c->reverse_constraint();
+  AbstractConstraint* rev_c = c->reverseConstraint();
   bool flag;
   GET_ASSIGNMENT(a, rev_c);
   return !flag;
@@ -101,19 +101,19 @@ void just_domain_dump(ostream& os) {
   vector<AnyVarRef> vars;
   // booleans;
   for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i)
-    vars.push_back(vc.boolVarContainer.get_var_num(i));
+    vars.push_back(vc.boolVarContainer.getVarNum(i));
 
   // bound vars
   for(UnsignedSysInt i = 0; i < vc.boundVarContainer.var_count(); ++i)
-    vars.push_back(vc.boundVarContainer.get_var_num(i));
+    vars.push_back(vc.boundVarContainer.getVarNum(i));
 
   // bigRangeVar
   for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.var_count(); ++i)
-    vars.push_back(vc.bigRangeVarContainer.get_var_num(i));
+    vars.push_back(vc.bigRangeVarContainer.getVarNum(i));
 
   // sparseBound
   for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i)
-    vars.push_back(vc.sparseBoundVarContainer.get_var_num(i));
+    vars.push_back(vc.sparseBoundVarContainer.getVarNum(i));
 
   for(UnsignedSysInt i = 0; i < vars.size(); ++i) {
     os << "find " << getNameFromVar(vars[i]) << " : int(";
@@ -156,14 +156,14 @@ void dump_solver(ostream& os, bool just_domains) {
 
   // booleans;
   for(UnsignedSysInt i = 0; i < vc.boolVarContainer.var_count(); ++i) {
-    BoolVarRef bv = vc.boolVarContainer.get_var_num(i);
+    BoolVarRef bv = vc.boolVarContainer.getVarNum(i);
     if(!bv.isAssigned())
       os << "BOOL " << getNameFromVar(bv) << endl;
   }
 
   // bound vars
   for(UnsignedSysInt i = 0; i < vc.boundVarContainer.var_count(); ++i) {
-    BoundVarRef bv = vc.boundVarContainer.get_var_num(i);
+    BoundVarRef bv = vc.boundVarContainer.getVarNum(i);
     if(!bv.isAssigned()) {
       os << "BOUND " << getNameFromVar(bv) << " ";
       os << "{" << bv.min() << ".." << bv.max() << "}" << endl;
@@ -172,7 +172,7 @@ void dump_solver(ostream& os, bool just_domains) {
 
   // bigRangeVar
   for(UnsignedSysInt i = 0; i < vc.bigRangeVarContainer.var_count(); ++i) {
-    BigRangeVarRef bv = vc.bigRangeVarContainer.get_var_num(i);
+    BigRangeVarRef bv = vc.bigRangeVarContainer.getVarNum(i);
     if(!bv.isAssigned()) {
       os << "DISCRETE " << getNameFromVar(bv) << " ";
       os << "{" << bv.min() << ".." << bv.max() << "}" << endl;
@@ -210,7 +210,7 @@ void dump_solver(ostream& os, bool just_domains) {
 
   // sparseBound
   for(UnsignedSysInt i = 0; i < vc.sparseBoundVarContainer.var_count(); ++i) {
-    SparseBoundVarRef bv = vc.sparseBoundVarContainer.get_var_num(i);
+    SparseBoundVarRef bv = vc.sparseBoundVarContainer.getVarNum(i);
     vector<DomainInt> dom = vc.sparseBoundVarContainer.get_raw_domain(i);
     if(!bv.isAssigned()) {
 
@@ -296,7 +296,7 @@ void dump_solver(ostream& os, bool just_domains) {
       // If it wasn't for the fact we are going to exit straight after printing
       // this out, this would be a disaster!
       if(!constraint_entailed(c))
-        os << search_state.getConstraintList()[i]->full_output_name() << "\n";
+        os << search_state.getConstraintList()[i]->fullOutputName() << "\n";
     }
   }
 

@@ -497,7 +497,7 @@ public:
 #endif
   }
 
-  BigRangeVarRef get_var_num(DomainInt i);
+  BigRangeVarRef getVarNum(DomainInt i);
 
   UnsignedSysInt var_count() {
     return var_count_m;
@@ -556,7 +556,7 @@ public:
 };
 
 template <typename T>
-inline BigRangeVarRef BigRangeVarContainer<T>::get_var_num(DomainInt i) {
+inline BigRangeVarRef BigRangeVarContainer<T>::getVarNum(DomainInt i) {
   D_ASSERT(i < (DomainInt)var_count_m);
   return BigRangeVarRef(BigRangeVarRef_internal(this, i));
 }

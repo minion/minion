@@ -179,7 +179,7 @@ struct STRData {
 
 template <typename VarArray, bool UseShort>
 struct STR : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(UseShort)
       return "shortstr2";
     else
@@ -188,11 +188,11 @@ struct STR : public AbstractConstraint {
 
   //    CONSTRAINT_ARG_LIST2(vars, tupleList);
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
     if(UseShort)
-      return ConOutput::print_con(constraint_name(), vars, shortTupleList);
+      return ConOutput::print_con(constraintName(), vars, shortTupleList);
     else
-      return ConOutput::print_con(constraint_name(), vars, longTupleList);
+      return ConOutput::print_con(constraintName(), vars, longTupleList);
   }
 
   ShortTupleList* shortTupleList;
@@ -259,7 +259,7 @@ struct STR : public AbstractConstraint {
     init();
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return vars.size();
   }
 
@@ -269,7 +269,7 @@ struct STR : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     limit = sct->tuples.size();
 
@@ -280,7 +280,7 @@ struct STR : public AbstractConstraint {
     do_prop();
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
     for(unsigned i = 0; i < vars.size(); ++i)
@@ -288,7 +288,7 @@ struct STR : public AbstractConstraint {
     return ret;
   }
 
-  virtual bool check_assignment(DomainInt* v, SysInt v_size) {
+  virtual bool checkAssignment(DomainInt* v, SysInt v_size) {
     if(UseShort) {
       const vector<set<DomainInt>>& doms = shortTupleList->initialDomains();
       if(doms.size() > 0) {
@@ -315,7 +315,7 @@ struct STR : public AbstractConstraint {
     return false;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
 
     for(SysInt i = 0; i < (SysInt)sct->compressed_tuples.size(); ++i) {
       bool sat = true;
@@ -337,7 +337,7 @@ struct STR : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -355,7 +355,7 @@ struct STR : public AbstractConstraint {
     sval.clear();
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     constraint_locked = false;
     D_ASSERT(!getState().isFailed());
     do_prop();

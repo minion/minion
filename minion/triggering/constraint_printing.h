@@ -292,36 +292,36 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
 } // namespace ConOutput
 
 #define CONSTRAINT_ARG_LIST0()                                                                     \
-  virtual string full_output_name() {                                                              \
-    return ConOutput::print_con(constraint_name());                                                \
+  virtual string fullOutputName() {                                                              \
+    return ConOutput::print_con(constraintName());                                                \
   }
 
 #define CONSTRAINT_ARG_LIST1(x)                                                                    \
-  virtual string full_output_name() {                                                              \
-    return ConOutput::print_con(constraint_name(), x);                                             \
+  virtual string fullOutputName() {                                                              \
+    return ConOutput::print_con(constraintName(), x);                                             \
   }
 
 #define CONSTRAINT_ARG_LIST2(x, y)                                                                 \
-  virtual string full_output_name() {                                                              \
-    return ConOutput::print_con(constraint_name(), x, y);                                          \
+  virtual string fullOutputName() {                                                              \
+    return ConOutput::print_con(constraintName(), x, y);                                          \
   }
 
 #define CONSTRAINT_ARG_LIST5(a, b, c, d, e)                                                        \
-  virtual string full_output_name() {                                                              \
-    return ConOutput::print_con(constraint_name(), a, b, c, d, e);                                 \
+  virtual string fullOutputName() {                                                              \
+    return ConOutput::print_con(constraintName(), a, b, c, d, e);                                 \
   }
 
 #define CONSTRAINT_REVERSIBLE_ARG_LIST2(name, revname, x, y)                                       \
-  virtual string full_output_name() {                                                              \
+  virtual string fullOutputName() {                                                              \
     return ConOutput::print_reversible_con(name, revname, x, y);                                   \
   }
 
 #define CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2(weight, name, revname, x, y)                      \
-  virtual string full_output_name() {                                                              \
+  virtual string fullOutputName() {                                                              \
     return ConOutput::print_weighted_reversible_con(weight, name, revname, x, y);                  \
   }
 
 #define CONSTRAINT_ARG_LIST3(x, y, z)                                                              \
-  virtual string full_output_name() {                                                              \
-    return ConOutput::print_con(constraint_name(), x, y, z);                                       \
+  virtual string fullOutputName() {                                                              \
+    return ConOutput::print_con(constraintName(), x, y, z);                                       \
   }

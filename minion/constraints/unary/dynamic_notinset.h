@@ -37,7 +37,7 @@ set {a1,..,an}.
 // Checks if a variable is not in a fixed set.
 template <typename Var>
 struct WatchNotInSetConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "w-notinset";
   }
 
@@ -53,11 +53,11 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     stable_sort(vals.begin(), vals.end());
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(var.isBound()) {
       moveTriggerInt(var, 0, DomainChanged);
       propagateDynInt(0, DomainDelta::empty());
@@ -87,19 +87,19 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 1);
     return !binary_search(vals.begin(), vals.end(), v[0]);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(1);
     vars.push_back(var);
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
     for(DomainInt i = var.min(); i <= var.max(); ++i) {
       if(var.inDomain(i) && !binary_search(vals.begin(), vals.end(), i)) {
@@ -110,14 +110,14 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new WatchInSetConstraint<Var>(var, vals);
   }
 };
 
 // From dynamic_inset.h
 template <typename Var>
-AbstractConstraint* WatchInSetConstraint<Var>::reverse_constraint() {
+AbstractConstraint* WatchInSetConstraint<Var>::reverseConstraint() {
   return new WatchNotInSetConstraint<Var>(var, vals);
 }
 

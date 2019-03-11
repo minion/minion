@@ -24,7 +24,7 @@ using namespace std;
 
 bool debug_crash = false;
 
-void output_fatal_error(string s) {
+void outputFatalError(string s) {
   std::cerr << s << "\n";
   abort();
 }
@@ -37,7 +37,7 @@ void FATAL_REPORTABLE_ERROR() {
          "instance which"
       << endl;
   oss << "caused the problem to us. Thank you." << endl;
-  output_fatal_error(oss.str());
+  outputFatalError(oss.str());
 }
 
 void D_FATAL_ERROR2(string s, string file, string line) {
@@ -53,7 +53,7 @@ void D_FATAL_ERROR2(string s, string file, string line) {
   oss << endl;
   oss << "The generated error message was: " << s << endl;
   oss << "The error was in the file " << file << " on line " << line << endl;
-  output_fatal_error(oss.str());
+  outputFatalError(oss.str());
 }
 
 void DOM_NORETURN FAIL_EXIT(string s) {

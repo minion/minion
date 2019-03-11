@@ -128,14 +128,14 @@ public:
 
   void set_table_filename(string file) {
     if(tablefilename != "") {
-      output_fatal_error("Can only set table output filename once");
+      outputFatalError("Can only set table output filename once");
     }
     tablefilename = file;
   }
 
   void set_json_filename(string file) {
     if(jsonfilename != "") {
-      output_fatal_error("Can only set JSON output filename once");
+      outputFatalError("Can only set JSON output filename once");
     }
     jsonfilename = file;
   }

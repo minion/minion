@@ -364,7 +364,7 @@ struct SparseBoundVarContainer {
   //  SparseBoundVarRef get_new_var();
   template <typename T>
   SparseBoundVarRef get_new_var(const vector<T>&);
-  SparseBoundVarRef get_var_num(DomainInt i);
+  SparseBoundVarRef getVarNum(DomainInt i);
 
   vector<DomainInt> get_raw_domain(DomainInt i) {
     return this->domains[checked_cast<SysInt>(i)];
@@ -438,7 +438,7 @@ struct SparseBoundVarContainer {
 };
 
 template <typename T>
-inline SparseBoundVarRef SparseBoundVarContainer<T>::get_var_num(DomainInt i) {
+inline SparseBoundVarRef SparseBoundVarContainer<T>::getVarNum(DomainInt i) {
   D_ASSERT(i < (SysInt)var_count_m);
   return SparseBoundVarRef(SparseBoundVarRef_internal<T>(this, i));
 }

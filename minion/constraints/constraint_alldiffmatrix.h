@@ -50,7 +50,7 @@ on the rows and columns.
 
 using namespace std;
 
-// for reverse_constraint,
+// for reverseConstraint,
 #include "constraint_occurrence.h"
 #include "dynamic_new_or.h"
 
@@ -91,13 +91,13 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   vector<SysInt> rowcolmatching; // For each row, the matching column.
   vector<SysInt> colrowmatching; // For each column, the matching row.
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "alldiffmatrix";
   }
 
   CONSTRAINT_ARG_LIST2(var_array, value);
 
-  SysInt dynamic_trigger_count() {
+  SysInt dynamicTriggerCount() {
     // Need one per variable on the value of interest, and one on any other
     // value.
     // Two blocks : first the triggers on the value of interest (for all vars)
@@ -118,7 +118,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   typedef typename VarArrayType::value_type VarRef;
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     // use a watched-or of NotOccurrenceEqualConstraint, i.e. the negation of
     // occurrence
     vector<AbstractConstraint*> con;
@@ -195,7 +195,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     constraint_locked = false;
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     constraint_locked = false;
 
     if(getState().isFailed()) {
@@ -204,7 +204,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     do_prop();
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     // Clear the two matching arrays
     for(int i = 0; i < squaresize; i++) {
       rowcolmatching[i] = -1;
@@ -240,7 +240,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     do_prop();
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt array_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
     D_ASSERT(array_size == (SysInt)var_array.size());
     for(SysInt i = 0; i < squaresize; i++) {
       SysInt count = 0;
@@ -261,7 +261,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -600,7 +600,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     }
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     // Clean up the matching first.
     for(int row = 0; row < squaresize; row++) {
       if(rowcolmatching[row] > -1 && !hasValue(row, rowcolmatching[row])) {

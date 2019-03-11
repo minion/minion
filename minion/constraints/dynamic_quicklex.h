@@ -30,7 +30,7 @@
 
 template <typename VarArray1, typename VarArray2, bool Less = false>
 struct QuickLexDynamic : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(Less)
       return "lexless[quick]";
     else
@@ -53,7 +53,7 @@ struct QuickLexDynamic : public AbstractConstraint {
           "QuickLexLeq and QuickLexLess only work with equal length vectors");
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
@@ -69,7 +69,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     releaseTriggerInt(1, TO_Backtrack);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     P("Full Prop");
 
     if(var_array1.size() == 0) {
@@ -158,7 +158,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array1.size() + (SysInt)var_array2.size());
     size_t x_size = var_array1.size();
 
@@ -173,7 +173,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     return !Less;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     size_t array_size = var_array1.size();
     for(size_t i = 0; i < array_size; ++i) {
       DomainInt x_i_min = var_array1[i].min();
@@ -192,11 +192,11 @@ struct QuickLexDynamic : public AbstractConstraint {
     return !Less;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new QuickLexDynamic<VarArray2, VarArray1, !Less>(var_array2, var_array1);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
     for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)

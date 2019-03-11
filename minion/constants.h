@@ -96,14 +96,14 @@ inline PropagationLevel GetPropMethodFromString(std::string instring) {
     ostringstream oss;
     oss << "'" << s << "'' is not a valid Propagation Method!" << std::endl;
     oss << "Valid Values: None, GAC, SAC, SSAC, SACBounds, SSACBounds" << std::endl;
-    output_fatal_error(oss.str());
+    outputFatalError(oss.str());
   }
 
   bool limit = false;
   if(find_split != string::npos) {
     string subtype = instring.substr(find_split + 1, instring.size());
     if(subtype != "limit") {
-      output_fatal_error(instring + " is not a valid propagation method");
+      outputFatalError(instring + " is not a valid propagation method");
     }
     limit = true;
   }

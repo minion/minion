@@ -56,7 +56,7 @@ ALL constraints are reifyimplyable.
 // Note: The whole constraint_locked thing is for the following case:
 // Consider the following events are on the queue:
 // "rareify boolean is assigned, Y is assigned"
-// Now "rareify boolean is assigned" causes full_propagate to be called for
+// Now "rareify boolean is assigned" causes fullPropagate to be called for
 // the constraint. It will set up it's data structures based on the current
 // assignment. Then later it will be given Y is assigned, but have already
 // possibly used that. Confusion follows. Therefore when we want to propagate
@@ -83,17 +83,17 @@ ALL constraints are reifyimplyable.
 
 #ifdef NEWREIFY
 
-// In here variables are numbered from child_constraints[0].get_vars(), then
-// child_constraints[1].get_vars(), then reify_var
+// In here variables are numbered from child_constraints[0].getVars(), then
+// child_constraints[1].getVars(), then reify_var
 
 template <typename BoolVar>
 struct reify : public ParentConstraint {
 
-  virtual string extended_name() {
-    return constraint_name() + ":" + child_constraints[0]->extended_name();
+  virtual string extendedName() {
+    return constraintName() + ":" + child_constraints[0]->extendedName();
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "reify";
   }
 
@@ -103,7 +103,7 @@ struct reify : public ParentConstraint {
   SysInt reify_var_num;
 
   bool constraint_locked;
-  Reversible<bool> full_propagate_called;
+  Reversible<bool> fullPropagate_called;
 
 #ifdef NODETRICK
   unsigned long long reifysetnode;
@@ -116,10 +116,10 @@ struct reify : public ParentConstraint {
   D_DATA(triggerpairstype triggerpairs);
 
   reify(AbstractConstraint* _poscon, BoolVar _rar_var)
-      : ParentConstraint({_poscon, _poscon->reverse_constraint()}),
+      : ParentConstraint({_poscon, _poscon->reverseConstraint()}),
         reify_var(_rar_var),
         constraint_locked(false),
-        full_propagate_called(false) {
+        fullPropagate_called(false) {
     CHECK(reify_var.initialMin() >= 0 && reify_var.initialMax() <= 1,
           "reify only works on Boolean variables");
 #ifdef NODETRICK
@@ -128,29 +128,29 @@ struct reify : public ParentConstraint {
 #endif
     // assume for the time being that the two child constraints have the same
     // number of vars.
-    reify_var_num = child_constraints[0]->get_vars_singleton()->size() +
-                    child_constraints[1]->get_vars_singleton()->size();
-    // dtcount=dynamic_trigger_count();
-    dtcount = child_constraints[0]->get_vars_singleton()->size() * 2 +
-              child_constraints[1]->get_vars_singleton()->size() * 2;
-    c0vars = child_constraints[0]->get_vars_singleton()->size();
+    reify_var_num = child_constraints[0]->getVarsSingleton()->size() +
+                    child_constraints[1]->getVarsSingleton()->size();
+    // dtcount=dynamicTriggerCount();
+    dtcount = child_constraints[0]->getVarsSingleton()->size() * 2 +
+              child_constraints[1]->getVarsSingleton()->size() * 2;
+    c0vars = child_constraints[0]->getVarsSingleton()->size();
 
     D_DATA(triggerpairs.resize(2));
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     // reverse it by swapping the positive and negative constraints.
-    // we call 'reverse_constraint' here to force a new copy of the constraint
-    return new reify<BoolVar>(child_constraints[0]->reverse_constraint(), reify_var);
+    // we call 'reverseConstraint' here to force a new copy of the constraint
+    return new reify<BoolVar>(child_constraints[0]->reverseConstraint(), reify_var);
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return dtcount + 1; // *2 for each child constraint.
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(reify_var.inDomain(1)) {
-      bool flag = child_constraints[0]->get_satisfying_assignment(assignment);
+      bool flag = child_constraints[0]->getSatisfyingAssignment(assignment);
       if(flag) {
         assignment.push_back(make_pair(reify_var_num, 1));
         return true;
@@ -158,7 +158,7 @@ struct reify : public ParentConstraint {
     }
     assignment.clear();
     if(reify_var.inDomain(0)) {
-      bool flag = child_constraints[1]->get_satisfying_assignment(assignment);
+      bool flag = child_constraints[1]->getSatisfyingAssignment(assignment);
       if(flag) {
         for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           assignment[i].first += c0vars;
@@ -169,21 +169,21 @@ struct reify : public ParentConstraint {
     return false;
   }
 
-  virtual BOOL check_assignment(DomainInt* vals, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* vals, SysInt v_size) {
     DomainInt back_val = *(vals + v_size - 1);
     if(back_val == 1) {
-      return child_constraints[0]->check_assignment(vals, c0vars);
+      return child_constraints[0]->checkAssignment(vals, c0vars);
     } else if(back_val == 0) {
       vals += c0vars;
-      return child_constraints[1]->check_assignment(vals, (dtcount / 2) - c0vars);
+      return child_constraints[1]->checkAssignment(vals, (dtcount / 2) - c0vars);
     } else
       return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     // Push both sets of vars, then reify var.
-    vector<AnyVarRef> vec0 = *child_constraints[0]->get_vars_singleton();
-    vector<AnyVarRef> vec1 = *child_constraints[1]->get_vars_singleton();
+    vector<AnyVarRef> vec0 = *child_constraints[0]->getVarsSingleton();
+    vector<AnyVarRef> vec1 = *child_constraints[1]->getVarsSingleton();
     vector<AnyVarRef> c;
     c.reserve(vec0.size() + vec1.size() + 1);
     for(SysInt i = 0; i < (SysInt)vec0.size(); i++)
@@ -194,18 +194,18 @@ struct reify : public ParentConstraint {
     return c;
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     D_ASSERT(constraint_locked);
     P("Special Check!");
     constraint_locked = false;
     D_ASSERT(reify_var.isAssigned() &&
              (reify_var.assignedValue() == 0 || reify_var.assignedValue() == 1));
     if(reify_var.inDomain(0)) {
-      child_constraints[1]->full_propagate();
+      child_constraints[1]->fullPropagate();
     } else {
-      child_constraints[0]->full_propagate();
+      child_constraints[0]->fullPropagate();
     }
-    full_propagate_called = true;
+    fullPropagate_called = true;
   }
 
   virtual void special_unlock() {
@@ -215,7 +215,7 @@ struct reify : public ParentConstraint {
   }
 
   void reify_var_assigned() {
-    if(!full_propagate_called) {
+    if(!fullPropagate_called) {
       P("reifyvar assigned - Do full propagate");
 #ifdef NODETRICK
       if(reifysetnode == getState().getNodeCount()) {
@@ -237,9 +237,9 @@ struct reify : public ParentConstraint {
       return;
 
     const SysInt _dt = 0;
-    // SysInt numtriggers=dynamic_trigger_count();
+    // SysInt numtriggers=dynamicTriggerCount();
 
-    if(!full_propagate_called) {
+    if(!fullPropagate_called) {
       if(trig >= _dt && trig < (_dt + (c0vars * 2))) { // Lost assignments for positive constraint.
         P("Triggered on an assignment watch for the positive child constraint");
 
@@ -259,7 +259,7 @@ struct reify : public ParentConstraint {
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[0]->get_vars_singleton()), 0, c0vars * 2);
+        watch_assignment(assignment, *(child_constraints[0]->getVarsSingleton()), 0, c0vars * 2);
 
         return;
       } else if(trig >= (_dt + (c0vars * 2)) &&
@@ -282,7 +282,7 @@ struct reify : public ParentConstraint {
           return;
         }
         P("Found new assignment");
-        watch_assignment(assignment, *(child_constraints[1]->get_vars_singleton()), c0vars * 2,
+        watch_assignment(assignment, *(child_constraints[1]->getVarsSingleton()), c0vars * 2,
                          dtcount);
         return;
       } else if(trig == _dt + dtcount) {
@@ -293,7 +293,7 @@ struct reify : public ParentConstraint {
         // This is an optimisation. Remove a trigger from stage 2.
         releaseTriggerInt(trig);
       }
-    } else // full_propagate_called
+    } else // fullPropagate_called
     {
       if(trig >= _dt && trig < _dt + dtcount) { // is it a trigger from stage 1 .. if so, ignore.
         P("In stage 2, ignoring trigger from stage 1");
@@ -337,10 +337,10 @@ struct reify : public ParentConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     P("Full prop");
-    P("reify " << child_constraints[0]->constraint_name());
-    P("negation: " << child_constraints[1]->constraint_name());
+    P("reify " << child_constraints[0]->constraintName());
+    P("negation: " << child_constraints[1]->constraintName());
 
     D_ASSERT(reify_var.min() >= 0);
     D_ASSERT(reify_var.max() <= 1);
@@ -351,11 +351,11 @@ struct reify : public ParentConstraint {
 
     if(reify_var.isAssigned()) {
       if(reify_var.assignedValue() == 1) {
-        child_constraints[0]->full_propagate();
+        child_constraints[0]->fullPropagate();
       } else {
-        child_constraints[1]->full_propagate();
+        child_constraints[1]->fullPropagate();
       }
-      full_propagate_called = true;
+      fullPropagate_called = true;
       return;
     }
 
@@ -386,8 +386,8 @@ struct reify : public ParentConstraint {
       return;
     }
 
-    watch_assignment(assignment0, *(child_constraints[0]->get_vars_singleton()), 0, (c0vars * 2));
-    watch_assignment(assignment1, *(child_constraints[1]->get_vars_singleton()), (c0vars * 2),
+    watch_assignment(assignment0, *(child_constraints[0]->getVarsSingleton()), 0, (c0vars * 2));
+    watch_assignment(assignment1, *(child_constraints[1]->getVarsSingleton()), (c0vars * 2),
                      dtcount);
   }
 };

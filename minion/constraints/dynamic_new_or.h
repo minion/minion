@@ -48,13 +48,13 @@ ensures that at least one of the constraints C1,...,Cn is true.
 #define P(x)
 
 struct Dynamic_OR : public ParentConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "watched-or";
   }
 
   CONSTRAINT_ARG_LIST1(child_constraints);
 
-  Reversible<bool> full_propagate_called;
+  Reversible<bool> fullPropagate_called;
   bool constraint_locked;
 
   SysInt assign_size;
@@ -65,39 +65,39 @@ struct Dynamic_OR : public ParentConstraint {
 
   Dynamic_OR(vector<AbstractConstraint*> _con)
       : ParentConstraint(_con),
-        full_propagate_called(false),
+        fullPropagate_called(false),
         constraint_locked(false),
         assign_size(-1),
         propagated_constraint(-1) {
     size_t max_size = 0;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
-      max_size = max(max_size, child_constraints[i]->get_vars_singleton()->size());
+      max_size = max(max_size, child_constraints[i]->getVarsSingleton()->size());
     assign_size = max_size * 2;
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      if(child_constraints[i]->check_assignment(v + checked_cast<SysInt>(start_of_constraint[i]),
-                                                child_constraints[i]->get_vars_singleton()->size()))
+      if(child_constraints[i]->checkAssignment(v + checked_cast<SysInt>(start_of_constraint[i]),
+                                                child_constraints[i]->getVarsSingleton()->size()))
         return true;
     }
     return false;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       assignment.clear();
-      bool flag = child_constraints[i]->get_satisfying_assignment(assignment);
+      bool flag = child_constraints[i]->getSatisfyingAssignment(assignment);
       if(flag) {
         // Fix up assignment
         for(SysInt j = 0; j < (SysInt)assignment.size(); ++j) {
           assignment[j].first += checked_cast<SysInt>(start_of_constraint[i]);
           D_ASSERT((*(child_constraints[i]
-                          ->get_vars_singleton()))[checked_cast<SysInt>(assignment[j].first -
+                          ->getVarsSingleton()))[checked_cast<SysInt>(assignment[j].first -
                                                                         start_of_constraint[i])]
                        .inDomain(assignment[j].second));
           D_ASSERT(
-              (*(this->get_vars_singleton()))[checked_cast<SysInt>(assignment[j].first)].inDomain(
+              (*(this->getVarsSingleton()))[checked_cast<SysInt>(assignment[j].first)].inDomain(
                   assignment[j].second));
         }
         return true;
@@ -106,25 +106,25 @@ struct Dynamic_OR : public ParentConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vecs;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      vector<AnyVarRef>* var_ptr = child_constraints[i]->get_vars_singleton();
+      vector<AnyVarRef>* var_ptr = child_constraints[i]->getVarsSingleton();
       vecs.insert(vecs.end(), var_ptr->begin(), var_ptr->end());
     }
     return vecs;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return assign_size * 2;
   }
 
-  virtual void special_check() {
+  virtual void specialCheck() {
     D_ASSERT(constraint_locked);
     constraint_locked = false;
     P("Full propagating: " << propagated_constraint);
-    child_constraints[propagated_constraint]->full_propagate();
-    full_propagate_called = true;
+    child_constraints[propagated_constraint]->fullPropagate();
+    fullPropagate_called = true;
   }
 
   virtual void special_unlock() {
@@ -136,13 +136,13 @@ struct Dynamic_OR : public ParentConstraint {
     // PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
     P("Current: " << watched_constraint[0] << " . " << watched_constraint[1]);
-    P("FullPropOn: " << (bool)full_propagate_called << ", on: " << propagated_constraint);
+    P("FullPropOn: " << (bool)fullPropagate_called << ", on: " << propagated_constraint);
     P("Locked:" << constraint_locked);
     if(constraint_locked)
       return;
 
     if(trig >= 0 && trig < assign_size * 2) {
-      if(full_propagate_called)
+      if(fullPropagate_called)
         return;
 
       SysInt tripped_constraint = checked_cast<SysInt>(trig / assign_size);
@@ -199,7 +199,7 @@ struct Dynamic_OR : public ParentConstraint {
       return;
     }
 
-    if(full_propagate_called && getChildDynamicTrigger(trig) == propagated_constraint) {
+    if(fullPropagate_called && getChildDynamicTrigger(trig) == propagated_constraint) {
       P("Propagating child");
       passDynTriggerToChild(trig, dd);
       // child_constraints[propagated_constraint]->propagateDynInt(trig);
@@ -212,7 +212,7 @@ struct Dynamic_OR : public ParentConstraint {
 
   void watch_assignment(AbstractConstraint* con, DomainInt dt,
                         box<pair<SysInt, DomainInt>>& assignment) {
-    vector<AnyVarRef>& vars = *(con->get_vars_singleton());
+    vector<AnyVarRef>& vars = *(con->getVarsSingleton());
     D_ASSERT((SysInt)assignment.size() <= assign_size);
     for(SysInt i = 0; i < (SysInt)assignment.size(); ++i) {
       const SysInt af = checked_cast<SysInt>(assignment[i].first);
@@ -223,7 +223,7 @@ struct Dynamic_OR : public ParentConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     P("Full Propagate")
     // Clean up triggers
     for(SysInt i = 0; i < assign_size * 2; ++i)
@@ -278,16 +278,16 @@ struct Dynamic_OR : public ParentConstraint {
     }
   }
 
-  virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverseConstraint();
 };
 
 #include "dynamic_new_and.h"
 
-inline AbstractConstraint* Dynamic_OR::reverse_constraint() { // and of the reverse of all the child
+inline AbstractConstraint* Dynamic_OR::reverseConstraint() { // and of the reverse of all the child
                                                               // constraints..
   vector<AbstractConstraint*> con;
   for(SysInt i = 0; i < (SysInt)child_constraints.size(); i++) {
-    con.push_back(child_constraints[i]->reverse_constraint());
+    con.push_back(child_constraints[i]->reverseConstraint());
   }
   return new Dynamic_AND(con);
 }

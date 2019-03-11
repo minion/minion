@@ -356,7 +356,7 @@ struct BoundVarContainer {
 
   //  BoundVarRef get_new_var();
   //  BoundVarRef get_new_var(SysInt i, SysInt j);
-  BoundVarRef get_var_num(DomainInt i);
+  BoundVarRef getVarNum(DomainInt i);
 
   void addVariables(Bounds bounds, SysInt count = 1) {
     D_ASSERT(!lock_m);
@@ -463,7 +463,7 @@ BoundVarContainer<T>::get_new_var(SysInt i, SysInt j)
 */
 
 template <typename T>
-inline BoundVarRef BoundVarContainer<T>::get_var_num(DomainInt i) {
+inline BoundVarRef BoundVarContainer<T>::getVarNum(DomainInt i) {
   D_ASSERT(i < (DomainInt)var_count_m);
   // Note we assume in BoundVarRef_internal that upper_bound(i) is just after
   // lower_bound(i)...

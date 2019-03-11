@@ -73,7 +73,7 @@
 // VarToCount = 1 means leq, = 0 means geq.
 template <typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reversed = false>
 struct BoolLessSumConstraintDynamic : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(VarToCount)
       return "watchsumleq";
     else
@@ -114,7 +114,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
 
     if(var_sum >= array_size || var_sum < 0) {
       // In these cases the constraints are all set before search.
-      // This will happen before triggers set up in full_propagate
+      // This will happen before triggers set up in fullPropagate
       // Thus zero triggers are needed
     } else {
       num_unwatched = checked_cast<SysInt>(array_size - var_sum - 1);
@@ -123,14 +123,14 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     }
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     if(var_sum >= (SysInt)var_array.size() || var_sum < 0)
       return 0;
     else
       return checked_cast<SysInt>(var_sum + 1);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     SysInt dt = 0;
 
     if(var_sum <= 0)
@@ -257,7 +257,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
@@ -265,7 +265,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     return count >= var_sum;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -273,7 +273,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var_sum <= 0) {
       return true;
     }
@@ -291,7 +291,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new BoolLessSumConstraintDynamic<VarArray, VarSum, 1 - VarToCount, true>(
         var_array, var_array.size() - var_sum + 1);
   }

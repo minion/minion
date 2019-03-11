@@ -44,7 +44,7 @@ For full documentation, see the help for the table constraint.
 template <typename VarArray, typename TableDataType = TrieData>
 struct LightTableConstraint : public AbstractConstraint {
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     const SysInt tuple_size = checked_cast<SysInt>(data->getVarCount());
     const SysInt length = checked_cast<SysInt>(data->getNumOfTuples());
     DomainInt* tuple_data = data->getPointer();
@@ -65,11 +65,11 @@ struct LightTableConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "lighttable";
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -91,7 +91,7 @@ struct LightTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return vars.size();
   }
 
@@ -128,18 +128,18 @@ struct LightTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       propagate_var(i);
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     return data->checkTuple(v, v_size);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> anyvars;
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
       anyvars.push_back(vars[i]);

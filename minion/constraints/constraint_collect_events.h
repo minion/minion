@@ -29,13 +29,13 @@ public:
 
   CollectEvents(const VarArrayType& _var_array) : var_array(_var_array) {}
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "collectevents";
   }
 
   CONSTRAINT_ARG_LIST1(var_array);
 
-  SysInt dynamic_trigger_count() {
+  SysInt dynamicTriggerCount() {
     return var_array.size();
   }
 
@@ -46,18 +46,18 @@ public:
     assignments.push_back(std::make_pair(trig, var_array[trig].assignedValue()));
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     // Set up triggers.
     for(int i = 0; i < (SysInt)var_array.size(); i++) {
       moveTriggerInt(var_array[i], i, Assigned);
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt array_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt array_size) {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)

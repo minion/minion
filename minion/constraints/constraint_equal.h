@@ -70,7 +70,7 @@ diseq(v0,v1)
 // on assignment.
 template <typename EqualVarRef1, typename EqualVarRef2, typename BoolVarRef, bool negated = false>
 struct ReifiedEqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "__reify_eq";
   }
 
@@ -92,12 +92,12 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       return 0;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new ReifiedEqualConstraint<EqualVarRef1, EqualVarRef2, BoolVarRef, !negated>(var1, var2,
                                                                                         var3);
   }
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
 
     vector<Mapper> v = var2.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_NEG)) {
@@ -121,7 +121,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     // within {0,1}");
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 5;
   }
 
@@ -134,7 +134,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
   }
 
   // rewrite the following two functions.
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
 
     D_ASSERT(var3.min() >= 0);
@@ -272,7 +272,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     bool hasFalse = var3.inDomain(false_value());
     bool hasTrue = var3.inDomain(true_value());
     // D_ASSERT(hasFalse || hasTrue); No longer true
@@ -315,13 +315,13 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     D_ASSERT(v[2] == 0 || v[2] == 1);
     return (v[0] == v[1]) == (v[2] == true_value());
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(3);
     vars.push_back(var1);
@@ -333,7 +333,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
 
 template <typename VarRef1, typename VarRef2>
 struct NeqConstraintBinary : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "diseq";
   }
 
@@ -344,7 +344,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
 
   NeqConstraintBinary(const VarRef1& _var1, const VarRef2& _var2) : var1(_var1), var2(_var2) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 6;
   }
 
@@ -438,7 +438,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
 
     if(var1.isAssigned()) {
@@ -465,14 +465,14 @@ struct NeqConstraintBinary : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     if(v[0] == v[1])
       return false;
     return true;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     D_ASSERT(var1.min() <= var1.max());
     D_ASSERT(var2.min() <= var2.max());
     if(var1.min() != var2.max()) {
@@ -492,23 +492,23 @@ struct NeqConstraintBinary : public AbstractConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars(2);
     vars[0] = var1;
     vars[1] = var2;
     return vars;
   }
 
-  virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverseConstraint();
 };
 
 template <typename EqualVarRef1, typename EqualVarRef2>
 struct EqualConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "eq";
   }
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
     vector<Mapper> v = var2.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_NEG)) {
       return ConOutput::print_con("minuseq", var1, var2.popOneMapper());
@@ -521,7 +521,7 @@ struct EqualConstraint : public AbstractConstraint {
   EqualVarRef2 var2;
   EqualConstraint(EqualVarRef1 _var1, EqualVarRef2 _var2) : var1(_var1), var2(_var2) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 4;
   }
 
@@ -532,7 +532,7 @@ struct EqualConstraint : public AbstractConstraint {
     moveTriggerInt(var2, 3, LowerBound);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
     for(int i = 0; i < 4; ++i)
       propagateDynInt(i, DomainDelta::empty());
@@ -548,12 +548,12 @@ struct EqualConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return (v[0] == v[1]);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(2);
     vars.push_back(var1);
@@ -561,7 +561,7 @@ struct EqualConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt min_val = max(var1.min(), var2.min());
     DomainInt max_val = min(var1.max(), var2.max());
 
@@ -575,13 +575,13 @@ struct EqualConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new NeqConstraintBinary<EqualVarRef1, EqualVarRef2>(var1, var2);
   }
 };
 
 template <typename VarRef1, typename VarRef2>
-AbstractConstraint* NeqConstraintBinary<VarRef1, VarRef2>::reverse_constraint() {
+AbstractConstraint* NeqConstraintBinary<VarRef1, VarRef2>::reverseConstraint() {
   return new EqualConstraint<VarRef1, VarRef2>(var1, var2);
 }
 

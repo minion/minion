@@ -48,15 +48,15 @@ struct NeqIterated; // because it is used in EqIterated before it is defn
 
 // for the reverse of the hamming constraint:
 struct EqIterated {
-  static string constraint_name() {
+  static string constraintName() {
     return "not-hamming";
   }
 
-  static SysInt dynamic_trigger_count() {
+  static SysInt dynamicTriggerCount() {
     return 4;
   }
 
-  static bool check_assignment(DomainInt i, DomainInt j) {
+  static bool checkAssignment(DomainInt i, DomainInt j) {
     return i == j;
   }
 
@@ -87,7 +87,7 @@ struct EqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+  static bool getSatisfyingAssignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
     DomainInt min = var1.min();
     if(var2.min() > min)
@@ -105,7 +105,7 @@ struct EqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+  static AbstractConstraint* reverseConstraint(const Var1& var1, const Var2& var2) {
     NeqConstraintBinary<Var1, Var2>* t = new NeqConstraintBinary<Var1, Var2>(var1, var2);
     return (AbstractConstraint*)t;
   }
@@ -114,15 +114,15 @@ struct EqIterated {
 };
 
 struct NeqIterated {
-  static string constraint_name() {
+  static string constraintName() {
     return "hamming";
   }
 
-  static SysInt dynamic_trigger_count() {
+  static SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  static bool check_assignment(DomainInt i, DomainInt j) {
+  static bool checkAssignment(DomainInt i, DomainInt j) {
     return i != j;
   }
 
@@ -163,7 +163,7 @@ struct NeqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+  static bool getSatisfyingAssignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
     if(var1.isAssigned() && var2.isAssigned() && var1.assignedValue() == var2.assignedValue())
       return false;
@@ -183,7 +183,7 @@ struct NeqIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+  static AbstractConstraint* reverseConstraint(const Var1& var1, const Var2& var2) {
     EqualConstraint<Var1, Var2>* t = new EqualConstraint<Var1, Var2>(var1, var2);
     return (AbstractConstraint*)t;
   }
@@ -192,11 +192,11 @@ struct NeqIterated {
 };
 
 struct LessIterated {
-  static bool check_assignment(DomainInt i, DomainInt j) {
+  static bool checkAssignment(DomainInt i, DomainInt j) {
     return i < j;
   }
 
-  static SysInt dynamic_trigger_count() {
+  static SysInt dynamicTriggerCount() {
     return 2;
   }
 
@@ -222,7 +222,7 @@ struct LessIterated {
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+  static bool getSatisfyingAssignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
     if(var1.min() < var2.max()) {
       assign = make_pair(var1.min(), var2.max());
@@ -232,7 +232,7 @@ struct LessIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+  static AbstractConstraint* reverseConstraint(const Var1& var1, const Var2& var2) {
     LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>>* t =
         new LeqConstraint<Var2, Var1, compiletime_val<SysInt, 0>>(var2, var1,
                                                                   compiletime_val<SysInt, 0>());
@@ -241,11 +241,11 @@ struct LessIterated {
 };
 
 struct BothNonZeroIterated {
-  static bool check_assignment(DomainInt i, DomainInt j) {
+  static bool checkAssignment(DomainInt i, DomainInt j) {
     return i > 0 && j > 0;
   }
 
-  static SysInt dynamic_trigger_count() {
+  static SysInt dynamicTriggerCount() {
     return 2;
   }
 
@@ -271,7 +271,7 @@ struct BothNonZeroIterated {
   }
 
   template <typename Var1, typename Var2>
-  static bool get_satisfying_assignment(const Var1& var1, const Var2& var2,
+  static bool getSatisfyingAssignment(const Var1& var1, const Var2& var2,
                                         pair<DomainInt, DomainInt>& assign) {
     if(var1.max() > 0 && var2.max() > 0) {
       assign = make_pair(var1.max(), var2.max());
@@ -281,7 +281,7 @@ struct BothNonZeroIterated {
   }
 
   template <typename Var1, typename Var2>
-  static AbstractConstraint* reverse_constraint(const Var1& var1, const Var2& var2) {
+  static AbstractConstraint* reverseConstraint(const Var1& var1, const Var2& var2) {
     ProductConstraint<Var1, Var2, ConstantVar>* t =
         new ProductConstraint<Var1, Var2, ConstantVar>(var1, var2, ConstantVar(0));
     return (AbstractConstraint*)t;
@@ -294,7 +294,7 @@ struct BothNonZeroIterated {
  */
 template <typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
 struct VecNeqDynamic : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "watchvecneq";
   }
 
@@ -317,8 +317,8 @@ struct VecNeqDynamic : public AbstractConstraint {
     D_ASSERT(var_array1.size() == var_array2.size());
   }
 
-  virtual SysInt dynamic_trigger_count() {
-    return Operator::dynamic_trigger_count() * 2;
+  virtual SysInt dynamicTriggerCount() {
+    return Operator::dynamicTriggerCount() * 2;
   }
 
   bool no_support_for_index(SysInt index) {
@@ -329,7 +329,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     Operator::add_triggers(this, var_array1[index], var_array2[index], dt);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     P("VecNeq full prop");
     SysInt size = var_array1.size();
     SysInt index = 0;
@@ -452,15 +452,15 @@ struct VecNeqDynamic : public AbstractConstraint {
     add_triggers(index, triggerpair * 2);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     SysInt v_size1 = var_array1.size();
     for(SysInt i = 0; i < v_size1; ++i)
-      if(Operator::check_assignment(v[i], v[i + v_size1]))
+      if(Operator::checkAssignment(v[i], v[i + v_size1]))
         return true;
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array1.size() + var_array2.size());
     for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
@@ -470,13 +470,13 @@ struct VecNeqDynamic : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     pair<DomainInt, DomainInt> assign;
     for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
-      if(Operator::get_satisfying_assignment(var_array1[i], var_array2[i], assign)) {
+      if(Operator::getSatisfyingAssignment(var_array1[i], var_array2[i], assign)) {
         D_ASSERT(var_array1[i].inDomain(assign.first));
         D_ASSERT(var_array2[i].inDomain(assign.second));
-        D_ASSERT(Operator::check_assignment(assign.first, assign.second));
+        D_ASSERT(Operator::checkAssignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + var_array1.size(), assign.second));
         return true;
@@ -485,10 +485,10 @@ struct VecNeqDynamic : public AbstractConstraint {
     return false;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     vector<AbstractConstraint*> con;
     for(SysInt i = 0; i < (SysInt)var_array1.size(); i++) {
-      con.push_back(Operator::reverse_constraint(var_array1[i], var_array2[i]));
+      con.push_back(Operator::reverseConstraint(var_array1[i], var_array2[i]));
     }
     return new Dynamic_AND(con);
     /*vector<AnyVarRef> t;

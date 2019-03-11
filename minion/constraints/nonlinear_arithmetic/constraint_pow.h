@@ -48,7 +48,7 @@ This constraint is only available for positive domains x, y and z.
 /// var1 ^ var2 = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3>
 struct PowConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "pow";
   }
 
@@ -77,7 +77,7 @@ struct PowConstraint : public AbstractConstraint {
     //}
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 6;
   }
 
@@ -169,18 +169,18 @@ struct PowConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     for(int i = 0; i < 6; ++i)
       propagateDynInt(i, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     return my_pow(v[0], v[1]) == v[2];
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     v.push_back(var1);
     v.push_back(var2);
@@ -188,7 +188,7 @@ struct PowConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(DomainInt v1 = var1.min(); v1 <= var1.max(); ++v1) {
       if(var1.inDomain(v1)) {
         for(DomainInt v2 = var2.min(); v2 <= var2.max(); ++v2) {
@@ -208,7 +208,7 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };

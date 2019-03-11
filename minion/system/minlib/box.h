@@ -522,6 +522,6 @@ void box<T>::M_range_insert(iterator position, _ForwardIterator first, _ForwardI
   box<std::pair<int, DomainInt>> c(                                                                \
       (std::pair<int, DomainInt>*)(alloca(sizeof(std::pair<int, DomainInt>) * num_vars##c * 2)),   \
       num_vars##c * 2);                                                                            \
-  flag = constraint->get_satisfying_assignment(c);
+  flag = constraint->getSatisfyingAssignment(c);
 
 #endif

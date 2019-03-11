@@ -24,7 +24,7 @@
 template <bool truth>
 struct ConstantConstraint : public AbstractConstraint {
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(truth)
       return "true";
     else
@@ -35,25 +35,25 @@ struct ConstantConstraint : public AbstractConstraint {
 
   ConstantConstraint() {}
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(!truth)
       getState().setFailed(true);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 0);
     return truth;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     return truth;
   }
 
-  AbstractConstraint* reverse_constraint() {
+  AbstractConstraint* reverseConstraint() {
     return new ConstantConstraint<!truth>();
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     return v;
   }

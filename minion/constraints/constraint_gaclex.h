@@ -47,7 +47,7 @@
 
 template <typename VarArray1, typename VarArray2, BOOL Less = false>
 struct GacLexLeqConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(Less)
       return "lexless[rv]";
     else
@@ -65,7 +65,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
   VarArray1 x;
   VarArray2 y;
 
-  virtual string full_output_name() {
+  virtual string fullOutputName() {
     VarArray1 cx(x);
     VarArray2 cy(y);
     for(SysInt i = 0; i < (SysInt)cx.size(); ++i) {
@@ -76,7 +76,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
         i--;
       }
     }
-    return ConOutput::print_con(constraint_name(), cx, cy);
+    return ConOutput::print_con(constraintName(), cx, cy);
   }
 
   vector<pair<DomainInt, DomainInt>> earliest_occurrence_x;
@@ -131,7 +131,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     F = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return std::max(x.size(), y.size()) * 4;
   }
 
@@ -149,7 +149,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new GacLexLeqConstraint<VarArray2, VarArray1, !Less>(y, x);
   }
 
@@ -332,7 +332,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     SysInt i, n = x.size();
     for(i = 0; i < n; i++) {
@@ -386,7 +386,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)x.size() + (SysInt)y.size());
     size_t x_size = x.size();
 
@@ -402,7 +402,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       return true;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     size_t x_size = x.size();
     for(size_t i = 0; i < x_size; ++i) {
       DomainInt x_i_min = x[i].min();
@@ -423,7 +423,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     return true;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> array_copy;
     for(UnsignedSysInt i = 0; i < x.size(); i++)
       array_copy.push_back(AnyVarRef(x[i]));

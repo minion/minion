@@ -1,4 +1,4 @@
-virtual AbstractConstraint* reverse_constraint() {
+virtual AbstractConstraint* reverseConstraint() {
   return forward_check_negation(this);
 }
 
@@ -21,7 +21,7 @@ struct Literal {
 // Methods common to both haggisgac_bt and haggisgac_stable. To be directly
 // included in both those files.
 
-virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
   D_ASSERT(vars.size() > 0);
   for(DomainInt i = vars[0].min(); i <= vars[0].max(); ++i) {
     literalsScratch.clear();
@@ -34,7 +34,7 @@ virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment)
   return false;
 }
 
-virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
   D_ASSERT(vars.size() > 0);
   if(v[0] < vars[0].initialMin())
     return false;
@@ -323,7 +323,7 @@ void printStructures() {
   cout << "inZeroLits:" << inZeroLits << endl;
 }
 
-SysInt dynamic_trigger_count() {
+SysInt dynamicTriggerCount() {
   return literalList.size();
 }
 

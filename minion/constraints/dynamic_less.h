@@ -34,7 +34,7 @@ The constraint watchless(x,y) ensures that x is less than y.
 // var1 < var2
 template <typename Var1, typename Var2, bool Negated = false>
 struct WatchLessConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "watchless";
   }
 
@@ -45,11 +45,11 @@ struct WatchLessConstraint : public AbstractConstraint {
 
   WatchLessConstraint(const Var1& _var1, const Var2& _var2) : var1(_var1), var2(_var2) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var2, 1, UpperBound);
 
@@ -69,12 +69,12 @@ struct WatchLessConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return v[0] < v[1];
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(2);
     vars.push_back(var1);
@@ -82,7 +82,7 @@ struct WatchLessConstraint : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var1.min() < var2.max()) {
       assignment.push_back(make_pair(0, var1.min()));
       assignment.push_back(make_pair(1, var2.max()));
@@ -109,7 +109,7 @@ struct WatchLessConstraint : public AbstractConstraint {
         var2, ShiftVar<Var1, compiletime_val<SysInt, 1>>(var1, compiletime_val<SysInt, 1>()));
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return rev_implement<Negated>(var2);
   }
 };

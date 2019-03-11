@@ -43,7 +43,7 @@ achieved by
 // x <= y + offset
 template <typename VarRef1, typename VarRef2, typename Offset>
 struct LeqConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "ineq";
   }
 
@@ -57,12 +57,12 @@ struct LeqConstraint : public AbstractConstraint {
 
   LeqConstraint(VarRef1 _x, VarRef2 _y, Offset _o) : x(_x), y(_y), offset(_o) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
   // Needs to be at end of file
-  virtual AbstractConstraint* reverse_constraint();
+  virtual AbstractConstraint* reverseConstraint();
 
   virtual void propagateDynInt(SysInt prop_val, DomainDelta) {
     PROP_INFO_ADDONE(BinaryLeq);
@@ -73,7 +73,7 @@ struct LeqConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     moveTriggerInt(x, 0, LowerBound);
     moveTriggerInt(y, 1, UpperBound);
 
@@ -81,12 +81,12 @@ struct LeqConstraint : public AbstractConstraint {
     propagateDynInt(1, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 2);
     return v[0] <= (v[1] + offset);
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt x_min = x.min();
     DomainInt y_max = y.max();
 
@@ -98,7 +98,7 @@ struct LeqConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> array;
     array.reserve(2);
     array.push_back(x);
@@ -126,7 +126,7 @@ AbstractConstraint* ImpliesCon(VarRef v1, VarRef v2) {
 
 // This is mainly inline to avoid multiple definitions.
 template <typename VarRef1, typename VarRef2, typename Offset>
-inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverse_constraint() {
+inline AbstractConstraint* LeqConstraint<VarRef1, VarRef2, Offset>::reverseConstraint() {
   return LeqCon(y, x, const_negminusone(offset));
 }
 

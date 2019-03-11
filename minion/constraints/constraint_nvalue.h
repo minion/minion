@@ -44,7 +44,7 @@ V.
 
 template <typename VarArray, typename VarResult>
 struct LessEqualNvalueConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "nvalueleq";
   }
 
@@ -63,15 +63,15 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     moveTriggerInt(result, vars.size(), UpperBound);
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return vars.size() + 1;
   }
 
   virtual void propagateDynInt(SysInt flag, DomainDelta) {
-    full_propagate();
+    fullPropagate();
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i) {
@@ -98,7 +98,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i)
       assigned.insert(v[i]);
@@ -106,7 +106,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     return (DomainInt)assigned.size() <= v[vars.size()];
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     for(unsigned i = 0; i < vars.size(); ++i)
       v.push_back(vars[i]);
@@ -114,7 +114,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].min() != vars[i].max()) {
         assignment.clear();
@@ -141,14 +141,14 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };
 
 template <typename VarArray, typename VarResult>
 struct GreaterEqualNvalueConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "nvaluegeq";
   }
 
@@ -159,7 +159,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
 
   GreaterEqualNvalueConstraint(VarArray _vars, VarResult _result) : vars(_vars), result(_result) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return vars.size() + 1;
   }
 
@@ -175,7 +175,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     propagateImpl();
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
     propagateImpl();
   }
@@ -231,7 +231,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     result.setMax(assigned.size() + unassigned_estimate);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i)
       assigned.insert(v[i]);
@@ -239,7 +239,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     return (DomainInt)assigned.size() >= v[vars.size()];
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     for(unsigned i = 0; i < vars.size(); ++i)
       v.push_back(vars[i]);
@@ -247,7 +247,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].min() != vars[i].max()) {
         assignment.clear();
@@ -274,7 +274,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };

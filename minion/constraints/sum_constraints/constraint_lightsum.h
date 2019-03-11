@@ -27,7 +27,7 @@
 /// V1 + ... Vn <= X
 template <typename VarRef, std::size_t size, typename VarSum, BOOL is_reversed = false>
 struct LightLessEqualSumConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "Light<=Sum";
   }
 
@@ -58,7 +58,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     }
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return var_array.size() + 1;
   }
 
@@ -69,7 +69,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     moveTriggerInt(var_sum, var_array.size(), UpperBound);
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt sum_value = 0;
     SysInt v_size = var_array.size();
 
@@ -110,13 +110,13 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
       var_array[i].setMax(var_array[i].min() + slack);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     propagateDynInt(var_array.size(), DomainDelta::empty());
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size() + 1);
     DomainInt sum = 0;
     for(SysInt i = 0; i < v_size - 1; i++)
@@ -124,7 +124,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     return sum <= *(v + v_size - 1);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> array_copy;
     array_copy.reserve(var_array.size() + 1);
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -133,7 +133,7 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
     return array_copy;
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return rev_implement<is_reversed>();
   }
 

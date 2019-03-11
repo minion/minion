@@ -7,8 +7,8 @@
 
 // Now requires bool flag to be declared before the macro is used.
 #define GET_ASSIGNMENT(c, constraint)                                                              \
-  const size_t num_vars##c = constraint->get_vars_singleton()->size();                             \
+  const size_t num_vars##c = constraint->getVarsSingleton()->size();                             \
   box<pair<SysInt, DomainInt>> c(                                                                  \
       (pair<SysInt, DomainInt>*)(alloca(sizeof(pair<SysInt, DomainInt>) * num_vars##c * 2)),       \
       num_vars##c * 2);                                                                            \
-  flag = constraint->get_satisfying_assignment(c);
+  flag = constraint->getSatisfyingAssignment(c);

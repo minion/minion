@@ -47,7 +47,7 @@ consistency.
 /// |var1 - var2| = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3>
 struct DifferenceConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "difference";
   }
 
@@ -59,7 +59,7 @@ struct DifferenceConstraint : public AbstractConstraint {
   DifferenceConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3)
       : var1(_var1), var2(_var2), var3(_var3) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 6;
   }
 
@@ -130,13 +130,13 @@ struct DifferenceConstraint : public AbstractConstraint {
     moveTriggerInt(var3, 5, UpperBound);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     trigger_setup();
     var3.setMin(0);
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     DomainInt abs_val = v[0] - v[1];
     if(abs_val < 0)
@@ -144,7 +144,7 @@ struct DifferenceConstraint : public AbstractConstraint {
     return abs_val == v[2];
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(DomainInt i = var1.min(); i <= var1.max(); ++i) {
       if(var1.inDomain(i)) {
         for(DomainInt j = var2.min(); j <= var2.max(); ++j) {
@@ -160,7 +160,7 @@ struct DifferenceConstraint : public AbstractConstraint {
     return false;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     v.push_back(var1);
     v.push_back(var2);
@@ -169,7 +169,7 @@ struct DifferenceConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };

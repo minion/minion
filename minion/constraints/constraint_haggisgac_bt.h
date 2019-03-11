@@ -133,7 +133,7 @@ help constraints shortstr2
 template <typename VarArray>
 struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "haggisgac";
   }
 
@@ -563,7 +563,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     findSupportsIncremental();
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     full_prop_init();
 
     litsWithLostExplicitSupport.resize(0);
@@ -576,7 +576,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
     findSupportsIncremental();
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> ret;
     ret.reserve(vars.size());
     for(unsigned i = 0; i < vars.size(); ++i)

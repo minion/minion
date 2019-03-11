@@ -51,7 +51,7 @@ void optimise_minimise_var(VarRef var) {
 /// Ensures a particular constraint is satisfied by the solution.
 template <typename T>
 void check_constraint(T* con) {
-  vector<AnyVarRef>& variables = *(con->get_vars_singleton());
+  vector<AnyVarRef>& variables = *(con->getVarsSingleton());
   UnsignedSysInt vec_size = variables.size();
 
   DomainInt* values = (DomainInt*)alloca(vec_size * sizeof(DomainInt));
@@ -66,8 +66,8 @@ void check_constraint(T* con) {
     values[loop] = variables[loop].assignedValue();
   }
 
-  if(!con->check_assignment(values, vec_size)) {
-    cerr << "A " << con->extended_name() << " constraint is not satisfied by this sol!" << endl;
+  if(!con->checkAssignment(values, vec_size)) {
+    cerr << "A " << con->extendedName() << " constraint is not satisfied by this sol!" << endl;
     cerr << "The constraint is over the following variables:" << endl;
     for(UnsignedSysInt loop = 0; loop < vec_size; ++loop)
       cerr << variables[loop] << ",";

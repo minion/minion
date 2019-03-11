@@ -23,11 +23,11 @@
 
 template <typename VarArray>
 struct BoolSATConstraintDynamic : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "watchsumgeq";
   }
 
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return new BoolLessSumConstraintDynamic<VarArray, DomainInt, 1>(var_array, var_array.size());
   }
 
@@ -43,11 +43,11 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     last = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 2;
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     SysInt array_size = var_array.size();
     SysInt trig1, trig2;
     SysInt index = 0;
@@ -131,7 +131,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     moveTriggerInt(var_array[loop], dt, UpperBound);
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
@@ -139,7 +139,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     return count > 0;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -147,7 +147,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
       if(var_array[i].inDomain(1)) {
         assignment.push_back(make_pair(i, 1));

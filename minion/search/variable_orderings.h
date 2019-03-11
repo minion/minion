@@ -303,7 +303,7 @@ struct WdegBranch : public VariableOrder {
       for(size_t j = 0; j < constrs_size; j++) { // find constrs to be deducted from var wdeg
         AbstractConstraint* c = (*constrs)[j];
         // cout << "con wdeg=" << c->getWdeg() << endl;
-        vector<AnyVarRef>* c_vars = c->get_vars_singleton();
+        vector<AnyVarRef>* c_vars = c->getVarsSingleton();
         size_t c_vars_size = c_vars->size();
         SysInt uninst = 0;
         for(size_t k = 0; k < c_vars_size; k++)
@@ -378,7 +378,7 @@ struct DomOverWdegBranch : VariableOrder {
       for(size_t j = 0; j < constrs_size; j++) { // find constrs to be deducted from var wdeg
         AbstractConstraint* c = (*constrs)[j];
         // cout << "con wdeg=" << c->getWdeg() << endl;
-        vector<AnyVarRef>* c_vars = c->get_vars_singleton();
+        vector<AnyVarRef>* c_vars = c->getVarsSingleton();
         size_t c_vars_size = c_vars->size();
         SysInt uninst = 0;
         for(size_t k = 0; k < c_vars_size; k++)

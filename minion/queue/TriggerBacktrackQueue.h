@@ -67,7 +67,7 @@ struct TriggerBacktrackQueue {
       }
     }
     queue.pop_back();
-    // The first layer of the queue consists of things added in full_propagate()
+    // The first layer of the queue consists of things added in fullPropagate()
     // So should never get popped.
     D_ASSERT(!queue.empty());
   }

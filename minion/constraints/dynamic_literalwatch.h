@@ -50,7 +50,7 @@ See also
 
 template <typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     return "litsumgeq";
   }
 
@@ -65,7 +65,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
   CONSTRAINT_ARG_LIST3(var_array, value_array, var_sum);
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 
@@ -91,7 +91,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     last = 0;
   }
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     if(var_sum <= 0)
       return 0;
     if(var_sum > (SysInt)var_array.size())
@@ -99,7 +99,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     return checked_cast<SysInt>(var_sum + 1);
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     if(var_sum <= 0)
       return;
 
@@ -220,7 +220,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     }
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == (SysInt)var_array.size());
     SysInt count = 0;
     for(SysInt i = 0; i < v_size; ++i)
@@ -228,7 +228,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     return count >= var_sum;
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
     vars.reserve(var_array.size());
     for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
@@ -236,7 +236,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     return vars;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(var_sum <= 0)
       return true;
     SysInt lit_match_count = 0;

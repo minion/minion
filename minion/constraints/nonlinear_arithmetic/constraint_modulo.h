@@ -67,7 +67,7 @@ help constraints mod
 /// var1 % var2 = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3, bool undef>
 struct ModConstraint : public AbstractConstraint {
-  virtual string constraint_name() {
+  virtual string constraintName() {
     if(undef)
       return "mod_undefzero";
     else
@@ -83,7 +83,7 @@ struct ModConstraint : public AbstractConstraint {
   ModConstraint(VarRef1 _var1, VarRef2 _var2, VarRef3 _var3)
       : var1(_var1), var2(_var2), var3(_var3) {}
 
-  virtual SysInt dynamic_trigger_count() {
+  virtual SysInt dynamicTriggerCount() {
     return 6;
   }
 
@@ -203,17 +203,17 @@ struct ModConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void full_propagate() {
+  virtual void fullPropagate() {
     setup_triggers();
     propagateDynInt(0, DomainDelta::empty());
   }
 
-  virtual BOOL check_assignment(DomainInt* v, SysInt v_size) {
+  virtual BOOL checkAssignment(DomainInt* v, SysInt v_size) {
     D_ASSERT(v_size == 3);
     return check_mod_result(v[0], v[1], v[2]);
   }
 
-  virtual vector<AnyVarRef> get_vars() {
+  virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> v;
     v.push_back(var1);
     v.push_back(var2);
@@ -221,7 +221,7 @@ struct ModConstraint : public AbstractConstraint {
     return v;
   }
 
-  virtual bool get_satisfying_assignment(box<pair<SysInt, DomainInt>>& assignment) {
+  virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(undef) {
       if(var2.inDomain(0) && var3.inDomain(0)) {
         assignment.push_back(make_pair(1, 0));
@@ -246,7 +246,7 @@ struct ModConstraint : public AbstractConstraint {
   }
 
   // Function to make it reifiable in the lousiest way.
-  virtual AbstractConstraint* reverse_constraint() {
+  virtual AbstractConstraint* reverseConstraint() {
     return forward_check_negation(this);
   }
 };
