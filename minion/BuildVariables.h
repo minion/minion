@@ -30,7 +30,7 @@ namespace BuildCon {
 
 /// Helper function used in a few places.
 AnyVarRef getAnyVarRefFromVar(Var v);
-std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v);
+std::pair<DomainInt, DomainInt> getInitialBoundsFromVar(Var v);
 
 /// Helper function used in a few places.
 vector<AnyVarRef> getAnyVarRefFromVar(const vector<Var>& v);

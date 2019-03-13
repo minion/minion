@@ -208,13 +208,13 @@ struct reify : public ParentConstraint {
     fullPropagate_called = true;
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     D_ASSERT(constraint_locked);
     P("Special unlock!");
     constraint_locked = false;
   }
 
-  void reify_var_assigned() {
+  void reify_varAssigned() {
     if(!fullPropagate_called) {
       P("reifyvar assigned - Do full propagate");
 #ifdef NODETRICK
@@ -286,7 +286,7 @@ struct reify : public ParentConstraint {
                          dtcount);
         return;
       } else if(trig == _dt + dtcount) {
-        reify_var_assigned();
+        reify_varAssigned();
         return;
       } else {
         P("Remove unused trigger");
@@ -413,8 +413,8 @@ inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& b
     // Code just for GACEQ case
     if(type == CT_GACEQ) {
       ConstraintBlob blob(bl.internal_constraints[0]);
-      auto bound1 = get_initialBounds_from_Var(blob.vars[0][0]);
-      auto bound2 = get_initialBounds_from_Var(blob.vars[1][0]);
+      auto bound1 = getInitialBoundsFromVar(blob.vars[0][0]);
+      auto bound2 = getInitialBoundsFromVar(blob.vars[1][0]);
       auto minbound = std::max(bound1.first, bound2.first);
       auto maxbound = std::min(bound1.second, bound2.second);
       if(minbound < 0 || maxbound > 1)

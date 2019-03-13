@@ -224,41 +224,41 @@ struct VarContainer {
   vector<Var> buildVarList(const string& name, const vector<DomainInt>& params) {
     vector<Var> return_list;
 
-    vector<DomainInt> max_index = getMatrixSymbol(name);
-    if(params.size() != max_index.size())
-      throw parse_exception("Can't index a " + tostring(max_index.size()) + "-d matrix with " +
+    vector<DomainInt> maxIndex = getMatrixSymbol(name);
+    if(params.size() != maxIndex.size())
+      throw parse_exception("Can't index a " + tostring(maxIndex.size()) + "-d matrix with " +
                             tostring(params.size()) + " indices.");
     for(SysInt i = 0; i < (SysInt)params.size(); ++i) {
       // Horrible hack: -999 means it was an _
-      if(params[i] != -999 && (params[i] < 0 || params[i] >= max_index[i]))
+      if(params[i] != -999 && (params[i] < 0 || params[i] >= maxIndex[i]))
         throw parse_exception(tostring(i) + string("th index is invalid"));
     }
 
     // Set all fixed indices to 1, so they won't move.
     // Set all variable indices to their max value.
     vector<DomainInt> modified_max(params.size());
-    for(SysInt i = 0; i < (SysInt)max_index.size(); i++) {
-      if(max_index[i] == 0) { // matrix is empty, all slices are empty.
+    for(SysInt i = 0; i < (SysInt)maxIndex.size(); i++) {
+      if(maxIndex[i] == 0) { // matrix is empty, all slices are empty.
         return return_list;
       }
 
       if(params[i] == -999)
-        modified_max[i] = max_index[i];
+        modified_max[i] = maxIndex[i];
       else
         modified_max[i] = 1;
     }
 
     // Iterates through the variable indices
-    vector<DomainInt> current_index(params.size());
+    vector<DomainInt> currentIndex(params.size());
 
     // Vector which actually contains the output
     vector<DomainInt> output(params);
     do {
-      for(SysInt i = 0; i < (SysInt)max_index.size(); i++)
+      for(SysInt i = 0; i < (SysInt)maxIndex.size(); i++)
         if(params[i] == -999)
-          output[i] = current_index[i];
+          output[i] = currentIndex[i];
       return_list.push_back(getSymbol(name + to_var_name(output)));
-    } while(increment_vector(current_index, modified_max));
+    } while(increment_vector(currentIndex, modified_max));
 
     return return_list;
   }

@@ -81,7 +81,7 @@ struct PowConstraint : public AbstractConstraint {
     return 6;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     moveTriggerInt(var1, 3, LowerBound);
     moveTriggerInt(var2, 4, LowerBound);
     moveTriggerInt(var3, 5, LowerBound);
@@ -170,7 +170,7 @@ struct PowConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     for(int i = 0; i < 6; ++i)
       propagateDynInt(i, DomainDelta::empty());
   }
@@ -209,7 +209,7 @@ struct PowConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 #endif

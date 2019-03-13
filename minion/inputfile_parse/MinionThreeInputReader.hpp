@@ -431,7 +431,7 @@ void MinionThreeInputReader<FileReader>::finalise() {
     }
   }
 
-  if(!unused_vars.empty() && ensure_branch_on_allVars) {
+  if(!unused_vars.empty() && ensureBranchOnAllVars) {
     vector<Var> unused_vec(unused_vars.begin(), unused_vars.end());
     if(instance->searchOrder.size() > 1 &&
        instance->searchOrder.back().find_one_assignment == true) {
@@ -601,7 +601,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile) {
   string name = infile->getString();
   MAYBE_PARSER_INFO("Gadget name:" + name);
 
-  MinionThreeInputReader gadget(parser_verbose, map_long_short_mode, ensure_branch_on_allVars);
+  MinionThreeInputReader gadget(parser_verbose, map_long_short_mode, ensureBranchOnAllVars);
   CSPInstance* new_instance = new CSPInstance;
   gadget.instance = new_instance;
   gadget.setGadgetReader();
@@ -821,15 +821,15 @@ Var MinionThreeInputReader<FileReader>::readIdentifier(FileReader* infile) {
   Var var = instance->vars.getSymbol(name);
   if(var.type() == VAR_MATRIX) {
     vector<DomainInt> params = readConstantVector(infile);
-    vector<DomainInt> max_index = instance->vars.getMatrixSymbol(name);
-    if(params.size() != max_index.size())
-      throw parse_exception("Can't index a " + tostring(max_index.size()) + "-d matrix with " +
+    vector<DomainInt> maxIndex = instance->vars.getMatrixSymbol(name);
+    if(params.size() != maxIndex.size())
+      throw parse_exception("Can't index a " + tostring(maxIndex.size()) + "-d matrix with " +
                             tostring(params.size()) + " indices.");
     for(SysInt i = 0; i < (SysInt)params.size(); ++i) {
-      if(params[i] < 0 || params[i] >= max_index[i])
+      if(params[i] < 0 || params[i] >= maxIndex[i])
         throw parse_exception(tostring(i) + string("th index is out of bounds,") +
                               tostring(params[i]) + " is not between 0 and " +
-                              tostring(max_index[i] - 1));
+                              tostring(maxIndex[i] - 1));
     }
     name += to_var_name(params);
     var = instance->vars.getSymbol(name);
@@ -1398,13 +1398,13 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
         instance->vars.addMatrixSymbol(varname, indices);
         // If any index is 0, don't add any variables.
         if(find(indices.begin(), indices.end(), 0) == indices.end()) {
-          vector<DomainInt> current_index(indices.size(), 0);
-          MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
-          instance->vars.addSymbol(varname + to_var_name(current_index),
+          vector<DomainInt> currentIndex(indices.size(), 0);
+          MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(currentIndex));
+          instance->vars.addSymbol(varname + to_var_name(currentIndex),
                                    instance->vars.getNewVar(variable_type, domain));
-          while(increment_vector(current_index, indices)) {
-            MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(current_index));
-            instance->vars.addSymbol(varname + to_var_name(current_index),
+          while(increment_vector(currentIndex, indices)) {
+            MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(currentIndex));
+            instance->vars.addSymbol(varname + to_var_name(currentIndex),
                                      instance->vars.getNewVar(variable_type, domain));
           }
 

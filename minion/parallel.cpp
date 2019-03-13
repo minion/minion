@@ -42,58 +42,58 @@ struct ParallelData {
   std::atomic<int> processCount;
   pthread_mutex_t outputLock;
 
-  std::atomic<bool> fatal_error_occurred;
+  std::atomic<bool> fatalErrorOccurred;
   std::atomic<bool> process_should_exit;
   std::atomic<long long> solutions;
   std::atomic<long long> nodes;
   std::atomic<long long> children;
-  pid_t parent_process_id;
-  std::atomic<bool> ctrl_c_pressed;
-  std::atomic<bool> alarm_trigger;
+  pid_t parentProcessID;
+  std::atomic<bool> ctrlCPressed;
+  std::atomic<bool> alarmTrigger;
 };
 
-static bool is_a_child_process;
-static bool fork_ever_called;
+static bool checkIsAChildProcess;
+static bool forkEverCalled;
 
 // This pipe is just to figure out when all children have exited, because
 // when all children exit, the pipe will automatically close
-static int child_tracking_pipe[2];
+static int childTrackingPipe[2];
 
 bool isAChildProcess() {
-  return is_a_child_process;
+  return checkIsAChildProcess;
 }
 
 bool isCtrlCPressed() {
-  return getParallelData().ctrl_c_pressed;
+  return getParallelData().ctrlCPressed;
 }
 
 void endParallelMinion() {
-  if(!fork_ever_called)
+  if(!forkEverCalled)
     return;
   atomic_fetch_add(&(getParallelData().processCount), 1);
 
-  if(is_a_child_process) {
+  if(checkIsAChildProcess) {
     atomic_fetch_add(&(getParallelData().solutions), getState().getSolutionCount());
     atomic_fetch_add(&(getParallelData().nodes), getState().getNodeCount());
     atomic_fetch_add(&(getParallelData().children), (long long)1);
   }
 
-  if(!is_a_child_process) {
+  if(!checkIsAChildProcess) {
     std::cout << "Waiting for all child processes to exit.." << std::endl;
     // Don't close until now, so all children have this pipe
-    close(child_tracking_pipe[1]);
+    close(childTrackingPipe[1]);
 
     signal(SIGPIPE, SIG_IGN);
     int ret = 1;
     while(ret != 0) {
       char buf[1024];
       // std::cout << getpid() << " reading 0" << std::endl;
-      ret = read(child_tracking_pipe[0], buf, 1024);
+      ret = read(childTrackingPipe[0], buf, 1024);
       // std::cout << ret << std::endl;
       // perror("Error:");
       // std::cerr << "Ready loop" << std::endl;
     }
-    if(getParallelData().fatal_error_occurred) {
+    if(getParallelData().fatalErrorOccurred) {
       std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
       exit(1);
     }
@@ -106,7 +106,7 @@ void endParallelMinion() {
 
 ParallelData* setupParallelData() {
   // Setup a pipe so parent can track if children are alive
-  pipe(child_tracking_pipe);
+  pipe(childTrackingPipe);
 
   ParallelData* pd;
   pd = (ParallelData*)mmap(NULL, sizeof(ParallelData), PROT_READ | PROT_WRITE,
@@ -128,9 +128,9 @@ ParallelData* setupParallelData() {
     }
   }
 
-  install_ctrlc_trigger(&(pd->ctrl_c_pressed));
+  install_ctrlc_trigger(&(pd->ctrlCPressed));
 
-  pd->parent_process_id = getpid();
+  pd->parentProcessID = getpid();
 
   return pd;
 }
@@ -163,16 +163,16 @@ bool shouldDoFork() {
 }
 
 int doFork() {
-  fork_ever_called = true;
+  forkEverCalled = true;
   int f = fork();
   if(f < 0) {
     D_FATAL_ERROR("Fork fail!\n");
-    getParallelData().fatal_error_occurred = true;
+    getParallelData().fatalErrorOccurred = true;
   } else if(f == 0) {
     getState().resetSearchCounters();
-    if(!is_a_child_process) {
-      is_a_child_process = true;
-      close(child_tracking_pipe[0]);
+    if(!checkIsAChildProcess) {
+      checkIsAChildProcess = true;
+      close(childTrackingPipe[0]);
       // std::cout << getpid() << " closing 0" << std::endl;
       // int devNull = open("/dev/null", O_WRONLY);
       // dup2(devNull, 1);
@@ -184,11 +184,11 @@ int doFork() {
 }
 
 bool isAlarmActivated() {
-  return getParallelData().alarm_trigger;
+  return getParallelData().alarmTrigger;
 }
 
-void setupAlarm(bool alarm_active, SysInt timeout, bool CPU_time) {
-  activate_trigger(&(getParallelData().alarm_trigger), alarm_active, timeout, CPU_time);
+void setupAlarm(bool alarmActive, SysInt timeout, bool CPU_time) {
+  activate_trigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPU_time);
 }
 
 } // namespace Parallel

@@ -100,7 +100,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     return x.size() * 4;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     for(SysInt i = 0; i < (SysInt)x.size(); i++) {
       moveTriggerInt(x[i], i * 4, LowerBound);
       moveTriggerInt(x[i], i * 4 + 1, UpperBound);
@@ -214,7 +214,7 @@ struct LexLeqConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     SysInt i, n = x.size();
     for(i = 0; i < n; i++) {
       if(!x[i].isAssigned())

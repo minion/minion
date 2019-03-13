@@ -427,7 +427,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
               "produced\n";
       cout << "# WARNING: This is by design, but use this option with extreme "
               "care\n";
-      getOptions().ensure_branch_on_allVars = false;
+      getOptions().ensureBranchOnAllVars = false;
     }
     /** @help switches;-cpulimit Description
     To stop search after N seconds (CPU time), do

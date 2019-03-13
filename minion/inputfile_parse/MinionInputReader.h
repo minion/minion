@@ -229,7 +229,7 @@ public:
   bool print_allVars;
   MapLongTuplesToShort map_long_short_mode;
 
-  bool ensure_branch_on_allVars;
+  bool ensureBranchOnAllVars;
 
   bool isGadgetReader_m;
 
@@ -244,7 +244,7 @@ public:
       : parser_verbose(_parser_verbose),
         print_allVars(true),
         map_long_short_mode(mls),
-        ensure_branch_on_allVars(_e),
+        ensureBranchOnAllVars(_e),
         isGadgetReader_m(false) {}
 };
 

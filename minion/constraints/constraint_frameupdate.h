@@ -59,9 +59,9 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   // Reversible<SysInt> targetidx;  //  Left of sourceidx and targetidx have already been copied
   // over.
 
-  Reversible<bool> idxes_assigned;
+  Reversible<bool> idxesAssigned;
 
-  // These should only be read when idxes_assigned is true
+  // These should only be read when idxesAssigned is true
   std::set<DomainInt> idx_source_set;
   std::set<DomainInt> idx_target_set;
   std::vector<SysInt> sourceToTarget_map;
@@ -75,8 +75,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
         idx_target(v4),
         blocksize(checked_cast<SysInt>(_value)),
         //,sourceidx(-1), targetidx(-1),
-        idxes_assigned() {
-    idxes_assigned = false;
+        idxesAssigned() {
+    idxesAssigned = false;
     CHECK((source.size() == target.size()),
           "Source and target vectors are different sizes in frameupdate constraint.");
 
@@ -120,7 +120,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   }
 
   bool check_idx_sets() {
-    D_ASSERT(idxes_assigned == false);
+    D_ASSERT(idxesAssigned == false);
     for(unsigned i = 0; i < idx_source.size(); ++i) {
       if(!idx_source[i].isAssigned()) {
         return false;
@@ -176,7 +176,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       idxtarget++;
     }
 
-    idxes_assigned = true;
+    idxesAssigned = true;
     return true;
   }
 
@@ -214,7 +214,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt flagin, DomainDelta) {
     SysInt flag = flagin;
     if(flag < (SysInt)(idx_source.size() + idx_target.size())) {
-      if(idxes_assigned)
+      if(idxesAssigned)
         return;
 
       // Check if idx sets incomplete or invalid
@@ -230,7 +230,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
       return;
     }
 
-    if(!idxes_assigned)
+    if(!idxesAssigned)
       return;
 
     flag -= idx_source.size() + idx_target.size();
@@ -389,7 +389,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 

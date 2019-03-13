@@ -142,7 +142,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 
@@ -275,14 +275,14 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BuildCT_LEQNVALUE(const VarArray& _varArray, const vector<VarSum>& _var_sum,
+AbstractConstraint* BuildCT_LEQNVALUE(const VarArray& _varArray, const vector<VarSum>& _varSum,
                                       ConstraintBlob&) {
-  return new LessEqualNvalueConstraint<VarArray, VarSum>(_varArray, _var_sum[0]);
+  return new LessEqualNvalueConstraint<VarArray, VarSum>(_varArray, _varSum[0]);
 }
 
 /* JSON
@@ -294,9 +294,9 @@ AbstractConstraint* BuildCT_LEQNVALUE(const VarArray& _varArray, const vector<Va
 */
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BuildCT_GEQNVALUE(const VarArray& _varArray, const vector<VarSum>& _var_sum,
+AbstractConstraint* BuildCT_GEQNVALUE(const VarArray& _varArray, const vector<VarSum>& _varSum,
                                       ConstraintBlob&) {
-  return new GreaterEqualNvalueConstraint<VarArray, VarSum>(_varArray, _var_sum[0]);
+  return new GreaterEqualNvalueConstraint<VarArray, VarSum>(_varArray, _varSum[0]);
 }
 
 /* JSON

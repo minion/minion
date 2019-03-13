@@ -98,28 +98,28 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     //  if(varArray[other_propval].isAssignedValue(1))
     //    return;
 
-    bool found_new_support = false;
+    bool foundNewSupport = false;
 
     SysInt loop = last;
 
-    while(loop < varSize && !found_new_support) {
+    while(loop < varSize && !foundNewSupport) {
       if(loop != other_propval && varArray[loop].inDomain(1))
-        found_new_support = true;
+        foundNewSupport = true;
       else
         ++loop;
     }
 
-    if(!found_new_support) {
+    if(!foundNewSupport) {
       loop = 0;
 
-      while(loop < last && !found_new_support) {
+      while(loop < last && !foundNewSupport) {
         if(loop != other_propval && varArray[loop].inDomain(1))
-          found_new_support = true;
+          foundNewSupport = true;
         else
           ++loop;
       }
 
-      if(!found_new_support) { // Have to propagate!
+      if(!foundNewSupport) { // Have to propagate!
         varArray[other_propval].assign(1);
         return;
       }

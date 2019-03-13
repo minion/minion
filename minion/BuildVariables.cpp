@@ -47,7 +47,7 @@ std::pair<DomainInt, DomainInt> get_initialBounds(const V& v) {
   return std::make_pair(v.initialMin(), v.initialMax());
 }
 
-std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v) {
+std::pair<DomainInt, DomainInt> getInitialBoundsFromVar(Var v) {
   switch(v.type()) {
   case VAR_BOOL: return get_initialBounds(getVars().boolVarContainer.getVarNum(v.pos()));
   case VAR_NOTBOOL:

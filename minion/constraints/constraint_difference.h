@@ -170,7 +170,7 @@ struct DifferenceConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 

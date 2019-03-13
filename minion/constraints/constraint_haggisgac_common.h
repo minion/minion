@@ -1,5 +1,5 @@
 virtual AbstractConstraint* reverseConstraint() {
-  return forward_check_negation(this);
+  return forwardCheckNegation(this);
 }
 
 struct Support;

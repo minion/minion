@@ -159,7 +159,7 @@ struct MDDC : public AbstractConstraint {
   }
 
   virtual string fullOutputName() {
-    return ConOutput::print_con(constraintName(), vars, tuples);
+    return ConOutput::printCon(constraintName(), vars, tuples);
   }
 
   VarArray vars;
@@ -489,14 +489,14 @@ struct MDDC : public AbstractConstraint {
     return vars.size();
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       moveTriggerInt(vars[i], i, DomainChanged);
     }
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     // Just propagate.
     do_prop();
   }
@@ -569,7 +569,7 @@ struct MDDC : public AbstractConstraint {
   }
 
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
@@ -579,7 +579,7 @@ struct MDDC : public AbstractConstraint {
     }
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     constraint_locked = false;
   }
 

@@ -46,17 +46,17 @@ public:
 
 class TrieState {
   TrieData* data;
-  vector<TrieObj**> trie_current_support;
+  vector<TrieObj**> trieCurrentSupport;
   vector<DomainInt> scratch_tuple;
 
 public:
   TrieState(TrieData* _data) : data(_data) {
     const SysInt litcount = checked_cast<SysInt>(data->getLiteralCount());
-    trie_current_support.resize(litcount);
+    trieCurrentSupport.resize(litcount);
     for(SysInt i = 0; i < litcount; ++i) {
-      trie_current_support[i] = new TrieObj*[checked_cast<SysInt>(data->getVarCount())];
+      trieCurrentSupport[i] = new TrieObj*[checked_cast<SysInt>(data->getVarCount())];
       for(SysInt j = 0; j < data->getVarCount(); ++j)
-        trie_current_support[i][j] = NULL;
+        trieCurrentSupport[i][j] = NULL;
     }
     scratch_tuple.resize(litcount);
   }
@@ -72,14 +72,14 @@ public:
 
     DomainInt litnum = data->getLiteralPos(lit);
 
-    DomainInt new_support = data->tupleTrieArrayptr->getTrie(varIndex).nextSupportingTuple(
-        val, vars, trie_current_support[checked_cast<SysInt>(litnum)]);
+    DomainInt newSupport = data->tupleTrieArrayptr->getTrie(varIndex).nextSupportingTuple(
+        val, vars, trieCurrentSupport[checked_cast<SysInt>(litnum)]);
 
-    if(new_support < 0)
+    if(newSupport < 0)
       return NULL;
     else {
       data->tupleTrieArrayptr->getTrie(varIndex).reconstructTuple(
-          &scratch_tuple.front(), trie_current_support[checked_cast<SysInt>(litnum)]);
+          &scratch_tuple.front(), trieCurrentSupport[checked_cast<SysInt>(litnum)]);
       return &scratch_tuple;
     }
   }
@@ -157,7 +157,7 @@ struct NewTableConstraint : public AbstractConstraint {
 
   LiteralSpecificLists* lists;
 
-  void* _current_support;
+  void* CurrentSupport;
 
   virtual SysInt dynamicTriggerCount() {
     return checked_cast<SysInt>(data->getLiteralCount() * ((SysInt)vars.size() - 1));
@@ -191,15 +191,15 @@ struct NewTableConstraint : public AbstractConstraint {
   void setup_watches(Literal lit, DomainInt lit_pos, const vector<DomainInt>& support) {
     D_ASSERT(data->getLiteralPos(lit) == lit_pos);
     SysInt varsSize = vars.size();
-    DomainInt trig_pos = checked_cast<SysInt>(lit_pos * (varsSize - 1));
+    DomainInt trigPos = checked_cast<SysInt>(lit_pos * (varsSize - 1));
     for(SysInt v = 0; v < varsSize; ++v) {
       if(v != lit.var) {
         P(vars.size() << ".Watching " << v << "." << support[v] << " for " << lit.var << "."
                       << lit.val);
         D_ASSERT(vars[v].inDomain(support[v]));
         PROP_INFO_ADDONE(CounterA);
-        moveTriggerInt(vars[v], trig_pos, DomainRemoval, support[v], TO_Store);
-        ++trig_pos;
+        moveTriggerInt(vars[v], trigPos, DomainRemoval, support[v], TO_Store);
+        ++trigPos;
       }
     }
   }

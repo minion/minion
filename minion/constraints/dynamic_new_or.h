@@ -127,7 +127,7 @@ struct Dynamic_OR : public ParentConstraint {
     fullPropagate_called = true;
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     D_ASSERT(constraint_locked);
     constraint_locked = false;
   }

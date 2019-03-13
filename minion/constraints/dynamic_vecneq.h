@@ -61,7 +61,7 @@ struct EqIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
+  static bool no_supportFor_pair(VarType1& var1, VarType2& var2) {
     return var1.min() > var2.max() || var1.max() < var2.min();
   }
 
@@ -79,7 +79,7 @@ struct EqIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
+  static void addTriggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, LowerBound);
     ac->moveTriggerInt(var1, dt + 1, UpperBound);
     ac->moveTriggerInt(var2, dt + 2, LowerBound);
@@ -127,7 +127,7 @@ struct NeqIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
+  static bool no_supportFor_pair(VarType1& var1, VarType2& var2) {
     return var1.isAssigned() && var2.isAssigned() &&
            var1.assignedValue() == var2.assignedValue();
   }
@@ -145,7 +145,7 @@ struct NeqIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
+  static void addTriggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, Assigned);
     ac->moveTriggerInt(var2, dt + 1, Assigned);
   }
@@ -201,7 +201,7 @@ struct LessIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
+  static bool no_supportFor_pair(VarType1& var1, VarType2& var2) {
     return var1.min() >= var2.max();
   }
 
@@ -216,7 +216,7 @@ struct LessIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
+  static void addTriggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, LowerBound);
     ac->moveTriggerInt(var2, dt + 1, UpperBound);
   }
@@ -250,7 +250,7 @@ struct BothNonZeroIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static bool no_support_for_pair(VarType1& var1, VarType2& var2) {
+  static bool no_supportFor_pair(VarType1& var1, VarType2& var2) {
     return var1.max() <= 0 || var2.max() <= 0;
   }
 
@@ -265,7 +265,7 @@ struct BothNonZeroIterated {
   }
 
   template <typename VarType1, typename VarType2>
-  static void add_triggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
+  static void addTriggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
     ac->moveTriggerInt(var1, dt, UpperBound);
     ac->moveTriggerInt(var2, dt + 1, UpperBound);
   }
@@ -306,8 +306,8 @@ struct VecNeqDynamic : public AbstractConstraint {
   VarArray1 varArray1;
   VarArray2 varArray2;
 
-  SysInt watched_index0;
-  SysInt watched_index1;
+  SysInt watchedIndex0;
+  SysInt watchedIndex1;
 
   Reversible<bool> propagate_mode;
   SysInt indexToPropagate;
@@ -321,12 +321,12 @@ struct VecNeqDynamic : public AbstractConstraint {
     return Operator::dynamicTriggerCount() * 2;
   }
 
-  bool no_support_for_index(SysInt index) {
-    return Operator::no_support_for_pair(varArray1[index], varArray2[index]);
+  bool no_supportForIndex(SysInt index) {
+    return Operator::no_supportFor_pair(varArray1[index], varArray2[index]);
   }
 
-  void add_triggers(SysInt index, DomainInt dt) {
-    Operator::add_triggers(this, varArray1[index], varArray2[index], dt);
+  void addTriggers(SysInt index, DomainInt dt) {
+    Operator::addTriggers(this, varArray1[index], varArray2[index], dt);
   }
 
   virtual void fullPropagate() {
@@ -335,7 +335,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     SysInt index = 0;
 
     // Find first pair we could watch.
-    while(index < size && no_support_for_index(index))
+    while(index < size && no_supportForIndex(index))
       ++index;
 
     // Vectors are assigned and equal.
@@ -344,28 +344,28 @@ struct VecNeqDynamic : public AbstractConstraint {
       return;
     }
 
-    watched_index0 = index;
+    watchedIndex0 = index;
 
     ++index;
 
     // Now, is there another fine pair?
-    while(index < size && no_support_for_index(index))
+    while(index < size && no_supportForIndex(index))
       ++index;
 
     // There is only one possible pair allowed...
     if(index == size) {
-      propagate_from_var1(watched_index0);
-      propagate_from_var2(watched_index0);
+      propagate_from_var1(watchedIndex0);
+      propagate_from_var2(watchedIndex0);
       propagate_mode = true;
-      indexToPropagate = watched_index0;
-      add_triggers(watched_index0, 0);
+      indexToPropagate = watchedIndex0;
+      addTriggers(watchedIndex0, 0);
       return;
     }
 
-    watched_index1 = index;
+    watchedIndex1 = index;
 
-    add_triggers(watched_index0, 0);
-    add_triggers(watched_index1, 2);
+    addTriggers(watchedIndex0, 0);
+    addTriggers(watchedIndex1, 2);
   }
 
   void propagate_from_var1(SysInt index) {
@@ -383,7 +383,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     if(propagate_mode) {
       P("Propagating: " << indexToPropagate);
     } else {
-      P("Watching " << watched_index0 << "," << watched_index1);
+      P("Watching " << watchedIndex0 << "," << watchedIndex1);
     }
 
     SysInt triggerpair = trigger_activated / 2;
@@ -392,20 +392,20 @@ struct VecNeqDynamic : public AbstractConstraint {
     SysInt triggerarray = (trigger_activated % 2) + 1;
     D_ASSERT(triggerarray == 1 || triggerarray == 2);
 
-    SysInt original_index;
-    SysInt other_index;
+    SysInt originalIndex;
+    SysInt otherIndex;
 
     if(triggerpair == 0) {
-      original_index = watched_index0;
-      other_index = watched_index1;
+      originalIndex = watchedIndex0;
+      otherIndex = watchedIndex1;
     } else {
-      original_index = watched_index1;
-      other_index = watched_index0;
+      originalIndex = watchedIndex1;
+      otherIndex = watchedIndex0;
     }
 
     if(propagate_mode) {
       // If this is true, the other index got assigned.
-      if(indexToPropagate != original_index)
+      if(indexToPropagate != originalIndex)
         return;
 
       if(triggerarray == 1) {
@@ -417,39 +417,39 @@ struct VecNeqDynamic : public AbstractConstraint {
     }
 
     // Check if propagation has caused a loss of support.
-    if(!no_support_for_index(original_index))
+    if(!no_supportForIndex(originalIndex))
       return;
 
-    SysInt index = original_index + 1;
+    SysInt index = originalIndex + 1;
 
     SysInt size = varArray1.size();
 
-    while((index < size && no_support_for_index(index)) || index == other_index)
+    while((index < size && no_supportForIndex(index)) || index == otherIndex)
       ++index;
 
     if(index == size) {
       index = 0;
-      while((index < original_index && no_support_for_index(index)) || index == other_index)
+      while((index < originalIndex && no_supportForIndex(index)) || index == otherIndex)
         ++index;
 
-      if(index == original_index) {
+      if(index == originalIndex) {
         // This is the only possible non-equal index.
         P("Entering propagate mode for index " << indexToPropagate);
         propagate_mode = true;
-        indexToPropagate = other_index;
-        propagate_from_var1(other_index);
-        propagate_from_var2(other_index);
+        indexToPropagate = otherIndex;
+        propagate_from_var1(otherIndex);
+        propagate_from_var2(otherIndex);
         return;
       }
     }
 
     if(triggerpair == 0)
-      watched_index0 = index;
+      watchedIndex0 = index;
     else
-      watched_index1 = index;
+      watchedIndex1 = index;
 
-    D_ASSERT(watched_index0 != watched_index1);
-    add_triggers(index, triggerpair * 2);
+    D_ASSERT(watchedIndex0 != watchedIndex1);
+    addTriggers(index, triggerpair * 2);
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
@@ -494,7 +494,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     /*vector<AnyVarRef> t;
     for(SysInt i=0; i<varArray1.size(); i++) t.push_back(varArray1[i]);
     for(SysInt i=0; i<varArray2.size(); i++) t.push_back(varArray2[i]);
-    return forward_check_negation(this);*/
+    return forwardCheckNegation(this);*/
   }
 };
 

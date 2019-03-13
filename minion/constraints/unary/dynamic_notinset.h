@@ -72,18 +72,18 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
     // If we are in here, we have a bounds variable.
     D_ASSERT(var.isBound());
     // lower loop
-    SysInt lower_index = 0;
+    SysInt lowerIndex = 0;
 
-    while(lower_index < (SysInt)vals.size() && vals[lower_index] <= var.min()) {
-      var.setMin(vals[lower_index] + 1);
-      lower_index++;
+    while(lowerIndex < (SysInt)vals.size() && vals[lowerIndex] <= var.min()) {
+      var.setMin(vals[lowerIndex] + 1);
+      lowerIndex++;
     }
 
-    SysInt upper_index = (SysInt)vals.size() - 1;
+    SysInt upperIndex = (SysInt)vals.size() - 1;
 
-    while(upper_index > 0 && vals[upper_index] >= var.max()) {
-      var.setMax(vals[upper_index] - 1);
-      upper_index--;
+    while(upperIndex > 0 && vals[upperIndex] >= var.max()) {
+      var.setMax(vals[upperIndex] - 1);
+      upperIndex--;
     }
   }
 

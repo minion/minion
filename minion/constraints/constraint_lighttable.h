@@ -70,7 +70,7 @@ struct LightTableConstraint : public AbstractConstraint {
   }
 
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   CONSTRAINT_ARG_LIST2(vars, tuples);
@@ -95,7 +95,7 @@ struct LightTableConstraint : public AbstractConstraint {
     return vars.size();
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       moveTriggerInt(vars[i], i, DomainChanged);
     }
@@ -129,7 +129,7 @@ struct LightTableConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
       propagate_var(i);
     }

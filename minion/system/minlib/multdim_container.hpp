@@ -233,7 +233,7 @@ struct MultiDimCon {
   friend MultiDimCon<I, R> flatten(const MultiDimCon<I, R>& in);
 
   template <typename I, typename R>
-  friend int mdc_indexSize(const MultiDimCon<I, R>& in, int dim);
+  friend int mdcIndexSize(const MultiDimCon<I, R>& in, int dim);
 
   template <typename I, typename R>
   friend std::vector<R> mdc_join_and_merge(const std::vector<MultiDimCon<I, R>>& vec);
@@ -249,7 +249,7 @@ struct MultiDimCon {
 };
 
 template <typename I, typename R>
-int mdc_indexSize(const MultiDimCon<I, R>& in, int dim) {
+int mdcIndexSize(const MultiDimCon<I, R>& in, int dim) {
   if(dim < 0 || dim >= in.array_bounds.size()) {
     std::string error = "Tried to get size of index " + tostring(dim) + " from array with " +
                         tostring(in.array_bounds.size()) + " dimensions, name: " + in.name;

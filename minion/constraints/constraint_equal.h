@@ -104,10 +104,10 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       if(negated) {
         FATAL_REPORTABLE_ERROR();
       }
-      return ConOutput::print_con("__reify_minuseq", var1, var2.popOneMapper(), var3);
+      return ConOutput::printCon("__reify_minuseq", var1, var2.popOneMapper(), var3);
     } else {
 
-      return ConOutput::print_con(negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
+      return ConOutput::printCon(negated ? "__reify_diseq" : "__reify_eq", var1, var2, var3);
     }
   }
 
@@ -301,9 +301,9 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
       }
     }
     if(hasTrue) {
-      DomainInt dom_min = max(var1.min(), var2.min());
-      DomainInt dom_max = min(var1.max(), var2.max());
-      for(DomainInt i = dom_min; i <= dom_max; ++i) {
+      DomainInt domMin = max(var1.min(), var2.min());
+      DomainInt domMax = min(var1.max(), var2.max());
+      for(DomainInt i = domMin; i <= domMax; ++i) {
         if(var1.inDomain(i) && var2.inDomain(i)) {
           assignment.push_back(make_pair(0, i));
           assignment.push_back(make_pair(1, i));
@@ -511,9 +511,9 @@ struct EqualConstraint : public AbstractConstraint {
   virtual string fullOutputName() {
     vector<Mapper> v = var2.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_NEG)) {
-      return ConOutput::print_con("minuseq", var1, var2.popOneMapper());
+      return ConOutput::printCon("minuseq", var1, var2.popOneMapper());
     } else {
-      return ConOutput::print_con("eq", var1, var2);
+      return ConOutput::printCon("eq", var1, var2);
     }
   }
 

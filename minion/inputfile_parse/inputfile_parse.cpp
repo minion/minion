@@ -31,9 +31,9 @@ void ReadCSP(Reader& reader, ConcreteFileReader<Stream>* infile) {
 }
 
 void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose,
-                        MapLongTuplesToShort mltts, bool ensure_branch_on_allVars) {
+                        MapLongTuplesToShort mltts, bool ensureBranchOnAllVars) {
   MinionThreeInputReader<ConcreteFileReader<CheapStream>> readerThree(parser_verbose, mltts,
-                                                                      ensure_branch_on_allVars);
+                                                                      ensureBranchOnAllVars);
 
   bool needsFinaliseThree = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {

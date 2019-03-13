@@ -76,7 +76,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
         i--;
       }
     }
-    return ConOutput::print_con(constraintName(), cx, cy);
+    return ConOutput::printCon(constraintName(), cx, cy);
   }
 
   vector<pair<DomainInt, DomainInt>> earliest_occurrence_x;
@@ -135,7 +135,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     return std::max(x.size(), y.size()) * 4;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     SysInt xSize = x.size();
     for(SysInt i = 0; i < xSize; ++i) {
       moveTriggerInt(x[i], i * 4, LowerBound);
@@ -333,7 +333,7 @@ struct GacLexLeqConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     SysInt i, n = x.size();
     for(i = 0; i < n; i++) {
       if(!x[i].isAssigned())

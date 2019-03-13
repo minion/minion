@@ -71,7 +71,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   }
 
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   struct Support {
@@ -102,8 +102,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   VarArray vars;
 
   SysInt numvals;
-  DomainInt dom_min;
-  DomainInt dom_max;
+  DomainInt domMin;
+  DomainInt domMax;
 
   // 2d array (indexed by var then val) of sentinels,
   // at the head of list of supports.
@@ -129,15 +129,15 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     getState().getGenericBacktracker().add(this);
 
     if(vars.size() > 0) {
-      dom_max = vars[0].initialMax();
-      dom_min = vars[0].initialMin();
+      domMax = vars[0].initialMax();
+      domMin = vars[0].initialMin();
       for(SysInt i = 1; i < (SysInt)vars.size(); i++) {
-        if(vars[i].initialMin() < dom_min)
-          dom_min = vars[i].initialMin();
-        if(vars[i].initialMax() > dom_max)
-          dom_max = vars[i].initialMax();
+        if(vars[i].initialMin() < domMin)
+          domMin = vars[i].initialMin();
+        if(vars[i].initialMax() > domMax)
+          domMax = vars[i].initialMax();
       }
-      numvals = checked_cast<SysInt>(dom_max - dom_min + 1);
+      numvals = checked_cast<SysInt>(domMax - domMin + 1);
     }
 
     supportListPerLit.resize(vars.size());
@@ -187,8 +187,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
     // Go through supportFreeList
     for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
-      for(DomainInt val = dom_min; val <= dom_max; val++) {
-        Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
+      for(DomainInt val = domMin; val <= domMax; val++) {
+        Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var];
         while(sup != 0) {
           vector<Support*>& prev = sup->prev;
           vector<Support*>& next = sup->next;
@@ -209,7 +209,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
           }
 
           Support* temp = sup;
-          sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
+          sup = supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var];
           myset.insert(temp);
         }
       }
@@ -329,7 +329,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   // For use by the backtracker.
   inline void addSupportInternal(Support* sup, SysInt var, DomainInt val) {
     // Adds sup to the list for var, val only.
-    const SysInt validx = checked_cast<SysInt>(val - dom_min);
+    const SysInt validx = checked_cast<SysInt>(val - domMin);
 
     sup->prev[var] = &(supportListPerLit[var][validx]);
     sup->next[var] = supportListPerLit[var][validx].next[var];
@@ -365,7 +365,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     for(SysInt i = 0; i < litsize; i++) {
       pair<SysInt, DomainInt> temp = litlist_internal[i];
       SysInt var = temp.first;
-      const SysInt val = checked_cast<SysInt>(temp.second - dom_min);
+      const SysInt val = checked_cast<SysInt>(temp.second - domMin);
 
       // Stitch it into supportListPerLit
       sup_internal->prev[var] = &(supportListPerLit[var][val]);
@@ -445,10 +445,10 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     cout << "Supports for each literal:" << endl;
     for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
       cout << "Variable: " << var << endl;
-      for(DomainInt val = dom_min; val <= dom_max; val++) {
+      for(DomainInt val = domMin; val <= domMax; val++) {
         if(vars[var].inDomain(val)) {
           cout << "Value: " << val << endl;
-          Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var];
+          Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var];
           while(sup != 0) {
             cout << *(sup) << endl;
             bool contains_varval = false;
@@ -478,14 +478,14 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   inline void attach_trigger(SysInt var, DomainInt val) {
     // P("Attach Trigger: " << i);
 
-    DomainInt dt = (var * numvals) + (val - dom_min);
+    DomainInt dt = (var * numvals) + (val - domMin);
     moveTriggerInt(vars[var], dt, DomainRemoval, val);
   }
 
   virtual void propagateDynInt(SysInt pos, DomainDelta) {
     const SysInt var = pos / numvals;
-    DomainInt val = pos - (var * numvals) + dom_min;
-    const SysInt validx = checked_cast<SysInt>(val - dom_min);
+    DomainInt val = pos - (var * numvals) + domMin;
+    const SysInt validx = checked_cast<SysInt>(val - domMin);
 
     // cout << "Entered propagate."<<endl;
     // printStructures();
@@ -637,7 +637,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
         if(vars[var].inDomain(val)) {
           // If the value is still there, Put trigger on.
           attach_trigger(var, val);
-          D_ASSERT(supportListPerLit[var][checked_cast<SysInt>(val - dom_min)].next[var] != 0);
+          D_ASSERT(supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var] != 0);
         }
       }
     }
@@ -652,7 +652,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   }
 
   Support* seekInferableSupport(SysInt var, DomainInt val) {
-    const SysInt validx = checked_cast<SysInt>(val - dom_min);
+    const SysInt validx = checked_cast<SysInt>(val - domMin);
     while(supportListPerLit[var][validx].next[var] != 0) {
       Support* temp = supportListPerLit[var][validx].next[var];
       vector<pair<SysInt, DomainInt>>& literals = temp->literals;

@@ -33,48 +33,48 @@
 
 template <typename VarArray, typename VarSum>
 AbstractConstraint* greaterEqualSumConstraint(const vector<VarArray>& _varArray,
-                                              const VarSum _var_sum) {
+                                              const VarSum _varSum) {
   if(_varArray.size() == 2) {
     std::array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _varArray[i];
-    return LightGreaterEqualSumCon(v_array, _var_sum);
+    return LightGreaterEqualSumCon(v_array, _varSum);
   } else {
     return (new LessEqualSumConstraint<vector<typename NegType<VarArray>::type>,
                                        typename NegType<VarSum>::type>(VarNegRef(_varArray),
-                                                                       VarNegRef(_var_sum)));
+                                                                       VarNegRef(_varSum)));
   }
 }
 
 template <typename VarArray, typename VarSum>
 AbstractConstraint* lessEqualSumConstraint(const vector<VarArray>& _varArray,
-                                           const VarSum _var_sum) {
+                                           const VarSum _varSum) {
   if(_varArray.size() == 2) {
     std::array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _varArray[i];
-    return LightLessEqualSumCon(v_array, _var_sum);
+    return LightLessEqualSumCon(v_array, _varSum);
   } else {
-    return new LessEqualSumConstraint<vector<VarArray>, VarSum>(_varArray, _var_sum);
+    return new LessEqualSumConstraint<vector<VarArray>, VarSum>(_varArray, _varSum);
   }
 }
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BuildCT_LEQSUM(const VarArray& _varArray, const vector<VarSum>& _var_sum,
+AbstractConstraint* BuildCT_LEQSUM(const VarArray& _varArray, const vector<VarSum>& _varSum,
                                    ConstraintBlob&) {
   if(_varArray.size() == 2) {
     std::array<typename VarArray::value_type, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _varArray[i];
-    return LightLessEqualSumCon(v_array, _var_sum[0]);
+    return LightLessEqualSumCon(v_array, _varSum[0]);
   } else {
-    return new LessEqualSumConstraint<VarArray, VarSum>(_varArray, _var_sum[0]);
+    return new LessEqualSumConstraint<VarArray, VarSum>(_varArray, _varSum[0]);
   }
 }
 
 inline AbstractConstraint* BuildCT_LEQSUM(const vector<BoolVarRef>& varArray,
-                                          const vector<ConstantVar>& var_sum, ConstraintBlob&) {
-  SysInt t2(checked_cast<SysInt>(var_sum[0].assignedValue()));
+                                          const vector<ConstantVar>& varSum, ConstraintBlob&) {
+  SysInt t2(checked_cast<SysInt>(varSum[0].assignedValue()));
   return BoolLessEqualSumCon(varArray, t2);
 }
 
@@ -88,22 +88,22 @@ inline AbstractConstraint* BuildCT_LEQSUM(const vector<BoolVarRef>& varArray,
 
 template <typename VarArray, typename VarSum>
 AbstractConstraint* BuildCT_GEQSUM(const vector<VarArray>& _varArray,
-                                   const vector<VarSum>& _var_sum, ConstraintBlob&) {
+                                   const vector<VarSum>& _varSum, ConstraintBlob&) {
   if(_varArray.size() == 2) {
     std::array<VarArray, 2> v_array;
     for(SysInt i = 0; i < 2; ++i)
       v_array[i] = _varArray[i];
-    return LightGreaterEqualSumCon(v_array, _var_sum[0]);
+    return LightGreaterEqualSumCon(v_array, _varSum[0]);
   } else {
     return (new LessEqualSumConstraint<vector<typename NegType<VarArray>::type>,
                                        typename NegType<VarSum>::type>(VarNegRef(_varArray),
-                                                                       VarNegRef(_var_sum[0])));
+                                                                       VarNegRef(_varSum[0])));
   }
 }
 
 inline AbstractConstraint* BuildCT_GEQSUM(const vector<BoolVarRef>& varArray,
-                                          const vector<ConstantVar>& var_sum, ConstraintBlob&) {
-  SysInt t2(checked_cast<SysInt>(var_sum[0].assignedValue()));
+                                          const vector<ConstantVar>& varSum, ConstraintBlob&) {
+  SysInt t2(checked_cast<SysInt>(varSum[0].assignedValue()));
   return BoolGreaterEqualSumCon(varArray, t2);
 }
 

@@ -307,7 +307,7 @@ inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& varArray,
   }
 }
 
-void inline standard_deal_with_solution() {
+void inline standard_dealWith_solution() {
   if(getState().isOptimisationProblem()) {
     if(!getState().getOptimiseVar()->isAssigned()) {
       cerr << "The optimisation variable isn't assigned at a solution node!" << endl;

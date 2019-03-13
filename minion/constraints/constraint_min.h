@@ -65,16 +65,16 @@ struct MinConstraint : public AbstractConstraint {
     // We assume constraint is propagated here, we will do a simple check
     // to see if it is true.
     if(min_var.isAssigned()) {
-      bool found_assigned_min = false;
+      bool foundAssigned_min = false;
       bool found_lesserValue = false;
       for(size_t i = 0; i < varArray.size(); ++i) {
         if(varArray[i].isAssigned() &&
            min_var.assignedValue() == varArray[i].assignedValue())
-          found_assigned_min = true;
+          foundAssigned_min = true;
         if(varArray[i].min() < min_var.min())
           found_lesserValue = true;
       }
-      if(found_assigned_min && !found_lesserValue)
+      if(foundAssigned_min && !found_lesserValue)
         return "true()";
     }
 
@@ -95,7 +95,7 @@ struct MinConstraint : public AbstractConstraint {
     return (varArray.size() + 1) * 2;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     SysInt vSize = varArray.size();
     for(SysInt i = 0; i < vSize; ++i) {
       moveTriggerInt(varArray[i], i, LowerBound);
@@ -131,8 +131,8 @@ struct MinConstraint : public AbstractConstraint {
       propVal -= (vSize + 1);
       if(propVal == vSize) {
         typename VarArray::iterator it = varArray.begin();
-        DomainInt minvar_max = min_var.max();
-        while(it != varArray.end() && (*it).min() > minvar_max)
+        DomainInt minvarMax = min_var.max();
+        while(it != varArray.end() && (*it).min() > minvarMax)
           ++it;
         if(it == varArray.end()) {
           getState().setFailed(true);
@@ -141,12 +141,12 @@ struct MinConstraint : public AbstractConstraint {
         // Possibly this variable is the only one that can be the minimum
         typename VarArray::iterator it_copy(it);
         ++it;
-        while(it != varArray.end() && (*it).min() > minvar_max)
+        while(it != varArray.end() && (*it).min() > minvarMax)
           ++it;
         if(it != varArray.end()) { // No, another variable can be the minimum
           return;
         }
-        it_copy->setMax(minvar_max);
+        it_copy->setMax(minvarMax);
       } else {
         min_var.setMax(varArray[checked_cast<SysInt>(propVal)].max());
       }
@@ -154,7 +154,7 @@ struct MinConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     SysInt arraySize = varArray.size();
     if(arraySize == 0) {
       getState().setFailed(true);
@@ -206,7 +206,7 @@ struct MinConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   virtual vector<AnyVarRef> getVars() {

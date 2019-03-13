@@ -44,9 +44,9 @@ void trigger_function(int /* signum */) {
 }
 
 #ifdef NO_SYSTEM
-void setup_triggers(bool, int) {}
+void setupTriggers(bool, int) {}
 #else
-void setup_triggers(bool timeout_active,
+void setupTriggers(bool timeout_active,
                     int timeout) // CPU_time = false -> real time
 {
   assert(TriggerEvent::trigger_event_X == TriggerEvent::none);
@@ -71,7 +71,7 @@ void setup_triggers(bool timeout_active,
 }
 #endif
 
-inline void check_triggers() {
+inline void checkTriggers() {
   if(TriggerEvent::get_trigger() != TriggerEvent::none) {
     if(TriggerEvent::get_trigger() == TriggerEvent::ctrl_c)
       throw EndOfSearch("ctrl+c");

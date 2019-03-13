@@ -391,7 +391,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
           // to updateCounters.
           // so we should be able to push it onto a list
           //
-          // As long as we do not actually call find_new_support.
+          // As long as we do not actually call findNewSupport.
           // So probably should shove things onto a list and then call find
           // supports later
           // Surely don't need to update lost supports on backtracking in

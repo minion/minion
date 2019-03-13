@@ -58,55 +58,55 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
   VarArray varArray;
   ValueArray value_array;
-  void* unwatched_indexes;
+  void* unwatchedIndexes;
   DomainInt last;
-  DomainInt num_unwatched;
+  DomainInt numUnwatched;
 
-  CONSTRAINT_ARG_LIST3(varArray, value_array, var_sum);
+  CONSTRAINT_ARG_LIST3(varArray, value_array, varSum);
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   SysInt& unwatched(DomainInt i) {
-    return static_cast<SysInt*>(unwatched_indexes)[checked_cast<SysInt>(i)];
+    return static_cast<SysInt*>(unwatchedIndexes)[checked_cast<SysInt>(i)];
   }
 
-  VarSum var_sum;
+  VarSum varSum;
 
-  LiteralSumConstraintDynamic(const VarArray& _varArray, ValueArray _val_array, VarSum _var_sum)
-      : varArray(_varArray), value_array(_val_array), var_sum(_var_sum) {
+  LiteralSumConstraintDynamic(const VarArray& _varArray, ValueArray _val_array, VarSum _varSum)
+      : varArray(_varArray), value_array(_val_array), varSum(_varSum) {
     SysInt arraySize = varArray.size();
 
-    num_unwatched = arraySize - var_sum - 1;
-    if(num_unwatched < 0)
-      num_unwatched = 0;
-    if(num_unwatched > (SysInt)varArray.size())
-      num_unwatched = varArray.size();
+    numUnwatched = arraySize - varSum - 1;
+    if(numUnwatched < 0)
+      numUnwatched = 0;
+    if(numUnwatched > (SysInt)varArray.size())
+      numUnwatched = varArray.size();
 
-    unwatched_indexes =
-        checked_malloc(checked_cast<SysInt>(sizeof(UnsignedSysInt) * num_unwatched));
+    unwatchedIndexes =
+        checked_malloc(checked_cast<SysInt>(sizeof(UnsignedSysInt) * numUnwatched));
     // above line might request 0 bytes
     last = 0;
   }
 
   virtual SysInt dynamicTriggerCount() {
-    if(var_sum <= 0)
+    if(varSum <= 0)
       return 0;
-    if(var_sum > (SysInt)varArray.size())
+    if(varSum > (SysInt)varArray.size())
       return varArray.size() + 1;
-    return checked_cast<SysInt>(var_sum + 1);
+    return checked_cast<SysInt>(varSum + 1);
   }
 
   virtual void fullPropagate() {
-    if(var_sum <= 0)
+    if(varSum <= 0)
       return;
 
-    DomainInt trig_pos = 0;
+    DomainInt trigPos = 0;
 
     SysInt arraySize = varArray.size();
-    DomainInt triggers_wanted = var_sum + 1;
+    DomainInt triggers_wanted = varSum + 1;
     SysInt index;
 
     for(index = 0; (index < arraySize) && (triggers_wanted > 0); ++index) {
@@ -141,15 +141,15 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
       for(SysInt i = 0; (i < index); ++i) // remember index was the elts we looked at
       {
         if(varArray[i].inDomain(value_array[i])) {
-          triggerInfo(trig_pos) = i;
-          moveTriggerInt(varArray[i], trig_pos, DomainRemoval, value_array[i]);
-          ++trig_pos;
+          triggerInfo(trigPos) = i;
+          moveTriggerInt(varArray[i], trigPos, DomainRemoval, value_array[i]);
+          ++trigPos;
         } else {
           unwatched(j) = i;
           ++j;
           // When run at root we could optimise as follows
           //    If VarToCount not in domain then do not put j in unwatched
-          //      Instead decrement num_unwatched
+          //      Instead decrement numUnwatched
         }
       }
 
@@ -158,7 +158,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
         ++j;
       }
 
-      D_ASSERT(j == num_unwatched);
+      D_ASSERT(j == numUnwatched);
     }
     return;
   }
@@ -178,31 +178,31 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
     D_ASSERT(!varArray[propval].inDomain(value_array[propval]));
 
-    BOOL found_new_support = false;
+    BOOL foundNewSupport = false;
 
     DomainInt j = 0;
 
-    for(SysInt loop = 0; (!found_new_support) && loop < num_unwatched;) {
-      D_ASSERT(num_unwatched > 0);
+    for(SysInt loop = 0; (!foundNewSupport) && loop < numUnwatched;) {
+      D_ASSERT(numUnwatched > 0);
 
-      j = (last + 1 + loop) % num_unwatched;
+      j = (last + 1 + loop) % numUnwatched;
       if(varArray[unwatched(j)].inDomain(value_array[unwatched(j)])) {
-        found_new_support = true;
+        foundNewSupport = true;
       }
       // XXX What is going on here? check in dynamic_sum!
       { ++loop; }
     }
 
-    if(found_new_support) // so we have found a new literal to watch
+    if(foundNewSupport) // so we have found a new literal to watch
     {
-      SysInt& unwatched_index = unwatched(j);
+      SysInt& unwatchedIndex = unwatched(j);
 
       // propval gives array index of old watched lit
 
-      triggerInfo(dt) = unwatched_index;
-      moveTriggerInt(varArray[unwatched_index], dt, DomainRemoval, value_array[unwatched_index]);
+      triggerInfo(dt) = unwatchedIndex;
+      moveTriggerInt(varArray[unwatchedIndex], dt, DomainRemoval, value_array[unwatchedIndex]);
 
-      unwatched_index = propval;
+      unwatchedIndex = propval;
       last = j;
       return;
     }
@@ -211,7 +211,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
     SysInt dt2 = 0;
 
-    for(SysInt z = 0; z < var_sum + 1; ++z) {
+    for(SysInt z = 0; z < varSum + 1; ++z) {
       if(dt != dt2) // that one has just been set the other way
       {
         varArray[triggerInfo(dt2)].assign(value_array[triggerInfo(dt2)]);
@@ -225,7 +225,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
     SysInt count = 0;
     for(SysInt i = 0; i < vSize; ++i)
       count += (v[i] == value_array[i]);
-    return count >= var_sum;
+    return count >= varSum;
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -237,7 +237,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    if(var_sum <= 0)
+    if(varSum <= 0)
       return true;
     SysInt lit_matchCount = 0;
 
@@ -245,7 +245,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
       if(varArray[i].inDomain(value_array[i])) {
         assignment.push_back(make_pair(i, value_array[i]));
         lit_matchCount++;
-        if(lit_matchCount == var_sum)
+        if(lit_matchCount == varSum)
           return true;
       }
     }
@@ -255,9 +255,9 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
 template <typename VarArray, typename ValArray, typename VarSum>
 AbstractConstraint* LiteralSumConDynamic(const VarArray& _varArray, const ValArray& _val_array,
-                                         VarSum _var_sum) {
+                                         VarSum _varSum) {
   return new LiteralSumConstraintDynamic<VarArray, ValArray, VarSum>(_varArray, _val_array,
-                                                                     _var_sum);
+                                                                     _varSum);
 }
 
 template <typename T1>

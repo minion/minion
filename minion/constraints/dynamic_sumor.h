@@ -86,14 +86,14 @@ struct VecCountDynamic : public AbstractConstraint {
     return checked_cast<SysInt>(Operator::dynamicTriggerCount() * num_to_watch);
   }
 
-  bool no_support_for_index(DomainInt index_in) {
+  bool no_supportForIndex(DomainInt index_in) {
     const SysInt index = checked_cast<SysInt>(index_in);
-    return Operator::no_support_for_pair(varArray1[index], varArray2[index]);
+    return Operator::no_supportFor_pair(varArray1[index], varArray2[index]);
   }
 
-  void add_triggers(DomainInt index_in, DomainInt dt) {
+  void addTriggers(DomainInt index_in, DomainInt dt) {
     const SysInt index = checked_cast<SysInt>(index_in);
-    Operator::add_triggers(this, varArray1[index], varArray2[index], dt);
+    Operator::addTriggers(this, varArray1[index], varArray2[index], dt);
   }
 
   virtual void fullPropagate() {
@@ -110,7 +110,7 @@ struct VecCountDynamic : public AbstractConstraint {
     // Find first pair we could watch.
 
     while(found_matches < num_to_watch && index < size) {
-      while(index < size && no_support_for_index(index)) {
+      while(index < size && no_supportForIndex(index)) {
         ++index;
       }
       if(index != size) {
@@ -133,14 +133,14 @@ struct VecCountDynamic : public AbstractConstraint {
       for(SysInt i = 0; i < num_to_watch - 1; ++i) {
         propagate_from_var1(watchedValues[i]);
         propagate_from_var2(watchedValues[i]);
-        add_triggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
+        addTriggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
       }
       return;
     }
 
     // Found enough values to watch, no propagation yet!
     for(SysInt i = 0; i < num_to_watch; ++i) {
-      add_triggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
+      addTriggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
     }
 
     // Setup the 'unwatched values' array.
@@ -214,12 +214,12 @@ struct VecCountDynamic : public AbstractConstraint {
     }
 
     // Check if propagation has caused a loss of support.
-    if(!no_support_for_index(watchedValues[triggerpair]))
+    if(!no_supportForIndex(watchedValues[triggerpair]))
       return;
 
     SysInt index = 0;
     SysInt unwatchedSize = unwatchedValues.size();
-    while(index < unwatchedSize && no_support_for_index(unwatchedValues[index]))
+    while(index < unwatchedSize && no_supportForIndex(unwatchedValues[index]))
       index++;
 
     if(index == unwatchedSize) {
@@ -243,7 +243,7 @@ struct VecCountDynamic : public AbstractConstraint {
 
     swap(watchedValues[triggerpair], unwatchedValues[index]);
 
-    add_triggers(watchedValues[triggerpair], triggerpair * Operator::dynamicTriggerCount());
+    addTriggers(watchedValues[triggerpair], triggerpair * Operator::dynamicTriggerCount());
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
@@ -270,16 +270,16 @@ struct VecCountDynamic : public AbstractConstraint {
       return true;
 
     pair<DomainInt, DomainInt> assign;
-    SysInt found_satisfying = 0;
+    SysInt foundSatisfying = 0;
     for(SysInt i = 0; i < (SysInt)varArray1.size(); ++i) {
       if(Operator::getSatisfyingAssignment(varArray1[i], varArray2[i], assign)) {
-        found_satisfying++;
+        foundSatisfying++;
         D_ASSERT(varArray1[i].inDomain(assign.first));
         D_ASSERT(varArray2[i].inDomain(assign.second));
         D_ASSERT(Operator::checkAssignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
         assignment.push_back(make_pair(i + varArray1.size(), assign.second));
-        if(found_satisfying == hamming_distance)
+        if(foundSatisfying == hamming_distance)
           return true;
       }
     }

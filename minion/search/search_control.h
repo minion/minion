@@ -124,7 +124,7 @@ shared_ptr<SearchManager> makeSearch_manager(PropagationLevel propMethod,
 
   // need to switch here for different search algorthms. plain, parallel, group
   shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p, standard_time_ctrlc_checks,
-                                                         standard_deal_with_solution, opt_handler));
+                                                         standard_dealWith_solution, opt_handler));
 
   return sm;
 }

@@ -40,7 +40,7 @@ class Queues {
   // normal queue is empty. This list is at the moment only used
   // by reified constraints when they want to start propagation.
   // I don't like it, but it is necesasary.
-  QueueCon<AbstractConstraint*> special_triggers;
+  QueueCon<AbstractConstraint*> specialTriggers;
 
   TriggerBacktrackQueue tbq;
 
@@ -53,7 +53,7 @@ public:
 
   void pushSpecialTrigger(AbstractConstraint* trigger) {
     CON_INFO_ADDONE(AddSpecialToQueue);
-    special_triggers.push_back(trigger);
+    specialTriggers.push_back(trigger);
   }
 
   void pushDynamicTriggers(DynamicTriggerEvent new_dynamic_trig_range) {
@@ -64,16 +64,16 @@ public:
   void clearQueues() {
     dynamic_trigger_list.clear();
 
-    if(!special_triggers.empty()) {
-      SysInt size = special_triggers.size();
+    if(!specialTriggers.empty()) {
+      SysInt size = specialTriggers.size();
       for(SysInt i = 0; i < size; ++i)
-        special_triggers[i]->special_unlock();
-      special_triggers.clear();
+        specialTriggers[i]->specialUnlock();
+      specialTriggers.clear();
     }
   }
 
   bool isQueuesEmpty() {
-    return dynamic_trigger_list.empty() && special_triggers.empty();
+    return dynamic_trigger_list.empty() && specialTriggers.empty();
   }
 
   // next_queuePtr is defined in constraint_dynamic.
@@ -123,11 +123,11 @@ public:
           return;
       }
 
-      if(special_triggers.empty())
+      if(specialTriggers.empty())
         return;
 
-      AbstractConstraint* trig = special_triggers.queueTop();
-      special_triggers.queuePop();
+      AbstractConstraint* trig = specialTriggers.queueTop();
+      specialTriggers.queuePop();
 
       CON_INFO_ADDONE(SpecialTrigger);
       trig->specialCheck();

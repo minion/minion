@@ -49,11 +49,11 @@ struct CheckAssignConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(CheckAssign);
-    if(check_unsat(propVal, DomainDelta::empty()))
+    if(checkUnsat(propVal, DomainDelta::empty()))
       getState().setFailed(true);
   }
 
-  virtual BOOL check_unsat(SysInt, DomainDelta) {
+  virtual BOOL checkUnsat(SysInt, DomainDelta) {
     typename OriginalConstraint::var_type& variables = originalcon.getVars();
 
     SysInt count = assigned_vars;
@@ -63,11 +63,11 @@ struct CheckAssignConstraint : public AbstractConstraint {
     D_ASSERT(count <= vSize);
 
     if(count == vSize)
-      return check_full_assignment();
+      return checkFullAssignment();
     return false;
   }
 
-  bool check_full_assignment() {
+  bool checkFullAssignment() {
     typename OriginalConstraint::var_type& variables = originalcon.getVars();
 
     MAKE_STACK_BOX(assignment, DomainInt, variables.size());
@@ -81,7 +81,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
       return !checkAssignment(&assignment.front(), assignment.size());
   }
 
-  virtual BOOL full_check_unsat() {
+  virtual BOOL fullCheckUnsat() {
     typename OriginalConstraint::var_type& variables = originalcon.getVars();
 
     UnsignedSysInt counter = 0;
@@ -91,7 +91,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
     assigned_vars = counter;
 
     if(counter == variables.size())
-      return check_full_assignment();
+      return checkFullAssignment();
     return false;
   }
 
@@ -108,7 +108,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     trigger_setup();
-    if(full_check_unsat())
+    if(fullCheckUnsat())
       getState().setFailed(true);
   }
 
@@ -231,7 +231,7 @@ public:
   }
 };
 
-inline AbstractConstraint* forward_check_negation(AbstractConstraint* c) {
+inline AbstractConstraint* forwardCheckNegation(AbstractConstraint* c) {
   return new CheckAssignConstraint<AbstractWrapper>(AbstractWrapper(c));
 }
 #endif

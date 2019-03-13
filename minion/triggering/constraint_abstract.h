@@ -227,7 +227,7 @@ public:
 
   // Called if failure occurs without actiating a special trigger, so the
   // constraint can unlock.
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     outputFatalError("Serious internal error");
   }
 

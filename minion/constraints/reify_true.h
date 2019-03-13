@@ -125,7 +125,7 @@ struct reify_true : public ParentConstraint {
     fullPropagate_called = true;
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     D_ASSERT(constraint_locked);
     P("Special unlock!");
     constraint_locked = false;

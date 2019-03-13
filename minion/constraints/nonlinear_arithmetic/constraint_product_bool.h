@@ -51,7 +51,7 @@ struct BoolProdConstraint : public AbstractConstraint {
                                 var3.initialMax() - var3.initialMin() + 1 + 2 + 2);
   }
 
-  void full_check() {
+  void fullCheck() {
     if(!var3.inDomain(0)) {
       var1.removeFromDomain(0);
       var2.removeFromDomain(0);
@@ -108,7 +108,7 @@ struct BoolProdConstraint : public AbstractConstraint {
     dvarbool = dvar3 + checked_cast<SysInt>(var3.initialMax() - var3.initialMin() + 1);
     dvarequalval = dvarbool + 2;
 
-    full_check();
+    fullCheck();
 
     for(DomainInt val = var2.min(); val <= var2.max(); val++) {
       if(var2.inDomain(val)) {
@@ -160,7 +160,7 @@ struct BoolProdConstraint : public AbstractConstraint {
       } else {
         D_ASSERT(var1.isAssignedValue(1));
         // var1 has changed, do a full pass
-        full_check();
+        fullCheck();
       }
     } else {
       D_ASSERT(pos == dvarequalval || pos == dvarequalval + 1);
@@ -200,7 +200,7 @@ struct BoolProdConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 

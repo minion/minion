@@ -34,18 +34,18 @@
 struct TriggerObj {
   DomainInt min;
   DomainInt max;
-  vector<DynamicTriggerList> _dynamic_triggers;
+  vector<DynamicTriggerList> _dynamicTriggers;
 
   TriggerObj() : min(-1), max(-1) {}
 
   DynamicTriggerList* trigger_type(DomainInt type) {
     D_ASSERT(type >= 0 && type < 4);
-    return &_dynamic_triggers[checked_cast<SysInt>(type)];
+    return &_dynamicTriggers[checked_cast<SysInt>(type)];
   }
 
   DynamicTriggerList* domainVal(DomainInt val) {
     D_ASSERT(val >= min && val <= max);
-    return &_dynamic_triggers[checked_cast<SysInt>(val - min + 4)];
+    return &_dynamicTriggers[checked_cast<SysInt>(val - min + 4)];
   }
 };
 
@@ -61,12 +61,12 @@ public:
     varCount_m = 0;
   }
 
-  vector<TriggerObj> dyn_triggers;
+  vector<TriggerObj> dynTriggers;
 
-  //  vector<vector<DynamicTriggerList>> dynamic_triggers_vec;
-  //  vector<vector<DynamicTriggerList>> dynamic_triggersDomain_vec;
+  //  vector<vector<DynamicTriggerList>> dynamicTriggers_vec;
+  //  vector<vector<DynamicTriggerList>> dynamicTriggersDomain_vec;
 
-  // void* dynamic_triggers;
+  // void* dynamicTriggers;
 
   SysInt varCount_m;
 
@@ -82,14 +82,14 @@ public:
     SysInt old_varCount = varCount_m;
     varCount_m += doms.size();
     CHECK(varCount_m < MAX_VARS, "Too many variables... increase MAX_VARS");
-    dyn_triggers.resize(varCount_m);
+    dynTriggers.resize(varCount_m);
     for(int i = 0; i < doms.size(); ++i) {
-      dyn_triggers[old_varCount + i].min = doms[i].first;
-      dyn_triggers[old_varCount + i].max = doms[i].second;
+      dynTriggers[old_varCount + i].min = doms[i].first;
+      dynTriggers[old_varCount + i].max = doms[i].second;
       if(only_bounds)
-        dyn_triggers[old_varCount + i]._dynamic_triggers.resize(4);
+        dynTriggers[old_varCount + i]._dynamicTriggers.resize(4);
       else
-        dyn_triggers[old_varCount + i]._dynamic_triggers.resize(
+        dynTriggers[old_varCount + i]._dynamicTriggers.resize(
             checked_cast<SysInt>(4 + (doms[i].second - doms[i].first + 1)));
     }
   }
@@ -102,12 +102,12 @@ public:
     D_ASSERT(!only_bounds || type != DomainRemoval);
     DynamicTriggerList* trig;
     if(type != DomainRemoval) {
-      trig = dyn_triggers[varNum].trigger_type(type);
+      trig = dynTriggers[varNum].trigger_type(type);
     } else {
       D_ASSERT(!only_bounds);
-      D_ASSERT(dyn_triggers[varNum].min <= val_removed);
-      D_ASSERT(dyn_triggers[varNum].max >= val_removed);
-      trig = dyn_triggers[varNum].domainVal(val_removed);
+      D_ASSERT(dynTriggers[varNum].min <= val_removed);
+      D_ASSERT(dynTriggers[varNum].max >= val_removed);
+      trig = dynTriggers[varNum].domainVal(val_removed);
     }
 
     // This is an optimisation, no need to push empty lists.
@@ -147,12 +147,12 @@ public:
     DynamicTriggerList* queue;
 
     if(type != DomainRemoval) {
-      queue = dyn_triggers[b].trigger_type(type);
+      queue = dynTriggers[b].trigger_type(type);
     } else {
       D_ASSERT(!only_bounds);
-      D_ASSERT(dyn_triggers[b].min <= val);
-      D_ASSERT(dyn_triggers[b].max >= val);
-      queue = dyn_triggers[b].domainVal(val);
+      D_ASSERT(dynTriggers[b].min <= val);
+      D_ASSERT(dynTriggers[b].max >= val);
+      queue = dynTriggers[b].domainVal(val);
     }
 
     D_ASSERT(queue->sanity_check_list());

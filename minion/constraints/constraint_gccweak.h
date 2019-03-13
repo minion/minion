@@ -67,9 +67,9 @@ hence the name gccweak.
 #include "gcc_common.h"
 
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint* BuildCT_GCCWEAK(const VarArray1& varArray, const VarArray2& cap_array,
+AbstractConstraint* BuildCT_GCCWEAK(const VarArray1& varArray, const VarArray2& capArray,
                                     ConstraintBlob& b) {
-  return new GCC<VarArray1, VarArray2, false>(varArray, cap_array, b.constants[0]);
+  return new GCC<VarArray1, VarArray2, false>(varArray, capArray, b.constants[0]);
 }
 
 /* JSON

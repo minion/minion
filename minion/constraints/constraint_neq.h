@@ -71,13 +71,13 @@ struct NeqConstraint : public AbstractConstraint {
     return varArray.size();
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     for(SysInt i = 0; i < varArray.size(); ++i)
       moveTriggerInt(varArray[i], i, Assigned);
   }
 
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   virtual void propagateDynInt(SysInt propVal_in, DomainDelta) {
@@ -100,7 +100,7 @@ struct NeqConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i)
       if(varArray[i].isAssigned()) {

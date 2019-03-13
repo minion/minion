@@ -58,7 +58,7 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   return check_failed;
 }
 
-inline bool check_sac_timeout() {
+inline bool checkSACTimeout() {
   if(Parallel::isAlarmActivated()) {
     if(Parallel::isCtrlCPressed()) {
       getState().setFailed(true);
@@ -78,7 +78,7 @@ bool pruneDomain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
   bool everfailed = false;
   DomainInt gallop = 1;
   while(true) {
-    if(check_sac_timeout())
+    if(checkSACTimeout())
       throw EndOfSearch();
     if(var.min() == var.max()) {
       return pruned;
@@ -117,7 +117,7 @@ bool pruneDomain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit) 
   bool everfailed = false;
   DomainInt gallop = 1;
   while(true) {
-    if(check_sac_timeout())
+    if(checkSACTimeout())
       throw EndOfSearch();
     if(var.min() == var.max()) {
       return pruned;
@@ -184,7 +184,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
             reduced = true;
           if(getState().isFailed())
             return;
-          if(check_sac_timeout())
+          if(checkSACTimeout())
             throw EndOfSearch();
         }
       }
@@ -196,7 +196,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         Var& var = vararray[i];
         if(!var.isBound()) {
           for(DomainInt val = var.min() + 1; val <= var.max() - 1; ++val) {
-            if(check_sac_timeout())
+            if(checkSACTimeout())
               throw EndOfSearch();
             if(var.inDomain(val) && check_fail(var, val, vararray, prop)) {
               reduced = true;

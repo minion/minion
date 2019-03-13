@@ -191,7 +191,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     constraint_locked = false;
   }
 

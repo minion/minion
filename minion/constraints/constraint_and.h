@@ -54,7 +54,7 @@ struct AndConstraint : public AbstractConstraint {
     return 6;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var2, 1, LowerBound);
     moveTriggerInt(var3, 2, LowerBound);
@@ -104,7 +104,7 @@ struct AndConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     if(var1.isAssignedValue(false) || var2.isAssignedValue(false))
       var3.assign(false);
 
@@ -165,7 +165,7 @@ struct AndConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 

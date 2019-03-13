@@ -190,9 +190,9 @@ struct STR : public AbstractConstraint {
 
   virtual string fullOutputName() {
     if(UseShort)
-      return ConOutput::print_con(constraintName(), vars, shortTupleList);
+      return ConOutput::printCon(constraintName(), vars, shortTupleList);
     else
-      return ConOutput::print_con(constraintName(), vars, longTupleList);
+      return ConOutput::printCon(constraintName(), vars, longTupleList);
   }
 
   ShortTupleList* shortTupleList;
@@ -263,14 +263,14 @@ struct STR : public AbstractConstraint {
     return vars.size();
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     for(SysInt i = 0; i < vars.size(); ++i) {
       moveTriggerInt(vars[i], i, DomainChanged);
     }
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     limit = sct->tuples.size();
 
     // pretend all variables have changed.
@@ -338,7 +338,7 @@ struct STR : public AbstractConstraint {
   }
 
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 
   virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
@@ -350,7 +350,7 @@ struct STR : public AbstractConstraint {
     }
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     constraint_locked = false;
     sval.clear();
   }

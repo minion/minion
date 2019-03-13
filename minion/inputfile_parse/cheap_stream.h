@@ -117,7 +117,7 @@ public:
 
 template <typename T>
 void getNum(CheapStream& cs, T& ret) {
-  SysInt neg_flag = 1;
+  SysInt negFlag = 1;
 
   long long i = 1;
   long long limit = std::numeric_limits<SysInt>::max() / 2;
@@ -127,7 +127,7 @@ void getNum(CheapStream& cs, T& ret) {
 
   if(cs.peek() == '-') {
     cs.get();
-    neg_flag = -1;
+    negFlag = -1;
   }
 
   if(cs.peek() >= '0' && cs.peek() <= '9') {
@@ -148,7 +148,7 @@ void getNum(CheapStream& cs, T& ret) {
     P(": '" << c << "' :" << i);
   }
 
-  ret = i * neg_flag;
+  ret = i * negFlag;
   P(">>SysInt Got: " << i);
 
   return;

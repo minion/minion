@@ -55,7 +55,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return "sumleq";
   }
 
-  CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2("weighted", "sumleq", "sumgeq", varArray, var_sum);
+  CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2("weighted", "sumleq", "sumgeq", varArray, varSum);
 
   // typedef BoolLessSumConstraint<VarArray, VarSum,1-VarToCount>
   // NegConstraintType;
@@ -64,11 +64,11 @@ struct LessEqualSumConstraint : public AbstractConstraint {
   bool no_negatives;
 
   VarArray varArray;
-  VarSum var_sum;
+  VarSum varSum;
   DomainInt max_looseness;
   Reversible<DomainInt> varArray_min_sum;
-  LessEqualSumConstraint(const VarArray& _varArray, VarSum _var_sum)
-      : varArray(_varArray), var_sum(_var_sum), varArray_min_sum() {
+  LessEqualSumConstraint(const VarArray& _varArray, VarSum _varSum)
+      : varArray(_varArray), varSum(_varSum), varArray_min_sum() {
     BigInt accumulator = 0;
     for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
       accumulator += checked_cast<SysInt>(
@@ -76,7 +76,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
     }
     accumulator +=
-        checked_cast<SysInt>(max(abs(var_sum.initialMax()), abs(var_sum.initialMin())));
+        checked_cast<SysInt>(max(abs(varSum.initialMax()), abs(varSum.initialMin())));
     CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
 
     no_negatives = true;
@@ -92,11 +92,11 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return varArray.size() + 1;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
       moveTriggerInt(varArray[i], i, LowerBound);
     }
-    moveTriggerInt(var_sum, varArray.size(), UpperBound);
+    moveTriggerInt(varSum, varArray.size(), UpperBound);
   }
 
   DomainInt get_real_min_sum() {
@@ -118,12 +118,12 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       varArray_min_sum = sum;
     }
 
-    var_sum.setMin(sum);
+    varSum.setMin(sum);
     if(getState().isFailed())
       return;
     D_ASSERT(sum <= get_real_min_sum());
 
-    DomainInt looseness = var_sum.max() - sum;
+    DomainInt looseness = varSum.max() - sum;
     if(looseness < 0) {
       getState().setFailed(true);
       return;
@@ -137,7 +137,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     P("Full Prop");
-    setup_triggers();
+    setupTriggers();
     DomainInt min_sum = 0;
     DomainInt max_diff = 0;
     for(typename VarArray::iterator it = varArray.begin(); it != varArray.end(); ++it) {
@@ -151,7 +151,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     if(!varArray.empty())
       propagateDynInt(0, DomainDelta::empty());
     else
-      var_sum.setMin(0);
+      varSum.setMin(0);
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
@@ -169,7 +169,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
     if(no_negatives) // How are the two cases different? They look identical.
     {
-      DomainInt max_sum = var_sum.max();
+      DomainInt max_sum = varSum.max();
       assignment.push_back(make_pair(vSize, max_sum));
       for(SysInt i = 0; i < vSize && sumValue <= max_sum; ++i) {
         DomainInt minVal = varArray[i].min();
@@ -183,11 +183,11 @@ struct LessEqualSumConstraint : public AbstractConstraint {
         assignment.push_back(make_pair(i, varArray[i].min()));
         sumValue += varArray[i].min();
       }
-      P("B" << (sumValue <= var_sum.max()));
-      if(sumValue > var_sum.max())
+      P("B" << (sumValue <= varSum.max()));
+      if(sumValue > varSum.max())
         return false;
       else
-        assignment.push_back(make_pair(vSize, var_sum.max()));
+        assignment.push_back(make_pair(vSize, varSum.max()));
       return true;
     }
   }
@@ -196,7 +196,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     vector<AnyVarRef> array_copy(varArray.size() + 1);
     for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
       array_copy[i] = varArray[i];
-    array_copy[varArray.size()] = var_sum;
+    array_copy[varArray.size()] = varSum;
     return array_copy;
   }
 
@@ -212,7 +212,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
     typedef typename ShiftType<typename NegType<VarSum>::type, compiletimeVal<SysInt, -1>>::type
         SumType;
-    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletimeVal<SysInt, -1>());
+    SumType new_sum = ShiftVarRef(VarNegRef(varSum), compiletimeVal<SysInt, -1>());
 
     return new LessEqualSumConstraint<typename NegType<VarArray>::type, SumType, true>(
         new_varArray, new_sum);
@@ -226,7 +226,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
     typedef typename ShiftType<typename NegType<VarSum>::type, compiletimeVal<SysInt, -1>>::type
         SumType;
-    SumType new_sum = ShiftVarRef(VarNegRef(var_sum), compiletimeVal<SysInt, -1>());
+    SumType new_sum = ShiftVarRef(VarNegRef(varSum), compiletimeVal<SysInt, -1>());
 
     return new LessEqualSumConstraint<vector<AnyVarRef>, AnyVarRef, true>(new_varArray, new_sum);
   }

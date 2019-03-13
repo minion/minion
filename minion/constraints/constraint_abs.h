@@ -128,10 +128,10 @@ struct AbsConstraint : public AbstractConstraint {
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt xDomMax = var1.max();
     DomainInt yDomMax = max(abs(var2.min()), abs(var2.max()));
-    DomainInt dom_max = min(xDomMax, yDomMax);
-    DomainInt dom_min = max(DomainInt(0), max(var1.min(), var2.min()));
+    DomainInt domMax = min(xDomMax, yDomMax);
+    DomainInt domMin = max(DomainInt(0), max(var1.min(), var2.min()));
 
-    for(DomainInt i = dom_min; i <= dom_max; ++i) {
+    for(DomainInt i = domMin; i <= domMax; ++i) {
       if(var1.inDomain(i)) {
         if(var2.inDomain(i)) {
           assignment.push_back(make_pair(0, i));
@@ -157,7 +157,7 @@ struct AbsConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 

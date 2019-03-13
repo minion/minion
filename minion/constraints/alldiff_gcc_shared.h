@@ -244,8 +244,8 @@ protected:
   FlowConstraint(const VarArray& _varArray)
       : numvars(0),
         numvals(0),
-        dom_min(0),
-        dom_max(0),
+        domMin(0),
+        domMax(0),
 #ifndef REVERSELIST
         varArray(_varArray),
 #else
@@ -253,17 +253,17 @@ protected:
 #endif
         constraint_locked(false) {
     if(varArray.size() > 0) {
-      dom_min = checked_cast<SysInt>(varArray[0].initialMin());
-      dom_max = checked_cast<SysInt>(varArray[0].initialMax());
+      domMin = checked_cast<SysInt>(varArray[0].initialMin());
+      domMax = checked_cast<SysInt>(varArray[0].initialMax());
     }
     for(SysInt i = 0; i < (SysInt)varArray.size(); ++i) {
-      if(varArray[i].initialMin() < dom_min)
-        dom_min = checked_cast<SysInt>(varArray[i].initialMin());
-      if(varArray[i].initialMax() > dom_max)
-        dom_max = checked_cast<SysInt>(varArray[i].initialMax());
+      if(varArray[i].initialMin() < domMin)
+        domMin = checked_cast<SysInt>(varArray[i].initialMin());
+      if(varArray[i].initialMax() > domMax)
+        domMax = checked_cast<SysInt>(varArray[i].initialMax());
     }
     numvars = varArray.size(); // number of variables in the constraint
-    numvals = dom_max - dom_min + 1;
+    numvals = domMax - domMin + 1;
 
     // to_process.reserve(varArray.size()); Could this be shared as well??
 
@@ -274,7 +274,7 @@ protected:
       for(SysInt i = 0; i < numvars; i++) {
         adjlist[i].resize(numvals);
         for(SysInt j = 0; j < numvals; j++)
-          adjlist[i][j] = j + dom_min;
+          adjlist[i][j] = j + domMin;
         adjlistpos[i].resize(numvals);
         for(SysInt j = 0; j < numvals; j++)
           adjlistpos[i][j] = j;
@@ -296,14 +296,14 @@ protected:
 
 #ifndef BTMATCHING
     varvalmatching.resize(numvars); // maps var to actual value
-    valvarmatching.resize(numvals); // maps val-dom_min to var.
+    valvarmatching.resize(numvals); // maps val-domMin to var.
 #else
     varvalmatching = getMemory().backTrack().template requestArray<SysInt>(numvars);
     valvarmatching = getMemory().backTrack().template requestArray<SysInt>(numvals);
 #endif
   }
 
-  SysInt numvars, numvals, dom_min, dom_max;
+  SysInt numvars, numvals, domMin, domMax;
 
   VarArray varArray;
 
@@ -311,7 +311,7 @@ protected:
 
 #ifndef BTMATCHING
   vector<SysInt> varvalmatching; // For each var, give the matching value.
-  // valvarmatching is from val-dom_min to var.
+  // valvarmatching is from val-domMin to var.
   vector<SysInt> valvarmatching; // need to set size somewhere.
 // -1 means unmatched.
 #else
@@ -321,7 +321,7 @@ protected:
 
   // ------------------ Incremental adjacency lists --------------------------
 
-  // adjlist[varnum or val-dom_min+numvars] is the vector of vals in the
+  // adjlist[varnum or val-domMin+numvars] is the vector of vals in the
   // domain of the variable, or variables with val in their domain.
   vector<vector<SysInt>> adjlist;
   SysInt* adjlistlength;
@@ -329,12 +329,12 @@ protected:
 
   inline void adjlist_remove(SysInt var, SysInt val) {
     // swap item at position varidx to the end, then reduce the length by 1.
-    SysInt validx = val - dom_min + numvars;
+    SysInt validx = val - domMin + numvars;
     SysInt varidx = adjlistpos[validx][var];
     D_ASSERT(varidx < adjlistlength[validx]); // var is actually in the list.
     delfromlist(validx, varidx);
 
-    delfromlist(var, adjlistpos[var][val - dom_min]);
+    delfromlist(var, adjlistpos[var][val - domMin]);
   }
 
   inline void delfromlist(SysInt i, SysInt j) {
@@ -343,8 +343,8 @@ protected:
     adjlist[i][adjlistlength[i] - 1] = adjlist[i][j];
 
     if(i < numvars) {
-      adjlistpos[i][adjlist[i][j] - dom_min] = adjlistlength[i] - 1;
-      adjlistpos[i][t - dom_min] = j;
+      adjlistpos[i][adjlist[i][j] - domMin] = adjlistlength[i] - 1;
+      adjlistpos[i][t - domMin] = j;
     } else {
       adjlistpos[i][adjlist[i][j]] = adjlistlength[i] - 1;
       adjlistpos[i][t] = j;
@@ -355,12 +355,12 @@ protected:
 
   void check_adjlists() {
     for(SysInt i = 0; i < numvars; i++) {
-      D_ASSERT(varArray[i].min() >= dom_min);
-      D_ASSERT(varArray[i].max() <= dom_max);
-      for(SysInt j = dom_min; j <= dom_max; j++) {
-        D_DATA(bool in = adjlistpos[i][j - dom_min] < adjlistlength[i]);
+      D_ASSERT(varArray[i].min() >= domMin);
+      D_ASSERT(varArray[i].max() <= domMax);
+      for(SysInt j = domMin; j <= domMax; j++) {
+        D_DATA(bool in = adjlistpos[i][j - domMin] < adjlistlength[i]);
         D_DATA(bool in2 =
-                   adjlistpos[j - dom_min + numvars][i] < adjlistlength[j - dom_min + numvars]);
+                   adjlistpos[j - domMin + numvars][i] < adjlistlength[j - domMin + numvars]);
         D_ASSERT(in == in2);
         D_ASSERT(in == varArray[i].inDomain(j));
       }
@@ -382,17 +382,17 @@ protected:
   // localmatching.
   // smallset_nolist valinlocalmatching;
 
-  // Uprevious (pred) gives (for each CSP value) the value-dom_min
+  // Uprevious (pred) gives (for each CSP value) the value-domMin
   // it was matched to in the previous layer. If it was unmatched,
   // -1 is used.
   vector<SysInt> uprevious; // -2 means unset, -1 labelled unmatched.
 
-  vector<vector<SysInt>> vprevious; // map val-dom_min to vector of vars.
+  vector<vector<SysInt>> vprevious; // map val-domMin to vector of vars.
   smallset_nolist invprevious;      // is there a mapping in vprevious for val?
                                     // Allows fast unset.
 
   smallset layer;
-  smallset unmatched; // contains vals-dom_min.
+  smallset unmatched; // contains vals-domMin.
 
   vector<vector<SysInt>> newlayer;
   smallset innewlayer;
@@ -431,7 +431,7 @@ protected:
 
       for(SysInt j = 0; j < numvars; j++) {
         // Restore valvarmatching because it might be messed up by Hopcroft.
-        valvarmatching[varvalmatching[j] - dom_min] = j;
+        valvarmatching[varvalmatching[j] - domMin] = j;
       }
 
       if(allowedToFail)
@@ -447,7 +447,7 @@ protected:
       vector<SysInt>& toiterate = valinlocalmatching.getlist();
       for(SysInt j = 0; j < (SysInt)toiterate.size(); j++) {
         SysInt tempval = toiterate[j];
-        varvalmatching[valvarmatching[tempval]] = tempval + dom_min;
+        varvalmatching[valvarmatching[tempval]] = tempval + domMin;
       }
     }
     return true;
@@ -456,7 +456,7 @@ protected:
   inline bool hopcroft(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs) {
     // Domain value convention:
     // Within hopcroft and recurse,
-    // a domain value is represented as val-dom_min always.
+    // a domain value is represented as val-domMin always.
 
     // Variables are always represented as their index in
     // varArray. sccstart and sccend indicates which variables
@@ -471,9 +471,9 @@ protected:
     for(SysInt i = sccstart; i <= sccend; i++) {
       SysInt tempvar = SCCs[i];
       if(varArray[tempvar].inDomain(varvalmatching[tempvar])) {
-        valinlocalmatching.insert(varvalmatching[tempvar] - dom_min);
+        valinlocalmatching.insert(varvalmatching[tempvar] - domMin);
         // Check the two matching arrays correspond.
-        // D_ASSERT(valvarmatching[varvalmatching[tempvar]-dom_min]==tempvar);
+        // D_ASSERT(valvarmatching[varvalmatching[tempvar]-domMin]==tempvar);
       }
     }
 
@@ -566,7 +566,7 @@ protected:
             for(DomainInt realval = varArray[tempvar].min();
                 realval <= varArray[tempvar].max(); realval++) {
               if(varArray[tempvar].inDomain(realval)) {
-                SysInt tempval = realval - dom_min;
+                SysInt tempval = realval - domMin;
 
                 if(!invprevious.in(tempval)) // if tempval not found in vprevious
                 {
@@ -677,7 +677,7 @@ protected:
   }
 
   bool recurse(SysInt val) {
-    // Again values are val-dom_min in this function.
+    // Again values are val-domMin in this function.
     // Clearly this should be turned into a loop.
     // cout << "Entering recurse with value " <<val <<endl;
     if(invprevious.in(val)) {
@@ -703,7 +703,7 @@ protected:
             }
 
             valvarmatching[val] = tempvar;
-            // varvalmatching[tempvar]=val+dom_min;  // This will be
+            // varvalmatching[tempvar]=val+domMin;  // This will be
             return true;
           }
         }
@@ -714,8 +714,8 @@ protected:
 
   // ----------------------- new hopcroft-karp implementation ----------------
 
-  // This one uses dom_min-1 as a marker for 'free variable' in matching.
-  // also has upper as the upper bound for value nodes, indexed by val+dom_min
+  // This one uses domMin-1 as a marker for 'free variable' in matching.
+  // also has upper as the upper bound for value nodes, indexed by val+domMin
   // usage is the occurrences of each value in the matching.
 
   // Oh no -- does this work with SCCs??
@@ -725,7 +725,7 @@ protected:
   smallset_nolist varvalused;
   smallset thislayer;
   deque<SysInt> fifo;
-  vector<SysInt> augpath; // alternating path stored here with vars and val-dom_min
+  vector<SysInt> augpath; // alternating path stored here with vars and val-domMin
 
   void hopcroft2_setup() {
     edges.resize(numvars + numvals + 1);
@@ -756,11 +756,11 @@ protected:
     // Clear vals if their usage is larger than the upper bound.
     for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); i++) {
       SysInt var = vars_in_scc[i];
-      if(matching[var] != dom_min - 1) {
+      if(matching[var] != domMin - 1) {
         SysInt match = matching[var];
-        if(!varArray[var].inDomain(match) || usage[match - dom_min] > upper[match - dom_min]) {
-          usage[match - dom_min]--;
-          matching[var] = dom_min - 1;
+        if(!varArray[var].inDomain(match) || usage[match - domMin] > upper[match - domMin]) {
+          usage[match - domMin]--;
+          matching[var] = domMin - 1;
         }
       }
     }
@@ -782,7 +782,7 @@ protected:
       SysInt unmatched = 0;
       for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); ++i) {
         SysInt tempvar = vars_in_scc[i];
-        if(matching[tempvar] == dom_min - 1) {
+        if(matching[tempvar] == domMin - 1) {
           edges[numvars + numvals].push_back(tempvar);
           edges[tempvar].clear();
           fifo.push_back(tempvar);
@@ -807,7 +807,7 @@ protected:
           // next layer is adjacent values which are not saturated.
           for(SysInt i = 0; i < adjlistlength[curnode]; i++) {
             SysInt realval = adjlist[curnode][i];
-            SysInt validx = realval - dom_min + numvars;
+            SysInt validx = realval - domMin + numvars;
             if(!varvalused.in(validx)) {
               edges[curnode].push_back(validx);
 
@@ -818,7 +818,7 @@ protected:
                 fifo.push_back(validx);
                 edges[validx].clear();
               }
-              if(usage[realval - dom_min] < upper[realval - dom_min]) {
+              if(usage[realval - domMin] < upper[realval - domMin]) {
                 foundFreeValNode = true;
               }
             }
@@ -846,7 +846,7 @@ protected:
           // next layer is variables, following matching edges.
           for(SysInt i = 0; i < adjlistlength[curnode]; i++) {
             SysInt var = adjlist[curnode][i];
-            if(!varvalused.in(var) && matching[var] == curnode + dom_min - numvars) {
+            if(!varvalused.in(var) && matching[var] == curnode + domMin - numvars) {
               edges[curnode].push_back(var);
               if(!thislayer.in(var)) { // have not seen this variable before.
                 // add it to the new layer.
@@ -900,7 +900,7 @@ protected:
     while(!outedges.empty()) {
       SysInt validx = outedges.back();
       outedges.pop_back();
-      D_ASSERT(varArray[var].inDomain(validx - numvars + dom_min));
+      D_ASSERT(varArray[var].inDomain(validx - numvars + domMin));
 
       // does this complete an augmenting path?
       if(usage[validx - numvars] < upper[validx - numvars]) {
@@ -933,11 +933,11 @@ protected:
     for(SysInt i = 0; i < (SysInt)augpath.size(); i = i + 2) {
       SysInt var = augpath[i];
       SysInt validx = augpath[i + 1];
-      if(matching[var] != dom_min - 1) {
-        usage[matching[var] - dom_min]--;
+      if(matching[var] != domMin - 1) {
+        usage[matching[var] - domMin]--;
       }
-      matching[var] = validx - numvars + dom_min;
-      D_ASSERT(varArray[var].inDomain(validx - numvars + dom_min));
+      matching[var] = validx - numvars + domMin;
+      D_ASSERT(varArray[var].inDomain(validx - numvars + domMin));
       usage[validx - numvars]++;
     }
     augpath.clear();

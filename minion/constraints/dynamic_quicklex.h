@@ -57,13 +57,13 @@ struct QuickLexDynamic : public AbstractConstraint {
     return 2;
   }
 
-  void attach_triggers(SysInt i) {
+  void attachTriggers(SysInt i) {
     P("Attach Trigger: " << i);
     moveTriggerInt(varArray1[i], 0, LowerBound, NoDomainValue, TO_Backtrack);
     moveTriggerInt(varArray2[i], 1, UpperBound, NoDomainValue, TO_Backtrack);
   }
 
-  void detach_triggers() {
+  void detachTriggers() {
     P("Detach Triggers");
     releaseTriggerInt(0, TO_Backtrack);
     releaseTriggerInt(1, TO_Backtrack);
@@ -120,7 +120,7 @@ struct QuickLexDynamic : public AbstractConstraint {
          varArray1[a].assignedValue() == varArray2[a].assignedValue()) {
         a++;
       } else {
-        attach_triggers(a);
+        attachTriggers(a);
         alpha = a;
         return;
       }
@@ -129,7 +129,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     if(Less)
       getState().setFailed(true);
     else {
-      detach_triggers();
+      detachTriggers();
       alpha = n;
     }
   }
@@ -154,7 +154,7 @@ struct QuickLexDynamic : public AbstractConstraint {
       progress();
     } else {
       // if(varArray1[a].max() < varArray2[a].min())
-      //    detach_triggers();
+      //    detachTriggers();
     }
   }
 

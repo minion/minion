@@ -139,7 +139,7 @@ struct Dynamic_AND : public ParentConstraint {
     }
   }
 
-  virtual void special_unlock() {
+  virtual void specialUnlock() {
     D_ASSERT(constraint_locked);
     constraint_locked = false;
   }

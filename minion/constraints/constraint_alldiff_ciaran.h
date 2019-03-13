@@ -68,7 +68,7 @@ struct AlldiffCiaran : public AbstractConstraint {
   virtual AbstractConstraint* reverseConstraint() { // w-or of pairwise equality.
 
     /// solely for reify exps
-    return forward_check_negation(stateObj, this);
+    return forwardCheckNegation(stateObj, this);
 
     vector<AbstractConstraint*> con;
     for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
@@ -85,7 +85,7 @@ struct AlldiffCiaran : public AbstractConstraint {
   smallset A;
   smallset D;
 
-  DomainInt dom_min, dom_max;
+  DomainInt domMin, domMax;
 
   vector<SysInt> sortedvars;
 
@@ -139,8 +139,8 @@ struct AlldiffCiaran : public AbstractConstraint {
       D.clear();
       for(DomainInt j = varArray[var].min(); j <= varArray[var].max(); j++) {
         if(varArray[var].inDomain(j)) {
-          if(!H.in(checked_cast<SysInt>(j - dom_min))) {
-            D.insert(checked_cast<SysInt>(j - dom_min));
+          if(!H.in(checked_cast<SysInt>(j - domMin))) {
+            D.insert(checked_cast<SysInt>(j - domMin));
           } else {
             varArray[var].removeFromDomain(j); //  Value is in the union of known Hall sets.
           }
@@ -152,7 +152,7 @@ struct AlldiffCiaran : public AbstractConstraint {
       vector<SysInt>& dlist = D.getlist();
       for(unsigned int diter = 0; diter < dlist.size(); diter++) {
         if(!A.in(dlist[diter]))
-          A.insert(dlist[diter]); // These are val-dom_min
+          A.insert(dlist[diter]); // These are val-domMin
       }
 
       // n gets n + 1
@@ -170,7 +170,7 @@ struct AlldiffCiaran : public AbstractConstraint {
         vector<SysInt>& alist = A.getlist();
         for(unsigned int aiter = 0; aiter < alist.size(); aiter++) {
           if(!H.in(alist[aiter]))
-            H.insert(alist[aiter]); // These are val-dom_min
+            H.insert(alist[aiter]); // These are val-domMin
         }
 
         // A gets empty set
@@ -185,19 +185,19 @@ struct AlldiffCiaran : public AbstractConstraint {
     if(varArray.size() == 0)
       return;
 
-    dom_min = varArray[0].min();
-    dom_max = varArray[0].max();
+    domMin = varArray[0].min();
+    domMax = varArray[0].max();
     for(unsigned int i = 1; i < varArray.size(); i++) {
-      if(varArray[i].min() < dom_min)
-        dom_min = varArray[i].min();
-      if(varArray[i].max() > dom_max)
-        dom_max = varArray[i].max();
+      if(varArray[i].min() < domMin)
+        domMin = varArray[i].min();
+      if(varArray[i].max() > domMax)
+        domMax = varArray[i].max();
     }
 
     //  Set up the smallsets
-    H.reserve(checked_cast<SysInt>(dom_max - dom_min + 1));
-    A.reserve(checked_cast<SysInt>(dom_max - dom_min + 1));
-    D.reserve(checked_cast<SysInt>(dom_max - dom_min + 1));
+    H.reserve(checked_cast<SysInt>(domMax - domMin + 1));
+    A.reserve(checked_cast<SysInt>(domMax - domMin + 1));
+    D.reserve(checked_cast<SysInt>(domMax - domMin + 1));
 
     propagate(0, DomainDelta::empty());
   }

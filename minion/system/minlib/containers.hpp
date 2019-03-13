@@ -70,19 +70,19 @@ std::vector<FirstArg> make_vec(const FirstArg& fa, const Args&... args) {
 }
 
 template <typename VecArg, typename FirstArg, typename... Args>
-std::vector<VecArg> make_vec_with_type(const FirstArg& fa, const Args&... args) {
+std::vector<VecArg> make_vecWith_type(const FirstArg& fa, const Args&... args) {
   return make_vector(static_cast<VecArg>(fa), args...);
 }
 
 template <typename Arg, typename... Args>
-std::array<Arg, SizeOf<Args...>::size> make_array_with_type(const Args&... args) {
+std::array<Arg, SizeOf<Args...>::size> make_arrayWith_type(const Args&... args) {
   std::array<Arg, SizeOf<Args...>::size> a;
   fill_container(a, 0, args...);
   return a;
 }
 
 template <typename VecArg>
-std::vector<VecArg> make_vec_with_type() {
+std::vector<VecArg> make_vecWith_type() {
   return std::vector<VecArg>();
 }
 
@@ -93,14 +93,14 @@ std::vector<Type> make_vec() {
 
 template <typename Type, typename... Args>
 std::vector<typename CommonType<Type, Args...>::type>
-make_vec_with_common_type(const Args&... args) {
-  return make_vec_with_type<typename CommonType<Type, Args...>::type>(args...);
+make_vecWith_common_type(const Args&... args) {
+  return make_vecWith_type<typename CommonType<Type, Args...>::type>(args...);
 }
 
 template <typename Type, typename... Args>
 std::array<typename CommonType<Type, Args...>::type, SizeOf<Args...>::size>
-make_array_with_common_type(const Args&... args) {
-  return make_array_with_type<typename CommonType<Type, Args...>::type>(args...);
+make_arrayWith_common_type(const Args&... args) {
+  return make_arrayWith_type<typename CommonType<Type, Args...>::type>(args...);
 }
 
 template <typename T>

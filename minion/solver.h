@@ -72,7 +72,7 @@ class SearchState {
 
   bool is_locked;
 
-  volatile bool alarm_trigger;
+  volatile bool alarmTrigger;
 
   GenericBacktracker generic_backtracker;
 
@@ -228,7 +228,7 @@ public:
         finished(false),
         failed(false),
         is_locked(false),
-        alarm_trigger(false) {}
+        alarmTrigger(false) {}
 
   // Must be defined later.
   ~SearchState();
@@ -356,7 +356,7 @@ public:
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
 
-  bool ensure_branch_on_allVars;
+  bool ensureBranchOnAllVars;
 
   SearchOptions()
       : silent(false),
@@ -386,7 +386,7 @@ public:
         noTimers(false),
         gapname("gap.sh"),
         map_long_short(MLTTS_NoMap),
-        ensure_branch_on_allVars(true) {
+        ensureBranchOnAllVars(true) {
   }
 
   /// Denotes all solutions should be found, by setting sollimit to -1.

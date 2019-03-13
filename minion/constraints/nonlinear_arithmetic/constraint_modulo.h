@@ -87,7 +87,7 @@ struct ModConstraint : public AbstractConstraint {
     return 6;
   }
 
-  void setup_triggers() {
+  void setupTriggers() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var1, 1, UpperBound);
     moveTriggerInt(var2, 2, LowerBound);
@@ -204,7 +204,7 @@ struct ModConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    setup_triggers();
+    setupTriggers();
     propagateDynInt(0, DomainDelta::empty());
   }
 
@@ -247,7 +247,7 @@ struct ModConstraint : public AbstractConstraint {
 
   // Function to make it reifiable in the lousiest way.
   virtual AbstractConstraint* reverseConstraint() {
-    return forward_check_negation(this);
+    return forwardCheckNegation(this);
   }
 };
 

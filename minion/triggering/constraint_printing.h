@@ -181,18 +181,18 @@ inline void compress_arrays(string name, vector<AnyVarRef>& vars, AnyVarRef& res
   }
 }
 
-inline string print_con(string name) {
+inline string printCon(string name) {
   return name + "()";
 }
 
 template <typename T>
-string print_con(string name, const T& args) {
+string printCon(string name, const T& args) {
   string s = print_vars(args);
   return name + "(" + s + ")";
 }
 
 template <typename T1, typename T2>
-string print_con(string name, const T1& args1, const T2& args2) {
+string printCon(string name, const T1& args1, const T2& args2) {
 
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
@@ -207,7 +207,7 @@ inline string print_array_var_con(string name, vector<AnyVarRef> args1, AnyVarRe
 }
 
 template <typename T1, typename T2, typename T3>
-string print_con(string name, const T1& args1, const T2& args2, const T3& args3) {
+string printCon(string name, const T1& args1, const T2& args2, const T3& args3) {
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
   string s3 = print_vars(args3);
@@ -215,7 +215,7 @@ string print_con(string name, const T1& args1, const T2& args2, const T3& args3)
 }
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
-string print_con(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4,
+string printCon(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4,
                  const T5& args5) {
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
@@ -253,7 +253,7 @@ string print_reversible_con(string name, string neg_name, const T1& vars, const 
 template <typename T1, typename T2>
 string print_weighted_con(string weight, string name, const T1& sumvars, const T2& result) {
   if(sumvars.empty())
-    return print_con(name, sumvars, result);
+    return printCon(name, sumvars, result);
 
   vector<Mapper> v = sumvars[0].getMapperStack();
   if(!v.empty() && (v.back().type() == MAP_MULT || v.back().type() == MAP_SWITCH_NEG)) {
@@ -293,22 +293,22 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
 
 #define CONSTRAINT_ARG_LIST0()                                                                     \
   virtual string fullOutputName() {                                                              \
-    return ConOutput::print_con(constraintName());                                                \
+    return ConOutput::printCon(constraintName());                                                \
   }
 
 #define CONSTRAINT_ARG_LIST1(x)                                                                    \
   virtual string fullOutputName() {                                                              \
-    return ConOutput::print_con(constraintName(), x);                                             \
+    return ConOutput::printCon(constraintName(), x);                                             \
   }
 
 #define CONSTRAINT_ARG_LIST2(x, y)                                                                 \
   virtual string fullOutputName() {                                                              \
-    return ConOutput::print_con(constraintName(), x, y);                                          \
+    return ConOutput::printCon(constraintName(), x, y);                                          \
   }
 
 #define CONSTRAINT_ARG_LIST5(a, b, c, d, e)                                                        \
   virtual string fullOutputName() {                                                              \
-    return ConOutput::print_con(constraintName(), a, b, c, d, e);                                 \
+    return ConOutput::printCon(constraintName(), a, b, c, d, e);                                 \
   }
 
 #define CONSTRAINT_REVERSIBLE_ARG_LIST2(name, revname, x, y)                                       \
@@ -323,5 +323,5 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
 
 #define CONSTRAINT_ARG_LIST3(x, y, z)                                                              \
   virtual string fullOutputName() {                                                              \
-    return ConOutput::print_con(constraintName(), x, y, z);                                       \
+    return ConOutput::printCon(constraintName(), x, y, z);                                       \
   }

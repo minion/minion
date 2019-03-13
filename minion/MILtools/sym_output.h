@@ -293,9 +293,9 @@ struct GraphBuilder {
       add_edge(t, b.vars[0][i]);
     }
 
-    string v_index = g.new_vertex(name + "_INDEX");
-    add_edge(v, v_index);
-    add_edge(v_index, b.vars[1][0]);
+    string vIndex = g.new_vertex(name + "_INDEX");
+    add_edge(v, vIndex);
+    add_edge(vIndex, b.vars[1][0]);
 
     string v_result = g.new_vertex(name + "_RESULT");
     add_edge(v, v_result);
@@ -350,7 +350,7 @@ struct GraphBuilder {
   // independantly swapped.
   // Other variables are assumed not symmetric.
   // Example: Hamming(M1, M2, C) - The hamming distance of arrays M1 and M2 is C
-  string colour_array_swap_each_index(const ConstraintBlob& b, string name) {
+  string colour_array_swap_eachIndex(const ConstraintBlob& b, string name) {
     D_ASSERT(b.vars[0].size() == b.vars[1].size());
 
     string v = g.new_vertex(name + "_MASTER");
@@ -381,7 +381,7 @@ struct GraphBuilder {
 
   // The first array can be permuted, if the same permutation is applied to the
   // second array.
-  string colour_symmetric_indexes(const ConstraintBlob& b, string name) {
+  string colour_symmetricIndexes(const ConstraintBlob& b, string name) {
 
     string v = g.new_vertex(name + "_MASTER");
 
@@ -610,7 +610,7 @@ struct GraphBuilder {
     case CT_WATCHED_NEGATIVE_TABLE:
     case CT_NEGATIVEMDDC: return colour_no_symmetry(b, "NEG_TABLE");
 
-    case CT_WATCHED_VECNEQ: return colour_array_swap_each_index(b, "VECNEQ");
+    case CT_WATCHED_VECNEQ: return colour_array_swap_eachIndex(b, "VECNEQ");
 
     case CT_WATCHED_LITSUM: return colour_no_symmetry(b, "LITSUM");
 
@@ -624,9 +624,9 @@ struct GraphBuilder {
 
     case CT_MODULO_UNDEFZERO: return colour_no_symmetry(b, "MOD_UNDEFZERO");
 
-    case CT_WATCHED_VEC_OR_LESS: return colour_symmetric_indexes(b, "VEC_OR_LESS");
+    case CT_WATCHED_VEC_OR_LESS: return colour_symmetricIndexes(b, "VEC_OR_LESS");
 
-    case CT_WATCHED_HAMMING: return colour_array_swap_each_index(b, "HAMMING");
+    case CT_WATCHED_HAMMING: return colour_array_swap_eachIndex(b, "HAMMING");
 
     case CT_WATCHED_LIT: return colour_lit(b, "WATCHED_LIT");
 

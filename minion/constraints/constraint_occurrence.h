@@ -144,14 +144,14 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     if(trigger1index == -1 || varArray[trigger1index].isAssigned()) {
       trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
       if(trigger1index == -1) {
-        valcount_assigned();
+        valcountAssigned();
         return;
       }
     }
     if(trigger2index == -1 || varArray[trigger2index].isAssigned()) {
       trigger2index = watch_unassigned_in_vector(trigger1index, trigger2index, 0);
       if(trigger2index == -1) {
-        valcount_assigned();
+        valcountAssigned();
         return;
       }
     }
@@ -168,20 +168,20 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
         // make sure both triggers are in place.
         trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
         if(trigger1index == -1) {
-          valcount_assigned();
+          valcountAssigned();
           return;
         }
         if(trigger2index == -1 || varArray[trigger2index].isAssigned()) {
           trigger2index = watch_unassigned_in_vector(trigger1index, trigger2index, 1);
           if(trigger2index == -1) {
-            valcount_assigned();
+            valcountAssigned();
             return;
           }
         }
       } else {
         trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
         if(trigger1index == -1) {
-          vector_assigned();
+          vectorAssigned();
           return;
         }
       }
@@ -202,7 +202,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
     trigger2index = watch_unassigned_in_vector(trigger1index, trigger2index, 1);
     if(trigger2index == -1) {
-      valcount_assigned();
+      valcountAssigned();
     }
   }
 
@@ -234,7 +234,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   SysInt trigger1index;
   SysInt trigger2index;
 
-  void vector_assigned() {
+  void vectorAssigned() {
     // count occurrences of val
     SysInt occ = 0;
     for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
@@ -246,7 +246,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     }
   }
 
-  void valcount_assigned() {
+  void valcountAssigned() {
     // valcount, and all but one (or all) of the vector, are assigned.
     // count occurrences of val
     SysInt occ = 0;
@@ -285,7 +285,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
     trigger1index = watch_unassigned_in_vector(-1, -1, 0);
     if(trigger1index == -1) {
-      vector_assigned();
+      vectorAssigned();
       return;
     }
 
@@ -293,7 +293,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
       // watch a second place in the vector.
       trigger2index = watch_unassigned_in_vector(trigger1index, trigger1index, 1);
       if(trigger2index == -1) {
-        valcount_assigned();
+        valcountAssigned();
         return;
       }
     }
@@ -339,10 +339,10 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
   virtual string fullOutputName() {
     if(valCount_min == 0) {
-      return ConOutput::print_con("occurrenceleq", varArray, value, valCount_max);
+      return ConOutput::printCon("occurrenceleq", varArray, value, valCount_max);
     } else {
       D_ASSERT(valCount_max == (SysInt)varArray.size());
-      return ConOutput::print_con("occurrencegeq", varArray, value, valCount_min);
+      return ConOutput::printCon("occurrencegeq", varArray, value, valCount_min);
     }
   }
 
