@@ -302,7 +302,7 @@ public:
   clock_t time_limit;
 
   /// Stores if the timelimit is CPU time (yes) or wall-clock time (no)
-  bool time_limit_is_CPU_time;
+  bool time_limit_is_CPUTime;
 
   /// Denotes if the variable and value orderings should be randomised.
   /// Initialised to false.
@@ -365,7 +365,7 @@ public:
         print_solution(true),
         timeoutActive(false),
         time_limit(0),
-        time_limit_is_CPU_time(false),
+        time_limit_is_CPUTime(false),
         randomiseValvarorder(false),
         parserVerbose(false),
         redump(false),

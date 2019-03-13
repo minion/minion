@@ -23,7 +23,7 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     auto timeoutChecker = [&](const vector<AnyVarRef>& varArray,
                               const vector<Controller::triple>& branches) {
       try {
-        Controller::standard_time_ctrlc_checks(varArray, branches);
+        Controller::standardTime_ctrlc_checks(varArray, branches);
       } catch(EndOfSearch&) {
         timeout = true;
         throw EndOfSearch();
@@ -49,14 +49,14 @@ struct RestartNewSearchManager : public Controller::SearchManager {
       sm->search();
     } catch(EndOfSearch&) {}
 
-    // double cputime = get_cpu_time();
+    // double cputime = get_cpuTime();
     // double timelimit = getOptions().time_limit;
 
     if(solutionFound) {
       // cout << "Solution found, stop the search" << endl;
       throw EndOfSearch();
     } else if(timeout) {
-      if(getOptions().timeoutActive && get_cpu_time() > getOptions().time_limit)
+      if(getOptions().timeoutActive && get_cpuTime() > getOptions().time_limit)
         cout << "Time limit is reached, stop the search" << endl;
       else
         cout << "Node limit is reached, stop the search" << endl;

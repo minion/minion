@@ -47,7 +47,7 @@ void triggerFunction(int /* signum */) {
 void setupTriggers(bool, int) {}
 #else
 void setupTriggers(bool timeoutActive,
-                    int timeout) // CPU_time = false -> real time
+                    int timeout) // CPUTime = false -> real time
 {
   assert(TriggerEvent::trigger_event_X == TriggerEvent::none);
 

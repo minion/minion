@@ -2,23 +2,23 @@
 #define TIME_KEEPING_HFDAFAD
 
 #ifdef NO_SYSTEM
-inline long double initStart_wall_time(int = 0) {
+inline long double initStart_wallTime(int = 0) {
   return 0;
 }
 
-inline long double get_wall_time() {
+inline long double get_wallTime() {
   return 0;
 }
 
-inline long double getRaw_wall_time() {
+inline long double getRaw_wallTime() {
   return 0;
 }
 
-inline long double get_cpu_time() {
+inline long double get_cpuTime() {
   return 0;
 }
 
-inline long double get_sys_time() {
+inline long double get_sysTime() {
   return 0;
 }
 
@@ -33,15 +33,15 @@ inline long getMax_rss() {
 
 #define ULL unsigned __int64
 
-inline long double get_wall_time() {
+inline long double get_wallTime() {
   return (long double)(clock()) / CLOCKS_PER_SEC;
 }
 
-inline long double getRaw_wall_time() {
-  return get_wall_time();
+inline long double getRaw_wallTime() {
+  return get_wallTime();
 }
 
-inline long double get_cpu_time() {
+inline long double get_cpuTime() {
   FILETIME creat_t, exit_t, kernel_t, user_t;
   if(GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
     return ((long double)(((ULL)user_t.dwHighDateTime << 32) + (ULL)user_t.dwLowDateTime)) / 10000 /
@@ -50,7 +50,7 @@ inline long double get_cpu_time() {
     abort();
 }
 
-inline long double get_sys_time() {
+inline long double get_sysTime() {
   FILETIME creat_t, exit_t, kernel_t, user_t;
   if(GetProcessTimes(GetCurrentProcess(), &creat_t, &exit_t, &kernel_t, &user_t))
     return ((long double)(((ULL)kernel_t.dwHighDateTime << 32) + (ULL)kernel_t.dwLowDateTime)) /
@@ -73,55 +73,55 @@ inline long getMax_rss() {
 
 // This function is a horrible hack, to let us avoid nasty global variables
 // leaking out of this file.
-// If you want to call 'get_wall_time', then you must call initStart_wall_time
+// If you want to call 'get_wallTime', then you must call initStart_wallTime
 // first, perferably
 // as close to the start of main as possible.
 
-inline long double initStart_wall_time(int specialCheck = 0) {
-  static long double start_time = 0;
+inline long double initStart_wallTime(int specialCheck = 0) {
+  static long double startTime = 0;
   if(specialCheck == 0) {
-    assert(start_time == 0);
+    assert(startTime == 0);
     timeval t;
     gettimeofday(&t, NULL);
-    start_time =
+    startTime =
         static_cast<long double>(t.tv_sec) + static_cast<long double>(t.tv_usec) / 1000000.0;
     return -1;
   } else {
-    assert(start_time != 0);
-    return start_time;
+    assert(startTime != 0);
+    return startTime;
   }
 }
 
-inline long double get_wall_time() {
+inline long double get_wallTime() {
   timeval t;
   gettimeofday(&t, NULL);
-  long double current_time =
+  long double currentTime =
       static_cast<long double>(t.tv_sec) + static_cast<long double>(t.tv_usec) / 1000000.0;
-  return current_time - initStart_wall_time(1);
+  return currentTime - initStart_wallTime(1);
 }
 
-inline long double getRaw_wall_time() {
+inline long double getRaw_wallTime() {
   timeval t;
   gettimeofday(&t, NULL);
-  long double current_time =
+  long double currentTime =
       static_cast<long double>(t.tv_sec) + static_cast<long double>(t.tv_usec) / 1000000.0;
-  return current_time;
+  return currentTime;
 }
 
-inline long double get_cpu_time() {
+inline long double get_cpuTime() {
   rusage r;
   getrusage(RUSAGE_SELF, &r);
-  long double cpu_time = r.ru_utime.tv_sec;
-  cpu_time += static_cast<long double>(r.ru_utime.tv_usec) / 1000000.0;
-  return cpu_time;
+  long double cpuTime = r.ru_utime.tv_sec;
+  cpuTime += static_cast<long double>(r.ru_utime.tv_usec) / 1000000.0;
+  return cpuTime;
 }
 
-inline long double get_sys_time() {
+inline long double get_sysTime() {
   rusage r;
   getrusage(RUSAGE_SELF, &r);
-  long double cpu_time = r.ru_stime.tv_sec;
-  cpu_time += static_cast<long double>(r.ru_stime.tv_usec) / 1000000.0;
-  return cpu_time;
+  long double cpuTime = r.ru_stime.tv_sec;
+  cpuTime += static_cast<long double>(r.ru_stime.tv_usec) / 1000000.0;
+  return cpuTime;
 }
 
 inline long getMax_rss() {

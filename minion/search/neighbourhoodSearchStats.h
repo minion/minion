@@ -79,11 +79,11 @@ struct NeighbourhoodSearchStats {
   }
 
   inline double getTotalTimeTaken() {
-    return get_cpu_time() - startTime;
+    return get_cpuTime() - startTime;
   }
 
   inline void startTimer() {
-    startTime = get_cpu_time();
+    startTime = get_cpuTime();
   }
 
   inline void reportnewStats(const int activatedCombination, const NeighbourhoodStats& stats) {

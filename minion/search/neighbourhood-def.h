@@ -14,7 +14,7 @@
 #define debug_code(x) // nothing
 #endif
 
-#define nhLog(message) std::cout << get_cpu_time() << ": " << message << std::endl
+#define nhLog(message) std::cout << get_cpuTime() << ": " << message << std::endl
 struct NeighbourhoodGroup {
   std::string name;
   std::vector<AnyVarRef> vars;

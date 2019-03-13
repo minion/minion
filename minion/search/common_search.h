@@ -286,7 +286,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
 }
 
 /// Check if timelimit has been exceeded.
-inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& varArray,
+inline void standardTime_ctrlc_checks(const vector<AnyVarRef>& varArray,
                                        const vector<Controller::triple>& branches) {
   if(getState().getNodeCount() >= getOptions().nodelimit) {
     generateRestartFile(varArray, branches);

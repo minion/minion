@@ -46,19 +46,19 @@ void CALLBACK ReallyStop(void*, BOOLEAN) {
   exit(1);
 }
 
-void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout, bool CPU_time) {
-  if(CPU_time)
+void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout, bool CPUTime) {
+  if(CPUTime)
     cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
 
   trig = b;
   *trig = false;
 
-  HANDLE m_timerHandle;
+  HANDLE mTimerHandle;
 
   if(timeoutActive) {
     if(timeout <= 0)
       *trig = true;
-    BOOL success = ::CreateTimerQueueTimer(&m_timerHandle, NULL, TimerProc, NULL, timeout * 1000, 0,
+    BOOL success = ::CreateTimerQueueTimer(&mTimerHandle, NULL, TimerProc, NULL, timeout * 1000, 0,
                                            WT_EXECUTEINTIMERTHREAD);
   }
 }
@@ -79,7 +79,7 @@ void triggerFunction(int /* signum */) {
 }
 
 void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout,
-                      bool CPU_time) // CPU_time = false -> real time
+                      bool CPUTime) // CPUTime = false -> real time
 {
   // We still set these, as they are how 'ctrlc' checks if we have got started
   // properly or not.
@@ -91,7 +91,7 @@ void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout,
   if(timeoutActive) {
     if(timeout <= 0)
       *trig = true;
-    if(CPU_time) {
+    if(CPUTime) {
       rlimit lim;
       lim.rlim_cur = timeout;
       lim.rlim_max = timeout + 5;

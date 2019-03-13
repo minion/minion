@@ -781,16 +781,16 @@ struct InstanceStats {
     }
   }
 
-#define START_CLOCK() start_time = get_cpu_time()
+#define START_CLOCK() startTime = get_cpuTime()
 #define END_CLOCK()                                                                                \
-  measured_time = get_cpu_time() - start_time;                                                     \
-  cout << "TIME: " << measured_time << endl;
-#define output_stat cout << measured_time << " " << s
+  measuredTime = get_cpuTime() - startTime;                                                     \
+  cout << "TIME: " << measuredTime << endl;
+#define output_stat cout << measuredTime << " " << s
 
   void output_stats() {
     string s("stats_"); // common prefix
     // Variables statistics
-    double start_time, measured_time;
+    double startTime, measuredTime;
     START_CLOCK();
     VarContainer& v = csp.vars;
     SysInt varcount = v.BOOLs + v.bound.size() + v.sparse_bound.size() + v.discrete.size();
@@ -1021,7 +1021,7 @@ struct InstanceStats {
   }
 
   void output_stats_tightness(vector<AbstractConstraint*> cons) {
-    double start_time, measured_time;
+    double startTime, measuredTime;
 
     string s("stats_");
     {

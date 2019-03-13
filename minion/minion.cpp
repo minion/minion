@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 
     if(!getOptions().noTimers) {
       Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
-                           getOptions().time_limit_is_CPU_time);
+                           getOptions().time_limit_is_CPUTime);
     }
 
     vector<string> files(1, getOptions().instance_name);

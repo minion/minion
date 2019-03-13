@@ -187,8 +187,8 @@ bool isAlarmActivated() {
   return getParallelData().alarmTrigger;
 }
 
-void setupAlarm(bool alarmActive, SysInt timeout, bool CPU_time) {
-  activateTrigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPU_time);
+void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
+  activateTrigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPUTime);
 }
 
 } // namespace Parallel

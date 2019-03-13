@@ -403,7 +403,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().timeoutActive = true;
       try {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
-        getOptions().time_limit_is_CPU_time = false;
+        getOptions().time_limit_is_CPUTime = false;
       } catch(...) {
         cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
         exit(1);
@@ -449,7 +449,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().timeoutActive = true;
       try {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
-        getOptions().time_limit_is_CPU_time = true;
+        getOptions().time_limit_is_CPUTime = true;
       } catch(...) {
         cout << "Did not understand the parameter to cpulimit:" << argv[i] << endl;
         exit(1);

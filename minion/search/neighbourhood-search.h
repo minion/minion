@@ -173,7 +173,7 @@ struct NeighbourhoodState {
     std::shared_ptr<Controller::StandardSearchManager> sm;
     auto timeoutChecker = [&](const vector<AnyVarRef>& varArray,
                               const vector<Controller::triple>& branches) {
-      Controller::standard_time_ctrlc_checks(varArray, branches);
+      Controller::standardTime_ctrlc_checks(varArray, branches);
       if(alarmTriggered) {
         if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
           highestNeighbourhoodSize =
@@ -215,7 +215,7 @@ struct NeighbourhoodState {
       setTimeout(searchParams.timeoutInMillis);
     }
 
-    double startTime = get_cpu_time();
+    double startTime = get_cpuTime();
     bool timeout = false;
     try {
       sm->search();
@@ -225,7 +225,7 @@ struct NeighbourhoodState {
       clearTimeout();
     }
     bool solutionFound = !solution.empty();
-    double totalTime = get_cpu_time();
+    double totalTime = get_cpuTime();
     NeighbourhoodStats stats(lastOptVal, oldMinValue, totalTime - startTime, solutionFound, timeout,
                              highestNeighbourhoodSize);
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);

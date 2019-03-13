@@ -22,7 +22,7 @@ struct RestartSearchManager : public Controller::SearchManager {
 
     auto timeoutChecker = [&](const vector<AnyVarRef>& varArray,
                               const vector<Controller::triple>& branches) {
-      Controller::standard_time_ctrlc_checks(varArray, branches);
+      Controller::standardTime_ctrlc_checks(varArray, branches);
       if(alarmTriggered) {
         throw TimeoutException();
       }
