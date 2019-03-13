@@ -151,7 +151,7 @@ struct NeighbourhoodState {
     }
 
     solution.clear();
-    auto vo = Controller::make_search_order_multiple(*chosenSearchOrder);
+    auto vo = Controller::makeSearchOrder_multiple(*chosenSearchOrder);
 
     prop->prop(vo->getVars());
 
@@ -342,16 +342,16 @@ private:
           }
         }
         for(AnyVarRef& varRef : neighbourhood.group->vars) {
-          searchOrders.back().var_order.push_back(varRef.getBaseVar());
-          searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+          searchOrders.back().varOrder.push_back(varRef.getBaseVar());
+          searchOrders.back().valOrder.push_back(VALORDER_RANDOM);
         }
       }
     }
     searchOrders.emplace_back();
     searchOrders.back().order = defaultOrdering;
     for(AnyVarRef& v : nhc.variablesOutOfNeighbourhoods) {
-      searchOrders.back().var_order.push_back(v.getBaseVar());
-      searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+      searchOrders.back().varOrder.push_back(v.getBaseVar());
+      searchOrders.back().valOrder.push_back(VALORDER_RANDOM);
     }
     // also add the local vars for neighbourhoods not activated just in case they are not
     // dontcared
@@ -365,19 +365,19 @@ private:
 
   void addNhLocalVars(vector<SearchOrder>& searchOrders, Neighbourhood& neighbourhood,
                       ValOrder nhSizeOrder) {
-    searchOrders.back().var_order.push_back(neighbourhood.deviation.getBaseVar());
-    searchOrders.back().val_order.push_back(nhSizeOrder);
+    searchOrders.back().varOrder.push_back(neighbourhood.deviation.getBaseVar());
+    searchOrders.back().valOrder.push_back(nhSizeOrder);
     for(AnyVarRef& nhLocalVar : neighbourhood.vars) {
-      searchOrders.back().var_order.push_back(nhLocalVar.getBaseVar());
-      searchOrders.back().val_order.push_back(VALORDER_RANDOM);
+      searchOrders.back().varOrder.push_back(nhLocalVar.getBaseVar());
+      searchOrders.back().valOrder.push_back(VALORDER_RANDOM);
     }
   }
 
   vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
     vector<SearchOrder> searchOrder(base_order.begin(), base_order.end());
     for(auto& so : searchOrder) {
-      for(int i = 0; i < so.val_order.size(); i++) {
-        so.val_order[i] = ValOrder(VALORDER_RANDOM, bias);
+      for(int i = 0; i < so.valOrder.size(); i++) {
+        so.valOrder[i] = ValOrder(VALORDER_RANDOM, bias);
       }
     }
     return searchOrder;

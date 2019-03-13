@@ -417,15 +417,15 @@ void MinionThreeInputReader<FileReader>::finalise() {
     throw parse_exception("Gadgets need a construction site!");
 
   // Fill in any missing defaults
-  if(instance->search_order.empty()) {
+  if(instance->searchOrder.empty()) {
     MAYBE_PARSER_INFO("No order generated, auto-generating complete order");
-    instance->search_order.push_back(instance->vars.getAllVars());
+    instance->searchOrder.push_back(instance->vars.getAllVars());
   }
 
   vector<Var> allVars = instance->vars.getAllVars();
   set<Var> unused_vars(allVars.begin(), allVars.end());
-  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i) {
-    const vector<Var>& vars_ref = instance->search_order[i].var_order;
+  for(SysInt i = 0; i < (SysInt)instance->searchOrder.size(); ++i) {
+    const vector<Var>& vars_ref = instance->searchOrder[i].varOrder;
     for(vector<Var>::const_iterator it = vars_ref.begin(); it != vars_ref.end(); ++it) {
       unused_vars.erase(*it);
     }
@@ -433,18 +433,18 @@ void MinionThreeInputReader<FileReader>::finalise() {
 
   if(!unused_vars.empty() && ensure_branch_on_allVars) {
     vector<Var> unused_vec(unused_vars.begin(), unused_vars.end());
-    if(instance->search_order.size() > 1 &&
-       instance->search_order.back().find_one_assignment == true) {
-      instance->search_order.back().var_order.insert(instance->search_order.back().var_order.end(),
+    if(instance->searchOrder.size() > 1 &&
+       instance->searchOrder.back().find_one_assignment == true) {
+      instance->searchOrder.back().varOrder.insert(instance->searchOrder.back().varOrder.end(),
                                                      unused_vec.begin(), unused_vec.end());
     } else {
-      instance->search_order.push_back(unused_vec);
-      instance->search_order.back().find_one_assignment = true;
+      instance->searchOrder.push_back(unused_vec);
+      instance->searchOrder.back().find_one_assignment = true;
     }
   }
 
-  for(SysInt i = 0; i < (SysInt)instance->search_order.size(); ++i)
-    instance->search_order[i].setupValueOrder();
+  for(SysInt i = 0; i < (SysInt)instance->searchOrder.size(); ++i)
+    instance->searchOrder[i].setupValueOrder();
 
   // This has to be delayed unless not all variables are defined where 'PRINT
   // ALL' occurs.
@@ -1191,9 +1191,9 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       found:;
       }
 
-      instance->search_order.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
+      instance->searchOrder.push_back(SearchOrder(readLiteralVector(infile), vo, find_one_sol));
       MAYBE_PARSER_INFO("Read var order, length " +
-                        tostring(instance->search_order.back().var_order.size()));
+                        tostring(instance->searchOrder.back().varOrder.size()));
     } else if(var_type == "PERMUTATION") {
       if(!instance->permutation.empty())
         throw parse_exception("Can't have two PERMUTATIONs!");
@@ -1205,9 +1205,9 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       instance->sym_order = readLiteralVector(infile);
       MAYBE_PARSER_INFO("Read Symmetry Ordering, length " + tostring(instance->permutation.size()));
     } else if(var_type == "VALORDER") {
-      if(instance->search_order.empty())
+      if(instance->searchOrder.empty())
         throw parse_exception("Must declare VARORDER first");
-      if(!instance->search_order.back().val_order.empty())
+      if(!instance->searchOrder.back().valOrder.empty())
         throw parse_exception("Can't have two VALORDERs for a VARORDER");
       vector<ValOrder> valOrder;
 
@@ -1226,10 +1226,10 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
         }
         delim = infile->getChar(); // , or ]
       }
-      instance->search_order.back().val_order = valOrder;
+      instance->searchOrder.back().valOrder = valOrder;
 
       MAYBE_PARSER_INFO("Read val order, length " +
-                        tostring(instance->search_order.back().val_order.size()));
+                        tostring(instance->searchOrder.back().valOrder.size()));
     } else if(var_type == "MAXIMISING" || var_type == "MAXIMIZING") {
       if(instance->is_optimisation_problem == true)
         throw parse_exception("Can only have one min / max per problem!");

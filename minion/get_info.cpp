@@ -105,7 +105,7 @@ void PropInfoAddone(Info_PropEvent type) {
   var_info.propcount[type]++;
 }
 
-void print_search_info() {
+void printSearchInfo() {
   cout << pad("");
   for(SysInt i = 0; i < VarTypeCount; ++i)
     cout << pad_start(VarNames[i]);

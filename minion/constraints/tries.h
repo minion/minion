@@ -90,8 +90,8 @@ struct TupleTrie {
 
     std::stable_sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
     if(tuplelist->size() > 0) {
-      build_trie(0, tuplelist->size());
-      build_final_trie();
+      buildTrie(0, tuplelist->size());
+      buildFinalTrie();
     }
   }
 
@@ -105,7 +105,7 @@ struct TupleTrie {
 
   TrieObj* trie_data; // This is the actual trie used during search.
 
-  void build_final_trie() {
+  void buildFinalTrie() {
     const SysInt size = checked_cast<SysInt>(initial_trie.size());
     trie_data = new TrieObj[size];
     for(SysInt i = 0; i < size; ++i) {
@@ -130,7 +130,7 @@ struct TupleTrie {
     }
   }
 
-  void build_trie(const DomainInt start_pos, const DomainInt end_pos, DomainInt depth = 0) {
+  void buildTrie(const DomainInt start_pos, const DomainInt end_pos, DomainInt depth = 0) {
     const bool last_stage = (depth == arity - 1);
     if(depth == arity)
       return;
@@ -157,7 +157,7 @@ struct TupleTrie {
           initial_trie[start_section + num_ofVal].offsetPtr = -1;
         } else {
           initial_trie[start_section + num_ofVal].offsetPtr = initial_trie.size();
-          build_trie(current_start, i, depth + 1);
+          buildTrie(current_start, i, depth + 1);
         }
         currentVal = tuples(i, depth);
         current_start = i;
@@ -173,7 +173,7 @@ struct TupleTrie {
     else
       initial_trie[start_section + num_ofVal].offsetPtr = initial_trie.size();
 
-    build_trie(current_start, end_pos, depth + 1);
+    buildTrie(current_start, end_pos, depth + 1);
 
     assert(num_ofVal + 1 == values);
     SysInt checkValues = checked_cast<SysInt>(values);
@@ -308,7 +308,7 @@ struct TupleTrie {
   }
 
   template <typename VarArray>
-  bool loop_search_trie(const VarArray& _vars, TrieObj** obj_list, DomainInt depth_in) {
+  bool loopSearch_trie(const VarArray& _vars, TrieObj** obj_list, DomainInt depth_in) {
     const SysInt depth = checked_cast<SysInt>(depth_in);
     CON_INFO_ADDONE(LoopSearchTrie);
     VarArray& vars = const_cast<VarArray&>(_vars);
@@ -319,7 +319,7 @@ struct TupleTrie {
       return search_trie(_vars, obj_list, depth);
 
     if(vars[map_depth(depth)].inDomain(obj_list[depth]->val)) {
-      if(loop_search_trie(_vars, obj_list, depth + 1))
+      if(loopSearch_trie(_vars, obj_list, depth + 1))
         return true;
     }
 
@@ -366,7 +366,7 @@ struct TupleTrie {
       else
         return -1;
     } else {
-      if(loop_search_trie(vars, obj_list, 1))
+      if(loopSearch_trie(vars, obj_list, 1))
         return obj_list[arity - 1] - obj_list[0];
       else
         return -1;

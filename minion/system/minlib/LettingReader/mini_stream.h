@@ -16,9 +16,9 @@ typedef SimpleMap<string, MultiDimCon<int, int>> simmap;
 
 class MiniStream {
   string s; // text to parse
-  const char* stream_start;
-  const char* stream_end;
-  const char* stream_pos;
+  const char* streamStart;
+  const char* streamEnd;
+  const char* streamPos;
 
   int linenum; // for errors
   int charnum;
@@ -28,14 +28,14 @@ class MiniStream {
   simmap* conmap;
 
   bool eof() {
-    return stream_pos == stream_end;
+    return streamPos == streamEnd;
   }
   char peek() {
-    return *stream_pos;
+    return *streamPos;
   }
   void incr() {
     charnum++;
-    stream_pos++;
+    streamPos++;
   }
 
   void skip_space() {
@@ -158,9 +158,9 @@ public:
 
     file.close();
 
-    stream_start = &*s.begin();
-    stream_end = &*s.begin() + s.length();
-    stream_pos = stream_start;
+    streamStart = &*s.begin();
+    streamEnd = &*s.begin() + s.length();
+    streamPos = streamStart;
 
     if(eof()) {
       throw std::runtime_error("Parameter file '" + fname + "' does not exist or is empty.");

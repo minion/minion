@@ -40,11 +40,11 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     return "w-notinrange";
   }
 
-  CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
+  CONSTRAINT_ARG_LIST2(var, make_vec(rangeMin, rangeMax));
   Var var;
 
-  DomainInt range_min;
-  DomainInt range_max;
+  DomainInt rangeMin;
+  DomainInt rangeMax;
 
   template <typename T>
   WatchNotInRangeConstraint(const Var& _var, const T& _vals) : var(_var) {
@@ -53,8 +53,8 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
       abort();
     }
 
-    range_min = _vals[0];
-    range_max = _vals[1];
+    rangeMin = _vals[0];
+    rangeMax = _vals[1];
   }
 
   virtual SysInt dynamicTriggerCount() {
@@ -63,16 +63,16 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     // Ignore empty ranges
-    if(range_min > range_max)
+    if(rangeMin > rangeMax)
       return;
 
-    if(var.max() <= range_max) {
-      var.setMax(range_min - 1);
+    if(var.max() <= rangeMax) {
+      var.setMax(rangeMin - 1);
       return;
     }
 
-    if(var.min() >= range_min) {
-      var.setMin(range_max + 1);
+    if(var.min() >= rangeMin) {
+      var.setMin(rangeMax + 1);
       return;
     }
 
@@ -80,7 +80,7 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
       moveTriggerInt(var, 0, DomainChanged);
       propagateDynInt(0, DomainDelta::empty());
     } else {
-      for(DomainInt i = range_min; i <= range_max; ++i)
+      for(DomainInt i = rangeMin; i <= rangeMax; ++i)
         var.removeFromDomain(i);
     }
   }
@@ -89,20 +89,20 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     PROP_INFO_ADDONE(WatchNotInRange);
     D_ASSERT(var.isBound());
 
-    if(var.max() <= range_max) {
-      var.setMax(range_min - 1);
+    if(var.max() <= rangeMax) {
+      var.setMax(rangeMin - 1);
       return;
     }
 
-    if(var.min() >= range_min) {
-      var.setMin(range_max + 1);
+    if(var.min() >= rangeMin) {
+      var.setMin(rangeMax + 1);
       return;
     }
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     D_ASSERT(vSize == 1);
-    return (v[0] < range_min || v[0] > range_max);
+    return (v[0] < rangeMin || v[0] > rangeMax);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -114,12 +114,12 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    if(var.min() < range_min || var.min() > range_max) {
+    if(var.min() < rangeMin || var.min() > rangeMax) {
       assignment.push_back(make_pair(0, var.min()));
       return true;
     }
 
-    if(var.max() < range_min || var.max() > range_max) {
+    if(var.max() < rangeMin || var.max() > rangeMax) {
       assignment.push_back(make_pair(0, var.max()));
       return true;
     }
@@ -127,7 +127,7 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
   }
 
   virtual AbstractConstraint* reverseConstraint() {
-    std::array<DomainInt, 2> a = {{range_min, range_max}};
+    std::array<DomainInt, 2> a = {{rangeMin, rangeMax}};
     return new WatchInRangeConstraint<Var>(var, a);
   }
 };
@@ -135,7 +135,7 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
 // From dynamic_inrange.h
 template <typename Var>
 AbstractConstraint* WatchInRangeConstraint<Var>::reverseConstraint() {
-  std::array<DomainInt, 2> a = {{range_min, range_max}};
+  std::array<DomainInt, 2> a = {{rangeMin, rangeMax}};
   return new WatchNotInRangeConstraint<Var>(var, a);
 }
 

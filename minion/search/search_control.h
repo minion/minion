@@ -24,11 +24,11 @@
 
 namespace Controller {
 
-shared_ptr<VariableOrder> make_search_order(SearchOrder order) {
+shared_ptr<VariableOrder> makeSearchOrder(SearchOrder order) {
   // collect the variables in the SearchOrder object
   vector<AnyVarRef> varArray;
-  for(SysInt i = 0; i < (SysInt)order.var_order.size(); i++) {
-    varArray.push_back(get_AnyVarRef_from_Var(order.var_order[i]));
+  for(SysInt i = 0; i < (SysInt)order.varOrder.size(); i++) {
+    varArray.push_back(getAnyVarRefFromVar(order.varOrder[i]));
     // some check here?
   }
 
@@ -37,23 +37,23 @@ shared_ptr<VariableOrder> make_search_order(SearchOrder order) {
 
   switch(order.order) // get the VarOrderEnum
   {
-  case ORDER_STATIC: vo = new StaticBranch(varArray, order.val_order); break;
-  case ORDER_ORIGINAL: vo = new StaticBranch(varArray, order.val_order); break;
-  case ORDER_SDF: vo = new SDFBranch(varArray, order.val_order); break;
-  case ORDER_SRF: vo = new SRFBranch(varArray, order.val_order); break;
-  case ORDER_LDF: vo = new LDFBranch(varArray, order.val_order); break;
+  case ORDER_STATIC: vo = new StaticBranch(varArray, order.valOrder); break;
+  case ORDER_ORIGINAL: vo = new StaticBranch(varArray, order.valOrder); break;
+  case ORDER_SDF: vo = new SDFBranch(varArray, order.valOrder); break;
+  case ORDER_SRF: vo = new SRFBranch(varArray, order.valOrder); break;
+  case ORDER_LDF: vo = new LDFBranch(varArray, order.valOrder); break;
   case ORDER_CONFLICT:
     // for the time being, just use static as the underlying order
-    vo2 = new StaticBranch(varArray, order.val_order);
-    vo = new ConflictBranch(varArray, order.val_order, vo2);
+    vo2 = new StaticBranch(varArray, order.valOrder);
+    vo = new ConflictBranch(varArray, order.valOrder, vo2);
     break;
   case ORDER_STATIC_LIMITED:
-    vo = new StaticBranchLimited(varArray, order.val_order, order.limit);
+    vo = new StaticBranchLimited(varArray, order.valOrder, order.limit);
     break;
 
 #ifdef WDEG
-  case ORDER_WDEG: vo = new WdegBranch(varArray, order.val_order); break;
-  case ORDER_DOMOVERWDEG: vo = new DomOverWdegBranch(varArray, order.val_order); break;
+  case ORDER_WDEG: vo = new WdegBranch(varArray, order.valOrder); break;
+  case ORDER_DOMOVERWDEG: vo = new DomOverWdegBranch(varArray, order.valOrder); break;
 #else
   case ORDER_WDEG:
   case ORDER_DOMOVERWDEG:
@@ -61,21 +61,21 @@ shared_ptr<VariableOrder> make_search_order(SearchOrder order) {
                "domoverwdeg orderings (add -WDEG to build options)");
 #endif
 
-  default: cout << "Order not found in make_search_order." << endl; abort();
+  default: cout << "Order not found in makeSearchOrder." << endl; abort();
   }
   return shared_ptr<VariableOrder>(vo);
 }
 
-shared_ptr<VariableOrder> make_search_order_multiple(const vector<SearchOrder>& order) {
+shared_ptr<VariableOrder> makeSearchOrder_multiple(const vector<SearchOrder>& order) {
   shared_ptr<VariableOrder> vo;
   bool hasAux = false;
 
   if(order.size() == 1) {
-    return make_search_order(order[0]);
+    return makeSearchOrder(order[0]);
   } else {
     vector<shared_ptr<VariableOrder>> vovector;
     for(SysInt i = 0; i < (SysInt)order.size(); i++) {
-      vovector.push_back(make_search_order(order[i]));
+      vovector.push_back(makeSearchOrder(order[i]));
       if(order[i].find_one_assignment)
         hasAux = true;
       if(order[i].find_one_assignment && i != (SysInt)order.size() - 1) {
@@ -92,28 +92,28 @@ shared_ptr<VariableOrder> make_search_order_multiple(const vector<SearchOrder>& 
   return vo;
 }
 
-shared_ptr<Propagate> make_propagator(PropagationLevel prop_method) {
+shared_ptr<Propagate> make_propagator(PropagationLevel propMethod) {
   shared_ptr<Propagate> p;
-  switch(prop_method.type) { // doesn't cover the PropLevel_None case.
-  case PropLevel_GAC: p = shared_ptr<Propagate>(new PropGAC(prop_method)); break;
-  case PropLevel_SAC: p = shared_ptr<Propagate>(new PropSAC(prop_method)); break;
-  case PropLevel_SSAC: p = shared_ptr<Propagate>(new PropSSAC(prop_method)); break;
-  case PropLevel_SACBounds: p = shared_ptr<Propagate>(new PropSAC_Bounds(prop_method)); break;
-  case PropLevel_SSACBounds: p = shared_ptr<Propagate>(new PropSSAC_Bounds(prop_method)); break;
-  default: cout << "Propagation method not found in make_search_manager." << endl; abort();
+  switch(propMethod.type) { // doesn't cover the PropLevel_None case.
+  case PropLevel_GAC: p = shared_ptr<Propagate>(new PropGAC(propMethod)); break;
+  case PropLevel_SAC: p = shared_ptr<Propagate>(new PropSAC(propMethod)); break;
+  case PropLevel_SSAC: p = shared_ptr<Propagate>(new PropSSAC(propMethod)); break;
+  case PropLevel_SACBounds: p = shared_ptr<Propagate>(new PropSAC_Bounds(propMethod)); break;
+  case PropLevel_SSACBounds: p = shared_ptr<Propagate>(new PropSSAC_Bounds(propMethod)); break;
+  default: cout << "Propagation method not found in makeSearch_manager." << endl; abort();
   }
   return p;
 }
 
 // returns an instance of SearchManager with the required variable ordering,
 // propagator etc.
-shared_ptr<SearchManager> make_search_manager(PropagationLevel prop_method,
+shared_ptr<SearchManager> makeSearch_manager(PropagationLevel propMethod,
                                               vector<SearchOrder> order) {
   shared_ptr<VariableOrder> vo;
 
-  vo = make_search_order_multiple(order);
+  vo = makeSearchOrder_multiple(order);
 
-  shared_ptr<Propagate> p = make_propagator(prop_method);
+  shared_ptr<Propagate> p = make_propagator(propMethod);
 
   std::function<void(void)> opt_handler;
   if(getState().isOptimisationProblem()) {

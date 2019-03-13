@@ -38,11 +38,11 @@ struct WatchInRangeConstraint : public AbstractConstraint {
     return "w-inrange";
   }
 
-  CONSTRAINT_ARG_LIST2(var, make_vec(range_min, range_max));
+  CONSTRAINT_ARG_LIST2(var, make_vec(rangeMin, rangeMax));
   Var var;
 
-  DomainInt range_min;
-  DomainInt range_max;
+  DomainInt rangeMin;
+  DomainInt rangeMax;
 
   template <typename T>
   WatchInRangeConstraint(const Var& _var, const T& _vals) : var(_var) {
@@ -50,8 +50,8 @@ struct WatchInRangeConstraint : public AbstractConstraint {
       outputFatalError("The range of an 'inrange' constraint must contain 2 values!");
     }
 
-    range_min = _vals[0];
-    range_max = _vals[1];
+    rangeMin = _vals[0];
+    rangeMax = _vals[1];
   }
 
   virtual SysInt dynamicTriggerCount() {
@@ -59,8 +59,8 @@ struct WatchInRangeConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    var.setMin(range_min);
-    var.setMax(range_max);
+    var.setMin(rangeMin);
+    var.setMax(rangeMax);
   }
 
   virtual void propagateDynInt(SysInt dt, DomainDelta) {
@@ -70,7 +70,7 @@ struct WatchInRangeConstraint : public AbstractConstraint {
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     D_ASSERT(vSize == 1);
-    return (v[0] >= range_min && v[0] <= range_max);
+    return (v[0] >= rangeMin && v[0] <= rangeMax);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -82,8 +82,8 @@ struct WatchInRangeConstraint : public AbstractConstraint {
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     /// TODO: Make faster
-    DomainInt minVal = max(range_min, var.min());
-    DomainInt maxVal = min(range_max, var.max());
+    DomainInt minVal = max(rangeMin, var.min());
+    DomainInt maxVal = min(rangeMax, var.max());
     for(DomainInt i = minVal; i <= maxVal; ++i) {
       if(var.inDomain(i)) {
         assignment.push_back(make_pair(0, i));

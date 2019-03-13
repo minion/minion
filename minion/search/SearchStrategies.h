@@ -493,10 +493,10 @@ public:
 };
 
 template <typename NhSelectionStrategy>
-shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationLevel& prop_method,
+shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationLevel& propMethod,
                                                                     vector<SearchOrder>& base_order,
                                                                     NeighbourhoodContainer& nhc) {
-  shared_ptr<Propagate> prop = Controller::make_propagator(prop_method);
+  shared_ptr<Propagate> prop = Controller::make_propagator(propMethod);
   switch(getOptions().neighbourhoodSearchStrategy) {
   case SearchOptions::NeighbourhoodSearchStrategy::META_WITH_HILLCLIMBING:
     return std::make_shared<
@@ -524,19 +524,19 @@ shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearchHelper(PropagationL
   }
 }
 
-shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel prop_method,
+shared_ptr<Controller::SearchManager> MakeNeighbourhoodSearch(PropagationLevel propMethod,
                                                               vector<SearchOrder> base_order,
                                                               NeighbourhoodContainer nhc) {
   switch(getOptions().neighbourhoodSelectionStrategy) {
   case SearchOptions::NeighbourhoodSelectionStrategy::RANDOM:
-    return MakeNeighbourhoodSearchHelper<RandomCombinationChooser>(prop_method, base_order, nhc);
+    return MakeNeighbourhoodSearchHelper<RandomCombinationChooser>(propMethod, base_order, nhc);
   case SearchOptions::NeighbourhoodSelectionStrategy::UCB:
-    return MakeNeighbourhoodSearchHelper<UCBNeighbourhoodSelection>(prop_method, base_order, nhc);
+    return MakeNeighbourhoodSearchHelper<UCBNeighbourhoodSelection>(propMethod, base_order, nhc);
   case SearchOptions::NeighbourhoodSelectionStrategy::LEARNING_AUTOMATON:
-    return MakeNeighbourhoodSearchHelper<LearningAutomatonNeighbourhoodSelection>(prop_method,
+    return MakeNeighbourhoodSearchHelper<LearningAutomatonNeighbourhoodSelection>(propMethod,
                                                                                   base_order, nhc);
   case SearchOptions::NeighbourhoodSelectionStrategy::INTERACTIVE:
-    return MakeNeighbourhoodSearchHelper<InteractiveCombinationChooser>(prop_method, base_order,
+    return MakeNeighbourhoodSearchHelper<InteractiveCombinationChooser>(propMethod, base_order,
                                                                         nhc);
   default: assert(false); abort();
   }

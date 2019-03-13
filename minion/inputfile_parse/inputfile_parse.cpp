@@ -35,7 +35,7 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
   MinionThreeInputReader<ConcreteFileReader<CheapStream>> readerThree(parser_verbose, mltts,
                                                                       ensure_branch_on_allVars);
 
-  bool needs_finalise_three = false;
+  bool needsFinaliseThree = false;
   for(vector<string>::const_iterator fname = fnames.begin(); fname != fnames.end(); fname++) {
     const char* filename = fname->c_str();
     string extension;
@@ -66,8 +66,8 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 
     try {
       {
-        string test_name = infile.getString();
-        if(test_name != "MINION")
+        string testName = infile.getString();
+        if(testName != "MINION")
           INPUT_ERROR("All Minion input files must begin 'MINION'");
 
         SysInt inputFileVersionNumber = infile.read_int();
@@ -78,35 +78,35 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
         readerThree.instance = &instance;
         ReadCSP(readerThree, &infile);
         // instance = std::move(readerThree.instance);
-        needs_finalise_three = true;
+        needsFinaliseThree = true;
       }
     } catch(const parse_exception& s) {
       cerr << "Error in input!" << endl;
       cerr << s.what() << endl;
 
       SysInt pos = cs.getRawPos();
-      cs.reset_stream();
+      cs.resetStream();
 
-      string current_line;
-      SysInt start_of_line = 0;
+      string currentLine;
+      SysInt startOfLine = 0;
       SysInt lineCount = -1;
 
       do {
         lineCount++;
-        start_of_line = cs.getRawPos();
-        current_line = cs.getline();
+        startOfLine = cs.getRawPos();
+        currentLine = cs.getline();
       } while(cs.getRawPos() < pos);
 
       cerr << "Error occurred on line " << lineCount << endl;
       cerr << "Parser gave up around:" << endl;
-      cerr << current_line << endl;
-      for(SysInt i = 0; i < pos - start_of_line - 1; ++i)
+      cerr << currentLine << endl;
+      for(SysInt i = 0; i < pos - startOfLine - 1; ++i)
         cerr << "-";
       cerr << "^" << endl;
       exit(1);
     }
   }
-  if(needs_finalise_three) {
+  if(needsFinaliseThree) {
     readerThree.finalise();
     // instance = std::move(readerThree.instance);
   }

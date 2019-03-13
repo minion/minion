@@ -2,15 +2,15 @@
 
 namespace Controller {
 struct RestartSearchManager : public Controller::SearchManager {
-  PropagationLevel prop_method;
+  PropagationLevel propMethod;
   vector<SearchOrder> initialOrder;
 
   void doASearch(const vector<SearchOrder>& order, int nodelimit) {
     int depth = Controller::get_world_depth();
     Controller::world_push();
 
-    auto prop = Controller::make_propagator(prop_method);
-    auto vo = Controller::make_search_order_multiple(order);
+    auto prop = Controller::make_propagator(propMethod);
+    auto vo = Controller::makeSearchOrder_multiple(order);
 
     std::shared_ptr<Controller::StandardSearchManager> sm;
 
@@ -52,8 +52,8 @@ struct RestartSearchManager : public Controller::SearchManager {
     Controller::world_popToDepth(depth);
   }
 
-  RestartSearchManager(PropagationLevel _prop_method, const vector<SearchOrder>& _order)
-      : prop_method(_prop_method), initialOrder(_order) {}
+  RestartSearchManager(PropagationLevel _propMethod, const vector<SearchOrder>& _order)
+      : propMethod(_propMethod), initialOrder(_order) {}
 
   virtual void search() {
     std::uniform_int_distribution<int> order(1, 7);
@@ -67,8 +67,8 @@ struct RestartSearchManager : public Controller::SearchManager {
   }
 };
 
-shared_ptr<Controller::SearchManager> make_restart_search_manager(PropagationLevel prop_method,
+shared_ptr<Controller::SearchManager> make_restart_search_manager(PropagationLevel propMethod,
                                                                   vector<SearchOrder> order) {
-  return shared_ptr<Controller::SearchManager>(new RestartSearchManager(prop_method, order));
+  return shared_ptr<Controller::SearchManager>(new RestartSearchManager(propMethod, order));
 }
 } // namespace Controller

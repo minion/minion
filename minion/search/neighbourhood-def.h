@@ -21,7 +21,7 @@ struct NeighbourhoodGroup {
   std::vector<int> neighbourhoodIndexes;
   NeighbourhoodGroup() {}
   NeighbourhoodGroup(const std::string& name, const ParsedNeighbourhoodGroup& p)
-      : name(name), vars(get_AnyVarRef_from_Var(p.vars)) {}
+      : name(name), vars(getAnyVarRefFromVar(p.vars)) {}
 };
 
 struct Neighbourhood {
@@ -34,9 +34,9 @@ struct Neighbourhood {
   NeighbourhoodType type = STANDARD;
   Neighbourhood(const ParsedNeighbourhood& p, std::shared_ptr<NeighbourhoodGroup>& g)
       : name(p.name),
-        activation(get_AnyVarRef_from_Var(p.activation)),
-        deviation(get_AnyVarRef_from_Var(p.deviation)),
-        vars(get_AnyVarRef_from_Var(p.vars)),
+        activation(getAnyVarRefFromVar(p.activation)),
+        deviation(getAnyVarRefFromVar(p.deviation)),
+        vars(getAnyVarRefFromVar(p.vars)),
         group(g) {}
 
   Neighbourhood(NeighbourhoodType type, std::shared_ptr<NeighbourhoodGroup>& g)
@@ -78,8 +78,8 @@ struct NeighbourhoodContainer {
   std::vector<AnyVarRef> variablesOutOfNeighbourhoods;
   int maxNeighbourhoodSize;
   NeighbourhoodContainer(const ParsedNeighbourhoodContainer& p)
-      : shadow_mapping(get_AnyVarRef_from_Var(p.shadow_mapping)),
-        shadow_disable(get_AnyVarRef_from_Var(p.shadow_disable)) {
+      : shadow_mapping(getAnyVarRefFromVar(p.shadow_mapping)),
+        shadow_disable(getAnyVarRefFromVar(p.shadow_disable)) {
     // buil shadow lookup
     for(int i = 0; i < shadow_mapping[0].size(); ++i) {
       shadowLookup.emplace(shadow_mapping[0][i], shadow_mapping[1][i]);

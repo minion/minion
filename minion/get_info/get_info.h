@@ -73,7 +73,7 @@ const SysInt PropEventCount = PropEvent_END;
 void VarInfoAddone(Info_VarType, Info_VarEvent);
 void ConInfoAddone(Info_ConEvent);
 void PropInfoAddone(Info_PropEvent);
-void print_search_info();
+void printSearchInfo();
 
 #else
 #define CON_INFO_ADDONE(ConEvent)

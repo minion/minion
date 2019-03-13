@@ -32,7 +32,7 @@ int get_distinctValues(const Tuples& tuples, int start_pos, int end_pos, int dep
 }
 
 template <typename Value, typename Tuples>
-void build_early_trie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tuples& tuples,
+void buildEarlyTrie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tuples& tuples,
                       int start_pos, int end_pos, int depth) {
   const bool last_stage = (depth == (int)tuples[0].size() - 1);
   assert(depth <= (int)tuples[0].size() - 1);
@@ -55,7 +55,7 @@ void build_early_trie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tupl
         initial_trie[start_section + num_ofVal].offset = -1;
       } else {
         initial_trie[start_section + num_ofVal].offset = initial_trie.size();
-        build_early_trie(initial_trie, tuples, current_start, i, depth + 1);
+        buildEarlyTrie(initial_trie, tuples, current_start, i, depth + 1);
       }
       currentVal = tuples[i][depth];
       current_start = i;
@@ -69,7 +69,7 @@ void build_early_trie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tupl
     initial_trie[start_section + num_ofVal].offset = -1;
   else {
     initial_trie[start_section + num_ofVal].offset = initial_trie.size();
-    build_early_trie(initial_trie, tuples, current_start, end_pos, depth + 1);
+    buildEarlyTrie(initial_trie, tuples, current_start, end_pos, depth + 1);
   }
 
   assert(num_ofVal + 1 == values);
@@ -78,15 +78,15 @@ void build_early_trie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tupl
 }
 
 template <typename Value>
-TrieObj<Value>* build_final_trie(const std::vector<earlyTrieObj<Value>>& early_trie) {
-  TrieObj<Value>* trie = new TrieObj<Value>[early_trie.size()];
-  for(size_t i = 0; i < early_trie.size(); ++i) {
-    trie[i].val = early_trie[i].val;
-    D_ASSERT(early_trie[i].offset >= -1);
-    if(early_trie[i].offset == -1)
+TrieObj<Value>* buildFinalTrie(const std::vector<earlyTrieObj<Value>>& earlyTrie) {
+  TrieObj<Value>* trie = new TrieObj<Value>[earlyTrie.size()];
+  for(size_t i = 0; i < earlyTrie.size(); ++i) {
+    trie[i].val = earlyTrie[i].val;
+    D_ASSERT(earlyTrie[i].offset >= -1);
+    if(earlyTrie[i].offset == -1)
       trie[i].ptr = 0;
     else
-      trie[i].ptr = trie + early_trie[i].offset;
+      trie[i].ptr = trie + earlyTrie[i].offset;
   }
 
   return trie;
@@ -95,7 +95,7 @@ TrieObj<Value>* build_final_trie(const std::vector<earlyTrieObj<Value>>& early_t
 } // end namespace TrieBuilder
 
 template <typename Tuples>
-TrieObj<int>* build_trie(const Tuples& tuples) {
+TrieObj<int>* buildTrie(const Tuples& tuples) {
   if(tuples.empty()) {
     return 0;
   } else if(tuples[0].empty()) {
@@ -105,9 +105,9 @@ TrieObj<int>* build_trie(const Tuples& tuples) {
     return t;
   } else {
     typedef int Value;
-    std::vector<TrieBuilder::earlyTrieObj<Value>> early_trie;
-    TrieBuilder::build_early_trie<Value>(early_trie, tuples, 0, tuples.size(), 0);
-    return build_final_trie(early_trie);
+    std::vector<TrieBuilder::earlyTrieObj<Value>> earlyTrie;
+    TrieBuilder::buildEarlyTrie<Value>(earlyTrie, tuples, 0, tuples.size(), 0);
+    return buildFinalTrie(earlyTrie);
   }
 }
 

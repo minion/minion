@@ -83,7 +83,7 @@ public:
 
   template <bool is_root_node>
   bool propagateDynamicTriggerLists() {
-    bool* fail_ptr = getState().getFailedPtr();
+    bool* failPtr = getState().getFailedPtr();
     while(!dynamic_trigger_list.empty()) {
       DynamicTriggerEvent dte = dynamic_trigger_list.queueTop();
       dynamic_trigger_list.queuePop();
@@ -93,7 +93,7 @@ public:
       SysInt pos = 0;
 
       while(pos < dtl.size()) {
-        if(*fail_ptr) {
+        if(*failPtr) {
           clearQueues();
           return true;
         }
@@ -104,7 +104,7 @@ public:
         }
 
 #ifdef WDEG
-        if(*fail_ptr)
+        if(*failPtr)
           ref.constraint()->incWdeg();
 #endif
 

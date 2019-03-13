@@ -100,7 +100,7 @@ AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_
   {
     vector<AnyVarRef> v(vars.size());
     for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-      v[i] = get_AnyVarRef_from_Var(vars[i]);
+      v[i] = getAnyVarRefFromVar(vars[i]);
 
     return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
   }

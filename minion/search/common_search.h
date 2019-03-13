@@ -216,7 +216,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
   }
 
   ProbSpec::MinionInstancePrinter printer(*getState().getInstance());
-  printer.build_instance(false);
+  printer.buildInstance(false);
   string inst(printer.getInstance());
 
   SysInt i = 0;

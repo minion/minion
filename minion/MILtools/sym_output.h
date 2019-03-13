@@ -852,11 +852,11 @@ struct InstanceStats {
     START_CLOCK();
     SysInt branchingvars = 0;
     SysInt auxvars = 0;
-    for(SysInt i = 0; i < (SysInt)csp.search_order.size(); i++) {
-      if(csp.search_order[i].find_one_assignment) {
-        auxvars = auxvars + csp.search_order[i].var_order.size();
+    for(SysInt i = 0; i < (SysInt)csp.searchOrder.size(); i++) {
+      if(csp.searchOrder[i].find_one_assignment) {
+        auxvars = auxvars + csp.searchOrder[i].varOrder.size();
       } else {
-        branchingvars = branchingvars + csp.search_order[i].var_order.size();
+        branchingvars = branchingvars + csp.searchOrder[i].varOrder.size();
       }
     }
     END_CLOCK();

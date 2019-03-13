@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 
     parseCommandLine(args, argc, argv);
 
-    global_random_gen.seed(args.random_seed);
+    global_random_gen.seed(args.randomSeed);
 
     if(!getOptions().silent) {
       time_t rawtime;
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
         cout << argv[i] << " ";
       }
       cout << endl;
-      getOptions().printLine("Using seed: " + tostring(args.random_seed));
+      getOptions().printLine("Using seed: " + tostring(args.randomSeed));
     }
 
     if(!getOptions().noTimers) {
@@ -151,13 +151,13 @@ int main(int argc, char** argv) {
 
     if(getOptions().redump) {
       MinionInstancePrinter printer(instance);
-      printer.build_instance();
+      printer.buildInstance();
       cout << printer.getInstance();
       exit(0);
     }
 
     // Copy args into tableout
-    getTableOut().set("RandomSeed", tostring(args.random_seed));
+    getTableOut().set("RandomSeed", tostring(args.randomSeed));
     getTableOut().set("Preprocess", tostring(args.preprocess));
     // should be one for varorder as well.
     getTableOut().set("MinionVersion", -1);

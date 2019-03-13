@@ -22,22 +22,22 @@
 
 namespace BuildCon {
 
-vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var>& vec) {
+vector<AnyVarRef> getAnyVarRefFromVar(const vector<Var>& vec) {
   vector<AnyVarRef> ret_vec;
   ret_vec.reserve(vec.size());
 
   for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
-    ret_vec.push_back(get_AnyVarRef_from_Var(vec[i]));
+    ret_vec.push_back(getAnyVarRefFromVar(vec[i]));
 
   return ret_vec;
 }
 
-vector<vector<AnyVarRef>> get_AnyVarRef_from_Var(const vector<vector<Var>>& vec) {
+vector<vector<AnyVarRef>> getAnyVarRefFromVar(const vector<vector<Var>>& vec) {
   vector<vector<AnyVarRef>> ret_vec;
   ret_vec.reserve(vec.size());
 
   for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
-    ret_vec.push_back(get_AnyVarRef_from_Var(vec[i]));
+    ret_vec.push_back(getAnyVarRefFromVar(vec[i]));
 
   return ret_vec;
 }
@@ -63,7 +63,7 @@ std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v) {
 }
 
 /// Helper function used in a few places.
-AnyVarRef get_AnyVarRef_from_Var(Var v) {
+AnyVarRef getAnyVarRefFromVar(Var v) {
   switch(v.type()) {
   case VAR_BOOL: return AnyVarRef(getVars().boolVarContainer.getVarNum(v.pos()));
   case VAR_NOTBOOL: return AnyVarRef(VarNotRef(getVars().boolVarContainer.getVarNum(v.pos())));

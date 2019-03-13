@@ -54,7 +54,7 @@ struct StandardSearchManager : public SearchManager {
   std::function<void(void)> handle_sol_func, handle_opt_func;
 
   vector<AnyVarRef> varArray;
-  shared_ptr<VariableOrder> var_order;
+  shared_ptr<VariableOrder> varOrder;
 
   shared_ptr<Propagate> prop; // Propagate is the type of the base class. Method
                               // prop->prop(varArray)
@@ -62,15 +62,15 @@ struct StandardSearchManager : public SearchManager {
   vector<Controller::triple> branches; // L & R branches so far (isLeftBranch?,var,value)
 
   StandardSearchManager(
-      shared_ptr<VariableOrder> _var_order, shared_ptr<Propagate> _prop,
+      shared_ptr<VariableOrder> _varOrder, shared_ptr<Propagate> _prop,
       std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> _check_func,
       std::function<void(void)> _handle_sol_func, std::function<void(void)> _handle_opt_func)
       : check_func(_check_func),
         handle_sol_func(_handle_sol_func),
         handle_opt_func(_handle_opt_func),
-        var_order(_var_order),
+        varOrder(_varOrder),
         prop(_prop) {
-    varArray = var_order->getVars();
+    varArray = varOrder->getVars();
     branches.reserve(varArray.size());
   }
 
@@ -134,8 +134,8 @@ struct StandardSearchManager : public SearchManager {
   }
 
   inline bool in_aux_vars() {
-    return var_order->hasAuxVars() && !branches.empty() &&
-           branches.back().var >= var_order->auxVarStart();
+    return varOrder->hasAuxVars() && !branches.empty() &&
+           branches.back().var >= varOrder->auxVarStart();
   }
 
   inline void jump_out_aux_vars() {
@@ -169,14 +169,14 @@ struct StandardSearchManager : public SearchManager {
 
       check_func(varArray, branches);
 
-      pair<SysInt, DomainInt> varval = var_order->pickVarVal();
+      pair<SysInt, DomainInt> varval = varOrder->pickVarVal();
 
       if(varval.first == -1) {
         // We have found a solution!
         check_sol_is_correct();
         maybe_print_node(true);
         handle_sol_func();
-        if(var_order->hasAuxVars()) { // There are AUX vars at the end of the var ordering.
+        if(varOrder->hasAuxVars()) { // There are AUX vars at the end of the var ordering.
           // Backtrack out of them.
           jump_out_aux_vars();
         }

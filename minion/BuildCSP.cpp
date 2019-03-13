@@ -48,10 +48,10 @@ void BuildCSP(CSPInstance& instance) {
   if(instance.is_optimisation_problem) {
     if(instance.optimise_minimising)
       Controller::optimise_minimise_var(
-          BuildCon::get_AnyVarRef_from_Var(instance.optimise_variable));
+          BuildCon::getAnyVarRefFromVar(instance.optimise_variable));
     else
       Controller::optimise_maximise_var(
-          BuildCon::get_AnyVarRef_from_Var(instance.optimise_variable));
+          BuildCon::getAnyVarRefFromVar(instance.optimise_variable));
   }
 
   vector<vector<AnyVarRef>>& print_matrix = getState().getPrintMatrix();
@@ -59,7 +59,7 @@ void BuildCSP(CSPInstance& instance) {
   // Reserve room in vector - no necessary but more efficent.
   print_matrix.reserve(instance.print_matrix.size());
   for(UnsignedSysInt i = 0; i < instance.print_matrix.size(); ++i)
-    print_matrix.push_back(BuildCon::get_AnyVarRef_from_Var(instance.print_matrix[i]));
+    print_matrix.push_back(BuildCon::getAnyVarRefFromVar(instance.print_matrix[i]));
 
   if(getOptions().dumptreeobj) {
     getOptions().dumptreeobj->initialVariables(getVars().getAllVars());
@@ -91,56 +91,56 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
 
   vector<AnyVarRef> preprocess_vars;
 
-  for(SysInt i = (SysInt)instance.search_order.size() - 1; i >= 0; --i) {
+  for(SysInt i = (SysInt)instance.searchOrder.size() - 1; i >= 0; --i) {
     if(args.order != ORDER_NONE) {
       //  For each varorder block, overwrite with order given on the command
       //  line.
-      instance.search_order[i].order = args.order;
-      instance.search_order[i].limit = args.limit;
+      instance.searchOrder[i].order = args.order;
+      instance.searchOrder[i].limit = args.limit;
     }
 
     if(args.valorder != ValOrder(VALORDER_NONE)) {
       //  For each varorder block, overwrite with order given on the command
       //  line.
-      for(UnsignedSysInt j = 0; j < instance.search_order[i].val_order.size(); ++j) {
-        instance.search_order[i].val_order[j] = args.valorder;
+      for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
+        instance.searchOrder[i].valOrder[j] = args.valorder;
       }
     }
 
-    for(SysInt j = 0; j < (SysInt)instance.search_order[i].var_order.size();
+    for(SysInt j = 0; j < (SysInt)instance.searchOrder[i].varOrder.size();
         j++) { // cobble together all the varorder blocks for preprocessing.
-      preprocess_vars.push_back(get_AnyVarRef_from_Var(instance.search_order[i].var_order[j]));
+      preprocess_vars.push_back(getAnyVarRefFromVar(instance.searchOrder[i].varOrder[j]));
     }
 
     if(getOptions().randomiseValvarorder) {
 
-      std::random_shuffle(instance.search_order[i].var_order.begin(),
-                          instance.search_order[i].var_order.end());
+      std::random_shuffle(instance.searchOrder[i].varOrder.begin(),
+                          instance.searchOrder[i].varOrder.end());
 
-      for(UnsignedSysInt j = 0; j < instance.search_order[i].val_order.size(); ++j) {
-        instance.search_order[i].val_order[j] = VALORDER_RANDOM;
+      for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
+        instance.searchOrder[i].valOrder[j] = VALORDER_RANDOM;
       }
     }
 
-    D_ASSERT(instance.search_order[i].var_order.size() ==
-             instance.search_order[i].val_order.size());
+    D_ASSERT(instance.searchOrder[i].varOrder.size() ==
+             instance.searchOrder[i].valOrder.size());
   }
 
   shared_ptr<Controller::SearchManager> sm;
 
   if(instance.neighbourhoodContainer) {
 
-    sm = MakeNeighbourhoodSearch(args.prop_method, instance.search_order,
+    sm = MakeNeighbourhoodSearch(args.propMethod, instance.searchOrder,
                                  *instance.neighbourhoodContainer);
   } else {
     if(getOptions().restart.active) {
       if(getOptions().sollimit != 1) {
         D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
       }
-      // sm = Controller::make_restart_search_manager(args.prop_method, instance.search_order);
-      sm = Controller::make_restart_new_search_manager(args.prop_method, instance.search_order);
+      // sm = Controller::make_restart_search_manager(args.propMethod, instance.searchOrder);
+      sm = Controller::make_restart_new_search_manager(args.propMethod, instance.searchOrder);
     } else {
-      sm = Controller::make_search_manager(args.prop_method, instance.search_order);
+      sm = Controller::makeSearch_manager(args.propMethod, instance.searchOrder);
     }
   }
 
@@ -149,11 +149,11 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   try {
 
     try {
-      PropogateCSP(std::max(args.preprocess, args.prop_method), preprocess_vars,
+      PropogateCSP(std::max(args.preprocess, args.propMethod), preprocess_vars,
                    !getOptions().silent);
     } catch(EndOfSearch eos) {
       if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
-        dump_solver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
+        dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
       throw;
     }
 
@@ -161,7 +161,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
                                                      getTableOut(), !getOptions().silent);
 
     if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
-      dump_solver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
+      dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
 
     if(!getState().isFailed()) {
       sm->search();
@@ -192,6 +192,6 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
 
 #ifdef MORE_SEARCH_INFO
   if(!getOptions().silent)
-    print_search_info();
+    printSearchInfo();
 #endif
 }

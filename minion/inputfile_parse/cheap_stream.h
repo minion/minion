@@ -34,84 +34,80 @@
 //#define P(x) cout << x << endl
 
 class CheapStream {
-  const char* stream_start;
-  const char* stream_end;
-  const char* stream_pos;
+  const char* streamStart;
+  const char* streamEnd;
+  const char* streamPos;
 
   std::string s;
 
 public:
-  bool fail_flag;
+  bool failFlag;
 
   SysInt getRawPos() {
-    return stream_pos - stream_start;
+    return streamPos - streamStart;
   }
 
-  const std::string& getRaw_string() {
-    return s;
+  void resetStream() {
+    streamPos = streamStart;
+    failFlag = false;
   }
 
-  void reset_stream() {
-    stream_pos = stream_start;
-    fail_flag = false;
-  }
-
-  CheapStream(const char* _stream_start, const char* _stream_end)
-      : stream_start(_stream_start),
-        stream_end(_stream_end),
-        stream_pos(_stream_start),
-        fail_flag(false) {}
+  CheapStream(const char* _streamStart, const char* _streamEnd)
+      : streamStart(_streamStart),
+        streamEnd(_streamEnd),
+        streamPos(_streamStart),
+        failFlag(false) {}
 
   template <typename IStream>
-  CheapStream(IStream& i, const char* filename = "") : fail_flag(false) {
+  CheapStream(IStream& i, const char* filename = "") : failFlag(false) {
     std::ostringstream iss;
     iss << i.rdbuf();
     s = iss.str();
     if(!s.empty()) {
-      stream_start = &*s.begin();
-      stream_end = &*s.begin() + s.length();
-      stream_pos = stream_start;
+      streamStart = &*s.begin();
+      streamEnd = &*s.begin() + s.length();
+      streamPos = streamStart;
     } else {
-      stream_start = stream_end = stream_pos = NULL;
+      streamStart = streamEnd = streamPos = NULL;
     }
   }
 
   bool fail() {
-    return fail_flag;
+    return failFlag;
   }
 
   bool operator!() {
-    return stream_pos == NULL;
+    return streamPos == NULL;
   }
 
   char get() {
-    char x = *stream_pos;
+    char x = *streamPos;
     P("Get '" << x << "'");
-    stream_pos++;
+    streamPos++;
     return x;
   }
 
   char peek() {
-    return *stream_pos;
+    return *streamPos;
   }
 
   void putback(char c) {
-    stream_pos--;
+    streamPos--;
   }
 
   bool eof() {
-    return stream_pos == stream_end;
+    return streamPos == streamEnd;
   }
 
   string getline(char deliminator = '\n') {
     std::vector<char> output;
-    while(stream_pos != stream_end) {
-      if(*stream_pos == deliminator) {
-        stream_pos++;
+    while(streamPos != streamEnd) {
+      if(*streamPos == deliminator) {
+        streamPos++;
         return string(output.begin(), output.end());
       } else {
-        output.push_back(*stream_pos);
-        stream_pos++;
+        output.push_back(*streamPos);
+        streamPos++;
       }
     }
     // reached end of stream
@@ -137,7 +133,7 @@ void getNum(CheapStream& cs, T& ret) {
   if(cs.peek() >= '0' && cs.peek() <= '9') {
     i *= (cs.get() - '0');
   } else {
-    cs.fail_flag = true;
+    cs.failFlag = true;
     return;
   }
 
@@ -146,7 +142,7 @@ void getNum(CheapStream& cs, T& ret) {
     i = i * 10 + c - '0';
     if(i > limit) {
       std::cerr << "Magnitude of number too large!\n";
-      cs.fail_flag = true;
+      cs.failFlag = true;
       return;
     }
     P(": '" << c << "' :" << i);

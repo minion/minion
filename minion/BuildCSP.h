@@ -31,14 +31,14 @@ struct SearchMethod {
   ValOrder valorder;
   unsigned int limit; // for static limited.
   PropagationLevel preprocess;
-  PropagationLevel prop_method;
-  UnsignedSysInt random_seed;
+  PropagationLevel propMethod;
+  UnsignedSysInt randomSeed;
   SearchMethod()
       : order(ORDER_NONE),
         valorder(VALORDER_NONE),
         preprocess(PropLevel_None),
-        prop_method(PropLevel_GAC),
-        random_seed(std::random_device{}()) {}
+        propMethod(PropLevel_GAC),
+        randomSeed(std::random_device{}()) {}
 };
 
 void BuildCSP(ProbSpec::CSPInstance& instance);

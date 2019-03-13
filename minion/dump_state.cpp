@@ -20,7 +20,7 @@
 
 #include "minion.h"
 
-bool constraint_entailed(AbstractConstraint* c) {
+bool constraintEntailed(AbstractConstraint* c) {
   AbstractConstraint* rev_c = c->reverseConstraint();
   bool flag;
   GET_ASSIGNMENT(a, rev_c);
@@ -32,16 +32,16 @@ inline string getNameFromVar(const T& v) {
   return getState().getInstance()->vars.getName(v.getBaseVar());
 }
 
-void dump_searchorder(const SearchOrder& order, ostream& os) {
+void dumpSearchorder(const SearchOrder& order, ostream& os) {
 
-  vector<SysInt> non_assigned_vars;
-  for(int i = 0; i < (SysInt)order.var_order.size(); ++i) {
-    AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(order.var_order[i]);
+  vector<SysInt> nonAssignedVars;
+  for(int i = 0; i < (SysInt)order.varOrder.size(); ++i) {
+    AnyVarRef v = BuildCon::getAnyVarRefFromVar(order.varOrder[i]);
     // XXX : To get tester to work.. for now. if(!v.isAssigned())
-    non_assigned_vars.push_back(i);
+    nonAssignedVars.push_back(i);
   }
 
-  if(non_assigned_vars.size() == 0)
+  if(nonAssignedVars.size() == 0)
     return;
 
   os << "VARORDER ";
@@ -65,8 +65,8 @@ void dump_searchorder(const SearchOrder& order, ostream& os) {
 
   os << "[";
   bool first = true;
-  for(SysInt i = 0; i < (SysInt)non_assigned_vars.size(); ++i) {
-    AnyVarRef v = BuildCon::get_AnyVarRef_from_Var(order.var_order[non_assigned_vars[i]]);
+  for(SysInt i = 0; i < (SysInt)nonAssignedVars.size(); ++i) {
+    AnyVarRef v = BuildCon::getAnyVarRefFromVar(order.varOrder[nonAssignedVars[i]]);
     // XXX : see above! D_ASSERT(!v.isAssigned());
     if(first)
       first = false;
@@ -81,12 +81,12 @@ void dump_searchorder(const SearchOrder& order, ostream& os) {
 
   os << "VALORDER [";
   first = true;
-  for(SysInt i = 0; i < (SysInt)non_assigned_vars.size(); ++i) {
+  for(SysInt i = 0; i < (SysInt)nonAssignedVars.size(); ++i) {
     if(first)
       first = false;
     else
       os << ",";
-    switch(order.val_order[non_assigned_vars[i]].type) {
+    switch(order.valOrder[nonAssignedVars[i]].type) {
     case VALORDER_ASCEND: os << "a"; break;
     case VALORDER_DESCEND: os << "d"; break;
     case VALORDER_RANDOM: os << "r"; break;
@@ -96,7 +96,7 @@ void dump_searchorder(const SearchOrder& order, ostream& os) {
   os << "]\n";
 }
 
-void justDomain_dump(ostream& os) {
+void justDomainDump(ostream& os) {
   VariableContainer& vc = getVars();
   vector<AnyVarRef> vars;
   // booleans;
@@ -131,11 +131,11 @@ void justDomain_dump(ostream& os) {
             else
               os << ",";
 
-            DomainInt range_start = val;
+            DomainInt rangeStart = val;
             ++val;
             while(vars[i].inDomain(val))
               ++val;
-            os << range_start << ".." << (val - 1);
+            os << rangeStart << ".." << (val - 1);
           }
         }
       }
@@ -144,9 +144,9 @@ void justDomain_dump(ostream& os) {
   }
 }
 
-void dump_solver(ostream& os, bool justDomains) {
+void dumpSolver(ostream& os, bool justDomains) {
   if(justDomains) {
-    justDomain_dump(os);
+    justDomainDump(os);
     return;
   }
   os << "# Redumped during search" << endl;
@@ -232,10 +232,10 @@ void dump_solver(ostream& os, bool justDomains) {
 
   // tuples
   os << "**TUPLELIST**" << endl;
-  SearchState& search_state = getState();
+  SearchState& searchState = getState();
 
-  for(SysInt i = 0; i < search_state.getTupleListContainer()->size(); ++i) {
-    TupleList* tl = search_state.getTupleListContainer()->getTupleList(i);
+  for(SysInt i = 0; i < searchState.getTupleListContainer()->size(); ++i) {
+    TupleList* tl = searchState.getTupleListContainer()->getTupleList(i);
     os << tl->getName() << " " << tl->size() << " " << tl->tupleSize() << "\n";
     for(SysInt i = 0; i < tl->size() * tl->tupleSize(); ++i) {
       os << (tl->getPointer())[i] << " ";
@@ -245,8 +245,8 @@ void dump_solver(ostream& os, bool justDomains) {
 
   os << "**SHORTTUPLELIST**" << endl;
 
-  for(SysInt i = 0; i < search_state.getShortTupleListContainer()->size(); ++i) {
-    ShortTupleList* tl = search_state.getShortTupleListContainer()->getShortTupleList(i);
+  for(SysInt i = 0; i < searchState.getShortTupleListContainer()->size(); ++i) {
+    ShortTupleList* tl = searchState.getShortTupleListContainer()->getShortTupleList(i);
     os << tl->getName() << " " << tl->size() << "\n";
 
     const vector<vector<pair<SysInt, DomainInt>>>& tupleRef = *(tl->tuplePtr());
@@ -282,8 +282,8 @@ void dump_solver(ostream& os, bool justDomains) {
   os << ConOutput::print_vars(getState().getPrintMatrix());
   os << endl;
 
-  for(UnsignedSysInt i = 0; i < getState().getInstance()->search_order.size(); ++i) {
-    dump_searchorder(getState().getInstance()->search_order[i], os);
+  for(UnsignedSysInt i = 0; i < getState().getInstance()->searchOrder.size(); ++i) {
+    dumpSearchorder(getState().getInstance()->searchOrder[i], os);
   }
 
   os << "**CONSTRAINTS**" << endl;
@@ -291,24 +291,24 @@ void dump_solver(ostream& os, bool justDomains) {
   if(getState().isFailed())
     os << "false()" << endl;
   else {
-    for(UnsignedSysInt i = 0; i < search_state.getConstraintList().size(); ++i) {
-      AbstractConstraint* c = search_state.getConstraintList()[i];
+    for(UnsignedSysInt i = 0; i < searchState.getConstraintList().size(); ++i) {
+      AbstractConstraint* c = searchState.getConstraintList()[i];
       // If it wasn't for the fact we are going to exit straight after printing
       // this out, this would be a disaster!
-      if(!constraint_entailed(c))
-        os << search_state.getConstraintList()[i]->fullOutputName() << "\n";
+      if(!constraintEntailed(c))
+        os << searchState.getConstraintList()[i]->fullOutputName() << "\n";
     }
   }
 
   os << "**EOF**" << endl;
 }
 
-void dump_solver(string filename, bool justDomains) {
+void dumpSolver(string filename, bool justDomains) {
   if(filename == "" || filename == "--") {
-    dump_solver(cout, justDomains);
+    dumpSolver(cout, justDomains);
   } else {
     ofstream ofs(filename.c_str());
-    dump_solver(ofs, justDomains);
+    dumpSolver(ofs, justDomains);
   }
   exit(0);
 }

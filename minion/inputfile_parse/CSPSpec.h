@@ -460,26 +460,26 @@ public:
 };
 
 struct SearchOrder {
-  vector<Var> var_order;
-  vector<ValOrder> val_order;
+  vector<Var> varOrder;
+  vector<ValOrder> valOrder;
   VarOrderEnum order;
   unsigned int limit;
   bool find_one_assignment;
 
   SearchOrder() : order(ORDER_ORIGINAL), find_one_assignment(false) {}
 
-  SearchOrder(const vector<Var>& _var_order)
-      : var_order(_var_order), order(ORDER_ORIGINAL), find_one_assignment(false) {}
+  SearchOrder(const vector<Var>& _varOrder)
+      : varOrder(_varOrder), order(ORDER_ORIGINAL), find_one_assignment(false) {}
 
-  SearchOrder(const vector<Var>& _var_order, VarOrderEnum _order, bool _find_one_assignment = false)
-      : var_order(_var_order), order(_order), find_one_assignment(_find_one_assignment) {}
+  SearchOrder(const vector<Var>& _varOrder, VarOrderEnum _order, bool _find_one_assignment = false)
+      : varOrder(_varOrder), order(_order), find_one_assignment(_find_one_assignment) {}
 
   void setupValueOrder() {
-    if(val_order.empty())
-      val_order.resize(var_order.size(), VALORDER_ASCEND);
-    while(val_order.size() < var_order.size())
-      val_order.push_back(val_order.back());
-    D_ASSERT(val_order.size() == var_order.size());
+    if(valOrder.empty())
+      valOrder.resize(varOrder.size(), VALORDER_ASCEND);
+    while(valOrder.size() < varOrder.size())
+      valOrder.push_back(valOrder.back());
+    D_ASSERT(valOrder.size() == varOrder.size());
   }
 };
 
@@ -490,7 +490,7 @@ struct CSPInstance {
   shared_ptr<TupleListContainer> tupleListContainer;
   shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
-  vector<SearchOrder> search_order;
+  vector<SearchOrder> searchOrder;
   vector<Var> permutation;
   vector<Var> sym_order;
 

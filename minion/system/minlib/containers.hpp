@@ -121,14 +121,14 @@ std::vector<typename Con::value_type> join_to_vec(const Con& vec1, const Args&..
 }
 
 template <typename FirstArg, typename... Args>
-std::set<FirstArg> make_set(const FirstArg& fa, const Args&... args) {
+std::set<FirstArg> makeSet(const FirstArg& fa, const Args&... args) {
   std::set<FirstArg> s;
   do_insert(s, fa, args...);
   return s;
 }
 
 template <typename Type>
-std::set<Type> make_set() {
+std::set<Type> makeSet() {
   return std::set<Type>();
 }
 

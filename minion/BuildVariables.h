@@ -29,13 +29,13 @@
 namespace BuildCon {
 
 /// Helper function used in a few places.
-AnyVarRef get_AnyVarRef_from_Var(Var v);
+AnyVarRef getAnyVarRefFromVar(Var v);
 std::pair<DomainInt, DomainInt> get_initialBounds_from_Var(Var v);
 
 /// Helper function used in a few places.
-vector<AnyVarRef> get_AnyVarRef_from_Var(const vector<Var>& v);
+vector<AnyVarRef> getAnyVarRefFromVar(const vector<Var>& v);
 
-vector<vector<AnyVarRef>> get_AnyVarRef_from_Var(const vector<vector<Var>>& v);
+vector<vector<AnyVarRef>> getAnyVarRefFromVar(const vector<vector<Var>>& v);
 
 /// Create all the variables used in the CSP.
 void buildVariables(const ProbSpec::VarContainer& vars);

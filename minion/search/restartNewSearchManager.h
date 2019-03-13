@@ -2,7 +2,7 @@
 
 namespace Controller {
 struct RestartNewSearchManager : public Controller::SearchManager {
-  PropagationLevel prop_method;
+  PropagationLevel propMethod;
   vector<SearchOrder> initialOrder;
 
   void doASearch(const vector<SearchOrder>& order, int backtracklimit) {
@@ -11,8 +11,8 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     int depth = Controller::get_world_depth();
     Controller::world_push();
 
-    auto prop = Controller::make_propagator(prop_method);
-    auto vo = Controller::make_search_order_multiple(order);
+    auto prop = Controller::make_propagator(propMethod);
+    auto vo = Controller::makeSearchOrder_multiple(order);
 
     std::shared_ptr<Controller::StandardSearchManager> sm;
 
@@ -66,14 +66,14 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     Controller::world_popToDepth(depth);
   }
 
-  RestartNewSearchManager(PropagationLevel _prop_method, const vector<SearchOrder>& _order)
-      : prop_method(_prop_method), initialOrder(_order) {}
+  RestartNewSearchManager(PropagationLevel _propMethod, const vector<SearchOrder>& _order)
+      : propMethod(_propMethod), initialOrder(_order) {}
 
   vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
     vector<SearchOrder> searchOrder(initialOrder);
     for(auto& so : searchOrder) {
-      for(int i = 0; i < so.val_order.size(); i++) {
-        so.val_order[i] = ValOrder(VALORDER_RANDOM, bias);
+      for(int i = 0; i < so.valOrder.size(); i++) {
+        so.valOrder[i] = ValOrder(VALORDER_RANDOM, bias);
       }
     }
     return searchOrder;
@@ -94,9 +94,9 @@ struct RestartNewSearchManager : public Controller::SearchManager {
   }
 };
 
-shared_ptr<Controller::SearchManager> make_restart_new_search_manager(PropagationLevel prop_method,
+shared_ptr<Controller::SearchManager> make_restart_new_search_manager(PropagationLevel propMethod,
                                                                       vector<SearchOrder> order) {
-  return shared_ptr<Controller::SearchManager>(new RestartNewSearchManager(prop_method, order));
+  return shared_ptr<Controller::SearchManager>(new RestartNewSearchManager(propMethod, order));
 }
 
 } // namespace Controller

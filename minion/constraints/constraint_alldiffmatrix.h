@@ -136,12 +136,12 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     }
 
     for(SysInt j = 0; j < squaresize; j++) {
-      std::vector<VarRef> col_varArray;
+      std::vector<VarRef> colVarArray;
       for(SysInt i = 0; i < squaresize; i++)
-        col_varArray.push_back(varArray[i * squaresize + j]);
+        colVarArray.push_back(varArray[i * squaresize + j]);
 
       NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>* t =
-          new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(col_varArray,
+          new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(colVarArray,
                                                                                  value, one);
       con.push_back((AbstractConstraint*)t);
     }

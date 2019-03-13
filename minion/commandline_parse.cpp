@@ -201,8 +201,8 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-prop-node") || command == string("-X-prop-node")) {
       INCREMENT_i(-X - prop - node);
       string prop_mode(argv[i]);
-      args.prop_method = GetPropMethodFromString(prop_mode);
-      if(args.prop_method.type == PropLevel_None) {
+      args.propMethod = GetPropMethodFromString(prop_mode);
+      if(args.propMethod.type == PropLevel_None) {
         outputFatalError("Cannot use 'None' for -prop-node, must propagate at each node!");
       }
     }
@@ -529,7 +529,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     */
     else if(command == string("-randomseed")) {
       INCREMENT_i(-randomseed);
-      args.random_seed = atoi(argv[i]);
+      args.randomSeed = atoi(argv[i]);
     }
     /** @help switches;-tableout Description
     Append a line of data about the current run of minion to a named file.

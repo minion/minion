@@ -202,7 +202,7 @@ struct MinionInstancePrinter {
     }
   }
 
-  void print_search_info(const vector<Var>& var_vec) {
+  void printSearchInfo(const vector<Var>& var_vec) {
     set<Var> vars(var_vec.begin(), var_vec.end());
 
     if(csp.is_optimisation_problem && vars.count(csp.optimise_variable)) {
@@ -214,40 +214,40 @@ struct MinionInstancePrinter {
       oss << endl;
     }
 
-    for(SysInt i = 0; i < (SysInt)csp.search_order.size(); ++i) {
+    for(SysInt i = 0; i < (SysInt)csp.searchOrder.size(); ++i) {
       // Filter the var and val orders.
 
-      vector<Var> var_order = csp.search_order[i].var_order;
-      vector<ValOrder> val_order = csp.search_order[i].val_order;
+      vector<Var> varOrder = csp.searchOrder[i].varOrder;
+      vector<ValOrder> valOrder = csp.searchOrder[i].valOrder;
 
       SysInt pos = 0;
-      while(pos < (SysInt)var_order.size()) {
-        if(vars.count(var_order[pos]) == 0) {
-          var_order.erase(var_order.begin() + pos);
-          val_order.erase(val_order.begin() + pos);
+      while(pos < (SysInt)varOrder.size()) {
+        if(vars.count(varOrder[pos]) == 0) {
+          varOrder.erase(varOrder.begin() + pos);
+          valOrder.erase(valOrder.begin() + pos);
         } else
           pos++;
       }
 
-      if(!var_order.empty()) {
+      if(!varOrder.empty()) {
         oss << "VARORDER ";
-        if(csp.search_order[i].find_one_assignment) {
+        if(csp.searchOrder[i].find_one_assignment) {
           oss << "AUX ";
         }
 
-        if(csp.search_order[i].order != ORDER_ORIGINAL) {
-          oss << csp.search_order[i].order << " ";
+        if(csp.searchOrder[i].order != ORDER_ORIGINAL) {
+          oss << csp.searchOrder[i].order << " ";
         }
 
-        print_instance(var_order);
+        print_instance(varOrder);
         oss << endl;
       }
 
-      if(!val_order.empty()) {
+      if(!valOrder.empty()) {
         oss << "VALORDER ";
         vector<string> output_vars;
-        for(SysInt j = 0; j < (SysInt)val_order.size(); ++j)
-          switch(val_order[j].type) {
+        for(SysInt j = 0; j < (SysInt)valOrder.size(); ++j)
+          switch(valOrder[j].type) {
           case VALORDER_NONE: D_FATAL_ERROR("Invalid value ordering");
           case VALORDER_ASCEND: output_vars.push_back("a"); break;
           case VALORDER_DESCEND: output_vars.push_back("d"); break;
@@ -286,15 +286,15 @@ struct MinionInstancePrinter {
     }
   }
 
-  void build_instance() {
-    build_instance(csp.constraints, csp.vars.getAllVars(), true);
+  void buildInstance() {
+    buildInstance(csp.constraints, csp.vars.getAllVars(), true);
   }
 
-  void build_instance(bool printEof) {
-    build_instance(csp.constraints, csp.vars.getAllVars(), printEof);
+  void buildInstance(bool printEof) {
+    buildInstance(csp.constraints, csp.vars.getAllVars(), printEof);
   }
 
-  void build_instance(const vector<Var>& varlist_vec, bool printEof) {
+  void buildInstance(const vector<Var>& varlist_vec, bool printEof) {
     list<ConstraintBlob> new_constraint_list;
 
     set<Var> varlist(varlist_vec.begin(), varlist_vec.end());
@@ -307,10 +307,10 @@ struct MinionInstancePrinter {
         new_constraint_list.push_back(*it);
     }
 
-    build_instance(new_constraint_list, varlist_vec, printEof);
+    buildInstance(new_constraint_list, varlist_vec, printEof);
   }
 
-  void build_instance(const list<ConstraintBlob>& constraints, const vector<Var>& varlist,
+  void buildInstance(const list<ConstraintBlob>& constraints, const vector<Var>& varlist,
                       bool printEof) {
     oss << "MINION 3" << endl;
 
@@ -320,7 +320,7 @@ struct MinionInstancePrinter {
     print_instance(csp.vars, varlist);
 
     oss << "**SEARCH**" << endl;
-    print_search_info(varlist);
+    printSearchInfo(varlist);
 
     oss << "**TUPLELIST**" << endl;
     print_tuples();
