@@ -87,7 +87,7 @@ string pad(string s, SysInt length = 18) {
 }
 
 // There must be a neater way of doing this...
-string pad_start(string s, SysInt length = 12) {
+string padStart(string s, SysInt length = 12) {
   string output;
   output.resize(length - s.size(), ' ');
   return output + s;
@@ -108,8 +108,8 @@ void PropInfoAddone(Info_PropEvent type) {
 void printSearchInfo() {
   cout << pad("");
   for(SysInt i = 0; i < VarTypeCount; ++i)
-    cout << pad_start(VarNames[i]);
-  cout << pad_start("Total");
+    cout << padStart(VarNames[i]);
+  cout << padStart("Total");
   cout << endl;
 
   for(SysInt j = 0; j < VarEventCount; ++j) {

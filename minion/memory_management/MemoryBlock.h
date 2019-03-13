@@ -163,18 +163,18 @@ public:
   }
 
 private:
-  void copyMemBlock(char* location, const BacktrackData& data, size_t copy_start,
+  void copyMemBlock(char* location, const BacktrackData& data, size_t copyStart,
                     size_t copy_length) {
-    D_ASSERT(data.total_bytes() >= copy_start + copy_length);
-    // memcpy(location, data.base + copy_start, copy_length);
+    D_ASSERT(data.total_bytes() >= copyStart + copy_length);
+    // memcpy(location, data.base + copyStart, copy_length);
 
     size_t data_copy = 0;
     // If these is some data to copy, then we do so. We write the code this way
     // to avoid UnsignedSysInt underflow.
-    if(copy_start <= data.total_bytes())
-      data_copy = std::min(data.total_bytes() - copy_start, copy_length);
+    if(copyStart <= data.total_bytes())
+      data_copy = std::min(data.total_bytes() - copyStart, copy_length);
 
-    memcpy(location, data.data + copy_start, data_copy);
+    memcpy(location, data.data + copyStart, data_copy);
     memset(location + data_copy, 0, copy_length - data_copy);
   }
 

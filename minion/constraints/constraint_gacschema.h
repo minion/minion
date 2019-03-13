@@ -55,15 +55,15 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     DomainInt* tupleData = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt* tuple_start = tupleData + i * tupleSize;
+      DomainInt* tupleStart = tupleData + i * tupleSize;
       bool success = true;
       for(SysInt j = 0; j < tupleSize && success; ++j) {
-        if(!vars[j].inDomain(tuple_start[j]))
+        if(!vars[j].inDomain(tupleStart[j]))
           success = false;
       }
       if(success) {
         for(SysInt i = 0; i < tupleSize; ++i)
-          assignment.push_back(make_pair(i, tuple_start[i]));
+          assignment.push_back(make_pair(i, tupleStart[i]));
         return true;
       }
     }

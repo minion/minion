@@ -106,16 +106,16 @@ public:
     DomainInt* tupleData = data->getPointer();
 
     for(SysInt i = 0; i < length; ++i) {
-      DomainInt* tuple_start = tupleData + i * tupleSize;
+      DomainInt* tupleStart = tupleData + i * tupleSize;
       bool success = true;
-      if(tuple_start[checked_cast<SysInt>(lit.var)] != lit.val)
+      if(tupleStart[checked_cast<SysInt>(lit.var)] != lit.val)
         success = false;
       for(SysInt j = 0; j < tupleSize && success; ++j) {
-        if(!vars[j].inDomain(tuple_start[j]))
+        if(!vars[j].inDomain(tupleStart[j]))
           success = false;
       }
       if(success) {
-        std::copy(tuple_start, tuple_start + tupleSize, scratch_tuple.begin());
+        std::copy(tupleStart, tupleStart + tupleSize, scratch_tuple.begin());
         return &scratch_tuple;
       }
     }

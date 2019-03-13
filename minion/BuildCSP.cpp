@@ -50,7 +50,7 @@ void BuildCSP(CSPInstance& instance) {
       Controller::optimise_minimiseVar(
           BuildCon::getAnyVarRefFromVar(instance.optimiseVariable));
     else
-      Controller::optimise_maximiseVar(
+      Controller::optimiseMaximiseVar(
           BuildCon::getAnyVarRefFromVar(instance.optimiseVariable));
   }
 

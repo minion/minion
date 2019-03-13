@@ -436,8 +436,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt array_start = max(DomainInt(0), indexvar.min());
-    DomainInt array_end = min(DomainInt(varArray.size()) - 1, indexvar.max());
+    DomainInt arrayStart = max(DomainInt(0), indexvar.min());
+    DomainInt arrayEnd = min(DomainInt(varArray.size()) - 1, indexvar.max());
 
     if(undefMapsZero) {
       if(resultvar.inDomain(0)) {
@@ -454,11 +454,11 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       }
     }
 
-    for(SysInt i = checked_cast<SysInt>(array_start); i <= checked_cast<SysInt>(array_end); ++i) {
+    for(SysInt i = checked_cast<SysInt>(arrayStart); i <= checked_cast<SysInt>(arrayEnd); ++i) {
       if(indexvar.inDomain(i)) {
-        DomainInt dom_start = max(resultvar.min(), varArray[i].min());
-        DomainInt dom_end = min(resultvar.max(), varArray[i].max());
-        for(DomainInt domval = dom_start; domval <= dom_end; ++domval) {
+        DomainInt domStart = max(resultvar.min(), varArray[i].min());
+        DomainInt domEnd = min(resultvar.max(), varArray[i].max());
+        for(DomainInt domval = domStart; domval <= domEnd; ++domval) {
           if(varArray[i].inDomain(domval) && resultvar.inDomain(domval)) {
             // indexvar = i
             assignment.push_back(make_pair(varArray.size(), i));

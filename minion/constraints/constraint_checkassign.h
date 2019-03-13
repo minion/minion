@@ -171,8 +171,8 @@ struct CheckAssignConstraint : public AbstractConstraint {
       c[freeVar] = free_min;
       if(try_assignment(ret_box, c))
         return true;
-      DomainInt free_max = variables[freeVar].max();
-      c[freeVar] = free_max;
+      DomainInt freeMax = variables[freeVar].max();
+      c[freeVar] = freeMax;
       if(try_assignment(ret_box, c))
         return true;
 
@@ -185,9 +185,9 @@ struct CheckAssignConstraint : public AbstractConstraint {
           }
         }
       } else {
-        D_ASSERT(free_min != free_max);
+        D_ASSERT(free_min != freeMax);
         ret_box.push_back(make_pair(freeVar, free_min));
-        ret_box.push_back(make_pair(freeVar, free_max));
+        ret_box.push_back(make_pair(freeVar, freeMax));
         return true;
       }
     }

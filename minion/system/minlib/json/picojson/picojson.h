@@ -525,7 +525,7 @@ inline bool _parse_string(String& out, input<Iter>& in) {
 
 template <typename Context, typename Iter>
 inline bool _parse_array(Context& ctx, input<Iter>& in) {
-  if(!ctx.parse_array_start()) {
+  if(!ctx.parse_arrayStart()) {
     return false;
   }
   if(in.expect(']')) {
@@ -543,7 +543,7 @@ inline bool _parse_array(Context& ctx, input<Iter>& in) {
 
 template <typename Context, typename Iter>
 inline bool _parse_object(Context& ctx, input<Iter>& in) {
-  if(!ctx.parse_object_start()) {
+  if(!ctx.parse_objectStart()) {
     return false;
   }
   if(in.expect('}')) {
@@ -629,14 +629,14 @@ public:
   bool parse_string(input<Iter>&) {
     return false;
   }
-  bool parse_array_start() {
+  bool parse_arrayStart() {
     return false;
   }
   template <typename Iter>
   bool parse_array_item(input<Iter>&, size_t) {
     return false;
   }
-  bool parse_object_start() {
+  bool parse_objectStart() {
     return false;
   }
   template <typename Iter>
@@ -668,7 +668,7 @@ public:
     *out_ = value(string_type, false);
     return _parse_string(out_->get<std::string>(), in);
   }
-  bool parse_array_start() {
+  bool parse_arrayStart() {
     *out_ = value(array_type, false);
     return true;
   }
@@ -679,7 +679,7 @@ public:
     default_parse_context ctx(&a.back());
     return _parse(ctx, in);
   }
-  bool parse_object_start() {
+  bool parse_objectStart() {
     *out_ = value(object_type, false);
     return true;
   }
@@ -717,14 +717,14 @@ public:
     dummy_str s;
     return _parse_string(s, in);
   }
-  bool parse_array_start() {
+  bool parse_arrayStart() {
     return true;
   }
   template <typename Iter>
   bool parse_array_item(input<Iter>& in, size_t) {
     return _parse(*this, in);
   }
-  bool parse_object_start() {
+  bool parse_objectStart() {
     return true;
   }
   template <typename Iter>

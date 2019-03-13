@@ -99,7 +99,7 @@ public:
         }
 
         Trig_ConRef ref = dtl[pos];
-        if(!ref.empty() && (!is_root_node || ref.con->fullPropagate_done)) {
+        if(!ref.empty() && (!is_root_node || ref.con->fullPropagateDone)) {
           ref.propagate(delta);
         }
 

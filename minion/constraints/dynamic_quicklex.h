@@ -177,15 +177,15 @@ struct QuickLexDynamic : public AbstractConstraint {
     size_t arraySize = varArray1.size();
     for(size_t i = 0; i < arraySize; ++i) {
       DomainInt x_i_min = varArray1[i].min();
-      DomainInt y_i_max = varArray2[i].max();
+      DomainInt y_iMax = varArray2[i].max();
 
-      if(x_i_min > y_i_max) {
+      if(x_i_min > y_iMax) {
         return false;
       }
 
       assignment.push_back(make_pair(i, x_i_min));
-      assignment.push_back(make_pair(i + arraySize, y_i_max));
-      if(x_i_min < y_i_max)
+      assignment.push_back(make_pair(i + arraySize, y_iMax));
+      if(x_i_min < y_iMax)
         return true;
     }
 

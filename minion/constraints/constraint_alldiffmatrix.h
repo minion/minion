@@ -450,7 +450,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   vector<SysInt> curnodestack;
 
-  SysInt max_dfs;
+  SysInt maxDfs;
 
   SysInt varcount, valcount;
   // SysInt localmin,localmax;
@@ -461,7 +461,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     tstack.reserve(squaresize * 2);
     in_tstack.reserve(squaresize * 2);
     // visited.reserve(squaresize*2);
-    max_dfs = 1;
+    maxDfs = 1;
     dfsnum.resize(squaresize * 2);
     lowlink.resize(squaresize * 2);
 
@@ -475,7 +475,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     in_tstack.clear();
 
     visited.clear();
-    max_dfs = 1;
+    maxDfs = 1;
 
     // Make sure all rows and columns are visited by Tarjans.
 
@@ -500,9 +500,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     // toplevel is true iff this is the top level of the recursion.
     tstack.push_back(curnode);
     in_tstack.insert(curnode);
-    dfsnum[curnode] = max_dfs;
-    lowlink[curnode] = max_dfs;
-    max_dfs++;
+    dfsnum[curnode] = maxDfs;
+    lowlink[curnode] = maxDfs;
+    maxDfs++;
     visited.insert(curnode);
     ADMPRINT("Visiting node: " << curnode);
 

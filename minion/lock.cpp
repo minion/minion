@@ -36,7 +36,7 @@ void lock() {
     if(getState().isFailed())
       return;
     getState().getConstraintList()[i]->fullPropagate();
-    getState().getConstraintList()[i]->fullPropagate_done = true;
+    getState().getConstraintList()[i]->fullPropagateDone = true;
     if(getState().isFailed())
       return;
     // If queues not empty, more work to do.

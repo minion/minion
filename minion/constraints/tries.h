@@ -144,7 +144,7 @@ struct TupleTrie {
     initial_trie.resize(checked_cast<SysInt>(initial_trie.size() + values + 1));
 
     DomainInt currentVal = tuples(start_pos, depth);
-    DomainInt current_start = start_pos;
+    DomainInt currentStart = start_pos;
     // I trust this not to overflow, and can't be bothered with all the required
     // casts
     SysInt num_ofVal = 0;
@@ -157,10 +157,10 @@ struct TupleTrie {
           initial_trie[start_section + num_ofVal].offsetPtr = -1;
         } else {
           initial_trie[start_section + num_ofVal].offsetPtr = initial_trie.size();
-          buildTrie(current_start, i, depth + 1);
+          buildTrie(currentStart, i, depth + 1);
         }
         currentVal = tuples(i, depth);
-        current_start = i;
+        currentStart = i;
         num_ofVal++;
       }
     }
@@ -173,7 +173,7 @@ struct TupleTrie {
     else
       initial_trie[start_section + num_ofVal].offsetPtr = initial_trie.size();
 
-    buildTrie(current_start, end_pos, depth + 1);
+    buildTrie(currentStart, end_pos, depth + 1);
 
     assert(num_ofVal + 1 == values);
     SysInt checkValues = checked_cast<SysInt>(values);

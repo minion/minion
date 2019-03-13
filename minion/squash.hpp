@@ -73,11 +73,11 @@ std::vector<std::set<DomainInt>> gatherDomains(const Tuples& tuples) {
 }
 
 inline std::set<Vint> full_squeeze_tuples(std::set<Vint> tuples,
-                                          const std::vector<std::set<DomainInt>>& domain_max,
+                                          const std::vector<std::set<DomainInt>>& domainMax,
                                           bool eager) {
   std::set<Vint> constraint;
   while(true) {
-    std::pair<std::set<Vint>, std::set<Vint>> pair_ret = squeeze_tuples(tuples, domain_max, eager);
+    std::pair<std::set<Vint>, std::set<Vint>> pair_ret = squeeze_tuples(tuples, domainMax, eager);
     for(std::set<Vint>::iterator it = pair_ret.first.begin(); it != pair_ret.first.end(); ++it)
       constraint.insert(*it);
     if(pair_ret.second.empty())

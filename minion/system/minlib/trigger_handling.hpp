@@ -35,7 +35,7 @@ Event getTrigger() {
 }
 } // namespace TriggerEvent
 
-void ctrlc_functionTrigger(int /* signum */) {
+void ctrlCFunctionTrigger(int /* signum */) {
   TriggerEvent::setTrigger(TriggerEvent::ctrl_c);
 }
 
@@ -59,7 +59,7 @@ void setupTriggers(bool timeout_active,
   sigaction(SIGXCPU, &act, NULL);
   sigaction(SIGALRM, &act, NULL);
 
-  act.sa_handler = ctrlc_functionTrigger;
+  act.sa_handler = ctrlCFunctionTrigger;
   sigaction(SIGINT, &act, NULL);
 
   if(timeout_active) {

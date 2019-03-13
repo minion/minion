@@ -435,10 +435,10 @@ struct SRFBranch : VariableOrder {
       DomainInt minval = varOrder[i].min();
 
       DomainInt original_minval = varOrder[i].initialMin();
-      DomainInt original_maxval = varOrder[i].initialMax();
+      DomainInt originalMaxval = varOrder[i].initialMax();
 
       float new_ratio = (checked_cast<float>(maxval - minval) * 1.0) /
-                        checked_cast<float>(original_maxval - original_minval);
+                        checked_cast<float>(originalMaxval - original_minval);
       if((maxval != minval) && (new_ratio < ratio)) {
         ratio = new_ratio;
         smallestDom = i;

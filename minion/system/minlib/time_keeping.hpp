@@ -2,7 +2,7 @@
 #define TIME_KEEPING_HFDAFAD
 
 #ifdef NO_SYSTEM
-inline long double init_start_wall_time(int = 0) {
+inline long double initStart_wall_time(int = 0) {
   return 0;
 }
 
@@ -22,7 +22,7 @@ inline long double get_sys_time() {
   return 0;
 }
 
-inline long get_max_rss() {
+inline long getMax_rss() {
   return 0;
 }
 #else
@@ -59,7 +59,7 @@ inline long double get_sys_time() {
     abort();
 }
 
-inline long get_max_rss() {
+inline long getMax_rss() {
   // FIXME: implement me
   return 0;
 }
@@ -73,11 +73,11 @@ inline long get_max_rss() {
 
 // This function is a horrible hack, to let us avoid nasty global variables
 // leaking out of this file.
-// If you want to call 'get_wall_time', then you must call init_start_wall_time
+// If you want to call 'get_wall_time', then you must call initStart_wall_time
 // first, perferably
 // as close to the start of main as possible.
 
-inline long double init_start_wall_time(int specialCheck = 0) {
+inline long double initStart_wall_time(int specialCheck = 0) {
   static long double start_time = 0;
   if(specialCheck == 0) {
     assert(start_time == 0);
@@ -97,7 +97,7 @@ inline long double get_wall_time() {
   gettimeofday(&t, NULL);
   long double current_time =
       static_cast<long double>(t.tv_sec) + static_cast<long double>(t.tv_usec) / 1000000.0;
-  return current_time - init_start_wall_time(1);
+  return current_time - initStart_wall_time(1);
 }
 
 inline long double getRaw_wall_time() {
@@ -124,7 +124,7 @@ inline long double get_sys_time() {
   return cpu_time;
 }
 
-inline long get_max_rss() {
+inline long getMax_rss() {
   rusage r;
   getrusage(RUSAGE_SELF, &r);
 #if __APPLE__ & __MACH__

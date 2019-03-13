@@ -19,8 +19,8 @@
  */
 
 class TimerClass {
-  double _internal_cpu_start_time;
-  double _internal_sys_start_time;
+  double _internal_cpuStart_time;
+  double _internal_sysStart_time;
   double _last_check_time;
   double start_wallclock;
 
@@ -31,14 +31,14 @@ public:
   }
 
   void startClock() {
-    _internal_cpu_start_time = get_cpu_time();
-    _internal_sys_start_time = get_sys_time();
-    _last_check_time = _internal_cpu_start_time;
+    _internal_cpuStart_time = get_cpu_time();
+    _internal_sysStart_time = get_sys_time();
+    _last_check_time = _internal_cpuStart_time;
     start_wallclock = getRaw_wall_time();
   }
 
   bool checkTimeout(unsigned seconds) {
-    return get_cpu_time() - _internal_cpu_start_time >= seconds;
+    return get_cpu_time() - _internal_cpuStart_time >= seconds;
   }
 
   template <typename Stream>
@@ -67,11 +67,11 @@ public:
 
     maybePrintTimestepStore(sout, time_name, store_name, tableout, toprint);
     if(toprint) {
-      sout << "Total Time: " << end_cpu_time - _internal_cpu_start_time << endl;
-      sout << "Total System Time: " << end_sys_time - _internal_sys_start_time << endl;
+      sout << "Total Time: " << end_cpu_time - _internal_cpuStart_time << endl;
+      sout << "Total System Time: " << end_sys_time - _internal_sysStart_time << endl;
       sout << "Total Wall Time: " << time_wallclock << endl;
-      sout << "Maximum RSS (kB): " << get_max_rss() << endl;
+      sout << "Maximum RSS (kB): " << getMax_rss() << endl;
     }
-    tableout.set(string("TotalTime"), end_cpu_time - _internal_cpu_start_time);
+    tableout.set(string("TotalTime"), end_cpu_time - _internal_cpuStart_time);
   }
 };

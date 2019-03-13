@@ -529,7 +529,7 @@ struct CTupleSTR : public AbstractConstraint {
       ssup.fill();
     }
 
-    vector<vector<vector<DomainInt>>>::iterator tup_start = sct->tuples.begin();
+    vector<vector<vector<DomainInt>>>::iterator tupStart = sct->tuples.begin();
 
     // We dealt with the first tuple, if we are in 'Short' mode.
     SysInt i = UseShort ? 1 : 0;
@@ -546,7 +546,7 @@ struct CTupleSTR : public AbstractConstraint {
     SysInt lim_cpy = checked_cast<SysInt>(limit);
     while(i < lim_cpy && ssup.size > 0) {
       const SysInt index = tupindices[i];
-      const vector<vector<DomainInt>>& tau = tup_start[index];
+      const vector<vector<DomainInt>>& tau = tupStart[index];
       // do stuff
       for(SysInt j = 0; j < ssup.size; j++) {
         const SysInt var = ssup.vals[j];

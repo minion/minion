@@ -710,24 +710,24 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
         SysInt tempidx = toiterate[i];
 
-        SysInt sccindex_start = varToSCCIndex[tempidx];
+        SysInt sccindexStart = varToSCCIndex[tempidx];
 
-        while(sccindex_start > 0 && SCCSplit.isMember(sccindex_start - 1)) {
-          sccindex_start--; // seek the first item in the SCC.
+        while(sccindexStart > 0 && SCCSplit.isMember(sccindexStart - 1)) {
+          sccindexStart--; // seek the first item in the SCC.
         }
 
-        if(!sccsToProcess.in(sccindex_start) &&
-           SCCSplit.isMember(sccindex_start)) // not singleton.
+        if(!sccsToProcess.in(sccindexStart) &&
+           SCCSplit.isMember(sccindexStart)) // not singleton.
         {
-          sccsToProcess.insert(sccindex_start);
+          sccsToProcess.insert(sccindexStart);
 #if DomainCounting || InternalDT
-          changedVars_per_scc[sccindex_start].clear();
+          changedVars_per_scc[sccindexStart].clear();
 #endif
         }
 #if DomainCounting || InternalDT
         // make a note of which changed vars are in the scc.
-        if(SCCSplit.isMember(sccindex_start)) // if not singleton..??
-          changedVars_per_scc[sccindex_start].push_back(tempidx);
+        if(SCCSplit.isMember(sccindexStart)) // if not singleton..??
+          changedVars_per_scc[sccindexStart].push_back(tempidx);
 #endif
       }
     }
@@ -736,10 +736,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       vector<SysInt>& toiterate = sccsToProcess.getlist();
       GCCPRINT("About to loop for sccsToProcess:" << toiterate);
       for(SysInt i = 0; i < (SysInt)toiterate.size(); i++) {
-        SysInt sccindex_start = toiterate[i];
+        SysInt sccindexStart = toiterate[i];
         vars_in_scc.clear();
         valsInSCC.clear();
-        for(SysInt j = sccindex_start; j < (numvars + numvals); j++) {
+        for(SysInt j = sccindexStart; j < (numvars + numvals); j++) {
           // copy vars and vals in the scc into two vectors.
           SysInt sccval = SCCs[j];
           if(sccval < numvars) {
@@ -777,7 +777,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #if DomainCounting || InternalDT // need to check through triggers to see if broken....
         {
           run_propagator = false;
-          vector<SysInt>& vars_changed = changedVars_per_scc[sccindex_start];
+          vector<SysInt>& vars_changed = changedVars_per_scc[sccindexStart];
 #if DomainCounting
           SysInt varcount = vars_in_scc.size();
           for(SysInt i = 0; i < (SysInt)vars_changed.size(); i++) {
@@ -816,7 +816,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
         if(run_propagator) {
           // cout << 1 << endl;
-          tarjan_recursive(sccindex_start, upper, lower, varvalmatching, usage);
+          tarjan_recursive(sccindexStart, upper, lower, varvalmatching, usage);
         } else {
           // cout << "Saved a call to tarjan's with dc/wl" << endl;
         }
@@ -1356,7 +1356,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   SysInt sccindex;
 
-  SysInt max_dfs;
+  SysInt maxDfs;
 
   SysInt varcount, valcount;
   // SysInt localmin,localmax;
@@ -1366,7 +1366,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     tstack.reserve(numnodes);
     in_tstack.reserve(numnodes);
     visited.reserve(numnodes);
-    max_dfs = 1;
+    maxDfs = 1;
     scc_split = false;
     dfsnum.resize(numnodes);
     lowlink.resize(numnodes);
@@ -1378,16 +1378,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // varinlocalmatching.reserve(numvars);
   }
 
-  void tarjan_recursive(SysInt sccindex_start, vector<SysInt>& upper, vector<SysInt>& lower,
+  void tarjan_recursive(SysInt sccindexStart, vector<SysInt>& upper, vector<SysInt>& lower,
                         vector<SysInt>& matching, vector<SysInt>& usage) {
     tstack.clear();
     in_tstack.clear();
 
     visited.clear();
-    max_dfs = 1;
+    maxDfs = 1;
 
     scc_split = false;
-    sccindex = sccindex_start;
+    sccindex = sccindexStart;
 
 #if InternalDT
     for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); i++) {
@@ -1428,20 +1428,20 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     for(SysInt i = 0; i < numvars + numvals; i++) {
       D_ASSERT(std::find(SCCs.begin(), SCCs.end(), i) != SCCs.end());
     }
-    for(SysInt i = sccindex_start; i < numvars + numvals; i++) {
+    for(SysInt i = sccindexStart; i < numvars + numvals; i++) {
       if(SCCs[i] < numvars && varArray[SCCs[i]].isAssigned()) {
         // swap with first element
-        if(sccindex_start != i) {
-          SysInt temp = SCCs[sccindex_start];
-          SCCs[sccindex_start] = SCCs[i];
+        if(sccindexStart != i) {
+          SysInt temp = SCCs[sccindexStart];
+          SCCs[sccindexStart] = SCCs[i];
           SCCs[i] = temp;
           varToSCCIndex[SCCs[i]] = i;
-          varToSCCIndex[SCCs[sccindex_start]] = sccindex_start;
+          varToSCCIndex[SCCs[sccindexStart]] = sccindexStart;
         }
         // partition
-        D_ASSERT(SCCSplit.isMember(sccindex_start));
-        SCCSplit.remove(sccindex_start);
-        sccindex_start++;
+        D_ASSERT(SCCSplit.isMember(sccindexStart));
+        SCCSplit.remove(sccindexStart);
+        sccindexStart++;
       }
       if(!SCCSplit.isMember(i)) {
         break;
@@ -1459,9 +1459,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // toplevel is true iff this is the top level of the recursion.
     tstack.push_back(curnode);
     in_tstack.insert(curnode);
-    dfsnum[curnode] = max_dfs;
-    lowlink[curnode] = max_dfs;
-    max_dfs++;
+    dfsnum[curnode] = maxDfs;
+    lowlink[curnode] = maxDfs;
+    maxDfs++;
     visited.insert(curnode);
     GCCPRINT("Visiting node: " << curnode);
 

@@ -163,10 +163,10 @@ struct Dynamic_OR : public ParentConstraint {
 
       const SysInt cons_s = child_constraints.size();
 
-      SysInt loop_start = watched_constraint[tripped_constraint] + 1;
+      SysInt loopStart = watched_constraint[tripped_constraint] + 1;
       SysInt skip_pos = watched_constraint[other_constraint];
 
-      for(SysInt i = loop_start; i < cons_s; ++i) {
+      for(SysInt i = loopStart; i < cons_s; ++i) {
         if(i != skip_pos) {
           GET_ASSIGNMENT(assignment, child_constraints[i]);
           if(flag) {
@@ -178,7 +178,7 @@ struct Dynamic_OR : public ParentConstraint {
         }
       }
 
-      for(SysInt i = 0; i < loop_start - 1; ++i) {
+      for(SysInt i = 0; i < loopStart - 1; ++i) {
         if(i != skip_pos) {
           GET_ASSIGNMENT(assignment, child_constraints[i]);
           if(flag) {

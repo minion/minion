@@ -87,12 +87,12 @@ struct LeqConstraint : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt x_min = x.min();
-    DomainInt y_max = y.max();
+    DomainInt xMin = x.min();
+    DomainInt yMax = y.max();
 
-    if(x_min <= y_max + offset) {
-      assignment.push_back(make_pair(0, x_min));
-      assignment.push_back(make_pair(1, y_max));
+    if(xMin <= yMax + offset) {
+      assignment.push_back(make_pair(0, xMin));
+      assignment.push_back(make_pair(1, yMax));
       return true;
     }
     return false;

@@ -339,9 +339,9 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
   virtual string fullOutputName() {
     if(valCount_min == 0) {
-      return ConOutput::printCon("occurrenceleq", varArray, value, valCount_max);
+      return ConOutput::printCon("occurrenceleq", varArray, value, valCountMax);
     } else {
-      D_ASSERT(valCount_max == (SysInt)varArray.size());
+      D_ASSERT(valCountMax == (SysInt)varArray.size());
       return ConOutput::printCon("occurrencegeq", varArray, value, valCount_min);
     }
   }
@@ -353,16 +353,16 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   VarArray varArray;
 
   DomainInt valCount_min;
-  DomainInt valCount_max;
+  DomainInt valCountMax;
   Val value;
 
   ConstantOccurrenceEqualConstraint(const VarArray& _varArray, const Val& _value,
-                                    DomainInt _valCount_min, DomainInt _valCount_max)
+                                    DomainInt _valCount_min, DomainInt _valCountMax)
       : occurrencesCount(),
         not_occurrencesCount(),
         varArray(_varArray),
         valCount_min(_valCount_min),
-        valCount_max(_valCount_max),
+        valCountMax(_valCountMax),
         value(_value) {
     occurrencesCount = 0;
     not_occurrencesCount = 0;
@@ -378,7 +378,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   void occurrence_limit_reached() {
-    D_ASSERT(valCount_max <= occurrencesCount);
+    D_ASSERT(valCountMax <= occurrencesCount);
     DomainInt occs = 0;
     typename VarArray::iterator end_it(varArray.end());
     for(typename VarArray::iterator it = varArray.begin(); it < end_it; ++it) {
@@ -389,7 +389,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
         it->removeFromDomain(value);
       }
     }
-    if(valCount_max < occs)
+    if(valCountMax < occs)
       getState().setFailed(true);
   }
 
@@ -417,9 +417,9 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
     if(varArray[i].assignedValue() == (DomainInt)value) {
       ++occurrencesCount;
-      if(valCount_max < occurrencesCount)
+      if(valCountMax < occurrencesCount)
         getState().setFailed(true);
-      if(occurrencesCount == valCount_max)
+      if(occurrencesCount == valCountMax)
         occurrence_limit_reached();
     } else {
       ++not_occurrencesCount;
@@ -448,17 +448,17 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     trigger_setup();
-    if(valCount_max < 0 || valCount_min > (SysInt)varArray.size())
+    if(valCountMax < 0 || valCount_min > (SysInt)varArray.size())
       getState().setFailed(true);
     setupCounters();
 
-    if(valCount_max < occurrencesCount)
+    if(valCountMax < occurrencesCount)
       getState().setFailed(true);
 
     if(valCount_min > static_cast<SysInt>(varArray.size()) - not_occurrencesCount)
       getState().setFailed(true);
 
-    if(occurrencesCount == valCount_max)
+    if(occurrencesCount == valCountMax)
       occurrence_limit_reached();
     if(not_occurrencesCount == static_cast<SysInt>(varArray.size()) - valCount_min)
       not_occurrence_limit_reached();
@@ -469,7 +469,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     DomainInt count = 0;
     for(SysInt i = 0; i < vSize; ++i)
       count += (*(v + i) == (DomainInt)value);
-    return (count >= valCount_min) && (count <= valCount_max);
+    return (count >= valCount_min) && (count <= valCountMax);
   }
 
   virtual vector<AnyVarRef> getVars() {
@@ -486,7 +486,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     MAKE_STACK_BOX(c, DomainInt, varArray.size());
 
     if(valCount_min == 0) {
-      DomainInt needVars = (DomainInt)varArray.size() - valCount_max;
+      DomainInt needVars = (DomainInt)varArray.size() - valCountMax;
       if(needVars <= 0)
         return true;
       for(int i = 0; i < (SysInt)varArray.size(); ++i) {
@@ -503,7 +503,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       }
       assignment.clear();
       return false;
-    } else if(valCount_max == (SysInt)varArray.size()) {
+    } else if(valCountMax == (SysInt)varArray.size()) {
       DomainInt needVars = valCount_min;
       if(needVars <= 0)
         return true;
@@ -526,15 +526,15 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   AbstractConstraint* reverseConstraint() {
     // This constraint actually constrains the occurrences of value to an an
     // interval
-    // [valCount_min, valCount_max]. But it's apparently only used for
+    // [valCount_min, valCountMax]. But it's apparently only used for
     // less-than
     // and greater-than. So identify the less-than case and make a greater-than,
     // etc.
     if(valCount_min == 0) {
       return new ConstantOccurrenceEqualConstraint<VarArray, Val>(
-          varArray, value, valCount_max + 1, varArray.size());
+          varArray, value, valCountMax + 1, varArray.size());
     }
-    if(valCount_max == (SysInt)varArray.size()) {
+    if(valCountMax == (SysInt)varArray.size()) {
       return new ConstantOccurrenceEqualConstraint<VarArray, Val>(varArray, value, 0,
                                                                   valCount_min - 1);
     }
@@ -730,9 +730,9 @@ AbstractConstraint* OccEqualCon(const VarArray& _varArray, const Val& _value,
 
 template <typename VarArray, typename Val>
 AbstractConstraint* ConstantOccEqualCon(const VarArray& _varArray, const Val& _value,
-                                        DomainInt _valCount_min, DomainInt _valCount_max) {
+                                        DomainInt _valCount_min, DomainInt _valCountMax) {
   return (new ConstantOccurrenceEqualConstraint<VarArray, Val>(_varArray, _value, _valCount_min,
-                                                               _valCount_max));
+                                                               _valCountMax));
 }
 
 template <typename T1>

@@ -66,9 +66,9 @@ struct LessEqualSumConstraint : public AbstractConstraint {
   VarArray varArray;
   VarSum varSum;
   DomainInt max_looseness;
-  Reversible<DomainInt> varArray_min_sum;
+  Reversible<DomainInt> varArrayMinSum;
   LessEqualSumConstraint(const VarArray& _varArray, VarSum _varSum)
-      : varArray(_varArray), varSum(_varSum), varArray_min_sum() {
+      : varArray(_varArray), varSum(_varSum), varArrayMinSum() {
     BigInt accumulator = 0;
     for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
       accumulator += checked_cast<SysInt>(
@@ -99,7 +99,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     moveTriggerInt(varSum, varArray.size(), UpperBound);
   }
 
-  DomainInt get_real_min_sum() {
+  DomainInt getRealMinSum() {
     DomainInt min_sum = 0;
     for(typename VarArray::iterator it = varArray.begin(); it != varArray.end(); ++it)
       min_sum += it->min();
@@ -109,19 +109,19 @@ struct LessEqualSumConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt propVal, DomainDelta domain_change) {
     P("Prop: " << propVal);
     PROP_INFO_ADDONE(FullSum);
-    DomainInt sum = varArray_min_sum;
+    DomainInt sum = varArrayMinSum;
     if(propVal != varArray.size()) { // One of the array changed
       DomainInt change = varArray[checked_cast<SysInt>(propVal)].getDomainChange(domain_change);
       P(" Change: " << change);
       D_ASSERT(change >= 0);
       sum += change;
-      varArray_min_sum = sum;
+      varArrayMinSum = sum;
     }
 
     varSum.setMin(sum);
     if(getState().isFailed())
       return;
-    D_ASSERT(sum <= get_real_min_sum());
+    D_ASSERT(sum <= getRealMinSum());
 
     DomainInt looseness = varSum.max() - sum;
     if(looseness < 0) {
@@ -139,15 +139,15 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     P("Full Prop");
     setupTriggers();
     DomainInt min_sum = 0;
-    DomainInt max_diff = 0;
+    DomainInt maxDiff = 0;
     for(typename VarArray::iterator it = varArray.begin(); it != varArray.end(); ++it) {
       min_sum += it->min();
-      max_diff = max(max_diff, it->max() - it->min());
+      maxDiff = max(maxDiff, it->max() - it->min());
     }
 
-    varArray_min_sum = min_sum;
-    D_ASSERT(min_sum == get_real_min_sum());
-    max_looseness = max_diff;
+    varArrayMinSum = min_sum;
+    D_ASSERT(min_sum == getRealMinSum());
+    max_looseness = maxDiff;
     if(!varArray.empty())
       propagateDynInt(0, DomainDelta::empty());
     else

@@ -194,8 +194,8 @@ public:
         int c_lvl = 0;
         vector<int> array_pointer;
         array_pointer.push_back(0);
-        vector<int> array_max;
-        array_max.push_back(1);
+        vector<int> arrayMax;
+        arrayMax.push_back(1);
 
         std::map<vector<int>, int> storage;
         bool needcomma = false;
@@ -204,7 +204,7 @@ public:
           if(is_sign(']')) { // closing array
             c_lvl--;
             if(c_lvl < 0) {
-              add_var(var_name, array_max, storage);
+              add_var(var_name, arrayMax, storage);
               break;
             }
             needcomma = true;
@@ -212,8 +212,8 @@ public:
 
           else if(is_sign(',')) { // next value
             array_pointer[c_lvl]++;
-            if(array_pointer[c_lvl] >= array_max[c_lvl]) {
-              array_max[c_lvl] = array_pointer[c_lvl] + 1;
+            if(array_pointer[c_lvl] >= arrayMax[c_lvl]) {
+              arrayMax[c_lvl] = array_pointer[c_lvl] + 1;
             }
             needcomma = false;
           }
@@ -225,7 +225,7 @@ public:
             }
             if((int)array_pointer.size() < c_lvl + 1) {
               array_pointer.push_back(0);
-              array_max.push_back(1);
+              arrayMax.push_back(1);
             } else
               array_pointer[c_lvl] = 0;
           }

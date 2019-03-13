@@ -88,12 +88,12 @@ T last(const INTERVAL_SET<T>& t) {
 }
 
 template <typename T>
-typename std::set<T>::const_iterator elements_begin(const INTERVAL_SET<T>& t) {
+typename std::set<T>::const_iterator elementsBegin(const INTERVAL_SET<T>& t) {
   return t._s.begin();
 }
 
 template <typename T>
-typename std::set<T>::const_iterator elements_end(const INTERVAL_SET<T>& t) {
+typename std::set<T>::const_iterator elementsEnd(const INTERVAL_SET<T>& t) {
   return t._s.end();
 }
 

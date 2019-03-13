@@ -287,15 +287,15 @@ struct LexLeqConstraint : public AbstractConstraint {
     size_t xSize = x.size();
     for(size_t i = 0; i < xSize; ++i) {
       DomainInt x_i_min = x[i].min();
-      DomainInt y_i_max = y[i].max();
+      DomainInt y_iMax = y[i].max();
 
-      if(x_i_min > y_i_max) {
+      if(x_i_min > y_iMax) {
         return false;
       }
 
       assignment.push_back(make_pair(i, x_i_min));
-      assignment.push_back(make_pair(i + xSize, y_i_max));
-      if(x_i_min < y_i_max)
+      assignment.push_back(make_pair(i + xSize, y_iMax));
+      if(x_i_min < y_iMax)
         return true;
     }
 

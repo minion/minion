@@ -45,7 +45,7 @@ void buildEarlyTrie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tuples
   initial_trie.resize(initial_trie.size() + values + 1);
 
   int currentVal = tuples[start_pos][depth];
-  int current_start = start_pos;
+  int currentStart = start_pos;
   int num_ofVal = 0;
 
   for(int i = start_pos; i < end_pos; ++i) {
@@ -55,10 +55,10 @@ void buildEarlyTrie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tuples
         initial_trie[start_section + num_ofVal].offset = -1;
       } else {
         initial_trie[start_section + num_ofVal].offset = initial_trie.size();
-        buildEarlyTrie(initial_trie, tuples, current_start, i, depth + 1);
+        buildEarlyTrie(initial_trie, tuples, currentStart, i, depth + 1);
       }
       currentVal = tuples[i][depth];
-      current_start = i;
+      currentStart = i;
       num_ofVal++;
     }
   }
@@ -69,7 +69,7 @@ void buildEarlyTrie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tuples
     initial_trie[start_section + num_ofVal].offset = -1;
   else {
     initial_trie[start_section + num_ofVal].offset = initial_trie.size();
-    buildEarlyTrie(initial_trie, tuples, current_start, end_pos, depth + 1);
+    buildEarlyTrie(initial_trie, tuples, currentStart, end_pos, depth + 1);
   }
 
   assert(num_ofVal + 1 == values);

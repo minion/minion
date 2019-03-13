@@ -86,7 +86,7 @@ struct ProductConstraint : public AbstractConstraint {
     moveTriggerInt(var3, 5, UpperBound);
   }
 
-  DomainInt mult_max(DomainInt min1, DomainInt max1, DomainInt min2, DomainInt max2) {
+  DomainInt multMax(DomainInt min1, DomainInt max1, DomainInt min2, DomainInt max2) {
     return mymax(mymax(min1 * min2, min1 * max2), mymax(max1 * min2, max1 * max2));
   }
 
@@ -122,7 +122,7 @@ struct ProductConstraint : public AbstractConstraint {
       var3.setMin(var3_min);
       var3.setMax(var3_max);
     } else {
-      var3.setMax(mult_max(var1_min, var1_max, var2_min, var2_max));
+      var3.setMax(multMax(var1_min, var1_max, var2_min, var2_max));
       var3.setMin(mult_min(var1_min, var1_max, var2_min, var2_max));
       if(var1.isAssigned()) {
         DomainInt val1 = var1.assignedValue();

@@ -123,7 +123,7 @@ public:
   UnsignedSysInt wdeg;
 #endif
 
-  BOOL fullPropagate_done;
+  BOOL fullPropagateDone;
 
   virtual string fullOutputName() {
     D_FATAL_ERROR("Unimplemented output in " + extendedName());
@@ -179,7 +179,7 @@ public:
 #ifdef WDEG
         wdeg(1),
 #endif
-        fullPropagate_done(false) {
+        fullPropagateDone(false) {
   }
 
   /// Method to get constraint name for output.

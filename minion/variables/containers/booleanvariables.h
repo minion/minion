@@ -47,7 +47,7 @@ eq(bool, 0) #variable bool equals 0
 /// Standard data type used for storing compressed booleans
 typedef unsigned long data_type;
 static const data_type one = 1;
-static const data_type max_data = one << (sizeof(data_type) - 1);
+static const data_type maxData = one << (sizeof(data_type) - 1);
 
 struct BoolVarContainer;
 

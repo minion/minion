@@ -27,9 +27,9 @@
 using namespace std;
 
 std::atomic<bool>* trig;
-std::atomic<bool>* ctrl_c_press;
+std::atomic<bool>* ctrlCPress;
 
-bool check_double_ctrlc;
+bool checkDoubleCtrlc;
 
 #include <stdio.h>
 
@@ -101,8 +101,8 @@ void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout,
   }
 }
 
-void ctrlc_function(int /* signum */) {
-  if(check_double_ctrlc) {
+void ctrlCFunction(int /* signum */) {
+  if(checkDoubleCtrlc) {
     cerr << "Ctrl+C pressed twice. Exiting immediately." << endl;
     exit(1);
   }
@@ -112,17 +112,17 @@ void ctrlc_function(int /* signum */) {
     exit(1);
   }
 
-  check_double_ctrlc = true;
+  checkDoubleCtrlc = true;
 
   cerr << getpid() << ": Ctrl+C pressed. Exiting." << std::endl;
   // This is the quickest way to get things to stop.
   *trig = true;
-  *ctrl_c_press = true;
+  *ctrlCPress = true;
 }
 
-void install_ctrlcTrigger(std::atomic<bool>* ctrl_c_press_) {
-  check_double_ctrlc = false;
-  ctrl_c_press = ctrl_c_press_;
-  signal(SIGINT, ctrlc_function);
+void install_ctrlcTrigger(std::atomic<bool>* ctrlCPress_) {
+  checkDoubleCtrlc = false;
+  ctrlCPress = ctrlCPress_;
+  signal(SIGINT, ctrlCFunction);
 }
 #endif

@@ -236,16 +236,16 @@ struct VarContainer {
 
     // Set all fixed indices to 1, so they won't move.
     // Set all variable indices to their max value.
-    vector<DomainInt> modified_max(params.size());
+    vector<DomainInt> modifiedMax(params.size());
     for(SysInt i = 0; i < (SysInt)maxIndex.size(); i++) {
       if(maxIndex[i] == 0) { // matrix is empty, all slices are empty.
         return return_list;
       }
 
       if(params[i] == -999)
-        modified_max[i] = maxIndex[i];
+        modifiedMax[i] = maxIndex[i];
       else
-        modified_max[i] = 1;
+        modifiedMax[i] = 1;
     }
 
     // Iterates through the variable indices
@@ -258,7 +258,7 @@ struct VarContainer {
         if(params[i] == -999)
           output[i] = currentIndex[i];
       return_list.push_back(getSymbol(name + to_var_name(output)));
-    } while(increment_vector(currentIndex, modified_max));
+    } while(increment_vector(currentIndex, modifiedMax));
 
     return return_list;
   }
