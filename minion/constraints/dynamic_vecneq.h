@@ -298,23 +298,23 @@ struct VecNeqDynamic : public AbstractConstraint {
     return "watchvecneq";
   }
 
-  CONSTRAINT_ARG_LIST2(var_array1, var_array2);
+  CONSTRAINT_ARG_LIST2(varArray1, varArray2);
 
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
 
-  VarArray1 var_array1;
-  VarArray2 var_array2;
+  VarArray1 varArray1;
+  VarArray2 varArray2;
 
   SysInt watched_index0;
   SysInt watched_index1;
 
   Reversible<bool> propagate_mode;
-  SysInt index_to_propagate;
+  SysInt indexToPropagate;
 
   VecNeqDynamic(const VarArray1& _array1, const VarArray2& _array2)
-      : var_array1(_array1), var_array2(_array2), propagate_mode(false) {
-    D_ASSERT(var_array1.size() == var_array2.size());
+      : varArray1(_array1), varArray2(_array2), propagate_mode(false) {
+    D_ASSERT(varArray1.size() == varArray2.size());
   }
 
   virtual SysInt dynamicTriggerCount() {
@@ -322,16 +322,16 @@ struct VecNeqDynamic : public AbstractConstraint {
   }
 
   bool no_support_for_index(SysInt index) {
-    return Operator::no_support_for_pair(var_array1[index], var_array2[index]);
+    return Operator::no_support_for_pair(varArray1[index], varArray2[index]);
   }
 
   void add_triggers(SysInt index, DomainInt dt) {
-    Operator::add_triggers(this, var_array1[index], var_array2[index], dt);
+    Operator::add_triggers(this, varArray1[index], varArray2[index], dt);
   }
 
   virtual void fullPropagate() {
     P("VecNeq full prop");
-    SysInt size = var_array1.size();
+    SysInt size = varArray1.size();
     SysInt index = 0;
 
     // Find first pair we could watch.
@@ -357,7 +357,7 @@ struct VecNeqDynamic : public AbstractConstraint {
       propagate_from_var1(watched_index0);
       propagate_from_var2(watched_index0);
       propagate_mode = true;
-      index_to_propagate = watched_index0;
+      indexToPropagate = watched_index0;
       add_triggers(watched_index0, 0);
       return;
     }
@@ -369,11 +369,11 @@ struct VecNeqDynamic : public AbstractConstraint {
   }
 
   void propagate_from_var1(SysInt index) {
-    Operator::propagate_from_var1(var_array1[index], var_array2[index]);
+    Operator::propagate_from_var1(varArray1[index], varArray2[index]);
   }
 
   void propagate_from_var2(SysInt index) {
-    Operator::propagate_from_var2(var_array1[index], var_array2[index]);
+    Operator::propagate_from_var2(varArray1[index], varArray2[index]);
   }
 
   virtual void propagateDynInt(SysInt trigger_activated, DomainDelta) {
@@ -381,7 +381,7 @@ struct VecNeqDynamic : public AbstractConstraint {
     P("VecNeq prop");
 
     if(propagate_mode) {
-      P("Propagating: " << index_to_propagate);
+      P("Propagating: " << indexToPropagate);
     } else {
       P("Watching " << watched_index0 << "," << watched_index1);
     }
@@ -405,13 +405,13 @@ struct VecNeqDynamic : public AbstractConstraint {
 
     if(propagate_mode) {
       // If this is true, the other index got assigned.
-      if(index_to_propagate != original_index)
+      if(indexToPropagate != original_index)
         return;
 
       if(triggerarray == 1) {
-        propagate_from_var1(index_to_propagate);
+        propagate_from_var1(indexToPropagate);
       } else {
-        propagate_from_var2(index_to_propagate);
+        propagate_from_var2(indexToPropagate);
       }
       return;
     }
@@ -422,7 +422,7 @@ struct VecNeqDynamic : public AbstractConstraint {
 
     SysInt index = original_index + 1;
 
-    SysInt size = var_array1.size();
+    SysInt size = varArray1.size();
 
     while((index < size && no_support_for_index(index)) || index == other_index)
       ++index;
@@ -434,9 +434,9 @@ struct VecNeqDynamic : public AbstractConstraint {
 
       if(index == original_index) {
         // This is the only possible non-equal index.
-        P("Entering propagate mode for index " << index_to_propagate);
+        P("Entering propagate mode for index " << indexToPropagate);
         propagate_mode = true;
-        index_to_propagate = other_index;
+        indexToPropagate = other_index;
         propagate_from_var1(other_index);
         propagate_from_var2(other_index);
         return;
@@ -453,7 +453,7 @@ struct VecNeqDynamic : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    SysInt vSize1 = var_array1.size();
+    SysInt vSize1 = varArray1.size();
     for(SysInt i = 0; i < vSize1; ++i)
       if(Operator::checkAssignment(v[i], v[i + vSize1]))
         return true;
@@ -462,23 +462,23 @@ struct VecNeqDynamic : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array1.size() + var_array2.size());
-    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
-      vars.push_back(AnyVarRef(var_array1[i]));
-    for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
-      vars.push_back(AnyVarRef(var_array2[i]));
+    vars.reserve(varArray1.size() + varArray2.size());
+    for(UnsignedSysInt i = 0; i < varArray1.size(); ++i)
+      vars.push_back(AnyVarRef(varArray1[i]));
+    for(UnsignedSysInt i = 0; i < varArray2.size(); ++i)
+      vars.push_back(AnyVarRef(varArray2[i]));
     return vars;
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     pair<DomainInt, DomainInt> assign;
-    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
-      if(Operator::getSatisfyingAssignment(var_array1[i], var_array2[i], assign)) {
-        D_ASSERT(var_array1[i].inDomain(assign.first));
-        D_ASSERT(var_array2[i].inDomain(assign.second));
+    for(SysInt i = 0; i < (SysInt)varArray1.size(); ++i) {
+      if(Operator::getSatisfyingAssignment(varArray1[i], varArray2[i], assign)) {
+        D_ASSERT(varArray1[i].inDomain(assign.first));
+        D_ASSERT(varArray2[i].inDomain(assign.second));
         D_ASSERT(Operator::checkAssignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
-        assignment.push_back(make_pair(i + var_array1.size(), assign.second));
+        assignment.push_back(make_pair(i + varArray1.size(), assign.second));
         return true;
       }
     }
@@ -487,13 +487,13 @@ struct VecNeqDynamic : public AbstractConstraint {
 
   virtual AbstractConstraint* reverseConstraint() {
     vector<AbstractConstraint*> con;
-    for(SysInt i = 0; i < (SysInt)var_array1.size(); i++) {
-      con.push_back(Operator::reverseConstraint(var_array1[i], var_array2[i]));
+    for(SysInt i = 0; i < (SysInt)varArray1.size(); i++) {
+      con.push_back(Operator::reverseConstraint(varArray1[i], varArray2[i]));
     }
     return new Dynamic_AND(con);
     /*vector<AnyVarRef> t;
-    for(SysInt i=0; i<var_array1.size(); i++) t.push_back(var_array1[i]);
-    for(SysInt i=0; i<var_array2.size(); i++) t.push_back(var_array2[i]);
+    for(SysInt i=0; i<varArray1.size(); i++) t.push_back(varArray1[i]);
+    for(SysInt i=0; i<varArray2.size(); i++) t.push_back(varArray2[i]);
     return forward_check_negation(this);*/
   }
 };

@@ -12,11 +12,11 @@ class DumpTreeJson : public SearchDumper {
 public:
   DumpTreeJson(std::ostream* o) : streamer(o) {}
 
-  void initial_variables(const std::vector<AnyVarRef>& vars) {}
+  void initialVariables(const std::vector<AnyVarRef>& vars) {}
 
   void output_node(long long nodeCount, const std::vector<AnyVarRef>& vars, bool isSolution) {
     streamer.mapElement("Node", getState().getNodeCount());
-    streamer.mapElement("Domains", get_dom_as_json(vars));
+    streamer.mapElement("Domains", getDom_as_json(vars));
     streamer.newline();
     if(isSolution) {
       streamer.mapElement("solution", 1);

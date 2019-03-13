@@ -100,9 +100,9 @@ struct WatchInRangeConstraint : public AbstractConstraint {
 #include "dynamic_notinrange.h"
 
 template <typename VarArray1>
-AbstractConstraint* BuildCT_WATCHED_INRANGE(const VarArray1& _var_array_1,
+AbstractConstraint* BuildCT_WATCHED_INRANGE(const VarArray1& _varArray_1,
                                             const ConstraintBlob& b) {
-  return new WatchInRangeConstraint<typename VarArray1::value_type>(_var_array_1[0],
+  return new WatchInRangeConstraint<typename VarArray1::value_type>(_varArray_1[0],
                                                                     b.constants[0]);
 }
 

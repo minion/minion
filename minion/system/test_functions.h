@@ -30,7 +30,7 @@ template <typename T>
 std::string getBaseVarName(const T& t);
 
 template <typename Var>
-void add_var_dom_to_json(const Var& v, std::ostream& s) {
+void add_varDom_to_json(const Var& v, std::ostream& s) {
   s << '"' << getBaseVarName(v) << "\":";
   if(v.isAssigned() || v.isBound()) {
     s << "[ [" << v.min() << "," << v.max() << "] ]";
@@ -61,14 +61,14 @@ void add_var_dom_to_json(const Var& v, std::ostream& s) {
 }
 
 template <typename T>
-raw_json get_dom_as_json(const vector<T>& vec) {
+raw_json getDom_as_json(const vector<T>& vec) {
   std::ostringstream s;
   s << "{";
   if(!vec.empty()) {
-    add_var_dom_to_json(vec[0], s);
+    add_varDom_to_json(vec[0], s);
     for(UnsignedSysInt i = 1; i < vec.size(); ++i) {
       s << ", ";
-      add_var_dom_to_json(vec[i], s);
+      add_varDom_to_json(vec[i], s);
     }
   }
   s << "}";
@@ -76,7 +76,7 @@ raw_json get_dom_as_json(const vector<T>& vec) {
 }
 
 template <typename Var>
-string get_dom_as_string(const Var& v) {
+string getDom_as_string(const Var& v) {
   ostringstream s;
   if(v.isAssigned()) {
     s << v.assignedValue();
@@ -95,13 +95,13 @@ string get_dom_as_string(const Var& v) {
 }
 
 template <typename T>
-string get_dom_as_string(const vector<T>& vec) {
+string getDom_as_string(const vector<T>& vec) {
   string output("<");
   if(!vec.empty()) {
-    output += get_dom_as_string(vec[0]);
+    output += getDom_as_string(vec[0]);
     for(UnsignedSysInt i = 1; i < vec.size(); ++i) {
       output += ",";
-      output += get_dom_as_string(vec[i]);
+      output += getDom_as_string(vec[i]);
     }
   }
   output += ">";

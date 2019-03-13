@@ -8,9 +8,9 @@
 #include "../constraints/constraint_alldiff_ciaran.h"
 
 template <typename VarArray>
-AbstractConstraint* BuildCT_ALLDIFF_CIARAN(StateObj* stateObj, const VarArray& var_array,
+AbstractConstraint* BuildCT_ALLDIFF_CIARAN(StateObj* stateObj, const VarArray& varArray,
                                            ConstraintBlob&) {
-  return new AlldiffCiaran<VarArray>(stateObj, var_array);
+  return new AlldiffCiaran<VarArray>(stateObj, varArray);
 }
 
 BUILD_CT(CT_ALLDIFF_CIARAN, 1)

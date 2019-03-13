@@ -224,7 +224,7 @@ struct SDFBranch : public VariableOrder {
   pair<SysInt, DomainInt> pickVarVal() {
     // cout << "In pickVarVal for SDF (approximation)" <<endl;
     SysInt length = var_order.size();
-    SysInt smallest_dom = -1;
+    SysInt smallestDom = -1;
     DomainInt domSize = DomainInt_Max;
 
     for(SysInt i = 0; i < length; ++i) {
@@ -233,20 +233,20 @@ struct SDFBranch : public VariableOrder {
 
       if((maxval != minval) && ((maxval - minval) < domSize)) {
         domSize = maxval - minval;
-        smallest_dom = i;
+        smallestDom = i;
         if(maxval - minval == 1) { // Binary domain, must be smallest
           break;
         }
       }
     }
 
-    if(smallest_dom == -1) { // all assigned
+    if(smallestDom == -1) { // all assigned
       return make_pair(-1, 0);
     }
 
-    DomainInt val = chooseVal(var_order[smallest_dom], val_order[smallest_dom]);
+    DomainInt val = chooseVal(var_order[smallestDom], val_order[smallestDom]);
 
-    return make_pair(smallest_dom, val);
+    return make_pair(smallestDom, val);
   }
 };
 
@@ -426,7 +426,7 @@ struct SRFBranch : VariableOrder {
 
   pair<SysInt, DomainInt> pickVarVal() {
     SysInt length = var_order.size();
-    SysInt smallest_dom = length;
+    SysInt smallestDom = length;
 
     float ratio = 2;
 
@@ -441,15 +441,15 @@ struct SRFBranch : VariableOrder {
                         checked_cast<float>(original_maxval - original_minval);
       if((maxval != minval) && (new_ratio < ratio)) {
         ratio = new_ratio;
-        smallest_dom = i;
+        smallestDom = i;
       }
     }
 
-    if(smallest_dom == length)
+    if(smallestDom == length)
       return make_pair(-1, 0);
 
-    DomainInt val = chooseVal(var_order[smallest_dom], val_order[smallest_dom]);
-    return make_pair(smallest_dom, val);
+    DomainInt val = chooseVal(var_order[smallestDom], val_order[smallestDom]);
+    return make_pair(smallestDom, val);
   }
 };
 
@@ -469,7 +469,7 @@ struct LDFBranch : VariableOrder {
       return make_pair(-1, 0);
     }
 
-    SysInt largest_dom = pos;
+    SysInt largestDom = pos;
     DomainInt domSize = var_order[pos].max() - var_order[pos].min();
 
     ++pos;
@@ -480,12 +480,12 @@ struct LDFBranch : VariableOrder {
 
       if(maxval - minval > domSize) {
         domSize = maxval - minval;
-        largest_dom = pos;
+        largestDom = pos;
       }
     }
 
-    DomainInt val = chooseVal(var_order[largest_dom], val_order[largest_dom]);
-    return make_pair(largest_dom, val);
+    DomainInt val = chooseVal(var_order[largestDom], val_order[largestDom]);
+    return make_pair(largestDom, val);
   }
 };
 

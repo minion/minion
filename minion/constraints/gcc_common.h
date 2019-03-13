@@ -101,7 +101,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   using FlowConstraint<VarArray, UseIncGraph>::adjlist_remove;
   using FlowConstraint<VarArray, UseIncGraph>::check_adjlists;
 
-  using FlowConstraint<VarArray, UseIncGraph>::var_array;
+  using FlowConstraint<VarArray, UseIncGraph>::varArray;
   using FlowConstraint<VarArray, UseIncGraph>::dom_min;
   using FlowConstraint<VarArray, UseIncGraph>::dom_max;
   using FlowConstraint<VarArray, UseIncGraph>::numvars;
@@ -119,19 +119,19 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   using FlowConstraint<VarArray, UseIncGraph>::hopcroft2;
   using FlowConstraint<VarArray, UseIncGraph>::augpath;
 
-  GCC(const VarArray& _var_array, const CapArray& _capacity_array, vector<DomainInt> _val_array)
-      : FlowConstraint<VarArray, UseIncGraph>(_var_array),
+  GCC(const VarArray& _varArray, const CapArray& _capacity_array, vector<DomainInt> _val_array)
+      : FlowConstraint<VarArray, UseIncGraph>(_varArray),
         capacity_array(_capacity_array) //, val_array(_val_array)
 #if InternalDT
         ,
-        idt(numvars, numvals, _var_array)
+        idt(numvars, numvals, _varArray)
 #endif
         ,
         SCCSplit(numvars + numvals) {
     for(SysInt i = 0; i < (SysInt)_val_array.size(); ++i)
       val_array.push_back(checked_cast<SysInt>(_val_array[i]));
 
-    CheckNotBound(_var_array, "gcc");
+    CheckNotBound(_varArray, "gcc");
     CHECK(capacity_array.size() == val_array.size(),
           "GCC: Vector of values and vector of cardinality variables must be "
           "same length.");
@@ -181,10 +181,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
 
     to_process.reserve(numvars + numvals);
-    sccs_to_process.reserve(numvars + numvals);
+    sccsToProcess.reserve(numvars + numvals);
 
     // Array to let us find the appropriate capacity variable for a value.
-    val_to_cap_index.resize(numvals);
+    valToCap_index.resize(numvals);
     for(SysInt i = 0; i < numvals; i++) {
       bool found = false;
       SysInt j;
@@ -196,12 +196,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       }
 
       if(!found) {
-        val_to_cap_index[i] = -1;
+        valToCap_index[i] = -1;
       } else {
-        val_to_cap_index[i] = j;
+        valToCap_index[i] = j;
       }
     }
-    GCCPRINT("val_to_cap_index:" << val_to_cap_index);
+    GCCPRINT("valToCap_index:" << valToCap_index);
 
     augpath.reserve(numvars + numvals + 1);
     // fifo.reserve(numvars+numvals);
@@ -231,7 +231,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   CapArray capacity_array;  // capacities for values of interest
   vector<SysInt> val_array; // values of interest
 
-  vector<SysInt> val_to_cap_index;
+  vector<SysInt> valToCap_index;
 
   vector<SysInt> vars_in_scc;
   vector<SysInt> valsInSCC; // Actual values.
@@ -260,7 +260,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       for(SysInt i = dom_min; i <= dom_max; i++) {
         for(SysInt j = 0; j < adjlistlength[i - dom_min + numvars]; j++) {
           SysInt var = adjlist[i - dom_min + numvars][j];
-          if(!var_array[var].inDomain(i)) {
+          if(!varArray[var].inDomain(i)) {
             if(varvalmatching[var] == i) {
               usage[varvalmatching[var] - dom_min]--;
               varvalmatching[var] = dom_min - 1;
@@ -273,7 +273,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
             // arranged in blocks for each variable, with numvals triggers in
             // each block
             DomainInt mydt = (var * numvals) + (i - dom_min);
-            this->moveTriggerInt(var_array[var], mydt, DomainRemoval, i);
+            this->moveTriggerInt(varArray[var], mydt, DomainRemoval, i);
           }
         }
       }
@@ -443,7 +443,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // Check if the matching is OK.
     bool matchok = true;
     for(SysInt i = 0; i < numvars; i++) {
-      if(!var_array[i].inDomain(varvalmatching[i])) {
+      if(!varArray[i].inDomain(varvalmatching[i])) {
         matchok = false;
         break;
       }
@@ -488,7 +488,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       for(SysInt i = dom_min; i <= dom_max; i++) {
         for(SysInt j = 0; j < adjlistlength[i - dom_min + numvars]; j++) {
           SysInt var = adjlist[i - dom_min + numvars][j];
-          if(!var_array[var].inDomain(i)) {
+          if(!varArray[var].inDomain(i)) {
             if(varvalmatching[var] == i) {
               usage[varvalmatching[var] - dom_min]--;
               varvalmatching[var] = dom_min - 1;
@@ -520,7 +520,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       return false;
     } else {
       for(SysInt i = 0; i < numvars; i++) {
-        D_ASSERT(var_array[i].inDomain(varvalmatching[i]));
+        D_ASSERT(varArray[i].inDomain(varvalmatching[i]));
         assignment.push_back(make_pair(i, varvalmatching[i]));
       }
       for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
@@ -649,7 +649,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     // fill in the blanks in the matching
     for(SysInt i = 0; i < numvars; i++) {
       if(lbcmatching[i] == dom_min - 1) {
-        DomainInt minval = var_array[i].min();
+        DomainInt minval = varArray[i].min();
         lbcmatching[i] = minval;
         lbcusage[minval - dom_min]++;
       }
@@ -680,7 +680,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     prop_capacity();
   }
 
-  smallset sccs_to_process;
+  smallset sccsToProcess;
 
   void do_gcc_prop_scc() {
     if(Strongcards) {
@@ -699,7 +699,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     usage.resize(numvals, 0);
 #endif
 
-    sccs_to_process.clear();
+    sccsToProcess.clear();
     {
       vector<SysInt>& toiterate = to_process.getlist();
       GCCPRINT("About to loop for to_process.");
@@ -716,10 +716,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           sccindex_start--; // seek the first item in the SCC.
         }
 
-        if(!sccs_to_process.in(sccindex_start) &&
+        if(!sccsToProcess.in(sccindex_start) &&
            SCCSplit.isMember(sccindex_start)) // not singleton.
         {
-          sccs_to_process.insert(sccindex_start);
+          sccsToProcess.insert(sccindex_start);
 #if DomainCounting || InternalDT
           changed_vars_per_scc[sccindex_start].clear();
 #endif
@@ -733,8 +733,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
     to_process.clear();
     {
-      vector<SysInt>& toiterate = sccs_to_process.getlist();
-      GCCPRINT("About to loop for sccs_to_process:" << toiterate);
+      vector<SysInt>& toiterate = sccsToProcess.getlist();
+      GCCPRINT("About to loop for sccsToProcess:" << toiterate);
       for(SysInt i = 0; i < (SysInt)toiterate.size(); i++) {
         SysInt sccindex_start = toiterate[i];
         vars_in_scc.clear();
@@ -765,7 +765,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
         // populate lower and upper
         for(SysInt i = 0; i < (SysInt)valsInSCC.size(); i++) {
           SysInt validx = valsInSCC[i] - dom_min;
-          SysInt capi = val_to_cap_index[validx];
+          SysInt capi = valToCap_index[validx];
           if(capi > -1) {
             lower[validx] = checked_cast<SysInt>(capacity_array[capi].min());
             upper[validx] = checked_cast<SysInt>(capacity_array[capi].max());
@@ -825,7 +825,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
         // Propagate to capacity variables for all values in valsInSCC
         for(SysInt valinscc = 0; valinscc < (SysInt)valsInSCC.size(); valinscc++) {
           SysInt v = valsInSCC[valinscc];
-          if(val_to_cap_index[v - dom_min] != -1 && lower[v - dom_min] != upper[v - dom_min]) {
+          if(valToCap_index[v - dom_min] != -1 && lower[v - dom_min] != upper[v - dom_min]) {
             if(Strongcards) {
               prop_capacity_strong_scc(v);
             } else {
@@ -877,7 +877,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #if !UseIncGraph
     for(SysInt scci = 0; scci < (SysInt)vars_in_scc.size(); scci++) {
       SysInt i = vars_in_scc[scci];
-      if(varvalmatching[i] != dom_min - 1 && !var_array[i].inDomain(varvalmatching[i])) {
+      if(varvalmatching[i] != dom_min - 1 && !varArray[i].inDomain(varvalmatching[i])) {
         usage[varvalmatching[i] - dom_min]--;
         varvalmatching[i] = dom_min - 1; // marker for unmatched.
       }
@@ -930,7 +930,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
             // follow the matching edge, if there is one.
             SysInt valtoqueue = varvalmatching[curnode];
             if(valtoqueue != dom_min - 1 && !visited.in(valtoqueue - dom_min + numvars)) {
-              D_ASSERT(var_array[curnode].inDomain(valtoqueue));
+              D_ASSERT(varArray[curnode].inDomain(valtoqueue));
               SysInt validx = valtoqueue - dom_min + numvars;
               if(usage[valtoqueue - dom_min] > lower[valtoqueue - dom_min]) {
                 // can reduce the flow of valtoqueue to increase startval.
@@ -961,7 +961,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
               // and also queue it if it is suitable.
               if(!visited.in(vartoqueue)
 #if !UseIncGraph
-                 && var_array[vartoqueue].inDomain(stackval)
+                 && varArray[vartoqueue].inDomain(stackval)
 #endif
                  &&
                  varvalmatching[vartoqueue] != stackval) // Need to exclude the matching edges????
@@ -1022,8 +1022,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
             if(curnode < numvars) { // it's a variable
 // follow all edges other than the matching edge.
 #if !UseIncGraph
-              for(DomainInt valtoqueue = var_array[curnode].min();
-                  valtoqueue <= var_array[curnode].max(); valtoqueue++) {
+              for(DomainInt valtoqueue = varArray[curnode].min();
+                  valtoqueue <= varArray[curnode].max(); valtoqueue++) {
 #else
               for(SysInt valtoqueuei = 0; valtoqueuei < adjlistlength[curnode]; valtoqueuei++) {
                 SysInt valtoqueue = adjlist[curnode][valtoqueuei];
@@ -1034,7 +1034,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
                 SysInt validx = valtoqueue - dom_min + numvars;
                 if(valtoqueue != varvalmatching[curnode]
 #if !UseIncGraph
-                   && var_array[curnode].inDomain(valtoqueue)
+                   && varArray[curnode].inDomain(valtoqueue)
 #endif
                    && !visited.in(validx)) {
                   // D_ASSERT(find(valsInSCC.begin(), valsInSCC.end(),
@@ -1069,7 +1069,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
                 // For each variable which is matched to stackval, queue it.
                 if(!visited.in(vartoqueue) && varvalmatching[vartoqueue] == stackval) {
-                  D_ASSERT(var_array[vartoqueue].inDomain(stackval));
+                  D_ASSERT(varArray[vartoqueue].inDomain(stackval));
                   // there is an edge from stackval to vartoqueue.
                   // queue vartoqueue
                   visited.insert(vartoqueue);
@@ -1129,7 +1129,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
               // follow the matching edge, if there is one.
               SysInt valtoqueue = varvalmatching[curnode];
               if(valtoqueue != dom_min - 1 && !visited.in(valtoqueue - dom_min + numvars)) {
-                D_ASSERT(var_array[curnode].inDomain(valtoqueue));
+                D_ASSERT(varArray[curnode].inDomain(valtoqueue));
                 SysInt validx = valtoqueue - dom_min + numvars;
                 visited.insert(validx);
                 prev[validx] = curnode;
@@ -1152,7 +1152,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
                 // and also queue it if it is suitable.
                 if(!visited.in(vartoqueue)
 #if !UseIncGraph
-                   && var_array[vartoqueue].inDomain(stackval)
+                   && varArray[vartoqueue].inDomain(stackval)
 #endif
                    &&
                    varvalmatching[vartoqueue] != stackval) // Need to exclude the matching edges????
@@ -1265,14 +1265,14 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       return "gccweak";
   }
 
-  CONSTRAINT_ARG_LIST3(var_array, val_array, capacity_array);
+  CONSTRAINT_ARG_LIST3(varArray, val_array, capacity_array);
 
   virtual SysInt dynamicTriggerCount() {
     SysInt trigs = old_dynamic_triggers();
 
     // These are only for !UseIncGraph || !defined(ONECALL)
     // but we define them always for simplicity.
-    trigs += var_array.size();
+    trigs += varArray.size();
 
     trigs += numvals * 2;
 
@@ -1284,13 +1284,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     SysInt capacitySize = capacity_array.size();
 
 #if !UseIncGraph || !defined(ONECALL)
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i) {
-      this->moveTriggerInt(var_array[i], base + i, DomainChanged);
+      this->moveTriggerInt(varArray[i], base + i, DomainChanged);
     }
 #endif
 
-    base += var_array.size();
+    base += varArray.size();
 
     for(SysInt i = 0; i < capacitySize; ++i) {
       if(val_array[i] >= dom_min && val_array[i] <= dom_max) {
@@ -1303,16 +1303,16 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     for(UnsignedSysInt i = 0; i < capacity_array.size(); ++i)
       vars.push_back(capacity_array[i]);
     return vars;
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vsize) {
-    D_ASSERT(vsize == (SysInt)var_array.size() + (SysInt)capacity_array.size());
+    D_ASSERT(vsize == (SysInt)varArray.size() + (SysInt)capacity_array.size());
     // borrow augpath array
     GCCPRINT("In checkAssignment with array:[");
     for(SysInt i = 0; i < vsize; i++) {
@@ -1429,7 +1429,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       D_ASSERT(std::find(SCCs.begin(), SCCs.end(), i) != SCCs.end());
     }
     for(SysInt i = sccindex_start; i < numvars + numvals; i++) {
-      if(SCCs[i] < numvars && var_array[SCCs[i]].isAssigned()) {
+      if(SCCs[i] < numvars && varArray[SCCs[i]].isAssigned()) {
         // swap with first element
         if(sccindex_start != i) {
           SysInt temp = SCCs[sccindex_start];
@@ -1519,7 +1519,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       D_ASSERT(find(vars_in_scc.begin(), vars_in_scc.end(), curnode) != vars_in_scc.end());
       varcount++;
       SysInt newnode = matching[curnode] - dom_min + numvars;
-      // D_ASSERT(var_array[curnode].inDomain(matching[curnode]));
+      // D_ASSERT(varArray[curnode].inDomain(matching[curnode]));
       D_ASSERT(adjlistpos[curnode][matching[curnode] - dom_min] < adjlistlength[curnode]);
 
       if(!visited.in(newnode)) {
@@ -1544,7 +1544,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 bool found=false;
 for(SysInt i=0; i<vars_in_scc.size(); i++)
 {
-    if(var_array[vars_in_scc[i]].inDomain(curnode+dom_min-numvars))
+    if(varArray[vars_in_scc[i]].inDomain(curnode+dom_min-numvars))
     {
         found=true;
     }
@@ -1564,7 +1564,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
         if(matching[newnode] != curnode - numvars + dom_min) // if the value is not in the matching.
         {
 #if !UseIncGraph
-          if(var_array[newnode].inDomain(curnode + dom_min - numvars))
+          if(varArray[newnode].inDomain(curnode + dom_min - numvars))
 #endif
           {
             // newnode=varvalmatching[newnode]-dom_min+numvars;  // Changed here
@@ -1726,8 +1726,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
                   // variable optimization?
                   if(matching[curvar] != copynode + dom_min - numvars) {
                     GCCPRINT("Removing var: " << curvar << " val:" << copynode + dom_min - numvars);
-                    if(var_array[curvar].inDomain(copynode + dom_min - numvars)) {
-                      var_array[curvar].removeFromDomain(copynode + dom_min - numvars);
+                    if(varArray[curvar].inDomain(copynode + dom_min - numvars)) {
+                      varArray[curvar].removeFromDomain(copynode + dom_min - numvars);
 #if UseIncGraph
                       adjlist_remove(curvar, copynode - numvars + dom_min);
 #endif
@@ -1763,9 +1763,9 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     augpath.clear();
     augpath.resize(numvals, 0);
 
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
-      if(var_array[i].isAssigned()) {
-        DomainInt val = var_array[i].assignedValue();
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
+      if(varArray[i].isAssigned()) {
+        DomainInt val = varArray[i].assignedValue();
         augpath[val - dom_min]++;
       }
     }
@@ -1800,21 +1800,21 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     augpath.resize(numvals, 0);
     for(SysInt i = 0; i < (SysInt)vars_in_scc.size(); i++) {
       SysInt var = vars_in_scc[i];
-      if(var_array[var].isAssigned()) {
-        augpath[var_array[var].assignedValue() - dom_min]++;
+      if(varArray[var].isAssigned()) {
+        augpath[varArray[var].assignedValue() - dom_min]++;
       }
     }
     // Set bounds
     for(SysInt i = 0; i < (SysInt)valsInSCC.size(); i++) {
       SysInt val = valsInSCC[i];
-      SysInt capidx = val_to_cap_index[val - dom_min];
+      SysInt capidx = valToCap_index[val - dom_min];
       capacity_array[capidx].setMin(augpath[val - dom_min]);
       capacity_array[capidx].setMax(adjlistlength[val - dom_min + numvars]);
     }
   }
 
   void prop_capacity_simple(SysInt val) {
-    SysInt i = val_to_cap_index[val - dom_min];
+    SysInt i = valToCap_index[val - dom_min];
     D_ASSERT(i != -1);
     D_ASSERT(lower[val - dom_min] < upper[val - dom_min]);
 // called above or directly from do_gcc_prop_scc when using SCCCARDS
@@ -1822,9 +1822,9 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     SysInt mincap = 0;
     SysInt maxcap = 0;
     for(SysInt j = 0; j < numvars; j++) {
-      if(var_array[j].inDomain(val)) {
+      if(varArray[j].inDomain(val)) {
         maxcap++;
-        if(var_array[j].isAssigned())
+        if(varArray[j].isAssigned())
           mincap++;
       }
     }
@@ -1842,7 +1842,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
       SysInt mincap = 0;
       for(SysInt vari = 0; vari < adjlistlength[val - dom_min + numvars]; vari++) {
         SysInt var = adjlist[val - dom_min + numvars][vari];
-        if(var_array[var].isAssigned() && var_array[var].assignedValue() == val)
+        if(varArray[var].isAssigned() && varArray[var].assignedValue() == val)
           mincap++;
       }
       capacity_array[i].setMin(mincap);
@@ -1881,7 +1881,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 
     SysInt newlb = bfsmatching_card_lowerbound(value, lower[value - dom_min]);
     GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
-    SysInt validx = val_to_cap_index[value - dom_min];
+    SysInt validx = valToCap_index[value - dom_min];
     if(newlb > capacity_array[validx].min()) {
       GCCPRINT("Improved lower bound " << newlb);
       capacity_array[validx].setMin(newlb);
@@ -1990,8 +1990,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
           if(curnode < numvars) { // it's a variable
 // follow all edges other than the matching edge.
 #if !UseIncGraph
-            for(DomainInt valtoqueue = var_array[curnode].min();
-                valtoqueue <= var_array[curnode].max(); valtoqueue++) {
+            for(DomainInt valtoqueue = varArray[curnode].min();
+                valtoqueue <= varArray[curnode].max(); valtoqueue++) {
 #else
             for(SysInt valtoqueuei = 0; valtoqueuei < adjlistlength[curnode]; valtoqueuei++) {
               SysInt valtoqueue = adjlist[curnode][valtoqueuei];
@@ -2002,7 +2002,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
               if(valtoqueue != varvalmatching[curnode] &&
                  valtoqueue != forbiddenval // added for this method.
 #if !UseIncGraph
-                 && var_array[curnode].inDomain(valtoqueue)
+                 && varArray[curnode].inDomain(valtoqueue)
 #endif
                  && !visited.in(validx)) {
                 // D_ASSERT(find(valsInSCC.begin(), valsInSCC.end(),
@@ -2037,7 +2037,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 #endif
               // For each variable which is matched to stackval, queue it.
               if(!visited.in(vartoqueue) && varvalmatching[vartoqueue] == stackval) {
-                D_ASSERT(var_array[vartoqueue].inDomain(stackval));
+                D_ASSERT(varArray[vartoqueue].inDomain(stackval));
                 // there is an edge from stackval to vartoqueue.
                 // queue vartoqueue
                 visited.insert(vartoqueue);
@@ -2060,13 +2060,13 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 #ifdef CAPBOUNDSCACHE
     boundsupported[(forbiddenval - dom_min) * 2] = usage[forbiddenval - dom_min];
     DomainInt dt = (numvars * numvals); // skip over the first block of triggers
-    dt += val_to_cap_index[forbiddenval - dom_min] * (val_array.size() + numvars) *
+    dt += valToCap_index[forbiddenval - dom_min] * (val_array.size() + numvars) *
           2; // move to the area for the value.
     // dt+=(val_array.size()+numvars);  // move to upper bound area
     // now put down the triggers for varvalmatching and usage
     for(SysInt i = 0; i < numvars; i++) {
       D_ASSERT(this->triggerInfo(dt + i) == (forbiddenval - dom_min) * 2);
-      this->moveTriggerInt(var_array[i], dt + i, DomainRemoval, varvalmatching[i]);
+      this->moveTriggerInt(varArray[i], dt + i, DomainRemoval, varvalmatching[i]);
     }
     for(SysInt i = 0; i < val_array.size(); i++) {
       D_ASSERT((dt + numvars + i)->trigger_info() == (forbiddenval - dom_min) * 2);
@@ -2135,7 +2135,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
           // follow the matching edge, if there is one.
           SysInt valtoqueue = varvalmatching[curnode];
           if(valtoqueue != dom_min - 1 && !visited.in(valtoqueue - dom_min + numvars)) {
-            D_ASSERT(var_array[curnode].inDomain(valtoqueue));
+            D_ASSERT(varArray[curnode].inDomain(valtoqueue));
             SysInt validx = valtoqueue - dom_min + numvars;
             if(usage[valtoqueue - dom_min] > lower[valtoqueue - dom_min]) {
               // can reduce the flow of valtoqueue to increase startval.
@@ -2162,7 +2162,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
             // and also queue it if it is suitable.
             if(!visited.in(vartoqueue)
 #if !UseIncGraph
-               && var_array[vartoqueue].inDomain(stackval)
+               && varArray[vartoqueue].inDomain(stackval)
 #endif
                && varvalmatching[vartoqueue] != stackval) // Need to exclude the matching edges????
             {
@@ -2198,13 +2198,13 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 #ifdef CAPBOUNDSCACHE
     boundsupported[(value - dom_min) * 2 + 1] = usage[startvalindex];
     DomainInt dt += (numvars * numvals); // skip over the first block of triggers
-    dt += val_to_cap_index[value - dom_min] * (val_array.size() + numvars) *
+    dt += valToCap_index[value - dom_min] * (val_array.size() + numvars) *
           2;                            // move to the area for the value.
     dt += (val_array.size() + numvars); // move to upper bound area
     // now put down the triggers for varvalmatching and usage
     for(SysInt i = 0; i < numvars; i++) {
       D_ASSERT(this->triggerInfo(dt + i) == (value - dom_min) * 2 + 1);
-      this->moveTriggerInt(var_array[i], dt + i, DomainRemoval, varvalmatching[i]);
+      this->moveTriggerInt(varArray[i], dt + i, DomainRemoval, varvalmatching[i]);
     }
     for(SysInt i = 0; i < val_array.size(); i++) {
       D_ASSERT(this->triggerInfo(dt + numvars + i) == (value - dom_min) * 2 + 1);
@@ -2227,7 +2227,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     vector<AbstractConstraint*> con;
     for(SysInt i = 0; i < (SysInt)capacity_array.size(); i++) {
       NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>* t =
-          new NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>(var_array, val_array[i],
+          new NotOccurrenceEqualConstraint<VarArray, DomainInt, CapVarRef>(varArray, val_array[i],
                                                                            capacity_array[i]);
       con.push_back((AbstractConstraint*)t);
     }

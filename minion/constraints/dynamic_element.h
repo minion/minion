@@ -116,7 +116,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   typedef typename VarArray::value_type VarRef;
 
   // ReversibleInt count;
-  VarArray var_array;
+  VarArray varArray;
   Index indexvar;
   Result resultvar;
 
@@ -127,30 +127,30 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     vector<Mapper> v = indexvar.getMapperStack();
     if(!v.empty() && v.back() == Mapper(MAP_SHIFT, -1)) {
-      return ConOutput::print_con("watchelement_one" + undef_name, var_array,
+      return ConOutput::print_con("watchelement_one" + undef_name, varArray,
                                   indexvar.popOneMapper(), resultvar);
     } else {
-      return ConOutput::print_con("watchelement" + undef_name, var_array, indexvar, resultvar);
+      return ConOutput::print_con("watchelement" + undef_name, varArray, indexvar, resultvar);
     }
   }
 
-  DomainInt initial_result_dom_min;
-  DomainInt initial_result_dom_max;
+  DomainInt initialResultDomMin;
+  DomainInt initialResultDomMax;
 
   vector<DomainInt> current_support;
 
-  ElementConstraintDynamic(const VarArray& _var_array, const Index& _index, const Result& _result)
-      : var_array(_var_array), indexvar(_index), resultvar(_result) {
-    CheckNotBound(var_array, "watchelement", "element");
+  ElementConstraintDynamic(const VarArray& _varArray, const Index& _index, const Result& _result)
+      : varArray(_varArray), indexvar(_index), resultvar(_result) {
+    CheckNotBound(varArray, "watchelement", "element");
     CheckNotBoundSingle(indexvar, "watchelement", "element");
     CheckNotBoundSingle(resultvar, "watchelement", "element");
-    initial_result_dom_min = std::min<DomainInt>(0, resultvar.initialMin());
-    initial_result_dom_max = std::max<DomainInt>(0, resultvar.initialMax());
+    initialResultDomMin = std::min<DomainInt>(0, resultvar.initialMin());
+    initialResultDomMax = std::max<DomainInt>(0, resultvar.initialMax());
   }
 
   virtual SysInt dynamicTriggerCount() {
-    SysInt count = var_array.size() * 2 +
-                   checked_cast<SysInt>(initial_result_dom_max - initial_result_dom_min + 1) * 2 +
+    SysInt count = varArray.size() * 2 +
+                   checked_cast<SysInt>(initialResultDomMax - initialResultDomMin + 1) * 2 +
                    1 + 1;
     if(undef_maps_zero)
       count++;
@@ -159,7 +159,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   }
 
   void find_new_support_for_result(SysInt j) {
-    DomainInt realj = j + initial_result_dom_min;
+    DomainInt realj = j + initialResultDomMin;
 
     if(!resultvar.inDomain(realj))
       return;
@@ -171,25 +171,25 @@ struct ElementConstraintDynamic : public AbstractConstraint {
         return;
       }
 
-      if(indexvar.max() >= (SysInt)var_array.size()) {
+      if(indexvar.max() >= (SysInt)varArray.size()) {
         moveTriggerInt(indexvar, 2 * j, DomainRemoval, indexvar.max());
         releaseTriggerInt(2 * j + 1);
         return;
       }
     }
 
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
 
     DomainInt indexvar_min = indexvar.min();
     DomainInt indexvar_max = indexvar.max();
 
     if(undef_maps_zero) {
       indexvar_min = std::max<DomainInt>(indexvar_min, 0);
-      indexvar_max = std::min<DomainInt>(indexvar_max, (DomainInt)var_array.size() - 1);
+      indexvar_max = std::min<DomainInt>(indexvar_max, (DomainInt)varArray.size() - 1);
     }
 
     D_ASSERT(indexvar_min >= 0);
-    D_ASSERT(indexvar_max < (DomainInt)var_array.size());
+    D_ASSERT(indexvar_max < (DomainInt)varArray.size());
 
     // support is value of index
     DomainInt oldsupport = max(current_support[j + arraySize],
@@ -199,20 +199,20 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     DomainInt support = oldsupport;
 
     while(support <= maxsupport &&
-          !(indexvar.inDomain(support) && var_array[checked_cast<SysInt>(support)].inDomain(realj)))
+          !(indexvar.inDomain(support) && varArray[checked_cast<SysInt>(support)].inDomain(realj)))
       ++support;
     if(support > maxsupport) {
       support = indexvar_min;
       DomainInt max_check = min(oldsupport, maxsupport + 1);
       while(support < max_check && !(indexvar.inDomain(support) &&
-                                     var_array[checked_cast<SysInt>(support)].inDomain(realj)))
+                                     varArray[checked_cast<SysInt>(support)].inDomain(realj)))
         ++support;
       if(support >= max_check) {
         resultvar.removeFromDomain(realj);
         return;
       }
     }
-    moveTriggerInt(var_array[checked_cast<SysInt>(support)], 2 * j, DomainRemoval, realj);
+    moveTriggerInt(varArray[checked_cast<SysInt>(support)], 2 * j, DomainRemoval, realj);
     moveTriggerInt(indexvar, 2 * j + 1, DomainRemoval, support);
     current_support[j + arraySize] = support;
   }
@@ -220,7 +220,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   void check_out_of_bounds_index() {
     if(!undef_maps_zero || !resultvar.inDomain(0)) {
       indexvar.setMin(0);
-      indexvar.setMax((DomainInt)var_array.size() - 1);
+      indexvar.setMax((DomainInt)varArray.size() - 1);
     }
   }
 
@@ -230,13 +230,13 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     DomainInt resultvarmin = resultvar.min();
     DomainInt resultvarmax = resultvar.max();
-    DomainInt trig_pos = (initial_result_dom_max - initial_result_dom_min + 1) * 2;
+    DomainInt trig_pos = (initialResultDomMax - initialResultDomMin + 1) * 2;
 
     if(resultvarmin == resultvarmax) {
-      if(!var_array[i].inDomain(resultvarmin))
+      if(!varArray[i].inDomain(resultvarmin))
         indexvar.removeFromDomain(i);
       else {
-        moveTriggerInt(var_array[i], trig_pos + 2 * i, DomainRemoval, resultvarmin);
+        moveTriggerInt(varArray[i], trig_pos + 2 * i, DomainRemoval, resultvarmin);
         moveTriggerInt(resultvar, trig_pos + 2 * i + 1, DomainRemoval, resultvarmin);
         current_support[i] = resultvarmin;
       }
@@ -249,16 +249,16 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     DomainInt maxsupport = resultvarmax;
     DomainInt support = oldsupport;
 
-    // SysInt support = initial_result_dom_min;
+    // SysInt support = initialResultDomMin;
     while(support <= maxsupport &&
-          !(resultvar.inDomain_noBoundCheck(support) && var_array[i].inDomain(support)))
+          !(resultvar.inDomain_noBoundCheck(support) && varArray[i].inDomain(support)))
       ++support;
 
     if(support > maxsupport) {
       support = resultvarmin;
       DomainInt max_check = min(oldsupport, maxsupport + 1);
       while(support < max_check &&
-            !(resultvar.inDomain_noBoundCheck(support) && var_array[i].inDomain(support)))
+            !(resultvar.inDomain_noBoundCheck(support) && varArray[i].inDomain(support)))
         ++support;
       if(support >= max_check) {
         indexvar.removeFromDomain(i);
@@ -266,7 +266,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       }
     }
 
-    moveTriggerInt(var_array[i], trig_pos + 2 * i, DomainRemoval, support);
+    moveTriggerInt(varArray[i], trig_pos + 2 * i, DomainRemoval, support);
     moveTriggerInt(resultvar, trig_pos + 2 * i + 1, DomainRemoval, support);
     current_support[i] = support;
   }
@@ -275,13 +275,13 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     D_ASSERT(indexvar.isAssigned());
     SysInt indexval = checked_cast<SysInt>(indexvar.assignedValue());
     if(undef_maps_zero) {
-      if(indexval < 0 || indexval >= (SysInt)var_array.size()) {
+      if(indexval < 0 || indexval >= (SysInt)varArray.size()) {
         resultvar.assign(0);
         return;
       }
     }
 
-    VarRef& var = var_array[indexval];
+    VarRef& var = varArray[indexval];
 
     DomainInt lower = resultvar.min();
     if(lower > var.min()) {
@@ -302,8 +302,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
-      if(var_array[i].isBound() && !var_array[i].isAssigned()) { // isassigned excludes constants.
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
+      if(varArray[i].isBound() && !varArray[i].isAssigned()) { // isassigned excludes constants.
         cerr << "Warning: watchelement is not designed to be used on bound "
                 "variables and may cause crashes."
              << endl;
@@ -316,8 +316,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
            << endl;
     }
 
-    SysInt arraySize = var_array.size();
-    DomainInt result_domSize = initial_result_dom_max - initial_result_dom_min + 1;
+    SysInt arraySize = varArray.size();
+    DomainInt resultDomSize = initialResultDomMax - initialResultDomMin + 1;
 
     // Setup SupportLostForIndexValue(i,j)
     // Here we are supporting values in the index variable
@@ -332,14 +332,14 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       return;
 
     for(SysInt i = 0; i < arraySize; ++i) {
-      current_support[i] = initial_result_dom_min - 1; // will be incremented if support sought
+      current_support[i] = initialResultDomMin - 1; // will be incremented if support sought
       if(indexvar.inDomain(i))
         find_new_support_for_index(i);
     }
 
-    for(SysInt i = 0; i < result_domSize; ++i) {
+    for(SysInt i = 0; i < resultDomSize; ++i) {
       current_support[i + arraySize] = -1; // will be incremented if support sought
-      if(resultvar.inDomain(i + initial_result_dom_min))
+      if(resultvar.inDomain(i + initialResultDomMin))
         find_new_support_for_result(i);
     }
 
@@ -347,8 +347,8 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       deal_with_assigned_index();
 
     DomainInt trig_pos =
-        var_array.size() * 2 +
-        checked_cast<SysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
+        varArray.size() * 2 +
+        checked_cast<SysInt>((initialResultDomMax - initialResultDomMin + 1) * 2);
 
     moveTriggerInt(resultvar, trig_pos,
                    DomainChanged); // Why is this always here-- why not place it
@@ -366,12 +366,12 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt pos, DomainDelta) {
     PROP_INFO_ADDONE(DynElement);
-    UnsignedSysInt arraySize = var_array.size();
+    UnsignedSysInt arraySize = varArray.size();
     UnsignedSysInt result_support_triggers =
-        checked_cast<UnsignedSysInt>((initial_result_dom_max - initial_result_dom_min + 1) * 2);
+        checked_cast<UnsignedSysInt>((initialResultDomMax - initialResultDomMin + 1) * 2);
     UnsignedSysInt index_support_triggers = arraySize * 2;
-    // SysInt when_index_assigned_triggers = (initial_result_dom_max -
-    // initial_result_dom_min + 1);
+    // SysInt when_index_assigned_triggers = (initialResultDomMax -
+    // initialResultDomMin + 1);
     if(pos < result_support_triggers) { // It was a value in the result var
                                         // which lost support
       find_new_support_for_result(pos / 2);
@@ -404,7 +404,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       D_ASSERT(pos == 1);
       D_ASSERT(!resultvar.inDomain(0));
       indexvar.setMin(0);
-      indexvar.setMax((DomainInt)var_array.size() - 1);
+      indexvar.setMax((DomainInt)varArray.size() - 1);
       return;
     }
 
@@ -412,7 +412,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    D_ASSERT(vSize == (SysInt)var_array.size() + 2);
+    D_ASSERT(vSize == (SysInt)varArray.size() + 2);
     DomainInt resultvariable = v[vSize - 1];
     DomainInt indexvariable = v[vSize - 2];
     if(indexvariable < 0 || indexvariable >= (SysInt)vSize - 2) {
@@ -427,9 +427,9 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size() + 2);
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size() + 2);
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     vars.push_back(indexvar);
     vars.push_back(resultvar);
     return vars;
@@ -437,18 +437,18 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     DomainInt array_start = max(DomainInt(0), indexvar.min());
-    DomainInt array_end = min(DomainInt(var_array.size()) - 1, indexvar.max());
+    DomainInt array_end = min(DomainInt(varArray.size()) - 1, indexvar.max());
 
     if(undef_maps_zero) {
       if(resultvar.inDomain(0)) {
         if(indexvar.min() < 0) {
-          assignment.push_back(make_pair(var_array.size(), indexvar.min()));
-          assignment.push_back(make_pair(var_array.size() + 1, 0));
+          assignment.push_back(make_pair(varArray.size(), indexvar.min()));
+          assignment.push_back(make_pair(varArray.size() + 1, 0));
           return true;
         }
-        if(indexvar.max() >= (SysInt)var_array.size()) {
-          assignment.push_back(make_pair(var_array.size(), indexvar.max()));
-          assignment.push_back(make_pair(var_array.size() + 1, 0));
+        if(indexvar.max() >= (SysInt)varArray.size()) {
+          assignment.push_back(make_pair(varArray.size(), indexvar.max()));
+          assignment.push_back(make_pair(varArray.size() + 1, 0));
           return true;
         }
       }
@@ -456,14 +456,14 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     for(SysInt i = checked_cast<SysInt>(array_start); i <= checked_cast<SysInt>(array_end); ++i) {
       if(indexvar.inDomain(i)) {
-        DomainInt dom_start = max(resultvar.min(), var_array[i].min());
-        DomainInt dom_end = min(resultvar.max(), var_array[i].max());
+        DomainInt dom_start = max(resultvar.min(), varArray[i].min());
+        DomainInt dom_end = min(resultvar.max(), varArray[i].max());
         for(DomainInt domval = dom_start; domval <= dom_end; ++domval) {
-          if(var_array[i].inDomain(domval) && resultvar.inDomain(domval)) {
+          if(varArray[i].inDomain(domval) && resultvar.inDomain(domval)) {
             // indexvar = i
-            assignment.push_back(make_pair(var_array.size(), i));
+            assignment.push_back(make_pair(varArray.size(), i));
             // resultvar = domval
-            assignment.push_back(make_pair(var_array.size() + 1, domval));
+            assignment.push_back(make_pair(varArray.size() + 1, domval));
             // vararray[i] = domval
             assignment.push_back(make_pair(i, domval));
             return true;
@@ -484,18 +484,18 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       // Constraint is satisfied if the index is out of range.
       vector<DomainInt> r;
       r.push_back(0);
-      r.push_back((DomainInt)var_array.size() - 1);
+      r.push_back((DomainInt)varArray.size() - 1);
       AbstractConstraint* t4 =
           (AbstractConstraint*)new WatchNotInRangeConstraint<Index>(indexvar, r);
       con.push_back(t4);
     }
 
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
       vector<AbstractConstraint*> con2;
       WatchLiteralConstraint<Index>* t = new WatchLiteralConstraint<Index>(indexvar, i);
       con2.push_back((AbstractConstraint*)t);
       NeqConstraintBinary<AnyVarRef, Result>* t2 =
-          new NeqConstraintBinary<AnyVarRef, Result>(var_array[i], resultvar);
+          new NeqConstraintBinary<AnyVarRef, Result>(varArray[i], resultvar);
       con2.push_back((AbstractConstraint*)t2);
 
       Dynamic_AND* t3 = new Dynamic_AND(con2);
@@ -507,7 +507,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       vector<AbstractConstraint*> out_bounds;
       out_bounds.push_back(new WatchNotLiteralConstraint<Result>(resultvar, 0));
       out_bounds.push_back(new WatchNotInRangeConstraint<Index>(
-          indexvar, make_vec<DomainInt>(0, (DomainInt)var_array.size() - 1)));
+          indexvar, make_vec<DomainInt>(0, (DomainInt)varArray.size() - 1)));
       con.push_back(new Dynamic_AND(out_bounds));
     }
     return new Dynamic_OR(con);

@@ -169,7 +169,7 @@ struct triple {
 };
 
 template <typename VarArray, typename BranchList>
-inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
+inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
   if(getOptions().noresumefile) {
     return;
   }
@@ -197,7 +197,7 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
       splits.push_back("");
     } else {
       typedef typename VarArray::value_type VarRef;
-      const VarRef& var = var_array[branches.back().var];
+      const VarRef& var = varArray[branches.back().var];
       curvar = getState().getInstance()->vars.getName(var.getBaseVar());
       DomainInt min = var.min();
       DomainInt max = var.max();
@@ -247,11 +247,11 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
           for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
               lb != left_branches_so_far.end(); lb++) {
             fileout << "w-notliteral(";
-            inputPrint(fileout, var_array[lb->var].getBaseVar());
+            inputPrint(fileout, varArray[lb->var].getBaseVar());
             fileout << "," << lb->val << "),";
           }
           fileout << "w-notliteral(";
-          inputPrint(fileout, var_array[curr->var].getBaseVar());
+          inputPrint(fileout, varArray[curr->var].getBaseVar());
           fileout << "," << curr->val << ")})" << endl;
         }
       }
@@ -272,11 +272,11 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
           for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
               lb != left_branches_so_far.end(); lb++) {
             cerr << "w-notliteral(";
-            inputPrint(cerr, var_array[lb->var].getBaseVar());
+            inputPrint(cerr, varArray[lb->var].getBaseVar());
             cerr << "," << lb->val << "),";
           }
           cerr << "w-notliteral(";
-          inputPrint(cerr, var_array[curr->var].getBaseVar());
+          inputPrint(cerr, varArray[curr->var].getBaseVar());
           cerr << "," << curr->val << ")})" << endl;
         }
       }
@@ -286,16 +286,16 @@ inline void generateRestartFile(VarArray& var_array, BranchList& branches) {
 }
 
 /// Check if timelimit has been exceeded.
-inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& var_array,
+inline void standard_time_ctrlc_checks(const vector<AnyVarRef>& varArray,
                                        const vector<Controller::triple>& branches) {
   if(getState().getNodeCount() >= getOptions().nodelimit) {
-    generateRestartFile(var_array, branches);
+    generateRestartFile(varArray, branches);
     throw EndOfSearch();
   }
 
   if(Parallel::isAlarmActivated()) { // Either a timeout has occurred, or
                                      // ctrl+c has been pressed.
-    generateRestartFile(var_array, branches);
+    generateRestartFile(varArray, branches);
     if(Parallel::isCtrlCPressed()) {
       throw EndOfSearch();
     }
@@ -335,7 +335,7 @@ void inline standard_deal_with_solution() {
 void inline maybe_print_node(bool isSolution = false) {
   if(getOptions().dumptree)
     cout << "Node: " << getState().getNodeCount() << ","
-         << get_dom_as_string(getVars().getAllVars()) << endl;
+         << getDom_as_string(getVars().getAllVars()) << endl;
   if(getOptions().dumptreeobj) {
     getOptions().dumptreeobj->output_node(getState().getNodeCount(), getVars().getAllVars(),
                                           isSolution);

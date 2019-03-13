@@ -26,9 +26,9 @@ namespace Controller {
 
 shared_ptr<VariableOrder> make_search_order(SearchOrder order) {
   // collect the variables in the SearchOrder object
-  vector<AnyVarRef> var_array;
+  vector<AnyVarRef> varArray;
   for(SysInt i = 0; i < (SysInt)order.var_order.size(); i++) {
-    var_array.push_back(get_AnyVarRef_from_Var(order.var_order[i]));
+    varArray.push_back(get_AnyVarRef_from_Var(order.var_order[i]));
     // some check here?
   }
 
@@ -37,23 +37,23 @@ shared_ptr<VariableOrder> make_search_order(SearchOrder order) {
 
   switch(order.order) // get the VarOrderEnum
   {
-  case ORDER_STATIC: vo = new StaticBranch(var_array, order.val_order); break;
-  case ORDER_ORIGINAL: vo = new StaticBranch(var_array, order.val_order); break;
-  case ORDER_SDF: vo = new SDFBranch(var_array, order.val_order); break;
-  case ORDER_SRF: vo = new SRFBranch(var_array, order.val_order); break;
-  case ORDER_LDF: vo = new LDFBranch(var_array, order.val_order); break;
+  case ORDER_STATIC: vo = new StaticBranch(varArray, order.val_order); break;
+  case ORDER_ORIGINAL: vo = new StaticBranch(varArray, order.val_order); break;
+  case ORDER_SDF: vo = new SDFBranch(varArray, order.val_order); break;
+  case ORDER_SRF: vo = new SRFBranch(varArray, order.val_order); break;
+  case ORDER_LDF: vo = new LDFBranch(varArray, order.val_order); break;
   case ORDER_CONFLICT:
     // for the time being, just use static as the underlying order
-    vo2 = new StaticBranch(var_array, order.val_order);
-    vo = new ConflictBranch(var_array, order.val_order, vo2);
+    vo2 = new StaticBranch(varArray, order.val_order);
+    vo = new ConflictBranch(varArray, order.val_order, vo2);
     break;
   case ORDER_STATIC_LIMITED:
-    vo = new StaticBranchLimited(var_array, order.val_order, order.limit);
+    vo = new StaticBranchLimited(varArray, order.val_order, order.limit);
     break;
 
 #ifdef WDEG
-  case ORDER_WDEG: vo = new WdegBranch(var_array, order.val_order); break;
-  case ORDER_DOMOVERWDEG: vo = new DomOverWdegBranch(var_array, order.val_order); break;
+  case ORDER_WDEG: vo = new WdegBranch(varArray, order.val_order); break;
+  case ORDER_DOMOVERWDEG: vo = new DomOverWdegBranch(varArray, order.val_order); break;
 #else
   case ORDER_WDEG:
   case ORDER_DOMOVERWDEG:

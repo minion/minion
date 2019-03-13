@@ -202,18 +202,18 @@ typename SwitchNegType<VRef>::type SwitchNegRef(const VRef& var_ref) {
 }
 
 template <typename VarRef>
-vector<SwitchNeg<VarRef>> SwitchNegRef(const vector<VarRef>& var_array) {
+vector<SwitchNeg<VarRef>> SwitchNegRef(const vector<VarRef>& varArray) {
   vector<SwitchNeg<VarRef>> neg_array;
-  neg_array.reserve(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    neg_array.push_back(SwitchNegRef(var_array[i]));
+  neg_array.reserve(varArray.size());
+  for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+    neg_array.push_back(SwitchNegRef(varArray[i]));
   return neg_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<SwitchNeg<VarRef>, i> SwitchNegRef(const std::array<VarRef, i>& var_array) {
+std::array<SwitchNeg<VarRef>, i> SwitchNegRef(const std::array<VarRef, i>& varArray) {
   std::array<SwitchNeg<VarRef>, i> neg_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
-    neg_array[l] = SwitchNegRef(var_array[l]);
+    neg_array[l] = SwitchNegRef(varArray[l]);
   return neg_array;
 }

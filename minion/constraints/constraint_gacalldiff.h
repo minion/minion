@@ -43,8 +43,8 @@ This constraint enforces generalized arc consistency.
 #include "alldiff_common.h"
 
 template <typename VarArray>
-AbstractConstraint* BuildCT_GACALLDIFF(const VarArray& var_array, ConstraintBlob&) {
-  return new GacAlldiffConstraint<VarArray>(var_array);
+AbstractConstraint* BuildCT_GACALLDIFF(const VarArray& varArray, ConstraintBlob&) {
+  return new GacAlldiffConstraint<VarArray>(varArray);
 }
 
 /* JSON

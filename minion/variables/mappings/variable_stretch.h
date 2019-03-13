@@ -424,19 +424,19 @@ typename MultiplyType<VRef>::type MultiplyVarRef(VRef var_ref, SysInt i) {
 }
 
 template <typename VarRef>
-vector<MultiplyVar<VarRef>> MultiplyVarRef(const vector<VarRef>& var_array,
+vector<MultiplyVar<VarRef>> MultiplyVarRef(const vector<VarRef>& varArray,
                                            const vector<DomainInt>& multiplies) {
-  vector<MultiplyVar<VarRef>> Multiply_array(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    Multiply_array[i] = MultiplyVarRef(var_array[i], multiplies[i]);
+  vector<MultiplyVar<VarRef>> Multiply_array(varArray.size());
+  for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+    Multiply_array[i] = MultiplyVarRef(varArray[i], multiplies[i]);
   return Multiply_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<MultiplyVar<VarRef>, i> MultiplyVarRef(const std::array<VarRef, i>& var_array,
+std::array<MultiplyVar<VarRef>, i> MultiplyVarRef(const std::array<VarRef, i>& varArray,
                                                   const std::array<SysInt, i>& multiplies) {
   std::array<MultiplyVar<VarRef>, i> Multiply_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
-    Multiply_array[l] = MultiplyVarRef(var_array[l], multiplies[i]);
+    Multiply_array[l] = MultiplyVarRef(varArray[l], multiplies[i]);
   return Multiply_array;
 }

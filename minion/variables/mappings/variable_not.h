@@ -213,18 +213,18 @@ VRef VarNotRef(const VarNot<VRef>& var_ref) {
 }
 
 template <typename VarRef>
-vector<VarNot<VarRef>> VarNotRef(const vector<VarRef>& var_array) {
+vector<VarNot<VarRef>> VarNotRef(const vector<VarRef>& varArray) {
   vector<VarNot<VarRef>> Not_array;
-  Not_array.reserve(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    Not_array.push_back(VarNotRef(var_array[i]));
+  Not_array.reserve(varArray.size());
+  for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+    Not_array.push_back(VarNotRef(varArray[i]));
   return Not_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<VarNot<VarRef>, i> VarNotRef(const std::array<VarRef, i>& var_array) {
+std::array<VarNot<VarRef>, i> VarNotRef(const std::array<VarRef, i>& varArray) {
   std::array<VarNot<VarRef>, i> Not_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
-    Not_array[l] = VarNotRef(var_array[l]);
+    Not_array[l] = VarNotRef(varArray[l]);
   return Not_array;
 }

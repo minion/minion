@@ -163,7 +163,7 @@ struct NeighbourhoodState {
                                  getState().getOptimiseVar()->min(), 0, false, false);
 
         globalStats.reportnewStats(searchParams.combinationToActivate, stats);
-        Controller::world_pop_to_depth(depth);
+        Controller::world_popToDepth(depth);
         return stats;
       }
     }
@@ -171,9 +171,9 @@ struct NeighbourhoodState {
     DomainInt highestNeighbourhoodSize, oldMinValue = getState().getOptimiseVar()->min(),
                                         newOptMinTarget = oldMinValue, lastOptVal = oldMinValue;
     std::shared_ptr<Controller::StandardSearchManager> sm;
-    auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
+    auto timeoutChecker = [&](const vector<AnyVarRef>& varArray,
                               const vector<Controller::triple>& branches) {
-      Controller::standard_time_ctrlc_checks(var_array, branches);
+      Controller::standard_time_ctrlc_checks(varArray, branches);
       if(alarmTriggered) {
         if(searchParams.mode == SearchParams::NEIGHBOURHOOD_SEARCH) {
           highestNeighbourhoodSize =
@@ -231,17 +231,17 @@ struct NeighbourhoodState {
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);
 
     if(Parallel::isAlarmActivated()) {
-      Controller::world_pop_to_depth(depth);
+      Controller::world_popToDepth(depth);
       throw EndOfSearch();
     }
 
-    Controller::world_pop_to_depth(depth);
+    Controller::world_popToDepth(depth);
     return stats;
   }
 
   void popToBaseDepth() {
     if(Controller::get_world_depth() != 1) {
-      Controller::world_pop_to_depth(1);
+      Controller::world_popToDepth(1);
     }
     Controller::world_push();
   }
@@ -260,7 +260,7 @@ struct NeighbourhoodState {
   }
   inline void printBestSolution() {
     if(Controller::get_world_depth() != 1) {
-      Controller::world_pop_to_depth(1);
+      Controller::world_popToDepth(1);
     }
     std::vector<std::pair<AnyVarRef, DomainInt>>& bestAssignment = globalStats.getBestAssignment();
     for(auto& varAssignmentPair : bestAssignment) {

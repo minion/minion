@@ -3,7 +3,7 @@
 namespace Controller {
 struct RestartSearchManager : public Controller::SearchManager {
   PropagationLevel prop_method;
-  vector<SearchOrder> initial_order;
+  vector<SearchOrder> initialOrder;
 
   void doASearch(const vector<SearchOrder>& order, int nodelimit) {
     int depth = Controller::get_world_depth();
@@ -20,9 +20,9 @@ struct RestartSearchManager : public Controller::SearchManager {
 
     std::cout << "Starting search\n";
 
-    auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
+    auto timeoutChecker = [&](const vector<AnyVarRef>& varArray,
                               const vector<Controller::triple>& branches) {
-      Controller::standard_time_ctrlc_checks(var_array, branches);
+      Controller::standard_time_ctrlc_checks(varArray, branches);
       if(alarmTriggered) {
         throw TimeoutException();
       }
@@ -49,16 +49,16 @@ struct RestartSearchManager : public Controller::SearchManager {
       throw EndOfSearch();
     }
     std::cout << "Did a search " << timeout << "\n";
-    Controller::world_pop_to_depth(depth);
+    Controller::world_popToDepth(depth);
   }
 
   RestartSearchManager(PropagationLevel _prop_method, const vector<SearchOrder>& _order)
-      : prop_method(_prop_method), initial_order(_order) {}
+      : prop_method(_prop_method), initialOrder(_order) {}
 
   virtual void search() {
     std::uniform_int_distribution<int> order(1, 7);
     for(int i = 1; i < 10000000; i *= 10) {
-      vector<SearchOrder> new_order = initial_order;
+      vector<SearchOrder> new_order = initialOrder;
       for(int j = 0; j < new_order.size(); ++j) {
         new_order[j].order = (VarOrderEnum)(order(global_random_gen));
       }

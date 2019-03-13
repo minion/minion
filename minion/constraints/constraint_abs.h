@@ -126,9 +126,9 @@ struct AbsConstraint : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    DomainInt x_dom_max = var1.max();
-    DomainInt y_dom_max = max(abs(var2.min()), abs(var2.max()));
-    DomainInt dom_max = min(x_dom_max, y_dom_max);
+    DomainInt xDomMax = var1.max();
+    DomainInt yDomMax = max(abs(var2.min()), abs(var2.max()));
+    DomainInt dom_max = min(xDomMax, yDomMax);
     DomainInt dom_min = max(DomainInt(0), max(var1.min(), var2.min()));
 
     for(DomainInt i = dom_min; i <= dom_max; ++i) {

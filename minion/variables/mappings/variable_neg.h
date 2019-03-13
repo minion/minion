@@ -197,19 +197,19 @@ VRef VarNegRef(const VarNeg<VRef>& var_ref) {
 }
 
 template <typename VarRef>
-vector<typename NegType<VarRef>::type> VarNegRef(const vector<VarRef>& var_array) {
+vector<typename NegType<VarRef>::type> VarNegRef(const vector<VarRef>& varArray) {
   vector<typename NegType<VarRef>::type> neg_array;
-  neg_array.reserve(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    neg_array.push_back(VarNegRef(var_array[i]));
+  neg_array.reserve(varArray.size());
+  for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+    neg_array.push_back(VarNegRef(varArray[i]));
   return neg_array;
 }
 
 template <typename VarRef, std::size_t i>
-std::array<typename NegType<VarRef>::type, i> VarNegRef(const std::array<VarRef, i>& var_array) {
+std::array<typename NegType<VarRef>::type, i> VarNegRef(const std::array<VarRef, i>& varArray) {
   std::array<typename NegType<VarRef>::type, i> neg_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
-    neg_array[l] = VarNegRef(var_array[l]);
+    neg_array[l] = VarNegRef(varArray[l]);
   return neg_array;
 }
 

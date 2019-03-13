@@ -233,26 +233,26 @@ struct STR : public AbstractConstraint {
     std::random_shuffle(tupindices.begin(), tupindices.end());
   }
 
-  STR(const VarArray& _var_array, ShortTupleList* _tuples)
+  STR(const VarArray& _varArray, ShortTupleList* _tuples)
       : shortTupleList(_tuples),
         longTupleList(0),
-        vars(_var_array),
+        vars(_varArray),
         constraint_locked(false),
         limit(),
-        sct(new STRData(_tuples, _var_array.size()))
+        sct(new STRData(_tuples, _varArray.size()))
   //, ssup_permanent()
   {
     CHECK(UseShort, "Internal error in ShortSTR2");
     init();
   }
 
-  STR(const VarArray& _var_array, TupleList* _tuples)
+  STR(const VarArray& _varArray, TupleList* _tuples)
       : shortTupleList(0),
         longTupleList(_tuples),
-        vars(_var_array),
+        vars(_varArray),
         constraint_locked(false),
         limit(),
-        sct(new STRData(_tuples, _var_array.size()))
+        sct(new STRData(_tuples, _varArray.size()))
   //, ssup_permanent()
   {
     CHECK(!UseShort, "Internal error in str2plus");

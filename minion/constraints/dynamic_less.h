@@ -115,10 +115,10 @@ struct WatchLessConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint* BuildCT_WATCHED_LESS(const VarArray1& _var_array_1,
-                                         const VarArray2& _var_array_2, ConstraintBlob&) {
+AbstractConstraint* BuildCT_WATCHED_LESS(const VarArray1& _varArray_1,
+                                         const VarArray2& _varArray_2, ConstraintBlob&) {
   return new WatchLessConstraint<typename VarArray1::value_type, typename VarArray2::value_type>(
-      _var_array_1[0], _var_array_2[0]);
+      _varArray_1[0], _varArray_2[0]);
 }
 
 /* JSON

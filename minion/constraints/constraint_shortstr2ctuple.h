@@ -303,13 +303,13 @@ struct CTupleSTR : public AbstractConstraint {
     std::random_shuffle(tupindices.begin(), tupindices.end());
   }
 
-  CTupleSTR(const VarArray& _var_array, ShortTupleList* _tuples)
+  CTupleSTR(const VarArray& _varArray, ShortTupleList* _tuples)
       : shortTupleList(_tuples),
         longTupleList(0),
-        vars(_var_array),
+        vars(_varArray),
         constraint_locked(false),
         limit(),
-        sct(new CTupleSTRData(_tuples, _var_array.size()))
+        sct(new CTupleSTRData(_tuples, _varArray.size()))
   //, ssup_permanent()
   {
     CHECK(UseShort, "Internal error in ShortSTR2");

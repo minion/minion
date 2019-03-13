@@ -64,8 +64,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   // These should only be read when idxes_assigned is true
   std::set<DomainInt> idx_source_set;
   std::set<DomainInt> idx_target_set;
-  std::vector<SysInt> source_to_target_map;
-  std::vector<SysInt> target_to_source_map;
+  std::vector<SysInt> sourceToTarget_map;
+  std::vector<SysInt> targetToSource_map;
 
   FrameUpdateConstraint(const V1& v1, const V2& v2, const V3& v3, const V4& v4,
                         const ValueType _value)
@@ -83,8 +83,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     CHECK((source.size() % blocksize == 0),
           "Source and target vector size does not divide by block size in frameupdate constraint.");
 
-    source_to_target_map.assign(source.size(), -1);
-    target_to_source_map.assign(target.size(), -1);
+    sourceToTarget_map.assign(source.size(), -1);
+    targetToSource_map.assign(target.size(), -1);
   }
 
   virtual string constraintName() {
@@ -153,8 +153,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     }
 
     // Setup mapping arrays
-    source_to_target_map.assign(source.size(), -1);
-    target_to_source_map.assign(target.size(), -1);
+    sourceToTarget_map.assign(source.size(), -1);
+    targetToSource_map.assign(target.size(), -1);
 
     SysInt numblocks = source.size() / blocksize;
     SysInt idxsource = 1; ///  Index blocks from 1.
@@ -168,8 +168,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
         idxtarget++;
       }
       if(idxsource <= numblocks && idxtarget <= numblocks) {
-        source_to_target_map[idxsource - 1] = idxtarget - 1;
-        target_to_source_map[idxtarget - 1] = idxsource - 1;
+        sourceToTarget_map[idxsource - 1] = idxtarget - 1;
+        targetToSource_map[idxtarget - 1] = idxsource - 1;
       }
 
       idxsource++;
@@ -189,9 +189,9 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
   void copy_from_source(SysInt i) {
     SysInt block = i / blocksize;
-    if(source_to_target_map[block] >= 0) {
+    if(sourceToTarget_map[block] >= 0) {
       SysInt blockpos = i % blocksize;
-      SysInt targetpos = source_to_target_map[block] * blocksize + blockpos;
+      SysInt targetpos = sourceToTarget_map[block] * blocksize + blockpos;
       D_ASSERT(targetpos >= 0 && targetpos < target.size());
       D_ASSERT(i >= 0 && i < source.size());
       target[targetpos].setMax(source[i].max());
@@ -201,9 +201,9 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
   void copy_from_target(SysInt i) {
     SysInt block = i / blocksize;
-    if(target_to_source_map[block] >= 0) {
+    if(targetToSource_map[block] >= 0) {
       SysInt blockpos = i % blocksize;
-      SysInt sourcepos = target_to_source_map[block] * blocksize + blockpos;
+      SysInt sourcepos = targetToSource_map[block] * blocksize + blockpos;
       D_ASSERT(sourcepos >= 0 && sourcepos < source.size());
       D_ASSERT(i >= 0 && i < target.size());
       source[sourcepos].setMax(target[i].max());

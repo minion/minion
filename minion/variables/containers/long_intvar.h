@@ -114,7 +114,7 @@ struct BigRangeVarContainer {
     return ((domain_bound_type*)bound_data())[i.varNum * BOUND_DATA_SIZE + 2];
   }
 
-  void reduce_domSize(BigRangeVarRef_internal i) {
+  void reduceDomSize(BigRangeVarRef_internal i) {
     domSize(i) -= 1;
   }
 
@@ -301,7 +301,7 @@ struct BigRangeVarContainer {
       return;
     }
     trigger_list.pushDomain_removal(d.varNum, i);
-    reduce_domSize(d);
+    reduceDomSize(d);
 #ifndef NO_DOMAIN_TRIGGERS
     trigger_list.pushDomain_changed(d.varNum);
 #endif
@@ -374,7 +374,7 @@ private:
       // initial_bounds[d.varNum].first);
       if(bms_array->isMember(loop + domainOffset) && loop != offset) {
         trigger_list.pushDomain_removal(d.varNum, loop);
-        reduce_domSize(d);
+        reduceDomSize(d);
       }
     }
     trigger_list.pushDomain_changed(d.varNum);
@@ -420,7 +420,7 @@ public:
         // initial_bounds[d.varNum].first);
         if(bms_array->isMember(domainOffset + loop)) {
           trigger_list.pushDomain_removal(d.varNum, loop);
-          reduce_domSize(d);
+          reduceDomSize(d);
         }
       }
       upper_bound(d) = offset;
@@ -470,7 +470,7 @@ public:
         // initial_bounds[d.varNum].first);
         if(bms_array->isMember(loop + domainOffset)) {
           trigger_list.pushDomain_removal(d.varNum, loop);
-          reduce_domSize(d);
+          reduceDomSize(d);
         }
       }
       D_ASSERT(getState().isFailed() ||

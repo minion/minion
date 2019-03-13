@@ -280,9 +280,9 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BuildCT_LEQNVALUE(const VarArray& _var_array, const vector<VarSum>& _var_sum,
+AbstractConstraint* BuildCT_LEQNVALUE(const VarArray& _varArray, const vector<VarSum>& _var_sum,
                                       ConstraintBlob&) {
-  return new LessEqualNvalueConstraint<VarArray, VarSum>(_var_array, _var_sum[0]);
+  return new LessEqualNvalueConstraint<VarArray, VarSum>(_varArray, _var_sum[0]);
 }
 
 /* JSON
@@ -294,9 +294,9 @@ AbstractConstraint* BuildCT_LEQNVALUE(const VarArray& _var_array, const vector<V
 */
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BuildCT_GEQNVALUE(const VarArray& _var_array, const vector<VarSum>& _var_sum,
+AbstractConstraint* BuildCT_GEQNVALUE(const VarArray& _varArray, const vector<VarSum>& _var_sum,
                                       ConstraintBlob&) {
-  return new GreaterEqualNvalueConstraint<VarArray, VarSum>(_var_array, _var_sum[0]);
+  return new GreaterEqualNvalueConstraint<VarArray, VarSum>(_varArray, _var_sum[0]);
 }
 
 /* JSON

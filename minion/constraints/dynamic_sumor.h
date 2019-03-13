@@ -46,7 +46,7 @@ struct VecCountDynamic : public AbstractConstraint {
     return Operator::constraintName();
   }
 
-  CONSTRAINT_ARG_LIST3(var_array1, var_array2, original_distance());
+  CONSTRAINT_ARG_LIST3(varArray1, varArray2, original_distance());
 
   // 10 - 3 + 1 = 8
   // 10 - 8 + 1 = 3
@@ -54,14 +54,14 @@ struct VecCountDynamic : public AbstractConstraint {
     if(constraintName() == "hamming")
       return hamming_distance;
     if(constraintName() == "not-hamming")
-      return (SysInt)var_array1.size() - hamming_distance + 1;
+      return (SysInt)varArray1.size() - hamming_distance + 1;
     abort();
   }
   typedef typename VarArray1::value_type VarRef1;
   typedef typename VarArray2::value_type VarRef2;
 
-  VarArray1 var_array1;
-  VarArray2 var_array2;
+  VarArray1 varArray1;
+  VarArray2 varArray2;
   DomainInt num_to_watch;
   DomainInt hamming_distance;
   vector<DomainInt> watchedValues;
@@ -71,15 +71,15 @@ struct VecCountDynamic : public AbstractConstraint {
   DomainInt index_to_not_propagate;
 
   VecCountDynamic(const VarArray1& _array1, const VarArray2& _array2, DomainInt _hamming_distance)
-      : var_array1(_array1),
-        var_array2(_array2),
+      : varArray1(_array1),
+        varArray2(_array2),
         num_to_watch(_hamming_distance + 1),
         hamming_distance(_hamming_distance),
         propagate_mode(false),
         index_to_not_propagate(-1) {
     if(num_to_watch <= 1)
       num_to_watch = 0;
-    D_ASSERT(var_array1.size() == var_array2.size());
+    D_ASSERT(varArray1.size() == varArray2.size());
   }
 
   virtual SysInt dynamicTriggerCount() {
@@ -88,12 +88,12 @@ struct VecCountDynamic : public AbstractConstraint {
 
   bool no_support_for_index(DomainInt index_in) {
     const SysInt index = checked_cast<SysInt>(index_in);
-    return Operator::no_support_for_pair(var_array1[index], var_array2[index]);
+    return Operator::no_support_for_pair(varArray1[index], varArray2[index]);
   }
 
   void add_triggers(DomainInt index_in, DomainInt dt) {
     const SysInt index = checked_cast<SysInt>(index_in);
-    Operator::add_triggers(this, var_array1[index], var_array2[index], dt);
+    Operator::add_triggers(this, varArray1[index], varArray2[index], dt);
   }
 
   virtual void fullPropagate() {
@@ -104,7 +104,7 @@ struct VecCountDynamic : public AbstractConstraint {
 
     watchedValues.resize(checked_cast<SysInt>(num_to_watch));
 
-    SysInt size = var_array1.size();
+    SysInt size = varArray1.size();
     SysInt index = 0;
     SysInt found_matches = 0;
     // Find first pair we could watch.
@@ -149,7 +149,7 @@ struct VecCountDynamic : public AbstractConstraint {
 
   void initalise_unwatchedValues() {
     unwatchedValues.resize(0);
-    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
+    for(SysInt i = 0; i < (SysInt)varArray1.size(); ++i) {
       bool found = false;
       for(SysInt j = 0; j < (SysInt)watchedValues.size(); ++j) {
         if(i == watchedValues[j])
@@ -164,12 +164,12 @@ struct VecCountDynamic : public AbstractConstraint {
 
   void propagate_from_var1(DomainInt index_in) {
     const SysInt index = checked_cast<SysInt>(index_in);
-    Operator::propagate_from_var1(var_array1[index], var_array2[index]);
+    Operator::propagate_from_var1(varArray1[index], varArray2[index]);
   }
 
   void propagate_from_var2(DomainInt index_in) {
     const SysInt index = checked_cast<SysInt>(index_in);
-    Operator::propagate_from_var2(var_array1[index], var_array2[index]);
+    Operator::propagate_from_var2(varArray1[index], varArray2[index]);
   }
 
   virtual void propagateDynInt(SysInt trigger_activated, DomainDelta) {
@@ -188,13 +188,13 @@ struct VecCountDynamic : public AbstractConstraint {
       printf("%d,", unwatchedValues[i]);
     printf("\n");
 
-    for(SysInt i = 0; i < var_array1.size(); ++i)
-      cout << var_array1[i].min() << ":" << var_array1[i].max() << ",";
+    for(SysInt i = 0; i < varArray1.size(); ++i)
+      cout << varArray1[i].min() << ":" << varArray1[i].max() << ",";
 
     cout << endl;
 
-    for(SysInt i = 0; i < var_array2.size(); ++i)
-      cout << var_array2[i].min() << ":" << var_array2[i].max() << ",";
+    for(SysInt i = 0; i < varArray2.size(); ++i)
+      cout << varArray2[i].min() << ":" << varArray2[i].max() << ",";
 
     cout << endl;*/
 
@@ -247,7 +247,7 @@ struct VecCountDynamic : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    UnsignedSysInt vSize1 = var_array1.size();
+    UnsignedSysInt vSize1 = varArray1.size();
     SysInt count = 0;
     for(UnsignedSysInt i = 0; i < vSize1; ++i)
       if(Operator::checkAssignment(v[i], v[i + vSize1]))
@@ -257,11 +257,11 @@ struct VecCountDynamic : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array1.size() + var_array2.size());
-    for(UnsignedSysInt i = 0; i < var_array1.size(); ++i)
-      vars.push_back(AnyVarRef(var_array1[i]));
-    for(UnsignedSysInt i = 0; i < var_array2.size(); ++i)
-      vars.push_back(AnyVarRef(var_array2[i]));
+    vars.reserve(varArray1.size() + varArray2.size());
+    for(UnsignedSysInt i = 0; i < varArray1.size(); ++i)
+      vars.push_back(AnyVarRef(varArray1[i]));
+    for(UnsignedSysInt i = 0; i < varArray2.size(); ++i)
+      vars.push_back(AnyVarRef(varArray2[i]));
     return vars;
   }
 
@@ -271,14 +271,14 @@ struct VecCountDynamic : public AbstractConstraint {
 
     pair<DomainInt, DomainInt> assign;
     SysInt found_satisfying = 0;
-    for(SysInt i = 0; i < (SysInt)var_array1.size(); ++i) {
-      if(Operator::getSatisfyingAssignment(var_array1[i], var_array2[i], assign)) {
+    for(SysInt i = 0; i < (SysInt)varArray1.size(); ++i) {
+      if(Operator::getSatisfyingAssignment(varArray1[i], varArray2[i], assign)) {
         found_satisfying++;
-        D_ASSERT(var_array1[i].inDomain(assign.first));
-        D_ASSERT(var_array2[i].inDomain(assign.second));
+        D_ASSERT(varArray1[i].inDomain(assign.first));
+        D_ASSERT(varArray2[i].inDomain(assign.second));
         D_ASSERT(Operator::checkAssignment(assign.first, assign.second));
         assignment.push_back(make_pair(i, assign.first));
-        assignment.push_back(make_pair(i + var_array1.size(), assign.second));
+        assignment.push_back(make_pair(i + varArray1.size(), assign.second));
         if(found_satisfying == hamming_distance)
           return true;
       }
@@ -289,7 +289,7 @@ struct VecCountDynamic : public AbstractConstraint {
 
   virtual AbstractConstraint* reverseConstraint() {
     return new VecCountDynamic<VarArray1, VarArray2, typename Operator::reverse_operator>(
-        var_array1, var_array2, (SysInt)var_array1.size() - hamming_distance + 1);
+        varArray1, varArray2, (SysInt)varArray1.size() - hamming_distance + 1);
   }
 };
 

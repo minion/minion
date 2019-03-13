@@ -169,16 +169,16 @@ struct SparseBoundVarContainer {
       D_ASSERT(bounds[loop] < bounds[loop + 1]);
     }
 
-    vector<BoundType> t_dom(bounds.size());
+    vector<BoundType> tDom(bounds.size());
     for(UnsignedSysInt j = 0; j < bounds.size(); ++j)
-      t_dom[j] = bounds[j];
+      tDom[j] = bounds[j];
 
-    domains.push_back(t_dom);
+    domains.push_back(tDom);
     for(SysInt j = 0; j < count; ++j)
       domain_reference.push_back(domains.size() - 1);
 
-    minDomainVal = mymin(t_dom.front(), minDomainVal);
-    maxDomainVal = mymax(t_dom.back(), maxDomainVal);
+    minDomainVal = mymin(tDom.front(), minDomainVal);
+    maxDomainVal = mymax(tDom.back(), maxDomainVal);
 
     // TODO: Setting varCount_m to avoid changing other code.. long term, do
     // we need it?

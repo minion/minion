@@ -22,34 +22,34 @@
 
 template <typename VarArrayType>
 struct CollectEvents : public AbstractConstraint {
-  VarArrayType var_array;
+  VarArrayType varArray;
 
 public:
   std::vector<std::pair<int, int>> assignments;
 
-  CollectEvents(const VarArrayType& _var_array) : var_array(_var_array) {}
+  CollectEvents(const VarArrayType& _varArray) : varArray(_varArray) {}
 
   virtual string constraintName() {
     return "collectevents";
   }
 
-  CONSTRAINT_ARG_LIST1(var_array);
+  CONSTRAINT_ARG_LIST1(varArray);
 
   SysInt dynamicTriggerCount() {
-    return var_array.size();
+    return varArray.size();
   }
 
   typedef typename VarArrayType::value_type VarRef;
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
     //  Trig is the assigned variable.
-    assignments.push_back(std::make_pair(trig, var_array[trig].assignedValue()));
+    assignments.push_back(std::make_pair(trig, varArray[trig].assignedValue()));
   }
 
   virtual void fullPropagate() {
     // Set up triggers.
-    for(int i = 0; i < (SysInt)var_array.size(); i++) {
-      moveTriggerInt(var_array[i], i, Assigned);
+    for(int i = 0; i < (SysInt)varArray.size(); i++) {
+      moveTriggerInt(varArray[i], i, Assigned);
     }
   }
 
@@ -59,9 +59,9 @@ public:
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     return vars;
   }
 
@@ -74,8 +74,8 @@ public:
 };
 
 template <typename VarArray>
-AbstractConstraint* BuildCT_COLLECTEVENTS(const VarArray& var_array, ConstraintBlob& b) {
-  return new CollectEvents<VarArray>(var_array);
+AbstractConstraint* BuildCT_COLLECTEVENTS(const VarArray& varArray, ConstraintBlob& b) {
+  return new CollectEvents<VarArray>(varArray);
 }
 
 // This constraint purposefully has a name which is not legal input, to stop it being used

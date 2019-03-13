@@ -181,10 +181,10 @@ struct MDDC : public AbstractConstraint {
   vector<arrayset> gacvalues; // Opposite of the sets in the Cheng and Yap
                               // paper: these start empty and are fille d
 
-  MDDC(const VarArray& _var_array, TupleList* _tuples)
+  MDDC(const VarArray& _varArray, TupleList* _tuples)
       :
 
-        vars(_var_array),
+        vars(_varArray),
         constraint_locked(false),
         gno(),
         tuples(_tuples) {

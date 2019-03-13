@@ -61,7 +61,7 @@ inline void world_pop() {
   }
 }
 
-inline void world_pop_to_depth(SysInt depth) {
+inline void world_popToDepth(SysInt depth) {
   // TODO: Speed up this method. It shouldn't call world_pop repeatedly.
   // The main problem is this requires adding additions to things like
   // monotonic sets I suspect.
@@ -92,6 +92,6 @@ inline void SearchState::addConstraintMidsearch(AbstractConstraint* c) {
 }
 
 inline void SearchState::redoFullPropagate(AbstractConstraint* c) {
-  constraints_to_propagate[Controller::get_world_depth()].insert(c);
+  constraintsToPropagate[Controller::get_world_depth()].insert(c);
   c->fullPropagate();
 }

@@ -241,31 +241,31 @@ template <typename VarArray, bool UseIncGraph>
 struct FlowConstraint : public AbstractConstraint {
 protected:
   // Base class for GAC alldiff and GCC
-  FlowConstraint(const VarArray& _var_array)
+  FlowConstraint(const VarArray& _varArray)
       : numvars(0),
         numvals(0),
         dom_min(0),
         dom_max(0),
 #ifndef REVERSELIST
-        var_array(_var_array),
+        varArray(_varArray),
 #else
-        var_array(_var_array.rbegin(), _var_array.rend()),
+        varArray(_varArray.rbegin(), _varArray.rend()),
 #endif
         constraint_locked(false) {
-    if(var_array.size() > 0) {
-      dom_min = checked_cast<SysInt>(var_array[0].initialMin());
-      dom_max = checked_cast<SysInt>(var_array[0].initialMax());
+    if(varArray.size() > 0) {
+      dom_min = checked_cast<SysInt>(varArray[0].initialMin());
+      dom_max = checked_cast<SysInt>(varArray[0].initialMax());
     }
-    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if(var_array[i].initialMin() < dom_min)
-        dom_min = checked_cast<SysInt>(var_array[i].initialMin());
-      if(var_array[i].initialMax() > dom_max)
-        dom_max = checked_cast<SysInt>(var_array[i].initialMax());
+    for(SysInt i = 0; i < (SysInt)varArray.size(); ++i) {
+      if(varArray[i].initialMin() < dom_min)
+        dom_min = checked_cast<SysInt>(varArray[i].initialMin());
+      if(varArray[i].initialMax() > dom_max)
+        dom_max = checked_cast<SysInt>(varArray[i].initialMax());
     }
-    numvars = var_array.size(); // number of variables in the constraint
+    numvars = varArray.size(); // number of variables in the constraint
     numvals = dom_max - dom_min + 1;
 
-    // to_process.reserve(var_array.size()); Could this be shared as well??
+    // to_process.reserve(varArray.size()); Could this be shared as well??
 
     if(UseIncGraph) {
       // refactor this to use initial upper and lower bounds.
@@ -305,7 +305,7 @@ protected:
 
   SysInt numvars, numvals, dom_min, dom_max;
 
-  VarArray var_array;
+  VarArray varArray;
 
   bool constraint_locked;
 
@@ -355,21 +355,21 @@ protected:
 
   void check_adjlists() {
     for(SysInt i = 0; i < numvars; i++) {
-      D_ASSERT(var_array[i].min() >= dom_min);
-      D_ASSERT(var_array[i].max() <= dom_max);
+      D_ASSERT(varArray[i].min() >= dom_min);
+      D_ASSERT(varArray[i].max() <= dom_max);
       for(SysInt j = dom_min; j <= dom_max; j++) {
         D_DATA(bool in = adjlistpos[i][j - dom_min] < adjlistlength[i]);
         D_DATA(bool in2 =
                    adjlistpos[j - dom_min + numvars][i] < adjlistlength[j - dom_min + numvars]);
         D_ASSERT(in == in2);
-        D_ASSERT(in == var_array[i].inDomain(j));
+        D_ASSERT(in == varArray[i].inDomain(j));
       }
     }
   }
 
   // -------------------------Hopcroft-Karp algorithm
   // -----------------------------
-  // Can be applied to a subset of var_array as required.
+  // Can be applied to a subset of varArray as required.
 
   // Each domain value has a label which is numvars+
 
@@ -423,7 +423,7 @@ protected:
   // Hopcroft-Karp which takes start and end indices.
 
   inline bool hopcroft_wrapper(SysInt sccstart, SysInt sccend, vector<SysInt>& SCCs,
-                               bool allowed_to_fail) {
+                               bool allowedToFail) {
     // Call hopcroft for the whole matching.
     if(!hopcroft(sccstart, sccend, SCCs)) {
       // The constraint is unsatisfiable (no matching).
@@ -434,7 +434,7 @@ protected:
         valvarmatching[varvalmatching[j] - dom_min] = j;
       }
 
-      if(allowed_to_fail)
+      if(allowedToFail)
         getState().setFailed(true);
       return false;
     }
@@ -459,7 +459,7 @@ protected:
     // a domain value is represented as val-dom_min always.
 
     // Variables are always represented as their index in
-    // var_array. sccstart and sccend indicates which variables
+    // varArray. sccstart and sccend indicates which variables
     // we are allowed to use here.
 
     SysInt localnumvars = sccend - sccstart + 1;
@@ -470,7 +470,7 @@ protected:
 
     for(SysInt i = sccstart; i <= sccend; i++) {
       SysInt tempvar = SCCs[i];
-      if(var_array[tempvar].inDomain(varvalmatching[tempvar])) {
+      if(varArray[tempvar].inDomain(varvalmatching[tempvar])) {
         valinlocalmatching.insert(varvalmatching[tempvar] - dom_min);
         // Check the two matching arrays correspond.
         // D_ASSERT(valvarmatching[varvalmatching[tempvar]-dom_min]==tempvar);
@@ -563,9 +563,9 @@ protected:
           for(SysInt i = 0; i < (SysInt)toiterate.size(); ++i) {
             // cout<<"Layer item: "<<(*setit)<<endl;
             SysInt tempvar = toiterate[i];
-            for(DomainInt realval = var_array[tempvar].min();
-                realval <= var_array[tempvar].max(); realval++) {
-              if(var_array[tempvar].inDomain(realval)) {
+            for(DomainInt realval = varArray[tempvar].min();
+                realval <= varArray[tempvar].max(); realval++) {
+              if(varArray[tempvar].inDomain(realval)) {
                 SysInt tempval = realval - dom_min;
 
                 if(!invprevious.in(tempval)) // if tempval not found in vprevious
@@ -758,7 +758,7 @@ protected:
       SysInt var = vars_in_scc[i];
       if(matching[var] != dom_min - 1) {
         SysInt match = matching[var];
-        if(!var_array[var].inDomain(match) || usage[match - dom_min] > upper[match - dom_min]) {
+        if(!varArray[var].inDomain(match) || usage[match - dom_min] > upper[match - dom_min]) {
           usage[match - dom_min]--;
           matching[var] = dom_min - 1;
         }
@@ -900,7 +900,7 @@ protected:
     while(!outedges.empty()) {
       SysInt validx = outedges.back();
       outedges.pop_back();
-      D_ASSERT(var_array[var].inDomain(validx - numvars + dom_min));
+      D_ASSERT(varArray[var].inDomain(validx - numvars + dom_min));
 
       // does this complete an augmenting path?
       if(usage[validx - numvars] < upper[validx - numvars]) {
@@ -937,7 +937,7 @@ protected:
         usage[matching[var] - dom_min]--;
       }
       matching[var] = validx - numvars + dom_min;
-      D_ASSERT(var_array[var].inDomain(validx - numvars + dom_min));
+      D_ASSERT(varArray[var].inDomain(validx - numvars + dom_min));
       usage[validx - numvars]++;
     }
     augpath.clear();
@@ -1001,10 +1001,10 @@ struct InternalDynamicTriggers {
   // -1 for nextidx means end of list.
   SysInt numvars;
 
-  VarArray var_array; // not nice to have this in here..
+  VarArray varArray; // not nice to have this in here..
 
-  InternalDynamicTriggers(SysInt _numvars, SysInt numvals, VarArray _var_array)
-      : numvars(_numvars), var_array(_var_array) {
+  InternalDynamicTriggers(SysInt _numvars, SysInt numvals, VarArray _varArray)
+      : numvars(_numvars), varArray(_varArray) {
     watches = getMemory().backTrack().template requestArray<short>(numvars + 1 + 4 * numvars +
                                                                    2 * numvals);
 
@@ -1027,7 +1027,7 @@ struct InternalDynamicTriggers {
       return true;
     }
     while(idx != -1) {
-      if(!var_array[var].inDomain(watches[idx])) {
+      if(!varArray[var].inDomain(watches[idx])) {
         return true;
       }
       idx = watches[idx + 1]; // go to next.

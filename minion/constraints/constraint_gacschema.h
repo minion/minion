@@ -123,8 +123,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   ////////////////////////////////////////////////////////////////////////////
   // Ctor
 
-  GACSchema(const VarArray& _var_array, TupleList* _data)
-      : vars(_var_array), supportFreeList(0), data(_data) {
+  GACSchema(const VarArray& _varArray, TupleList* _data)
+      : vars(_varArray), supportFreeList(0), data(_data) {
     // Register this with the backtracker.
     getState().getGenericBacktracker().add(this);
 
@@ -676,8 +676,8 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 }; // end of class
 
 template <typename VarArray>
-AbstractConstraint* BuildCT_GACSCHEMA(const VarArray& var_array, ConstraintBlob& b) {
-  return new GACSchema<VarArray>(var_array, b.tuples);
+AbstractConstraint* BuildCT_GACSCHEMA(const VarArray& varArray, ConstraintBlob& b) {
+  return new GACSchema<VarArray>(varArray, b.tuples);
 }
 
 /* JSON

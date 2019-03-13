@@ -175,18 +175,18 @@ typename ShiftType<VRef, Shift>::type ShiftVarRef(VRef var_ref, Shift shift) {
 }
 
 template <typename VarRef, typename Shift>
-vector<ShiftVar<VarRef, Shift>> ShiftVarRef(const vector<VarRef>& var_array, const Shift& shift) {
-  vector<ShiftVar<VarRef, Shift>> shift_array(var_array.size());
-  for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-    shift_array[i] = ShiftVarRef(var_array[i], shift);
+vector<ShiftVar<VarRef, Shift>> ShiftVarRef(const vector<VarRef>& varArray, const Shift& shift) {
+  vector<ShiftVar<VarRef, Shift>> shift_array(varArray.size());
+  for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+    shift_array[i] = ShiftVarRef(varArray[i], shift);
   return shift_array;
 }
 
 template <typename VarRef, typename Shift, std::size_t i>
-std::array<ShiftVar<VarRef, Shift>, i> ShiftVarRef(const std::array<VarRef, i>& var_array,
+std::array<ShiftVar<VarRef, Shift>, i> ShiftVarRef(const std::array<VarRef, i>& varArray,
                                                    const Shift& shift) {
   std::array<ShiftVar<VarRef, Shift>, i> shift_array;
   for(UnsignedSysInt l = 0; l < i; ++l)
-    shift_array[l] = ShiftVarRef(var_array[l], shift);
+    shift_array[l] = ShiftVarRef(varArray[l], shift);
   return shift_array;
 }

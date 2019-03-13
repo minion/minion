@@ -804,33 +804,33 @@ struct InstanceStats {
     // collect all domain sizes into an array
     START_CLOCK();
     vector<DomainInt> domsizes;
-    long long int var_memory_usage = 0;
+    long long int varMemoryUsage = 0;
     double domain_product = 1;
     for(SysInt i = 0; i < v.BOOLs; i++) {
       domsizes.push_back(2);
-      var_memory_usage += 1;
+      varMemoryUsage += 1;
       domain_product += log((double)2);
     }
     for(SysInt i = 0; i < (SysInt)v.bound.size(); i++) {
       SysInt domSize = checked_cast<SysInt>(v.bound[i].upper_bound - v.bound[i].lower_bound + 1);
       domsizes.push_back(domSize);
-      var_memory_usage += 64;
+      varMemoryUsage += 64;
       domain_product += log((double)domSize);
     }
     for(SysInt i = 0; i < (SysInt)v.discrete.size(); i++) {
       SysInt domSize =
           checked_cast<SysInt>(v.discrete[i].upper_bound - v.discrete[i].lower_bound + 1);
       domsizes.push_back(domSize);
-      var_memory_usage += domSize;
+      varMemoryUsage += domSize;
       domain_product += log((double)domSize);
     }
     for(SysInt i = 0; i < (SysInt)v.sparse_bound.size(); i++) {
       domsizes.push_back(v.sparse_bound[i].size());
-      var_memory_usage += 64;
+      varMemoryUsage += 64;
       domain_product += log((double)v.sparse_bound[i].size());
     }
     END_CLOCK();
-    output_stat << "VarMemory: " << var_memory_usage << endl;
+    output_stat << "VarMemory: " << varMemoryUsage << endl;
     output_stat << "DomainProductLog: " << domain_product << endl;
     std::sort(domsizes.begin(), domsizes.end());
     // Some rubbish which does not give you the real medians, quartiles

@@ -204,8 +204,8 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
   ShortTupleList* data;
 
-  HaggisGAC(const VarArray& _var_array, ShortTupleList* tuples)
-      : vars(_var_array), supportFreeList(0), data(tuples) {
+  HaggisGAC(const VarArray& _varArray, ShortTupleList* tuples)
+      : vars(_varArray), supportFreeList(0), data(tuples) {
     init();
 
     litsWithLostExplicitSupport.reserve(

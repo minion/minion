@@ -68,9 +68,9 @@ gccweak constraint.
 #include "gcc_common.h"
 
 template <typename VarArray1, typename VarArray2>
-AbstractConstraint* BuildCT_GCC(const VarArray1& var_array, const VarArray2& cap_array,
+AbstractConstraint* BuildCT_GCC(const VarArray1& varArray, const VarArray2& cap_array,
                                 ConstraintBlob& b) {
-  return new GCC<VarArray1, VarArray2, true>(var_array, cap_array, b.constants[0]);
+  return new GCC<VarArray1, VarArray2, true>(varArray, cap_array, b.constants[0]);
 }
 
 /* JSON

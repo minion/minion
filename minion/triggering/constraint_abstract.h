@@ -333,18 +333,18 @@ protected:
   vector<AbstractConstraint*> child_constraints;
   // Maps a dynamic trigger to the constraint which it belongs to.
   // SysInt as they never change, and are always used to index arrays
-  vector<SysInt> _dynamic_trigger_to_constraint;
+  vector<SysInt> _dynamic_triggerToConstraint;
   // Offset into array
   vector<SysInt> _dynamic_trigger_child_offset;
 
   // Maps variables to constraints
-  vector<DomainInt> variable_to_constraint;
+  vector<DomainInt> variableToConstraint;
   // Gets start of each constraint
   vector<DomainInt> start_of_constraint;
 
 public:
   SysInt getChildDynamicTrigger(DomainInt p) {
-    return _dynamic_trigger_to_constraint[checked_cast<SysInt>(p)];
+    return _dynamic_triggerToConstraint[checked_cast<SysInt>(p)];
   }
 
   void passDynTriggerToChild(SysInt trig, DomainDelta dd) {
@@ -381,7 +381,7 @@ public:
       start_of_constraint.push_back(varCount);
       SysInt conSize = child_constraints[i]->getVarsSingleton()->size();
       for(SysInt j = 0; j < conSize; ++j) {
-        variable_to_constraint.push_back(i);
+        variableToConstraint.push_back(i);
       }
       varCount += conSize;
     }
@@ -398,7 +398,7 @@ public:
     SysInt current_triggerCount = dynamicTriggerCount();
 
     for(SysInt count = 0; count < current_triggerCount; ++count)
-      _dynamic_trigger_to_constraint.push_back(child_constraints.size());
+      _dynamic_triggerToConstraint.push_back(child_constraints.size());
 
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       _dynamic_trigger_child_offset.push_back(current_triggerCount);
@@ -415,7 +415,7 @@ public:
 
       for(SysInt count = current_triggerCount; count < current_triggerCount + child_trigCount;
           ++count)
-        _dynamic_trigger_to_constraint.push_back(i);
+        _dynamic_triggerToConstraint.push_back(i);
 
       current_triggerCount += child_trigCount;
     }

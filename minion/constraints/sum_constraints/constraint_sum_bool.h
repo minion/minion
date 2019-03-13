@@ -31,23 +31,23 @@ struct BoolLessSumConstraint : public AbstractConstraint {
       return "sumgeq";
   }
 
-  CONSTRAINT_ARG_LIST2(var_array, ConstantVar(var_sum));
+  CONSTRAINT_ARG_LIST2(varArray, ConstantVar(var_sum));
 
   typedef BoolLessSumConstraint<VarArray, VarSum, 1 - VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
 
   ReversibleInt count;
-  VarArray var_array;
+  VarArray varArray;
 
   VarSum var_sum;
 
-  BoolLessSumConstraint(const VarArray& _var_array, VarSum _var_sum)
-      : count(), var_array(_var_array), var_sum(_var_sum) {
+  BoolLessSumConstraint(const VarArray& _varArray, VarSum _var_sum)
+      : count(), varArray(_varArray), var_sum(_var_sum) {
     CHECK((VarToCount == 0) || (VarToCount == 1), "Fatal Internal Bug");
     BigInt accumulator = 0;
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
       accumulator += checked_cast<SysInt>(
-          (DomainInt)max(abs(var_array[i].initialMax()), abs(var_array[i].initialMin())));
+          (DomainInt)max(abs(varArray[i].initialMax()), abs(varArray[i].initialMin())));
       CHECKSIZE(accumulator, "Sum of bounds of variables too large in sum constraint");
     }
     accumulator += checked_cast<SysInt>((DomainInt)abs(var_sum));
@@ -57,33 +57,33 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   }
 
   virtual SysInt dynamicTriggerCount() {
-    return var_array.size();
+    return varArray.size();
   }
 
   void setup_triggers() {
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
-      moveTriggerInt(var_array[i], i, VarToCount ? LowerBound : UpperBound);
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
+      moveTriggerInt(varArray[i], i, VarToCount ? LowerBound : UpperBound);
     }
   }
 
   virtual AbstractConstraint* reverseConstraint() {
     if(VarToCount)
-      return new BoolLessSumConstraint<VarArray, SysInt, 0>(var_array, var_sum + 1);
+      return new BoolLessSumConstraint<VarArray, SysInt, 0>(varArray, var_sum + 1);
     else
-      return new BoolLessSumConstraint<VarArray, SysInt, 1>(var_array, var_sum - 1);
+      return new BoolLessSumConstraint<VarArray, SysInt, 1>(varArray, var_sum - 1);
   }
 
   DomainInt occCount() {
     if(VarToCount)
       return var_sum;
     else
-      return (SysInt)var_array.size() - var_sum;
+      return (SysInt)varArray.size() - var_sum;
   }
 
   void limit_reached() {
     SysInt one_vars = 0;
-    typename VarArray::value_type* it = &*var_array.begin();
-    typename VarArray::value_type* end_it = it + var_array.size();
+    typename VarArray::value_type* it = &*varArray.begin();
+    typename VarArray::value_type* end_it = it + varArray.size();
     for(; it < end_it; ++it) {
       if(it->isAssigned()) {
         if(it->assignedValue() == VarToCount)
@@ -99,8 +99,8 @@ struct BoolLessSumConstraint : public AbstractConstraint {
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
     PROP_INFO_ADDONE(BoolSum);
-    D_ASSERT(var_array[checked_cast<SysInt>(i)].assignedValue() == 0 ||
-             var_array[checked_cast<SysInt>(i)].assignedValue() == 1);
+    D_ASSERT(varArray[checked_cast<SysInt>(i)].assignedValue() == 0 ||
+             varArray[checked_cast<SysInt>(i)].assignedValue() == 1);
     SysInt c = count + 1;
     count = c;
     if(c == occCount())
@@ -110,9 +110,9 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     setup_triggers();
     SysInt occs = 0;
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i)
-      if(var_array[i].isAssignedValue(VarToCount))
+      if(varArray[i].isAssignedValue(VarToCount))
         occs++;
     count = occs;
     if(occs > occCount())
@@ -122,7 +122,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    D_ASSERT(vSize == (SysInt)var_array.size());
+    D_ASSERT(vSize == (SysInt)varArray.size());
     for(SysInt i = 0; i < vSize; i++)
       D_ASSERT(v[i] == 0 || v[i] == 1);
     if(VarToCount)
@@ -137,13 +137,13 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   assignment)
   {
     SysInt sumValue = 0;
-    SysInt vSize = var_array.size();
+    SysInt vSize = varArray.size();
     if(VarToCount)
     {
       for(SysInt i = 0; i < vSize; ++i)
       {
-        assignment.push_back(make_pair(i, var_array[i].min()));
-        sumValue += var_array[i].min();
+        assignment.push_back(make_pair(i, varArray[i].min()));
+        sumValue += varArray[i].min();
       }
       return (sumValue <= var_sum);
     }
@@ -151,8 +151,8 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     {
       for(SysInt i = 0; i < vSize; ++i)
       {
-        assignment.push_back(make_pair(i, var_array[i].max()));
-        sumValue += var_array[i].max();
+        assignment.push_back(make_pair(i, varArray[i].max()));
+        sumValue += varArray[i].max();
       }
       return (sumValue >= var_sum);
     }
@@ -161,10 +161,10 @@ struct BoolLessSumConstraint : public AbstractConstraint {
 
   // TODO : Optimise for booleans
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    SysInt vSize = var_array.size();
+    SysInt vSize = varArray.size();
     DomainInt sum_limit;
     if(VarToCount)
-      sum_limit = (SysInt)var_array.size() - var_sum;
+      sum_limit = (SysInt)varArray.size() - var_sum;
     else
       sum_limit = var_sum;
 
@@ -173,7 +173,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     SysInt valCount = 0;
 
     for(SysInt i = 0; i < vSize && valCount < sum_limit; ++i) {
-      if(var_array[i].inDomain(ValToFind)) {
+      if(varArray[i].inDomain(ValToFind)) {
         valCount++;
         assignment.push_back(make_pair(i, ValToFind));
       }
@@ -183,21 +183,21 @@ struct BoolLessSumConstraint : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     return vars;
   }
 };
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BoolLessEqualSumCon(const VarArray& _var_array, VarSum _var_sum) {
-  return (new BoolLessSumConstraint<VarArray, VarSum>(_var_array, _var_sum));
+AbstractConstraint* BoolLessEqualSumCon(const VarArray& _varArray, VarSum _var_sum) {
+  return (new BoolLessSumConstraint<VarArray, VarSum>(_varArray, _var_sum));
 }
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BoolGreaterEqualSumCon(const VarArray& _var_array, VarSum _var_sum) {
-  return (new BoolLessSumConstraint<VarArray, VarSum, 0>(_var_array, _var_sum));
+AbstractConstraint* BoolGreaterEqualSumCon(const VarArray& _varArray, VarSum _var_sum) {
+  return (new BoolLessSumConstraint<VarArray, VarSum, 0>(_varArray, _var_sum));
 }
 
 #endif

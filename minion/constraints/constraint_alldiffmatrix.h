@@ -59,21 +59,21 @@ using namespace std;
 
 template <typename VarArrayType, typename ValueType>
 struct AlldiffMatrixConstraint : public AbstractConstraint {
-  VarArrayType var_array;
+  VarArrayType varArray;
 
   bool constraint_locked;
 
-  AlldiffMatrixConstraint(const VarArrayType& _var_array, const ValueType _value)
-      : var_array(_var_array),
+  AlldiffMatrixConstraint(const VarArrayType& _varArray, const ValueType _value)
+      : varArray(_varArray),
         constraint_locked(false),
         value(_value)
 
   {
-    squaresize = (int)sqrt(var_array.size());
-    CHECK((squaresize * squaresize == (SysInt)var_array.size()),
+    squaresize = (int)sqrt(varArray.size());
+    CHECK((squaresize * squaresize == (SysInt)varArray.size()),
           "Length of array is not a square.");
 
-    CheckNotBound(var_array, "alldiffmatrix", "no alternative");
+    CheckNotBound(varArray, "alldiffmatrix", "no alternative");
 
     rowcolmatching.resize(squaresize, -1);
     colrowmatching.resize(squaresize, -1);
@@ -95,7 +95,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     return "alldiffmatrix";
   }
 
-  CONSTRAINT_ARG_LIST2(var_array, value);
+  CONSTRAINT_ARG_LIST2(varArray, value);
 
   SysInt dynamicTriggerCount() {
     // Need one per variable on the value of interest, and one on any other
@@ -103,17 +103,17 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     // Two blocks : first the triggers on the value of interest (for all vars)
     // then triggers for assignment.
     // Need to know when assigned to value.
-    return var_array.size() * 2;
+    return varArray.size() * 2;
   }
 
   inline bool hasValue(int row, int col) {
     //   Indexing the latin square from 0
-    return var_array[row * squaresize + col].inDomain(value);
+    return varArray[row * squaresize + col].inDomain(value);
   }
 
   inline bool assignedValue(int row, int col) {
-    return var_array[row * squaresize + col].isAssigned() &&
-           var_array[row * squaresize + col].assignedValue() == value;
+    return varArray[row * squaresize + col].isAssigned() &&
+           varArray[row * squaresize + col].assignedValue() == value;
   }
 
   typedef typename VarArrayType::value_type VarRef;
@@ -125,23 +125,23 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
     ConstantVar one(1);
     for(SysInt i = 0; i < squaresize; i++) {
-      std::vector<VarRef> row_var_array;
+      std::vector<VarRef> row_varArray;
       for(SysInt j = 0; j < squaresize; j++)
-        row_var_array.push_back(var_array[i * squaresize + j]);
+        row_varArray.push_back(varArray[i * squaresize + j]);
 
       NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>* t =
-          new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(row_var_array,
+          new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(row_varArray,
                                                                                  value, one);
       con.push_back((AbstractConstraint*)t);
     }
 
     for(SysInt j = 0; j < squaresize; j++) {
-      std::vector<VarRef> col_var_array;
+      std::vector<VarRef> col_varArray;
       for(SysInt i = 0; i < squaresize; i++)
-        col_var_array.push_back(var_array[i * squaresize + j]);
+        col_varArray.push_back(varArray[i * squaresize + j]);
 
       NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>* t =
-          new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(col_var_array,
+          new NotOccurrenceEqualConstraint<VarArrayType, ValueType, ConstantVar>(col_varArray,
                                                                                  value, one);
       con.push_back((AbstractConstraint*)t);
     }
@@ -150,7 +150,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta) {
-    if(trig < (SysInt)var_array.size()) {
+    if(trig < (SysInt)varArray.size()) {
       // One of the value has been pruned somewhere
       // Need to propagate.
 
@@ -168,11 +168,11 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         getQueue().pushSpecialTrigger(this);
       }
     } else {
-      D_ASSERT(trig < (SysInt)var_array.size() * 2);
+      D_ASSERT(trig < (SysInt)varArray.size() * 2);
       // In the second block. Something was assigned.
-      SysInt vidx = checked_cast<SysInt>(trig) - (SysInt)var_array.size();
+      SysInt vidx = checked_cast<SysInt>(trig) - (SysInt)varArray.size();
 
-      if(var_array[vidx].assignedValue() == value) {
+      if(varArray[vidx].assignedValue() == value) {
         SysInt row = vidx / squaresize;
         SysInt col = vidx % squaresize;
 
@@ -213,13 +213,13 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
     // Set up triggers.
 
-    for(int i = 0; i < (SysInt)var_array.size(); i++) {
-      if(var_array[i].inDomain(value)) {
-        moveTriggerInt(var_array[i], i, DomainRemoval, value);
-        moveTriggerInt(var_array[i], i + var_array.size(), Assigned);
+    for(int i = 0; i < (SysInt)varArray.size(); i++) {
+      if(varArray[i].inDomain(value)) {
+        moveTriggerInt(varArray[i], i, DomainRemoval, value);
+        moveTriggerInt(varArray[i], i + varArray.size(), Assigned);
       }
 
-      if(var_array[i].isAssigned() && var_array[i].assignedValue() == value) {
+      if(varArray[i].isAssigned() && varArray[i].assignedValue() == value) {
         SysInt row = i / squaresize;
         SysInt col = i % squaresize;
 
@@ -241,7 +241,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt arraySize) {
-    D_ASSERT(arraySize == (SysInt)var_array.size());
+    D_ASSERT(arraySize == (SysInt)varArray.size());
     for(SysInt i = 0; i < squaresize; i++) {
       SysInt count = 0;
       for(SysInt j = 0; j < squaresize; j++)
@@ -263,9 +263,9 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     return vars;
   }
 
@@ -583,11 +583,11 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
               if(rowcolmatching[row] != copynode - squaresize) {
                 ADMPRINT("Pruning row: " << row << " column: " << copynode - squaresize
                                          << " removing value.");
-                var_array[row * squaresize + copynode - squaresize].removeFromDomain(value);
+                varArray[row * squaresize + copynode - squaresize].removeFromDomain(value);
               } else {
                 ADMPRINT("Setting row: " << row << " column: " << copynode - squaresize
                                          << " to value.");
-                var_array[row * squaresize + copynode - squaresize].assign(value);
+                varArray[row * squaresize + copynode - squaresize].assign(value);
               }
             }
           }
@@ -632,12 +632,12 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         if(rowcolmatching[row] == col) {
           assignment.push_back(make_pair((row * squaresize) + col, value));
         } else {
-          if(var_array[row * squaresize + col].max() != value) {
+          if(varArray[row * squaresize + col].max() != value) {
             assignment.push_back(
-                make_pair((row * squaresize) + col, var_array[row * squaresize + col].max()));
+                make_pair((row * squaresize) + col, varArray[row * squaresize + col].max()));
           } else {
             assignment.push_back(
-                make_pair((row * squaresize) + col, var_array[row * squaresize + col].min()));
+                make_pair((row * squaresize) + col, varArray[row * squaresize + col].min()));
           }
         }
       }
@@ -647,8 +647,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray>
-AbstractConstraint* BuildCT_ALLDIFFMATRIX(const VarArray& var_array, ConstraintBlob& b) {
-  return new AlldiffMatrixConstraint<VarArray, decltype(b.constants[0][0])>(var_array,
+AbstractConstraint* BuildCT_ALLDIFFMATRIX(const VarArray& varArray, ConstraintBlob& b) {
+  return new AlldiffMatrixConstraint<VarArray, decltype(b.constants[0][0])>(varArray,
                                                                             b.constants[0][0]);
 }
 

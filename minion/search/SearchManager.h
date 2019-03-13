@@ -53,11 +53,11 @@ struct StandardSearchManager : public SearchManager {
   std::function<void(const vector<AnyVarRef>&, const vector<Controller::triple>&)> check_func;
   std::function<void(void)> handle_sol_func, handle_opt_func;
 
-  vector<AnyVarRef> var_array;
+  vector<AnyVarRef> varArray;
   shared_ptr<VariableOrder> var_order;
 
   shared_ptr<Propagate> prop; // Propagate is the type of the base class. Method
-                              // prop->prop(var_array)
+                              // prop->prop(varArray)
 
   vector<Controller::triple> branches; // L & R branches so far (isLeftBranch?,var,value)
 
@@ -70,8 +70,8 @@ struct StandardSearchManager : public SearchManager {
         handle_opt_func(_handle_opt_func),
         var_order(_var_order),
         prop(_prop) {
-    var_array = var_order->getVars();
-    branches.reserve(var_array.size());
+    varArray = var_order->getVars();
+    branches.reserve(varArray.size());
   }
 
   void reset() {
@@ -81,11 +81,11 @@ struct StandardSearchManager : public SearchManager {
   // returns false if left branch not possible.
   inline void branch_left(pair<SysInt, DomainInt> picked) {
     D_ASSERT(picked.first != -1);
-    D_ASSERT(!var_array[picked.first].isAssigned());
+    D_ASSERT(!varArray[picked.first].isAssigned());
 
     world_push();
-    var_array[picked.first].assign(picked.second);
-    maybe_print_search_assignment(var_array[picked.first], picked.second, true);
+    varArray[picked.first].assign(picked.second);
+    maybe_print_search_assignment(varArray[picked.first], picked.second, true);
     branches.push_back(Controller::triple(true, picked.first, picked.second));
   }
 
@@ -111,18 +111,18 @@ struct StandardSearchManager : public SearchManager {
     // remove the left branch.
     branches.pop_back();
 
-    D_ASSERT(var_array[var].inDomain(val));
+    D_ASSERT(varArray[var].inDomain(val));
 
     // special case the upper and lower bounds to make it work for bound
     // variables
-    if(var_array[var].min() == val) {
-      var_array[var].setMin(val + 1);
-    } else if(var_array[var].max() == val) {
-      var_array[var].setMax(val - 1);
+    if(varArray[var].min() == val) {
+      varArray[var].setMin(val + 1);
+    } else if(varArray[var].max() == val) {
+      varArray[var].setMax(val - 1);
     } else {
-      var_array[var].removeFromDomain(val);
+      varArray[var].removeFromDomain(val);
     }
-    maybe_print_search_assignment(var_array[var], val, false);
+    maybe_print_search_assignment(varArray[var], val, false);
     branches.push_back(Controller::triple(false, var, val));
 
     // If this branch was stolen, then we want to carry on
@@ -167,7 +167,7 @@ struct StandardSearchManager : public SearchManager {
 
       getState().incrementNodeCount();
 
-      check_func(var_array, branches);
+      check_func(varArray, branches);
 
       pair<SysInt, DomainInt> varval = var_order->pickVarVal();
 
@@ -186,7 +186,7 @@ struct StandardSearchManager : public SearchManager {
       } else {
         maybe_print_node();
         branch_left(varval);
-        prop->prop(var_array);
+        prop->prop(varArray);
       }
 
       if(getOptions().parallel && !getState().isFailed() && !in_aux_vars()) {
@@ -224,7 +224,7 @@ struct StandardSearchManager : public SearchManager {
                 }
               }
               D_ASSERT(branches.size() == steal + 1);
-              prop->prop(var_array);
+              prop->prop(varArray);
               // std::cerr << branches << "\n";
               // unlockSolsout();
             }
@@ -261,7 +261,7 @@ struct StandardSearchManager : public SearchManager {
         // Deal with optimisation variables
         getState().incrementBacktrackCount();
         handle_opt_func();
-        prop->prop(var_array);
+        prop->prop(varArray);
       }
     }
   }

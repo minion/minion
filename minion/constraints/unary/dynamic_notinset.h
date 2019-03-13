@@ -122,9 +122,9 @@ AbstractConstraint* WatchInSetConstraint<Var>::reverseConstraint() {
 }
 
 template <typename VarArray1>
-AbstractConstraint* BuildCT_WATCHED_NOT_INSET(const VarArray1& _var_array_1,
+AbstractConstraint* BuildCT_WATCHED_NOT_INSET(const VarArray1& _varArray_1,
                                               const ConstraintBlob& b) {
-  return new WatchNotInSetConstraint<typename VarArray1::value_type>(_var_array_1[0],
+  return new WatchNotInSetConstraint<typename VarArray1::value_type>(_varArray_1[0],
                                                                      b.constants[0]);
 }
 

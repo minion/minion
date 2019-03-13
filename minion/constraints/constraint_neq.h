@@ -61,19 +61,19 @@ struct NeqConstraint : public AbstractConstraint {
   // NegConstraintType;
   typedef typename VarArray::value_type VarRef;
 
-  VarArray var_array;
+  VarArray varArray;
 
-  CONSTRAINT_ARG_LIST1(var_array);
+  CONSTRAINT_ARG_LIST1(varArray);
 
-  NeqConstraint(const VarArray& _var_array) : var_array(_var_array) {}
+  NeqConstraint(const VarArray& _varArray) : varArray(_varArray) {}
 
   virtual SysInt dynamicTriggerCount() {
-    return var_array.size();
+    return varArray.size();
   }
 
   void setup_triggers() {
-    for(SysInt i = 0; i < var_array.size(); ++i)
-      moveTriggerInt(var_array[i], i, Assigned);
+    for(SysInt i = 0; i < varArray.size(); ++i)
+      moveTriggerInt(varArray[i], i, Assigned);
   }
 
   virtual AbstractConstraint* reverseConstraint() {
@@ -83,17 +83,17 @@ struct NeqConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt propVal_in, DomainDelta) {
     const SysInt propVal = checked_cast<SysInt>(propVal_in);
     PROP_INFO_ADDONE(ArrayNeq);
-    DomainInt removeVal = var_array[propVal].assignedValue();
-    SysInt arraySize = var_array.size();
+    DomainInt removeVal = varArray[propVal].assignedValue();
+    SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i) {
       if(i != propVal) {
-        if(var_array[i].isBound()) {
-          if(var_array[i].min() == removeVal)
-            var_array[i].setMin(removeVal + 1);
-          if(var_array[i].max() == removeVal)
-            var_array[i].setMax(removeVal - 1);
+        if(varArray[i].isBound()) {
+          if(varArray[i].min() == removeVal)
+            varArray[i].setMin(removeVal + 1);
+          if(varArray[i].max() == removeVal)
+            varArray[i].setMax(removeVal - 1);
         } else {
-          var_array[i].removeFromDomain(removeVal);
+          varArray[i].removeFromDomain(removeVal);
         }
       }
     }
@@ -101,19 +101,19 @@ struct NeqConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     setup_triggers();
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i)
-      if(var_array[i].isAssigned()) {
-        DomainInt removeVal = var_array[i].assignedValue();
+      if(varArray[i].isAssigned()) {
+        DomainInt removeVal = varArray[i].assignedValue();
         for(SysInt j = 0; j < arraySize; ++j) {
           if(i != j) {
-            if(var_array[j].isBound()) {
-              if(var_array[j].min() == removeVal)
-                var_array[j].setMin(removeVal + 1);
-              if(var_array[j].max() == removeVal)
-                var_array[j].setMax(removeVal - 1);
+            if(varArray[j].isBound()) {
+              if(varArray[j].min() == removeVal)
+                varArray[j].setMin(removeVal + 1);
+              if(varArray[j].max() == removeVal)
+                varArray[j].setMax(removeVal - 1);
             } else {
-              var_array[j].removeFromDomain(removeVal);
+              varArray[j].removeFromDomain(removeVal);
             }
           }
         }
@@ -121,7 +121,7 @@ struct NeqConstraint : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    D_ASSERT(vSize == (SysInt)var_array.size());
+    D_ASSERT(vSize == (SysInt)varArray.size());
     SysInt arraySize = checked_cast<SysInt>(vSize);
     for(SysInt i = 0; i < arraySize; i++)
       for(SysInt j = i + 1; j < arraySize; j++)
@@ -132,28 +132,28 @@ struct NeqConstraint : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     return vars;
   }
 
   // Getting a satisfying assignment here is too hard, we don't want to have to
   // build a matching.
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    MAKE_STACK_BOX(c, DomainInt, var_array.size());
+    MAKE_STACK_BOX(c, DomainInt, varArray.size());
 
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i) {
-      if(!var_array[i].isAssigned()) {
-        assignment.push_back(make_pair(i, var_array[i].min()));
-        assignment.push_back(make_pair(i, var_array[i].max()));
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i) {
+      if(!varArray[i].isAssigned()) {
+        assignment.push_back(make_pair(i, varArray[i].min()));
+        assignment.push_back(make_pair(i, varArray[i].max()));
         return true;
       } else
-        c.push_back(var_array[i].assignedValue());
+        c.push_back(varArray[i].assignedValue());
     }
 
     if(checkAssignment(c.begin(), c.size())) { // Put the complete assignment in the box.
-      for(SysInt i = 0; i < (SysInt)var_array.size(); ++i)
+      for(SysInt i = 0; i < (SysInt)varArray.size(); ++i)
         assignment.push_back(make_pair(i, c[i]));
       return true;
     }
@@ -162,8 +162,8 @@ struct NeqConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray>
-AbstractConstraint* BuildCT_ALLDIFF(const VarArray& var_array, ConstraintBlob&) {
-  return new NeqConstraint<VarArray>(var_array);
+AbstractConstraint* BuildCT_ALLDIFF(const VarArray& varArray, ConstraintBlob&) {
+  return new NeqConstraint<VarArray>(varArray);
 }
 
 /* JSON

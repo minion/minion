@@ -12,8 +12,8 @@ public:
     parent_stack.push_back(0);
   }
 
-  void initial_variables(const std::vector<AnyVarRef>& vars) {
-    std::cout << "!!Initial domains" << get_dom_as_json(vars).str << std::endl;
+  void initialVariables(const std::vector<AnyVarRef>& vars) {
+    std::cout << "!!Initial domains" << getDom_as_json(vars).str << std::endl;
   }
 
   void output_node(long long nodeCount, const std::vector<AnyVarRef>& vars, bool isSolution) {
@@ -21,7 +21,7 @@ public:
     if(parent_stack.size() > 0)
       std::cout << "!!Parent id" << parent_stack.back() << std::endl;
     std::cout << "!!is a solution" << isSolution << std::endl;
-    std::cout << "!!domains: " << get_dom_as_json(vars).str << std::endl;
+    std::cout << "!!domains: " << getDom_as_json(vars).str << std::endl;
   }
 
   void backtrack() {

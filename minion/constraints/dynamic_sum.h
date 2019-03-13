@@ -83,8 +83,8 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
   typedef BoolLessSumConstraintDynamic<VarArray, VarSum, 1 - VarToCount> NegConstraintType;
   typedef typename VarArray::value_type VarRef;
 
-  CONSTRAINT_ARG_LIST2(var_array,
-                       VarToCount ? (DomainInt)(var_array.size()) - var_sum : (DomainInt)(var_sum));
+  CONSTRAINT_ARG_LIST2(varArray,
+                       VarToCount ? (DomainInt)(varArray.size()) - var_sum : (DomainInt)(var_sum));
 
   // When VarToCount=1 this constraint actually counts 0's and ensures there are
   // var_sum or more.
@@ -92,7 +92,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
   // and values flipped
   // for it to make sense.
 
-  VarArray var_array;
+  VarArray varArray;
   VarSum var_sum;
 
   void* unwatched_indexes;
@@ -103,14 +103,14 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     return static_cast<SysInt*>(unwatched_indexes)[i];
   }
 
-  BoolLessSumConstraintDynamic(const VarArray& _var_array, VarSum _var_sum)
-      : var_array(_var_array), var_sum(_var_sum), last(0) {
+  BoolLessSumConstraintDynamic(const VarArray& _varArray, VarSum _var_sum)
+      : varArray(_varArray), var_sum(_var_sum), last(0) {
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
     // Sum of 1's is >= K
     // == Number of 1's is >=K         // this is the one I want to do
     // == Number of 0's is <= N-K
 
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
 
     if(var_sum >= arraySize || var_sum < 0) {
       // In these cases the constraints are all set before search.
@@ -124,7 +124,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
   }
 
   virtual SysInt dynamicTriggerCount() {
-    if(var_sum >= (SysInt)var_array.size() || var_sum < 0)
+    if(var_sum >= (SysInt)varArray.size() || var_sum < 0)
       return 0;
     else
       return checked_cast<SysInt>(var_sum + 1);
@@ -137,12 +137,12 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       // Constraint trivially satisfied
       return;
 
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
     DomainInt triggers_wanted = var_sum + 1;
     SysInt index;
 
     for(index = 0; (index < arraySize) && (triggers_wanted > 0); ++index) {
-      if(var_array[index].inDomain(1 - VarToCount)) {
+      if(varArray[index].inDomain(1 - VarToCount)) {
         // delay setting up triggers in case we don't need to
         --triggers_wanted;
       }
@@ -157,11 +157,11 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     } else if(triggers_wanted == 1) // Then we can propagate
     {                               // We never even set up triggers
       for(SysInt i = 0; i < arraySize; ++i) {
-        if(var_array[i].inDomain(1 - VarToCount)) {
+        if(varArray[i].inDomain(1 - VarToCount)) {
           if(VarToCount)
-            var_array[i].setMax(0);
+            varArray[i].setMax(0);
           else
-            var_array[i].setMin(1);
+            varArray[i].setMin(1);
         }
       }
     } else // Now set up triggers
@@ -175,9 +175,9 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
 
       for(SysInt i = 0; (i < index); ++i) // remember index was the elts we looked at
       {
-        if(var_array[i].inDomain(1 - VarToCount)) {
+        if(varArray[i].inDomain(1 - VarToCount)) {
           triggerInfo(dt) = i;
-          moveTriggerInt(var_array[i], dt, VarToCount ? LowerBound : UpperBound);
+          moveTriggerInt(varArray[i], dt, VarToCount ? LowerBound : UpperBound);
           ++dt;
         } else {
           unwatched(j) = i;
@@ -210,7 +210,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     PROP_INFO_ADDONE(DynSum);
     D_ASSERT(check_consistency());
     SysInt propval = triggerInfo(dt);
-    D_ASSERT(var_array[propval].assignedValue() == VarToCount);
+    D_ASSERT(varArray[propval].assignedValue() == VarToCount);
     // should generalise
     // and will need to loop round for watched lits
 
@@ -223,7 +223,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       D_ASSERT(num_unwatched > 0);
 
       j = (last + 1 + loop) % num_unwatched;
-      if(var_array[unwatched(j)].inDomain(1 - VarToCount)) {
+      if(varArray[unwatched(j)].inDomain(1 - VarToCount)) {
         found_new_support = true;
       }
     }
@@ -233,7 +233,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       SysInt& unwatched_index = unwatched(j);
 
       triggerInfo(dt) = unwatched_index;
-      moveTriggerInt(var_array[unwatched_index], dt, VarToCount ? LowerBound : UpperBound);
+      moveTriggerInt(varArray[unwatched_index], dt, VarToCount ? LowerBound : UpperBound);
 
       unwatched_index = propval;
       last = j;
@@ -249,16 +249,16 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       if(dt != dt2) // that one has just been set the other way
       {
         if(VarToCount)
-          var_array[triggerInfo(dt2)].setMax(0);
+          varArray[triggerInfo(dt2)].setMax(0);
         else
-          var_array[triggerInfo(dt2)].setMin(1);
+          varArray[triggerInfo(dt2)].setMin(1);
       }
       dt2++;
     }
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    D_ASSERT(vSize == (SysInt)var_array.size());
+    D_ASSERT(vSize == (SysInt)varArray.size());
     SysInt count = 0;
     for(SysInt i = 0; i < vSize; ++i)
       count += (v[i] != VarToCount);
@@ -267,9 +267,9 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(AnyVarRef(var_array[i]));
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(AnyVarRef(varArray[i]));
     return vars;
   }
 
@@ -279,8 +279,8 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
     }
 
     SysInt count = 0;
-    for(SysInt i = 0; i < (SysInt)var_array.size(); ++i) {
-      if(var_array[i].inDomain(!VarToCount)) {
+    for(SysInt i = 0; i < (SysInt)varArray.size(); ++i) {
+      if(varArray[i].inDomain(!VarToCount)) {
         assignment.push_back(make_pair(i, !VarToCount));
         count++;
         if(count >= var_sum)
@@ -293,19 +293,19 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
 
   virtual AbstractConstraint* reverseConstraint() {
     return new BoolLessSumConstraintDynamic<VarArray, VarSum, 1 - VarToCount, true>(
-        var_array, var_array.size() - var_sum + 1);
+        varArray, varArray.size() - var_sum + 1);
   }
 };
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BoolLessEqualSumConDynamic(const VarArray& _var_array, VarSum _var_sum) {
-  return new BoolLessSumConstraintDynamic<VarArray, VarSum>(_var_array, (SysInt)_var_array.size() -
+AbstractConstraint* BoolLessEqualSumConDynamic(const VarArray& _varArray, VarSum _var_sum) {
+  return new BoolLessSumConstraintDynamic<VarArray, VarSum>(_varArray, (SysInt)_varArray.size() -
                                                                             (SysInt)(_var_sum));
 }
 
 template <typename VarArray, typename VarSum>
-AbstractConstraint* BoolGreaterEqualSumConDynamic(const VarArray& _var_array, VarSum _var_sum) {
-  return new BoolLessSumConstraintDynamic<VarArray, VarSum, 0>(_var_array, _var_sum);
+AbstractConstraint* BoolGreaterEqualSumConDynamic(const VarArray& _varArray, VarSum _var_sum) {
+  return new BoolLessSumConstraintDynamic<VarArray, VarSum, 0>(_varArray, _var_sum);
 }
 
 #include "dynamic_sum_sat.h"

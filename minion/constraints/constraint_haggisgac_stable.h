@@ -141,8 +141,8 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
 
   ShortTupleList* data;
 
-  HaggisGACStable(const VarArray& _var_array, ShortTupleList* tuples)
-      : vars(_var_array), supportFreeList(0), data(tuples) {
+  HaggisGACStable(const VarArray& _varArray, ShortTupleList* tuples)
+      : vars(_varArray), supportFreeList(0), data(tuples) {
     init();
 
     // Pointers to the last implicit/explicit support for a var/literal

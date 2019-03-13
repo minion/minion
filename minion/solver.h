@@ -56,7 +56,7 @@ class SearchState {
 
   vector<AbstractConstraint*> constraints;
 
-  vector<set<AbstractConstraint*>> constraints_to_propagate;
+  vector<set<AbstractConstraint*>> constraintsToPropagate;
 
   long long int solutions;
 
@@ -96,7 +96,7 @@ public:
   }
 
   vector<set<AbstractConstraint*>>& getConstraintsToPropagate() {
-    return constraints_to_propagate;
+    return constraintsToPropagate;
   }
 
   long long getNodeCount() {
@@ -223,7 +223,7 @@ public:
         raw_optimise_var(NULL),
         current_optimise_position(0),
         optimise(false),
-        constraints_to_propagate(1),
+        constraintsToPropagate(1),
         solutions(0),
         finished(false),
         failed(false),

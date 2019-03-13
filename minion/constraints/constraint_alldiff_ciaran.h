@@ -41,26 +41,26 @@ struct AlldiffCiaran : public AbstractConstraint {
     return "alldiffciaran";
   }
 
-  CONSTRAINT_ARG_LIST1(var_array);
+  CONSTRAINT_ARG_LIST1(varArray);
 
-  VarArray var_array;
+  VarArray varArray;
 
-  AlldiffCiaran(StateObj* _stateObj, const VarArray& _var_array)
+  AlldiffCiaran(StateObj* _stateObj, const VarArray& _varArray)
       : AbstractConstraint(_stateObj),
-        var_array(_var_array),
+        varArray(_varArray),
         H(),
         A(),
         D(),
-        sortedvars(_var_array.size(), 0) {
-    for(unsigned int i = 0; i < var_array.size(); i++)
+        sortedvars(_varArray.size(), 0) {
+    for(unsigned int i = 0; i < varArray.size(); i++)
       sortedvars[i] = i;
   }
 
   virtual triggerCollection setup_internal() {
     triggerCollection t;
-    SysInt arraySize = var_array.size();
+    SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i)
-      t.push_back(make_trigger(var_array[i], Trigger(this, i), DomainChanged));
+      t.push_back(make_trigger(varArray[i], Trigger(this, i), DomainChanged));
     return t;
   }
 
@@ -71,10 +71,10 @@ struct AlldiffCiaran : public AbstractConstraint {
     return forward_check_negation(stateObj, this);
 
     vector<AbstractConstraint*> con;
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
-      for(SysInt j = i + 1; j < (SysInt)var_array.size(); j++) {
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
+      for(SysInt j = i + 1; j < (SysInt)varArray.size(); j++) {
         EqualConstraint<VarRef, VarRef>* t =
-            new EqualConstraint<VarRef, VarRef>(stateObj, var_array[i], var_array[j]);
+            new EqualConstraint<VarRef, VarRef>(stateObj, varArray[i], varArray[j]);
         con.push_back((AbstractConstraint*)t);
       }
     }
@@ -104,14 +104,14 @@ struct AlldiffCiaran : public AbstractConstraint {
            A gets empty set
            n gets 0
     */
-    if(var_array.size() == 0)
+    if(varArray.size() == 0)
       return;
 
     // insertion sort
-    for(SysInt i = 1; i < (SysInt)var_array.size(); i++) {
+    for(SysInt i = 1; i < (SysInt)varArray.size(); i++) {
       for(SysInt j = i - 1; j >= 0; j--) {
 
-        if(var_array[sortedvars[j + 1]].domSize() < var_array[sortedvars[j]].domSize()) {
+        if(varArray[sortedvars[j + 1]].domSize() < varArray[sortedvars[j]].domSize()) {
           // swap
           SysInt tmp = sortedvars[j + 1];
           sortedvars[j + 1] = sortedvars[j];
@@ -132,17 +132,17 @@ struct AlldiffCiaran : public AbstractConstraint {
     for(unsigned int i = 0; i < sortedvars.size(); i++) {
       SysInt var = sortedvars[i];
 
-      // std::cout << "Processing variable :" << var << " ("<< var_array[var].min() << " ," <<
-      // var_array[var].max() << ")" <<std::endl;
+      // std::cout << "Processing variable :" << var << " ("<< varArray[var].min() << " ," <<
+      // varArray[var].max() << ")" <<std::endl;
 
       //  D gets D \ H (remove previously seen Hall sets from D)
       D.clear();
-      for(DomainInt j = var_array[var].min(); j <= var_array[var].max(); j++) {
-        if(var_array[var].inDomain(j)) {
+      for(DomainInt j = varArray[var].min(); j <= varArray[var].max(); j++) {
+        if(varArray[var].inDomain(j)) {
           if(!H.in(checked_cast<SysInt>(j - dom_min))) {
             D.insert(checked_cast<SysInt>(j - dom_min));
           } else {
-            var_array[var].removeFromDomain(j); //  Value is in the union of known Hall sets.
+            varArray[var].removeFromDomain(j); //  Value is in the union of known Hall sets.
           }
         }
       }
@@ -182,16 +182,16 @@ struct AlldiffCiaran : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    if(var_array.size() == 0)
+    if(varArray.size() == 0)
       return;
 
-    dom_min = var_array[0].min();
-    dom_max = var_array[0].max();
-    for(unsigned int i = 1; i < var_array.size(); i++) {
-      if(var_array[i].min() < dom_min)
-        dom_min = var_array[i].min();
-      if(var_array[i].max() > dom_max)
-        dom_max = var_array[i].max();
+    dom_min = varArray[0].min();
+    dom_max = varArray[0].max();
+    for(unsigned int i = 1; i < varArray.size(); i++) {
+      if(varArray[i].min() < dom_min)
+        dom_min = varArray[i].min();
+      if(varArray[i].max() > dom_max)
+        dom_max = varArray[i].max();
     }
 
     //  Set up the smallsets
@@ -203,18 +203,18 @@ struct AlldiffCiaran : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
-      if(!var_array[i].isAssigned()) {
-        assignment.push_back(make_pair(i, var_array[i].min()));
-        assignment.push_back(make_pair(i, var_array[i].max()));
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
+      if(!varArray[i].isAssigned()) {
+        assignment.push_back(make_pair(i, varArray[i].min()));
+        assignment.push_back(make_pair(i, varArray[i].max()));
         return true;
       }
     }
 
     // Otherwise, check pairwise assignments
-    for(SysInt i = 0; i < (SysInt)var_array.size(); i++) {
-      for(SysInt j = i + 1; j < (SysInt)var_array.size(); j++) {
-        if(var_array[i].assignedValue() == var_array[j].assignedValue()) {
+    for(SysInt i = 0; i < (SysInt)varArray.size(); i++) {
+      for(SysInt j = i + 1; j < (SysInt)varArray.size(); j++) {
+        if(varArray[i].assignedValue() == varArray[j].assignedValue()) {
           return false;
         }
       }
@@ -223,7 +223,7 @@ struct AlldiffCiaran : public AbstractConstraint {
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt arraySize) {
-    D_ASSERT(arraySize == (SysInt)var_array.size());
+    D_ASSERT(arraySize == (SysInt)varArray.size());
     for(SysInt i = 0; i < arraySize; i++)
       for(SysInt j = i + 1; j < arraySize; j++)
         if(v[i] == v[j])
@@ -233,9 +233,9 @@ struct AlldiffCiaran : public AbstractConstraint {
 
   virtual vector<AnyVarRef> getVars() {
     vector<AnyVarRef> vars;
-    vars.reserve(var_array.size());
-    for(UnsignedSysInt i = 0; i < var_array.size(); ++i)
-      vars.push_back(var_array[i]);
+    vars.reserve(varArray.size());
+    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
+      vars.push_back(varArray[i]);
     return vars;
   }
 };

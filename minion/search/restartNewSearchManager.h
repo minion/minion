@@ -3,7 +3,7 @@
 namespace Controller {
 struct RestartNewSearchManager : public Controller::SearchManager {
   PropagationLevel prop_method;
-  vector<SearchOrder> initial_order;
+  vector<SearchOrder> initialOrder;
 
   void doASearch(const vector<SearchOrder>& order, int backtracklimit) {
     bool timeout = false;
@@ -20,10 +20,10 @@ struct RestartNewSearchManager : public Controller::SearchManager {
 
     // std::cout << "Starting search\n";
 
-    auto timeoutChecker = [&](const vector<AnyVarRef>& var_array,
+    auto timeoutChecker = [&](const vector<AnyVarRef>& varArray,
                               const vector<Controller::triple>& branches) {
       try {
-        Controller::standard_time_ctrlc_checks(var_array, branches);
+        Controller::standard_time_ctrlc_checks(varArray, branches);
       } catch(EndOfSearch&) {
         timeout = true;
         throw EndOfSearch();
@@ -63,14 +63,14 @@ struct RestartNewSearchManager : public Controller::SearchManager {
       throw EndOfSearch();
     }
 
-    Controller::world_pop_to_depth(depth);
+    Controller::world_popToDepth(depth);
   }
 
   RestartNewSearchManager(PropagationLevel _prop_method, const vector<SearchOrder>& _order)
-      : prop_method(_prop_method), initial_order(_order) {}
+      : prop_method(_prop_method), initialOrder(_order) {}
 
   vector<SearchOrder> makeRandomWalkSearchOrder(int bias) {
-    vector<SearchOrder> searchOrder(initial_order);
+    vector<SearchOrder> searchOrder(initialOrder);
     for(auto& so : searchOrder) {
       for(int i = 0; i < so.val_order.size(); i++) {
         so.val_order[i] = ValOrder(VALORDER_RANDOM, bias);
