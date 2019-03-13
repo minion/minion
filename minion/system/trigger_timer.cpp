@@ -46,7 +46,7 @@ void CALLBACK ReallyStop(void*, BOOLEAN) {
   exit(1);
 }
 
-void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout, bool CPU_time) {
+void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout, bool CPU_time) {
   if(CPU_time)
     cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
 
@@ -55,7 +55,7 @@ void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout, boo
 
   HANDLE m_timerHandle;
 
-  if(timeout_active) {
+  if(timeoutActive) {
     if(timeout <= 0)
       *trig = true;
     BOOL success = ::CreateTimerQueueTimer(&m_timerHandle, NULL, TimerProc, NULL, timeout * 1000, 0,
@@ -74,11 +74,11 @@ void install_ctrlcTrigger(std::atomic<bool>*) { /* Not implemented on windows */
 #include <sys/types.h>
 #include <unistd.h>
 
-void trigger_function(int /* signum */) {
+void triggerFunction(int /* signum */) {
   *trig = true;
 }
 
-void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout,
+void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout,
                       bool CPU_time) // CPU_time = false -> real time
 {
   // We still set these, as they are how 'ctrlc' checks if we have got started
@@ -86,9 +86,9 @@ void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout,
   trig = b;
   *trig = false;
 
-  signal(SIGXCPU, trigger_function);
-  signal(SIGALRM, trigger_function);
-  if(timeout_active) {
+  signal(SIGXCPU, triggerFunction);
+  signal(SIGALRM, triggerFunction);
+  if(timeoutActive) {
     if(timeout <= 0)
       *trig = true;
     if(CPU_time) {

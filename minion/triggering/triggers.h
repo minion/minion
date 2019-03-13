@@ -34,17 +34,17 @@ class AbstractConstraint;
  * which uses this and corrects the domain.
  */
 class DomainDelta {
-  DomainInt domain_change;
+  DomainInt domainChange;
 
 public:
   /// This function shouldn't be called directly. This object should be passed
   /// to a variables, which will do any "massaging" which
   /// is required.
   DomainInt XXX_getDomain_diff() {
-    return domain_change;
+    return domainChange;
   }
 
-  DomainDelta(DomainInt i) : domain_change(i) {}
+  DomainDelta(DomainInt i) : domainChange(i) {}
 
   static DomainDelta empty() {
     return DomainDelta(0);

@@ -67,7 +67,7 @@ class MiniStream {
       pos++;
       incr();
       if(pos >= 999) {
-        p_error("Identifier too long:");
+        pError("Identifier too long:");
       }
     }
 
@@ -114,11 +114,11 @@ class MiniStream {
   }
 
   // methods for printing errors
-  void p_error(const string error) {
-    p_error(error, charnum);
+  void pError(const string error) {
+    pError(error, charnum);
   }
 
-  void p_error(const string error, int cNum) {
+  void pError(const string error, int cNum) {
     cerr << "Error occurred on line " << linenum << ":" << endl;
     cerr << error << endl;
 
@@ -175,18 +175,18 @@ public:
     while(!eof()) {
       if(!getString(var_name)) { // fails if file contains only
         linenum--;                // spaces +/ comments
-        p_error("No 'letting's found.");
+        pError("No 'letting's found.");
       }
       if(var_name != "letting") { // letting
-        p_error("Expected 'letting' here:", charnum - var_name.length());
+        pError("Expected 'letting' here:", charnum - var_name.length());
       }
 
       if(!getString(var_name)) { // var name
-        p_error("Expected a variable name here:");
+        pError("Expected a variable name here:");
       }
 
       if(!is_sign('=')) { // equals
-        p_error("Expected '=' here:");
+        pError("Expected '=' here:");
       }
 
       if(is_sign('[')) { // array
@@ -221,7 +221,7 @@ public:
           else if(!needcomma && is_sign('[')) { // go deeper
             c_lvl++;
             if(depth != 0 && c_lvl > depth) {
-              p_error("Array dimensions do not match:");
+              pError("Array dimensions do not match:");
             }
             if((int)array_pointer.size() < c_lvl + 1) {
               array_pointer.push_back(0);
@@ -235,7 +235,7 @@ public:
               depth = (int)array_pointer.size() - 1;
             }
             if(c_lvl != depth) {
-              p_error("Array dimensions do not match:", charnum - 1);
+              pError("Array dimensions do not match:", charnum - 1);
             }
             storage[array_pointer] = varValue;
             needcomma = true;
@@ -248,14 +248,14 @@ public:
             if(depth != c_lvl && !needcomma)
               error += "'[' or ";
             error += "']' or ',' here:";
-            p_error(error);
+            pError(error);
           }
         }
       }
 
       else { // simple value
         if(!get_int(varValue)) {
-          p_error("Expected integer value or '[' here:");
+          pError("Expected integer value or '[' here:");
         } else {
 
           add_var(var_name, varValue);

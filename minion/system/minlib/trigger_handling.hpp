@@ -39,14 +39,14 @@ void ctrlCFunctionTrigger(int /* signum */) {
   TriggerEvent::setTrigger(TriggerEvent::ctrl_c);
 }
 
-void trigger_function(int /* signum */) {
+void triggerFunction(int /* signum */) {
   TriggerEvent::setTrigger(TriggerEvent::timeout);
 }
 
 #ifdef NO_SYSTEM
 void setupTriggers(bool, int) {}
 #else
-void setupTriggers(bool timeout_active,
+void setupTriggers(bool timeoutActive,
                     int timeout) // CPU_time = false -> real time
 {
   assert(TriggerEvent::trigger_event_X == TriggerEvent::none);
@@ -55,14 +55,14 @@ void setupTriggers(bool timeout_active,
   act.sa_flags = 0;
   sigfillset(&act.sa_mask);
 
-  act.sa_handler = trigger_function;
+  act.sa_handler = triggerFunction;
   sigaction(SIGXCPU, &act, NULL);
   sigaction(SIGALRM, &act, NULL);
 
   act.sa_handler = ctrlCFunctionTrigger;
   sigaction(SIGINT, &act, NULL);
 
-  if(timeout_active) {
+  if(timeoutActive) {
     rlimit lim;
     lim.rlim_cur = timeout;
     lim.rlim_max = timeout + 10;

@@ -777,11 +777,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #if DomainCounting || InternalDT // need to check through triggers to see if broken....
         {
           run_propagator = false;
-          vector<SysInt>& vars_changed = changedVars_per_scc[sccindexStart];
+          vector<SysInt>& varsChanged = changedVars_per_scc[sccindexStart];
 #if DomainCounting
           SysInt varcount = vars_in_scc.size();
-          for(SysInt i = 0; i < (SysInt)vars_changed.size(); i++) {
-            SysInt var = vars_changed[i];
+          for(SysInt i = 0; i < (SysInt)varsChanged.size(); i++) {
+            SysInt var = varsChanged[i];
             if(var >= numvars || adjlistlength[var] < varcount) { // either its a val (i.e. a
                                                                   // trigger from a cap variable)
               // or its a var with fewer than all the values.
@@ -791,8 +791,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           }
 #endif
 #if InternalDT
-          for(SysInt i = 0; i < (SysInt)vars_changed.size() && !run_propagator; i++) {
-            SysInt var = vars_changed[i];
+          for(SysInt i = 0; i < (SysInt)varsChanged.size() && !run_propagator; i++) {
+            SysInt var = varsChanged[i];
             if(var >= numvars) {
               // var is actually a val. Triggered from a
               // capacity variable.

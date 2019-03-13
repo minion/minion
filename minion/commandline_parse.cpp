@@ -396,11 +396,11 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     */
     else if(command == string("-timelimit")) {
       INCREMENT_i(-timelimit);
-      if(getOptions().timeout_active) {
+      if(getOptions().timeoutActive) {
         cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
         exit(1);
       }
-      getOptions().timeout_active = true;
+      getOptions().timeoutActive = true;
       try {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
         getOptions().time_limit_is_CPU_time = false;
@@ -442,11 +442,11 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     */
     else if(command == string("-cpulimit")) {
       INCREMENT_i(-cpulimit);
-      if(getOptions().timeout_active) {
+      if(getOptions().timeoutActive) {
         cout << "Only one '-cpulimit', or '-timelimit' per instance" << endl;
         exit(1);
       }
-      getOptions().timeout_active = true;
+      getOptions().timeoutActive = true;
       try {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
         getOptions().time_limit_is_CPU_time = true;

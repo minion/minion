@@ -129,7 +129,7 @@ public:
     dynamic_propagate(varNum, Assigned, -1);
   }
 
-  void pushDomain_changed(DomainInt varNum) {
+  void pushDomainChanged(DomainInt varNum) {
     dynamic_propagate(varNum, DomainChanged, -1);
   }
 

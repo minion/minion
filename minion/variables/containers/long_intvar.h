@@ -303,7 +303,7 @@ struct BigRangeVarContainer {
     trigger_list.pushDomain_removal(d.varNum, i);
     reduceDomSize(d);
 #ifndef NO_DOMAIN_TRIGGERS
-    trigger_list.pushDomain_changed(d.varNum);
+    trigger_list.pushDomainChanged(d.varNum);
 #endif
     D_ASSERT(!bms_array->isMember(var_offset[d.varNum] + i));
 
@@ -377,7 +377,7 @@ private:
         reduceDomSize(d);
       }
     }
-    trigger_list.pushDomain_changed(d.varNum);
+    trigger_list.pushDomainChanged(d.varNum);
     trigger_list.push_assign(d.varNum, offset);
 
     DomainInt low_bound = lower_bound(d);
@@ -428,7 +428,7 @@ public:
       upper_bound(d) = new_upper;
 
 #ifndef NO_DOMAIN_TRIGGERS
-      trigger_list.pushDomain_changed(d.varNum);
+      trigger_list.pushDomainChanged(d.varNum);
 #endif
       trigger_list.push_upper(d.varNum, up_bound - upper_bound(d));
 
@@ -481,7 +481,7 @@ public:
       lower_bound(d) = new_lower;
 
 #ifndef NO_DOMAIN_TRIGGERS
-      trigger_list.pushDomain_changed(d.varNum);
+      trigger_list.pushDomainChanged(d.varNum);
 #endif
       trigger_list.push_lower(d.varNum, lower_bound(d) - low_bound);
       if(lower_bound(d) == upper_bound(d)) {

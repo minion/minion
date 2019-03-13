@@ -296,7 +296,7 @@ public:
   bool print_solution;
 
   /// Is there a timeout?
-  bool timeout_active;
+  bool timeoutActive;
 
   /// Stores the timelimit.
   clock_t time_limit;
@@ -363,7 +363,7 @@ public:
         tableout(false),
         solsoutWrite(false),
         print_solution(true),
-        timeout_active(false),
+        timeoutActive(false),
         time_limit(0),
         time_limit_is_CPU_time(false),
         randomiseValvarorder(false),

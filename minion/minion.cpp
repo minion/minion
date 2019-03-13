@@ -113,7 +113,7 @@ int main(int argc, char** argv) {
     }
 
     if(!getOptions().noTimers) {
-      Parallel::setupAlarm(getOptions().timeout_active, getOptions().time_limit,
+      Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
                            getOptions().time_limit_is_CPU_time);
     }
 

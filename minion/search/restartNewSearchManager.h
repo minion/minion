@@ -56,7 +56,7 @@ struct RestartNewSearchManager : public Controller::SearchManager {
       // cout << "Solution found, stop the search" << endl;
       throw EndOfSearch();
     } else if(timeout) {
-      if(getOptions().timeout_active && get_cpu_time() > getOptions().time_limit)
+      if(getOptions().timeoutActive && get_cpu_time() > getOptions().time_limit)
         cout << "Time limit is reached, stop the search" << endl;
       else
         cout << "Node limit is reached, stop the search" << endl;

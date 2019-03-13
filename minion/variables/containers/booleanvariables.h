@@ -284,7 +284,7 @@ struct BoolVarContainer {
     assign_ptr()[d.data_offset()] |= d.shift_offset;
 
     trigger_list.push_assign(d.varNum, b);
-    trigger_list.pushDomain_changed(d.varNum);
+    trigger_list.pushDomainChanged(d.varNum);
     trigger_list.pushDomain_removal(d.varNum, 1 - b);
 
     if(b == 1) {

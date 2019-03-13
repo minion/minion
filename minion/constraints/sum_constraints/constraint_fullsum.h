@@ -106,12 +106,12 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     return min_sum;
   }
 
-  virtual void propagateDynInt(SysInt propVal, DomainDelta domain_change) {
+  virtual void propagateDynInt(SysInt propVal, DomainDelta domainChange) {
     P("Prop: " << propVal);
     PROP_INFO_ADDONE(FullSum);
     DomainInt sum = varArrayMinSum;
     if(propVal != varArray.size()) { // One of the array changed
-      DomainInt change = varArray[checked_cast<SysInt>(propVal)].getDomainChange(domain_change);
+      DomainInt change = varArray[checked_cast<SysInt>(propVal)].getDomainChange(domainChange);
       P(" Change: " << change);
       D_ASSERT(change >= 0);
       sum += change;
