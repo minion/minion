@@ -270,7 +270,7 @@ struct CTupleSTR : public AbstractConstraint {
 
   VarArray vars;
 
-  bool constraint_locked;
+  bool constraintLocked;
 
   vector<SysInt> tupindices;
 
@@ -307,7 +307,7 @@ struct CTupleSTR : public AbstractConstraint {
       : shortTupleList(_tuples),
         longTupleList(0),
         vars(_varArray),
-        constraint_locked(false),
+        constraintLocked(false),
         limit(),
         sct(new CTupleSTRData(_tuples, _varArray.size()))
   //, ssup_permanent()
@@ -412,19 +412,19 @@ struct CTupleSTR : public AbstractConstraint {
   virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
     sval.insert(prop_var);
 
-    if(!constraint_locked) {
-      constraint_locked = true;
+    if(!constraintLocked) {
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
     }
   }
 
   virtual void specialUnlock() {
-    constraint_locked = false;
+    constraintLocked = false;
     sval.clear();
   }
 
   virtual void specialCheck() {
-    constraint_locked = false;
+    constraintLocked = false;
     D_ASSERT(!getState().isFailed());
     do_prop();
   }

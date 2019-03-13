@@ -251,7 +251,7 @@ protected:
 #else
         varArray(_varArray.rbegin(), _varArray.rend()),
 #endif
-        constraint_locked(false) {
+        constraintLocked(false) {
     if(varArray.size() > 0) {
       domMin = checked_cast<SysInt>(varArray[0].initialMin());
       domMax = checked_cast<SysInt>(varArray[0].initialMax());
@@ -307,7 +307,7 @@ protected:
 
   VarArray varArray;
 
-  bool constraint_locked;
+  bool constraintLocked;
 
 #ifndef BTMATCHING
   vector<SysInt> varvalmatching; // For each var, give the matching value.

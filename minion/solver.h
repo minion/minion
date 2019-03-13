@@ -45,8 +45,8 @@ class SearchState {
 
   long long nodes;
   long long backtracks;
-  AnyVarRef* optimise_var;
-  AnyVarRef* raw_optimise_var;
+  AnyVarRef* optimiseVar;
+  AnyVarRef* raw_optimiseVar;
   DomainInt current_optimise_position;
   bool optimise;
   bool maximise;
@@ -69,8 +69,6 @@ class SearchState {
 
   shared_ptr<TupleListContainer> tupleListContainer;
   shared_ptr<ShortTupleListContainer> shortTupleListContainer;
-
-  bool is_locked;
 
   volatile bool alarmTrigger;
 
@@ -122,17 +120,17 @@ public:
   }
 
   AnyVarRef* getOptimiseVar() {
-    return optimise_var;
+    return optimiseVar;
   }
   void setOptimiseVar(AnyVarRef* _var) {
-    optimise_var = _var;
+    optimiseVar = _var;
   }
 
   AnyVarRef* getRawOptimiseVar() {
-    return raw_optimise_var;
+    return raw_optimiseVar;
   }
   void setRawOptimiseVar(AnyVarRef* _var) {
-    raw_optimise_var = _var;
+    raw_optimiseVar = _var;
   }
 
   DomainInt getOptimiseValue() {
@@ -219,27 +217,20 @@ public:
   SearchState()
       : nodes(0),
         backtracks(0),
-        optimise_var(NULL),
-        raw_optimise_var(NULL),
+        optimiseVar(NULL),
+        raw_optimiseVar(NULL),
         current_optimise_position(0),
         optimise(false),
         constraintsToPropagate(1),
         solutions(0),
         finished(false),
         failed(false),
-        is_locked(false),
         alarmTrigger(false) {}
 
   // Must be defined later.
   ~SearchState();
 
-  void markLocked() {
-    is_locked = true;
-  }
 
-  bool isLocked() {
-    return is_locked;
-  }
 };
 
 struct NhConfig;
@@ -318,7 +309,7 @@ public:
   bool randomiseValvarorder;
 
   /// Denotes if parser should output verbosely
-  bool parser_verbose;
+  bool parserVerbose;
 
   /// The filename of the current input file (-- if reading from command line)
   string instance_name;
@@ -376,7 +367,7 @@ public:
         time_limit(0),
         time_limit_is_CPU_time(false),
         randomiseValvarorder(false),
-        parser_verbose(false),
+        parserVerbose(false),
         redump(false),
         graph(false),
         instance_stats(false),

@@ -61,11 +61,11 @@ template <typename VarArrayType, typename ValueType>
 struct AlldiffMatrixConstraint : public AbstractConstraint {
   VarArrayType varArray;
 
-  bool constraint_locked;
+  bool constraintLocked;
 
   AlldiffMatrixConstraint(const VarArrayType& _varArray, const ValueType _value)
       : varArray(_varArray),
-        constraint_locked(false),
+        constraintLocked(false),
         value(_value)
 
   {
@@ -163,8 +163,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         rowcolmatching[row] = -1;
       }
 
-      if(!constraint_locked) {
-        constraint_locked = true;
+      if(!constraintLocked) {
+        constraintLocked = true;
         getQueue().pushSpecialTrigger(this);
       }
     } else {
@@ -183,8 +183,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
         }
 
         // If it was assigned to value, then we need to propagate.
-        if(!constraint_locked) {
-          constraint_locked = true;
+        if(!constraintLocked) {
+          constraintLocked = true;
           getQueue().pushSpecialTrigger(this);
         }
       }
@@ -192,11 +192,11 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   }
 
   virtual void specialUnlock() {
-    constraint_locked = false;
+    constraintLocked = false;
   }
 
   virtual void specialCheck() {
-    constraint_locked = false;
+    constraintLocked = false;
 
     if(getState().isFailed()) {
       return;

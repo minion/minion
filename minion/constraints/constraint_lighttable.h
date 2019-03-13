@@ -101,16 +101,16 @@ struct LightTableConstraint : public AbstractConstraint {
     }
   }
 
-  virtual void propagateDynInt(SysInt changed_var, DomainDelta) {
+  virtual void propagateDynInt(SysInt changedVar, DomainDelta) {
     // Propagate to all vars except the one that changed.
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      if(i != changed_var) {
-        propagate_var(i);
+      if(i != changedVar) {
+        propagateVar(i);
       }
     }
   }
 
-  void propagate_var(SysInt varidx) {
+  void propagateVar(SysInt varidx) {
     VarRef var = vars[varidx];
 
     for(DomainInt val = var.min(); val <= var.max(); val++) {
@@ -131,7 +131,7 @@ struct LightTableConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     setupTriggers();
     for(SysInt i = 0; i < (SysInt)vars.size(); i++) {
-      propagate_var(i);
+      propagateVar(i);
     }
   }
 

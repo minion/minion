@@ -55,7 +55,7 @@ struct Dynamic_OR : public ParentConstraint {
   CONSTRAINT_ARG_LIST1(child_constraints);
 
   Reversible<bool> fullPropagate_called;
-  bool constraint_locked;
+  bool constraintLocked;
 
   SysInt assignSize;
 
@@ -66,7 +66,7 @@ struct Dynamic_OR : public ParentConstraint {
   Dynamic_OR(vector<AbstractConstraint*> _con)
       : ParentConstraint(_con),
         fullPropagate_called(false),
-        constraint_locked(false),
+        constraintLocked(false),
         assignSize(-1),
         propagated_constraint(-1) {
     size_t maxSize = 0;
@@ -120,16 +120,16 @@ struct Dynamic_OR : public ParentConstraint {
   }
 
   virtual void specialCheck() {
-    D_ASSERT(constraint_locked);
-    constraint_locked = false;
+    D_ASSERT(constraintLocked);
+    constraintLocked = false;
     P("Full propagating: " << propagated_constraint);
     child_constraints[propagated_constraint]->fullPropagate();
     fullPropagate_called = true;
   }
 
   virtual void specialUnlock() {
-    D_ASSERT(constraint_locked);
-    constraint_locked = false;
+    D_ASSERT(constraintLocked);
+    constraintLocked = false;
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
@@ -137,8 +137,8 @@ struct Dynamic_OR : public ParentConstraint {
     P("Prop");
     P("Current: " << watched_constraint[0] << " . " << watched_constraint[1]);
     P("FullPropOn: " << (bool)fullPropagate_called << ", on: " << propagated_constraint);
-    P("Locked:" << constraint_locked);
-    if(constraint_locked)
+    P("Locked:" << constraintLocked);
+    if(constraintLocked)
       return;
 
     if(trig >= 0 && trig < assignSize * 2) {
@@ -194,7 +194,7 @@ struct Dynamic_OR : public ParentConstraint {
       // Need to propagate!
       propagated_constraint = watched_constraint[other_constraint];
       // the following may be necessary for correctness for some constraints
-      constraint_locked = true;
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
       return;
     }
@@ -273,7 +273,7 @@ struct Dynamic_OR : public ParentConstraint {
 
     if(found_watch == false) {
       propagated_constraint = watched_constraint[0];
-      constraint_locked = true;
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
     }
   }

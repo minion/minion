@@ -329,7 +329,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
         literalList[lit].supportCellList->prev = &(supCells[i]);
       } else {
         // Attach trigger if this is the first support containing var,val.
-        attach_trigger(var, literalList[lit].val, lit);
+        attachTrigger(var, literalList[lit].val, lit);
       }
       literalList[lit].supportCellList = &(supCells[i]);
 
@@ -414,7 +414,7 @@ struct HaggisGAC : public AbstractConstraint, Backtrackable {
 #endif
           // Remove trigger since this is the last support containing var,val.
           if(SupportsGACUseDT) {
-            detach_trigger(lit);
+            detachTrigger(lit);
           }
         } else {
           supCell.next->prev = 0;

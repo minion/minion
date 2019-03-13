@@ -164,7 +164,7 @@ struct MDDC : public AbstractConstraint {
 
   VarArray vars;
 
-  bool constraint_locked;
+  bool constraintLocked;
 
   //  gyes is set of mdd nodes that have been visited already in this call.
   arrayset gyes;
@@ -185,11 +185,11 @@ struct MDDC : public AbstractConstraint {
       :
 
         vars(_varArray),
-        constraint_locked(false),
+        constraintLocked(false),
         gno(),
         tuples(_tuples) {
     if(isNegative) {
-      init_negative(_tuples);
+      initNegative(_tuples);
     } else {
       init(_tuples);
     }
@@ -309,7 +309,7 @@ struct MDDC : public AbstractConstraint {
 
   // This one converts a negative list of tuples (i.e. a negative table
   // constraint) to an mdd.
-  void init_negative(TupleList* tuples) {
+  void initNegative(TupleList* tuples) {
     // First build a trie by inserting the tuples one by one.
 
     SysInt tlsize = checked_cast<SysInt>(tuples->size());
@@ -573,18 +573,18 @@ struct MDDC : public AbstractConstraint {
   }
 
   virtual void propagateDynInt(SysInt prop_var, DomainDelta) {
-    if(!constraint_locked) {
-      constraint_locked = true;
+    if(!constraintLocked) {
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
     }
   }
 
   virtual void specialUnlock() {
-    constraint_locked = false;
+    constraintLocked = false;
   }
 
   virtual void specialCheck() {
-    constraint_locked = false;
+    constraintLocked = false;
     D_ASSERT(!getState().isFailed());
     do_prop();
   }

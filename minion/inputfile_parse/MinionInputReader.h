@@ -225,7 +225,7 @@ public:
   void finalise();
 
   ProbSpec::CSPInstance* instance;
-  bool parser_verbose;
+  bool parserVerbose;
   bool print_allVars;
   MapLongTuplesToShort map_long_short_mode;
 
@@ -240,8 +240,8 @@ public:
     return isGadgetReader_m;
   }
 
-  MinionThreeInputReader(bool _parser_verbose, MapLongTuplesToShort mls, bool _e)
-      : parser_verbose(_parser_verbose),
+  MinionThreeInputReader(bool _parserVerbose, MapLongTuplesToShort mls, bool _e)
+      : parserVerbose(_parserVerbose),
         print_allVars(true),
         map_long_short_mode(mls),
         ensureBranchOnAllVars(_e),

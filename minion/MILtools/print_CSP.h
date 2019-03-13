@@ -205,12 +205,12 @@ struct MinionInstancePrinter {
   void printSearchInfo(const vector<Var>& var_vec) {
     set<Var> vars(var_vec.begin(), var_vec.end());
 
-    if(csp.is_optimisation_problem && vars.count(csp.optimise_variable)) {
+    if(csp.is_optimisation_problem && vars.count(csp.optimiseVariable)) {
       if(csp.optimise_minimising)
         oss << "MINIMISING ";
       else
         oss << "MAXIMISING ";
-      print_instance(csp.optimise_variable);
+      print_instance(csp.optimiseVariable);
       oss << endl;
     }
 

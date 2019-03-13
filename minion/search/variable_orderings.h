@@ -504,7 +504,7 @@ struct ConflictBranch : VariableOrder {
         valOrder(_valOrder),
         pos(),
         innervarorder(_innervarorder),
-        last_returned_var(-1),
+        last_returnedVar(-1),
         in_conflict(false) {
     pos = 0;
     pos2 = 0;
@@ -512,18 +512,18 @@ struct ConflictBranch : VariableOrder {
 
   // pos maintains a 'depth' which is actually the number of calls to
   // pickVarVals
-  // last_returned_var contains the last var returned by pickvarval, or -1
+  // last_returnedVar contains the last var returned by pickvarval, or -1
   // if we were at a solution.
 
   // pos and pos2 are used to see if we have backtracked.
 
   SysInt pos2;
 
-  SysInt last_returned_var;
+  SysInt last_returnedVar;
   bool in_conflict;
 
   pair<SysInt, DomainInt> pickVarVal() {
-    if(in_conflict && varOrder[last_returned_var].isAssigned()) {
+    if(in_conflict && varOrder[last_returnedVar].isAssigned()) {
       // If the conflict variable has been successfully assigned, come out
       // of conflict mode.
       in_conflict = false;
@@ -532,7 +532,7 @@ struct ConflictBranch : VariableOrder {
     if(pos2 > pos) {
       pos2 = pos;
 
-      if(last_returned_var != -1 && !varOrder[last_returned_var].isAssigned()) {
+      if(last_returnedVar != -1 && !varOrder[last_returnedVar].isAssigned()) {
         // we backtracked since the last call.
         // Assume the search procedure made a left branch which failed,
         // then backtracked.
@@ -546,11 +546,11 @@ struct ConflictBranch : VariableOrder {
 
     if(in_conflict) {
 
-      DomainInt val = chooseVal(varOrder[last_returned_var], valOrder[last_returned_var]);
-      return make_pair(last_returned_var, val);
+      DomainInt val = chooseVal(varOrder[last_returnedVar], valOrder[last_returnedVar]);
+      return make_pair(last_returnedVar, val);
     } else {
       pair<SysInt, DomainInt> temp = innervarorder->pickVarVal();
-      last_returned_var = temp.first;
+      last_returnedVar = temp.first;
       D_ASSERT(temp.first == -1 || varOrder[temp.first].inDomain(temp.second));
       return temp;
     }

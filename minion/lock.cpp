@@ -45,6 +45,5 @@ void lock() {
     }
   }
 
-  getState().markLocked();
 }
 } // namespace Controller

@@ -65,10 +65,10 @@ struct Dynamic_AND : public ParentConstraint {
 
   CONSTRAINT_ARG_LIST1(child_constraints);
 
-  bool constraint_locked;
+  bool constraintLocked;
   SysInt propagated_to;
   Dynamic_AND(vector<AbstractConstraint*> _con)
-      : ParentConstraint(_con), constraint_locked(false) {}
+      : ParentConstraint(_con), constraintLocked(false) {}
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
@@ -123,10 +123,10 @@ struct Dynamic_AND : public ParentConstraint {
   }
 
   virtual void specialCheck() {
-    D_ASSERT(constraint_locked);
+    D_ASSERT(constraintLocked);
     P("Full propagating all constraints in AND");
     if(child_constraints.size() == 0) {
-      constraint_locked = false;
+      constraintLocked = false;
       return;
     }
 
@@ -135,24 +135,24 @@ struct Dynamic_AND : public ParentConstraint {
     if(propagated_to != (SysInt)child_constraints.size())
       getQueue().pushSpecialTrigger(this);
     else {
-      constraint_locked = false;
+      constraintLocked = false;
     }
   }
 
   virtual void specialUnlock() {
-    D_ASSERT(constraint_locked);
-    constraint_locked = false;
+    D_ASSERT(constraintLocked);
+    constraintLocked = false;
   }
 
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     // PROP_INFO_ADDONE(WatchedOr);
     P("Prop");
-    P("Locked:" << constraint_locked);
+    P("Locked:" << constraintLocked);
     // pass the trigger down
     P("Propagating child");
     // need to know which child to prop.
     SysInt child = getChildDynamicTrigger(trig);
-    if(!constraint_locked || child < propagated_to) {
+    if(!constraintLocked || child < propagated_to) {
       passDynTriggerToChild(trig, dd);
       // child_constraints[child]->propagateDynInt(trig);
     }
@@ -161,8 +161,8 @@ struct Dynamic_AND : public ParentConstraint {
   virtual void fullPropagate() {
     P("AND Full Propagate");
     // push it on the special queue to be fullPropagated later.
-    D_ASSERT(!constraint_locked);
-    constraint_locked = true;
+    D_ASSERT(!constraintLocked);
+    constraintLocked = true;
     propagated_to = 0;
     getQueue().pushSpecialTrigger(this);
   }

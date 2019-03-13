@@ -397,14 +397,14 @@ nothing at all...)
 
 #define MAYBE_PARSER_INFO(X)                                                                       \
   {                                                                                                \
-    if(this->parser_verbose) {                                                                     \
+    if(this->parserVerbose) {                                                                     \
       this->parser_info(X);                                                                        \
     }                                                                                              \
   }
 
 template <typename FileReader>
 void MinionThreeInputReader<FileReader>::parser_info(string s) {
-  if(parser_verbose)
+  if(parserVerbose)
     cout << s << endl;
 }
 
@@ -423,16 +423,16 @@ void MinionThreeInputReader<FileReader>::finalise() {
   }
 
   vector<Var> allVars = instance->vars.getAllVars();
-  set<Var> unused_vars(allVars.begin(), allVars.end());
+  set<Var> unusedVars(allVars.begin(), allVars.end());
   for(SysInt i = 0; i < (SysInt)instance->searchOrder.size(); ++i) {
     const vector<Var>& vars_ref = instance->searchOrder[i].varOrder;
     for(vector<Var>::const_iterator it = vars_ref.begin(); it != vars_ref.end(); ++it) {
-      unused_vars.erase(*it);
+      unusedVars.erase(*it);
     }
   }
 
-  if(!unused_vars.empty() && ensureBranchOnAllVars) {
-    vector<Var> unused_vec(unused_vars.begin(), unused_vars.end());
+  if(!unusedVars.empty() && ensureBranchOnAllVars) {
+    vector<Var> unused_vec(unusedVars.begin(), unusedVars.end());
     if(instance->searchOrder.size() > 1 &&
        instance->searchOrder.back().find_one_assignment == true) {
       instance->searchOrder.back().varOrder.insert(instance->searchOrder.back().varOrder.end(),
@@ -601,7 +601,7 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile) {
   string name = infile->getString();
   MAYBE_PARSER_INFO("Gadget name:" + name);
 
-  MinionThreeInputReader gadget(parser_verbose, map_long_short_mode, ensureBranchOnAllVars);
+  MinionThreeInputReader gadget(parserVerbose, map_long_short_mode, ensureBranchOnAllVars);
   CSPInstance* new_instance = new CSPInstance;
   gadget.instance = new_instance;
   gadget.setGadgetReader();

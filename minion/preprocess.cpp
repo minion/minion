@@ -25,7 +25,7 @@
 /// Apply a high level of consistency to a CSP.
 /** This function is not particularly optimised, implementing only the most
  * basic SAC and SSAC algorithms */
-void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool print_info) {
+void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool printInfo) {
   if(preprocessLevel.type == PropLevel_None)
     return;
 
@@ -47,7 +47,7 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
     prop_SAC(vars);
   }
 
-  if(print_info) {
+  if(printInfo) {
     cout << "SAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }
@@ -63,7 +63,7 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
     PropagateSSAC prop_SSAC(preprocessLevel);
     prop_SSAC(vars);
   }
-  if(print_info) {
+  if(printInfo) {
     cout << "SSAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }

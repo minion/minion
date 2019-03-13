@@ -84,7 +84,7 @@ struct Forward_Checking : public AbstractConstraint {
 
     trig1 = trig2 = -1;
 
-    trig1 = find_new_trigger(-1, -1, 0, size, vars);
+    trig1 = find_newTrigger(-1, -1, 0, size, vars);
 
     // if all variables assigned
     if(trig1 == -1) {
@@ -94,7 +94,7 @@ struct Forward_Checking : public AbstractConstraint {
       return;
     }
 
-    trig2 = find_new_trigger(trig1, -1, 1, size, vars);
+    trig2 = find_newTrigger(trig1, -1, 1, size, vars);
 
     if(trig2 == -1) { // One variable unassigned
       // make sure we put trig2 somewhere!
@@ -112,7 +112,7 @@ struct Forward_Checking : public AbstractConstraint {
     if(dt == 0) {
       // Find trigger 1 again.
 
-      SysInt temp = find_new_trigger(trig2, trig1, 0, size, vars);
+      SysInt temp = find_newTrigger(trig2, trig1, 0, size, vars);
 
       if(temp != -1) {
         trig1 = temp;
@@ -124,7 +124,7 @@ struct Forward_Checking : public AbstractConstraint {
     } else if(dt == 1) {
       // Find trigger 2 again.
 
-      SysInt temp = find_new_trigger(trig1, trig2, 1, size, vars);
+      SysInt temp = find_newTrigger(trig1, trig2, 1, size, vars);
 
       if(temp != -1) {
         trig2 = temp;
@@ -165,7 +165,7 @@ struct Forward_Checking : public AbstractConstraint {
     }
   }
 
-  SysInt find_new_trigger(SysInt toavoid, SysInt start, DomainInt dtthis, SysInt size,
+  SysInt find_newTrigger(SysInt toavoid, SysInt start, DomainInt dtthis, SysInt size,
                           vector<AnyVarRef>* vars) {
     SysInt i = start + 1;
     for(; i < size; i++) {

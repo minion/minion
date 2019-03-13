@@ -988,7 +988,7 @@ struct InstanceStats {
     if(conspairs > 0)
       proportion = ((double)count_2_overlaps) / conspairs;
     // proportion of pairs of constraints that share two or more variables.
-    output_stat << "multi_shared_vars:" << proportion << endl;
+    output_stat << "multi_sharedVars:" << proportion << endl;
 
     START_CLOCK();
 

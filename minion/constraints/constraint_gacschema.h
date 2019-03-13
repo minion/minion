@@ -475,7 +475,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
     return vars.size() * numvals;
   }
 
-  inline void attach_trigger(SysInt var, DomainInt val) {
+  inline void attachTrigger(SysInt var, DomainInt val) {
     // P("Attach Trigger: " << i);
 
     DomainInt dt = (var * numvals) + (val - domMin);
@@ -636,7 +636,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
 
         if(vars[var].inDomain(val)) {
           // If the value is still there, Put trigger on.
-          attach_trigger(var, val);
+          attachTrigger(var, val);
           D_ASSERT(supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var] != 0);
         }
       }

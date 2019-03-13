@@ -30,7 +30,7 @@ namespace Controller {
 
 /// Sets optimisation variable.
 template <typename VarRef>
-void optimise_maximise_var(VarRef var) {
+void optimise_maximiseVar(VarRef var) {
   getOptions().findAllSolutions();
   getState().setOptimiseVar(new AnyVarRef(var));
   getState().setOptimisationProblem(true);
@@ -40,7 +40,7 @@ void optimise_maximise_var(VarRef var) {
 
 /// Sets optimisation variable.
 template <typename VarRef>
-void optimise_minimise_var(VarRef var) {
+void optimise_minimiseVar(VarRef var) {
   getOptions().findAllSolutions();
   getState().setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
   getState().setOptimisationProblem(true);

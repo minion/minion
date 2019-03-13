@@ -111,7 +111,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     help switches -verbose
     */
     else if(command == string("-quiet")) {
-      getOptions().parser_verbose = false;
+      getOptions().parserVerbose = false;
     }
 
     else if(command == string("-redump")) {
@@ -179,7 +179,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     help switches -quiet
     */
     else if(command == string("-verbose")) {
-      getOptions().parser_verbose = true;
+      getOptions().parserVerbose = true;
     }
     /** @help switches;-prop-node Description
     Allows the user to choose the level of consistency to be enforced

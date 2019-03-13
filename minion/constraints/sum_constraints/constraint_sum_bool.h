@@ -81,19 +81,19 @@ struct BoolLessSumConstraint : public AbstractConstraint {
   }
 
   void limit_reached() {
-    SysInt one_vars = 0;
+    SysInt oneVars = 0;
     typename VarArray::value_type* it = &*varArray.begin();
     typename VarArray::value_type* end_it = it + varArray.size();
     for(; it < end_it; ++it) {
       if(it->isAssigned()) {
         if(it->assignedValue() == VarToCount)
-          ++one_vars;
+          ++oneVars;
       } else {
         it->uncheckedAssign(1 - VarToCount);
       }
     }
-    // D_ASSERT(one_vars >= occCount());
-    if(one_vars > occCount())
+    // D_ASSERT(oneVars >= occCount());
+    if(oneVars > occCount())
       getState().setFailed(true);
   }
 

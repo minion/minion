@@ -68,7 +68,7 @@ protected:
 
   vector<AnyVarRef> singleton_vars;
 
-  vector<SysInt> _trigger_info;
+  vector<SysInt> Trigger_info;
 
 public:
   void _setParent(AbstractConstraint* _parent, SysInt _childpos) {
@@ -310,9 +310,9 @@ public:
   }
 
   SysInt& triggerInfo(DomainInt t) {
-    if(_trigger_info.size() <= t)
-      _trigger_info.resize(checked_cast<SysInt>(t) + 1);
-    return _trigger_info[checked_cast<SysInt>(t)];
+    if(Trigger_info.size() <= t)
+      Trigger_info.resize(checked_cast<SysInt>(t) + 1);
+    return Trigger_info[checked_cast<SysInt>(t)];
   }
 
   void releaseTriggerInt(DomainInt t, TrigOp op = TO_Default) {
@@ -333,9 +333,9 @@ protected:
   vector<AbstractConstraint*> child_constraints;
   // Maps a dynamic trigger to the constraint which it belongs to.
   // SysInt as they never change, and are always used to index arrays
-  vector<SysInt> _dynamic_triggerToConstraint;
+  vector<SysInt> _dynamicTriggerToConstraint;
   // Offset into array
-  vector<SysInt> _dynamic_trigger_child_offset;
+  vector<SysInt> _dynamicTriggerChildOffset;
 
   // Maps variables to constraints
   vector<DomainInt> variableToConstraint;
@@ -344,18 +344,18 @@ protected:
 
 public:
   SysInt getChildDynamicTrigger(DomainInt p) {
-    return _dynamic_triggerToConstraint[checked_cast<SysInt>(p)];
+    return _dynamicTriggerToConstraint[checked_cast<SysInt>(p)];
   }
 
   void passDynTriggerToChild(SysInt trig, DomainDelta dd) {
     SysInt child = getChildDynamicTrigger(trig);
-    SysInt offset = _dynamic_trigger_child_offset[child];
+    SysInt offset = _dynamicTriggerChildOffset[child];
     D_ASSERT(trig >= offset);
     child_constraints[child]->propagateDynInt(trig - offset, dd);
   }
 
   Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger) {
-    SysInt offset = _dynamic_trigger_child_offset[child];
+    SysInt offset = _dynamicTriggerChildOffset[child];
     SysInt trignum = offset + trigger;
     if(parent != nullptr) {
       return parent->_parent_map_Trig_ConRef(childpos, trignum);
@@ -365,7 +365,7 @@ public:
   }
 
   Con_TrigRef _parent_map_Con_TrigRef(SysInt child, SysInt trigger) {
-    SysInt offset = _dynamic_trigger_child_offset[child];
+    SysInt offset = _dynamicTriggerChildOffset[child];
     SysInt trignum = offset + trigger;
     if(parent != nullptr) {
       return parent->_parent_map_Con_TrigRef(childpos, trignum);
@@ -395,17 +395,17 @@ public:
   }
 
   virtual void setupDynamicTriggerDatastructures() {
-    SysInt current_triggerCount = dynamicTriggerCount();
+    SysInt currentTriggerCount = dynamicTriggerCount();
 
-    for(SysInt count = 0; count < current_triggerCount; ++count)
-      _dynamic_triggerToConstraint.push_back(child_constraints.size());
+    for(SysInt count = 0; count < currentTriggerCount; ++count)
+      _dynamicTriggerToConstraint.push_back(child_constraints.size());
 
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      _dynamic_trigger_child_offset.push_back(current_triggerCount);
+      _dynamicTriggerChildOffset.push_back(currentTriggerCount);
       // We need this check to ensure we don't try constructing a "start of
       // trigger" block one off the
       // the end of memory array.
-      if(current_triggerCount == dynamicTriggerCountWithChildren())
+      if(currentTriggerCount == dynamicTriggerCountWithChildren())
         return;
 
       // Get start child's dynamic triggers.
@@ -413,11 +413,11 @@ public:
 
       SysInt child_trigCount = child_constraints[i]->dynamicTriggerCountWithChildren();
 
-      for(SysInt count = current_triggerCount; count < current_triggerCount + child_trigCount;
+      for(SysInt count = currentTriggerCount; count < currentTriggerCount + child_trigCount;
           ++count)
-        _dynamic_triggerToConstraint.push_back(i);
+        _dynamicTriggerToConstraint.push_back(i);
 
-      current_triggerCount += child_trigCount;
+      currentTriggerCount += child_trigCount;
     }
   }
 

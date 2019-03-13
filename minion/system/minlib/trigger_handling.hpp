@@ -22,7 +22,7 @@ enum Event { none, ctrl_c, timeout };
 
 volatile Event trigger_event_X;
 
-void set_trigger(Event e) {
+void setTrigger(Event e) {
   if(trigger_event_X == none) {
     trigger_event_X = e;
   } else {
@@ -30,17 +30,17 @@ void set_trigger(Event e) {
   }
 }
 
-Event get_trigger() {
+Event getTrigger() {
   return trigger_event_X;
 }
 } // namespace TriggerEvent
 
-void ctrlc_function_trigger(int /* signum */) {
-  TriggerEvent::set_trigger(TriggerEvent::ctrl_c);
+void ctrlc_functionTrigger(int /* signum */) {
+  TriggerEvent::setTrigger(TriggerEvent::ctrl_c);
 }
 
 void trigger_function(int /* signum */) {
-  TriggerEvent::set_trigger(TriggerEvent::timeout);
+  TriggerEvent::setTrigger(TriggerEvent::timeout);
 }
 
 #ifdef NO_SYSTEM
@@ -59,7 +59,7 @@ void setupTriggers(bool timeout_active,
   sigaction(SIGXCPU, &act, NULL);
   sigaction(SIGALRM, &act, NULL);
 
-  act.sa_handler = ctrlc_function_trigger;
+  act.sa_handler = ctrlc_functionTrigger;
   sigaction(SIGINT, &act, NULL);
 
   if(timeout_active) {
@@ -72,8 +72,8 @@ void setupTriggers(bool timeout_active,
 #endif
 
 inline void checkTriggers() {
-  if(TriggerEvent::get_trigger() != TriggerEvent::none) {
-    if(TriggerEvent::get_trigger() == TriggerEvent::ctrl_c)
+  if(TriggerEvent::getTrigger() != TriggerEvent::none) {
+    if(TriggerEvent::getTrigger() == TriggerEvent::ctrl_c)
       throw EndOfSearch("ctrl+c");
     else
       throw EndOfSearch("time");

@@ -81,7 +81,7 @@ class TupleList {
   DomainInt* tupleData;
   SysInt tupleLength;
   SysInt numberOfTuples;
-  bool tuples_locked;
+  bool tuplesLocked;
 
   SysInt hash_code;
 
@@ -128,7 +128,7 @@ public:
         triearray(NULL),
         regin(NULL),
         egg(NULL),
-        tuples_locked(false),
+        tuplesLocked(false),
         hash_code(0) {
     numberOfTuples = tuple_list.size();
     tupleLength = tuple_list[0].size();
@@ -148,7 +148,7 @@ public:
         egg(NULL),
         tupleLength(checked_cast<SysInt>(_tuplelength)),
         numberOfTuples(checked_cast<SysInt>(_numtuples)),
-        tuples_locked(false),
+        tuplesLocked(false),
         hash_code(0) {
     tupleData = new DomainInt[numberOfTuples * tupleLength];
   }
@@ -199,9 +199,9 @@ public:
 
   /// Sets up the variable/value pair to literal mapping, used by getLiteral.
   void finalise_tuples() {
-    if(tuples_locked)
+    if(tuplesLocked)
       return;
-    tuples_locked = true;
+    tuplesLocked = true;
 
     DomainInt arity = tupleSize();
 

@@ -486,33 +486,33 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     MAKE_STACK_BOX(c, DomainInt, varArray.size());
 
     if(valCount_min == 0) {
-      DomainInt need_vars = (DomainInt)varArray.size() - valCount_max;
-      if(need_vars <= 0)
+      DomainInt needVars = (DomainInt)varArray.size() - valCount_max;
+      if(needVars <= 0)
         return true;
       for(int i = 0; i < (SysInt)varArray.size(); ++i) {
         if(varArray[i].min() != value) {
           assignment.push_back(make_pair(i, varArray[i].min()));
-          need_vars--;
+          needVars--;
         } else if(varArray[i].max() != value) {
           assignment.push_back(make_pair(i, varArray[i].max()));
-          need_vars--;
+          needVars--;
         }
-        if(need_vars == 0) {
+        if(needVars == 0) {
           return true;
         }
       }
       assignment.clear();
       return false;
     } else if(valCount_max == (SysInt)varArray.size()) {
-      DomainInt need_vars = valCount_min;
-      if(need_vars <= 0)
+      DomainInt needVars = valCount_min;
+      if(needVars <= 0)
         return true;
       for(int i = 0; i < (SysInt)varArray.size(); ++i) {
         if(varArray[i].inDomain(value)) {
           assignment.push_back(make_pair(i, value));
-          need_vars--;
+          needVars--;
         }
-        if(need_vars == 0)
+        if(needVars == 0)
           return true;
       }
       assignment.clear();

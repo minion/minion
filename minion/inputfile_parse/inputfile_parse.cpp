@@ -30,9 +30,9 @@ void ReadCSP(Reader& reader, ConcreteFileReader<Stream>* infile) {
   getTableOut().set(string("Filename"), infile->filename);
 }
 
-void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parser_verbose,
+void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, bool parserVerbose,
                         MapLongTuplesToShort mltts, bool ensureBranchOnAllVars) {
-  MinionThreeInputReader<ConcreteFileReader<CheapStream>> readerThree(parser_verbose, mltts,
+  MinionThreeInputReader<ConcreteFileReader<CheapStream>> readerThree(parserVerbose, mltts,
                                                                       ensureBranchOnAllVars);
 
   bool needsFinaliseThree = false;

@@ -60,7 +60,7 @@ struct AlldiffCiaran : public AbstractConstraint {
     triggerCollection t;
     SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i)
-      t.push_back(make_trigger(varArray[i], Trigger(this, i), DomainChanged));
+      t.push_back(makeTrigger(varArray[i], Trigger(this, i), DomainChanged));
     return t;
   }
 

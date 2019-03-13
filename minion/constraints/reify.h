@@ -53,7 +53,7 @@ if the constraint is NOT reifiable.
 ALL constraints are reifyimplyable.
 */
 
-// Note: The whole constraint_locked thing is for the following case:
+// Note: The whole constraintLocked thing is for the following case:
 // Consider the following events are on the queue:
 // "rareify boolean is assigned, Y is assigned"
 // Now "rareify boolean is assigned" causes fullPropagate to be called for
@@ -102,7 +102,7 @@ struct reify : public ParentConstraint {
   BoolVar reify_var;
   SysInt reify_varNum;
 
-  bool constraint_locked;
+  bool constraintLocked;
   Reversible<bool> fullPropagate_called;
 
 #ifdef NODETRICK
@@ -118,7 +118,7 @@ struct reify : public ParentConstraint {
   reify(AbstractConstraint* _poscon, BoolVar _rar_var)
       : ParentConstraint({_poscon, _poscon->reverseConstraint()}),
         reify_var(_rar_var),
-        constraint_locked(false),
+        constraintLocked(false),
         fullPropagate_called(false) {
     CHECK(reify_var.initialMin() >= 0 && reify_var.initialMax() <= 1,
           "reify only works on Boolean variables");
@@ -195,9 +195,9 @@ struct reify : public ParentConstraint {
   }
 
   virtual void specialCheck() {
-    D_ASSERT(constraint_locked);
+    D_ASSERT(constraintLocked);
     P("Special Check!");
-    constraint_locked = false;
+    constraintLocked = false;
     D_ASSERT(reify_var.isAssigned() &&
              (reify_var.assignedValue() == 0 || reify_var.assignedValue() == 1));
     if(reify_var.inDomain(0)) {
@@ -209,9 +209,9 @@ struct reify : public ParentConstraint {
   }
 
   virtual void specialUnlock() {
-    D_ASSERT(constraint_locked);
+    D_ASSERT(constraintLocked);
     P("Special unlock!");
-    constraint_locked = false;
+    constraintLocked = false;
   }
 
   void reify_varAssigned() {
@@ -225,7 +225,7 @@ struct reify : public ParentConstraint {
       }
 #endif
 
-      constraint_locked = true;
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
     }
   }
@@ -233,7 +233,7 @@ struct reify : public ParentConstraint {
   virtual void propagateDynInt(SysInt trig, DomainDelta dd) {
     PROP_INFO_ADDONE(Reify);
     P("Dynamic prop start");
-    if(constraint_locked)
+    if(constraintLocked)
       return;
 
     const SysInt _dt = 0;

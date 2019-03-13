@@ -51,14 +51,14 @@ struct reify_true : public ParentConstraint {
   CONSTRAINT_ARG_LIST2(child_constraints[0], rar_var);
 
   BoolVar rar_var;
-  bool constraint_locked;
+  bool constraintLocked;
 
   Reversible<bool> fullPropagate_called;
 
   reify_true(AbstractConstraint* _poscon, BoolVar _rar_var)
       : ParentConstraint({_poscon}),
         rar_var(_rar_var),
-        constraint_locked(false),
+        constraintLocked(false),
         fullPropagate_called(false) {
     CHECK(rar_var.initialMin() >= 0 && rar_var.initialMax() <= 1,
           "reifyimply only works on Boolean variables");
@@ -79,7 +79,7 @@ struct reify_true : public ParentConstraint {
       return 1;
   }
 
-  SysInt reify_var_trigger() {
+  SysInt reify_varTrigger() {
     if(DoWatchAssignment)
       return child_constraints[0]->getVarsSingleton()->size() * 2;
     else
@@ -118,17 +118,17 @@ struct reify_true : public ParentConstraint {
   }
 
   virtual void specialCheck() {
-    D_ASSERT(constraint_locked);
+    D_ASSERT(constraintLocked);
     P("Special Check!");
-    constraint_locked = false;
+    constraintLocked = false;
     child_constraints[0]->fullPropagate();
     fullPropagate_called = true;
   }
 
   virtual void specialUnlock() {
-    D_ASSERT(constraint_locked);
+    D_ASSERT(constraintLocked);
     P("Special unlock!");
-    constraint_locked = false;
+    constraintLocked = false;
   }
 
   void reify_var_pruned() {
@@ -136,7 +136,7 @@ struct reify_true : public ParentConstraint {
       return;
     D_ASSERT(rar_var.assignedValue() == 1);
     P("rarvar assigned to 1- Do full propagate");
-    constraint_locked = true;
+    constraintLocked = true;
     getQueue().pushSpecialTrigger(this);
   }
 
@@ -144,12 +144,12 @@ struct reify_true : public ParentConstraint {
     PROP_INFO_ADDONE(ReifyTrue);
 
     P("Dynamic prop start");
-    if(constraint_locked)
+    if(constraintLocked)
       return;
 
     const SysInt dt = 0;
 
-    if(trig == reify_var_trigger()) {
+    if(trig == reify_varTrigger()) {
       reify_var_pruned();
       return;
     }
@@ -209,7 +209,7 @@ struct reify_true : public ParentConstraint {
     D_ASSERT(rar_var.min() >= 0);
     D_ASSERT(rar_var.max() <= 1);
 
-    moveTriggerInt(rar_var, reify_var_trigger(), LowerBound);
+    moveTriggerInt(rar_var, reify_varTrigger(), LowerBound);
 
     if(rar_var.isAssigned() && rar_var.assignedValue() == 1) {
       child_constraints[0]->fullPropagate();

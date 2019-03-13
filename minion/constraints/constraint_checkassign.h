@@ -39,9 +39,9 @@ struct CheckAssignConstraint : public AbstractConstraint {
 
   OriginalConstraint originalcon;
 
-  ReversibleInt assigned_vars;
+  ReversibleInt assignedVars;
 
-  CheckAssignConstraint(const OriginalConstraint& con) : originalcon(con), assigned_vars() {}
+  CheckAssignConstraint(const OriginalConstraint& con) : originalcon(con), assignedVars() {}
 
   virtual AbstractConstraint* reverseConstraint() {
     return new CheckAssignConstraint<OriginalConstraint, !negate>(originalcon);
@@ -56,9 +56,9 @@ struct CheckAssignConstraint : public AbstractConstraint {
   virtual BOOL checkUnsat(SysInt, DomainDelta) {
     typename OriginalConstraint::var_type& variables = originalcon.getVars();
 
-    SysInt count = assigned_vars;
+    SysInt count = assignedVars;
     ++count;
-    assigned_vars = count;
+    assignedVars = count;
     SysInt vSize = variables.size();
     D_ASSERT(count <= vSize);
 
@@ -88,7 +88,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       if(variables[i].isAssigned())
         ++counter;
-    assigned_vars = counter;
+    assignedVars = counter;
 
     if(counter == variables.size())
       return checkFullAssignment();
@@ -141,53 +141,53 @@ struct CheckAssignConstraint : public AbstractConstraint {
     D_ASSERT(variables.size() == originalcon.getVars().size());
     D_ASSERT(ret_box.size() == 0);
 
-    SysInt free_var = -1;
+    SysInt freeVar = -1;
 
     for(UnsignedSysInt i = 0; i < variables.size(); ++i) {
       if(!variables[i].isAssigned()) {
-        if(free_var != -1) {
+        if(freeVar != -1) {
           D_ASSERT(variables[i].min() != variables[i].max());
           ret_box.push_back(make_pair(i, variables[i].min()));
           ret_box.push_back(make_pair(i, variables[i].max()));
           return true;
         } else {
-          free_var = i;
+          freeVar = i;
           c.push_back(-9999); // this value should never be used
         }
       } else
         c.push_back(variables[i].assignedValue());
     }
 
-    if(free_var == -1) {
+    if(freeVar == -1) {
       if(try_assignment(ret_box, c))
         return true;
       else
         return false;
     } else {
-      D_ASSERT(c[free_var] == -9999);
-      D_ASSERT(variables[free_var].min() != variables[free_var].max());
+      D_ASSERT(c[freeVar] == -9999);
+      D_ASSERT(variables[freeVar].min() != variables[freeVar].max());
 
-      DomainInt free_min = variables[free_var].min();
-      c[free_var] = free_min;
+      DomainInt free_min = variables[freeVar].min();
+      c[freeVar] = free_min;
       if(try_assignment(ret_box, c))
         return true;
-      DomainInt free_max = variables[free_var].max();
-      c[free_var] = free_max;
+      DomainInt free_max = variables[freeVar].max();
+      c[freeVar] = free_max;
       if(try_assignment(ret_box, c))
         return true;
 
-      if(!variables[free_var].isBound()) {
-        for(DomainInt i = variables[free_var].min() + 1; i < variables[free_var].max(); ++i) {
-          if(variables[free_var].inDomain(i)) {
-            c[free_var] = i;
+      if(!variables[freeVar].isBound()) {
+        for(DomainInt i = variables[freeVar].min() + 1; i < variables[freeVar].max(); ++i) {
+          if(variables[freeVar].inDomain(i)) {
+            c[freeVar] = i;
             if(try_assignment(ret_box, c))
               return true;
           }
         }
       } else {
         D_ASSERT(free_min != free_max);
-        ret_box.push_back(make_pair(free_var, free_min));
-        ret_box.push_back(make_pair(free_var, free_max));
+        ret_box.push_back(make_pair(freeVar, free_min));
+        ret_box.push_back(make_pair(freeVar, free_max));
         return true;
       }
     }

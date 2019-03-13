@@ -128,7 +128,7 @@ ParallelData* setupParallelData() {
     }
   }
 
-  install_ctrlc_trigger(&(pd->ctrlCPressed));
+  install_ctrlcTrigger(&(pd->ctrlCPressed));
 
   pd->parentProcessID = getpid();
 
@@ -188,7 +188,7 @@ bool isAlarmActivated() {
 }
 
 void setupAlarm(bool alarmActive, SysInt timeout, bool CPU_time) {
-  activate_trigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPU_time);
+  activateTrigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPU_time);
 }
 
 } // namespace Parallel

@@ -89,7 +89,7 @@ using namespace std;
 
 template <typename VarArray>
 struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
-  using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
+  using FlowConstraint<VarArray, UseIncGraph>::constraintLocked;
   using FlowConstraint<VarArray, UseIncGraph>::adjlist;
   using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
   using FlowConstraint<VarArray, UseIncGraph>::adjlistpos;
@@ -273,9 +273,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       to_process.insert(prop_var);
     }
 
-    if(!constraint_locked) {
+    if(!constraintLocked) {
 #ifdef SPECIALQUEUE
-      constraint_locked = true;
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
 #else
 #ifndef SCC
@@ -370,9 +370,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       to_process.insert(prop_var);
     }
 
-    if(!constraint_locked) {
+    if(!constraintLocked) {
 #ifdef SPECIALQUEUE
-      constraint_locked = true;
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
 #else
 #ifndef SCC
@@ -385,11 +385,11 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   }
 
   virtual void specialUnlock() {
-    constraint_locked = false;
+    constraintLocked = false;
     to_process.clear();
   }
   virtual void specialCheck() {
-    constraint_locked = false; // should be above the if.
+    constraintLocked = false; // should be above the if.
 
     if(getState().isFailed()) {
       to_process.clear();

@@ -47,11 +47,11 @@ void BuildCSP(CSPInstance& instance) {
   // Set up optimisation
   if(instance.is_optimisation_problem) {
     if(instance.optimise_minimising)
-      Controller::optimise_minimise_var(
-          BuildCon::getAnyVarRefFromVar(instance.optimise_variable));
+      Controller::optimise_minimiseVar(
+          BuildCon::getAnyVarRefFromVar(instance.optimiseVariable));
     else
-      Controller::optimise_maximise_var(
-          BuildCon::getAnyVarRefFromVar(instance.optimise_variable));
+      Controller::optimise_maximiseVar(
+          BuildCon::getAnyVarRefFromVar(instance.optimiseVariable));
   }
 
   vector<vector<AnyVarRef>>& print_matrix = getState().getPrintMatrix();

@@ -401,6 +401,6 @@ struct PropSSAC_Bounds : Propagate {
   }
 };
 
-void PropogateCSP(PropagationLevel, vector<AnyVarRef>&, bool print_info = false);
+void PropogateCSP(PropagationLevel, vector<AnyVarRef>&, bool printInfo = false);
 
 #endif

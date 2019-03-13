@@ -341,12 +341,12 @@ inline void updateCounters(SysInt lit) {
   }
 }
 
-inline void attach_trigger(SysInt var, DomainInt val, SysInt lit) {
+inline void attachTrigger(SysInt var, DomainInt val, SysInt lit) {
   // P("Attach Trigger: " << i);
   moveTriggerInt(vars[var], lit, DomainRemoval, val); //, TO_Backtrack
 }
 
-inline void detach_trigger(SysInt lit) {
+inline void detachTrigger(SysInt lit) {
   // P("Detach Triggers");
   releaseTriggerInt(lit); // , TO_Backtrack
 }

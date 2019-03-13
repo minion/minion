@@ -118,7 +118,7 @@ int main(int argc, char** argv) {
     }
 
     vector<string> files(1, getOptions().instance_name);
-    readInputFromFiles(instance, files, getOptions().parser_verbose, getOptions().map_long_short,
+    readInputFromFiles(instance, files, getOptions().parserVerbose, getOptions().map_long_short,
                        getOptions().ensureBranchOnAllVars);
 
     if(getOptions().graph) {

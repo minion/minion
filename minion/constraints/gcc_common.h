@@ -93,7 +93,7 @@
 
 template <typename VarArray, typename CapArray, bool Strongcards>
 struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
-  using FlowConstraint<VarArray, UseIncGraph>::constraint_locked;
+  using FlowConstraint<VarArray, UseIncGraph>::constraintLocked;
 
   using FlowConstraint<VarArray, UseIncGraph>::adjlist;
   using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
@@ -224,7 +224,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
 
 #if DomainCounting || InternalDT
-    changed_vars_per_scc.resize(numvars + numvals);
+    changedVars_per_scc.resize(numvars + numvals);
 #endif
   }
 
@@ -237,7 +237,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
   vector<SysInt> valsInSCC; // Actual values.
 
 #if DomainCounting || InternalDT
-  vector<vector<SysInt>> changed_vars_per_scc;
+  vector<vector<SysInt>> changedVars_per_scc;
 #endif
 
 #if InternalDT
@@ -335,9 +335,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
                                    // val-domMin+numvars
     }
 
-    if(!constraint_locked) {
+    if(!constraintLocked) {
 #ifdef SPECIALQUEUE
-      constraint_locked = true;
+      constraintLocked = true;
       getQueue().pushSpecialTrigger(this);
 #else
 #ifdef SCC
@@ -382,9 +382,9 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
         if(!to_process.in(var)) {
           to_process.insert(var); // add the var to the queue to be processed.
         }
-        if(!constraint_locked) {
+        if(!constraintLocked) {
 #ifdef SPECIALQUEUE
-          constraint_locked = true;
+          constraintLocked = true;
           getQueue().pushSpecialTrigger(this);
 #else
 #ifdef SCC
@@ -421,11 +421,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #endif
 
   virtual void specialUnlock() {
-    constraint_locked = false;
+    constraintLocked = false;
     to_process.clear();
   }
   virtual void specialCheck() {
-    constraint_locked = false; // should be above the if.
+    constraintLocked = false; // should be above the if.
 
     if(getState().isFailed()) {
       to_process.clear();
@@ -721,13 +721,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
         {
           sccsToProcess.insert(sccindex_start);
 #if DomainCounting || InternalDT
-          changed_vars_per_scc[sccindex_start].clear();
+          changedVars_per_scc[sccindex_start].clear();
 #endif
         }
 #if DomainCounting || InternalDT
         // make a note of which changed vars are in the scc.
         if(SCCSplit.isMember(sccindex_start)) // if not singleton..??
-          changed_vars_per_scc[sccindex_start].push_back(tempidx);
+          changedVars_per_scc[sccindex_start].push_back(tempidx);
 #endif
       }
     }
@@ -777,7 +777,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #if DomainCounting || InternalDT // need to check through triggers to see if broken....
         {
           run_propagator = false;
-          vector<SysInt>& vars_changed = changed_vars_per_scc[sccindex_start];
+          vector<SysInt>& vars_changed = changedVars_per_scc[sccindex_start];
 #if DomainCounting
           SysInt varcount = vars_in_scc.size();
           for(SysInt i = 0; i < (SysInt)vars_changed.size(); i++) {

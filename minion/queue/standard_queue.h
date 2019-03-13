@@ -34,7 +34,7 @@
 
 class Queues {
 
-  QueueCon<DynamicTriggerEvent> dynamic_trigger_list;
+  QueueCon<DynamicTriggerEvent> dynamicTriggerList;
 
   // Special triggers are those which can only be run while the
   // normal queue is empty. This list is at the moment only used
@@ -58,11 +58,11 @@ public:
 
   void pushDynamicTriggers(DynamicTriggerEvent new_dynamic_trig_range) {
     CON_INFO_ADDONE(AddDynToQueue);
-    dynamic_trigger_list.push_back(new_dynamic_trig_range);
+    dynamicTriggerList.push_back(new_dynamic_trig_range);
   }
 
   void clearQueues() {
-    dynamic_trigger_list.clear();
+    dynamicTriggerList.clear();
 
     if(!specialTriggers.empty()) {
       SysInt size = specialTriggers.size();
@@ -73,7 +73,7 @@ public:
   }
 
   bool isQueuesEmpty() {
-    return dynamic_trigger_list.empty() && specialTriggers.empty();
+    return dynamicTriggerList.empty() && specialTriggers.empty();
   }
 
   // next_queuePtr is defined in constraint_dynamic.
@@ -84,9 +84,9 @@ public:
   template <bool is_root_node>
   bool propagateDynamicTriggerLists() {
     bool* failPtr = getState().getFailedPtr();
-    while(!dynamic_trigger_list.empty()) {
-      DynamicTriggerEvent dte = dynamic_trigger_list.queueTop();
-      dynamic_trigger_list.queuePop();
+    while(!dynamicTriggerList.empty()) {
+      DynamicTriggerEvent dte = dynamicTriggerList.queueTop();
+      dynamicTriggerList.queuePop();
 
       DynamicTriggerList& dtl = *(dte.event());
       DomainDelta delta = dte.data;
@@ -118,7 +118,7 @@ public:
   template <bool is_root_node>
   inline void propagateQueueImpl() {
     while(true) {
-      while(!dynamic_trigger_list.empty()) {
+      while(!dynamicTriggerList.empty()) {
         if(propagateDynamicTriggerLists<is_root_node>())
           return;
       }

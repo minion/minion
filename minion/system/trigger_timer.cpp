@@ -46,7 +46,7 @@ void CALLBACK ReallyStop(void*, BOOLEAN) {
   exit(1);
 }
 
-void activate_trigger(std::atomic<bool>* b, bool timeout_active, int timeout, bool CPU_time) {
+void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout, bool CPU_time) {
   if(CPU_time)
     cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
 
@@ -63,7 +63,7 @@ void activate_trigger(std::atomic<bool>* b, bool timeout_active, int timeout, bo
   }
 }
 
-void install_ctrlc_trigger(std::atomic<bool>*) { /* Not implemented on windows */
+void install_ctrlcTrigger(std::atomic<bool>*) { /* Not implemented on windows */
 }
 
 #else
@@ -78,7 +78,7 @@ void trigger_function(int /* signum */) {
   *trig = true;
 }
 
-void activate_trigger(std::atomic<bool>* b, bool timeout_active, int timeout,
+void activateTrigger(std::atomic<bool>* b, bool timeout_active, int timeout,
                       bool CPU_time) // CPU_time = false -> real time
 {
   // We still set these, as they are how 'ctrlc' checks if we have got started
@@ -120,7 +120,7 @@ void ctrlc_function(int /* signum */) {
   *ctrl_c_press = true;
 }
 
-void install_ctrlc_trigger(std::atomic<bool>* ctrl_c_press_) {
+void install_ctrlcTrigger(std::atomic<bool>* ctrl_c_press_) {
   check_double_ctrlc = false;
   ctrl_c_press = ctrl_c_press_;
   signal(SIGINT, ctrlc_function);

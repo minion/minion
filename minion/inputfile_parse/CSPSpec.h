@@ -499,7 +499,7 @@ struct CSPInstance {
 
   bool is_optimisation_problem;
   bool optimise_minimising;
-  Var optimise_variable;
+  Var optimiseVariable;
 
   vector<vector<Var>> print_matrix;
 
@@ -527,7 +527,7 @@ public:
   void set_optimise(BOOL _minimising, Var var) {
     is_optimisation_problem = true;
     optimise_minimising = _minimising;
-    optimise_variable = var;
+    optimiseVariable = var;
   }
 
   void add_constraint(const ConstraintBlob& b) {
