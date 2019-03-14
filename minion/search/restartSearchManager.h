@@ -6,8 +6,8 @@ struct RestartSearchManager : public Controller::SearchManager {
   vector<SearchOrder> initialOrder;
 
   void doASearch(const vector<SearchOrder>& order, int nodelimit) {
-    int depth = Controller::get_world_depth();
-    Controller::world_push();
+    int depth = Controller::getWorldDepth();
+    Controller::worldPush();
 
     auto prop = Controller::make_propagator(propMethod);
     auto vo = Controller::makeSearchOrder_multiple(order);
@@ -49,7 +49,7 @@ struct RestartSearchManager : public Controller::SearchManager {
       throw EndOfSearch();
     }
     std::cout << "Did a search " << timeout << "\n";
-    Controller::world_popToDepth(depth);
+    Controller::worldPopToDepth(depth);
   }
 
   RestartSearchManager(PropagationLevel _propMethod, const vector<SearchOrder>& _order)

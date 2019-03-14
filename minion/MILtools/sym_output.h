@@ -36,11 +36,11 @@ SysInt repartition(const std::vector<std::set<SysInt>>& graph, std::vector<SysIn
     }
 
   std::set<std::multiset<SysInt>> partition_set(partition_loop.begin(), partition_loop.end());
-  std::vector<std::multiset<SysInt>> partition_vec(partition_set.begin(), partition_set.end());
+  std::vector<std::multiset<SysInt>> partitionVec(partition_set.begin(), partition_set.end());
 
   for(SysInt i = 0; i < (SysInt)graph.size(); ++i) {
     partitionNum[i] =
-        find(partition_vec.begin(), partition_vec.end(), partition_loop[i]) - partition_vec.begin();
+        find(partitionVec.begin(), partitionVec.end(), partition_loop[i]) - partitionVec.begin();
   }
 
   return partition_set.size();
@@ -687,7 +687,7 @@ struct InstanceStats {
       for(SysInt j = 0; j < (SysInt)i.vars.size(); j++) {
         for(SysInt k = 0; k < (SysInt)i.vars[j].size(); k++) {
           num++;
-          Bounds bounds = v.get_bounds(i.vars[j][k]);
+          Bounds bounds = v.getBounds(i.vars[j][k]);
           lower = lower > bounds.lower_bound ? bounds.lower_bound : lower;
           upper = upper < bounds.upper_bound ? bounds.upper_bound : upper;
         }
@@ -1078,8 +1078,8 @@ struct InstanceStats {
     output_stat << "literal_tightness_75:" << lit_tightness[(lit_tightness.size() * 3) / 4] << endl;
     output_stat << "literal_tightness_100:" << lit_tightness.back() << endl;
 
-    double new_totaltightness = std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
-    double lt_mean = (double)new_totaltightness / (double)lit_tightness.size();
+    double newTotaltightness = std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
+    double lt_mean = (double)newTotaltightness / (double)lit_tightness.size();
     output_stat << "literal_tightness_mean:" << lt_mean << endl;
     // coefficient of variation
     double st_dev = 0;

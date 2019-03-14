@@ -33,7 +33,7 @@ public:
   }
 
   Literal getLiteralFromPos(SysInt pos) {
-    pair<SysInt, DomainInt> lit = tupleData->get_varval_from_literal(pos);
+    pair<SysInt, DomainInt> lit = tupleData->getVarvalFromLiteral(pos);
     return Literal(lit.first, lit.second);
   }
 

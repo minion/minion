@@ -32,7 +32,7 @@ public:
   void add(T name, U prop) {
     if(props.count(name) > 0)
       throw std::runtime_error(tostring(name) + " already defined in map as " +
-                               try_tostring(props.find(name)->second));
+                               tryTostring(props.find(name)->second));
     props.insert(std::make_pair(name, prop));
   }
 

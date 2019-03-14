@@ -20,33 +20,33 @@
 
 namespace Controller {
 
-inline SysInt get_world_depth() {
+inline SysInt getWorldDepth() {
   return getMemory().backTrack().current_depth();
 }
 
 /// Pushes the state of the whole world.
-inline void world_push() {
+inline void worldPush() {
   D_ASSERT(!getState().isFailed());
-  getQueue().getTbq().world_push();
+  getQueue().getTbq().worldPush();
   getMemory().monotonicSet().before_branch_left();
   D_ASSERT(getQueue().isQueuesEmpty());
-  getMemory().backTrack().world_push();
+  getMemory().backTrack().worldPush();
   getMemory().monotonicSet().after_branch_left();
   getState().getConstraintsToPropagate().push_back(set<AbstractConstraint*>());
   getState().getGenericBacktracker().mark();
 }
 
 /// Pops the state of the whole world.
-inline void world_pop() {
+inline void worldPop() {
   getState().setFailed(false);
   getQueue().clearQueues();
-  getState().getGenericBacktracker().world_pop();
-  getMemory().backTrack().world_pop();
+  getState().getGenericBacktracker().worldPop();
+  getMemory().backTrack().worldPop();
   getMemory().monotonicSet().undo();
-  getQueue().getTbq().world_pop();
+  getQueue().getTbq().worldPop();
 
   vector<set<AbstractConstraint*>>& constraintList = getState().getConstraintsToPropagate();
-  SysInt propagateDepth = get_world_depth() + 1;
+  SysInt propagateDepth = getWorldDepth() + 1;
   if((SysInt)constraintList.size() > propagateDepth) {
     for(set<AbstractConstraint*>::iterator it = constraintList[propagateDepth].begin();
         it != constraintList[propagateDepth].end(); it++) {
@@ -61,19 +61,19 @@ inline void world_pop() {
   }
 }
 
-inline void world_popToDepth(SysInt depth) {
-  // TODO: Speed up this method. It shouldn't call world_pop repeatedly.
+inline void worldPopToDepth(SysInt depth) {
+  // TODO: Speed up this method. It shouldn't call worldPop repeatedly.
   // The main problem is this requires adding additions to things like
   // monotonic sets I suspect.
-  D_ASSERT(depth <= get_world_depth());
-  while(depth < get_world_depth())
-    world_pop();
+  D_ASSERT(depth <= getWorldDepth());
+  while(depth < getWorldDepth())
+    worldPop();
 }
 
-inline void world_pop_all() {
+inline void worldPop_all() {
   SysInt depth = getMemory().backTrack().current_depth();
   for(; depth > 0; depth--)
-    world_pop();
+    worldPop();
 }
 } // namespace Controller
 
@@ -92,6 +92,6 @@ inline void SearchState::addConstraintMidsearch(AbstractConstraint* c) {
 }
 
 inline void SearchState::redoFullPropagate(AbstractConstraint* c) {
-  constraintsToPropagate[Controller::get_world_depth()].insert(c);
+  constraintsToPropagate[Controller::getWorldDepth()].insert(c);
   c->fullPropagate();
 }

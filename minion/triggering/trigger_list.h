@@ -63,8 +63,8 @@ public:
 
   vector<TriggerObj> dynTriggers;
 
-  //  vector<vector<DynamicTriggerList>> dynamicTriggers_vec;
-  //  vector<vector<DynamicTriggerList>> dynamicTriggersDomain_vec;
+  //  vector<vector<DynamicTriggerList>> dynamicTriggersVec;
+  //  vector<vector<DynamicTriggerList>> dynamicTriggersDomainVec;
 
   // void* dynamicTriggers;
 

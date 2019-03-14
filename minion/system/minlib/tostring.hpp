@@ -47,19 +47,19 @@ decltype((std::cout << std::declval<T>(), std::true_type())) is_printable(const 
 std::false_type is_printable(AnyGrab);
 
 template <typename T>
-std::string try_tostring_impl(const T& t, std::true_type) {
+std::string tryTostring_impl(const T& t, std::true_type) {
   return tostring(t);
 }
 
 template <typename T>
-std::string try_tostring_impl(const T& t, std::false_type) {
+std::string tryTostring_impl(const T& t, std::false_type) {
   return std::string("<no printer for ") + typeid(t).name() + ">";
 }
 
 template <typename T>
-std::string try_tostring(const T& t) {
+std::string tryTostring(const T& t) {
   decltype(is_printable(t)) d;
-  return try_tostring_impl(t, d);
+  return tryTostring_impl(t, d);
 }
 
 #endif

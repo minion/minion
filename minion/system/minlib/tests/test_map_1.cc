@@ -12,7 +12,7 @@ int main(void) {
   std::vector<int> v;
   v.push_back(2);
   std::vector<pair<int, int>> res = doMap(MapperObj(), v);
-  D_ASSERT(res == make_vec(make_pair(2, 2)));
+  D_ASSERT(res == makeVec(make_pair(2, 2)));
 
   std::set<int> s;
   s.insert(1);

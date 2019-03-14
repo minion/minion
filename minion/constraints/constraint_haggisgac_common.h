@@ -43,9 +43,9 @@ virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     return false;
 
   const SysInt val_offset = checked_cast<SysInt>(v[0] - vars[0].initialMin());
-  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->get_tl()[0][val_offset];
+  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->getTL()[0][val_offset];
 
-  for(SysInt i = 0; i < (SysInt)tuple_list->get_tl()[0][val_offset].size(); i++) {
+  for(SysInt i = 0; i < (SysInt)tuple_list->getTL()[0][val_offset].size(); i++) {
     const vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
@@ -387,9 +387,9 @@ void partition_swap(SysInt xi, SysInt xj) {
 // DomainInt val) {
 template <bool keepassigned>
 bool findNewSupport(SysInt var, DomainInt val) {
-  D_ASSERT(tuple_list->get_tl().size() == vars.size());
+  D_ASSERT(tuple_list->getTL().size() == vars.size());
   const SysInt val_offset = checked_cast<SysInt>(val - vars[var].initialMin());
-  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->get_tl()[var][val_offset];
+  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->getTL()[var][val_offset];
 
   SysInt listsize = tuplist.size();
   for(SysInt i = tuple_list_pos[var][val_offset]; i < listsize; i++) {

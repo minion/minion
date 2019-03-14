@@ -507,7 +507,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
       vector<AbstractConstraint*> out_bounds;
       out_bounds.push_back(new WatchNotLiteralConstraint<Result>(resultvar, 0));
       out_bounds.push_back(new WatchNotInRangeConstraint<Index>(
-          indexvar, make_vec<DomainInt>(0, (DomainInt)varArray.size() - 1)));
+          indexvar, makeVec<DomainInt>(0, (DomainInt)varArray.size() - 1)));
       con.push_back(new Dynamic_AND(out_bounds));
     }
     return new Dynamic_OR(con);

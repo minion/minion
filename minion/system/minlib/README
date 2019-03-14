@@ -25,4 +25,4 @@ D_ASSERT(x) : A pretty-printing assert function.
 
 
 *** Array functions
-make_vec(T t) : Make a vector<T> containing the elements of T.
+makeVec(T t) : Make a vector<T> containing the elements of T.

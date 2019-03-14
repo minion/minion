@@ -127,8 +127,8 @@ struct NeighbourhoodState {
   searchNeighbourhoods(const SearchParams& searchParams,
                        ContinueSearchFunc&& continueSearch = DefaultContinueSearchFunc()) {
     // Save state of the world
-    int depth = Controller::get_world_depth();
-    Controller::world_push();
+    int depth = Controller::getWorldDepth();
+    Controller::worldPush();
     vector<SearchOrder> searchOrder;
     vector<SearchOrder>* chosenSearchOrder = NULL;
     int bottomOfPrimaryNhIndex;
@@ -163,7 +163,7 @@ struct NeighbourhoodState {
                                  getState().getOptimiseVar()->min(), 0, false, false);
 
         globalStats.reportnewStats(searchParams.combinationToActivate, stats);
-        Controller::world_popToDepth(depth);
+        Controller::worldPopToDepth(depth);
         return stats;
       }
     }
@@ -231,19 +231,19 @@ struct NeighbourhoodState {
     globalStats.reportnewStats(searchParams.combinationToActivate, stats);
 
     if(Parallel::isAlarmActivated()) {
-      Controller::world_popToDepth(depth);
+      Controller::worldPopToDepth(depth);
       throw EndOfSearch();
     }
 
-    Controller::world_popToDepth(depth);
+    Controller::worldPopToDepth(depth);
     return stats;
   }
 
   void popToBaseDepth() {
-    if(Controller::get_world_depth() != 1) {
-      Controller::world_popToDepth(1);
+    if(Controller::getWorldDepth() != 1) {
+      Controller::worldPopToDepth(1);
     }
-    Controller::world_push();
+    Controller::worldPush();
   }
   inline void copyOverIncumbent(const vector<DomainInt>& solution) {
     popToBaseDepth();
@@ -259,8 +259,8 @@ struct NeighbourhoodState {
     prop->prop(emptyVars);
   }
   inline void printBestSolution() {
-    if(Controller::get_world_depth() != 1) {
-      Controller::world_popToDepth(1);
+    if(Controller::getWorldDepth() != 1) {
+      Controller::worldPopToDepth(1);
     }
     std::vector<std::pair<AnyVarRef, DomainInt>>& bestAssignment = globalStats.getBestAssignment();
     for(auto& varAssignmentPair : bestAssignment) {
@@ -301,7 +301,7 @@ private:
                                               MultiBranch& varOrder, int bottomOfPrimaryNhIndex) {
     while(!sm.branches.empty() && varOrder.pos > bottomOfPrimaryNhIndex) {
       if(sm.branches.back().isLeft) {
-        Controller::world_pop();
+        Controller::worldPop();
         Controller::maybe_print_right_backtrack();
       }
       sm.branches.pop_back();

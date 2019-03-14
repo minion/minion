@@ -400,12 +400,12 @@ namespace Controller {
 void lock();
 
 /// Pushes the state of the whole world.
-inline void world_push();
+inline void worldPush();
 
 /// Pops the state of the whole world.
-inline void world_pop();
+inline void worldPop();
 
-inline void world_pop_all();
+inline void worldPop_all();
 } // namespace Controller
 
 #endif

@@ -3,7 +3,7 @@ http://minion.sourceforge.net
 
 For Licence Information see file LICENSE.txt
 
-  $Id: dynamic_vecneq.h 1117 2008-02-15 17:19:14Z caj $
+  $Id: dynamicVecneq.h 1117 2008-02-15 17:19:14Z caj $
 */
 
 /* Minion
@@ -62,28 +62,28 @@ struct VecCountDynamic : public AbstractConstraint {
 
   VarArray1 varArray1;
   VarArray2 varArray2;
-  DomainInt num_to_watch;
+  DomainInt numTo_watch;
   DomainInt hamming_distance;
   vector<DomainInt> watchedValues;
   vector<DomainInt> unwatchedValues;
 
   Reversible<bool> propagate_mode;
-  DomainInt index_to_not_propagate;
+  DomainInt indexTo_not_propagate;
 
   VecCountDynamic(const VarArray1& _array1, const VarArray2& _array2, DomainInt _hamming_distance)
       : varArray1(_array1),
         varArray2(_array2),
-        num_to_watch(_hamming_distance + 1),
+        numTo_watch(_hamming_distance + 1),
         hamming_distance(_hamming_distance),
         propagate_mode(false),
-        index_to_not_propagate(-1) {
-    if(num_to_watch <= 1)
-      num_to_watch = 0;
+        indexTo_not_propagate(-1) {
+    if(numTo_watch <= 1)
+      numTo_watch = 0;
     D_ASSERT(varArray1.size() == varArray2.size());
   }
 
   virtual SysInt dynamicTriggerCount() {
-    return checked_cast<SysInt>(Operator::dynamicTriggerCount() * num_to_watch);
+    return checked_cast<SysInt>(Operator::dynamicTriggerCount() * numTo_watch);
   }
 
   bool no_supportForIndex(DomainInt index_in) {
@@ -99,17 +99,17 @@ struct VecCountDynamic : public AbstractConstraint {
   virtual void fullPropagate() {
 
     // Check if the constraint is trivial, if so just exit now.
-    if(num_to_watch <= 1)
+    if(numTo_watch <= 1)
       return;
 
-    watchedValues.resize(checked_cast<SysInt>(num_to_watch));
+    watchedValues.resize(checked_cast<SysInt>(numTo_watch));
 
     SysInt size = varArray1.size();
     SysInt index = 0;
     SysInt found_matches = 0;
     // Find first pair we could watch.
 
-    while(found_matches < num_to_watch && index < size) {
+    while(found_matches < numTo_watch && index < size) {
       while(index < size && no_supportForIndex(index)) {
         ++index;
       }
@@ -121,16 +121,16 @@ struct VecCountDynamic : public AbstractConstraint {
     }
 
     // Failed to find enough watches
-    if(found_matches < num_to_watch - 1) {
+    if(found_matches < numTo_watch - 1) {
       getState().setFailed(true);
       return;
     }
 
     // Found exactly as many values as we need to propagate
-    if(found_matches == num_to_watch - 1) {
-      index_to_not_propagate = -1;
+    if(found_matches == numTo_watch - 1) {
+      indexTo_not_propagate = -1;
       propagate_mode = true;
-      for(SysInt i = 0; i < num_to_watch - 1; ++i) {
+      for(SysInt i = 0; i < numTo_watch - 1; ++i) {
         propagate_from_var1(watchedValues[i]);
         propagate_from_var2(watchedValues[i]);
         addTriggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
@@ -139,7 +139,7 @@ struct VecCountDynamic : public AbstractConstraint {
     }
 
     // Found enough values to watch, no propagation yet!
-    for(SysInt i = 0; i < num_to_watch; ++i) {
+    for(SysInt i = 0; i < numTo_watch; ++i) {
       addTriggers(watchedValues[i], Operator::dynamicTriggerCount() * i);
     }
 
@@ -175,7 +175,7 @@ struct VecCountDynamic : public AbstractConstraint {
   virtual void propagateDynInt(SysInt trigger_activated, DomainDelta) {
     PROP_INFO_ADDONE(DynVecNeq);
     SysInt triggerpair = trigger_activated / Operator::dynamicTriggerCount();
-    D_ASSERT(triggerpair >= 0 && triggerpair < num_to_watch);
+    D_ASSERT(triggerpair >= 0 && triggerpair < numTo_watch);
 
     /*printf("propmode=%d, triggerpair=%d, trigger_activated=%d\n",
       (SysInt)propagate_mode, (SysInt)triggerpair, (SysInt)trigger_activated);
@@ -199,7 +199,7 @@ struct VecCountDynamic : public AbstractConstraint {
     cout << endl;*/
 
     if(propagate_mode) {
-      if(index_to_not_propagate == watchedValues[triggerpair])
+      if(indexTo_not_propagate == watchedValues[triggerpair])
         return;
 
       // assumes that the first set of Operator::dynamicTriggerCount()/2
@@ -225,12 +225,12 @@ struct VecCountDynamic : public AbstractConstraint {
     if(index == unwatchedSize) {
       // This is the only possible non-equal index.
       propagate_mode = true;
-      index_to_not_propagate = watchedValues[triggerpair];
+      indexTo_not_propagate = watchedValues[triggerpair];
 
       //     printf("!propmode=%d, triggerpair=%d, trigger_activated=%d,
       //     nopropindex=%d\n",
       //        (SysInt)propagate_mode, (SysInt)triggerpair,
-      //        (SysInt)trigger_activated, (SysInt)index_to_not_propagate);
+      //        (SysInt)trigger_activated, (SysInt)indexTo_not_propagate);
 
       for(SysInt i = 0; i < (SysInt)watchedValues.size(); ++i) {
         if(i != triggerpair) {
@@ -266,7 +266,7 @@ struct VecCountDynamic : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    if(num_to_watch <= 1)
+    if(numTo_watch <= 1)
       return true;
 
     pair<DomainInt, DomainInt> assign;

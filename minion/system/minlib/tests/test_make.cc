@@ -4,7 +4,7 @@ using namespace std;
 
 int main(void) {
   auto con = make<vector>(1, 2, 3);
-  auto convec = make_vec(1, 2, 3);
+  auto convec = makeVec(1, 2, 3);
 
   D_ASSERT(con == convec);
 

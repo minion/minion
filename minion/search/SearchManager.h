@@ -83,7 +83,7 @@ struct StandardSearchManager : public SearchManager {
     D_ASSERT(picked.first != -1);
     D_ASSERT(!varArray[picked.first].isAssigned());
 
-    world_push();
+    worldPush();
     varArray[picked.first].assign(picked.second);
     maybe_print_search_assignment(varArray[picked.first], picked.second, true);
     branches.push_back(Controller::triple(true, picked.first, picked.second));
@@ -100,7 +100,7 @@ struct StandardSearchManager : public SearchManager {
     if(branches.empty())
       return false;
 
-    world_pop();
+    worldPop();
 
     SysInt var = branches.back().var;
     DomainInt val = branches.back().val;
@@ -141,7 +141,7 @@ struct StandardSearchManager : public SearchManager {
   inline void jump_out_aux_vars() {
     while(in_aux_vars()) {
       if(branches.back().isLeft) {
-        world_pop();
+        worldPop();
         maybe_print_right_backtrack();
       }
 

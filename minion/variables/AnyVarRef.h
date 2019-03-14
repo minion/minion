@@ -185,7 +185,7 @@ struct AnyVarRef_Abstract {
   virtual void incWdeg() = 0;
 #endif
 
-  virtual string virtual_tostring() = 0;
+  virtual string virtualTostring() = 0;
 
   virtual ~AnyVarRef_Abstract() {}
 
@@ -300,7 +300,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
   }
 #endif
 
-  virtual string virtual_tostring() {
+  virtual string virtualTostring() {
     return tostring(data);
   }
 
@@ -437,7 +437,7 @@ public:
 #endif
 
   friend std::ostream& operator<<(std::ostream& o, const AnyVarRef& avr) {
-    return o << "AnyVarRef:" << avr.data->virtual_tostring();
+    return o << "AnyVarRef:" << avr.data->virtualTostring();
   }
 
   DomainInt getDomainChange(DomainDelta d) {

@@ -432,13 +432,13 @@ void MinionThreeInputReader<FileReader>::finalise() {
   }
 
   if(!unusedVars.empty() && ensureBranchOnAllVars) {
-    vector<Var> unused_vec(unusedVars.begin(), unusedVars.end());
+    vector<Var> unusedVec(unusedVars.begin(), unusedVars.end());
     if(instance->searchOrder.size() > 1 &&
        instance->searchOrder.back().find_one_assignment == true) {
       instance->searchOrder.back().varOrder.insert(instance->searchOrder.back().varOrder.end(),
-                                                     unused_vec.begin(), unused_vec.end());
+                                                     unusedVec.begin(), unusedVec.end());
     } else {
-      instance->searchOrder.push_back(unused_vec);
+      instance->searchOrder.push_back(unusedVec);
       instance->searchOrder.back().find_one_assignment = true;
     }
   }
@@ -708,7 +708,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
   for(SysInt i = 0; i < def->number_of_params; ++i) {
     switch(def->read_types[i]) {
     case read_list: varsblob.push_back(readLiteralVector(infile)); break;
-    case read_var: varsblob.push_back(make_vec(readIdentifier(infile))); break;
+    case read_var: varsblob.push_back(makeVec(readIdentifier(infile))); break;
     case read_2_vars: {
       vector<Var> vars(2);
       vars[0] = readIdentifier(infile);
@@ -716,7 +716,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
       vars[1] = readIdentifier(infile);
       varsblob.push_back(std::move(vars));
     } break;
-    case read_constant: constblob.push_back(make_vec(infile->readNum())); break;
+    case read_constant: constblob.push_back(makeVec(infile->readNum())); break;
     case read_constant_list: {
       vector<Var> vectorOfConst = readLiteralVector(infile);
       vector<DomainInt> vals;
@@ -1027,8 +1027,8 @@ vector<vector<Var>> MinionThreeInputReader<FileReader>::read2DMatrixVariable(Fil
     vector<DomainInt> terms;
     terms.push_back(-999);
     // Use the existing code to flatten a matrix.
-    // make_vec takes a T and turns it into a 1 element vector<T>.
-    return make_vec(instance->vars.buildVarList(name, terms));
+    // makeVec takes a T and turns it into a 1 element vector<T>.
+    return makeVec(instance->vars.buildVarList(name, terms));
   } else {
     return instance->vars.flattenTo2DMatrix(name);
   }
@@ -1402,7 +1402,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
           MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(currentIndex));
           instance->vars.addSymbol(varname + to_var_name(currentIndex),
                                    instance->vars.getNewVar(variable_type, domain));
-          while(increment_vector(currentIndex, indices)) {
+          while(incrementVector(currentIndex, indices)) {
             MAYBE_PARSER_INFO("New Var: " + varname + to_var_name(currentIndex));
             instance->vars.addSymbol(varname + to_var_name(currentIndex),
                                      instance->vars.getNewVar(variable_type, domain));
@@ -1415,7 +1415,7 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       } else {
         Var v = instance->vars.getNewVar(variable_type, domain);
         instance->vars.addSymbol(varname, v);
-        instance->allVars_list.push_back(make_vec(v));
+        instance->allVars_list.push_back(makeVec(v));
       }
     }
   }

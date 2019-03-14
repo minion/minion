@@ -64,7 +64,7 @@ protected:
 
   /// Private members of the base class.
 
-  vector<Con_TrigRef> trig_info_vec;
+  vector<Con_TrigRef> trig_infoVec;
 
   vector<AnyVarRef> singleton_vars;
 
@@ -79,21 +79,21 @@ public:
 
   Con_TrigRef _getTrigRef(SysInt trigger) {
     D_ASSERT(parent == nullptr);
-    return trig_info_vec[trigger];
+    return trig_infoVec[trigger];
   }
 
   void _reportTriggerMovementToConstraint(SysInt trigger, Con_TrigRef tpi) {
     D_ASSERT(parent == nullptr);
-    D_ASSERT(trigger >= 0 && trigger < trig_info_vec.size());
-    TRIGP("CM" << trig_info_vec[trigger] << "->" << trigger << ":" << tpi);
-    trig_info_vec[trigger] = tpi;
+    D_ASSERT(trigger >= 0 && trigger < trig_infoVec.size());
+    TRIGP("CM" << trig_infoVec[trigger] << "->" << trigger << ":" << tpi);
+    trig_infoVec[trigger] = tpi;
   }
 
   void _reportTriggerRemovalToConstraint(SysInt trigger) {
     D_ASSERT(parent == nullptr);
-    D_ASSERT(trigger >= 0 && trigger < trig_info_vec.size());
-    TRIGP("CR" << trig_info_vec[trigger] << ":" << trigger);
-    trig_info_vec[trigger] = Con_TrigRef{};
+    D_ASSERT(trigger >= 0 && trigger < trig_infoVec.size());
+    TRIGP("CR" << trig_infoVec[trigger] << ":" << trigger);
+    trig_infoVec[trigger] = Con_TrigRef{};
   }
 
   virtual Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger) {
@@ -111,8 +111,8 @@ public:
     if(parent == nullptr) {
       t = parent->_parent_map_Con_TrigRef(childpos, trigger);
     } else {
-      D_ASSERT(trigger >= 0 && trigger < trig_info_vec.size());
-      t = trig_info_vec[trigger];
+      D_ASSERT(trigger >= 0 && trigger < trig_infoVec.size());
+      t = trig_infoVec[trigger];
     }
     Trig_ConRef tcr = t.dtl->_getConRef(t.triggerListPos);
 
@@ -239,7 +239,7 @@ public:
   virtual ~AbstractConstraint() {}
 
   virtual void setupDynamicTriggers() {
-    trig_info_vec.resize(dynamicTriggerCount());
+    trig_infoVec.resize(dynamicTriggerCount());
   }
 
   virtual void setupDynamicTriggerDatastructures() {}
@@ -422,7 +422,7 @@ public:
   }
 
   virtual void setupDynamicTriggers() {
-    trig_info_vec.resize(dynamicTriggerCountWithChildren());
+    trig_infoVec.resize(dynamicTriggerCountWithChildren());
   }
 
   /// Actually creates the dynamic triggers. Calls dynamicTriggerCount from

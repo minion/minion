@@ -40,7 +40,7 @@ struct WatchNotInRangeConstraint : public AbstractConstraint {
     return "w-notinrange";
   }
 
-  CONSTRAINT_ARG_LIST2(var, make_vec(rangeMin, rangeMax));
+  CONSTRAINT_ARG_LIST2(var, makeVec(rangeMin, rangeMax));
   Var var;
 
   DomainInt rangeMin;

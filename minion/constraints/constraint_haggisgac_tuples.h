@@ -33,7 +33,7 @@ struct HaggisGACTuples {
 
   tuple_list_type tuple_list_cpy;
 
-  const tuple_list_type& get_tl() const {
+  const tuple_list_type& getTL() const {
     return tuple_list_cpy;
   }
 

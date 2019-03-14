@@ -62,7 +62,7 @@ struct TupleTrie {
   // complete assignment.
   DomainInt current_tuple[max_arity];
 
-  vector<vector<DomainInt>> tuples_vector;
+  vector<vector<DomainInt>> tuplesVector;
 
   SysInt map_depth(DomainInt depth) {
     if(depth == 0)
@@ -73,7 +73,7 @@ struct TupleTrie {
   }
 
   DomainInt tuples(DomainInt num, DomainInt depth) {
-    return tuples_vector[checked_cast<SysInt>(num)][map_depth(depth)];
+    return tuplesVector[checked_cast<SysInt>(num)][map_depth(depth)];
   }
 
   TupleTrie(DomainInt _significantIndex, TupleList* tuplelist)
@@ -82,13 +82,13 @@ struct TupleTrie {
     // TODO : Fix this hard limit.
     D_ASSERT(arity < 100);
     trie_data = NULL;
-    tuples_vector.resize(checked_cast<SysInt>(tuplelist->size()));
+    tuplesVector.resize(checked_cast<SysInt>(tuplelist->size()));
 
     // Need a copy so we can sort it and such things.
     for(SysInt i = 0; i < tuplelist->size(); ++i)
-      tuples_vector[i] = tuplelist->getVector(i);
+      tuplesVector[i] = tuplelist->getVector(i);
 
-    std::stable_sort(tuples_vector.begin(), tuples_vector.end(), TupleComparator(sigIndex, arity));
+    std::stable_sort(tuplesVector.begin(), tuplesVector.end(), TupleComparator(sigIndex, arity));
     if(tuplelist->size() > 0) {
       buildTrie(0, tuplelist->size());
       buildFinalTrie();

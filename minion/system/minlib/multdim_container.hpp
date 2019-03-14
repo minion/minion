@@ -66,7 +66,7 @@ struct MultiDimCon {
     do {
       indices[v] = *values;
       values++;
-    } while(increment_vector(v, array_bounds));
+    } while(incrementVector(v, array_bounds));
   }
 
   template <typename Index2, typename Result2>
@@ -76,7 +76,7 @@ struct MultiDimCon {
         name(mdc.name) {}
 
   MultiDimCon(const Result& r) : name("<unknown single variable>") {
-    indices[make_vec<Index>()] = r;
+    indices[makeVec<Index>()] = r;
   }
 
   /// Returns the arity of the members of the container.
@@ -195,7 +195,7 @@ struct MultiDimCon {
     std::vector<Index> v;
     v.resize(array_bounds.size());
 
-    std::vector<Index> it = initialize_vector_from_intervals(ind);
+    std::vector<Index> it = initializeVector_from_intervals(ind);
     do {
       auto pos = indices.find(it);
       if(pos != indices.end()) {
@@ -203,7 +203,7 @@ struct MultiDimCon {
           v[i] = (pos->first)[i] - first(ind[i]);
         mdc_new.add(v, pos->second);
       }
-    } while(increment_vector_from_intervals(it, ind));
+    } while(incrementVector_from_intervals(it, ind));
 
     /*		for(auto it = indices.begin(); it != indices.end(); ++it)
                     {
@@ -260,10 +260,10 @@ int mdcIndexSize(const MultiDimCon<I, R>& in, int dim) {
 
 template <typename Index, typename Result>
 MultiDimCon<Index, Result> flatten(const MultiDimCon<Index, Result>& in) {
-  MultiDimCon<Index, Result> mdc(make_vec<Index>(in.indices.size()));
+  MultiDimCon<Index, Result> mdc(makeVec<Index>(in.indices.size()));
   Index pos = 0;
   for(auto it = in.indices.begin(); it != in.indices.end(); ++it, ++pos) {
-    mdc.add(make_vec(pos), it->second);
+    mdc.add(makeVec(pos), it->second);
   }
   return mdc;
 }
@@ -288,7 +288,7 @@ bool operator==(const MultiDimCon<Index, Result>& l, const MultiDimCon<Index, Re
 template <typename Index, typename Result>
 DOM_NOINLINE MultiDimCon<Index, Result> mdc_join(const std::vector<MultiDimCon<Index, Result>>& v) {
   if(v.empty()) {
-    return MultiDimCon<Index, Result>(make_vec<Index>(0));
+    return MultiDimCon<Index, Result>(makeVec<Index>(0));
   }
 
   std::vector<Index> new_bounds = v[0].array_bounds;
@@ -303,12 +303,12 @@ DOM_NOINLINE MultiDimCon<Index, Result> mdc_join(const std::vector<MultiDimCon<I
   new_bounds.insert(new_bounds.begin(), v.size());
   MultiDimCon<Index, Result> mdc(new_bounds);
   // We do this to reduce memory reallocations
-  std::vector<Index> temp_vec;
+  std::vector<Index> tempVec;
   for(size_t i = 0; i < v.size(); ++i) {
     for(auto it = v[i].indices.begin(); it != v[i].indices.end(); ++it) {
-      temp_vec = it->first;
-      temp_vec.insert(temp_vec.begin(), i);
-      mdc.add(temp_vec, it->second);
+      tempVec = it->first;
+      tempVec.insert(tempVec.begin(), i);
+      mdc.add(tempVec, it->second);
     }
   }
   return mdc;
@@ -337,7 +337,7 @@ DOM_NOINLINE MultiDimCon<Index, Result> project(const MultiDimCon<Index, Result>
   /// B) Remove indices that are projected out
   ///    and move index values down where approriate.
 
-  std::vector<bool> is_intervals = make_vec<bool>(is_interval<Args>::val...);
+  std::vector<bool> is_intervals = makeVec<bool>(is_interval<Args>::val...);
   auto intervals = intervalise_list<Index>(args...);
 
   if(is_intervals.size() != mdc.arity()) {

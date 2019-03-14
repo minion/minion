@@ -14,7 +14,7 @@
  * \return true if the array was previously at maximum value.
  */
 template <typename Container>
-bool increment_vector(Container& vals, const Container& maxvals) {
+bool incrementVector(Container& vals, const Container& maxvals) {
   bool carry = true;
   int position = (int)vals.size() - 1;
   while(position >= 0 && carry == true) {
@@ -31,7 +31,7 @@ bool increment_vector(Container& vals, const Container& maxvals) {
 
 /// I
 template <typename T>
-std::vector<T> initialize_vector_from_intervals(const std::vector<INTERVAL<T>>& intervals) {
+std::vector<T> initializeVector_from_intervals(const std::vector<INTERVAL<T>>& intervals) {
   std::vector<T> t;
   for(auto it = intervals.begin(); it != intervals.end(); ++it)
     t.push_back(first(*it));
@@ -41,7 +41,7 @@ std::vector<T> initialize_vector_from_intervals(const std::vector<INTERVAL<T>>& 
 /// increments a container of values. Returns 'true' until the maximum value is
 /// reached.
 template <typename Container, typename IntervalContainer>
-bool increment_vector_from_intervals(Container& vals, const IntervalContainer& intervals) {
+bool incrementVector_from_intervals(Container& vals, const IntervalContainer& intervals) {
   bool carry = true;
   int position = (int)vals.size() - 1;
   while(position >= 0 && carry == true) {
@@ -86,14 +86,14 @@ Container cross_prod(const Container& con) {
     for(unsigned i = 0; i < maxCounter.size(); ++i)
       inner_con.push_back(con[i][sizeCounter[i]]);
     outcon.push_back(inner_con);
-  } while(increment_vector(sizeCounter, maxCounter));
+  } while(incrementVector(sizeCounter, maxCounter));
 
   return outcon;
 }
 
 /// Merges a vector<vector<val>> to a vector<val>
 template <typename val>
-std::vector<val> merge_vectors(const std::vector<std::vector<val>>& v) {
+std::vector<val> mergeVectors(const std::vector<std::vector<val>>& v) {
   std::vector<val> ret;
   typedef typename std::vector<std::vector<val>>::const_iterator iter;
   for(iter it = v.begin(); it != v.end(); ++it)

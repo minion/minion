@@ -74,42 +74,42 @@ DomainRange_Impl<T> Range(const T& b, const T& e, const T& s) {
 
 template <typename T>
 class ContainerRange_Impl {
-  T max_vec;
+  T maxVec;
 
 public:
-  ContainerRange_Impl(T _vec) : max_vec(_vec) {}
+  ContainerRange_Impl(T Vec) : maxVec(Vec) {}
 
   struct Container_iter {
-    T max_vec;
-    T current_vec;
+    T maxVec;
+    T currentVec;
 
-    Container_iter(T vec) : max_vec(vec), current_vec(vec.size()) {}
+    Container_iter(T vec) : maxVec(vec), currentVec(vec.size()) {}
 
-    Container_iter(T vec, bool) : max_vec(vec), current_vec(vec) {}
+    Container_iter(T vec, bool) : maxVec(vec), currentVec(vec) {}
 
     T operator*() {
-      return current_vec;
+      return currentVec;
     }
 
     void operator++() {
       // We are reusing the existing increment vector,
       // which loops around and returns false at the end
       // of the loop
-      if(!increment_vector(current_vec, max_vec))
-        current_vec = max_vec;
+      if(!incrementVector(currentVec, maxVec))
+        currentVec = maxVec;
     }
 
     friend bool operator!=(Container_iter lhs, Container_iter rhs) {
-      return lhs.current_vec != rhs.current_vec;
+      return lhs.currentVec != rhs.currentVec;
     }
   };
 
   Container_iter begin() const {
-    return Container_iter(max_vec);
+    return Container_iter(maxVec);
   }
 
   Container_iter end() const {
-    return Container_iter(max_vec, true);
+    return Container_iter(maxVec, true);
   }
 };
 

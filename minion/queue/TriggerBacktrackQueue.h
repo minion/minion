@@ -49,12 +49,12 @@ struct TriggerBacktrackQueue {
     queue.back().push_back(make_pair(conref.dtl, t));
   }
 
-  void world_push() {
+  void worldPush() {
     P("TBQ: World_push");
     queue.push_back(TriggerList());
   }
 
-  void world_pop() {
+  void worldPop() {
     P("TBQ: World_pop");
     TriggerList& tl = queue.back();
     for(SysInt i = (SysInt)tl.size() - 1; i >= 0; --i) {

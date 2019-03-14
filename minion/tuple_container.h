@@ -193,7 +193,7 @@ public:
     return _MapVarsToLiteral[varNum][checked_cast<SysInt>(domNum - domSmallest[varNum])];
   }
 
-  pair<SysInt, DomainInt> get_varval_from_literal(DomainInt literal) {
+  pair<SysInt, DomainInt> getVarvalFromLiteral(DomainInt literal) {
     return _MapLiteralToVars[checked_cast<SysInt>(literal)];
   }
 
@@ -233,8 +233,8 @@ public:
         _MapVarsToLiteral[i][j] = literalCount;
         _MapLiteralToVars.push_back(make_pair(i, j + domSmallest[checked_cast<SysInt>(i)]));
         D_ASSERT(getLiteral(i, j + domSmallest[i]) == literalCount);
-        D_ASSERT(get_varval_from_literal(literalCount).first == i);
-        D_ASSERT(get_varval_from_literal(literalCount).second ==
+        D_ASSERT(getVarvalFromLiteral(literalCount).first == i);
+        D_ASSERT(getVarvalFromLiteral(literalCount).second ==
                  j + domSmallest[checked_cast<SysInt>(i)]);
         ++literalCount;
       }

@@ -23,41 +23,41 @@
 namespace BuildCon {
 
 vector<AnyVarRef> getAnyVarRefFromVar(const vector<Var>& vec) {
-  vector<AnyVarRef> ret_vec;
-  ret_vec.reserve(vec.size());
+  vector<AnyVarRef> retVec;
+  retVec.reserve(vec.size());
 
   for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
-    ret_vec.push_back(getAnyVarRefFromVar(vec[i]));
+    retVec.push_back(getAnyVarRefFromVar(vec[i]));
 
-  return ret_vec;
+  return retVec;
 }
 
 vector<vector<AnyVarRef>> getAnyVarRefFromVar(const vector<vector<Var>>& vec) {
-  vector<vector<AnyVarRef>> ret_vec;
-  ret_vec.reserve(vec.size());
+  vector<vector<AnyVarRef>> retVec;
+  retVec.reserve(vec.size());
 
   for(SysInt i = 0; i < (SysInt)vec.size(); ++i)
-    ret_vec.push_back(getAnyVarRefFromVar(vec[i]));
+    retVec.push_back(getAnyVarRefFromVar(vec[i]));
 
-  return ret_vec;
+  return retVec;
 }
 
 template <typename V>
-std::pair<DomainInt, DomainInt> get_initialBounds(const V& v) {
+std::pair<DomainInt, DomainInt> getInitialBounds(const V& v) {
   return std::make_pair(v.initialMin(), v.initialMax());
 }
 
 std::pair<DomainInt, DomainInt> getInitialBoundsFromVar(Var v) {
   switch(v.type()) {
-  case VAR_BOOL: return get_initialBounds(getVars().boolVarContainer.getVarNum(v.pos()));
+  case VAR_BOOL: return getInitialBounds(getVars().boolVarContainer.getVarNum(v.pos()));
   case VAR_NOTBOOL:
-    return get_initialBounds(VarNotRef(getVars().boolVarContainer.getVarNum(v.pos())));
-  case VAR_BOUND: return get_initialBounds(getVars().boundVarContainer.getVarNum(v.pos()));
+    return getInitialBounds(VarNotRef(getVars().boolVarContainer.getVarNum(v.pos())));
+  case VAR_BOUND: return getInitialBounds(getVars().boundVarContainer.getVarNum(v.pos()));
   case VAR_SPARSEBOUND:
-    return get_initialBounds(getVars().sparseBoundVarContainer.getVarNum(v.pos()));
-  case VAR_DISCRETE: return get_initialBounds(getVars().bigRangeVarContainer.getVarNum(v.pos()));
+    return getInitialBounds(getVars().sparseBoundVarContainer.getVarNum(v.pos()));
+  case VAR_DISCRETE: return getInitialBounds(getVars().bigRangeVarContainer.getVarNum(v.pos()));
   case VAR_SPARSEDISCRETE: INPUT_ERROR("Sparse Discrete not supported at present");
-  case VAR_CONSTANT: return get_initialBounds(ConstantVar(v.pos()));
+  case VAR_CONSTANT: return getInitialBounds(ConstantVar(v.pos()));
   default: INPUT_ERROR("Unknown variable type " << v.type() << ".");
   }
 }

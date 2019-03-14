@@ -423,19 +423,19 @@ inline AbstractConstraint* BuildCT_REIFY(const VarArray& vars, ConstraintBlob& b
     // Common code for GACEQ and EQ
     {
       ConstraintBlob blob(bl.internal_constraints[0]);
-      blob.vars.push_back(make_vec(bl.vars[0][0]));
+      blob.vars.push_back(makeVec(bl.vars[0][0]));
       blob.constraint = get_constraint(CT_EQ_REIFY);
       return build_constraint(blob);
     }
   case CT_DISEQ: {
     ConstraintBlob blob(bl.internal_constraints[0]);
-    blob.vars.push_back(make_vec(bl.vars[0][0]));
+    blob.vars.push_back(makeVec(bl.vars[0][0]));
     blob.constraint = get_constraint(CT_DISEQ_REIFY);
     return build_constraint(blob);
   }
   case CT_MINUSEQ: {
     ConstraintBlob blob(bl.internal_constraints[0]);
-    blob.vars.push_back(make_vec(bl.vars[0][0]));
+    blob.vars.push_back(makeVec(bl.vars[0][0]));
     blob.constraint = get_constraint(CT_MINUSEQ_REIFY);
     return build_constraint(blob);
   }

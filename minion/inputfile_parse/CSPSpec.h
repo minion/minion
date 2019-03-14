@@ -258,7 +258,7 @@ struct VarContainer {
         if(params[i] == -999)
           output[i] = currentIndex[i];
       return_list.push_back(getSymbol(name + to_var_name(output)));
-    } while(increment_vector(currentIndex, modifiedMax));
+    } while(incrementVector(currentIndex, modifiedMax));
 
     return return_list;
   }
@@ -365,7 +365,7 @@ struct VarContainer {
     }
   }
 
-  Bounds get_bounds(Var v) const {
+  Bounds getBounds(Var v) const {
     switch(v.type()) {
     case VAR_CONSTANT: return Bounds(v.pos(), v.pos());
     case VAR_BOOL: return Bounds(0, 1);
@@ -541,13 +541,13 @@ public:
     switch(con.constraint->type) {
 
     case CT_PRODUCT2:
-      return DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound) *
-                          checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).lower_bound)) &&
-             DOMAIN_CHECK(checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound) *
-                          checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound));
+      return DOMAIN_CHECK(checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).lower_bound) *
+                          checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).lower_bound)) &&
+             DOMAIN_CHECK(checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).upper_bound) *
+                          checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).upper_bound));
     case CT_POW: {
-      BigInt a = checked_cast<BigInt>(vars.get_bounds(con.vars[0][0]).upper_bound);
-      BigInt b = checked_cast<BigInt>(vars.get_bounds(con.vars[0][1]).upper_bound);
+      BigInt a = checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).upper_bound);
+      BigInt b = checked_cast<BigInt>(vars.getBounds(con.vars[0][1]).upper_bound);
       BigInt out = 1;
       for(SysInt i = 0; i < b; ++i) {
         out *= a;

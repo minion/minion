@@ -55,7 +55,7 @@ T<FirstArg> make(const FirstArg& fa, const Args&... args) {
 
 // Needed for windows
 template <typename FirstArg, typename... Args>
-std::vector<FirstArg> make_vector(const FirstArg& fa, const Args&... args) {
+std::vector<FirstArg> makeVector(const FirstArg& fa, const Args&... args) {
   std::vector<FirstArg> t;
   t.reserve(SizeOf<Args...>::size);
   push_back(t, fa, args...);
@@ -63,15 +63,15 @@ std::vector<FirstArg> make_vector(const FirstArg& fa, const Args&... args) {
 }
 
 template <typename FirstArg, typename... Args>
-std::vector<FirstArg> make_vec(const FirstArg& fa, const Args&... args) {
+std::vector<FirstArg> makeVec(const FirstArg& fa, const Args&... args) {
   std::vector<FirstArg> v;
-  v = make_vector(fa, args...);
+  v = makeVector(fa, args...);
   return v;
 }
 
 template <typename VecArg, typename FirstArg, typename... Args>
-std::vector<VecArg> make_vecWith_type(const FirstArg& fa, const Args&... args) {
-  return make_vector(static_cast<VecArg>(fa), args...);
+std::vector<VecArg> makeVecWith_type(const FirstArg& fa, const Args&... args) {
+  return makeVector(static_cast<VecArg>(fa), args...);
 }
 
 template <typename Arg, typename... Args>
@@ -82,19 +82,19 @@ std::array<Arg, SizeOf<Args...>::size> make_arrayWith_type(const Args&... args) 
 }
 
 template <typename VecArg>
-std::vector<VecArg> make_vecWith_type() {
+std::vector<VecArg> makeVecWith_type() {
   return std::vector<VecArg>();
 }
 
 template <typename Type>
-std::vector<Type> make_vec() {
+std::vector<Type> makeVec() {
   return std::vector<Type>();
 }
 
 template <typename Type, typename... Args>
 std::vector<typename CommonType<Type, Args...>::type>
-make_vecWith_common_type(const Args&... args) {
-  return make_vecWith_type<typename CommonType<Type, Args...>::type>(args...);
+makeVecWith_common_type(const Args&... args) {
+  return makeVecWith_type<typename CommonType<Type, Args...>::type>(args...);
 }
 
 template <typename Type, typename... Args>
@@ -114,7 +114,7 @@ void container_push_back(T& t, const Arg1& arg1, const Args&... args) {
 }
 
 template <typename Con, typename... Args>
-std::vector<typename Con::value_type> join_to_vec(const Con& vec1, const Args&... args) {
+std::vector<typename Con::value_type> joinToVec(const Con& vec1, const Args&... args) {
   std::vector<typename Con::value_type> vec_out(vec1.begin(), vec1.end());
   container_push_back(vec_out, args...);
   return vec_out;
@@ -138,7 +138,7 @@ OutCon<typename InCon::value_type> to_container(const InCon& c) {
 }
 
 template <typename InCon>
-std::vector<typename InCon::value_type> to_vec(const InCon& c) {
+std::vector<typename InCon::value_type> toVec(const InCon& c) {
   return std::vector<typename InCon::value_type>(c.begin(), c.end());
 }
 

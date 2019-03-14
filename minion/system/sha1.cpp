@@ -328,7 +328,7 @@ void SHA1_Final(SHA1_CTX* context, uint8_t digest[SHA1_DIGEST_SIZE]) {
 
 /*************************************************************/
 
-void digest_to_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char* output) {
+void digestTo_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char* output) {
   int i, j;
 
   char* c = output;
@@ -349,7 +349,7 @@ std::string sha1_hash(const std::string& s) {
   SHA1_Init(&context);
   SHA1_Update(&context, (const uint8_t*)s.c_str(), s.size());
   SHA1_Final(&context, digest);
-  digest_to_hex(digest, output);
+  digestTo_hex(digest, output);
   return output;
 }
 
@@ -408,7 +408,7 @@ static char *test_results[] = {
     "34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F"};
 
 
-void digest_to_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char *output)
+void digestTo_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char *output)
 {
     int i,j;
     char *c = output;
@@ -439,7 +439,7 @@ int main(int argc, char** argv)
         SHA1_Init(&context);
         SHA1_Update(&context, (uint8_t*)test_data[k], strlen(test_data[k]));
         SHA1_Final(&context, digest);
-	digest_to_hex(digest, output);
+	digestTo_hex(digest, output);
 
         if (strcmp(output, test_results[k])) {
             fprintf(stdout, "FAIL\n");
@@ -454,7 +454,7 @@ int main(int argc, char** argv)
     for (k = 0; k < 1000000; k++)
         SHA1_Update(&context, (uint8_t*)"a", 1);
     SHA1_Final(&context, digest);
-    digest_to_hex(digest, output);
+    digestTo_hex(digest, output);
     if (strcmp(output, test_results[2])) {
         fprintf(stdout, "FAIL\n");
         fprintf(stderr,"* hash of \"%s\" incorrect:\n", test_data[2]);

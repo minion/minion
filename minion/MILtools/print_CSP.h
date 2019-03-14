@@ -202,8 +202,8 @@ struct MinionInstancePrinter {
     }
   }
 
-  void printSearchInfo(const vector<Var>& var_vec) {
-    set<Var> vars(var_vec.begin(), var_vec.end());
+  void printSearchInfo(const vector<Var>& varVec) {
+    set<Var> vars(varVec.begin(), varVec.end());
 
     if(csp.is_optimisation_problem && vars.count(csp.optimiseVariable)) {
       if(csp.optimise_minimising)
@@ -294,10 +294,10 @@ struct MinionInstancePrinter {
     buildInstance(csp.constraints, csp.vars.getAllVars(), printEof);
   }
 
-  void buildInstance(const vector<Var>& varlist_vec, bool printEof) {
+  void buildInstance(const vector<Var>& varlistVec, bool printEof) {
     list<ConstraintBlob> new_constraint_list;
 
-    set<Var> varlist(varlist_vec.begin(), varlist_vec.end());
+    set<Var> varlist(varlistVec.begin(), varlistVec.end());
 
     // set<Var> list_of_vars
     for(list<ConstraintBlob>::iterator it = csp.constraints.begin(); it != csp.constraints.end();
@@ -307,7 +307,7 @@ struct MinionInstancePrinter {
         new_constraint_list.push_back(*it);
     }
 
-    buildInstance(new_constraint_list, varlist_vec, printEof);
+    buildInstance(new_constraint_list, varlistVec, printEof);
   }
 
   void buildInstance(const list<ConstraintBlob>& constraints, const vector<Var>& varlist,

@@ -212,7 +212,7 @@ public:
   }
 
   /// Copies the current state of backtrackable memory.
-  void world_push() {
+  void worldPush() {
     UnsignedSysInt dataSize = this->getDataSize();
     char* tmp = (char*)block_cache.do_malloc(dataSize); // calloc(dataSize, sizeof(char));
     this->copyIntoPtr(tmp);
@@ -226,7 +226,7 @@ public:
   }
 
   /// Restores the state of backtrackable memory to the last stored state.
-  void world_pop() {
+  void worldPop() {
     D_ASSERT(backtrack_stack.size() > 0);
     BacktrackData bd = backtrack_stack.back();
     backtrack_stack.pop_back();
@@ -276,10 +276,10 @@ public:
     return backtrack_stack.size();
   }
 
-  void world_pop_to(SysInt depth) {
+  void worldPopTo(SysInt depth) {
     D_ASSERT(current_depth() >= depth);
     while(current_depth() > depth)
-      world_pop();
+      worldPop();
     D_ASSERT(current_depth() == depth);
   }
 

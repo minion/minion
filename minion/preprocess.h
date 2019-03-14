@@ -25,13 +25,13 @@
 
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
-  Controller::world_push();
+  Controller::worldPush();
   var.assign(val);
   prop(vars);
 
   bool check_failed = getState().isFailed();
 
-  Controller::world_pop();
+  Controller::worldPop();
 
   return check_failed;
 }
@@ -44,7 +44,7 @@ inline string getNameFromVar(const T& v) {
 
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop) {
-  Controller::world_push();
+  Controller::worldPush();
 
   var.setMin(lowval);
   var.setMax(highval);
@@ -53,7 +53,7 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   bool check_failed = getState().isFailed();
   getState().setFailed(false);
 
-  Controller::world_pop();
+  Controller::worldPop();
 
   return check_failed;
 }
@@ -73,7 +73,7 @@ inline bool checkSACTimeout() {
 }
 
 template <typename Var, typename Prop>
-bool pruneDomain_top(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
+bool pruneDomainTop(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
   bool pruned = false;
   bool everfailed = false;
   DomainInt gallop = 1;
@@ -180,7 +180,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
             reduced = true;
           if(getState().isFailed())
             return;
-          if(pruneDomain_top(var, vararray, prop, limit))
+          if(pruneDomainTop(var, vararray, prop, limit))
             reduced = true;
           if(getState().isFailed())
             return;
@@ -245,7 +245,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
 
       c->liftTriggersLessEqual(i);
 
-      Controller::world_push();
+      Controller::worldPush();
 
       var.setMax(0);
       prop(vararray);
@@ -261,9 +261,9 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       bool check_failed = getState().isFailed();
       getState().setFailed(false);
 
-      Controller::world_pop();
+      Controller::worldPop();
 
-      Controller::world_push();
+      Controller::worldPush();
 
       var.setMin(1);
       prop(vararray);
@@ -278,7 +278,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       check_failed = getState().isFailed();
       getState().setFailed(false);
 
-      Controller::world_pop();
+      Controller::worldPop();
     }
 
     std::cout << "AMO " << listallpairs.size() / 2 << " ";

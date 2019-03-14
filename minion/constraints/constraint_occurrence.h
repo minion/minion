@@ -142,14 +142,14 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   void propagateValCount() {
     // valCount has been assigned.
     if(trigger1index == -1 || varArray[trigger1index].isAssigned()) {
-      trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
+      trigger1index = watch_unassigned_inVector(-1, trigger1index, 0);
       if(trigger1index == -1) {
         valcountAssigned();
         return;
       }
     }
     if(trigger2index == -1 || varArray[trigger2index].isAssigned()) {
-      trigger2index = watch_unassigned_in_vector(trigger1index, trigger2index, 0);
+      trigger2index = watch_unassigned_inVector(trigger1index, trigger2index, 0);
       if(trigger2index == -1) {
         valcountAssigned();
         return;
@@ -166,20 +166,20 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     if(trig == 0 || trigger1index == -1) {
       if(valCount.isAssigned()) {
         // make sure both triggers are in place.
-        trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
+        trigger1index = watch_unassigned_inVector(-1, trigger1index, 0);
         if(trigger1index == -1) {
           valcountAssigned();
           return;
         }
         if(trigger2index == -1 || varArray[trigger2index].isAssigned()) {
-          trigger2index = watch_unassigned_in_vector(trigger1index, trigger2index, 1);
+          trigger2index = watch_unassigned_inVector(trigger1index, trigger2index, 1);
           if(trigger2index == -1) {
             valcountAssigned();
             return;
           }
         }
       } else {
-        trigger1index = watch_unassigned_in_vector(-1, trigger1index, 0);
+        trigger1index = watch_unassigned_inVector(-1, trigger1index, 0);
         if(trigger1index == -1) {
           vectorAssigned();
           return;
@@ -200,7 +200,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
       return;
     }
 
-    trigger2index = watch_unassigned_in_vector(trigger1index, trigger2index, 1);
+    trigger2index = watch_unassigned_inVector(trigger1index, trigger2index, 1);
     if(trigger2index == -1) {
       valcountAssigned();
     }
@@ -208,7 +208,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
   // unfinished new stuff starts here.
 
-  SysInt watch_unassigned_in_vector(SysInt avoidindex, SysInt oldsupport, DomainInt dt) {
+  SysInt watch_unassigned_inVector(SysInt avoidindex, SysInt oldsupport, DomainInt dt) {
     // move dt to an index other than avoidindex, or return -1.
     SysInt newsupport = oldsupport + 1;
     for(; newsupport < (SysInt)varArray.size(); newsupport++) {
@@ -283,7 +283,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     trigger_setup();
 
-    trigger1index = watch_unassigned_in_vector(-1, -1, 0);
+    trigger1index = watch_unassigned_inVector(-1, -1, 0);
     if(trigger1index == -1) {
       vectorAssigned();
       return;
@@ -291,7 +291,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
     if(valCount.isAssigned()) {
       // watch a second place in the vector.
-      trigger2index = watch_unassigned_in_vector(trigger1index, trigger1index, 1);
+      trigger2index = watch_unassigned_inVector(trigger1index, trigger1index, 1);
       if(trigger2index == -1) {
         valcountAssigned();
         return;
@@ -737,9 +737,9 @@ AbstractConstraint* ConstantOccEqualCon(const VarArray& _varArray, const Val& _v
 
 template <typename T1>
 AbstractConstraint* BuildCT_GEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
-  const SysInt val_toCount = checked_cast<SysInt>(b.constants[0][0]);
+  const SysInt valToCount = checked_cast<SysInt>(b.constants[0][0]);
   DomainInt occs = b.constants[1][0];
-  { return ConstantOccEqualCon(t1, val_toCount, occs, t1.size()); }
+  { return ConstantOccEqualCon(t1, valToCount, occs, t1.size()); }
 }
 
 /* JSON
@@ -752,9 +752,9 @@ AbstractConstraint* BuildCT_GEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
 
 template <typename T1>
 AbstractConstraint* BuildCT_LEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
-  const SysInt val_toCount = checked_cast<SysInt>(b.constants[0][0]);
+  const SysInt valToCount = checked_cast<SysInt>(b.constants[0][0]);
   DomainInt occs = b.constants[1][0];
-  return ConstantOccEqualCon(t1, val_toCount, 0, occs);
+  return ConstantOccEqualCon(t1, valToCount, 0, occs);
 }
 
 /* JSON
@@ -767,8 +767,8 @@ AbstractConstraint* BuildCT_LEQ_OCCURRENCE(const T1& t1, ConstraintBlob& b) {
 
 template <typename T1, typename T3>
 AbstractConstraint* BuildCT_OCCURRENCE(const T1& t1, const T3& t3, ConstraintBlob& b) {
-  const SysInt val_toCount = checked_cast<SysInt>(b.constants[0][0]);
-  return OccEqualCon(t1, val_toCount, t3[0]);
+  const SysInt valToCount = checked_cast<SysInt>(b.constants[0][0]);
+  return OccEqualCon(t1, valToCount, t3[0]);
 }
 
 /* JSON

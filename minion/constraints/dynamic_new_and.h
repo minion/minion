@@ -66,7 +66,7 @@ struct Dynamic_AND : public ParentConstraint {
   CONSTRAINT_ARG_LIST1(child_constraints);
 
   bool constraintLocked;
-  SysInt propagated_to;
+  SysInt propagatedTo;
   Dynamic_AND(vector<AbstractConstraint*> _con)
       : ParentConstraint(_con), constraintLocked(false) {}
 
@@ -130,9 +130,9 @@ struct Dynamic_AND : public ParentConstraint {
       return;
     }
 
-    child_constraints[propagated_to]->fullPropagate();
-    propagated_to++;
-    if(propagated_to != (SysInt)child_constraints.size())
+    child_constraints[propagatedTo]->fullPropagate();
+    propagatedTo++;
+    if(propagatedTo != (SysInt)child_constraints.size())
       getQueue().pushSpecialTrigger(this);
     else {
       constraintLocked = false;
@@ -152,7 +152,7 @@ struct Dynamic_AND : public ParentConstraint {
     P("Propagating child");
     // need to know which child to prop.
     SysInt child = getChildDynamicTrigger(trig);
-    if(!constraintLocked || child < propagated_to) {
+    if(!constraintLocked || child < propagatedTo) {
       passDynTriggerToChild(trig, dd);
       // child_constraints[child]->propagateDynInt(trig);
     }
@@ -163,7 +163,7 @@ struct Dynamic_AND : public ParentConstraint {
     // push it on the special queue to be fullPropagated later.
     D_ASSERT(!constraintLocked);
     constraintLocked = true;
-    propagated_to = 0;
+    propagatedTo = 0;
     getQueue().pushSpecialTrigger(this);
   }
 

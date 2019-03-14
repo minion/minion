@@ -13,10 +13,10 @@ void test_tuples(const Tuples& tuples) {
 }
 
 int main(void) {
-  test_tuples(make_vec(make_vec(1), make_vec(2), make_vec(3), make_vec(4), make_vec(5)));
-  test_tuples(make_vec(make_vec(1, 2), make_vec(3, 4)));
-  test_tuples(make_vec(make_vec(1)));
-  test_tuples(make_vec(make_vec(1, 2), make_vec(1, 3), make_vec(1, 5)));
-  test_tuples(make_vec(make_vec(1, 2, 3, 4, 5, 6)));
-  test_tuples(make_vec(make_vec(1, 1, 1, 1, 1), make_vec(2, 0, 0, 0, 0)));
+  test_tuples(makeVec(makeVec(1), makeVec(2), makeVec(3), makeVec(4), makeVec(5)));
+  test_tuples(makeVec(makeVec(1, 2), makeVec(3, 4)));
+  test_tuples(makeVec(makeVec(1)));
+  test_tuples(makeVec(makeVec(1, 2), makeVec(1, 3), makeVec(1, 5)));
+  test_tuples(makeVec(makeVec(1, 2, 3, 4, 5, 6)));
+  test_tuples(makeVec(makeVec(1, 1, 1, 1, 1), makeVec(2, 0, 0, 0, 0)));
 }

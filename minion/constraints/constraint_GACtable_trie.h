@@ -182,7 +182,7 @@ struct GACTableConstraint : public AbstractConstraint {
 
   BOOL findNewSupport(DomainInt literal) {
     const SysInt sysLiteral = checked_cast<SysInt>(literal);
-    pair<DomainInt, DomainInt> varval = tuples->get_varval_from_literal(literal);
+    pair<DomainInt, DomainInt> varval = tuples->getVarvalFromLiteral(literal);
     DomainInt varIndex = varval.first;
     DomainInt val = varval.second;
     if(negative == 0) {
@@ -215,7 +215,7 @@ struct GACTableConstraint : public AbstractConstraint {
 
     BOOL isNewSupport = findNewSupport(propagated_literal);
 
-    pair<DomainInt, DomainInt> varval = tuples->get_varval_from_literal(propagated_literal);
+    pair<DomainInt, DomainInt> varval = tuples->getVarvalFromLiteral(propagated_literal);
     DomainInt varIndex = varval.first;
     DomainInt val = varval.second;
 

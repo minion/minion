@@ -10,11 +10,11 @@ int main(void) {
   assert(l2 == j);
 
   auto l3 = intervalise_list<int>(i);
-  assert(l3 == make_vec(i));
+  assert(l3 == makeVec(i));
 
   auto l4 = intervalise_list<int>(3);
-  assert(l4 == make_vec(j));
+  assert(l4 == makeVec(j));
 
   auto l5 = intervalise_list<int>(3, i, k);
-  assert(l5 == make_vec(j, i, k));
+  assert(l5 == makeVec(j, i, k));
 }
