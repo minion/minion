@@ -125,7 +125,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
     return 5;
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var1, 1, UpperBound);
     moveTriggerInt(var2, 2, LowerBound);
@@ -135,7 +135,7 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
 
   // rewrite the following two functions.
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
 
     D_ASSERT(var3.min() >= 0);
     D_ASSERT(var3.max() <= 1);
@@ -422,7 +422,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
     }
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     if(var1.isBound()) {
       moveTriggerInt(var1, 3, UpperBound);
       moveTriggerInt(var1, 4, LowerBound);
@@ -439,7 +439,7 @@ struct NeqConstraintBinary : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
 
     if(var1.isAssigned()) {
       DomainInt removeVal = var1.assignedValue();
@@ -525,7 +525,7 @@ struct EqualConstraint : public AbstractConstraint {
     return 4;
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     moveTriggerInt(var1, 0, UpperBound);
     moveTriggerInt(var1, 1, LowerBound);
     moveTriggerInt(var2, 2, UpperBound);
@@ -533,7 +533,7 @@ struct EqualConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     for(int i = 0; i < 4; ++i)
       propagateDynInt(i, DomainDelta::empty());
   }

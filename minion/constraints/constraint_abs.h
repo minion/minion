@@ -52,7 +52,7 @@ struct AbsConstraint : public AbstractConstraint {
     return 4;
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     moveTriggerInt(var1, 0, UpperBound);
     moveTriggerInt(var1, 1, LowerBound);
     moveTriggerInt(var2, 2, UpperBound);
@@ -60,7 +60,7 @@ struct AbsConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     var1.setMin(0);
     for(SysInt i = 0; i < 4 && !getState().isFailed(); ++i)
       propagateDynInt(i, DomainDelta::empty());

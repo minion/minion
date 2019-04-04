@@ -193,11 +193,11 @@ struct LessEqualSumConstraint : public AbstractConstraint {
   }
 
   virtual vector<AnyVarRef> getVars() {
-    vector<AnyVarRef> array_copy(varArray.size() + 1);
+    vector<AnyVarRef> arrayCopy(varArray.size() + 1);
     for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
-      array_copy[i] = varArray[i];
-    array_copy[varArray.size()] = varSum;
-    return array_copy;
+      arrayCopy[i] = varArray[i];
+    arrayCopy[varArray.size()] = varSum;
+    return arrayCopy;
   }
 
   virtual AbstractConstraint* reverseConstraint() {

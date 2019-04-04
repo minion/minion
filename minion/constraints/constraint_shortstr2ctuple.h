@@ -93,7 +93,7 @@ help constraints shortstr2
 
 using namespace std;
 
-struct arrayset_boundscheck {
+struct arraysetBoundscheck {
   vector<SysInt> vals;
   vector<SysInt> valsPos;
   DomainInt size;
@@ -114,13 +114,13 @@ struct arrayset_boundscheck {
     size = 0;
   }
 
-  bool out_of_bounds(DomainInt val) {
+  bool outOfBounds(DomainInt val) {
     DomainInt pos = val - minval;
     return (pos < 0 || pos >= valsPos.size());
   }
 
   bool in(DomainInt val) {
-    if(out_of_bounds(val))
+    if(outOfBounds(val))
       return false;
     return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
@@ -130,7 +130,7 @@ private:
   // clever enough to realise various things don't alias, and this method
   // being called as much as it is.
   void unsafe_insert(DomainInt val) {
-    D_ASSERT(!out_of_bounds(val));
+    D_ASSERT(!outOfBounds(val));
     D_ASSERT(!in(val));
     const SysInt minval_cpy = checked_cast<SysInt>(minval);
     const SysInt validx = checked_cast<SysInt>(val - minval_cpy);
@@ -155,7 +155,7 @@ public:
 
 private:
   void unsafe_remove(DomainInt val) {
-    D_ASSERT(!out_of_bounds(val));
+    D_ASSERT(!outOfBounds(val));
     // swap to posiition size-1 then reduce size
     D_ASSERT(in(val));
     const SysInt validx = checked_cast<SysInt>(val - minval);
@@ -181,14 +181,14 @@ public:
   }
 };
 
-struct ReversibleArrayset_boundscheck {
+struct ReversibleArraysetBoundscheck {
   // Only allows deletion.
   vector<SysInt> vals;
   vector<SysInt> valsPos;
   ReversibleInt size;
   SysInt minval;
 
-  ReversibleArrayset_boundscheck() : size() {}
+  ReversibleArraysetBoundscheck() : size() {}
 
   void initialise(DomainInt low_, DomainInt high_) {
     const SysInt low = checked_cast<SysInt>(low_);
@@ -203,19 +203,19 @@ struct ReversibleArrayset_boundscheck {
     size = vals.size();
   }
 
-  bool out_of_bounds(DomainInt val) {
+  bool outOfBounds(DomainInt val) {
     DomainInt pos = val - minval;
     return (pos < 0 || pos >= valsPos.size());
   }
 
   bool in(DomainInt val) {
-    if(out_of_bounds(val))
+    if(outOfBounds(val))
       return false;
     return valsPos[checked_cast<SysInt>(val - minval)] < size;
   }
 
   void remove(DomainInt val) {
-    if(out_of_bounds(val))
+    if(outOfBounds(val))
       return;
     // swap to posiition size-1 then reduce size
     if(in(val)) {
@@ -433,7 +433,7 @@ struct CTupleSTR : public AbstractConstraint {
   // at least one unsupported val.
   // Iterate only on S_Sup in the main loops looking for support.
   // Unfortunately can't do this exactly as in STR2 paper.
-  arrayset_boundscheck ssup;
+  arraysetBoundscheck ssup;
 
   // ReversibleArrayset ssup_permanent;  // when a var is assigned and after
   // str2 has been run, it is removed from here.
@@ -446,11 +446,11 @@ struct CTupleSTR : public AbstractConstraint {
   // if it belongs to the scope of the constraint.
 
   // Here interpreted as the set of variables that triggered this call.
-  arrayset_boundscheck sval;
+  arraysetBoundscheck sval;
 
   // lastSize array dropped. Only need to keep a list of the triggering vars.
 
-  vector<arrayset_boundscheck> gacvalues;
+  vector<arraysetBoundscheck> gacvalues;
 
   bool validTuple(SysInt i) {
     SysInt index = tupindices[i];

@@ -36,19 +36,19 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
     return;
 
   DomainInt lits = litCount(vars);
-  bool bounds_check = ((preprocessLevel.type == PropLevel_SACBounds) ||
+  bool boundsCheck = ((preprocessLevel.type == PropLevel_SACBounds) ||
                        (preprocessLevel.type == PropLevel_SSACBounds));
 
-  if(bounds_check) {
-    PropagateSAC_Bounds prop_SAC_bounds(preprocessLevel);
-    prop_SAC_bounds(vars);
+  if(boundsCheck) {
+    PropagateSAC_Bounds prop_SACBounds(preprocessLevel);
+    prop_SACBounds(vars);
   } else {
     PropagateSAC prop_SAC(preprocessLevel);
     prop_SAC(vars);
   }
 
   if(printInfo) {
-    cout << "SAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
+    cout << "SAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }
 
@@ -56,15 +56,15 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
     return;
 
   lits = litCount(vars);
-  if(bounds_check) {
-    PropagateSSAC_Bounds prop_SSAC_bounds(preprocessLevel);
-    prop_SSAC_bounds(vars);
+  if(boundsCheck) {
+    PropagateSSAC_Bounds prop_SSACBounds(preprocessLevel);
+    prop_SSACBounds(vars);
   } else {
     PropagateSSAC prop_SSAC(preprocessLevel);
     prop_SSAC(vars);
   }
   if(printInfo) {
-    cout << "SSAC" << (bounds_check ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
+    cout << "SSAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }
 }

@@ -217,7 +217,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     currentSupport[j + arraySize] = support;
   }
 
-  void check_out_of_boundsIndex() {
+  void check_outOfBoundsIndex() {
     if(!undefMapsZero || !resultvar.inDomain(0)) {
       indexvar.setMin(0);
       indexvar.setMax((DomainInt)varArray.size() - 1);
@@ -326,7 +326,7 @@ struct ElementConstraintDynamic : public AbstractConstraint {
     // Couple of quick sanity-propagations.
     // We define UNDEF = false ;)
 
-    check_out_of_boundsIndex();
+    check_outOfBoundsIndex();
 
     if(getState().isFailed())
       return;
@@ -504,11 +504,11 @@ struct ElementConstraintDynamic : public AbstractConstraint {
 
     if(undefMapsZero) {
       // or (i not in {0..size-1} /\ r!=0)
-      vector<AbstractConstraint*> out_bounds;
-      out_bounds.push_back(new WatchNotLiteralConstraint<Result>(resultvar, 0));
-      out_bounds.push_back(new WatchNotInRangeConstraint<Index>(
+      vector<AbstractConstraint*> outBounds;
+      outBounds.push_back(new WatchNotLiteralConstraint<Result>(resultvar, 0));
+      outBounds.push_back(new WatchNotInRangeConstraint<Index>(
           indexvar, makeVec<DomainInt>(0, (DomainInt)varArray.size() - 1)));
-      con.push_back(new Dynamic_AND(out_bounds));
+      con.push_back(new Dynamic_AND(outBounds));
     }
     return new Dynamic_OR(con);
   }

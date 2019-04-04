@@ -119,20 +119,20 @@ struct MultiBranch : public VariableOrder {
 
   virtual DomainInt auxVarStart() const {
     D_ASSERT(hasAuxVars());
-    return variable_offset.back();
+    return variableOffset.back();
   }
 
   // need to patch up the returned variable index
-  vector<DomainInt> variable_offset;
+  vector<DomainInt> variableOffset;
 
   MultiBranch(const vector<shared_ptr<VariableOrder>> _vovector, bool _hasAux)
       : vovector(_vovector), hasAux(_hasAux) {
     pos = 0;
-    variable_offset.resize(vovector.size());
-    variable_offset[0] = 0;
+    variableOffset.resize(vovector.size());
+    variableOffset[0] = 0;
     for(SysInt i = 1; i < (SysInt)vovector.size(); i++) {
       const vector<AnyVarRef>& vars = vovector[i - 1]->getVars();
-      variable_offset[i] = variable_offset[i - 1] + vars.size();
+      variableOffset[i] = variableOffset[i - 1] + vars.size();
       varOrder.insert(varOrder.end(), vars.begin(), vars.end());
     }
 
@@ -153,7 +153,7 @@ struct MultiBranch : public VariableOrder {
       t = vovector[pos2]->pickVarVal();
     }
     pos = pos2;
-    t.first += checked_cast<SysInt>(variable_offset[pos2]);
+    t.first += checked_cast<SysInt>(variableOffset[pos2]);
     return t;
   }
 };

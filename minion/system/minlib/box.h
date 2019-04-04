@@ -59,7 +59,7 @@ template <typename T>
 class box {
   T* M_start;
   T* M_finish;
-  T* M_end_of_storage;
+  T* M_endOf_storage;
 
   void construct(T* pos, const T& place) {
     *pos = place;
@@ -87,7 +87,7 @@ public:
   enum IsFull { StartEmpty, StartFull };
 
   box(T* start_p, T* end_p, IsFull isFull = StartEmpty)
-      : M_start(start_p), M_end_of_storage(end_p) {
+      : M_start(start_p), M_endOf_storage(end_p) {
     if(isFull == StartEmpty)
       M_finish = start_p;
     else
@@ -97,7 +97,7 @@ public:
   }
 
   box(T* start_p, size_t Size, IsFull isFull = StartEmpty)
-      : M_start(start_p), M_end_of_storage(start_p + Size) {
+      : M_start(start_p), M_endOf_storage(start_p + Size) {
     if(isFull == StartEmpty)
       M_finish = start_p;
     else
@@ -107,7 +107,7 @@ public:
   }
 
   //  box(const box& box) : M_start(box.M_start), M_finish(box.M_start),
-  //    M_end_of_storage(box.M_end_of_storage)
+  //    M_endOf_storage(box.M_endOf_storage)
   //    { }
 
   ~box() {}
@@ -163,7 +163,7 @@ public:
   }
 
   size_type maxSize() const {
-    return M_end_of_storage - M_start;
+    return M_endOf_storage - M_start;
   }
 
   void resize(size_type newSize, const value_type& x) {
@@ -181,7 +181,7 @@ public:
   }
 
   size_type capacity() const {
-    return M_end_of_storage - M_start;
+    return M_endOf_storage - M_start;
   }
 
   bool empty() const {
@@ -231,7 +231,7 @@ public:
   }
 
   void push_back(const value_type& x) {
-    D_ASSERT(M_finish != M_end_of_storage);
+    D_ASSERT(M_finish != M_endOf_storage);
     construct(M_finish, x);
     M_finish++;
   }
@@ -272,7 +272,7 @@ public:
   void swap(box& x) {
     std::swap(M_start, x.M_impl.M_start);
     std::swap(M_finish, x.M_impl.M_finish);
-    std::swap(M_end_of_storage, x.M_impl.M_end_of_storage);
+    std::swap(M_endOf_storage, x.M_impl.M_endOf_storage);
   }
 
   void clear() {
@@ -284,9 +284,9 @@ protected:
   template <typename _Integer>
   void M_initialize_dispatch(_Integer n, _Integer value, std::true_type) {
     M_start = M_allocate(n);
-    M_end_of_storage = M_start + n;
+    M_endOf_storage = M_start + n;
     std::uninitialized_fill_n(M_start, n, value);
-    M_finish = M_end_of_storage;
+    M_finish = M_endOf_storage;
   }
 
   // Called by the range constructor to implement [23.1.1]/9
@@ -394,17 +394,17 @@ inline void swap(box<T>& x, box<T>& y) {
 template <typename T>
 typename box<T>::iterator box<T>::insert(iterator position, const value_type& x) {
   const size_type n = position - begin();
-  if(M_finish != M_end_of_storage && position == end()) {
+  if(M_finish != M_endOf_storage && position == end()) {
     construct(M_finish, x);
     ++M_finish;
   } else {
-    D_ASSERT(M_finish != M_end_of_storage);
+    D_ASSERT(M_finish != M_endOf_storage);
 
     construct(M_finish, *(M_finish - 1));
     ++M_finish;
-    T x_copy = x;
+    T xCopy = x;
     std::copy_backward(position, iterator(M_finish - 2), iterator(M_finish - 1));
-    *position = x_copy;
+    *position = xCopy;
   }
   return begin() + n;
 }
@@ -456,22 +456,22 @@ void box<T>::M_fill_insert(iterator position, size_type n, const value_type& x) 
   if(n == 0)
     return;
 
-  D_ASSERT(!(size_type(M_end_of_storage - M_finish) < n));
+  D_ASSERT(!(size_type(M_endOf_storage - M_finish) < n));
 
-  value_type x_copy = x;
+  value_type xCopy = x;
   const size_type elems_after = end() - position;
   iterator old_finish(M_finish);
   if(elems_after > n) {
     std::uninitialized_copy(M_finish - n, M_finish, M_finish);
     M_finish += n;
     std::copy_backward(position, old_finish - n, old_finish);
-    std::fill(position, position + n, x_copy);
+    std::fill(position, position + n, xCopy);
   } else {
-    std::uninitialized_fill_n(M_finish, n - elems_after, x_copy);
+    std::uninitialized_fill_n(M_finish, n - elems_after, xCopy);
     M_finish += n - elems_after;
     std::uninitialized_copy(position, old_finish, M_finish);
     M_finish += elems_after;
-    std::fill(position, old_finish, x_copy);
+    std::fill(position, old_finish, xCopy);
   }
 }
 
@@ -494,7 +494,7 @@ void box<T>::M_range_insert(iterator position, _ForwardIterator first, _ForwardI
 
   const size_type n = std::distance(first, last);
 
-  D_ASSERT(!(size_type(M_end_of_storage - M_finish) < n));
+  D_ASSERT(!(size_type(M_endOf_storage - M_finish) < n));
 
   const size_type elems_after = end() - position;
   iterator old_finish(M_finish);

@@ -83,12 +83,12 @@ void buildVariables(const ProbSpec::VarContainer& vars) {
   for(int i = 0; i < vars.bound.size(); ++i)
     getVars().boundVarContainer.addVariables(vars.bound[i], 1);
 
-  for(int i = 0; i < vars.sparse_bound.size(); ++i)
-    getVars().sparseBoundVarContainer.addVariables(vars.sparse_bound[i], 1);
+  for(int i = 0; i < vars.sparseBound.size(); ++i)
+    getVars().sparseBoundVarContainer.addVariables(vars.sparseBound[i], 1);
 
   getVars().bigRangeVarContainer.addVariables(vars.discrete);
 
-  for(SysInt i = 0; i < (SysInt)vars.sparse_discrete.size(); ++i) {
+  for(SysInt i = 0; i < (SysInt)vars.sparseDiscrete.size(); ++i) {
     INPUT_ERROR("Sparse discrete disabled at present due to bugs. Sorry.");
   }
 }

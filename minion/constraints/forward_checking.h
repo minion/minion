@@ -88,7 +88,7 @@ struct Forward_Checking : public AbstractConstraint {
 
     // if all variables assigned
     if(trig1 == -1) {
-      if(full_assignment_failed(size, vars)) {
+      if(full_assignmentFailed(size, vars)) {
         getState().setFailed(true);
       }
       return;
@@ -140,7 +140,7 @@ struct Forward_Checking : public AbstractConstraint {
         return;
       } else {
         // Continue doing the bounds pruning.
-        fc_pruning_bound(pruningvar, size, vars);
+        fc_pruningBound(pruningvar, size, vars);
         return;
       }
     } else {
@@ -148,7 +148,7 @@ struct Forward_Checking : public AbstractConstraint {
     }
   }
 
-  bool full_assignment_failed(SysInt size, vector<AnyVarRef>* vars) {
+  bool full_assignmentFailed(SysInt size, vector<AnyVarRef>* vars) {
     MAKE_STACK_BOX(b, DomainInt, size);
     for(SysInt i = 0; i < size; ++i)
       b.push_back((*vars)[i].assignedValue());
@@ -188,17 +188,17 @@ struct Forward_Checking : public AbstractConstraint {
 
   void start_fc_pruning(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
     if(!(*vars)[var].isBound()) {
-      fc_pruning_discrete(var, size, vars);
+      fc_pruningDiscrete(var, size, vars);
     } else {
       // It's a bound var.
       FCPruning.remove(0); // go into 'pruning' mode
       moveTriggerInt((*vars)[var], 2, DomainChanged);
       pruningvar = var;
-      fc_pruning_bound(var, size, vars);
+      fc_pruningBound(var, size, vars);
     }
   }
 
-  void fc_pruning_discrete(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
+  void fc_pruningDiscrete(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
     // Can poke holes so do full FC
     MAKE_STACK_BOX(b, DomainInt, size);
     AnyVarRef v = (*vars)[var];
@@ -224,7 +224,7 @@ struct Forward_Checking : public AbstractConstraint {
     }
   }
 
-  void fc_pruning_bound(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
+  void fc_pruningBound(SysInt var, SysInt size, vector<AnyVarRef>* vars) {
 
     MAKE_STACK_BOX(b, DomainInt, size);
     AnyVarRef v = (*vars)[var];

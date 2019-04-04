@@ -121,7 +121,7 @@ struct DifferenceConstraint : public AbstractConstraint {
     }
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     moveTriggerInt(var1, 0, LowerBound);
     moveTriggerInt(var1, 1, UpperBound);
     moveTriggerInt(var2, 2, LowerBound);
@@ -131,7 +131,7 @@ struct DifferenceConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     var3.setMin(0);
     propagateDynInt(0, DomainDelta::empty());
   }

@@ -29,11 +29,11 @@ bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   var.assign(val);
   prop(vars);
 
-  bool check_failed = getState().isFailed();
+  bool checkFailed = getState().isFailed();
 
   Controller::worldPop();
 
-  return check_failed;
+  return checkFailed;
 }
 
 // Copied from dump_state.cpp
@@ -50,12 +50,12 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   var.setMax(highval);
   prop(vars);
 
-  bool check_failed = getState().isFailed();
+  bool checkFailed = getState().isFailed();
   getState().setFailed(false);
 
   Controller::worldPop();
 
-  return check_failed;
+  return checkFailed;
 }
 
 inline bool checkSACTimeout() {
@@ -258,7 +258,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
       assignments.clear();
 
-      bool check_failed = getState().isFailed();
+      bool checkFailed = getState().isFailed();
       getState().setFailed(false);
 
       Controller::worldPop();
@@ -275,7 +275,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
       assignments.clear();
 
-      check_failed = getState().isFailed();
+      checkFailed = getState().isFailed();
       getState().setFailed(false);
 
       Controller::worldPop();

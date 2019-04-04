@@ -66,23 +66,23 @@ struct BoolVarRef_internal {
     FATAL_REPORTABLE_ERROR();
   }
 
-  data_type shift_offset;
+  data_type shiftOffset;
   SysInt varNum;
   void* data_position;
   void* value_position;
 
-  UnsignedSysInt data_offset() const {
+  UnsignedSysInt dataOffset() const {
     return varNum / (sizeof(data_type) * 8);
   }
 
   static BoolVarContainer& getCon_Static();
   BoolVarRef_internal(const BoolVarRef_internal& b)
-      : shift_offset(b.shift_offset),
+      : shiftOffset(b.shiftOffset),
         varNum(b.varNum),
         data_position(b.data_position),
         value_position(b.value_position) {}
 
-  BoolVarRef_internal() : shift_offset(~1), varNum(~1) {}
+  BoolVarRef_internal() : shiftOffset(~1), varNum(~1) {}
 
   BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);
 
@@ -95,12 +95,12 @@ struct BoolVarRef_internal {
   }
 
   BOOL isAssigned() const {
-    return assign_ptr() & shift_offset;
+    return assign_ptr() & shiftOffset;
   }
 
   DomainInt assignedValue() const {
     D_ASSERT(isAssigned());
-    return (bool)(valuePtr() & shift_offset);
+    return (bool)(valuePtr() & shiftOffset);
   }
 
   BOOL inDomain(DomainInt b) const {
@@ -174,7 +174,7 @@ struct BoolVarContainer {
   BoolVarContainer() : varCount_m(0), trigger_list(false), lock_m(false) {}
 
   static const SysInt width = 7;
-  ExtendableBlock assign_offset;
+  ExtendableBlock assignOffset;
   void* values_mem;
   vector<vector<AbstractConstraint*>> constraints;
 #ifdef WDEG
@@ -195,11 +195,11 @@ struct BoolVarContainer {
   }
 
   data_type* assign_ptr() {
-    return (data_type*)(assign_offset());
+    return (data_type*)(assignOffset());
   }
 
   const data_type* assign_ptr() const {
-    return (const data_type*)(assign_offset());
+    return (const data_type*)(assignOffset());
   }
 
   void lock() {
@@ -220,12 +220,12 @@ struct BoolVarContainer {
     SysInt required_mem = varCount_m / 8 + 1;
     // Round up to nearest data_type block
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
-    if(assign_offset.empty()) {
-      assign_offset = getMemory().backTrack().requestBytesExtendable(required_mem);
+    if(assignOffset.empty()) {
+      assignOffset = getMemory().backTrack().requestBytesExtendable(required_mem);
       values_mem = checked_malloc(10 * 1024 * 1024);
       CHECK(required_mem < 10 * 1024 * 1024, "Bool mem overflow");
     } else {
-      getMemory().backTrack().resizeExtendableBlock(assign_offset, required_mem);
+      getMemory().backTrack().resizeExtendableBlock(assignOffset, required_mem);
     }
     constraints.resize(varCount_m);
 #ifdef WDEG
@@ -281,7 +281,7 @@ struct BoolVarContainer {
       getState().setFailed(true);
       return;
     }
-    assign_ptr()[d.data_offset()] |= d.shift_offset;
+    assign_ptr()[d.dataOffset()] |= d.shiftOffset;
 
     trigger_list.push_assign(d.varNum, b);
     trigger_list.pushDomainChanged(d.varNum);
@@ -289,10 +289,10 @@ struct BoolVarContainer {
 
     if(b == 1) {
       trigger_list.push_lower(d.varNum, 1);
-      valuePtr()[d.data_offset()] |= d.shift_offset;
+      valuePtr()[d.dataOffset()] |= d.shiftOffset;
     } else {
       trigger_list.push_upper(d.varNum, 1);
-      valuePtr()[d.data_offset()] &= ~d.shift_offset;
+      valuePtr()[d.dataOffset()] &= ~d.shiftOffset;
     }
   }
 
@@ -346,9 +346,9 @@ inline BoolVarRef BoolVarContainer::getVarNum(DomainInt i) {
 
 inline BoolVarRef_internal::BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con)
     : varNum(checked_cast<UnsignedSysInt>(value)),
-      data_position((char*)(b_con->assign_offset()) + data_offset() * sizeof(data_type)),
-      value_position((char*)(b_con->values_mem) + data_offset() * sizeof(data_type)) {
-  shift_offset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type) * 8));
+      data_position((char*)(b_con->assignOffset()) + dataOffset() * sizeof(data_type)),
+      value_position((char*)(b_con->values_mem) + dataOffset() * sizeof(data_type)) {
+  shiftOffset = one << (checked_cast<UnsignedSysInt>(value) % (sizeof(data_type) * 8));
 }
 
 #endif

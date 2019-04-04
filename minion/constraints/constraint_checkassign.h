@@ -54,7 +54,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   }
 
   virtual BOOL checkUnsat(SysInt, DomainDelta) {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
 
     SysInt count = assignedVars;
     ++count;
@@ -68,7 +68,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   }
 
   bool checkFullAssignment() {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
 
     MAKE_STACK_BOX(assignment, DomainInt, variables.size());
     for(UnsignedSysInt i = 0; i < variables.size(); ++i) {
@@ -82,7 +82,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   }
 
   virtual BOOL fullCheckUnsat() {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
 
     UnsignedSysInt counter = 0;
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
@@ -96,24 +96,24 @@ struct CheckAssignConstraint : public AbstractConstraint {
   }
 
   virtual SysInt dynamicTriggerCount() {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
     return variables.size();
   }
 
-  void trigger_setup() {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+  void triggerSetup() {
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
     for(UnsignedSysInt i = 0; i < variables.size(); ++i)
       moveTriggerInt(variables[i], i, Assigned);
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     if(fullCheckUnsat())
       getState().setFailed(true);
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
     (void)variables;
     D_ASSERT(vSize == (SysInt)variables.size());
     if(negate)
@@ -123,7 +123,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   }
 
   virtual vector<AnyVarRef> getVars() {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
 
     vector<AnyVarRef> vars;
     vars.reserve(variables.size());
@@ -135,7 +135,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   // Getting a satisfying assignment here is too hard.
   // Let's at least try forward checking!
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& ret_box) {
-    typename OriginalConstraint::var_type& variables = originalcon.getVars();
+    typename OriginalConstraint::varType& variables = originalcon.getVars();
 
     MAKE_STACK_BOX(c, DomainInt, variables.size());
     D_ASSERT(variables.size() == originalcon.getVars().size());
@@ -210,7 +210,7 @@ class AbstractWrapper {
   AbstractConstraint* c;
 
 public:
-  typedef vector<AnyVarRef> var_type;
+  typedef vector<AnyVarRef> varType;
 
   AbstractWrapper(AbstractConstraint* _c) : c(_c) {}
 

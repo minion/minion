@@ -164,7 +164,7 @@ INTERVAL_SET<Domain> make_interval_set(Args... args) {
 }
 
 template <typename Domain>
-INTERVAL_SET<Domain> interval_set_from_bounds(Domain x, Domain y) {
+INTERVAL_SET<Domain> interval_set_fromBounds(Domain x, Domain y) {
   return make_interval_set<Domain>(make_interval<Domain>(x, y));
 }
 

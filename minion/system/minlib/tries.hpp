@@ -32,49 +32,49 @@ int get_distinctValues(const Tuples& tuples, int start_pos, int end_pos, int dep
 }
 
 template <typename Value, typename Tuples>
-void buildEarlyTrie(std::vector<earlyTrieObj<Value>>& initial_trie, const Tuples& tuples,
+void buildEarlyTrie(std::vector<earlyTrieObj<Value>>& initialTrie, const Tuples& tuples,
                       int start_pos, int end_pos, int depth) {
   const bool last_stage = (depth == (int)tuples[0].size() - 1);
   assert(depth <= (int)tuples[0].size() - 1);
   assert(start_pos <= end_pos);
   int values = get_distinctValues(tuples, start_pos, end_pos, depth);
 
-  int start_section = initial_trie.size();
+  int start_section = initialTrie.size();
   // Make space for this list of values.
   // '+1' is for end marker.
-  initial_trie.resize(initial_trie.size() + values + 1);
+  initialTrie.resize(initialTrie.size() + values + 1);
 
   int currentVal = tuples[start_pos][depth];
   int currentStart = start_pos;
-  int num_ofVal = 0;
+  int numOfVal = 0;
 
   for(int i = start_pos; i < end_pos; ++i) {
     if(currentVal != tuples[i][depth]) {
-      initial_trie[start_section + num_ofVal].val = currentVal;
+      initialTrie[start_section + numOfVal].val = currentVal;
       if(last_stage) {
-        initial_trie[start_section + num_ofVal].offset = -1;
+        initialTrie[start_section + numOfVal].offset = -1;
       } else {
-        initial_trie[start_section + num_ofVal].offset = initial_trie.size();
-        buildEarlyTrie(initial_trie, tuples, currentStart, i, depth + 1);
+        initialTrie[start_section + numOfVal].offset = initialTrie.size();
+        buildEarlyTrie(initialTrie, tuples, currentStart, i, depth + 1);
       }
       currentVal = tuples[i][depth];
       currentStart = i;
-      num_ofVal++;
+      numOfVal++;
     }
   }
 
   // Also have to cover last stretch of values.
-  initial_trie[start_section + num_ofVal].val = currentVal;
+  initialTrie[start_section + numOfVal].val = currentVal;
   if(last_stage)
-    initial_trie[start_section + num_ofVal].offset = -1;
+    initialTrie[start_section + numOfVal].offset = -1;
   else {
-    initial_trie[start_section + num_ofVal].offset = initial_trie.size();
-    buildEarlyTrie(initial_trie, tuples, currentStart, end_pos, depth + 1);
+    initialTrie[start_section + numOfVal].offset = initialTrie.size();
+    buildEarlyTrie(initialTrie, tuples, currentStart, end_pos, depth + 1);
   }
 
-  assert(num_ofVal + 1 == values);
-  initial_trie[start_section + values].val = std::numeric_limits<Value>::max();
-  initial_trie[start_section + values].offset = -1;
+  assert(numOfVal + 1 == values);
+  initialTrie[start_section + values].val = std::numeric_limits<Value>::max();
+  initialTrie[start_section + values].offset = -1;
 }
 
 template <typename Value>
@@ -112,28 +112,28 @@ TrieObj<int>* buildTrie(const Tuples& tuples) {
 }
 
 template <typename Value>
-void randomise_trie(TrieObj<Value>* to) {
+void randomiseTrie(TrieObj<Value>* to) {
   if(to == NULL)
     return;
 
   TrieObj<Value>* end = to;
   while(end->val != std::numeric_limits<Value>::max()) {
     if(end->ptr)
-      randomise_trie(end->ptr);
+      randomiseTrie(end->ptr);
     end++;
   }
   std::random_shuffle(to, end);
 }
 
 template <typename Value>
-std::vector<std::vector<Value>> unroll_trie(TrieObj<Value>* to) {
+std::vector<std::vector<Value>> unrollTrie(TrieObj<Value>* to) {
   std::vector<std::vector<Value>> final_tuples;
   for(; to->val != std::numeric_limits<Value>::max(); to++) {
     std::vector<std::vector<Value>> loop_tuples;
     if(to->ptr == 0)
       loop_tuples.resize(1);
     else
-      loop_tuples = unroll_trie(to->ptr);
+      loop_tuples = unrollTrie(to->ptr);
     for(auto it = loop_tuples.begin(); it != loop_tuples.end(); ++it)
       it->insert(it->begin(), to->val);
     final_tuples.insert(final_tuples.end(), loop_tuples.begin(), loop_tuples.end());

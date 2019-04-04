@@ -77,7 +77,7 @@ struct MinionInstancePrinter {
     SysInt const_pos = 0;
     SysInt constraint_child_pos = 0;
 
-    for(SysInt i = 0; i < blob.constraint->number_of_params; i++) {
+    for(SysInt i = 0; i < blob.constraint->numberOfParams; i++) {
       if(i != 0)
         oss << ", ";
 
@@ -263,9 +263,9 @@ struct MinionInstancePrinter {
       oss << endl;
     }
 
-    if(!csp.sym_order.empty()) {
+    if(!csp.symOrder.empty()) {
       oss << "SYMORDER ";
-      print_instance(csp.sym_order);
+      print_instance(csp.symOrder);
       oss << endl;
     }
     if(csp.print_matrix.empty()) {
@@ -299,7 +299,7 @@ struct MinionInstancePrinter {
 
     set<Var> varlist(varlistVec.begin(), varlistVec.end());
 
-    // set<Var> list_of_vars
+    // set<Var> listOf_vars
     for(list<ConstraintBlob>::iterator it = csp.constraints.begin(); it != csp.constraints.end();
         ++it) {
       set<Var> vars = it->getAllVars();

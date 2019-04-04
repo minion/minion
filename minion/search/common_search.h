@@ -175,7 +175,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
   }
 
   vector<string> splits;
-  string curvar = "(no_split_variable)";
+  string curvar = "(noSplit_variable)";
   string opt = "";
 
   if(getOptions().split) {

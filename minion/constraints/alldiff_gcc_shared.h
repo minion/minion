@@ -727,7 +727,7 @@ protected:
   deque<SysInt> fifo;
   vector<SysInt> augpath; // alternating path stored here with vars and val-domMin
 
-  void hopcroft2_setup() {
+  void hopcroft2Setup() {
     edges.resize(numvars + numvals + 1);
     for(SysInt i = 0; i < numvars; i++) {
       edges.reserve(numvals);

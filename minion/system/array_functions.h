@@ -20,20 +20,20 @@
 
 /// A simple wrapper for a pair of bounds.
 struct Bounds {
-  DomainInt lower_bound;
-  DomainInt upper_bound;
-  Bounds(DomainInt _lower, DomainInt _upper) : lower_bound(_lower), upper_bound(_upper) {}
+  DomainInt lowerBound;
+  DomainInt upperBound;
+  Bounds(DomainInt _lower, DomainInt _upper) : lowerBound(_lower), upperBound(_upper) {}
 
   bool contains(DomainInt i) {
-    return lower_bound <= i && i <= upper_bound;
+    return lowerBound <= i && i <= upperBound;
   }
 
   DomainInt min() const {
-    return lower_bound;
+    return lowerBound;
   }
 
   DomainInt max() const {
-    return upper_bound;
+    return upperBound;
   }
 
   bool hasSingleValue() const {
@@ -42,7 +42,7 @@ struct Bounds {
 };
 
 inline bool operator==(Bounds lhs, Bounds rhs) {
-  return lhs.lower_bound == rhs.lower_bound && lhs.upper_bound == rhs.upper_bound;
+  return lhs.lowerBound == rhs.lowerBound && lhs.upperBound == rhs.upperBound;
 }
 
 inline Bounds emptyBounds() {
@@ -55,7 +55,7 @@ inline Bounds getBounds(const T& t) {
 }
 
 inline Bounds addValue(Bounds b, DomainInt d) {
-  return Bounds(std::min(b.lower_bound, d), std::max(b.upper_bound, d));
+  return Bounds(std::min(b.lowerBound, d), std::max(b.upperBound, d));
 }
 
 inline bool checkAllZero(char* begin, char* end) {

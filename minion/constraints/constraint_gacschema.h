@@ -451,12 +451,12 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
           Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var];
           while(sup != 0) {
             cout << *(sup) << endl;
-            bool contains_varval = false;
+            bool containsVarVal = false;
             for(SysInt i = 0; i < (SysInt)sup->literals.size(); i++) {
               if(sup->literals[i].first == var && sup->literals[i].second == val)
-                contains_varval = true;
+                containsVarVal = true;
             }
-            D_ASSERT(contains_varval);
+            D_ASSERT(containsVarVal);
 
             D_ASSERT(sup->next[var] == 0 || sup->next[var]->prev[var] == sup);
             sup = sup->next[var];

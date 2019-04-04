@@ -49,25 +49,6 @@ inline string to_var_name(const vector<DomainInt>& params) {
   return s.str();
 }
 
-struct ParsedNeighbourhood {
-  std::string name;
-  std::string groupName;
-  Var activation;
-  Var deviation;
-  std::vector<Var> vars;
-};
-
-struct ParsedNeighbourhoodGroup {
-  std::vector<Var> vars;
-};
-
-struct ParsedNeighbourhoodContainer {
-  std::vector<std::vector<Var>> shadow_mapping;
-  Var shadow_disable;
-  std::unordered_map<std::string, ParsedNeighbourhoodGroup> neighbourhoodGroups;
-  std::vector<ParsedNeighbourhood> neighbourhoods;
-};
-
 enum ReadTypes {
   read_list,
   read_var,
@@ -131,7 +112,7 @@ struct ValOrder {
 struct ConstraintDef {
   std::string name;
   ConstraintType type;
-  SysInt number_of_params;
+  SysInt numberOfParams;
   std::array<ReadTypes, 5> read_types;
 };
 
@@ -212,9 +193,9 @@ struct VarContainer {
   INPUT_MAP_TYPE<string, Var> symbol_table;
   INPUT_MAP_TYPE<Var, string> name_table;
   vector<Bounds> bound;
-  vector<vector<DomainInt>> sparse_bound;
+  vector<vector<DomainInt>> sparseBound;
   vector<Bounds> discrete;
-  vector<vector<DomainInt>> sparse_discrete;
+  vector<vector<DomainInt>> sparseDiscrete;
   INPUT_MAP_TYPE<string, vector<DomainInt>> matrix_table;
   VarContainer() : BOOLs(0) {}
 
@@ -343,23 +324,23 @@ struct VarContainer {
       return make_pair(Bound_No, dom);
     case VAR_BOUND: {
       D_ASSERT(v.pos() < bound.size());
-      dom.push_back(bound[v.pos()].lower_bound);
-      dom.push_back(bound[v.pos()].upper_bound);
+      dom.push_back(bound[v.pos()].lowerBound);
+      dom.push_back(bound[v.pos()].upperBound);
       return make_pair(Bound_Yes, dom);
     }
     case VAR_SPARSEBOUND: {
-      D_ASSERT(v.pos() < sparse_bound.size());
-      return make_pair(Bound_No, sparse_bound[v.pos()]);
+      D_ASSERT(v.pos() < sparseBound.size());
+      return make_pair(Bound_No, sparseBound[v.pos()]);
     }
     case VAR_DISCRETE: {
       D_ASSERT(v.pos() < discrete.size());
-      dom.push_back(discrete[v.pos()].lower_bound);
-      dom.push_back(discrete[v.pos()].upper_bound);
+      dom.push_back(discrete[v.pos()].lowerBound);
+      dom.push_back(discrete[v.pos()].upperBound);
       return make_pair(Bound_Yes, dom);
     }
     case VAR_SPARSEDISCRETE: {
-      D_ASSERT(v.pos() < sparse_discrete.size());
-      return make_pair(Bound_No, sparse_discrete[v.pos()]);
+      D_ASSERT(v.pos() < sparseDiscrete.size());
+      return make_pair(Bound_No, sparseDiscrete[v.pos()]);
     }
     default: throw parse_exception("Internal Error - Unknown Variable Type");
     }
@@ -375,8 +356,8 @@ struct VarContainer {
     }
 
     case VAR_SPARSEBOUND: {
-      D_ASSERT(v.pos() < sparse_bound.size());
-      return Bounds(sparse_bound[v.pos()].front(), sparse_bound[v.pos()].back());
+      D_ASSERT(v.pos() < sparseBound.size());
+      return Bounds(sparseBound[v.pos()].front(), sparseBound[v.pos()].back());
     }
 
     case VAR_DISCRETE: {
@@ -384,8 +365,8 @@ struct VarContainer {
       return discrete[v.pos()];
     }
     case VAR_SPARSEDISCRETE: {
-      D_ASSERT(v.pos() < sparse_discrete.size());
-      return Bounds(sparse_discrete[v.pos()].front(), sparse_discrete[v.pos()].back());
+      D_ASSERT(v.pos() < sparseDiscrete.size());
+      return Bounds(sparseDiscrete[v.pos()].front(), sparseDiscrete[v.pos()].back());
     }
     default: throw parse_exception("Internal Error - Unknown Variable Type");
     }
@@ -401,17 +382,17 @@ struct VarContainer {
       return Var(VAR_BOUND, i);
     i -= bound.size();
 
-    if(i < sparse_bound.size())
+    if(i < sparseBound.size())
       return Var(VAR_SPARSEBOUND, i);
-    i -= sparse_bound.size();
+    i -= sparseBound.size();
 
     if(i < discrete.size())
       return Var(VAR_DISCRETE, i);
     i -= discrete.size();
 
-    if(i < sparse_discrete.size())
+    if(i < sparseDiscrete.size())
       return Var(VAR_SPARSEDISCRETE, i);
-    i -= sparse_discrete.size();
+    i -= sparseDiscrete.size();
 
     throw parse_exception("Var Out of Range!");
   }
@@ -444,8 +425,8 @@ private:
   }
 
   Var _getNewSparseBoundVar(const vector<DomainInt>& vals) {
-    sparse_bound.push_back(vals);
-    return Var(VAR_SPARSEBOUND, (SysInt)sparse_bound.size() - 1);
+    sparseBound.push_back(vals);
+    return Var(VAR_SPARSEBOUND, (SysInt)sparseBound.size() - 1);
   }
 
   Var _getNewDiscreteVar(DomainInt lower, DomainInt upper) {
@@ -484,7 +465,6 @@ struct SearchOrder {
 };
 
 struct CSPInstance {
-  option<ParsedNeighbourhoodContainer> neighbourhoodContainer;
   VarContainer vars;
   list<ConstraintBlob> constraints;
   shared_ptr<TupleListContainer> tupleListContainer;
@@ -492,7 +472,7 @@ struct CSPInstance {
 
   vector<SearchOrder> searchOrder;
   vector<Var> permutation;
-  vector<Var> sym_order;
+  vector<Var> symOrder;
 
   /// Only used for gadgets.
   vector<Var> constructionSite;
@@ -532,37 +512,6 @@ public:
 
   void add_constraint(const ConstraintBlob& b) {
     constraints.push_back(b);
-  }
-
-  // Perform a simple check to ensure the constraint will not cause integer
-  // overflow.
-  bool bounds_check_last_constraint() {
-    const ConstraintBlob& con = constraints.back();
-    switch(con.constraint->type) {
-
-    case CT_PRODUCT2:
-      return DOMAIN_CHECK(checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).lower_bound) *
-                          checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).lower_bound)) &&
-             DOMAIN_CHECK(checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).upper_bound) *
-                          checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).upper_bound));
-    case CT_POW: {
-      BigInt a = checked_cast<BigInt>(vars.getBounds(con.vars[0][0]).upper_bound);
-      BigInt b = checked_cast<BigInt>(vars.getBounds(con.vars[0][1]).upper_bound);
-      BigInt out = 1;
-      for(SysInt i = 0; i < b; ++i) {
-        out *= a;
-        if(!DOMAIN_CHECK(out))
-          return false;
-      }
-      return true;
-    }
-
-    default: return true;
-    }
-    // This should be unreachable.
-    throw parse_exception("Internal Error - Constraint has not had a check "
-                          "implemented to ensure\n"
-                          "The values given will not cause integer overflow.");
   }
 
   void addUnnamedTableSymbol(TupleList* tuplelist) {
@@ -647,8 +596,8 @@ public:
         vars.addSymbol("x" + tostring(i), allVars[i]);
     }
 
-    if(sym_order.empty())
-      sym_order = vars.getAllVars();
+    if(symOrder.empty())
+      symOrder = vars.getAllVars();
   }
 };
 } // namespace ProbSpec

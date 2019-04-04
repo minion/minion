@@ -93,7 +93,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
 
   CONSTRAINT_ARG_LIST5(idx_source, idx_target, source, target, blocksize);
 
-  void trigger_setup() {
+  void triggerSetup() {
     int trig = 0;
 
     for(unsigned i = 0; i < idx_source.size(); ++i) {
@@ -181,7 +181,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
 
     // -1 to force we check the indices
     propagateDynInt(-1, DomainDelta::empty());

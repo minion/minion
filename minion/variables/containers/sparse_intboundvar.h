@@ -97,28 +97,28 @@ struct SparseBoundVarContainer {
     return domains[checked_cast<SysInt>(domain_reference[i])];
   }
 
-  const BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i) const {
+  const BoundType& lowerBound(SparseBoundVarRef_internal<BoundType> i) const {
     return ((BoundType*)bound_data())[i.varNum * 2];
   }
 
-  const BoundType& upper_bound(SparseBoundVarRef_internal<BoundType> i) const {
+  const BoundType& upperBound(SparseBoundVarRef_internal<BoundType> i) const {
     return ((BoundType*)bound_data())[i.varNum * 2 + 1];
   }
 
-  BoundType& lower_bound(SparseBoundVarRef_internal<BoundType> i) {
+  BoundType& lowerBound(SparseBoundVarRef_internal<BoundType> i) {
     return ((BoundType*)bound_data())[i.varNum * 2];
   }
 
-  BoundType& upper_bound(SparseBoundVarRef_internal<BoundType> i) {
+  BoundType& upperBound(SparseBoundVarRef_internal<BoundType> i) {
     return ((BoundType*)bound_data())[i.varNum * 2 + 1];
   }
 
-  /// find the small possible lower bound above new_lower_bound.
+  /// find the small possible lower bound above new_lowerBound.
   /// Does not actually change the lower bound.
-  DomainInt find_lower_bound(SparseBoundVarRef_internal<BoundType> d, DomainInt new_lower_bound) {
+  DomainInt find_lowerBound(SparseBoundVarRef_internal<BoundType> d, DomainInt new_lowerBound) {
     vector<BoundType>& bounds = getDomain(d);
     typename vector<BoundType>::iterator it =
-        std::lower_bound(bounds.begin(), bounds.end(), new_lower_bound);
+        std::lower_bound(bounds.begin(), bounds.end(), new_lowerBound);
     if(it == bounds.end()) {
       getState().setFailed(true);
       return *(it - 1);
@@ -127,18 +127,18 @@ struct SparseBoundVarContainer {
     return *it;
   }
 
-  /// find the largest possible upper bound below new_upper_bound.
+  /// find the largest possible upper bound below new_upperBound.
   /// Does not actually change the upper bound.
-  DomainInt find_upper_bound(SparseBoundVarRef_internal<BoundType>& d, DomainInt new_upper_bound) {
+  DomainInt find_upperBound(SparseBoundVarRef_internal<BoundType>& d, DomainInt new_upperBound) {
     vector<BoundType>& bounds = getDomain(d);
 
     typename vector<BoundType>::iterator it =
-        std::lower_bound(bounds.begin(), bounds.end(), new_upper_bound);
+        std::lower_bound(bounds.begin(), bounds.end(), new_upperBound);
     if(it == bounds.end())
       return *(it - 1);
 
-    if(*it == new_upper_bound)
-      return new_upper_bound;
+    if(*it == new_upperBound)
+      return new_upperBound;
 
     if(it == bounds.begin()) {
       getState().setFailed(true);
@@ -203,26 +203,26 @@ struct SparseBoundVarContainer {
       bound_ptr[2 * i + 1] = getDomain_from_int(i).back();
     }
 
-    std::vector<std::pair<DomainInt, DomainInt>> trig_bounds(
+    std::vector<std::pair<DomainInt, DomainInt>> trigBounds(
         count, make_pair(bounds.front(), bounds.back()));
-    trigger_list.addVariables(trig_bounds);
+    trigger_list.addVariables(trigBounds);
   }
 
   BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const {
     D_ASSERT(lock_m);
-    return lower_bound(d) == upper_bound(d);
+    return lowerBound(d) == upperBound(d);
   }
 
   DomainInt getAssignedValue(SparseBoundVarRef_internal<BoundType> d) const {
     D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
-    return lower_bound(d);
+    return lowerBound(d);
   }
 
   BOOL inDomain(SparseBoundVarRef_internal<BoundType> d, DomainInt i) const {
     D_ASSERT(lock_m);
     // First check against bounds
-    if(i < lower_bound(d) || i > upper_bound(d)) {
+    if(i < lowerBound(d) || i > upperBound(d)) {
       return false;
     } else {
       return inDomain_noBoundCheck(d, i);
@@ -247,12 +247,12 @@ struct SparseBoundVarContainer {
 
   DomainInt getMin(SparseBoundVarRef_internal<BoundType> d) const {
     D_ASSERT(lock_m);
-    return lower_bound(d);
+    return lowerBound(d);
   }
 
   DomainInt getMax(SparseBoundVarRef_internal<BoundType> d) const {
     D_ASSERT(lock_m);
-    return upper_bound(d);
+    return upperBound(d);
   }
 
   DomainInt initialMin(SparseBoundVarRef_internal<BoundType> d) {
@@ -300,8 +300,8 @@ struct SparseBoundVarContainer {
       trigger_list.push_upper(d.varNum, maxVal - i);
     }
 
-    upper_bound(d) = i;
-    lower_bound(d) = i;
+    upperBound(d) = i;
+    lowerBound(d) = i;
   }
 
   void assign(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
@@ -315,47 +315,47 @@ struct SparseBoundVarContainer {
 
   void setMax(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
     // Note, this just finds a new upper bound, it doesn't set it.
-    i = find_upper_bound(d, i);
+    i = find_upperBound(d, i);
 
-    DomainInt low_bound = lower_bound(d);
+    DomainInt lowBound = lowerBound(d);
 
-    if(i < low_bound) {
+    if(i < lowBound) {
       getState().setFailed(true);
       return;
     }
 
-    DomainInt up_bound = upper_bound(d);
+    DomainInt upBound = upperBound(d);
 
-    if(i < up_bound) {
-      trigger_list.push_upper(d.varNum, up_bound - i);
+    if(i < upBound) {
+      trigger_list.push_upper(d.varNum, upBound - i);
       trigger_list.pushDomainChanged(d.varNum);
       // Can't attach triggers to bound vars!
 
-      upper_bound(d) = i;
-      if(low_bound == i) {
+      upperBound(d) = i;
+      if(lowBound == i) {
         trigger_list.push_assign(d.varNum, i);
       }
     }
   }
 
   void setMin(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
-    i = find_lower_bound(d, i);
+    i = find_lowerBound(d, i);
 
-    DomainInt up_bound = upper_bound(d);
+    DomainInt upBound = upperBound(d);
 
-    if(i > up_bound) {
+    if(i > upBound) {
       getState().setFailed(true);
       return;
     }
 
-    DomainInt low_bound = lower_bound(d);
+    DomainInt lowBound = lowerBound(d);
 
-    if(i > low_bound) {
-      trigger_list.push_lower(d.varNum, i - low_bound);
+    if(i > lowBound) {
+      trigger_list.push_lower(d.varNum, i - lowBound);
       trigger_list.pushDomainChanged(d.varNum);
       // Can't attach triggers to bound vars!
-      lower_bound(d) = i;
-      if(up_bound == i) {
+      lowerBound(d) = i;
+      if(upBound == i) {
         trigger_list.push_assign(d.varNum, i);
       }
     }

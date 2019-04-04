@@ -77,7 +77,7 @@ struct Dynamic_OR : public ParentConstraint {
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
-      if(child_constraints[i]->checkAssignment(v + checked_cast<SysInt>(start_of_constraint[i]),
+      if(child_constraints[i]->checkAssignment(v + checked_cast<SysInt>(startOf_constraint[i]),
                                                 child_constraints[i]->getVarsSingleton()->size()))
         return true;
     }
@@ -91,10 +91,10 @@ struct Dynamic_OR : public ParentConstraint {
       if(flag) {
         // Fix up assignment
         for(SysInt j = 0; j < (SysInt)assignment.size(); ++j) {
-          assignment[j].first += checked_cast<SysInt>(start_of_constraint[i]);
+          assignment[j].first += checked_cast<SysInt>(startOf_constraint[i]);
           D_ASSERT((*(child_constraints[i]
                           ->getVarsSingleton()))[checked_cast<SysInt>(assignment[j].first -
-                                                                        start_of_constraint[i])]
+                                                                        startOf_constraint[i])]
                        .inDomain(assignment[j].second));
           D_ASSERT(
               (*(this->getVarsSingleton()))[checked_cast<SysInt>(assignment[j].first)].inDomain(
@@ -151,12 +151,12 @@ struct Dynamic_OR : public ParentConstraint {
       D_ASSERT(tripped_constraint == 0 || tripped_constraint == 1);
 
       bool flag;
-      GET_ASSIGNMENT(assignment_try, child_constraints[watched_constraint[tripped_constraint]]);
+      GET_ASSIGNMENT(assignmentTry, child_constraints[watched_constraint[tripped_constraint]]);
       if(flag) { // Found new support without having to move.
         watch_assignment(child_constraints[watched_constraint[tripped_constraint]],
-                         tripped_constraint * assignSize, assignment_try);
-        for(SysInt i = 0; i < (SysInt)assignment_try.size(); ++i)
-          P(assignment_try[i].first << "." << assignment_try[i].second << "  ");
+                         tripped_constraint * assignSize, assignmentTry);
+        for(SysInt i = 0; i < (SysInt)assignmentTry.size(); ++i)
+          P(assignmentTry[i].first << "." << assignmentTry[i].second << "  ");
         P(" -- Fixed, returning");
         return;
       }

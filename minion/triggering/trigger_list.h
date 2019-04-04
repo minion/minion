@@ -54,10 +54,10 @@ class TriggerList {
   TriggerList(const TriggerList&);
   TriggerList();
   void operator=(const TriggerList&);
-  bool only_bounds;
+  bool onlyBounds;
 
 public:
-  TriggerList(bool _only_bounds) : only_bounds(_only_bounds) {
+  TriggerList(bool _onlyBounds) : onlyBounds(_onlyBounds) {
     varCount_m = 0;
   }
 
@@ -86,7 +86,7 @@ public:
     for(int i = 0; i < doms.size(); ++i) {
       dynTriggers[old_varCount + i].min = doms[i].first;
       dynTriggers[old_varCount + i].max = doms[i].second;
-      if(only_bounds)
+      if(onlyBounds)
         dynTriggers[old_varCount + i]._dynamicTriggers.resize(4);
       else
         dynTriggers[old_varCount + i]._dynamicTriggers.resize(
@@ -99,12 +99,12 @@ public:
     const SysInt varNum = checked_cast<SysInt>(_varNum);
     D_ASSERT(val_removed == NoDomainValue ||
              (type == DomainRemoval && val_removed != NoDomainValue));
-    D_ASSERT(!only_bounds || type != DomainRemoval);
+    D_ASSERT(!onlyBounds || type != DomainRemoval);
     DynamicTriggerList* trig;
     if(type != DomainRemoval) {
       trig = dynTriggers[varNum].trigger_type(type);
     } else {
-      D_ASSERT(!only_bounds);
+      D_ASSERT(!onlyBounds);
       D_ASSERT(dynTriggers[varNum].min <= val_removed);
       D_ASSERT(dynTriggers[varNum].max >= val_removed);
       trig = dynTriggers[varNum].domainVal(val_removed);
@@ -134,14 +134,14 @@ public:
   }
 
   void pushDomain_removal(DomainInt varNum, DomainInt val_removed) {
-    D_ASSERT(!only_bounds);
+    D_ASSERT(!onlyBounds);
     dynamic_propagate(varNum, DomainRemoval, -1, val_removed);
   }
 
   void addDynamicTrigger(DomainInt _b, Trig_ConRef t, TrigType type, DomainInt val,
                          TrigOp op = TO_Default) {
     const SysInt b = checked_cast<SysInt>(_b);
-    D_ASSERT(!only_bounds || type != DomainRemoval);
+    D_ASSERT(!onlyBounds || type != DomainRemoval);
     D_ASSERT(t.con != NULL);
 
     DynamicTriggerList* queue;
@@ -149,7 +149,7 @@ public:
     if(type != DomainRemoval) {
       queue = dynTriggers[b].trigger_type(type);
     } else {
-      D_ASSERT(!only_bounds);
+      D_ASSERT(!onlyBounds);
       D_ASSERT(dynTriggers[b].min <= val);
       D_ASSERT(dynTriggers[b].max >= val);
       queue = dynTriggers[b].domainVal(val);

@@ -146,20 +146,20 @@ class BackTrackMemory {
 public:
   void copyIntoPtr(char* storePtr) {
     P("StoreMem: " << (void*)this << " : " << (void*)storePtr);
-    UnsignedSysInt current_offset = 0;
+    UnsignedSysInt currentOffset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      P((void*)(storePtr + current_offset)
+      P((void*)(storePtr + currentOffset)
         << " " << (void*)stored_blocks[i].base << " " << stored_blocks[i].size);
-      memcpy(storePtr + current_offset, stored_blocks[i].base, stored_blocks[i].size);
-      current_offset += stored_blocks[i].size;
+      memcpy(storePtr + currentOffset, stored_blocks[i].base, stored_blocks[i].size);
+      currentOffset += stored_blocks[i].size;
     }
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(storePtr + current_offset, extendable_blocks[i].base, extendable_blocks[i].size);
-      current_offset += extendable_blocks[i].size;
+      memcpy(storePtr + currentOffset, extendable_blocks[i].base, extendable_blocks[i].size);
+      currentOffset += extendable_blocks[i].size;
     }
 
-    D_ASSERT(getDataSize() == current_offset);
+    D_ASSERT(getDataSize() == currentOffset);
   }
 
 private:
@@ -168,31 +168,31 @@ private:
     D_ASSERT(data.total_bytes() >= copyStart + copy_length);
     // memcpy(location, data.base + copyStart, copy_length);
 
-    size_t data_copy = 0;
+    size_t dataCopy = 0;
     // If these is some data to copy, then we do so. We write the code this way
     // to avoid UnsignedSysInt underflow.
     if(copyStart <= data.total_bytes())
-      data_copy = std::min(data.total_bytes() - copyStart, copy_length);
+      dataCopy = std::min(data.total_bytes() - copyStart, copy_length);
 
-    memcpy(location, data.data + copyStart, data_copy);
-    memset(location + data_copy, 0, copy_length - data_copy);
+    memcpy(location, data.data + copyStart, dataCopy);
+    memset(location + dataCopy, 0, copy_length - dataCopy);
   }
 
 public:
   void retrieveFromPtr(const BacktrackData& storePtr) {
     P("RetrieveMem: ");
-    UnsignedSysInt current_offset = 0;
+    UnsignedSysInt currentOffset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      copyMemBlock(stored_blocks[i].base, storePtr, current_offset, stored_blocks[i].size);
-      current_offset += stored_blocks[i].size;
+      copyMemBlock(stored_blocks[i].base, storePtr, currentOffset, stored_blocks[i].size);
+      currentOffset += stored_blocks[i].size;
     }
 
     for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(extendable_blocks[i].base, storePtr.data + current_offset, extendable_blocks[i].size);
-      current_offset += extendable_blocks[i].size;
+      memcpy(extendable_blocks[i].base, storePtr.data + currentOffset, extendable_blocks[i].size);
+      currentOffset += extendable_blocks[i].size;
     }
 
-    D_ASSERT(getDataSize() == current_offset);
+    D_ASSERT(getDataSize() == currentOffset);
   }
 
   /// Returns the size of the allocated memory in bytes.

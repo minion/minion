@@ -73,7 +73,7 @@ struct Dynamic_AND : public ParentConstraint {
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       if(!child_constraints[i]->checkAssignment(
-             v + checked_cast<SysInt>(start_of_constraint[i]),
+             v + checked_cast<SysInt>(startOf_constraint[i]),
              child_constraints[i]->getVarsSingleton()->size()))
         return false;
     }
@@ -96,10 +96,10 @@ struct Dynamic_AND : public ParentConstraint {
       P(localassignment[0] << ":" << localassignment[1]);
       for(SysInt j = 0; j < (SysInt)localassignment.size(); j++) {
         assignment.push_back(
-            make_pair(checked_cast<SysInt>(localassignment[j].first + start_of_constraint[i]),
+            make_pair(checked_cast<SysInt>(localassignment[j].first + startOf_constraint[i]),
                       localassignment[j].second));
         D_ASSERT((*(this->getVarsSingleton()))[checked_cast<SysInt>(localassignment[j].first +
-                                                                      start_of_constraint[i])]
+                                                                      startOf_constraint[i])]
                      .inDomain(localassignment[j].second));
         D_ASSERT((*(child_constraints[i]
                         ->getVarsSingleton()))[checked_cast<SysInt>(localassignment[j].first)]

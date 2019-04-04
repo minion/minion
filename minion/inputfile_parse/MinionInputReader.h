@@ -31,7 +31,7 @@ struct ConcreteFileReader {
 
   /// Removes all comments after the current place in the file.
   // Returns peeked char.
-  void check_for_comments() {
+  void checkFor_comments() {
     char peek = simplepeekChar();
     while(peek == '#') {
       simplegetline();
@@ -125,7 +125,7 @@ struct ConcreteFileReader {
   }
 
   string getline() {
-    check_for_comments();
+    checkFor_comments();
     return simplegetline();
   }
 
@@ -140,7 +140,7 @@ struct ConcreteFileReader {
   }
 
   string getline(char deliminator) {
-    check_for_comments();
+    checkFor_comments();
     std::string s = infile.getline(deliminator);
     // avoid copy for no reason
     if(s.empty() || (!isspace(s[0])))
@@ -190,9 +190,6 @@ class MinionThreeInputReader {
   ConstraintBlob readConstraint(FileReader* infile, BOOL reified = false);
   ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef* def);
   void readGadget(FileReader* infile);
-  void readNeighbourhood(FileReader* infile);
-  void parseGroup(FileReader* infile, ParsedNeighbourhoodContainer& nbhc);
-  void parseNeighbourhood(FileReader* infile, ParsedNeighbourhoodContainer& nbhc);
   TupleList* readConstraintTupleList(FileReader* infile);
   Var readIdentifier(FileReader* infile);
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);

@@ -55,11 +55,11 @@ fi fi firsttime = false;
 match_heading =`echo $entry | cut - d ' ' - f 4`;
 #heading comment is for lines_in_file =`wc - l $match_file | awk '{print $1}' | cut - d ' ' - f1`;
 #lines in match file reqd_lines = $(($lines_in_file - $match_line))
-    end_of_comment_in_tail =`tail - n$reqd_lines $match_file | grep - m1 - n "\*/" |
+    endOf_comment_in_tail =`tail - n$reqd_lines $match_file | grep - m1 - n "\*/" |
                             cut - d ':' - f1`;
-end_of_comment = $(($match_line + $end_of_comment_in_tail));
+endOf_comment = $(($match_line + $endOf_comment_in_tail));
 #line comment ends on first_l = $(($match_line + 1));
-#line body starts on last_l = $(($end_of_comment - 1));
+#line body starts on last_l = $(($endOf_comment - 1));
 #line body ends on body =`sed - n $first_l, "$last_l" p $match_file`;
 #body of entry match_entry_spaces =`echo $match_entry | sed 's/;/ /g'`;
     echo $match_entry_spaces >> $TMP_FILE #record entry for later
@@ -70,9 +70,9 @@ end_of_comment = $(($match_line + $end_of_comment_in_tail));
     OLDIFS = $IFS;
     IFS = ' ';
 #multiline c string, add << and quotes
-    body_for_c =`echo $body | sed 's/^/<< "/g' | sed 's/$/" << endl/g'`;
+    bodyFor_c =`echo $body | sed 's/^/<< "/g' | sed 's/$/" << endl/g'`;
     IFS = $OLDIFS;
-    echo "cout $body_for_c << endl << endl;";
+    echo "cout $bodyFor_c << endl << endl;";
     previous_entry = $match_entry;
 #remember this entry next time done echo "} else";
     echo 'cout << "Unknown entry, please try again." << endl;';

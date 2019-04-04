@@ -125,12 +125,12 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
   }
 
   virtual vector<AnyVarRef> getVars() {
-    vector<AnyVarRef> array_copy;
-    array_copy.reserve(varArray.size() + 1);
+    vector<AnyVarRef> arrayCopy;
+    arrayCopy.reserve(varArray.size() + 1);
     for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
-      array_copy.push_back(varArray[i]);
-    array_copy.push_back(varSum);
-    return array_copy;
+      arrayCopy.push_back(varArray[i]);
+    arrayCopy.push_back(varSum);
+    return arrayCopy;
   }
 
   virtual AbstractConstraint* reverseConstraint() {

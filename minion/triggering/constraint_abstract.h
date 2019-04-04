@@ -340,7 +340,7 @@ protected:
   // Maps variables to constraints
   vector<DomainInt> variableToConstraint;
   // Gets start of each constraint
-  vector<DomainInt> start_of_constraint;
+  vector<DomainInt> startOf_constraint;
 
 public:
   SysInt getChildDynamicTrigger(DomainInt p) {
@@ -378,7 +378,7 @@ public:
     SysInt varCount = 0;
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       child_constraints[i]->_setParent(this, i);
-      start_of_constraint.push_back(varCount);
+      startOf_constraint.push_back(varCount);
       SysInt conSize = child_constraints[i]->getVarsSingleton()->size();
       for(SysInt j = 0; j < conSize; ++j) {
         variableToConstraint.push_back(i);

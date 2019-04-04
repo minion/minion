@@ -24,17 +24,11 @@
 #include "preprocess.h"
 #include "search/search_control.h"
 
-#include "search/SearchStrategies.h"
-#include "search/neighbourhood-search.h"
 #include "search/restartNewSearchManager.h"
-#include "search/restartSearchManager.h"
 
 #include "dump_state.hpp"
 
 using namespace ProbSpec;
-std::shared_ptr<NhConfig> makeNhConfig() {
-  return make_shared<NhConfig>();
-}
 
 void BuildCSP(CSPInstance& instance) {
   getState().setTupleListContainer(instance.tupleListContainer);
@@ -128,20 +122,14 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
 
   shared_ptr<Controller::SearchManager> sm;
 
-  if(instance.neighbourhoodContainer) {
-
-    sm = MakeNeighbourhoodSearch(args.propMethod, instance.searchOrder,
-                                 *instance.neighbourhoodContainer);
-  } else {
-    if(getOptions().restart.active) {
-      if(getOptions().sollimit != 1) {
-        D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
-      }
-      // sm = Controller::make_restart_search_manager(args.propMethod, instance.searchOrder);
-      sm = Controller::make_restart_new_search_manager(args.propMethod, instance.searchOrder);
-    } else {
-      sm = Controller::makeSearch_manager(args.propMethod, instance.searchOrder);
+  if(getOptions().restart.active) {
+    if(getOptions().sollimit != 1) {
+      D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
     }
+    // sm = Controller::make_restart_search_manager(args.propMethod, instance.searchOrder);
+    sm = Controller::make_restart_new_search_manager(args.propMethod, instance.searchOrder);
+  } else {
+    sm = Controller::makeSearch_manager(args.propMethod, instance.searchOrder);
   }
 
   getState().getOldTimer().maybePrintTimestepStore(

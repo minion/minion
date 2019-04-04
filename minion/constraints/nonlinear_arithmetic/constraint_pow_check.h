@@ -41,11 +41,11 @@ template <typename T1, typename T2, typename T3, bool undef_zero>
 class PowConstraint_Check {
 
 public:
-  typedef typename common_var_type3<T1, T2, T3>::type var_common;
-  typedef std::array<var_common, 3> var_type;
+  typedef typename commonVarType3<T1, T2, T3>::type var_common;
+  typedef std::array<var_common, 3> varType;
 
 private:
-  var_type vars;
+  varType vars;
 
 public:
   PowConstraint_Check(const T1& v1, const T2& v2, const T3& v3)
@@ -65,7 +65,7 @@ public:
 
   CONSTRAINT_ARG_LIST3(vars[0], vars[1], vars[2])
 
-  var_type& getVars() {
+  varType& getVars() {
     return vars;
   }
 

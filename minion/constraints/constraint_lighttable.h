@@ -119,7 +119,7 @@ struct LightTableConstraint : public AbstractConstraint {
 
         TupleTrie& trie = data->tupleTrieArrayptr->getTrie(varidx);
 
-        bool support = trie.search_trie_nostate(val, vars);
+        bool support = trie.searchTrie_nostate(val, vars);
 
         if(!support) {
           var.removeFromDomain(val);

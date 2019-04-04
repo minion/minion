@@ -139,10 +139,10 @@ struct Graph {
 
     if(print_names)
       cout << "varnames := [";
-    for(SysInt i = 0; i < (SysInt)csp.sym_order.size(); ++i) {
+    for(SysInt i = 0; i < (SysInt)csp.symOrder.size(); ++i) {
       if(print_names)
-        cout << "\"" << name(csp.sym_order[i], csp) << "\", ";
-      vNum[name(csp.sym_order[i], csp)] = i + 1;
+        cout << "\"" << name(csp.symOrder[i], csp) << "\", ";
+      vNum[name(csp.symOrder[i], csp)] = i + 1;
     }
     if(print_names)
       cout << "];" << endl;
@@ -240,7 +240,7 @@ struct GraphBuilder {
 
   GraphBuilder(CSPInstance& _csp) : csp(_csp) {
     csp.add_variable_names();
-    if(csp.sym_order.empty())
+    if(csp.symOrder.empty())
       D_FATAL_ERROR("Symmetry detection doesn't work with input formats 1 and 2. Upgrade!");
 
     build_graph();
@@ -688,8 +688,8 @@ struct InstanceStats {
         for(SysInt k = 0; k < (SysInt)i.vars[j].size(); k++) {
           num++;
           Bounds bounds = v.getBounds(i.vars[j][k]);
-          lower = lower > bounds.lower_bound ? bounds.lower_bound : lower;
-          upper = upper < bounds.upper_bound ? bounds.upper_bound : upper;
+          lower = lower > bounds.lowerBound ? bounds.lowerBound : lower;
+          upper = upper < bounds.upperBound ? bounds.upperBound : upper;
         }
       }
       alldiffdomovervars->push_back((double)(checked_cast<SysInt>(upper - lower + 1)) /
@@ -793,13 +793,13 @@ struct InstanceStats {
     double startTime, measuredTime;
     START_CLOCK();
     VarContainer& v = csp.vars;
-    SysInt varcount = v.BOOLs + v.bound.size() + v.sparse_bound.size() + v.discrete.size();
+    SysInt varcount = v.BOOLs + v.bound.size() + v.sparseBound.size() + v.discrete.size();
     END_CLOCK();
     output_stat << "varcount:" << varcount << endl;
     output_stat << "var_bool:" << v.BOOLs << endl;
-    output_stat << "var_discrete:" << v.discrete.size() << endl;
-    output_stat << "var_bound:" << v.bound.size() << endl;
-    output_stat << "var_sparsebound:" << v.sparse_bound.size() << endl;
+    output_stat << "varDiscrete:" << v.discrete.size() << endl;
+    output_stat << "varBound:" << v.bound.size() << endl;
+    output_stat << "var_sparsebound:" << v.sparseBound.size() << endl;
 
     // collect all domain sizes into an array
     START_CLOCK();
@@ -812,22 +812,22 @@ struct InstanceStats {
       domain_product += log((double)2);
     }
     for(SysInt i = 0; i < (SysInt)v.bound.size(); i++) {
-      SysInt domSize = checked_cast<SysInt>(v.bound[i].upper_bound - v.bound[i].lower_bound + 1);
+      SysInt domSize = checked_cast<SysInt>(v.bound[i].upperBound - v.bound[i].lowerBound + 1);
       domsizes.push_back(domSize);
       varMemoryUsage += 64;
       domain_product += log((double)domSize);
     }
     for(SysInt i = 0; i < (SysInt)v.discrete.size(); i++) {
       SysInt domSize =
-          checked_cast<SysInt>(v.discrete[i].upper_bound - v.discrete[i].lower_bound + 1);
+          checked_cast<SysInt>(v.discrete[i].upperBound - v.discrete[i].lowerBound + 1);
       domsizes.push_back(domSize);
       varMemoryUsage += domSize;
       domain_product += log((double)domSize);
     }
-    for(SysInt i = 0; i < (SysInt)v.sparse_bound.size(); i++) {
-      domsizes.push_back(v.sparse_bound[i].size());
+    for(SysInt i = 0; i < (SysInt)v.sparseBound.size(); i++) {
+      domsizes.push_back(v.sparseBound[i].size());
       varMemoryUsage += 64;
-      domain_product += log((double)v.sparse_bound[i].size());
+      domain_product += log((double)v.sparseBound[i].size());
     }
     END_CLOCK();
     output_stat << "VarMemory: " << varMemoryUsage << endl;
@@ -1045,7 +1045,7 @@ struct InstanceStats {
     }
     START_CLOCK();
     // now literal tightness
-    map<pair<Var, DomainInt>, vector<DomainInt>> scores_for_varval;
+    map<pair<Var, DomainInt>, vector<DomainInt>> scoresForVarVal;
     // all available tightnesses for varvals
     // iterate over constraints, collecting all available tightnesses for
     // varvals involved in con
@@ -1055,15 +1055,15 @@ struct InstanceStats {
         Var vv = allVars[var].getBaseVar();
         for(DomainInt val = allVars[var].initialMin(); val <= allVars[var].initialMax();
             val++) {
-          scores_for_varval[make_pair(vv, val)].push_back(
+          scoresForVarVal[make_pair(vv, val)].push_back(
               cons[con]->getTightnessEstimateVarVal(var, val));
         }
       }
     }
     // now average the tightnesses
     vector<double> lit_tightness;
-    for(map<pair<Var, DomainInt>, vector<DomainInt>>::iterator curr = scores_for_varval.begin();
-        curr != scores_for_varval.end(); curr++) {
+    for(map<pair<Var, DomainInt>, vector<DomainInt>>::iterator curr = scoresForVarVal.begin();
+        curr != scoresForVarVal.end(); curr++) {
       vector<DomainInt> nums = curr->second;
       lit_tightness.push_back(
           (double)checked_cast<SysInt>(std::accumulate(nums.begin(), nums.end(), (DomainInt)0)) /
@@ -1087,7 +1087,7 @@ struct InstanceStats {
       st_dev += pow((double)lit_tightness[i] - lt_mean, 2);
     }
     st_dev = sqrt(st_dev / lit_tightness.size());
-    output_stat << "literal_coeff_of_variation:" << st_dev / lt_mean << endl;
+    output_stat << "literal_coeffOf_variation:" << st_dev / lt_mean << endl;
   }
 
   SysInt arity(ConstraintBlob& ct) {

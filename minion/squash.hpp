@@ -24,12 +24,12 @@ squeeze_tuples(const TupleCon& tuples, const std::vector<std::set<DomainInt>>& d
         if(tuple[i] == freeValue)
           continue;
 
-        Vint tuple_copy = tuple;
+        Vint tupleCopy = tuple;
         bool found = true;
         for(std::set<DomainInt>::iterator it = domains[i].begin(); it != domains[i].end(); ++it) {
           DomainInt j = *it;
-          tuple_copy[i] = j;
-          if(tuples.count(tuple_copy) == 0 || (eager_prune && used_tuples.count(tuple_copy) != 0)) {
+          tupleCopy[i] = j;
+          if(tuples.count(tupleCopy) == 0 || (eager_prune && used_tuples.count(tupleCopy) != 0)) {
             found = false;
             break;
           }
@@ -37,12 +37,12 @@ squeeze_tuples(const TupleCon& tuples, const std::vector<std::set<DomainInt>>& d
         if(found) {
           for(std::set<DomainInt>::iterator it = domains[i].begin(); it != domains[i].end(); ++it) {
             DomainInt j = *it;
-            tuple_copy[i] = j;
-            used_tuples.insert(tuple_copy);
+            tupleCopy[i] = j;
+            used_tuples.insert(tupleCopy);
           }
-          tuple_copy[i] = freeValue;
-          // std::cout << tuple_copy << std::endl;
-          ret_tuples.insert(tuple_copy);
+          tupleCopy[i] = freeValue;
+          // std::cout << tupleCopy << std::endl;
+          ret_tuples.insert(tupleCopy);
         }
       }
     }

@@ -477,22 +477,22 @@ AnyVarRef AnyVarRef_Concrete<VarRef>::popOneMapper() const {
 }
 
 template <typename T, typename U>
-struct common_var_type2 {
+struct commonVarType2 {
   typedef AnyVarRef type;
 };
 
 template <typename T>
-struct common_var_type2<T, T> {
+struct commonVarType2<T, T> {
   typedef T type;
 };
 
 template <typename T, typename U, typename V>
-struct common_var_type3 {
+struct commonVarType3 {
   typedef AnyVarRef type;
 };
 
 template <typename T>
-struct common_var_type3<T, T, T> {
+struct commonVarType3<T, T, T> {
   typedef T type;
 };
 

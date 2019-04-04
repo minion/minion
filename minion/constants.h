@@ -72,10 +72,10 @@ inline bool operator<(PropagationLevel lhs, PropagationLevel rhs) {
 }
 
 inline PropagationLevel GetPropMethodFromString(std::string instring) {
-  int find_split = instring.find('_');
+  int findSplit = instring.find('_');
   string s = instring;
-  if(find_split != string::npos) {
-    s = instring.substr(0, find_split);
+  if(findSplit != string::npos) {
+    s = instring.substr(0, findSplit);
   }
 
   PropagationType type = PropLevel_None;
@@ -100,8 +100,8 @@ inline PropagationLevel GetPropMethodFromString(std::string instring) {
   }
 
   bool limit = false;
-  if(find_split != string::npos) {
-    string subtype = instring.substr(find_split + 1, instring.size());
+  if(findSplit != string::npos) {
+    string subtype = instring.substr(findSplit + 1, instring.size());
     if(subtype != "limit") {
       outputFatalError(instring + " is not a valid propagation method");
     }

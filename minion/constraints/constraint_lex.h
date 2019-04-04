@@ -305,13 +305,13 @@ struct LexLeqConstraint : public AbstractConstraint {
   }
 
   virtual vector<AnyVarRef> getVars() {
-    vector<AnyVarRef> array_copy;
+    vector<AnyVarRef> arrayCopy;
     for(UnsignedSysInt i = 0; i < x.size(); i++)
-      array_copy.push_back(AnyVarRef(x[i]));
+      arrayCopy.push_back(AnyVarRef(x[i]));
 
     for(UnsignedSysInt i = 0; i < y.size(); i++)
-      array_copy.push_back(AnyVarRef(y[i]));
-    return array_copy;
+      arrayCopy.push_back(AnyVarRef(y[i]));
+    return arrayCopy;
   }
 };
 

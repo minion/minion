@@ -31,7 +31,7 @@ struct MultiDimCon {
   typedef Result result_type;
 
   std::map<std::vector<Index>, Result> indices;
-  std::vector<Index> array_bounds;
+  std::vector<Index> arrayBounds;
 
   std::string name;
 
@@ -40,39 +40,39 @@ struct MultiDimCon {
   }
 
   const std::vector<Index>& getBounds() const {
-    return array_bounds;
+    return arrayBounds;
   }
 
   const std::map<std::vector<Index>, Result>& getIndices() const {
     return indices;
   }
 
-  explicit MultiDimCon(const std::vector<Index>& _bounds)
-      : array_bounds(_bounds), name("<unknown>") {
-    for(size_t i = 0; i < array_bounds.size(); ++i) {
-      D_ASSERT(array_bounds[i] >= 0);
+  explicit MultiDimCon(const std::vector<Index>& Bounds)
+      : arrayBounds(Bounds), name("<unknown>") {
+    for(size_t i = 0; i < arrayBounds.size(); ++i) {
+      D_ASSERT(arrayBounds[i] >= 0);
     }
   }
 
   template <typename T>
-  explicit MultiDimCon(const std::vector<Index>& _bounds, T* values)
-      : array_bounds(_bounds), name("<unknown>") {
-    for(size_t i = 0; i < array_bounds.size(); ++i) {
-      D_ASSERT(array_bounds[i] >= 0);
+  explicit MultiDimCon(const std::vector<Index>& Bounds, T* values)
+      : arrayBounds(Bounds), name("<unknown>") {
+    for(size_t i = 0; i < arrayBounds.size(); ++i) {
+      D_ASSERT(arrayBounds[i] >= 0);
     }
 
-    std::vector<int> v(array_bounds.size(), 0);
+    std::vector<int> v(arrayBounds.size(), 0);
 
     do {
       indices[v] = *values;
       values++;
-    } while(incrementVector(v, array_bounds));
+    } while(incrementVector(v, arrayBounds));
   }
 
   template <typename Index2, typename Result2>
   MultiDimCon(const MultiDimCon<Index2, Result2>& mdc)
       : indices(mdc.indices.begin(), mdc.indices.end()),
-        array_bounds(mdc.array_bounds.begin(), mdc.array_bounds.end()),
+        arrayBounds(mdc.arrayBounds.begin(), mdc.arrayBounds.end()),
         name(mdc.name) {}
 
   MultiDimCon(const Result& r) : name("<unknown single variable>") {
@@ -81,7 +81,7 @@ struct MultiDimCon {
 
   /// Returns the arity of the members of the container.
   size_t arity() const {
-    return array_bounds.size();
+    return arrayBounds.size();
   }
 
   bool empty() const {
@@ -89,8 +89,8 @@ struct MultiDimCon {
   }
 
   void checkArrayIndices(const std::vector<Index>& assign) const {
-    if(assign.size() != array_bounds.size()) {
-      std::string error = tostring(array_bounds.size()) + "dimensions, but deref used only " +
+    if(assign.size() != arrayBounds.size()) {
+      std::string error = tostring(arrayBounds.size()) + "dimensions, but deref used only " +
                           tostring(assign.size());
       if(!name.empty())
         error += " in " + name;
@@ -98,7 +98,7 @@ struct MultiDimCon {
     }
 
     for(size_t i = 0; i < assign.size(); ++i) {
-      if(assign[i] < 0 || assign[i] >= array_bounds[i]) {
+      if(assign[i] < 0 || assign[i] >= arrayBounds[i]) {
         std::string error =
             "The " + tostring(i) + "th dimension accessed by invalid value " + tostring(assign[i]);
         if(!name.empty())
@@ -139,18 +139,18 @@ struct MultiDimCon {
    *  Asserts if this results in two values mapping to the same reduction.
    */
   void remove_indices(const std::vector<bool>& vb) {
-    if(array_bounds.size() != vb.size()) {
-      std::string error = "Array " + name + " with " + tostring(array_bounds.size()) +
+    if(arrayBounds.size() != vb.size()) {
+      std::string error = "Array " + name + " with " + tostring(arrayBounds.size()) +
                           " dimensions derefed using " + tostring(vb.size()) + " indices.";
       throw InvalidDerefException(error);
     }
 
-    std::vector<Index> new_array_bounds;
+    std::vector<Index> new_arrayBounds;
     for(size_t i = 0; i < vb.size(); ++i) {
       if(vb[i])
-        new_array_bounds.push_back(array_bounds[i]);
+        new_arrayBounds.push_back(arrayBounds[i]);
     }
-    array_bounds = new_array_bounds;
+    arrayBounds = new_arrayBounds;
 
     std::map<std::vector<Index>, Result> new_map;
 
@@ -178,22 +178,22 @@ struct MultiDimCon {
    *  Asserts if this results in two values mapping to the same reduction.
    */
   MultiDimCon<Index, Result> project(std::vector<INTERVAL<Index>> ind) const {
-    D_ASSERT(ind.size() == array_bounds.size());
+    D_ASSERT(ind.size() == arrayBounds.size());
 
-    std::vector<Index> new_array_bounds;
+    std::vector<Index> new_arrayBounds;
     for(size_t i = 0; i < ind.size(); ++i) {
-      ind[i] = clamp_interval(ind[i], 0, array_bounds[i] - 1);
-      if(first(ind[i]) < 0 || last(ind[i]) >= array_bounds[i])
+      ind[i] = clamp_interval(ind[i], 0, arrayBounds[i] - 1);
+      if(first(ind[i]) < 0 || last(ind[i]) >= arrayBounds[i])
         throw InvalidDerefException("Attempt to project index " + tostring(i) +
                                     " with invalid range " + tostring(ind[i]) + " in " + name);
-      new_array_bounds.push_back(last(ind[i]) - first(ind[i]) + 1);
+      new_arrayBounds.push_back(last(ind[i]) - first(ind[i]) + 1);
     }
 
-    MultiDimCon<Index, Result> mdc_new(new_array_bounds);
+    MultiDimCon<Index, Result> mdc_new(new_arrayBounds);
     // Bad behaviour, but we don't define this in the function, else we would
     // have to keep reallocating memory.
     std::vector<Index> v;
-    v.resize(array_bounds.size());
+    v.resize(arrayBounds.size());
 
     std::vector<Index> it = initializeVector_from_intervals(ind);
     do {
@@ -226,7 +226,7 @@ struct MultiDimCon {
   }
 
   friend std::ostream& operator<<(std::ostream& o, const MultiDimCon& mdc) {
-    return o << "bounds:" << mdc.array_bounds << "  " << mdc.indices;
+    return o << "bounds:" << mdc.arrayBounds << "  " << mdc.indices;
   }
 
   template <typename I, typename R>
@@ -250,12 +250,12 @@ struct MultiDimCon {
 
 template <typename I, typename R>
 int mdcIndexSize(const MultiDimCon<I, R>& in, int dim) {
-  if(dim < 0 || dim >= in.array_bounds.size()) {
+  if(dim < 0 || dim >= in.arrayBounds.size()) {
     std::string error = "Tried to get size of index " + tostring(dim) + " from array with " +
-                        tostring(in.array_bounds.size()) + " dimensions, name: " + in.name;
+                        tostring(in.arrayBounds.size()) + " dimensions, name: " + in.name;
     throw InvalidDerefException(error);
   }
-  return in.array_bounds[dim];
+  return in.arrayBounds[dim];
 }
 
 template <typename Index, typename Result>
@@ -291,17 +291,17 @@ DOM_NOINLINE MultiDimCon<Index, Result> mdc_join(const std::vector<MultiDimCon<I
     return MultiDimCon<Index, Result>(makeVec<Index>(0));
   }
 
-  std::vector<Index> new_bounds = v[0].array_bounds;
+  std::vector<Index> newBounds = v[0].arrayBounds;
   for(size_t i = 1; i < v.size(); ++i) {
-    if(v[0].array_bounds.size() != v[i].array_bounds.size()) {
+    if(v[0].arrayBounds.size() != v[i].arrayBounds.size()) {
       D_ASSERT(0 && "Attempt to join matrices of different dimensions!");
     }
-    for(size_t j = 0; j < new_bounds.size(); ++j)
-      new_bounds[j] = std::max(new_bounds[j], v[i].array_bounds[j]);
+    for(size_t j = 0; j < newBounds.size(); ++j)
+      newBounds[j] = std::max(newBounds[j], v[i].arrayBounds[j]);
   }
 
-  new_bounds.insert(new_bounds.begin(), v.size());
-  MultiDimCon<Index, Result> mdc(new_bounds);
+  newBounds.insert(newBounds.begin(), v.size());
+  MultiDimCon<Index, Result> mdc(newBounds);
   // We do this to reduce memory reallocations
   std::vector<Index> tempVec;
   for(size_t i = 0; i < v.size(); ++i) {

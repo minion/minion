@@ -42,10 +42,10 @@ virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
   if(v[0] > vars[0].initialMax())
     return false;
 
-  const SysInt val_offset = checked_cast<SysInt>(v[0] - vars[0].initialMin());
-  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->getTL()[0][val_offset];
+  const SysInt valOffset = checked_cast<SysInt>(v[0] - vars[0].initialMin());
+  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->getTL()[0][valOffset];
 
-  for(SysInt i = 0; i < (SysInt)tuple_list->getTL()[0][val_offset].size(); i++) {
+  for(SysInt i = 0; i < (SysInt)tuple_list->getTL()[0][valOffset].size(); i++) {
     const vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
@@ -388,11 +388,11 @@ void partition_swap(SysInt xi, SysInt xj) {
 template <bool keepassigned>
 bool findNewSupport(SysInt var, DomainInt val) {
   D_ASSERT(tuple_list->getTL().size() == vars.size());
-  const SysInt val_offset = checked_cast<SysInt>(val - vars[var].initialMin());
-  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->getTL()[var][val_offset];
+  const SysInt valOffset = checked_cast<SysInt>(val - vars[var].initialMin());
+  const vector<vector<pair<SysInt, DomainInt>>*>& tuplist = tuple_list->getTL()[var][valOffset];
 
   SysInt listsize = tuplist.size();
-  for(SysInt i = tuple_list_pos[var][val_offset]; i < listsize; i++) {
+  for(SysInt i = tuple_list_pos[var][valOffset]; i < listsize; i++) {
     vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
@@ -409,12 +409,12 @@ bool findNewSupport(SysInt var, DomainInt val) {
       for(SysInt j = 0; j < supsize; j++) {
         ADDTOASSIGNMENT(tup[j].first, tup[j].second); // assignment.push_back(tuplist[i][j]);
       }
-      tuple_list_pos[var][val_offset] = i;
+      tuple_list_pos[var][valOffset] = i;
       return true;
     }
   }
 
-  for(SysInt i = 0; i < tuple_list_pos[var][val_offset]; i++) {
+  for(SysInt i = 0; i < tuple_list_pos[var][valOffset]; i++) {
     vector<pair<SysInt, DomainInt>>& tup = *(tuplist[i]);
 
     SysInt supsize = tup.size();
@@ -431,7 +431,7 @@ bool findNewSupport(SysInt var, DomainInt val) {
       for(SysInt j = 0; j < supsize; j++) {
         ADDTOASSIGNMENT(tup[j].first, tup[j].second); // assignment.push_back(tuplist[i][j]);
       }
-      tuple_list_pos[var][val_offset] = i;
+      tuple_list_pos[var][valOffset] = i;
       return true;
     }
   }

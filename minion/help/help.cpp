@@ -2545,7 +2545,7 @@ void help(string request) {
          << "lexleq( [bm], [bm] ) # This is OK!" << endl
          << "" << endl
          << "# Can give tuplelists, which can have names!" << endl
-         << "# The input is: <name> <num_of_tuples> <tupleLength> <numbers...>" << endl
+         << "# The input is: <name> <numOf_tuples> <tupleLength> <numbers...>" << endl
          << "# The formatting can be about anything.." << endl
          << "" << endl
          << "**TUPLELIST**" << endl

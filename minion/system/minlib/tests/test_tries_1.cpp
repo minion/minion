@@ -3,11 +3,11 @@
 template <typename Tuples>
 void test_tuples(const Tuples& tuples) {
   auto ptr = buildTrie(tuples);
-  auto vec = unroll_trie(ptr);
+  auto vec = unrollTrie(ptr);
   D_ASSERT(tuples == vec);
 
-  randomise_trie(ptr);
-  auto vec2 = unroll_trie(ptr);
+  randomiseTrie(ptr);
+  auto vec2 = unrollTrie(ptr);
   std::sort(vec2.begin(), vec2.end());
   D_ASSERT(tuples == vec2);
 }

@@ -139,14 +139,14 @@ struct MinConstraint : public AbstractConstraint {
           return;
         }
         // Possibly this variable is the only one that can be the minimum
-        typename VarArray::iterator it_copy(it);
+        typename VarArray::iterator itCopy(it);
         ++it;
         while(it != varArray.end() && (*it).min() > minvarMax)
           ++it;
         if(it != varArray.end()) { // No, another variable can be the minimum
           return;
         }
-        it_copy->setMax(minvarMax);
+        itCopy->setMax(minvarMax);
       } else {
         min_var.setMax(varArray[checked_cast<SysInt>(propVal)].max());
       }

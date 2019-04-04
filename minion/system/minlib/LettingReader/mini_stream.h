@@ -124,10 +124,10 @@ class MiniStream {
 
     size_t p = 0;
     for(int i = 1; i < linenum; i++) { // find the right line
-      p = s.find_first_of('\n', p);
+      p = s.find_firstOf('\n', p);
       p++;
     }
-    cerr << s.substr(p, s.find_first_of('\n', p + 1) - p) << endl;
+    cerr << s.substr(p, s.find_firstOf('\n', p + 1) - p) << endl;
 
     for(int i = 1; i < cNum; i++) // draw the fancy arrow
       cerr << '-';

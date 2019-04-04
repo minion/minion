@@ -66,6 +66,7 @@ struct PowConstraint : public AbstractConstraint {
                                      "allow y to contain 0, to avoid the case "
                                      "0^0.");
 
+
     // Take this check out for now; it seems to be too restrictive. The
     // propagator
     // uses doubles anyway so integer overflow is not the problem.

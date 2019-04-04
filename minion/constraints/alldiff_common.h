@@ -831,7 +831,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
   vector<SysInt> curnodestack;
 
   // Filled in before calling tarjan's.
-  bool scc_split;
+  bool sccSplit;
 
   SysInt sccindex;
 
@@ -856,7 +856,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     in_tstack.reserve(numnodes);
     visited.reserve(numnodes);
     maxDfs = 1;
-    scc_split = false;
+    sccSplit = false;
     dfsnum.resize(numnodes);
     lowlink.resize(numnodes);
 
@@ -918,7 +918,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     visited.clear();
     maxDfs = 1;
 
-    scc_split = false;
+    sccSplit = false;
     sccindex = sccindexStart;
 
     for(SysInt i = 0; i < (SysInt)var_indices.size(); ++i) {
@@ -1091,7 +1091,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       // variables.
       // I think these two cases cover everything.
       if(!toplevel || varcount < (SysInt)var_indices.size()) {
-        scc_split = true; // The SCC has split and there is some work to do later.
+        sccSplit = true; // The SCC has split and there is some work to do later.
       }
 
       // Doing something with the components should not be necessary unless the
@@ -1099,9 +1099,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       // The first SCC found is deep in the tree, so the flag will be set to its
       // final value
       // the first time we are here.
-      // so it is OK to assume that scc_split has been
+      // so it is OK to assume that sccSplit has been
       // set correctly before we do the following.
-      if(scc_split) {
+      if(sccSplit) {
         // For each variable, write it to the scc array.
         // If its the last one, flip the bit.
 

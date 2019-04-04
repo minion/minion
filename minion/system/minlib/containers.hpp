@@ -93,13 +93,13 @@ std::vector<Type> makeVec() {
 
 template <typename Type, typename... Args>
 std::vector<typename CommonType<Type, Args...>::type>
-makeVecWith_common_type(const Args&... args) {
+makeVecWithCommonType(const Args&... args) {
   return makeVecWith_type<typename CommonType<Type, Args...>::type>(args...);
 }
 
 template <typename Type, typename... Args>
 std::array<typename CommonType<Type, Args...>::type, SizeOf<Args...>::size>
-make_arrayWith_common_type(const Args&... args) {
+make_arrayWithCommonType(const Args&... args) {
   return make_arrayWith_type<typename CommonType<Type, Args...>::type>(args...);
 }
 

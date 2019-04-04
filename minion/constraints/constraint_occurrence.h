@@ -117,7 +117,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     return 3;
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     moveTriggerInt(valCount, 2, Assigned);
   }
 
@@ -281,7 +281,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
 
     trigger1index = watch_unassigned_inVector(-1, -1, 0);
     if(trigger1index == -1) {
@@ -372,7 +372,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     return varArray.size();
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
       moveTriggerInt(varArray[i], i, Assigned);
   }
@@ -447,7 +447,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     if(valCountMax < 0 || valCount_min > (SysInt)varArray.size())
       getState().setFailed(true);
     setupCounters();
@@ -644,7 +644,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     not_occurrencesCount = not_occs;
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
       moveTriggerInt(varArray[i], i, Assigned);
     moveTriggerInt(valCount, varArray.size(), UpperBound);
@@ -652,7 +652,7 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
 
     valCount.setMin(0);
     valCount.setMax(varArray.size());

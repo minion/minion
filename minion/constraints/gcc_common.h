@@ -114,7 +114,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   using FlowConstraint<VarArray, UseIncGraph>::initialize_hopcroft;
 
-  using FlowConstraint<VarArray, UseIncGraph>::hopcroft2_setup;
+  using FlowConstraint<VarArray, UseIncGraph>::hopcroft2Setup;
   using FlowConstraint<VarArray, UseIncGraph>::hopcroft_wrapper2;
   using FlowConstraint<VarArray, UseIncGraph>::hopcroft2;
   using FlowConstraint<VarArray, UseIncGraph>::augpath;
@@ -218,7 +218,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       varvalmatching[i] = domMin - 1;
 
 #ifdef QUIMPER
-    hopcroft2_setup();
+    hopcroft2Setup();
     lbcmatching.resize(numvars, domMin - 1);
     lbcusage.resize(numvals, 0);
 #endif
@@ -1352,7 +1352,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   vector<SysInt> curnodestack;
 
-  bool scc_split;
+  bool sccSplit;
 
   SysInt sccindex;
 
@@ -1367,7 +1367,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     in_tstack.reserve(numnodes);
     visited.reserve(numnodes);
     maxDfs = 1;
-    scc_split = false;
+    sccSplit = false;
     dfsnum.resize(numnodes);
     lowlink.resize(numnodes);
 
@@ -1386,7 +1386,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     visited.clear();
     maxDfs = 1;
 
-    scc_split = false;
+    sccSplit = false;
     sccindex = sccindexStart;
 
 #if InternalDT
@@ -1632,7 +1632,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
       // I think these two cases cover everything.
       if(!toplevel || varcount < (SysInt)vars_in_scc.size() ||
          valcount < (SysInt)valsInSCC.size()) {
-        scc_split = true; // The SCC has split and there is some work to do later.
+        sccSplit = true; // The SCC has split and there is some work to do later.
       }
 
       // Doing something with the components should not be necessary unless the
@@ -1640,9 +1640,9 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
       // The first SCC found is deep in the tree, so the flag will be set to its
       // final value
       // the first time we are here.
-      // so it is OK to assume that scc_split has been
+      // so it is OK to assume that sccSplit has been
       // set correctly before we do the following.
-      if(scc_split) {
+      if(sccSplit) {
         // For each variable and value, write it to the scc array.
         // If its the last one, flip the bit.
 

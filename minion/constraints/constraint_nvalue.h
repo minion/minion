@@ -55,7 +55,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
 
   LessEqualNvalueConstraint(VarArray _vars, VarResult _result) : vars(_vars), result(_result) {}
 
-  void trigger_setup() {
+  void triggerSetup() {
     for(unsigned i = 0; i < vars.size(); ++i) {
       moveTriggerInt(vars[i], i, Assigned);
     }
@@ -72,7 +72,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     std::set<DomainInt> assigned;
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].isAssigned()) {
@@ -163,7 +163,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
     return vars.size() + 1;
   }
 
-  void trigger_setup() {
+  void triggerSetup() {
     for(unsigned i = 0; i < vars.size(); ++i) {
       moveTriggerInt(vars[i], i, Assigned);
     }
@@ -176,7 +176,7 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
   }
 
   virtual void fullPropagate() {
-    trigger_setup();
+    triggerSetup();
     propagateImpl();
   }
 
