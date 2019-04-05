@@ -473,6 +473,7 @@ struct CSPInstance {
   vector<SearchOrder> searchOrder;
   vector<Var> permutation;
   vector<Var> symOrder;
+  vector<Var> preprocess_vars;
 
   /// Only used for gadgets.
   vector<Var> constructionSite;

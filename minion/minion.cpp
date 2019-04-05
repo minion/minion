@@ -131,6 +131,7 @@ int main(int argc, char** argv) {
     getState().getOldTimer().maybePrintTimestepStore(cout, "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);
 
+    SetupCSPOrdering(instance, args);
     BuildCSP(instance);
     SolveCSP(instance, args);
 

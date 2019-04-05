@@ -30,6 +30,42 @@
 
 using namespace ProbSpec;
 
+void SetupCSPOrdering(CSPInstance& instance, SearchMethod args) {
+  for(SysInt i = (SysInt)instance.searchOrder.size() - 1; i >= 0; --i) {
+    if(args.order != ORDER_NONE) {
+      //  For each varorder block, overwrite with order given on the command
+      //  line.
+      instance.searchOrder[i].order = args.order;
+      instance.searchOrder[i].limit = args.limit;
+    }
+
+    if(args.valorder != ValOrder(VALORDER_NONE)) {
+      //  For each varorder block, overwrite with order given on the command
+      //  line.
+      for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
+        instance.searchOrder[i].valOrder[j] = args.valorder;
+      }
+    }
+
+    for(SysInt j = 0; j < (SysInt)instance.searchOrder[i].varOrder.size();
+        j++) { // cobble together all the varorder blocks for preprocessing.
+      instance.preprocess_vars.push_back(instance.searchOrder[i].varOrder[j]);
+    }
+
+    if(getOptions().randomiseValvarorder) {
+
+      std::random_shuffle(instance.searchOrder[i].varOrder.begin(),
+                          instance.searchOrder[i].varOrder.end());
+
+      for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
+        instance.searchOrder[i].valOrder[j] = VALORDER_RANDOM;
+      }
+    }
+
+    D_ASSERT(instance.searchOrder[i].varOrder.size() ==
+             instance.searchOrder[i].valOrder.size());
+  }
+}
 void BuildCSP(CSPInstance& instance) {
   getState().setTupleListContainer(instance.tupleListContainer);
   getState().setShortTupleListContainer(instance.shortTupleListContainer);
@@ -70,6 +106,7 @@ void BuildCSP(CSPInstance& instance) {
   Controller::initalise_search();
   getState().getOldTimer().maybePrintTimestepStore(cout, "Initial Propagate: ", "InitialPropagate",
                                                    getTableOut(), !getOptions().silent);
+
 }
 
 void SolveCSP(CSPInstance& instance, SearchMethod args) {
@@ -83,42 +120,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   // Likewise, using a dynamic variable ordering, it only applies within
   // the VARORDER blocks.
 
-  vector<AnyVarRef> preprocess_vars;
-
-  for(SysInt i = (SysInt)instance.searchOrder.size() - 1; i >= 0; --i) {
-    if(args.order != ORDER_NONE) {
-      //  For each varorder block, overwrite with order given on the command
-      //  line.
-      instance.searchOrder[i].order = args.order;
-      instance.searchOrder[i].limit = args.limit;
-    }
-
-    if(args.valorder != ValOrder(VALORDER_NONE)) {
-      //  For each varorder block, overwrite with order given on the command
-      //  line.
-      for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
-        instance.searchOrder[i].valOrder[j] = args.valorder;
-      }
-    }
-
-    for(SysInt j = 0; j < (SysInt)instance.searchOrder[i].varOrder.size();
-        j++) { // cobble together all the varorder blocks for preprocessing.
-      preprocess_vars.push_back(getAnyVarRefFromVar(instance.searchOrder[i].varOrder[j]));
-    }
-
-    if(getOptions().randomiseValvarorder) {
-
-      std::random_shuffle(instance.searchOrder[i].varOrder.begin(),
-                          instance.searchOrder[i].varOrder.end());
-
-      for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
-        instance.searchOrder[i].valOrder[j] = VALORDER_RANDOM;
-      }
-    }
-
-    D_ASSERT(instance.searchOrder[i].varOrder.size() ==
-             instance.searchOrder[i].valOrder.size());
-  }
+  vector<AnyVarRef> preprocess_anyvars = getAnyVarRefFromVar(instance.preprocess_vars);
 
   shared_ptr<Controller::SearchManager> sm;
 
@@ -137,7 +139,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   try {
 
     try {
-      PropogateCSP(std::max(args.preprocess, args.propMethod), preprocess_vars,
+      PropogateCSP(std::max(args.preprocess, args.propMethod), preprocess_anyvars,
                    !getOptions().silent);
     } catch(EndOfSearch eos) {
       if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
