@@ -6,8 +6,8 @@ edition = "2018"
 
 [dependencies]
 lazy_static = "1.1.0"
-rand = "0.5"
-itertools = "0.7.8"
+rand = "0.6"
+itertools = "0.8"
 atomic-counter = "1.0.0"
 tempfile = "3"
 simple-error = "=0.1.12"

@@ -17,7 +17,6 @@ extern crate simple_error;
 extern crate num_integer;
 extern crate rayon;
 
-
 extern crate structopt;
 use structopt::StructOpt;
 

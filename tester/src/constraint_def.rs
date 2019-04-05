@@ -8,6 +8,7 @@ use std::collections::HashSet;
 use std::fmt;
 use std::iter::FromIterator;
 
+use self::rand::seq::SliceRandom;
 use self::rand::Rng;
 
 use std::sync::Arc;
@@ -78,7 +79,7 @@ pub fn random_sublist(list: &[i64]) -> Vec<i64> {
 pub fn random_sublist_of_size(list: &[i64], target: i64) -> Vec<i64> {
     let mut rng = rand::thread_rng();
     let mut vec = list.to_vec();
-    rng.shuffle(&mut vec);
+    vec.shuffle(&mut rng);
     while vec.len() as i64 > target {
         vec.pop();
     }

@@ -2,7 +2,7 @@ use crate::constraint_def;
 use crate::run_minion;
 extern crate rand;
 
-use self::rand::Rng;
+use self::rand::seq::SliceRandom;
 
 use simple_error::SimpleError;
 
@@ -137,8 +137,8 @@ pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
 ) -> Result<(), SimpleError> {
-    let nest_type = rand::thread_rng()
-        .choose(&constraint_def::NESTED_CONSTRAINT_LIST)
+    let nest_type = constraint_def::NESTED_CONSTRAINT_LIST
+        .choose(&mut rand::thread_rng())
         .unwrap();
     let mut instance;
     let tups;
