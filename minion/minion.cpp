@@ -25,9 +25,7 @@
 #include "commandline_parse.h"
 #include "inputfile_parse/inputfile_parse.h"
 
-#include "MILtools/print_CSP.h"
-
-#include "MILtools/sym_output.h"
+#include "info_dumps.h"
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Entrance:
@@ -121,40 +119,8 @@ int main(int argc, char** argv) {
     readInputFromFiles(instance, files, getOptions().parserVerbose, getOptions().map_long_short,
                        getOptions().ensureBranchOnAllVars);
 
-    if(getOptions().graph) {
-      GraphBuilder graph(instance);
-      // graph.g.output_graph();
-      graph.g.output_nauty_graph(instance);
-      exit(0);
-    }
-
-    if(getOptions().instance_stats) {
-      InstanceStats s(instance);
-      s.output_stats();
-
-      // Do the minimal amount of setting up to create the constraint objects
-      getState().setTupleListContainer(instance.tupleListContainer);
-      getState().setShortTupleListContainer(instance.shortTupleListContainer);
-
-      BuildCon::buildVariables(instance.vars);
-
-      // Create Constraints
-      vector<AbstractConstraint*> cons;
-      while(!instance.constraints.empty()) {
-        cons.push_back(build_constraint(instance.constraints.front()));
-        instance.constraints.pop_front();
-      }
-
-      s.output_stats_tightness(cons);
-      exit(0);
-    }
-
-    if(getOptions().redump) {
-      MinionInstancePrinter printer(instance);
-      printer.buildInstance();
-      cout << printer.getInstance();
-      exit(0);
-    }
+    // Output graphs, stats, or redump (will not return in these cases)
+    infoDumps(instance);
 
     // Copy args into tableout
     getTableOut().set("RandomSeed", tostring(args.randomSeed));
