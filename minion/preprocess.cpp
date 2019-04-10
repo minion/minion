@@ -18,7 +18,6 @@
  * USA.
  */
 
-
 #include "minion.h"
 
 #include "preprocess.h"
@@ -37,7 +36,7 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
 
   DomainInt lits = litCount(vars);
   bool boundsCheck = ((preprocessLevel.type == PropLevel_SACBounds) ||
-                       (preprocessLevel.type == PropLevel_SSACBounds));
+                      (preprocessLevel.type == PropLevel_SSACBounds));
 
   if(boundsCheck) {
     PropagateSAC_Bounds prop_SACBounds(preprocessLevel);

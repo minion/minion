@@ -176,7 +176,7 @@ if not os.path.exists(objdir):
 verbose_print(1, "Current dir: " + currentdir)
 verbose_print(1, "Minion base dir: " + scriptdir)
 
-commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
+commandargs = ["-Wall", "-std=gnu++14", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
 for c in ['domains64', 'quick', 'debug', 'print', 'info', 'profile', 'static']:

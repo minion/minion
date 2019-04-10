@@ -361,8 +361,8 @@ public:
         CHECK(v >= 0, "The short tuple '" + tuple_name + "' contains the negative variable index " +
                           tostring(v));
         CHECK(v < varCount, "The short tuple '" + tuple_name + "' contains variable index " +
-                                 tostring(v) + ", but only contains " + tostring(varCount) +
-                                 " variables (0 indexed)");
+                                tostring(v) + ", but only contains " + tostring(varCount) +
+                                " variables (0 indexed)");
       }
     }
   }

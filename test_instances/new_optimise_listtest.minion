@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 14
+
+**VARIABLES** 
+
+BOUND b {0..6}
+BOOL c
+
+**SEARCH**
+
+MAXIMISING [b,c]
+
+**EOF**

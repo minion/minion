@@ -45,9 +45,9 @@ class SearchState {
 
   long long nodes;
   long long backtracks;
-  AnyVarRef* optimiseVar;
-  AnyVarRef* raw_optimiseVar;
-  DomainInt current_optimise_position;
+  vector<AnyVarRef> optimiseVars;
+  vector<AnyVarRef> raw_optimiseVars;
+  vector<DomainInt> current_optimise_positions;
   bool optimise;
   bool maximise;
 
@@ -119,25 +119,26 @@ public:
     solutions = 0;
   }
 
-  AnyVarRef* getOptimiseVar() {
-    return optimiseVar;
+  vector<AnyVarRef>& getOptimiseVars() {
+    return optimiseVars;
   }
-  void setOptimiseVar(AnyVarRef* _var) {
-    optimiseVar = _var;
-  }
-
-  AnyVarRef* getRawOptimiseVar() {
-    return raw_optimiseVar;
-  }
-  void setRawOptimiseVar(AnyVarRef* _var) {
-    raw_optimiseVar = _var;
+  void setOptimiseVars(const vector<AnyVarRef>& _var) {
+    optimiseVars = _var;
   }
 
-  DomainInt getOptimiseValue() {
-    return current_optimise_position;
+  vector<AnyVarRef>& getRawOptimiseVars() {
+    return raw_optimiseVars;
   }
-  void setOptimiseValue(DomainInt optimise_pos) {
-    current_optimise_position = optimise_pos;
+  void setRawOptimiseVars(const vector<AnyVarRef>& _var) {
+    raw_optimiseVars = _var;
+  }
+
+  const vector<DomainInt>& getOptimiseValues() {
+    return current_optimise_positions;
+  }
+
+  void setOptimiseValue(const vector<DomainInt>& optimise_pos) {
+    current_optimise_positions = optimise_pos;
   }
 
   bool isOptimisationProblem() {
@@ -217,9 +218,6 @@ public:
   SearchState()
       : nodes(0),
         backtracks(0),
-        optimiseVar(NULL),
-        raw_optimiseVar(NULL),
-        current_optimise_position(0),
         optimise(false),
         constraintsToPropagate(1),
         solutions(0),
@@ -229,8 +227,6 @@ public:
 
   // Must be defined later.
   ~SearchState();
-
-
 };
 
 struct NhConfig;
@@ -241,7 +237,6 @@ std::shared_ptr<NhConfig> makeNhConfig();
 class SearchOptions {
 
 public:
-
   struct RestartStruct {
     bool active = false;
     double multiplier = 1.5;

@@ -117,7 +117,18 @@ shared_ptr<SearchManager> makeSearch_manager(PropagationLevel propMethod,
 
   std::function<void(void)> opt_handler;
   if(getState().isOptimisationProblem()) {
-    opt_handler = []() { getState().getOptimiseVar()->setMin(getState().getOptimiseValue()); };
+    opt_handler = []() { 
+      const auto& vals = getState().getOptimiseValues();
+      auto& vars = getState().getOptimiseVars();
+      // vals.size == 0 before an optimisation value found
+      D_ASSERT(vals.size() == 0 || vals.size() == vars.size());
+      for(int i = 0; i < vals.size(); ++i) {
+        vars[i].setMin(vals[i]);
+        if(!(vars[i].isAssigned() && vars[i].assignedValue() == vals[i])) {
+          return;
+        }
+      }
+    };
   } else {
     opt_handler = []() {};
   }

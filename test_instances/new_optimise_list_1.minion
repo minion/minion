@@ -1,0 +1,14 @@
+MINION 3
+#TEST SOLCOUNT 49
+
+**VARIABLES** 
+
+BOUND b {0..6}
+BOUND c {0..6}
+
+**SEARCH**
+VARORDER[b,c]
+VALORDER[d,d]
+MINIMISING [b,c]
+
+**EOF**

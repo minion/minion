@@ -62,8 +62,7 @@ void SetupCSPOrdering(CSPInstance& instance, SearchMethod args) {
       }
     }
 
-    D_ASSERT(instance.searchOrder[i].varOrder.size() ==
-             instance.searchOrder[i].valOrder.size());
+    D_ASSERT(instance.searchOrder[i].varOrder.size() == instance.searchOrder[i].valOrder.size());
   }
 }
 void BuildCSP(CSPInstance& instance) {
@@ -77,11 +76,9 @@ void BuildCSP(CSPInstance& instance) {
   // Set up optimisation
   if(instance.is_optimisation_problem) {
     if(instance.optimise_minimising)
-      Controller::optimise_minimiseVar(
-          BuildCon::getAnyVarRefFromVar(instance.optimiseVariable));
+      Controller::optimise_minimiseVars(BuildCon::getAnyVarRefFromVar(instance.optimiseVariables));
     else
-      Controller::optimiseMaximiseVar(
-          BuildCon::getAnyVarRefFromVar(instance.optimiseVariable));
+      Controller::optimiseMaximiseVars(BuildCon::getAnyVarRefFromVar(instance.optimiseVariables));
   }
 
   vector<vector<AnyVarRef>>& print_matrix = getState().getPrintMatrix();
@@ -106,7 +103,6 @@ void BuildCSP(CSPInstance& instance) {
   Controller::initalise_search();
   getState().getOldTimer().maybePrintTimestepStore(cout, "Initial Propagate: ", "InitialPropagate",
                                                    getTableOut(), !getOptions().silent);
-
 }
 
 void SolveCSP(CSPInstance& instance, SearchMethod args) {

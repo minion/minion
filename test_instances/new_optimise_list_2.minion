@@ -1,0 +1,18 @@
+MINION 3
+#TEST SOLCOUNT 25
+
+**VARIABLES** 
+
+DISCRETE b {0..6}
+DISCRETE c {0..6}
+
+**SEARCH**
+VARORDER [b,c]
+VALORDER [a,a]
+MAXIMISING [b,c]
+
+**CONSTRAINTS**
+sumgeq([b,c], 2)
+sumleq([b,c], 6)
+
+**EOF**

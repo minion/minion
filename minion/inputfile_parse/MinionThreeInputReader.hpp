@@ -238,10 +238,11 @@ default is to use ascending order for every search variable.
    ValOrder::= VALORDER[ (a|d)+ ]
 
 To model an optimisation problem the user can specify to minimise
-or maximise a variable's value.
+or maximise a variable's value, or list of variables (under
+lexicographic ordering)
 
-   OptimisationFn::= MAXIMISING <varname>
-                   | MINIMISING <varname>
+   OptimisationFn::= MAXIMISING <varname> or <varlist>
+                   | MINIMISING <varname> or <varlist>
 
 Finally, the user can control some aspects of the way solutions are
 printed. By default (no PrintFormat specified) all the variables are
@@ -867,11 +868,11 @@ vector<ConstraintBlob> MinionThreeInputReader<FileReader>::readConstraintList(Fi
 /// M (for matrix identifer M)
 /// [ M,B,.. ] (for matrix identifers M and variables B)
 template <typename FileReader>
-vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* infile) {
+vector<Var> MinionThreeInputReader<FileReader>::readLiteralVector(FileReader* infile, bool mustBeVector) {
   vector<Var> newVector;
 
   if(infile->peekChar() != '[') { // Must just be a matrix identifier
-    return readPossibleMatrixIdentifier(infile, true);
+    return readPossibleMatrixIdentifier(infile, mustBeVector);
   }
 
   infile->checkSym('[');
@@ -1159,16 +1160,16 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       if(instance->is_optimisation_problem == true)
         throw parse_exception("Can only have one min / max per problem!");
 
-      Var var = readIdentifier(infile);
-      MAYBE_PARSER_INFO("Maximising " + tostring(var));
-      instance->set_optimise(false, var);
+      vector<Var> vars = readLiteralVector(infile, false);
+      MAYBE_PARSER_INFO("Maximising " + tostring(vars));
+      instance->set_optimise(false, vars);
     } else if(varType == "MINIMISING" || varType == "MINIMIZING") {
       if(instance->is_optimisation_problem == true)
         throw parse_exception("Can only have one min / max per problem!");
 
-      Var var = readIdentifier(infile);
-      MAYBE_PARSER_INFO("Minimising " + tostring(var));
-      instance->set_optimise(true, var);
+      vector<Var> vars = readLiteralVector(infile, false);
+      MAYBE_PARSER_INFO("Minimising " + tostring(vars));
+      instance->set_optimise(true, vars);
     } else if(varType == "PRINT") {
       if(infile->peekChar() == 'A') {
         string in = infile->getString();

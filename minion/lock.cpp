@@ -44,6 +44,5 @@ void lock() {
       getQueue().propagateQueueRoot();
     }
   }
-
 }
 } // namespace Controller

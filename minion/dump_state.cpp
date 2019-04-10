@@ -268,15 +268,15 @@ void dumpSolver(ostream& os, bool justDomains) {
   }
 
   os << "**SEARCH**" << endl;
-  if(getState().getRawOptimiseVar()) {
+  if(!getState().getRawOptimiseVars().empty()) {
     if(getState().isMaximise())
       os << "MAXIMISING ";
     else
       os << "MINIMISING ";
-    if(getState().getRawOptimiseVar()->isAssigned())
-      os << getState().getRawOptimiseVar()->assignedValue() << "\n";
-    else
-      os << getNameFromVar(*getState().getRawOptimiseVar()) << "\n";
+    output_mapped_container(
+        os, getState().getRawOptimiseVars(),
+        [](auto& v) { return v.isAssigned() ? to_string(v.assignedValue()) : getNameFromVar(v); },
+        true);
   }
   os << "PRINT ";
   os << ConOutput::print_vars(getState().getPrintMatrix());

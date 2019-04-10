@@ -41,7 +41,6 @@ struct SearchMethod {
         randomSeed(std::random_device{}()) {}
 };
 
-
 void SetupCSPOrdering(CSPInstance& instance, SearchMethod args);
 void BuildCSP(ProbSpec::CSPInstance& instance);
 void SolveCSP(ProbSpec::CSPInstance& instance, SearchMethod args);

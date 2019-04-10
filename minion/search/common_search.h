@@ -30,21 +30,25 @@ namespace Controller {
 
 /// Sets optimisation variable.
 template <typename VarRef>
-void optimiseMaximiseVar(VarRef var) {
+void optimiseMaximiseVars(const vector<VarRef>& vars) {
   getOptions().findAllSolutions();
-  getState().setOptimiseVar(new AnyVarRef(var));
+  getState().setOptimiseVars(vars);
   getState().setOptimisationProblem(true);
-  getState().setRawOptimiseVar(new AnyVarRef(var));
+  getState().setRawOptimiseVars(vars);
   getState().setMaximise(true);
 }
 
 /// Sets optimisation variable.
 template <typename VarRef>
-void optimise_minimiseVar(VarRef var) {
+void optimise_minimiseVars(const vector<VarRef>& vars) {
   getOptions().findAllSolutions();
-  getState().setOptimiseVar(new AnyVarRef(VarNeg<VarRef>(var)));
+  vector<AnyVarRef> negvars;
+  for(const auto& v : vars) {
+    negvars.push_back(VarNeg<VarRef>(v));
+  }
+  getState().setOptimiseVars(negvars);
   getState().setOptimisationProblem(true);
-  getState().setRawOptimiseVar(new AnyVarRef(var));
+  getState().setRawOptimiseVars(vars);
   getState().setMaximise(false);
 }
 
@@ -180,7 +184,8 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
 
   if(getOptions().split) {
     if(getState().isOptimisationProblem()) {
-      AnyVarRef* optVarRef = getState().getOptimiseVar();
+      abort();
+/*      const vector<AnyVarRef>& optVarRef = getState().getOptimiseVar();
       string optVar = getState().getInstance()->vars.getName(optVarRef->getBaseVar());
       DomainInt optVal = getState().getOptimiseValue();
       opt += "ineq(";
@@ -188,7 +193,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
         opt += tostring(optVal) + string(", ") + optVar + string(", 0)\n");
       } else {
         opt += optVar + string(", ") + tostring(-optVal) + string(", 0)\n");
-      }
+      }*/
     }
     if(branches.empty()) {
       // TODO: We should check if any variable has non-empty domain, but this
@@ -309,23 +314,46 @@ inline void standardTime_ctrlc_checks(const vector<AnyVarRef>& varArray,
 
 void inline standard_dealWith_solution() {
   if(getState().isOptimisationProblem()) {
-    if(!getState().getOptimiseVar()->isAssigned()) {
-      cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
-      cerr << "Put it in the variable ordering?" << endl;
-      cerr << "Aborting Search" << endl;
-      exit(1);
+    const auto& vars = getState().getOptimiseVars();
+    for(const auto& v : vars) {
+      if(!v.isAssigned()) {
+        cerr << "The optimisation variable isn't assigned at a solution node!" << endl;
+        cerr << "Put it in the variable ordering?" << endl;
+        cerr << "Aborting Search" << endl;
+        exit(1);
+      }
+    }
+
+    std::vector<DomainInt> rawOptVals;
+    for(auto& v : getState().getRawOptimiseVars()) {
+      rawOptVals.push_back(v.assignedValue());
     }
 
     if(getOptions().printonlyoptimal) {
-      getState().storedSolution += "Solution found with Value: " +
-                                   tostring(getState().getRawOptimiseVar()->assignedValue()) +
-                                   "\n";
+      {
+        std::ostringstream oss(getState().storedSolution);
+        oss << "Solution found with Value: ";
+        output_mapped_container(oss, rawOptVals,
+        [](auto& v){return v;}, true);
+        oss << "\n";
+      }
     } else {
-      cout << "Solution found with Value: " << getState().getRawOptimiseVar()->assignedValue()
-           << endl;
+      cout << "Solution found with Value: ";
+      output_mapped_container(cout, rawOptVals,
+      [](auto& v){return v;}, true);
+      cout << endl;
     }
 
-    getState().setOptimiseValue(getState().getOptimiseVar()->assignedValue() + 1);
+    std::vector<DomainInt> optVals;
+    for(auto& v : getState().getOptimiseVars()) {
+      optVals.push_back(v.assignedValue());
+    }
+
+    if(optVals.size() > 0)
+    {
+      optVals.back()++;
+    }
+    getState().setOptimiseValue(optVals);
   }
   // Note that sollimit = -1 if all solutions should be found.
   if(getState().getSolutionCount() == getOptions().sollimit)
@@ -366,8 +394,8 @@ void inline initalise_search() {
   /// Failed initially propagating constraints!
   if(getState().isFailed())
     return;
-  if(getState().isOptimisationProblem())
-    getState().setOptimiseValue(DomainInt_Min);
+
+  getState().setOptimiseValue(vector<DomainInt>{});
 }
 } // namespace Controller
 

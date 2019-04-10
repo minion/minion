@@ -193,7 +193,7 @@ class MinionThreeInputReader {
   TupleList* readConstraintTupleList(FileReader* infile);
   Var readIdentifier(FileReader* infile);
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);
-  vector<Var> readLiteralVector(FileReader* infile);
+  vector<Var> readLiteralVector(FileReader* infile, bool mustBeVector = true);
   vector<DomainInt> readConstantVector(FileReader* infile, char start = '[', char end = ']',
                                        bool = false);
   vector<DomainInt> readRange(FileReader* infile);

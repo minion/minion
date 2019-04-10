@@ -125,6 +125,25 @@ void output_container(std::ostream& o, const T& t) {
   o << "]";
 }
 
+template<typename T, typename Func>
+void output_mapped_container(std::ostream& o, const T& t, Func func, bool singlevar) {
+  if(!(singlevar && t.size() == 1)) {
+    o << "[";
+  }
+
+  bool firstvar = true;
+  for(auto& v : t) {
+    if(firstvar) {
+      firstvar = false;
+    } else {
+      o << ", ";
+    }
+    o << func(v);
+  }
+  if(! (singlevar && t.size() == 1)) {
+    o << "]";
+  }
+}
 #endif
 /** @}
  */
