@@ -334,13 +334,13 @@ void inline standard_dealWith_solution() {
         std::ostringstream oss(getState().storedSolution);
         oss << "Solution found with Value: ";
         output_mapped_container(oss, rawOptVals,
-        [](auto& v){return v;}, true);
+        [](DomainInt v){return v;}, true);
         oss << "\n";
       }
     } else {
       cout << "Solution found with Value: ";
       output_mapped_container(cout, rawOptVals,
-      [](auto& v){return v;}, true);
+      [](DomainInt v){return v;}, true);
       cout << endl;
     }
 
