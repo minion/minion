@@ -117,7 +117,7 @@ struct ModConstraint : public AbstractConstraint {
   // This function exists for two reasons:
   // 1) Make sure we never divide by zero
   // 2) Abstract checking mod_undefzero
-  bool check_mod_result(DomainInt i, DomainInt j, DomainInt k) {
+  bool check_modResult(DomainInt i, DomainInt j, DomainInt k) {
     if(j == 0) {
       return (undef && k == 0);
     }
@@ -134,7 +134,7 @@ struct ModConstraint : public AbstractConstraint {
     int assigedcount = b1.hasSingleValue() + b2.hasSingleValue() + b3.hasSingleValue();
 
     if(assigedcount == 3) {
-      if(!check_mod_result(b1.min(), b2.min(), b3.min())) {
+      if(!check_modResult(b1.min(), b2.min(), b3.min())) {
         getState().setFailed(true);
       }
       return;
@@ -174,7 +174,7 @@ struct ModConstraint : public AbstractConstraint {
 
     if(b2.hasSingleValue()) {
       if(var3.isBound() || var1.isBound()) {
-        if(do_div<undef>(b1.min(), b2.min()) == do_div<undef>(b1.max(), b2.min())) {
+        if(doDiv<undef>(b1.min(), b2.min()) == doDiv<undef>(b1.max(), b2.min())) {
           Bounds b = emptyBounds();
           b = addValue(b, do_mod(b1.min(), b2.min()));
           b = addValue(b, do_mod(b1.max(), b2.min()));
@@ -210,7 +210,7 @@ struct ModConstraint : public AbstractConstraint {
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
     D_ASSERT(vSize == 3);
-    return check_mod_result(v[0], v[1], v[2]);
+    return check_modResult(v[0], v[1], v[2]);
   }
 
   virtual vector<AnyVarRef> getVars() {

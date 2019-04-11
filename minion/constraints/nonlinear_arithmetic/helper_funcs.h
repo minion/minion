@@ -1,7 +1,7 @@
 #ifndef NONLINEAR_HELPER_H
 #define NONLINEAR_HELPER_H
 
-inline DomainInt round_up_div(DomainInt x, DomainInt y) {
+inline DomainInt roundUpDiv(DomainInt x, DomainInt y) {
   if(y == 0)
     return 0;
   DomainInt ret = x / y;
@@ -10,7 +10,7 @@ inline DomainInt round_up_div(DomainInt x, DomainInt y) {
   return ret;
 }
 
-inline DomainInt round_down_div(DomainInt x, DomainInt y) {
+inline DomainInt round_downDiv(DomainInt x, DomainInt y) {
   if(y == 0)
     return DomainInt_Max;
   return x / y;
@@ -19,7 +19,7 @@ inline DomainInt round_down_div(DomainInt x, DomainInt y) {
 // This function does i/j with Minion semantics.
 // It will assert if undef==false and j==0
 template <bool undef>
-DomainInt do_div(DomainInt i, DomainInt j) {
+DomainInt doDiv(DomainInt i, DomainInt j) {
   if(j == 0) {
     D_ASSERT(undef);
     return 0;
@@ -36,12 +36,12 @@ DomainInt do_div(DomainInt i, DomainInt j) {
 // 1) Make sure we never divide by zero
 // 2) Abstract checking div_undefzero
 template <bool undef>
-bool check_div_result(DomainInt i, DomainInt j, DomainInt k) {
+bool checkDivResult(DomainInt i, DomainInt j, DomainInt k) {
   if(j == 0) {
     return (undef && k == 0);
   }
 
-  return do_div<undef>(i, j) == k;
+  return doDiv<undef>(i, j) == k;
 }
 
 #endif

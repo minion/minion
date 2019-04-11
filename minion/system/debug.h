@@ -70,7 +70,7 @@ inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "") 
   }
 // These functions are defined in debug_functions.cpp
 
-extern bool debug_crash;
+extern bool debugCrash;
 void D_FATAL_ERROR2(string s, string file, string line);
 void DOM_NORETURN FAIL_EXIT(string s = "");
 

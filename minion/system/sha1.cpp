@@ -402,7 +402,7 @@ static char *test_data[] = {
     "abc",
     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
     "A million repetitions of 'a'"};
-static char *test_results[] = {
+static char *testResults[] = {
     "A9993E36 4706816A BA3E2571 7850C26C 9CD0D89D",
     "84983E44 1C3BD26E BAAE4AA1 F95129E5 E54670F1",
     "34AA973C D4C4DAA4 F61EEB2B DBAD2731 6534016F"};
@@ -441,11 +441,11 @@ int main(int argc, char** argv)
         SHA1_Final(&context, digest);
 	digestTo_hex(digest, output);
 
-        if (strcmp(output, test_results[k])) {
+        if (strcmp(output, testResults[k])) {
             fprintf(stdout, "FAIL\n");
             fprintf(stderr,"* hash of \"%s\" incorrect:\n", test_data[k]);
             fprintf(stderr,"\t%s returned\n", output);
-            fprintf(stderr,"\t%s is correct\n", test_results[k]);
+            fprintf(stderr,"\t%s is correct\n", testResults[k]);
             return (1);
         }
     }
@@ -455,11 +455,11 @@ int main(int argc, char** argv)
         SHA1_Update(&context, (uint8_t*)"a", 1);
     SHA1_Final(&context, digest);
     digestTo_hex(digest, output);
-    if (strcmp(output, test_results[2])) {
+    if (strcmp(output, testResults[2])) {
         fprintf(stdout, "FAIL\n");
         fprintf(stderr,"* hash of \"%s\" incorrect:\n", test_data[2]);
         fprintf(stderr,"\t%s returned\n", output);
-        fprintf(stderr,"\t%s is correct\n", test_results[2]);
+        fprintf(stderr,"\t%s is correct\n", testResults[2]);
         return (1);
     }
 

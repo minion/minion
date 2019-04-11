@@ -100,7 +100,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     if(command == string("-findallsols")) {
       getOptions().findAllSolutions();
     } else if(command == string("-crash")) {
-      debug_crash = true;
+      debugCrash = true;
     }
     /** @help switches;-quiet Description
     Do not print parser progress (default)

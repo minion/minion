@@ -33,7 +33,7 @@ struct MultiplyHelp {
     return newval - 1;
   }
 
-  static inline DomainInt round_up(DomainInt val, DomainInt divisor) {
+  static inline DomainInt roundUp(DomainInt val, DomainInt divisor) {
     D_ASSERT(divisor > 0);
     if(val < 0)
       return val / divisor;
@@ -62,7 +62,7 @@ struct MultiplyHelp<BoolVarRef>
       return 1;
   }
 
-  static inline SysInt round_up(SysInt val, SysInt divisor)
+  static inline SysInt roundUp(SysInt val, SysInt divisor)
   {
     if(
   }
@@ -172,13 +172,13 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
     if(dataMap.multiply() >= 0)
       data.setMax(MapHelp::round_down(i, dataMap.multiply()));
     else
-      data.setMin(MapHelp::round_up(-i, -dataMap.multiply()));
+      data.setMin(MapHelp::roundUp(-i, -dataMap.multiply()));
   }
 
   void setMin(DomainInt i)
   {
     if(Multiply >= 0)
-      data.setMin(MapHelp::round_up(i, dataMap.multiply()));
+      data.setMin(MapHelp::roundUp(i, dataMap.multiply()));
     else
       data.setMax(MapHelp::round_down(-i, dataMap.multiply()));
   }
@@ -314,12 +314,12 @@ struct MultiplyVar {
     if(Multiply >= 0)
       data.setMax(MultiplyHelp<VarRef>::round_down(i, Multiply));
     else
-      data.setMin(MultiplyHelp<VarRef>::round_up(-i, -Multiply));
+      data.setMin(MultiplyHelp<VarRef>::roundUp(-i, -Multiply));
   }
 
   void setMin(DomainInt i) {
     if(Multiply >= 0)
-      data.setMin(MultiplyHelp<VarRef>::round_up(i, Multiply));
+      data.setMin(MultiplyHelp<VarRef>::roundUp(i, Multiply));
     else
       data.setMax(MultiplyHelp<VarRef>::round_down(-i, -Multiply));
   }

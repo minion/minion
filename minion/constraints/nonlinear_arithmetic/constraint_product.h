@@ -109,11 +109,11 @@ struct ProductConstraint : public AbstractConstraint {
       var3_min = max(var3_min, var1_min * var2_min);
       var3_max = min(var3_max, var1_max * var2_max);
 
-      var1_min = max(var1_min, round_up_div(var3_min, var2_max));
-      var1_max = min(var1_max, round_down_div(var3_max, var2_min));
+      var1_min = max(var1_min, roundUpDiv(var3_min, var2_max));
+      var1_max = min(var1_max, round_downDiv(var3_max, var2_min));
 
-      var2_min = max(var2_min, round_up_div(var3_min, var1_max));
-      var2_max = min(var2_max, round_down_div(var3_max, var1_min));
+      var2_min = max(var2_min, roundUpDiv(var3_min, var1_max));
+      var2_max = min(var2_max, round_downDiv(var3_max, var1_min));
 
       var1.setMin(var1_min);
       var1.setMax(var1_max);

@@ -297,9 +297,9 @@ struct GraphBuilder {
     add_edge(v, vIndex);
     add_edge(vIndex, b.vars[1][0]);
 
-    string v_result = g.new_vertex(name + "_RESULT");
-    add_edge(v, v_result);
-    add_edge(v_result, b.vars[2][0]);
+    string vResult = g.new_vertex(name + "_RESULT");
+    add_edge(v, vResult);
+    add_edge(vResult, b.vars[2][0]);
 
     return v;
   }

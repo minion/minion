@@ -124,8 +124,8 @@ struct BigRangeVarContainer {
   /// this function to move this value past any removed values.
   DomainInt findNewUpperBound(BigRangeVarRef_internal d) {
     DomainInt lower = lowerBound(d);
-    DomainInt old_upBound = upperBound(d);
-    DomainInt loopvar = old_upBound;
+    DomainInt oldUpBound = upperBound(d);
+    DomainInt loopvar = oldUpBound;
     // DomainInt lowBound = initialBounds[d.varNum].first;
     if(loopvar < lower) {
       getState().setFailed(true);
@@ -140,7 +140,7 @@ struct BigRangeVarContainer {
         return loopvar;
     }
     getState().setFailed(true);
-    return old_upBound;
+    return oldUpBound;
   }
 
   /// Find new "true" lower bound.
