@@ -1,7 +1,8 @@
 # We want Ubuntu 14.04 "Trust" instead of 12.04 "Precise" to get newer
 # and less buggy gcov
 dist: trusty
-language: c
+language: rust
+cache: cargo
 
 env:
   global:
@@ -13,10 +14,14 @@ addons:
   apt_packages:
     - libgmp-dev
     - libreadline-dev
+    - clang
+    - make
+    - valgrind
 
 matrix:
   include:
     - env: TEST_SUITES="test_instances"
+    - env: TEST_SUITES="rust"
 script:
   - gcov --version
   - bash etc/ci-prepare.sh && bash etc/ci.sh

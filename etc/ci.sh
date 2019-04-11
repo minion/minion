@@ -22,6 +22,10 @@ do
     cd test_instances
     ./run_tests.sh ../bin/minion*
     ;;
+  rust)
+    cd tester
+    cargo run --release -- --minion ../bin/minion*
+    ;;
   esac
 done
 
