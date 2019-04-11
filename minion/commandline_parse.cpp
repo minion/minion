@@ -99,8 +99,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     const string command(argv[i]);
     if(command == string("-findallsols")) {
       getOptions().findAllSolutions();
-    } else if(command == string("-crash")) {
-      debugCrash = true;
     }
     /** @help switches;-quiet Description
     Do not print parser progress (default)

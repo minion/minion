@@ -22,8 +22,6 @@
 
 using namespace std;
 
-bool debugCrash = false;
-
 void outputFatalError(string s) {
   std::cerr << s << "\n";
   abort();
@@ -60,10 +58,6 @@ void DOM_NORETURN FAIL_EXIT(string s) {
   cerr << "Unrecoverable error. Exiting." << endl;
   cerr << s << endl;
   cerr.flush();
-  if(debugCrash) {
-    SysInt* i = NULL;
-    *i = 0;
-  }
   throw 9;
 }
 
