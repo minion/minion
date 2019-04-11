@@ -275,7 +275,7 @@ struct MDDC : public AbstractConstraint {
         // Search for value.
         vector<std::pair<DomainInt, MDDNode*>>& links = curnode->links;
 
-        int idx = find_link(links, tup[i]);
+        int idx = findLink(links, tup[i]);
 
         if(idx == -1) {
           // New node needed.
@@ -332,7 +332,7 @@ struct MDDC : public AbstractConstraint {
         // Search for value.
         vector<std::pair<DomainInt, MDDNode*>>& links = curnode->links;
 
-        int idx = find_link(links, tup[i]);
+        int idx = findLink(links, tup[i]);
 
         if(idx == -1) {
           // New node(s) needed.
@@ -519,7 +519,7 @@ struct MDDC : public AbstractConstraint {
       }
 
       vector<std::pair<DomainInt, MDDNode*>>& links = curnode->links;
-      int idx = find_link(links, tup[i]);
+      int idx = findLink(links, tup[i]);
 
       if(idx == -1)
         return false; // implicit ff node.
@@ -538,7 +538,7 @@ struct MDDC : public AbstractConstraint {
   }
 
   // Binary search for a value in a vector
-  inline SysInt find_link(vector<std::pair<DomainInt, MDDNode*>> links, DomainInt value) {
+  inline SysInt findLink(vector<std::pair<DomainInt, MDDNode*>> links, DomainInt value) {
     // Binary search to find the index where the first element of the pair
     // equals value.
     SysInt first = 0;

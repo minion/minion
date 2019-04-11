@@ -445,15 +445,15 @@ struct SearchOrder {
   vector<ValOrder> valOrder;
   VarOrderEnum order;
   unsigned int limit;
-  bool find_one_assignment;
+  bool findOneAssignment;
 
-  SearchOrder() : order(ORDER_ORIGINAL), find_one_assignment(false) {}
+  SearchOrder() : order(ORDER_ORIGINAL), findOneAssignment(false) {}
 
   SearchOrder(const vector<Var>& _varOrder)
-      : varOrder(_varOrder), order(ORDER_ORIGINAL), find_one_assignment(false) {}
+      : varOrder(_varOrder), order(ORDER_ORIGINAL), findOneAssignment(false) {}
 
-  SearchOrder(const vector<Var>& _varOrder, VarOrderEnum _order, bool _find_one_assignment = false)
-      : varOrder(_varOrder), order(_order), find_one_assignment(_find_one_assignment) {}
+  SearchOrder(const vector<Var>& _varOrder, VarOrderEnum _order, bool _findOneAssignment = false)
+      : varOrder(_varOrder), order(_order), findOneAssignment(_findOneAssignment) {}
 
   void setupValueOrder() {
     if(valOrder.empty())

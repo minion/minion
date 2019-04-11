@@ -853,7 +853,7 @@ struct InstanceStats {
     SysInt branchingvars = 0;
     SysInt auxvars = 0;
     for(SysInt i = 0; i < (SysInt)csp.searchOrder.size(); i++) {
-      if(csp.searchOrder[i].find_one_assignment) {
+      if(csp.searchOrder[i].findOneAssignment) {
         auxvars = auxvars + csp.searchOrder[i].varOrder.size();
       } else {
         branchingvars = branchingvars + csp.searchOrder[i].varOrder.size();

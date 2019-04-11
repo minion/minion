@@ -45,7 +45,7 @@ void dumpSearchorder(const SearchOrder& order, ostream& os) {
     return;
 
   os << "VARORDER ";
-  if(order.find_one_assignment)
+  if(order.findOneAssignment)
     os << "AUX ";
 
   switch(order.order) {

@@ -113,12 +113,12 @@ struct SparseBoundVarContainer {
     return ((BoundType*)bound_data())[i.varNum * 2 + 1];
   }
 
-  /// find the small possible lower bound above new_lowerBound.
+  /// find the small possible lower bound above newLowerBound.
   /// Does not actually change the lower bound.
-  DomainInt find_lowerBound(SparseBoundVarRef_internal<BoundType> d, DomainInt new_lowerBound) {
+  DomainInt findLowerBound(SparseBoundVarRef_internal<BoundType> d, DomainInt newLowerBound) {
     vector<BoundType>& bounds = getDomain(d);
     typename vector<BoundType>::iterator it =
-        std::lower_bound(bounds.begin(), bounds.end(), new_lowerBound);
+        std::lower_bound(bounds.begin(), bounds.end(), newLowerBound);
     if(it == bounds.end()) {
       getState().setFailed(true);
       return *(it - 1);
@@ -127,18 +127,18 @@ struct SparseBoundVarContainer {
     return *it;
   }
 
-  /// find the largest possible upper bound below new_upperBound.
+  /// find the largest possible upper bound below newUpperBound.
   /// Does not actually change the upper bound.
-  DomainInt find_upperBound(SparseBoundVarRef_internal<BoundType>& d, DomainInt new_upperBound) {
+  DomainInt findUpperBound(SparseBoundVarRef_internal<BoundType>& d, DomainInt newUpperBound) {
     vector<BoundType>& bounds = getDomain(d);
 
     typename vector<BoundType>::iterator it =
-        std::lower_bound(bounds.begin(), bounds.end(), new_upperBound);
+        std::lower_bound(bounds.begin(), bounds.end(), newUpperBound);
     if(it == bounds.end())
       return *(it - 1);
 
-    if(*it == new_upperBound)
-      return new_upperBound;
+    if(*it == newUpperBound)
+      return newUpperBound;
 
     if(it == bounds.begin()) {
       getState().setFailed(true);
@@ -293,11 +293,11 @@ struct SparseBoundVarContainer {
     // Can't attach triggers to bound vars!
 
     if(minVal != i) {
-      trigger_list.push_lower(d.varNum, i - minVal);
+      trigger_list.pushLower(d.varNum, i - minVal);
     }
 
     if(maxVal != i) {
-      trigger_list.push_upper(d.varNum, maxVal - i);
+      trigger_list.pushUpper(d.varNum, maxVal - i);
     }
 
     upperBound(d) = i;
@@ -315,7 +315,7 @@ struct SparseBoundVarContainer {
 
   void setMax(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
     // Note, this just finds a new upper bound, it doesn't set it.
-    i = find_upperBound(d, i);
+    i = findUpperBound(d, i);
 
     DomainInt lowBound = lowerBound(d);
 
@@ -327,7 +327,7 @@ struct SparseBoundVarContainer {
     DomainInt upBound = upperBound(d);
 
     if(i < upBound) {
-      trigger_list.push_upper(d.varNum, upBound - i);
+      trigger_list.pushUpper(d.varNum, upBound - i);
       trigger_list.pushDomainChanged(d.varNum);
       // Can't attach triggers to bound vars!
 
@@ -339,7 +339,7 @@ struct SparseBoundVarContainer {
   }
 
   void setMin(SparseBoundVarRef_internal<BoundType> d, DomainInt i) {
-    i = find_lowerBound(d, i);
+    i = findLowerBound(d, i);
 
     DomainInt upBound = upperBound(d);
 
@@ -351,7 +351,7 @@ struct SparseBoundVarContainer {
     DomainInt lowBound = lowerBound(d);
 
     if(i > lowBound) {
-      trigger_list.push_lower(d.varNum, i - lowBound);
+      trigger_list.pushLower(d.varNum, i - lowBound);
       trigger_list.pushDomainChanged(d.varNum);
       // Can't attach triggers to bound vars!
       lowerBound(d) = i;

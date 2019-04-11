@@ -1876,11 +1876,11 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   void prop_capacity_strong_scc(SysInt value) {
     GCCPRINT("In prop_capacity_strong_scc(value)");
     // use the matching -- change it by lowering flow to value.
-    GCCPRINT("Calling bfsmatching_card_lowerbound for value " << value);
+    GCCPRINT("Calling bfsmatching_cardLowerbound for value " << value);
     // assumes vars_in_scc and valsInSCC are already populated.
 
-    SysInt newlb = bfsmatching_card_lowerbound(value, lower[value - domMin]);
-    GCCPRINT("bfsmatching_card_lowerbound Returned " << newlb);
+    SysInt newlb = bfsmatching_cardLowerbound(value, lower[value - domMin]);
+    GCCPRINT("bfsmatching_cardLowerbound Returned " << newlb);
     SysInt validx = valToCapIndex[value - domMin];
     if(newlb > capacity_array[validx].min()) {
       GCCPRINT("Improved lower bound " << newlb);
@@ -1888,9 +1888,9 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
       lower[value - domMin] = newlb;
     }
 
-    GCCPRINT("Calling card_upperbound for value " << value);
-    SysInt newub = card_upperbound(value, upper[value - domMin]);
-    GCCPRINT("card_upperbound Returned " << newub);
+    GCCPRINT("Calling cardUpperbound for value " << value);
+    SysInt newub = cardUpperbound(value, upper[value - domMin]);
+    GCCPRINT("cardUpperbound Returned " << newub);
 
     if(newub < capacity_array[validx].max()) {
       GCCPRINT("Improved upper bound " << newub);
@@ -1904,7 +1904,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   // Changed copy of bfsmatching_gcc method above.
 
   // should stop when we reach the existing bound.
-  inline SysInt bfsmatching_card_lowerbound(SysInt forbiddenval, SysInt existinglb) {
+  inline SysInt bfsmatching_cardLowerbound(SysInt forbiddenval, SysInt existinglb) {
     // lower and upper are indexed by value-domMin and provide the capacities.
     // usage is the number of times a value is used in the matching.
 
@@ -2086,7 +2086,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     return newlb;
   }
 
-  // By changing the flow in card_upperbound and not restoring it,
+  // By changing the flow in cardUpperbound and not restoring it,
   // might compromize the the worst-case analysis of the lowerbound thing...
   // it requires the same flow so that it only looks for a mazimum of r paths.
 
@@ -2096,7 +2096,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   // therefore occurrences of b might be reduced.
   // overall though, not sure if worst-case analysis is not compromised.
 
-  inline SysInt card_upperbound(SysInt value, SysInt existingub) {
+  inline SysInt cardUpperbound(SysInt value, SysInt existingub) {
     // lower and upper are indexed by value-domMin and provide the capacities.
     // usage is the number of times a value is used in the matching.
 

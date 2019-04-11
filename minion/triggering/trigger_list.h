@@ -115,12 +115,12 @@ public:
       getQueue().pushDynamicTriggers(DynamicTriggerEvent(trig, checked_cast<SysInt>(domain_delta)));
   }
 
-  void push_upper(DomainInt varNum, DomainInt upper_delta) {
+  void pushUpper(DomainInt varNum, DomainInt upper_delta) {
     D_ASSERT(upper_delta > 0 || getState().isFailed());
     dynamic_propagate(varNum, UpperBound, upper_delta);
   }
 
-  void push_lower(DomainInt varNum, DomainInt lower_delta) {
+  void pushLower(DomainInt varNum, DomainInt lower_delta) {
     D_ASSERT(lower_delta > 0 || getState().isFailed());
     dynamic_propagate(varNum, LowerBound, lower_delta);
   }

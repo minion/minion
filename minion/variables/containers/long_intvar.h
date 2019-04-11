@@ -122,7 +122,7 @@ struct BigRangeVarContainer {
   /// This should be used by first setting the value of upperBound(d), then
   /// calling
   /// this function to move this value past any removed values.
-  DomainInt find_new_upperBound(BigRangeVarRef_internal d) {
+  DomainInt findNewUpperBound(BigRangeVarRef_internal d) {
     DomainInt lower = lowerBound(d);
     DomainInt old_upBound = upperBound(d);
     DomainInt loopvar = old_upBound;
@@ -147,7 +147,7 @@ struct BigRangeVarContainer {
   /// This should be used by first setting the value of lowerBound(d), then
   /// calling
   /// this function to move this value past any removed values.
-  DomainInt find_new_lowerBound(BigRangeVarRef_internal d) {
+  DomainInt findNewLowerBound(BigRangeVarRef_internal d) {
     DomainInt upper = upperBound(d);
     DomainInt old_lowBound = lowerBound(d);
     DomainInt loopvar = old_lowBound;
@@ -309,14 +309,14 @@ struct BigRangeVarContainer {
 
     domainBound_type upBound = upperBound(d);
     if(i == upBound) {
-      upperBound(d) = find_new_upperBound(d);
-      trigger_list.push_upper(d.varNum, upBound - upperBound(d));
+      upperBound(d) = findNewUpperBound(d);
+      trigger_list.pushUpper(d.varNum, upBound - upperBound(d));
     }
 
     domainBound_type lowBound = lowerBound(d);
     if(i == lowBound) {
-      lowerBound(d) = find_new_lowerBound(d);
-      trigger_list.push_lower(d.varNum, lowerBound(d) - lowBound);
+      lowerBound(d) = findNewLowerBound(d);
+      trigger_list.pushLower(d.varNum, lowerBound(d) - lowBound);
     }
 
     if(upperBound(d) == lowerBound(d)) {
@@ -382,13 +382,13 @@ private:
 
     DomainInt lowBound = lowerBound(d);
     if(offset != lowBound) {
-      trigger_list.push_lower(d.varNum, offset - lowBound);
+      trigger_list.pushLower(d.varNum, offset - lowBound);
       lowerBound(d) = offset;
     }
 
     DomainInt upBound = upperBound(d);
     if(offset != upBound) {
-      trigger_list.push_upper(d.varNum, upBound - offset);
+      trigger_list.pushUpper(d.varNum, upBound - offset);
       upperBound(d) = offset;
     }
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
@@ -424,13 +424,13 @@ public:
         }
       }
       upperBound(d) = offset;
-      DomainInt new_upper = find_new_upperBound(d);
-      upperBound(d) = new_upper;
+      DomainInt newUpper = findNewUpperBound(d);
+      upperBound(d) = newUpper;
 
 #ifndef NO_DOMAIN_TRIGGERS
       trigger_list.pushDomainChanged(d.varNum);
 #endif
-      trigger_list.push_upper(d.varNum, upBound - upperBound(d));
+      trigger_list.pushUpper(d.varNum, upBound - upperBound(d));
 
       if(lowerBound(d) == upperBound(d)) {
         trigger_list.push_assign(d.varNum, getAssignedValue(d));
@@ -477,13 +477,13 @@ public:
                (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
 
       lowerBound(d) = offset;
-      DomainInt new_lower = find_new_lowerBound(d);
-      lowerBound(d) = new_lower;
+      DomainInt newLower = findNewLowerBound(d);
+      lowerBound(d) = newLower;
 
 #ifndef NO_DOMAIN_TRIGGERS
       trigger_list.pushDomainChanged(d.varNum);
 #endif
-      trigger_list.push_lower(d.varNum, lowerBound(d) - lowBound);
+      trigger_list.pushLower(d.varNum, lowerBound(d) - lowBound);
       if(lowerBound(d) == upperBound(d)) {
         trigger_list.push_assign(d.varNum, getAssignedValue(d));
       }

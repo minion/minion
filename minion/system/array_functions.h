@@ -22,7 +22,7 @@
 struct Bounds {
   DomainInt lowerBound;
   DomainInt upperBound;
-  Bounds(DomainInt _lower, DomainInt _upper) : lowerBound(_lower), upperBound(_upper) {}
+  Bounds(DomainInt Lower, DomainInt Upper) : lowerBound(Lower), upperBound(Upper) {}
 
   bool contains(DomainInt i) {
     return lowerBound <= i && i <= upperBound;

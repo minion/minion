@@ -435,12 +435,12 @@ void MinionThreeInputReader<FileReader>::finalise() {
   if(!unusedVars.empty() && ensureBranchOnAllVars) {
     vector<Var> unusedVec(unusedVars.begin(), unusedVars.end());
     if(instance->searchOrder.size() > 1 &&
-       instance->searchOrder.back().find_one_assignment == true) {
+       instance->searchOrder.back().findOneAssignment == true) {
       instance->searchOrder.back().varOrder.insert(instance->searchOrder.back().varOrder.end(),
                                                      unusedVec.begin(), unusedVec.end());
     } else {
       instance->searchOrder.push_back(unusedVec);
-      instance->searchOrder.back().find_one_assignment = true;
+      instance->searchOrder.back().findOneAssignment = true;
     }
   }
 

@@ -76,9 +76,9 @@ shared_ptr<VariableOrder> makeSearchOrder_multiple(const vector<SearchOrder>& or
     vector<shared_ptr<VariableOrder>> vovector;
     for(SysInt i = 0; i < (SysInt)order.size(); i++) {
       vovector.push_back(makeSearchOrder(order[i]));
-      if(order[i].find_one_assignment)
+      if(order[i].findOneAssignment)
         hasAux = true;
-      if(order[i].find_one_assignment && i != (SysInt)order.size() - 1) {
+      if(order[i].findOneAssignment && i != (SysInt)order.size() - 1) {
         cout << "Only one VARORDER AUX is allowed, and it must be the final "
                 "VARORDER command."
              << endl;

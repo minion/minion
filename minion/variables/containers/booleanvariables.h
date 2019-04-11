@@ -288,10 +288,10 @@ struct BoolVarContainer {
     trigger_list.pushDomain_removal(d.varNum, 1 - b);
 
     if(b == 1) {
-      trigger_list.push_lower(d.varNum, 1);
+      trigger_list.pushLower(d.varNum, 1);
       valuePtr()[d.dataOffset()] |= d.shiftOffset;
     } else {
-      trigger_list.push_upper(d.varNum, 1);
+      trigger_list.pushUpper(d.varNum, 1);
       valuePtr()[d.dataOffset()] &= ~d.shiftOffset;
     }
   }
