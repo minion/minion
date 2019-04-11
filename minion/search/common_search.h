@@ -40,7 +40,7 @@ void optimiseMaximiseVars(const vector<VarRef>& vars) {
 
 /// Sets optimisation variable.
 template <typename VarRef>
-void optimise_minimiseVars(const vector<VarRef>& vars) {
+void optimiseMinimiseVars(const vector<VarRef>& vars) {
   getOptions().findAllSolutions();
   vector<AnyVarRef> negvars;
   for(const auto& v : vars) {

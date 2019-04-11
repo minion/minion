@@ -479,7 +479,7 @@ struct CSPInstance {
   vector<Var> constructionSite;
 
   bool is_optimisation_problem;
-  bool optimise_minimising;
+  bool optimiseMinimising;
   vector<Var> optimiseVariables;
 
   vector<vector<Var>> print_matrix;
@@ -507,7 +507,7 @@ private:
 public:
   void set_optimise(BOOL _minimising, vector<Var> var) {
     is_optimisation_problem = true;
-    optimise_minimising = _minimising;
+    optimiseMinimising = _minimising;
     optimiseVariables = var;
   }
 

@@ -206,7 +206,7 @@ struct MinionInstancePrinter {
     set<Var> vars(varVec.begin(), varVec.end());
 
     if(csp.is_optimisation_problem) {
-      if(csp.optimise_minimising)
+      if(csp.optimiseMinimising)
         oss << "MINIMISING ";
       else
         oss << "MAXIMISING ";

@@ -75,8 +75,8 @@ void BuildCSP(CSPInstance& instance) {
 
   // Set up optimisation
   if(instance.is_optimisation_problem) {
-    if(instance.optimise_minimising)
-      Controller::optimise_minimiseVars(BuildCon::getAnyVarRefFromVar(instance.optimiseVariables));
+    if(instance.optimiseMinimising)
+      Controller::optimiseMinimiseVars(BuildCon::getAnyVarRefFromVar(instance.optimiseVariables));
     else
       Controller::optimiseMaximiseVars(BuildCon::getAnyVarRefFromVar(instance.optimiseVariables));
   }
