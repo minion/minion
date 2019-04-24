@@ -106,7 +106,11 @@ void endParallelMinion() {
 
 ParallelData* setupParallelData() {
   // Setup a pipe so parent can track if children are alive
-  pipe(childTrackingPipe);
+  int ret = pipe(childTrackingPipe);
+
+  if(ret < 0) {
+    D_FATAL_ERROR("Parallel pipe construction failed");
+  }
 
   ParallelData* pd;
   pd = (ParallelData*)mmap(NULL, sizeof(ParallelData), PROT_READ | PROT_WRITE,

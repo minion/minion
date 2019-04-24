@@ -105,6 +105,8 @@ struct StandardSearchManager : public SearchManager {
     SysInt var = branches.back().var;
     DomainInt val = branches.back().val;
     bool isLeft = branches.back().isLeft;
+    (void)isLeft;
+  
     bool stolen = branches.back().stolen;
 
     D_ASSERT(isLeft);

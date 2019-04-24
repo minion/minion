@@ -776,7 +776,7 @@ struct InstanceStats {
     case CT_FRAMEUPDATE:
     case CT_FORWARD_CHECKING:
     case CT_CHECK_ASSIGN:
-      // default:
+    case CT_COLLECTEVENTS:
       cerr << "Stats: Uncategorised constraint:" << i.constraint->name << endl;
     }
   }

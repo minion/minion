@@ -275,7 +275,7 @@ void dumpSolver(ostream& os, bool justDomains) {
       os << "MINIMISING ";
     output_mapped_container(
         os, getState().getRawOptimiseVars(),
-        [](const AnyVarRef& v) { return v.isAssigned() ? to_string(v.assignedValue()) : getNameFromVar(v); },
+        [](const AnyVarRef& v) { return v.isAssigned() ? tostring(v.assignedValue()) : getNameFromVar(v); },
         true);
   }
   os << "PRINT ";

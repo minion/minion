@@ -227,7 +227,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
     CollectEvents<std::vector<Var>>* c = new CollectEvents<std::vector<Var>>(listbools);
     getState().addConstraintMidsearch((AbstractConstraint*)c);
 
-    std::vector<std::pair<int, int>>& assignments = c->assignments;
+    std::vector<std::pair<int, DomainInt>>& assignments = c->assignments;
 
     std::vector<int> listallpairs;
 
@@ -258,7 +258,6 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
       assignments.clear();
 
-      bool checkFailed = getState().isFailed();
       getState().setFailed(false);
 
       Controller::worldPop();
@@ -275,7 +274,6 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
       assignments.clear();
 
-      checkFailed = getState().isFailed();
       getState().setFailed(false);
 
       Controller::worldPop();

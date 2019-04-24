@@ -25,7 +25,7 @@ struct CollectEvents : public AbstractConstraint {
   VarArrayType varArray;
 
 public:
-  std::vector<std::pair<int, int>> assignments;
+  std::vector<std::pair<int, DomainInt>> assignments;
 
   CollectEvents(const VarArrayType& _varArray) : varArray(_varArray) {}
 
