@@ -146,7 +146,27 @@ int main(int argc, char** argv) {
 
     SolveCSP(instance, args);
 
+
+    getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
+                                                          getTableOut(), !getOptions().silent);
+    getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
+
+    getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
+
+    getTableOut().set("Nodes", tostring(getState().getNodeCount()));
+    getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
+    getTableOut().set("SolutionsFound", getState().getSolutionCount());
+
+    if(getOptions().tableout && !Parallel::isAChildProcess()) {
+      getTableOut().print_line(); // Outputs a line to the table file.
+    }
+
+  #ifdef MORE_SEARCH_INFO
+    if(!getOptions().silent)
+      printSearchInfo();
+  #endif
     return 0;
+
 
   } catch(...) {
     cerr << "Minion exited abnormally via an exception." << endl;
