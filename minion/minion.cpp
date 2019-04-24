@@ -20,6 +20,8 @@
 
 #include "minion.h"
 
+#include "dump_state.hpp"
+
 #include "BuildVariables.h"
 
 #include "commandline_parse.h"
@@ -133,6 +135,15 @@ int main(int argc, char** argv) {
 
     SetupCSPOrdering(instance, args);
     BuildCSP(instance);
+
+    PreprocessCSP(instance, args);
+
+    getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
+                                                     getTableOut(), !getOptions().silent);
+
+    if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
+      dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
+
     SolveCSP(instance, args);
 
     return 0;

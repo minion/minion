@@ -105,6 +105,16 @@ void BuildCSP(CSPInstance& instance) {
                                                    getTableOut(), !getOptions().silent);
 }
 
+void PreprocessCSP(CSPInstance& instance, SearchMethod args) {
+    vector<AnyVarRef> preprocess_anyvars = getAnyVarRefFromVar(instance.preprocess_vars);
+
+    try {
+      PropogateCSP(std::max(args.preprocess, args.propMethod), preprocess_anyvars,
+                   !getOptions().silent);
+    } catch(EndOfSearch eos) {
+      getState().setFailed(true);
+    }
+}
 void SolveCSP(CSPInstance& instance, SearchMethod args) {
   // Check that when searching PropagateSAC does actually do the SAC over all
   // vars in any
@@ -115,8 +125,6 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   // only shuffled within the VARORDER blocks from the input file.
   // Likewise, using a dynamic variable ordering, it only applies within
   // the VARORDER blocks.
-
-  vector<AnyVarRef> preprocess_anyvars = getAnyVarRefFromVar(instance.preprocess_vars);
 
   shared_ptr<Controller::SearchManager> sm;
 
@@ -130,25 +138,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
     sm = Controller::makeSearch_manager(args.propMethod, instance.searchOrder);
   }
 
-  getState().getOldTimer().maybePrintTimestepStore(
-      cout, "Build Search Ordering Time: ", "SearchOrderTime", getTableOut(), !getOptions().silent);
   try {
-
-    try {
-      PropogateCSP(std::max(args.preprocess, args.propMethod), preprocess_anyvars,
-                   !getOptions().silent);
-    } catch(EndOfSearch eos) {
-      if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
-        dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
-      throw;
-    }
-
-    getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
-                                                     getTableOut(), !getOptions().silent);
-
-    if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
-      dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
-
     if(!getState().isFailed()) {
       sm->search();
     }
