@@ -61,6 +61,39 @@ void worker() {
   }
 }
 
+void doStandardSearch(CSPInstance& instance, SearchMethod args) {
+    PreprocessCSP(instance, args);
+
+    getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
+                                                     getTableOut(), !getOptions().silent);
+
+    if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
+      dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
+
+    SolveCSP(instance, args);
+
+
+    getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
+                                                          getTableOut(), !getOptions().silent);
+    getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
+
+    getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
+
+    getTableOut().set("Nodes", tostring(getState().getNodeCount()));
+    getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
+    getTableOut().set("SolutionsFound", getState().getSolutionCount());
+
+    if(getOptions().tableout && !Parallel::isAChildProcess()) {
+      getTableOut().print_line(); // Outputs a line to the table file.
+    }
+
+  #ifdef MORE_SEARCH_INFO
+    if(!getOptions().silent)
+      printSearchInfo();
+  #endif
+
+}
+
 int main(int argc, char** argv) {
   // Wrap main in a try/catch just to stop exceptions leaving main,
   // as windows gets really annoyed when that happens.
@@ -136,35 +169,8 @@ int main(int argc, char** argv) {
     SetupCSPOrdering(instance, args);
     BuildCSP(instance);
 
-    PreprocessCSP(instance, args);
+    doStandardSearch(instance, args);
 
-    getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
-                                                     getTableOut(), !getOptions().silent);
-
-    if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
-      dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
-
-    SolveCSP(instance, args);
-
-
-    getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
-                                                          getTableOut(), !getOptions().silent);
-    getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
-
-    getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
-
-    getTableOut().set("Nodes", tostring(getState().getNodeCount()));
-    getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
-    getTableOut().set("SolutionsFound", getState().getSolutionCount());
-
-    if(getOptions().tableout && !Parallel::isAChildProcess()) {
-      getTableOut().print_line(); // Outputs a line to the table file.
-    }
-
-  #ifdef MORE_SEARCH_INFO
-    if(!getOptions().silent)
-      printSearchInfo();
-  #endif
     return 0;
 
 
