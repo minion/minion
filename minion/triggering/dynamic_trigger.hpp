@@ -25,7 +25,7 @@ inline void DynamicTriggerList::add(Trig_ConRef t) {
   TRIGP("LA:" << elems.size() << ":" << t);
 }
 
-inline bool DynamicTriggerList::sanity_check_list() {
+inline bool DynamicTriggerList::sanityCheckList() {
   for(size_t i = 0; i < elems.size(); ++i) {
     Trig_ConRef trig = elems[i];
     if(!trig.empty()) {
@@ -37,7 +37,7 @@ inline bool DynamicTriggerList::sanity_check_list() {
   return true;
 }
 
-inline void DynamicTriggerList::verify_slack() const {
+inline void DynamicTriggerList::verifySlack() const {
 // Note: In non-debug mode, this does nothing
 #ifdef MINION_DEBUG
   size_t slack_debugCount = 0;
@@ -58,7 +58,7 @@ inline void DynamicTriggerList::verify_slack() const {
 inline void DynamicTriggerList::
     tryCompressList() { /*
                          // In debug mode, let's check our slack counter is correct
-                         verify_slack();
+                         verifySlack();
 
                          SysInt slacksize = slack.size();
                          // Quick early return
@@ -78,7 +78,7 @@ inline void DynamicTriggerList::
 
                          if(slacksize == 0)
                          {
-                           verify_slack();
+                           verifySlack();
                            return;
                          }
 
@@ -139,7 +139,7 @@ inline void releaseMergedTrigger(Con_TrigRef t, TrigOp op) {
   tcr.con->_reportTriggerRemovalToConstraint(tcr.conListPos);
   t.dtl->_reportTriggerRemovalToList(t.triggerListPos);
 
-  D_ASSERT(t.dtl->sanity_check_list());
+  D_ASSERT(t.dtl->sanityCheckList());
 }
 
 inline void releaseMergedTrigger(Trig_ConRef t, TrigOp op) {
@@ -163,7 +163,7 @@ inline void releaseMergedTrigger(Trig_ConRef t, TrigOp op) {
   t.con->_reportTriggerRemovalToConstraint(t.conListPos);
   ctr.dtl->_reportTriggerRemovalToList(ctr.triggerListPos);
 
-  D_ASSERT(ctr.dtl->sanity_check_list());
+  D_ASSERT(ctr.dtl->sanityCheckList());
 }
 
 inline void _restoreTriggerOnBacktrack(Trig_ConRef tcr) {

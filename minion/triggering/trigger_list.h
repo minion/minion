@@ -155,7 +155,7 @@ public:
       queue = dynTriggers[b].domainVal(val);
     }
 
-    D_ASSERT(queue->sanity_check_list());
+    D_ASSERT(queue->sanityCheckList());
     /* XXX
         switch (op) {
         case TO_Default: break;

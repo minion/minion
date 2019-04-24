@@ -76,7 +76,7 @@ struct BigRangeVarContainer {
   typedef BigRangeVarRef_internal_template<UnsignedSysInt> BigRangeVarRef_internal;
 
   BigRangeVarContainer()
-      : bms_array(&getMemory().monotonicSet()), trigger_list(false), varCount_m(0), lock_m(0) {
+      : bms_array(&getMemory().monotonicSet()), triggerList(false), varCount_m(0), lock_m(0) {
     // Store where the first variable will go.
     varOffset.push_back(0);
   }
@@ -84,7 +84,7 @@ struct BigRangeVarContainer {
   typedef DomainInt domainBound_type;
   ExtendableBlock bound_data;
   MonotonicSet* bms_array;
-  TriggerList trigger_list;
+  TriggerList triggerList;
 
   /// Initial bounds of each variable
   vector<pair<DomainInt, DomainInt>> initialBounds;
@@ -218,7 +218,7 @@ struct BigRangeVarContainer {
       }
     }
 
-    trigger_list.addVariables(initialBounds);
+    triggerList.addVariables(initialBounds);
   }
 
   BOOL isAssigned(BigRangeVarRef_internal d) const {
@@ -300,27 +300,27 @@ struct BigRangeVarContainer {
 #endif
       return;
     }
-    trigger_list.pushDomain_removal(d.varNum, i);
+    triggerList.pushDomain_removal(d.varNum, i);
     reduceDomSize(d);
 #ifndef NO_DOMAIN_TRIGGERS
-    trigger_list.pushDomainChanged(d.varNum);
+    triggerList.pushDomainChanged(d.varNum);
 #endif
     D_ASSERT(!bms_array->isMember(varOffset[d.varNum] + i));
 
     domainBound_type upBound = upperBound(d);
     if(i == upBound) {
       upperBound(d) = findNewUpperBound(d);
-      trigger_list.pushUpper(d.varNum, upBound - upperBound(d));
+      triggerList.pushUpper(d.varNum, upBound - upperBound(d));
     }
 
     domainBound_type lowBound = lowerBound(d);
     if(i == lowBound) {
       lowerBound(d) = findNewLowerBound(d);
-      trigger_list.pushLower(d.varNum, lowerBound(d) - lowBound);
+      triggerList.pushLower(d.varNum, lowerBound(d) - lowBound);
     }
 
     if(upperBound(d) == lowerBound(d)) {
-      trigger_list.push_assign(d.varNum, getAssignedValue(d));
+      triggerList.push_assign(d.varNum, getAssignedValue(d));
     }
 
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
@@ -373,22 +373,22 @@ private:
       // def of inDomain: bms_array->isMember(varOffset[d.varNum] + i -
       // initialBounds[d.varNum].first);
       if(bms_array->isMember(loop + domainOffset) && loop != offset) {
-        trigger_list.pushDomain_removal(d.varNum, loop);
+        triggerList.pushDomain_removal(d.varNum, loop);
         reduceDomSize(d);
       }
     }
-    trigger_list.pushDomainChanged(d.varNum);
-    trigger_list.push_assign(d.varNum, offset);
+    triggerList.pushDomainChanged(d.varNum);
+    triggerList.push_assign(d.varNum, offset);
 
     DomainInt lowBound = lowerBound(d);
     if(offset != lowBound) {
-      trigger_list.pushLower(d.varNum, offset - lowBound);
+      triggerList.pushLower(d.varNum, offset - lowBound);
       lowerBound(d) = offset;
     }
 
     DomainInt upBound = upperBound(d);
     if(offset != upBound) {
-      trigger_list.pushUpper(d.varNum, upBound - offset);
+      triggerList.pushUpper(d.varNum, upBound - offset);
       upperBound(d) = offset;
     }
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
@@ -419,7 +419,7 @@ public:
         // Def of inDomain: bms_array->isMember(varOffset[d.varNum] + i -
         // initialBounds[d.varNum].first);
         if(bms_array->isMember(domainOffset + loop)) {
-          trigger_list.pushDomain_removal(d.varNum, loop);
+          triggerList.pushDomain_removal(d.varNum, loop);
           reduceDomSize(d);
         }
       }
@@ -428,12 +428,12 @@ public:
       upperBound(d) = newUpper;
 
 #ifndef NO_DOMAIN_TRIGGERS
-      trigger_list.pushDomainChanged(d.varNum);
+      triggerList.pushDomainChanged(d.varNum);
 #endif
-      trigger_list.pushUpper(d.varNum, upBound - upperBound(d));
+      triggerList.pushUpper(d.varNum, upBound - upperBound(d));
 
       if(lowerBound(d) == upperBound(d)) {
-        trigger_list.push_assign(d.varNum, getAssignedValue(d));
+        triggerList.push_assign(d.varNum, getAssignedValue(d));
       }
     }
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
@@ -469,7 +469,7 @@ public:
         // def of inDomain: bms_array->isMember(varOffset[d.varNum] + i -
         // initialBounds[d.varNum].first);
         if(bms_array->isMember(loop + domainOffset)) {
-          trigger_list.pushDomain_removal(d.varNum, loop);
+          triggerList.pushDomain_removal(d.varNum, loop);
           reduceDomSize(d);
         }
       }
@@ -481,11 +481,11 @@ public:
       lowerBound(d) = newLower;
 
 #ifndef NO_DOMAIN_TRIGGERS
-      trigger_list.pushDomainChanged(d.varNum);
+      triggerList.pushDomainChanged(d.varNum);
 #endif
-      trigger_list.pushLower(d.varNum, lowerBound(d) - lowBound);
+      triggerList.pushLower(d.varNum, lowerBound(d) - lowBound);
       if(lowerBound(d) == upperBound(d)) {
-        trigger_list.push_assign(d.varNum, getAssignedValue(d));
+        triggerList.push_assign(d.varNum, getAssignedValue(d));
       }
     }
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
@@ -511,7 +511,7 @@ public:
     D_ASSERT(b.varNum >= 0);
     D_ASSERT(b.varNum <= (SysInt)varCount_m);
     D_ASSERT(type != DomainRemoval || (pos >= initialMin(b) && pos <= initialMax(b)));
-    trigger_list.addDynamicTrigger(b.varNum, t, type, pos, op);
+    triggerList.addDynamicTrigger(b.varNum, t, type, pos, op);
   }
 
   vector<AbstractConstraint*>* getConstraints(const BigRangeVarRef_internal& b) {

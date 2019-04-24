@@ -192,10 +192,10 @@ typedef BoundVarRef_internal<> BoundVarRef;
 template <typename BoundType = DomainInt>
 struct BoundVarContainer {
 
-  BoundVarContainer() : trigger_list(true), varCount_m(0), lock_m(0) {}
+  BoundVarContainer() : triggerList(true), varCount_m(0), lock_m(0) {}
 
   ExtendableBlock bound_data;
-  TriggerList trigger_list;
+  TriggerList triggerList;
   vector<pair<BoundType, BoundType>> initialBounds;
   vector<vector<AbstractConstraint*>> constraints;
 #ifdef WDEG
@@ -223,7 +223,7 @@ struct BoundVarContainer {
   void lock() {
     D_ASSERT(!lock_m);
     lock_m = true;
-    trigger_list.addVariables(initialBounds);
+    triggerList.addVariables(initialBounds);
   }
 
   BOOL isAssigned(const BoundVarRef_internal<BoundType>& d) const {
@@ -287,15 +287,15 @@ struct BoundVarContainer {
     if(minVal == maxVal)
       return;
 
-    trigger_list.pushDomainChanged(d.varNum);
-    trigger_list.push_assign(d.varNum, i);
+    triggerList.pushDomainChanged(d.varNum);
+    triggerList.push_assign(d.varNum, i);
 
     if(minVal != i) {
-      trigger_list.pushLower(d.varNum, i - minVal);
+      triggerList.pushLower(d.varNum, i - minVal);
     }
 
     if(maxVal != i) {
-      trigger_list.pushUpper(d.varNum, maxVal - i);
+      triggerList.pushUpper(d.varNum, maxVal - i);
     }
 
     upperBound(d) = i;
@@ -322,11 +322,11 @@ struct BoundVarContainer {
     }
 
     if(i < upBound) {
-      trigger_list.pushUpper(d.varNum, upBound - i);
-      trigger_list.pushDomainChanged(d.varNum);
+      triggerList.pushUpper(d.varNum, upBound - i);
+      triggerList.pushDomainChanged(d.varNum);
       upperBound(d) = i;
       if(lowBound == i) {
-        trigger_list.push_assign(d.varNum, i);
+        triggerList.push_assign(d.varNum, i);
       }
     }
   }
@@ -341,11 +341,11 @@ struct BoundVarContainer {
     }
 
     if(i > lowBound) {
-      trigger_list.pushLower(d.varNum, i - lowBound);
-      trigger_list.pushDomainChanged(d.varNum);
+      triggerList.pushLower(d.varNum, i - lowBound);
+      triggerList.pushDomainChanged(d.varNum);
       lowerBound(d) = i;
       if(upBound == i) {
-        trigger_list.push_assign(d.varNum, i);
+        triggerList.push_assign(d.varNum, i);
       }
     }
   }
@@ -431,7 +431,7 @@ struct BoundVarContainer {
       USER_ERROR("Some constraint you are using does not work with BOUND variables\n"
                  "Unfortunatly we cannot tell you which one. Sorry!");
     }
-    trigger_list.addDynamicTrigger(b.varNum, t, type, pos, op);
+    triggerList.addDynamicTrigger(b.varNum, t, type, pos, op);
   }
 
   operator std::string() {

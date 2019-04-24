@@ -77,7 +77,7 @@ template <typename BoundType = DomainInt>
 struct SparseBoundVarContainer {
 
   ExtendableBlock bound_data;
-  TriggerList trigger_list;
+  TriggerList triggerList;
   vector<vector<BoundType>> domains;
   vector<DomainInt> domain_reference;
   vector<vector<AbstractConstraint*>> constraints;
@@ -87,7 +87,7 @@ struct SparseBoundVarContainer {
   UnsignedSysInt varCount_m;
   BOOL lock_m;
 
-  SparseBoundVarContainer() : trigger_list(true), varCount_m(0), lock_m(false) {}
+  SparseBoundVarContainer() : triggerList(true), varCount_m(0), lock_m(false) {}
 
   vector<BoundType>& getDomain(SparseBoundVarRef_internal<BoundType> i) {
     return domains[checked_cast<SysInt>(domain_reference[i.varNum])];
@@ -205,7 +205,7 @@ struct SparseBoundVarContainer {
 
     std::vector<std::pair<DomainInt, DomainInt>> trigBounds(
         count, make_pair(bounds.front(), bounds.back()));
-    trigger_list.addVariables(trigBounds);
+    triggerList.addVariables(trigBounds);
   }
 
   BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const {
@@ -287,17 +287,17 @@ struct SparseBoundVarContainer {
     if(minVal == maxVal)
       return;
 
-    trigger_list.pushDomainChanged(d.varNum);
-    trigger_list.push_assign(d.varNum, i);
+    triggerList.pushDomainChanged(d.varNum);
+    triggerList.push_assign(d.varNum, i);
 
     // Can't attach triggers to bound vars!
 
     if(minVal != i) {
-      trigger_list.pushLower(d.varNum, i - minVal);
+      triggerList.pushLower(d.varNum, i - minVal);
     }
 
     if(maxVal != i) {
-      trigger_list.pushUpper(d.varNum, maxVal - i);
+      triggerList.pushUpper(d.varNum, maxVal - i);
     }
 
     upperBound(d) = i;
@@ -327,13 +327,13 @@ struct SparseBoundVarContainer {
     DomainInt upBound = upperBound(d);
 
     if(i < upBound) {
-      trigger_list.pushUpper(d.varNum, upBound - i);
-      trigger_list.pushDomainChanged(d.varNum);
+      triggerList.pushUpper(d.varNum, upBound - i);
+      triggerList.pushDomainChanged(d.varNum);
       // Can't attach triggers to bound vars!
 
       upperBound(d) = i;
       if(lowBound == i) {
-        trigger_list.push_assign(d.varNum, i);
+        triggerList.push_assign(d.varNum, i);
       }
     }
   }
@@ -351,12 +351,12 @@ struct SparseBoundVarContainer {
     DomainInt lowBound = lowerBound(d);
 
     if(i > lowBound) {
-      trigger_list.pushLower(d.varNum, i - lowBound);
-      trigger_list.pushDomainChanged(d.varNum);
+      triggerList.pushLower(d.varNum, i - lowBound);
+      triggerList.pushDomainChanged(d.varNum);
       // Can't attach triggers to bound vars!
       lowerBound(d) = i;
       if(upBound == i) {
-        trigger_list.push_assign(d.varNum, i);
+        triggerList.push_assign(d.varNum, i);
       }
     }
   }
@@ -416,7 +416,7 @@ struct SparseBoundVarContainer {
                  "variables\n"
                  "Unfortunatly we cannot tell you which one. Sorry!");
     }
-    trigger_list.addDynamicTrigger(b.varNum, t, type, pos, op);
+    triggerList.addDynamicTrigger(b.varNum, t, type, pos, op);
   }
 
   operator std::string() {

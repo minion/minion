@@ -171,7 +171,7 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BoolVarContainer {
 
-  BoolVarContainer() : varCount_m(0), trigger_list(false), lock_m(false) {}
+  BoolVarContainer() : varCount_m(0), triggerList(false), lock_m(false) {}
 
   static const SysInt width = 7;
   ExtendableBlock assignOffset;
@@ -181,7 +181,7 @@ struct BoolVarContainer {
   vector<DomainInt> wdegs;
 #endif
   UnsignedSysInt varCount_m;
-  TriggerList trigger_list;
+  TriggerList triggerList;
   /// When false, no variable can be altered. When true, no variables can be
   /// created.
   BOOL lock_m;
@@ -207,7 +207,7 @@ struct BoolVarContainer {
     // Min domain value = 0, max domain val = 1.
     std::vector<std::pair<DomainInt, DomainInt>> doms(varCount_m,
                                                       make_pair(DomainInt(0), DomainInt(1)));
-    trigger_list.addVariables(doms);
+    triggerList.addVariables(doms);
   }
 
   /// Returns a new Boolean Variable.
@@ -283,15 +283,15 @@ struct BoolVarContainer {
     }
     assign_ptr()[d.dataOffset()] |= d.shiftOffset;
 
-    trigger_list.push_assign(d.varNum, b);
-    trigger_list.pushDomainChanged(d.varNum);
-    trigger_list.pushDomain_removal(d.varNum, 1 - b);
+    triggerList.push_assign(d.varNum, b);
+    triggerList.pushDomainChanged(d.varNum);
+    triggerList.pushDomain_removal(d.varNum, 1 - b);
 
     if(b == 1) {
-      trigger_list.pushLower(d.varNum, 1);
+      triggerList.pushLower(d.varNum, 1);
       valuePtr()[d.dataOffset()] |= d.shiftOffset;
     } else {
-      trigger_list.pushUpper(d.varNum, 1);
+      triggerList.pushUpper(d.varNum, 1);
       valuePtr()[d.dataOffset()] &= ~d.shiftOffset;
     }
   }
@@ -314,7 +314,7 @@ struct BoolVarContainer {
     D_ASSERT(pos == NoDomainValue || (type == DomainRemoval && pos != NoDomainValue));
     D_ASSERT(lock_m);
 
-    trigger_list.addDynamicTrigger(b.varNum, t, type, pos, op);
+    triggerList.addDynamicTrigger(b.varNum, t, type, pos, op);
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoolVarRef_internal& b) {

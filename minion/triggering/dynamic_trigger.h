@@ -97,7 +97,7 @@ public:
     abort();
   }
 
-  bool sanity_check_list();
+  bool sanityCheckList();
 
   void add(Trig_ConRef t);
 
@@ -112,7 +112,7 @@ public:
     return elems[s];
   }
 
-  void verify_slack() const;
+  void verifySlack() const;
 
   void tryCompressList();
 
