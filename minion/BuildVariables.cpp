@@ -76,6 +76,12 @@ AnyVarRef getAnyVarRefFromVar(Var v) {
   }
 }
 
+AnyVarRef getAnyVarRefFromString(const CSPInstance& c, const std::string& s) {
+  Var v = c.vars.getSymbol(s);
+  return getAnyVarRefFromVar(v); 
+}
+
+
 /// Create all the variables used in the CSP.
 void buildVariables(const ProbSpec::VarContainer& vars) {
   for(int i = 0; i < vars.BOOLs; ++i)

@@ -652,7 +652,12 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().noresumefile = false;
       getOptions().splitstderr = true;
     }
-
+    else if(command == string("-command-list")) {
+      INCREMENT_i(-command-list);
+      getOptions().commandlistIn = argv[i];
+      INCREMENT_i(-command-list);
+      getOptions().commandlistOut = argv[i];
+    }
     else if(command == string("-restarts")) {
       getOptions().restart.active = true;
     } else if(command == string("-restarts-multiplier")) {

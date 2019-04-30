@@ -29,6 +29,8 @@
 
 #include "info_dumps.h"
 
+#include "command_search.h"
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -169,8 +171,12 @@ int main(int argc, char** argv) {
     SetupCSPOrdering(instance, args);
     BuildCSP(instance);
 
-    doStandardSearch(instance, args);
-
+    if(getOptions().commandlistIn != "") {
+      doCommandSearch(instance, args);
+    } else {
+      doStandardSearch(instance, args);
+    }
+    
     return 0;
 
 

@@ -306,6 +306,10 @@ public:
 
   bool splitstderr;
 
+  // files containing list of commands for minion to run
+  std::string commandlistIn;
+  std::string commandlistOut;
+  
   /// Output a compressed file
   string outputCompressed;
 

@@ -30,6 +30,8 @@ namespace BuildCon {
 
 /// Helper function used in a few places.
 AnyVarRef getAnyVarRefFromVar(Var v);
+AnyVarRef getAnyVarRefFromString(const CSPInstance& c, const std::string& s);
+
 std::pair<DomainInt, DomainInt> getInitialBoundsFromVar(Var v);
 
 /// Helper function used in a few places.
