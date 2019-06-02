@@ -22,18 +22,15 @@
 
 #include "parallel/parallel.h"
 
+// Disable on windows
+#ifndef _WIN32
 #define PARALLEL
+#endif
 
-#ifdef PARALLEL
 
-#include <fcntl.h>
-#include <semaphore.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 
 #include <atomic>
+#include <signal.h>
 
 namespace Parallel {
 
@@ -104,6 +101,56 @@ void endParallelMinion() {
   }
 }
 
+
+void lockSolsout() {
+  if(getOptions().parallel) {
+    pthread_mutex_lock(&(getParallelData().outputLock));
+  }
+}
+
+void unlockSolsout() {
+  if(getOptions().parallel) {
+    pthread_mutex_unlock(&(getParallelData().outputLock));
+  }
+}
+
+bool shouldDoFork() {
+  if(!getOptions().parallel)
+    return false;
+  if(getParallelData().processCount > 0) {
+    int old = atomic_fetch_sub(&(getParallelData().processCount), 1);
+    if(old < 0) {
+      atomic_fetch_add(&(getParallelData().processCount), 1);
+      return false;
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+bool isAlarmActivated() {
+  return getParallelData().alarmTrigger;
+}
+
+void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
+  activateTrigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPUTime);
+}
+
+} // namespace Parallel
+
+#ifdef PARALLEL
+
+#include <fcntl.h>
+#include <semaphore.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+namespace Parallel {
+
 ParallelData* setupParallelData() {
   // Setup a pipe so parent can track if children are alive
   int ret = pipe(childTrackingPipe);
@@ -139,32 +186,6 @@ ParallelData* setupParallelData() {
   return pd;
 }
 
-void lockSolsout() {
-  if(getOptions().parallel) {
-    pthread_mutex_lock(&(getParallelData().outputLock));
-  }
-}
-
-void unlockSolsout() {
-  if(getOptions().parallel) {
-    pthread_mutex_unlock(&(getParallelData().outputLock));
-  }
-}
-
-bool shouldDoFork() {
-  if(!getOptions().parallel)
-    return false;
-  if(getParallelData().processCount > 0) {
-    int old = atomic_fetch_sub(&(getParallelData().processCount), 1);
-    if(old < 0) {
-      atomic_fetch_add(&(getParallelData().processCount), 1);
-      return false;
-    }
-    return true;
-  } else {
-    return false;
-  }
-}
 
 int doFork() {
   forkEverCalled = true;
@@ -187,19 +208,15 @@ int doFork() {
   return f;
 }
 
-bool isAlarmActivated() {
-  return getParallelData().alarmTrigger;
 }
 
-void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
-  activateTrigger(&(getParallelData().alarmTrigger), alarmActive, timeout, CPUTime);
-}
-
-} // namespace Parallel
 #else
 
 namespace Parallel {
-struct ParallelData {};
+
+int doFork() {
+  D_FATAL_ERROR("This Minion was built without parallelisation");
+}
 
 ParallelData* setupParallelData() {
   static ParallelData dummy;
