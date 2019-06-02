@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "SearchManager.h"
 
 namespace Controller {
