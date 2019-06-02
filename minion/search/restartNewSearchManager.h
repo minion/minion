@@ -89,7 +89,7 @@ struct RestartNewSearchManager : public Controller::SearchManager {
       cout << "Increasing backtrack limit to " << i << endl;
       int bias = 0;
       if(useBias)
-        bias = random() % 200 - 100;
+        bias = rand() % 200 - 100;
       vector<SearchOrder> new_order = makeRandomWalkSearchOrder(bias);
       doASearch(new_order, i);
     }
