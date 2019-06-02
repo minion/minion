@@ -1,0 +1,38 @@
+# C/C++ with GCC
+# Build your C/C++ project with GCC using make.
+# Add steps that publish test results, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/c-cpp/gcc
+
+strategy:
+  matrix:
+    linux:
+      imageName: 'ubuntu-latest'
+    mac:
+      imageName: 'macos-latest'
+    windows:
+      imageName: 'vs2017-win2016'
+
+trigger:
+- master
+
+pool:
+  vmImage: $(imageName)
+
+steps:
+- bash: |
+    mkdir bin-quick
+    cd bin-quick
+    python2 ../configure.py --quick
+    make -j2
+  displayName: 'make'
+- bash: |
+    cd test_instances
+    ./run_tests.sh ../bin-quick/minion
+- bash: |
+    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
+  displayName: 'Install rustc'
+- bash: |
+    export PATH=$PATH:$HOME/.cargo/bin
+    cd tester
+    cargo run --release -- --minion ../bin-quick/minion
+  displayName: 'Run minion tests'
