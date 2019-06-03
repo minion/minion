@@ -249,7 +249,8 @@ struct MultiplyVar {
     Multiply = 0;
   }
 
-  MultiplyVar(const MultiplyVar& b) : data(b.data), Multiply(b.Multiply) {}
+  MultiplyVar(const MultiplyVar& b) = default;
+  MultiplyVar& operator=(const MultiplyVar&) = default;
 
   BOOL isAssigned() const {
     return data.isAssigned();

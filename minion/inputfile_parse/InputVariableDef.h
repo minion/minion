@@ -72,9 +72,12 @@ public:
 
   Var(VariableType _type, DomainInt _pos) : type_m(_type), pos_m(checked_cast<SysInt>(_pos)) {}
 
-  Var(const Var& v) : type_m(v.type_m), pos_m(v.pos_m) {}
+  Var(const Var& v) = default;
+  Var& operator=(const Var& v) = default;
 
   Var() : type_m(VAR_INVALID), pos_m(-1) {}
+
+  
 
   friend std::ostream& operator<<(std::ostream& o, const Var& v) {
     return o << "Var. Type:" << v.type_m << " Pos:" << v.pos_m << ".";

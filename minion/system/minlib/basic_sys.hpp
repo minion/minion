@@ -2,7 +2,9 @@
 #define BASIC_SYS_CQP
 
 #ifdef _WIN32
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #endif
 
 #include <algorithm>
