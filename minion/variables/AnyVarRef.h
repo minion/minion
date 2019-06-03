@@ -346,6 +346,10 @@ public:
 
   AnyVarRef(const AnyVarRef& b) : data(b.data) {}
 
+  void operator=(const AnyVarRef& b) {
+    this->data = b.data;
+  }
+
   BOOL isAssigned() const {
     return data->isAssigned();
   }
