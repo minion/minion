@@ -42,12 +42,7 @@
 template <typename... Class>
 struct TypeDefs;
 
-#ifdef _WIN32
-#define DOM_NORETURN
-#define DOM_NOINLINE
-#else
 #define DOM_NORETURN __attribute__((noreturn))
 #define DOM_NOINLINE __attribute__((noinline))
-#endif
 
 #endif
