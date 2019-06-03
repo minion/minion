@@ -64,44 +64,6 @@ bool isCtrlCPressed() {
   return getParallelData().ctrlCPressed;
 }
 
-void endParallelMinion() {
-  if(!forkEverCalled)
-    return;
-  atomic_fetch_add(&(getParallelData().processCount), 1);
-
-  if(checkIsAChildProcess) {
-    atomic_fetch_add(&(getParallelData().solutions), getState().getSolutionCount());
-    atomic_fetch_add(&(getParallelData().nodes), getState().getNodeCount());
-    atomic_fetch_add(&(getParallelData().children), (long long)1);
-  }
-
-  if(!checkIsAChildProcess) {
-    std::cout << "Waiting for all child processes to exit.." << std::endl;
-    // Don't close until now, so all children have this pipe
-    close(childTrackingPipe[1]);
-
-    signal(SIGPIPE, SIG_IGN);
-    int ret = 1;
-    while(ret != 0) {
-      char buf[1024];
-      // std::cout << getpid() << " reading 0" << std::endl;
-      ret = read(childTrackingPipe[0], buf, 1024);
-      // std::cout << ret << std::endl;
-      // perror("Error:");
-      // std::cerr << "Ready loop" << std::endl;
-    }
-    if(getParallelData().fatalErrorOccurred) {
-      std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
-      exit(1);
-    }
-    std::cout << "A total of " << getParallelData().children << " children were used" << std::endl;
-
-    getState().incrementSolutionCount(getParallelData().solutions);
-    getState().incrementNodeCount(getParallelData().nodes);
-  }
-}
-
-
 void lockSolsout() {
   if(getOptions().parallel) {
     pthread_mutex_lock(&(getParallelData().outputLock));
@@ -208,11 +170,53 @@ int doFork() {
   return f;
 }
 
+void endParallelMinion() {
+  if(!forkEverCalled)
+    return;
+  atomic_fetch_add(&(getParallelData().processCount), 1);
+
+  if(checkIsAChildProcess) {
+    atomic_fetch_add(&(getParallelData().solutions), getState().getSolutionCount());
+    atomic_fetch_add(&(getParallelData().nodes), getState().getNodeCount());
+    atomic_fetch_add(&(getParallelData().children), (long long)1);
+  }
+
+  if(!checkIsAChildProcess) {
+    std::cout << "Waiting for all child processes to exit.." << std::endl;
+    // Don't close until now, so all children have this pipe
+    close(childTrackingPipe[1]);
+
+    signal(SIGPIPE, SIG_IGN);
+    int ret = 1;
+    while(ret != 0) {
+      char buf[1024];
+      // std::cout << getpid() << " reading 0" << std::endl;
+      ret = read(childTrackingPipe[0], buf, 1024);
+      // std::cout << ret << std::endl;
+      // perror("Error:");
+      // std::cerr << "Ready loop" << std::endl;
+    }
+    if(getParallelData().fatalErrorOccurred) {
+      std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
+      exit(1);
+    }
+    std::cout << "A total of " << getParallelData().children << " children were used" << std::endl;
+
+    getState().incrementSolutionCount(getParallelData().solutions);
+    getState().incrementNodeCount(getParallelData().nodes);
+  }
 }
+
+}
+
 
 #else
 
 namespace Parallel {
+
+void endParallelMinion() {
+
+}
 
 int doFork() {
   D_FATAL_ERROR("This Minion was built without parallelisation");
