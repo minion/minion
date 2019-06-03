@@ -3,7 +3,7 @@
 from __future__ import print_function, absolute_import, division, generators, nested_scopes, with_statement
 
 import os, sys, functools, argparse, re, copy
-from os.path import join, getsize
+from os.path import join, getsize, relpath
 import json
 import subprocess
 import platform
@@ -150,11 +150,14 @@ parser.add_argument('--buildsystem', help="Set build system. Current options: ma
 arg = parser.parse_args()
 
 
-scriptdir = os.path.dirname(os.path.realpath(__file__))
 currentdir = os.getcwd()
 
-outsrcdir = os.getcwd() + "/src/"
-objdir = os.getcwd() + "/bin/"
+print(currentdir)
+print(os.path.dirname(os.path.realpath(__file__)))
+scriptdir = os.path.relpath(os.path.dirname(os.path.realpath(__file__)), currentdir)
+
+outsrcdir = "src/"
+objdir = "bin/"
 
 if scriptdir == currentdir:
     fatal_error("ERROR: Can't build Minion in it's source directory\n",
