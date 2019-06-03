@@ -41,8 +41,9 @@ struct SwitchNeg {
 
   SwitchNeg() : data() {}
 
-  SwitchNeg(const SwitchNeg& b) : data(b.data), multiplier(b.multiplier) {}
-
+  SwitchNeg(const SwitchNeg& b) = default;
+  SwitchNeg& operator=(const SwitchNeg&) = default;
+  
   BOOL isAssigned() const {
     return data.isAssigned();
   }

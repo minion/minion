@@ -48,7 +48,8 @@ struct VarNeg {
 
   VarNeg() : data() {}
 
-  VarNeg(const VarNeg& b) : data(b.data) {}
+  VarNeg(const VarNeg& b) = default;
+  VarNeg& operator=(const VarNeg&) = default;
 
   BOOL isAssigned() const {
     return data.isAssigned();
