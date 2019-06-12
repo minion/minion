@@ -51,10 +51,14 @@ pub fn Solutions_equal(orig: Vec<Vec<i64>>, new: Vec<Vec<i64>>) -> SimpleResult<
     }
 }
 pub fn Solutions_unorderedequal(
-    mut orig: Vec<Vec<i64>>,
-    mut new: Vec<Vec<i64>>,
+    orig: Vec<Vec<i64>>,
+    new: Vec<Vec<i64>>,
 ) -> SimpleResult<()> {
-    if orig.sort() != new.sort() {
+    let mut o = orig.clone();
+    let mut n = new.clone();
+    o.sort();
+    n.sort();
+    if o != n {
         Err(SimpleError::new("Solutions not equal as unordered list"))
     } else {
         Ok(())
