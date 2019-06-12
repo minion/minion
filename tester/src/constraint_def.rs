@@ -66,7 +66,7 @@ fn random_in_range(low: i64, high: i64) -> i64 {
 
 pub fn random_sublist(list: &[i64]) -> Vec<i64> {
     let mut vec = vec![];
-    while vec.len() == 0 {
+    while vec.is_empty() {
         for l in list {
             if rand::random() {
                 vec.push(*l)
@@ -229,7 +229,7 @@ impl ConstraintInstance {
         use self::itertools::Itertools;
 
         // Special case 0 variables
-        if self.vars().concat().len() == 0 {
+        if self.vars().concat().is_empty() {
             if self.check_tuple(&vec![]) {
                 return vec![vec![]];
             } else {
@@ -800,7 +800,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
                 if vals.len().is_odd() || vals.len() < 2 {
                     return false;
                 }
-                if vals.len() > 0 {
+                if !vals.is_empty() {
                     for i in (0..vals.len()).step_by(2) {
                         if vals[i] > vals[i + 1] {
                             return false;
