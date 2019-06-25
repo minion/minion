@@ -560,8 +560,30 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
        minion -solsout mysols.txt myproblem.minion
     */
     else if(command == string("-solsout") || command == string("-solsout0")) {
+      if(getOptions().solsoutWrite) {
+        outputFatalError("Cannot give two of -jsonsolsout and -solsout");
+      }
       getOptions().solsoutWrite = true;
       INCREMENT_i(-solsout);
+      solsoutFile.open(argv[i], ios::app);
+      if(!solsoutFile) {
+        ostringstream oss;
+        oss << "Cannot open '" << argv[i] << "' for writing.";
+        outputFatalError(oss.str());
+      }
+    }
+    /** @help switches;-solsout Example
+    To add the solutions of myproblem.minion to mysols.txt do
+
+       minion -solsout mysols.txt myproblem.minion
+    */
+    else if(command == string("-jsonsolsout")) {
+      if(getOptions().solsoutWrite) {
+        outputFatalError("Cannot give two of -jsonsolsout and -solsout");
+      }
+      getOptions().solsoutWrite = true;
+      getOptions().solsoutJson = true;
+      INCREMENT_i(-jsonsolsout);
       solsoutFile.open(argv[i], ios::app);
       if(!solsoutFile) {
         ostringstream oss;

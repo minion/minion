@@ -534,4 +534,15 @@ typename make_AnyVarRef_type<std::array<T, param>>::type make_AnyVarRef(std::arr
   return v;
 }
 
+inline std::ostream& json_dump(const AnyVarRef& v, std::ostream& o) {
+  o << "{";
+  if(v.isAssigned()) {
+    o << '"' << getBaseVarName(v) << "\":" << v.assignedValue();
+  } else {
+    add_varDomTo_json(v, o);
+  }
+  return o << "}";
+}
+
+
 #endif

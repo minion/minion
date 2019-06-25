@@ -122,12 +122,16 @@ inline void check_sol_is_correct() {
     Parallel::lockSolsout();
 
     vector<vector<AnyVarRef>> print_matrix = getState().getPrintMatrix();
-    for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
-      for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j) {
-        if(!print_matrix[i][j].isAssigned())
-          INPUT_ERROR("Some variable was unassigned while writing solution to file.");
-        solsoutFile << print_matrix[i][j].assignedValue() << " ";
-      }
+    if(getOptions().solsoutJson) {
+      json_dump(print_matrix, solsoutFile);
+    } else {
+      for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
+        for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j) {
+          if(!print_matrix[i][j].isAssigned())
+            INPUT_ERROR("Some variable was unassigned while writing solution to file.");
+          solsoutFile << print_matrix[i][j].assignedValue() << " ";
+        }
+    }
     solsoutFile << "\n";
     solsoutFile.flush();
 

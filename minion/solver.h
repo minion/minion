@@ -271,6 +271,9 @@ public:
   /// Denotes if solutions should be printed to a seperate file.
   bool solsoutWrite;
 
+  /// Denotes if solutions should be written to seperate file in JSON
+  bool solsoutJson = false;
+
   /// Denotes if solutions should be printed.
   /// Initialised to true.
   bool print_solution;
