@@ -91,7 +91,7 @@ impl MinionVariable {
     fn random(d: VarType) -> Arc<MinionVariable> {
         let domain = match d {
             Constant => vec![random_in_range(-10, 10)],
-            Bool => random_sublist(&vec![0, 1]),
+            Bool => random_sublist(&[0, 1]),
             Discrete => {
                 let v: Vec<i64> = (-10..10).collect();
                 random_sublist_of_size(&v, random_in_range(1, 8))
@@ -110,8 +110,8 @@ impl MinionVariable {
 
         Arc::new(MinionVariable {
             var_type: d,
-            name: name,
-            domain: domain,
+            name,
+            domain,
         })
     }
 
@@ -214,7 +214,7 @@ impl ConstraintInstance {
         Arc::new(varlist)
     }
 
-    fn check_tuple(&self, tup: &Vec<i64>) -> bool {
+    fn check_tuple(&self, tup: &[i64]) -> bool {
         let mut slices: Vec<&[i64]> = vec![];
         let mut place: usize = 0;
         for var in self.vars().iter() {
@@ -222,7 +222,7 @@ impl ConstraintInstance {
             slices.push(&tup[place..place + i]);
             place += i;
         }
-        return (self.constraint.checker)(self, &slices);
+        (self.constraint.checker)(self, &slices)
     }
 
     fn build_tuples(&self) -> Vec<Vec<i64>> {
@@ -230,7 +230,7 @@ impl ConstraintInstance {
 
         // Special case 0 variables
         if self.vars().concat().is_empty() {
-            if self.check_tuple(&vec![]) {
+            if self.check_tuple(&[]) {
                 return vec![vec![]];
             } else {
                 return vec![];
@@ -241,12 +241,13 @@ impl ConstraintInstance {
             .iter()
             .map(|x| x.domain.clone())
             .collect();
-        return v
+        
+        v
             .iter()
             .cloned()
             .multi_cartesian_product()
             .filter(|t| self.check_tuple(t))
-            .collect();
+            .collect()
     }
 
     pub fn tableise(&self, limit: usize) -> Option<ConstraintInstance> {
@@ -259,7 +260,7 @@ impl ConstraintInstance {
             constraint: STANDARD_TABLE_CONSTRAINT.clone(),
             varlist: {
                 let vars: Vec<Arc<MinionVariable>> =
-                    self.vars().iter().cloned().into_iter().flatten().collect();
+                    self.vars().iter().cloned().flatten().collect();
                 Arc::new(vec![vars])
             },
             tuples: Some(Tuples::new(tuples)),
@@ -344,7 +345,7 @@ fn check_element(v: &[&[i64]], offset: i64, undefzero: bool) -> bool {
             return false;
         }
     }
-    return v[0][index as usize] == v[2][0];
+    v[0][index as usize] == v[2][0]
 }
 
 lazy_static! {
@@ -370,7 +371,7 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             "reify", // CT_REIFY
             vec![Constraint, Var(Bool)],
             |c, assign| {
-                let ref child = c.child_constraints[0];
+                let child = &c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) == ischildtrue
             },
@@ -381,7 +382,7 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             "reifyimply-quick", // CT_REIFYIMPLY_QUICK
             vec![Constraint, Var(Bool)],
             |c, assign| {
-                let ref child = c.child_constraints[0];
+                let child = &c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) <= ischildtrue
             },
@@ -392,7 +393,7 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             "reifyimply", // CT_REIFYIMPLY
             vec![Constraint, Var(Bool)],
             |c, assign| {
-                let ref child = c.child_constraints[0];
+                let child = &c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) <= ischildtrue
             },
@@ -908,7 +909,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "w-notliteral", // CT_WATCHED_NOTLIT
             vec![Var(Discrete), Var(Constant)],
-            |v| !(v[0][0] == v[1][0]),
+            |v| (v[0][0] != v[1][0]),
             true,
             true,
         ),

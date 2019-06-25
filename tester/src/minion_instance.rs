@@ -8,7 +8,7 @@ use crate::constraint_def::*;
 
 fn print_minion_tuples<F: Write>(f: &mut F, tuples: &Tuples) -> Result<()> {
     f.write_all(b"**TUPLELIST**\n")?;
-    let ref tups = tuples.tupledata;
+    let tups = &tuples.tupledata;
     if tups.is_empty() {
         f.write_all(format!("{}  0 0\n", tuples.name).as_bytes())?;
     } else {
