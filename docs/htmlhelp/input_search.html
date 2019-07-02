@@ -50,10 +50,11 @@ default is to use ascending order for every search variable.
    ValOrder::= VALORDER[ (a|d)+ ]
 
 To model an optimisation problem the user can specify to minimise
-or maximise a variable's value.
+or maximise a variable's value, or list of variables (under
+lexicographic ordering)
 
-   OptimisationFn::= MAXIMISING &lt;varname&gt;
-                   | MINIMISING &lt;varname&gt;
+   OptimisationFn::= MAXIMISING &lt;varname&gt; or &lt;varlist&gt;
+                   | MINIMISING &lt;varname&gt; or &lt;varlist&gt;
 
 Finally, the user can control some aspects of the way solutions are
 printed. By default (no PrintFormat specified) all the variables are

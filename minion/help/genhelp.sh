@@ -1,4 +1,4 @@
-#!/ bin / bash
+#!/usr/bin/env bash
 
 CODE_ROOT = $1;
 TMP_FILE = "entries.tmp";

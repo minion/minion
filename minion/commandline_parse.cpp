@@ -572,10 +572,14 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         outputFatalError(oss.str());
       }
     }
-    /** @help switches;-solsout Example
+    /** @help switches;-jsonsolsout Description
+    Append all solutions to a named file, as JSON objects.
+    Each solution is store as a seperate JSON object.
+    */
+    /** @help switches;-jsonsolsout Example
     To add the solutions of myproblem.minion to mysols.txt do
 
-       minion -solsout mysols.txt myproblem.minion
+       minion -jsonsolsout mysols.json myproblem.minion
     */
     else if(command == string("-jsonsolsout")) {
       if(getOptions().solsoutWrite) {

@@ -340,6 +340,21 @@
 \paragraph{/cdrom}
 {\footnotesize
 \begin{verbatim}
+    Append all solutions to a named file, as JSON objects.
+    Each solution is store as a seperate JSON object.
+\end{verbatim}
+}
+\paragraph{/cdrom}
+{\footnotesize
+\begin{verbatim}
+    To add the solutions of myproblem.minion to mysols.txt do
+
+       minion -jsonsolsout mysols.json myproblem.minion
+\end{verbatim}
+}
+\paragraph{/cdrom}
+{\footnotesize
+\begin{verbatim}
     Write a resume file on timeout or being killed.
 \end{verbatim}
 }
@@ -402,35 +417,6 @@
     files.
 
     See documentation for -split.
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-When running neighbourhood search, the flag -nhsearch allows the neighbourhood search strategy to be
-specified. Options are "meta" (default) or "hillclimbing".
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-When running neighbourhood search, the flag -nhselection allows the neighbourhood selection strategy
-to be specified. Options are "ucb" (default), "la" (learning automaton), random" or "interactive".
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-When When using the UCB neighbourhood selector during neighbourhood search, the -ucbInit flag allows
-a file to be specified that will be used to initialise the UCB neighbourhood  selector with values
-from previous runs of the same problem class.  If the file cannot be found, a new file shall be
-created.  When search is finished, the state of the UCB is saved to the same file.
-\end{verbatim}
-}
-\paragraph{/cdrom}
-{\footnotesize
-\begin{verbatim}
-When Allows values used during neighbourhood search to be configured.
 \end{verbatim}
 }
 \section{constraints}
@@ -1734,14 +1720,6 @@ ensures that sum(vec) <= c.
 \end{verbatim}
 }
 \section{constraints table}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-help input tuplelist
-help input table
-help input haggisgac
-\end{verbatim}
-}
 \paragraph{Description}
 {\footnotesize
 \begin{verbatim}
@@ -1796,87 +1774,12 @@ help input negativetable
 help input haggisgac
 \end{verbatim}
 }
-\section{constraints watchboundelement}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint
-
-   watchboundelement(vec, i, e)
-
-specifies that, in any solution, vec[i] = e and i is in the range
-[0 .. |vec|-1].
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-Enforces generalised arc consistency.
-\end{verbatim}
-}
 \paragraph{References}
 {\footnotesize
 \begin{verbatim}
-See entry
-
-   help constraints element
-
-for details of an identical constraint that enforces a lower level of
-consistency.
-\end{verbatim}
-}
-\section{constraints watchboundelement\textunderscore one}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-This constraint is identical to watchboundelement, except the vector
-is indexed from 1 rather than from 0.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-See entry
-
-   help constraints watchboundelement
-
-for details of watchboundelement which watchboundelement_one is based on.
-\end{verbatim}
-}
-\section{constraints watchboundelement\textunderscore undefzero}
-\paragraph{Description}
-{\footnotesize
-\begin{verbatim}
-The constraint
-
-   watchboundelement_undefzero(vec, i, e)
-
-specifies that, in any solution, either:
-a)  vec[i] = e and i is in the range [0 .. |vec|-1]
-b)  i is outside the index range of vec, and e = 0
-
-Unlike watchboundelement (and element) which are false if i is outside
-the index range of vec.
-
-In general, use watchboundelement unless you have a special reason to
-use this constraint!
-\end{verbatim}
-}
-\paragraph{Notes}
-{\footnotesize
-\begin{verbatim}
-Enforces generalised arc consistency.
-\end{verbatim}
-}
-\paragraph{References}
-{\footnotesize
-\begin{verbatim}
-See entry
-
-   help constraints watchboundelement
-
-for details of the standard element constraint, which is false
-when the array value is out of bounds.
+help input tuplelist
+help input table
+help input haggisgac
 \end{verbatim}
 }
 \section{constraints watched-and}
@@ -2396,7 +2299,7 @@ lexleq( [bn[1,_,0,_], bool, q[0]] , [b, bm, d] )
 lexleq( [bm], [bm] ) # This is OK!
 
 # Can give tuplelists, which can have names!
-# The input is: <name> <num_of_tuples> <tuple_length> <numbers...>
+# The input is: <name> <numOf_tuples> <tupleLength> <numbers...>
 # The formatting can be about anything..
 
 **TUPLELIST**
@@ -2481,10 +2384,11 @@ default is to use ascending order for every search variable.
    ValOrder::= VALORDER[ (a|d)+ ]
 
 To model an optimisation problem the user can specify to minimise
-or maximise a variable's value.
+or maximise a variable's value, or list of variables (under
+lexicographic ordering)
 
-   OptimisationFn::= MAXIMISING <varname>
-                   | MINIMISING <varname>
+   OptimisationFn::= MAXIMISING <varname> or <varlist>
+                   | MINIMISING <varname> or <varlist>
 
 Finally, the user can control some aspects of the way solutions are
 printed. By default (no PrintFormat specified) all the variables are
@@ -2519,9 +2423,9 @@ The required format is
 TuplelistSection::= **TUPLELIST**
                     <Tuplelist>*
 
-Tuplelist::= <name> <num_tuples> <short_tuple>+
+Tuplelist::= <name> <num_tuples> <shortTuple>+
 
-short_tuple ::= [ <literal>*, ]
+shortTuple ::= [ <literal>*, ]
 
 literal ::= (<num>, <num>)
 \end{verbatim}
@@ -2594,7 +2498,7 @@ The required format is
 TuplelistSection::= **TUPLELIST**
                     <Tuplelist>*
 
-Tuplelist::= <name> <num_tuples> <tuple_length> <numbers>+
+Tuplelist::= <name> <num_tuples> <tupleLength> <numbers>+
 \end{verbatim}
 }
 \paragraph{Example}
