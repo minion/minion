@@ -57,12 +57,6 @@ void print_default_help(char** argv) {
   cout << endl;
 }
 
-void worker() {
-  while(1) {
-    ;
-  }
-}
-
 void doStandardSearch(CSPInstance& instance, SearchMethod args) {
     PreprocessCSP(instance, args);
 
