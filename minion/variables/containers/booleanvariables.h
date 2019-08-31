@@ -222,8 +222,8 @@ struct BoolVarContainer {
     required_mem += sizeof(data_type) - (required_mem % sizeof(data_type));
     if(assignOffset.empty()) {
       assignOffset = getMemory().backTrack().requestBytesExtendable(required_mem);
-      values_mem = checked_malloc(10 * 1024 * 1024);
-      CHECK(required_mem < 10 * 1024 * 1024, "Bool mem overflow");
+      values_mem = checked_malloc(512 * 1024 * 1024);
+      CHECK(required_mem < 512 * 1024 * 1024, "Bool mem overflow");
     } else {
       getMemory().backTrack().resizeExtendableBlock(assignOffset, required_mem);
     }

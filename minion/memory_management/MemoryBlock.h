@@ -307,7 +307,7 @@ public:
   }
 
   ExtendableBlock requestBytesExtendable(UnsignedSysInt baseSize) {
-    const SysInt maxSize = 10 * 1024 * 1024;
+    const SysInt maxSize = 512 * 1024 * 1024;
     char* block = (char*)calloc(maxSize, 1);
     extendable_blocks.push_back(BlockDef{block, baseSize, maxSize});
     allocated_extendable_bytes += baseSize;
@@ -318,7 +318,7 @@ public:
     UnsignedSysInt oldSize = extendable_blocks[block.getPos()].size;
     D_ASSERT(block() == extendable_blocks[block.getPos()].base);
     D_ASSERT(newSize >= oldSize);
-    D_ASSERT(newSize <= extendable_blocks[block.getPos()].capacity);
+    D_CHECK(newSize <= extendable_blocks[block.getPos()].capacity);
     D_ASSERT(checkAllZero(block() + oldSize, block() + newSize));
 
     allocated_extendable_bytes += (newSize - oldSize);
