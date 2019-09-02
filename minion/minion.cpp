@@ -58,7 +58,7 @@ void print_default_help(char** argv) {
 }
 
 void doStandardSearch(CSPInstance& instance, SearchMethod args) {
-    PreprocessCSP(instance, args);
+    bool preprocess = PreprocessCSP(instance, args);
 
     getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
                                                      getTableOut(), !getOptions().silent);
@@ -66,8 +66,12 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
     if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
       dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
 
-    SolveCSP(instance, args);
+    // This has to happen here, so the dumpSolver knows if the solver failed or not
+    if(!preprocess) {
+      getState().setFailed(true);
+    }
 
+    SolveCSP(instance, args);
 
     getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
                                                           getTableOut(), !getOptions().silent);

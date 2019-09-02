@@ -105,15 +105,16 @@ void BuildCSP(CSPInstance& instance) {
                                                    getTableOut(), !getOptions().silent);
 }
 
-void PreprocessCSP(CSPInstance& instance, SearchMethod args) {
+bool PreprocessCSP(CSPInstance& instance, SearchMethod args) {
     vector<AnyVarRef> preprocess_anyvars = getAnyVarRefFromVar(instance.preprocess_vars);
 
     try {
       PropogateCSP(std::max(args.preprocess, args.propMethod), preprocess_anyvars,
                    !getOptions().silent);
     } catch(EndOfSearch eos) {
-      getState().setFailed(true);
+      return false;
     }
+    return true;
 }
 void SolveCSP(CSPInstance& instance, SearchMethod args) {
   // Check that when searching PropagateSAC does actually do the SAC over all

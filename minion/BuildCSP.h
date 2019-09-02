@@ -43,7 +43,7 @@ struct SearchMethod {
 
 void SetupCSPOrdering(CSPInstance& instance, SearchMethod args);
 void BuildCSP(ProbSpec::CSPInstance& instance);
-void PreprocessCSP(ProbSpec::CSPInstance& instance, SearchMethod args);
+bool PreprocessCSP(ProbSpec::CSPInstance& instance, SearchMethod args);
 void SolveCSP(ProbSpec::CSPInstance& instance, SearchMethod args);
 
 #endif
