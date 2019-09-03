@@ -37,6 +37,7 @@ namespace Parallel {
 struct ParallelData {
 
   std::atomic<int> processCount;
+  int initialProcessCount;
   pthread_mutex_t outputLock;
 
   std::atomic<bool> fatalErrorOccurred;
@@ -114,6 +115,9 @@ void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
 namespace Parallel {
 
 ParallelData* setupParallelData() {
+  // make sure we don't end up with too many children
+  signal(SIGCHLD, SIG_IGN);
+
   // Setup a pipe so parent can track if children are alive
   int ret = pipe(childTrackingPipe);
 
@@ -132,6 +136,7 @@ ParallelData* setupParallelData() {
     cores = sysconf(_SC_NPROCESSORS_ONLN);
   }
   pd->processCount = cores;
+  pd->initialProcessCount = cores;
 
   {
     pthread_mutexattr_t mutexAttr;
@@ -200,6 +205,15 @@ void endParallelMinion() {
       std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
       exit(1);
     }
+
+    if(getParallelData().processCount != getParallelData().initialProcessCount + 1)
+    {
+      std::cerr << "**ERROR ERROR ERROR ERROR***\n";
+      std::cerr << "**AT LEAST ONE CHILD PROCESS WAS LOST**\n";
+      std::cerr << "**THE SEARCH IS INCOMPLETE**\n";
+      exit(1);
+    }
+
     std::cout << "A total of " << getParallelData().children << " children were used" << std::endl;
 
     getState().incrementSolutionCount(getParallelData().solutions);
