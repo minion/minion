@@ -202,7 +202,8 @@ void endParallelMinion() {
       // std::cerr << "Ready loop" << std::endl;
     }
     if(getParallelData().fatalErrorOccurred) {
-      std::cerr << "ERROR: A Fatal error occurred during parallelisation\n";
+      std::cerr << "**ERROR ERROR ERROR ERROR***\n";
+      std::cerr << "** A Fatal error occurred during parallelisation **\n";
       exit(1);
     }
 
