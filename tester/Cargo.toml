@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 lazy_static = "1.1.0"
-rand = "0.6"
+rand = "0.7"
 itertools = "0.8"
 atomic-counter = "1.0.0"
 tempfile = "3"
@@ -16,5 +16,5 @@ serde_derive = "1.0"
 serde = "1.0"
 rayon = "1.0"
 num-integer = "0.1"
-structopt = "0.2"
+structopt = "0.3"
 
