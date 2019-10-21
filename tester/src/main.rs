@@ -11,8 +11,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-#[macro_use]
-extern crate simple_error;
 
 extern crate num_integer;
 extern crate rayon;
@@ -21,6 +19,10 @@ extern crate structopt;
 use structopt::StructOpt;
 
 use rayon::prelude::*;
+
+use anyhow::Result;
+use anyhow::Context;
+
 
 mod constraint_def;
 mod counter;
@@ -47,7 +49,7 @@ struct Opt {
     maxtuples: usize,
 }
 
-fn main() -> Result<(), simple_error::SimpleError> {
+fn main() -> Result<()> {
     let opt = Opt::from_args();
     println!("{:?}", opt);
 
@@ -70,35 +72,34 @@ fn main() -> Result<(), simple_error::SimpleError> {
         maxtuples: opt.maxtuples,
     };
 
-    v.clone().into_par_iter().try_for_each(|ref c| {
-        try_with!(
+    let ret : Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint(&config, &c)),
-            format!("failure in {}", c.name)
-        );
-        try_with!(
+                .try_for_each(|_| test_types::test_constraint(&config, &c)).context(format!("failure in {}", c.name))?;
+  
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint_nested(&config, &c)),
-            format!("failure in {} with nesting", c.name)
-        );
+                .try_for_each(|_| test_types::test_constraint_nested(&config, &c)).
+            context(format!("failure in {} with nesting", c.name))?;
+        
         println!("Tested {}", c.name);
         Ok(())
-    })?;
+    });
+
+    ret?;
 
     println!("Parallel tests\n");
-    v.clone().into_par_iter().try_for_each(|ref c| {
-        try_with!(
+    let ret2 : Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
             (0..opt.count)
                 .into_par_iter()
-                .try_for_each(|_| test_types::test_constraint_par(&config, &c)),
-            format!("failure in {}", c.name)
-        );
+                .try_for_each(|_| test_types::test_constraint_par(&config, &c)).
+            context(format!("failure in {}", c.name))?;
 
         println!("Tested {}", c.name);
         Ok(())
-    })?;
+    });
+
+    ret2?;
 
     Ok(())
 }

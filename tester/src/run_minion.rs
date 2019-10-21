@@ -2,8 +2,8 @@
 
 use crate::constraint_def::ConstraintInstance;
 use crate::minion_instance::print_minion_file_pair;
-use simple_error::SimpleError;
-use simple_error::SimpleResult;
+
+use anyhow::{Result,anyhow,Context};
 
 use std;
 use std::fs;
@@ -25,27 +25,27 @@ pub struct MinionOutput {
     pub cleanup: CleanupFiles,
 }
 
-pub fn Nodes_more(orig: i64, new: i64) -> SimpleResult<()> {
+pub fn Nodes_more(orig: i64, new: i64) -> Result<()> {
     if orig > new {
-        Err(SimpleError::new("Number of nodes has decreased!"))
+        Err(anyhow!("Number of nodes has decreased!"))
     } else {
         Ok(())
     }
 }
-pub fn Nodes_equal(orig: i64, new: i64) -> SimpleResult<()> {
+pub fn Nodes_equal(orig: i64, new: i64) -> Result<()> {
     if orig != new {
-        Err(SimpleError::new("Node counts not equal"))
+        Err(anyhow!("Node counts not equal"))
     } else {
         Ok(())
     }
 }
-pub fn Nodes_nocompare(_orig: i64, _new: i64) -> SimpleResult<()> {
+pub fn Nodes_nocompare(_orig: i64, _new: i64) -> Result<()> {
     Ok(())
 }
 
-pub fn Solutions_equal(orig: Vec<Vec<i64>>, new: Vec<Vec<i64>>) -> SimpleResult<()> {
+pub fn Solutions_equal(orig: Vec<Vec<i64>>, new: Vec<Vec<i64>>) -> Result<()> {
     if orig != new {
-        Err(SimpleError::new("Solutions not equal as ordered list"))
+        Err(anyhow!("Solutions not equal as ordered list"))
     } else {
         Ok(())
     }
@@ -53,20 +53,20 @@ pub fn Solutions_equal(orig: Vec<Vec<i64>>, new: Vec<Vec<i64>>) -> SimpleResult<
 pub fn Solutions_unorderedequal(
     orig: Vec<Vec<i64>>,
     new: Vec<Vec<i64>>,
-) -> SimpleResult<()> {
+) -> Result<()> {
     let mut o = orig.clone();
     let mut n = new.clone();
     o.sort();
     n.sort();
     if o != n {
-        Err(SimpleError::new("Solutions not equal as unordered list"))
+        Err(anyhow!("Solutions not equal as unordered list"))
     } else {
         Ok(())
     }
 }
 
-pub type NodeCheck = fn(i64, i64) -> SimpleResult<()>;
-pub type SolCheck = fn(Vec<Vec<i64>>, Vec<Vec<i64>>) -> SimpleResult<()>;
+pub type NodeCheck = fn(i64, i64) -> Result<()>;
+pub type SolCheck = fn(Vec<Vec<i64>>, Vec<Vec<i64>>) -> Result<()>;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct CleanupFiles {
@@ -93,14 +93,14 @@ pub fn get_minion_solutions(
     minionargs: &[&str],
     instance: &ConstraintInstance,
     testname: &str,
-) -> SimpleResult<MinionOutput> {
+) -> Result<MinionOutput> {
     let nameid = format!(
         "{:?}_{}_{}",
         std::process::id(),
         get_unique_value(),
         testname
     );
-    try_with!(fs::create_dir_all("tempdir"), "Failed to create 'tempdir'");
+    fs::create_dir_all("tempdir").context("Failed to create 'tempdir'")?;
 
     let minout = format!("tempdir/input{}.minion", nameid);
     let solsout = format!("tempdir/sols{}.out", nameid);
@@ -115,32 +115,26 @@ pub fn get_minion_solutions(
     args.push(minout.clone());
 
     {
-        let mut outfile = try_with!(
-            fs::File::create(&minout),
-            "Could not open output file for writing"
-        );
-        try_with!(
-            print_minion_file_pair(&mut outfile, &instance),
-            "failed writing Minion output"
-        );
+        let mut outfile = 
+            fs::File::create(&minout).context(
+            "Could not open output file for writing")?;
+            print_minion_file_pair(&mut outfile, &instance).context(
+            "failed writing Minion output")?;
     }
 
     let minioncmd = format!("{} {}", minionexec, args.iter().join(" "));
 
-    let child = try_with!(
+    let child = 
         Command::new(minionexec)
             .args(args)
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
-            .spawn(),
-        format!("Failed to start '{}'", minionexec)
-    );
+            .spawn().context(format!("Failed to start '{}'", minionexec))?;
 
-    let output = try_with!(
-        child.wait_with_output(),
+    let output = 
+        child.wait_with_output().context(format!(
         "failed to capture Minion output: {}",
-        minioncmd
-    );
+        minioncmd))?;
 
     if !output.status.success() {
         print!(
@@ -148,24 +142,23 @@ pub fn get_minion_solutions(
             String::from_utf8_lossy(&output.stdout),
             String::from_utf8_lossy(&output.stderr)
         );
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Minion returned non-zero value: {}",
             minioncmd
         )));
     }
 
     let solutions = {
-        let f = try_with!(
-            fs::File::open(&solsout),
+        let f = 
+            fs::File::open(&solsout).context(format!(
             "failed to open solution file: {}",
-            minioncmd
-        );
+            minioncmd))?;
 
         let reader = BufReader::new(f);
 
         let mut solutions: Vec<Vec<i64>> = Vec::new();
         for tryline in reader.lines() {
-            let line = try_with!(tryline, "failure reading solutions: {}", minioncmd);
+            let line = tryline.context(format!("failure reading solutions: {}", minioncmd))?;
             solutions.push(
                 line.split_whitespace()
                     .map(|x| x.parse::<i64>().unwrap())
@@ -176,29 +169,26 @@ pub fn get_minion_solutions(
     };
 
     let nodes = {
-        let f = try_with!(
-            fs::File::open(&tableout),
+        let f = 
+            fs::File::open(&tableout).context(format!(
             "failed to open jsontableout file: {}",
-            minioncmd
-        );
+            minioncmd))?;
 
         let reader = BufReader::new(f);
 
-        let v: MinionJsonOut = try_with!(
-            serde_json::from_reader(reader),
+        let v: MinionJsonOut = 
+            serde_json::from_reader(reader).context(format!(
             "jsontableout not valid json!: {}",
-            minioncmd
-        );
+            minioncmd))?;
 
-        let nodes = try_with!(v.Nodes.parse::<i64>(), "invalid node count: {}", minioncmd);
-        let solcount = try_with!(
-            v.SolutionsFound.parse::<i64>(),
+        let nodes = v.Nodes.parse::<i64>().context(format!("invalid node count: {}", minioncmd))?;
+        let solcount = 
+            v.SolutionsFound.parse::<i64>().context(format!(
             "invalid solution count: {}",
-            minioncmd
-        );
+            minioncmd))?;
 
         if solcount != solutions.len() as i64 {
-            return Err(SimpleError::new(format!(
+            return Err(anyhow!(format!(
                 "Solutions files contains {} solutions, but SolutionsFound is {}",
                 solutions.len(),
                 solcount

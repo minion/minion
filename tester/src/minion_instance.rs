@@ -38,7 +38,7 @@ fn print_minion_constraint_contents<F: Write>(f: &mut F, con: &ConstraintInstanc
     let varlist = (0..con.constraint.arg.len())
         .map(|list| match con.constraint.arg[list] {
             Arg::Var(..) => con.vars()[list][0].name.clone(),
-            Arg::List(..) | Arg::TwoVars(..) => {
+            Arg::List(..) /*| Arg::TwoVars(..)*/ => {
                 let commalist = con.vars()[list].iter().map(|x| &x.name).join(", ");
                 format!("[{}]", commalist)
             }

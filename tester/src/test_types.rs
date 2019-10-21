@@ -4,9 +4,9 @@ extern crate rand;
 
 use self::rand::seq::SliceRandom;
 
-use simple_error::SimpleError;
-
 use crate::run_minion::{NodeCheck, SolCheck};
+
+use anyhow::{Result, anyhow, Context};
 
 pub struct MinionConfig<'a> {
     pub minionexec: &'a str,
@@ -19,7 +19,7 @@ pub fn test_constraint_with_flags(
     flags: &[&str],
     node_check: NodeCheck,
     sol_check: SolCheck,
-) -> Result<(), SimpleError> {
+) -> Result<()> {
     let instance = constraint_def::build_random_instance(c);
     let ret = run_minion::get_minion_solutions(
         config.minionexec,
@@ -32,18 +32,15 @@ pub fn test_constraint_with_flags(
     args.push("-findallsols");
     let ret2 = run_minion::get_minion_solutions(config.minionexec, &args, &instance, "flags")?;
 
-    try_with!(
-        node_check(ret.nodes, ret2.nodes),
+        node_check(ret.nodes, ret2.nodes).context(format!(
         "in {} vs {}",
         ret.filename,
-        ret2.filename
-    );
-    try_with!(
-        sol_check(ret.solutions, ret2.solutions),
+        ret2.filename))?;
+    
+        sol_check(ret.solutions, ret2.solutions).context(format!(
         "in {} vs {}",
         ret.filename,
-        ret2.filename
-    );
+        ret2.filename))?;
 
     ret.cleanup.cleanup();
     ret2.cleanup.cleanup();
@@ -53,7 +50,7 @@ pub fn test_constraint_with_flags(
 pub fn test_constraint(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
-) -> Result<(), SimpleError> {
+) -> Result<()> {
     let mut instance;
     let tups;
     loop {
@@ -74,13 +71,13 @@ pub fn test_constraint(
     let ret2 =
         run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
     if ret.solutions != ret2.solutions {
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
     }
     if instance.constraint.gac && ret.nodes != ret2.nodes {
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
@@ -95,7 +92,7 @@ pub fn test_constraint(
 pub fn test_constraint_par(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
-) -> Result<(), SimpleError> {
+) -> Result<()> {
     let instance = constraint_def::build_random_instance(c);
     let ret = run_minion::get_minion_solutions(
         config.minionexec,
@@ -114,14 +111,14 @@ pub fn test_constraint_par(
     sortsols.sort();
     sortsols2.sort();
     if sortsols != sortsols2 {
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
     }
 
     if instance.constraint.gac && ret.nodes != ret2.nodes {
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
@@ -136,7 +133,7 @@ pub fn test_constraint_par(
 pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
-) -> Result<(), SimpleError> {
+) -> Result<()> {
     let nest_type = constraint_def::NESTED_CONSTRAINT_LIST
         .choose(&mut rand::thread_rng())
         .unwrap();
@@ -160,13 +157,13 @@ pub fn test_constraint_nested(
     let ret2 =
         run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
     if ret.solutions != ret2.solutions {
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
             ret.filename, ret2.filename
         )));
     }
     if instance.constraint.gac && ret.nodes != ret2.nodes {
-        return Err(SimpleError::new(format!(
+        return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
         )));

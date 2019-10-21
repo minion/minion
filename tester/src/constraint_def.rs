@@ -13,6 +13,8 @@ use self::rand::Rng;
 
 use std::sync::Arc;
 
+use arrayvec::ArrayVec;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum VarType {
     Constant,
@@ -27,7 +29,7 @@ use self::VarType::*;
 pub enum Arg {
     Var(VarType),
     List(VarType),
-    TwoVars(VarType),
+    // TwoVars(VarType),
     //    ConstantList,
     Tuples,
     //    Short_Tuples,
@@ -215,7 +217,7 @@ impl ConstraintInstance {
     }
 
     fn check_tuple(&self, tup: &[i64]) -> bool {
-        let mut slices: Vec<&[i64]> = vec![];
+        let mut slices: ArrayVec<[&[i64];16]> = ArrayVec::new();
         let mut place: usize = 0;
         for var in self.vars().iter() {
             let i = var.len();
@@ -296,10 +298,11 @@ pub fn build_random_instance_with_children(
                     let len = rand::random::<usize>() % 5;
                     variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
                 }
-
+/*
                 TwoVars(d) => {
                     variables.push(vec![MinionVariable::random(d), MinionVariable::random(d)]);
                 }
+                */
                 Tuples => unimplemented!(),
                 Constraint => {
                     // Leave dummy empty vec in variables
