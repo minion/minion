@@ -104,15 +104,17 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
       }
     }
 
-    vector<std::pair<DomainInt, DomainInt>>::iterator it_high = std::lower_bound(
-        intervals.begin(), intervals.end(), std::make_pair(var.max(), var.max()));
-    if(it_high == intervals.end()) {
-      // var.setMax(*(it_high - 1).second);  // didn't we already do this in
-      // full prop?
+    SysInt pos = intervals.size() - 1;
+    DomainInt maxval = var.max();
+    while(pos >= 0 && intervals[pos].first > var.max())
+      pos--;
+    if(pos < 0) {
+      // This will cause failure
+      var.setMax(intervals[0].first - 1);
       return;
     }
 
-    var.setMax((*it_high).second);
+    var.setMax(intervals[pos].second);
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
