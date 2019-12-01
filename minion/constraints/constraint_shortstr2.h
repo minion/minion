@@ -498,9 +498,30 @@ struct STR : public AbstractConstraint {
     // Prune the domains.
     for(SysInt j = 0; j < ssup.size; j++) {
       SysInt var = ssup.vals[j];
-      for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
-        if(!gacvalues[var].in(val)) {
-          vars[var].removeFromDomain(val);
+      if(vars[var].isBound()) {
+        DomainInt new_min = vars[var].max() + 1;
+        for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
+          if(gacvalues[var].in(val)) {
+            new_min = val;
+            break;
+          }
+        }
+        DomainInt new_max = vars[var].min() - 1;
+        for(DomainInt val = vars[var].max(); val >= vars[var].min(); val--) {
+          if(gacvalues[var].in(val)) {
+            new_max = val;
+            break;
+          }
+        }
+
+        vars[var].setMin(new_min);
+        vars[var].setMax(new_max);
+      }
+      else {
+        for(DomainInt val = vars[var].min(); val <= vars[var].max(); val++) {
+          if(!gacvalues[var].in(val)) {
+            vars[var].removeFromDomain(val);
+          }
         }
       }
     }
