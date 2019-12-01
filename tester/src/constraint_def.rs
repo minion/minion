@@ -372,7 +372,7 @@ lazy_static! {
     pub static ref STANDARD_TABLE_CONSTRAINT: ConstraintDef = {
         ConstraintDef {
             name: "str2plus".to_string(),
-            arg: vec![List(Discrete), Tuples],
+            arg: vec![List(Bound), Tuples],
             checker: Arc::new(|_, __| unimplemented!()),
             gac: true,
             reifygac: true,
@@ -458,14 +458,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
     vec![
         ConstraintDef::new(
             "abs", // ABS
-            vec![Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound)],
             |v| v[0][0] == v[1][0].abs(),
             false,
             false,
         ),
         ConstraintDef::new(
             "alldiff", // ALLDIFF
-            vec![List(Discrete)],
+            vec![List(Bound)],
             check_alldiff,
             false,
             false,
@@ -473,7 +473,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // TODO: ALLDIFF_MATRIX
         ConstraintDef::new(
             "difference", // CT_DIFFERENCE
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| (v[0][0] - v[1][0]).abs() == v[2][0],
             false,
             false,
@@ -481,14 +481,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // CT_DISEQ_REIFY handled by DISEQ
         ConstraintDef::new(
             "diseq", // CT_DISEQ
-            vec![Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound)],
             |v| (v[0][0] != v[1][0]),
             false,
             false,
         ),
         ConstraintDef::new(
             "div_undefzero", // CT_DIV_UNDEFZERO
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
                 (v[2][0]
                     == (if v[1][0] == 0 {
@@ -502,7 +502,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "div", // CT_DIV_UNDEFZERO
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
                 (if v[1][0] == 0 {
                     false
@@ -515,21 +515,21 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "element_one", // CT_ELEMENT_ONE
-            vec![List(Discrete), Var(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound), Var(Bound)],
             |v| check_element(v, 1, false),
             false,
             false,
         ),
         ConstraintDef::new(
             "element_undefzero", // CT_ELEMENT_UNDEFZERO
-            vec![List(Discrete), Var(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound), Var(Bound)],
             |v| check_element(v, 0, true),
             false,
             false,
         ),
         ConstraintDef::new(
             "element", // CT_ELEMENT
-            vec![List(Discrete), Var(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound), Var(Bound)],
             |v| check_element(v, 0, false),
             false,
             false,
@@ -537,7 +537,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // CT_EQ_REIFY handled by CT_EQ
         ConstraintDef::new(
             "eq", // CT_EQ
-            vec![Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound)],
             |v| (v[0][0] == v[1][0]),
             false,
             false,
@@ -566,7 +566,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "lexleq[rv]", // CT_GACLEXLEQ
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| (v[0] <= v[1]),
             true,
             true,
@@ -584,7 +584,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "nvaluegeq", // CT_GEQNVALUE
-            vec![List(Discrete), Var(Constant)],
+            vec![List(Bound), Var(Constant)],
             |v| {
                 let h: HashSet<i64> = HashSet::from_iter(v[0].iter().cloned());
                 h.len() as i64 >= v[1][0]
@@ -594,7 +594,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "sumgeq", // CT_GEQSUM
-            vec![List(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound)],
             |v| (v[0].iter().sum::<i64>() >= v[1][0]),
             false,
             false,
@@ -602,7 +602,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // TODO: CT_HAGGISGAC_STABLE, CT_HAGGISGAC
         ConstraintDef::new(
             "ineq", // CT_INEQ
-            vec![Var(Discrete), Var(Discrete), Var(Constant)],
+            vec![Var(Bound), Var(Bound), Var(Constant)],
             |v| v[0][0] <= v[1][0] + v[2][0],
             false,
             false,
@@ -616,7 +616,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "nvalueleq", // CT_LEQNVALUE
-            vec![List(Discrete), Var(Constant)],
+            vec![List(Bound), Var(Constant)],
             |v| {
                 let h: HashSet<i64> = HashSet::from_iter(v[0].iter().cloned());
                 h.len() as i64 <= v[1][0]
@@ -626,14 +626,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "sumleq", // CT_LEQSUM
-            vec![List(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound)],
             |v| (v[0].iter().sum::<i64>() <= v[1][0]),
             false,
             false,
         ),
         ConstraintDef::new_with_validator(
             "lexleq", // CT_LEXLEQ
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| (v[0] <= v[1]),
             true,
             true,
@@ -641,7 +641,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "lexless", // CT_LEXLESS
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| (v[0] < v[1]),
             true,
             true,
@@ -650,7 +650,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // TODO: CT_LIGHTTABLE
         ConstraintDef::new(
             "max", // CT_MAX
-            vec![List(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound)],
             |v| (v[0].iter().cloned().max() == Some(v[1][0])),
             false,
             false,
@@ -658,7 +658,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // TODO: CT_MDDC
         ConstraintDef::new(
             "min", // CT_MIN
-            vec![List(Discrete), Var(Discrete)],
+            vec![List(Bound), Var(Bound)],
             |v| (v[0].iter().cloned().min() == Some(v[1][0])),
             false,
             false,
@@ -666,14 +666,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // MINUSEQ_REIFY handled by CT_MINUSEQ
         ConstraintDef::new(
             "minuseq", // CT_MINUSEQ
-            vec![Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound)],
             |v| (v[0][0] == -v[1][0]),
             false,
             false,
         ),
         ConstraintDef::new(
             "modulo_undefzero", // CT_MODULO_UNDEFZERO
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
                 (v[2][0]
                     == (if v[1][0] == 0 {
@@ -687,7 +687,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "modulo", // CT_MODULO
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| (v[1][0] != 0 && (v[0][0].mod_floor(&v[1][0]) == v[2][0])),
             false,
             false,
@@ -702,7 +702,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "pow", // CT_POW
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
                 if v[0][0] == 0 {
                     if v[1][0] < 0 {
@@ -731,14 +731,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         //TODO: CT_NEGATIVEMDDC
         ConstraintDef::new(
             "product", // CT_PRODUCT
-            vec![Var(Discrete), Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| (v[0][0] * v[1][0] == v[2][0]),
             false,
             false,
         ),
         ConstraintDef::new_with_validator(
             "lexleq[quick]", // CT_QUICK_LEXLEQ
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| (v[0] <= v[1]),
             false,
             false,
@@ -746,7 +746,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "lexless[quick]", // CT_QUICK_LEXLESS
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| (v[0] < v[1]),
             false,
             false,
@@ -797,7 +797,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "hamming", // CT_WATCHED_HAMMING
-            vec![List(Discrete), List(Discrete), Var(Constant)],
+            vec![List(Bound), List(Bound), Var(Constant)],
             |v| v[0].iter().zip(v[1]).filter(|(a, b)| *a != *b).count() as i64 >= v[2][0],
             true,
             true,
@@ -805,7 +805,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "w-inintervalset", // CT_WATCHED_ININTERVALSET
-            vec![Var(Discrete), List(Constant)],
+            vec![Var(Bound), List(Constant)],
             |v| {
                 for i in (0..v[1].len()).step_by(2) {
                     if v[1][i] <= v[0][0] && v[0][0] <= v[1][i + 1] {
@@ -838,7 +838,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "w-inrange", // CT_WATCHED_INRANGE
-            vec![Var(Discrete), List(Constant)],
+            vec![Var(Bound), List(Constant)],
             |v| v[1][0] <= v[0][0] && v[0][0] <= v[1][1],
             true,
             true,
@@ -849,7 +849,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "w-inset", // CT_WATCHED_INSET
-            vec![Var(Discrete), List(Constant)],
+            vec![Var(Bound), List(Constant)],
             |v| v[1].contains(&v[0][0]),
             true,
             true,
@@ -867,14 +867,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "watchless", // CT_WATCHED_LESS
-            vec![Var(Discrete), Var(Discrete)],
+            vec![Var(Bound), Var(Bound)],
             |v| (v[0][0] < v[1][0]),
             true,
             true,
         ),
         ConstraintDef::new(
             "w-literal", // CT_WATCHED_LIT
-            vec![Var(Discrete), Var(Constant)],
+            vec![Var(Bound), Var(Constant)],
             |v| (v[0][0] == v[1][0]),
             true,
             true,
@@ -898,7 +898,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // TODO: WATCHED_NEW_AND, WATCHED_NEW_OR
         ConstraintDef::new_with_validator(
             "not-hamming", // CT_WATCHED_NOT_HAMMING
-            vec![List(Discrete), List(Discrete), Var(Constant)],
+            vec![List(Bound), List(Bound), Var(Constant)],
             |v| (v[0].iter().zip(v[1]).filter(|(a, b)| *a != *b).count() as i64) < v[2][0],
             false,
             false,
@@ -906,7 +906,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "w-notinrange", // CT_WATCHED_NOT_INRANGE
-            vec![Var(Discrete), List(Constant)],
+            vec![Var(Bound), List(Constant)],
             |v| !(v[1][0] <= v[0][0] && v[0][0] <= v[1][1]),
             true,
             true,
@@ -917,7 +917,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "w-notinset", // CT_WATCHED_NOT_INSET
-            vec![Var(Discrete), List(Constant)],
+            vec![Var(Bound), List(Constant)],
             |v| !v[1].contains(&v[0][0]),
             true,
             true,
@@ -928,7 +928,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new(
             "w-notliteral", // CT_WATCHED_NOTLIT
-            vec![Var(Discrete), Var(Constant)],
+            vec![Var(Bound), Var(Constant)],
             |v| (v[0][0] != v[1][0]),
             true,
             true,
@@ -936,7 +936,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         // TODO: CT_WATCHED_TABLE
         ConstraintDef::new_with_validator(
             "watchvecexists_less", // CT_WATCHED_VEC_OR_LESS
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| v[0].iter().zip(v[1]).any(|(a, b)| *a < *b),
             true,
             true,
@@ -944,7 +944,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "watchvecneq", // CT_WATCHED_VECNEQ
-            vec![List(Discrete), List(Discrete)],
+            vec![List(Bound), List(Bound)],
             |v| v[0].iter().zip(v[1]).any(|(a, b)| *a != *b),
             true,
             true,
@@ -952,7 +952,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "weightedsumgeq", // CT_WEIGHTGEQSUM
-            vec![List(Constant), List(Discrete), Var(Discrete)],
+            vec![List(Constant), List(Bound), Var(Bound)],
             |v| v[0].iter().zip(v[1]).map(|(a, b)| *a * *b).sum::<i64>() >= v[2][0],
             true,
             true,
@@ -960,7 +960,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_with_validator(
             "weightedsumleq", // CT_WEIGHTLEQSUM
-            vec![List(Constant), List(Discrete), Var(Discrete)],
+            vec![List(Constant), List(Bound), Var(Bound)],
             |v| v[0].iter().zip(v[1]).map(|(a, b)| *a * *b).sum::<i64>() <= v[2][0],
             true,
             true,
