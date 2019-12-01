@@ -136,18 +136,31 @@ struct NeqIterated {
   static void propagate_from_var1(VarType1& var1, VarType2& var2) {
     if(var1.isAssigned())
       removeValue(var1.assignedValue(), var2);
+    if(var1.isBound()) {
+      if(var2.isAssigned())
+        removeValue(var2.assignedValue(), var1);
+    }
   }
 
   template <typename VarType1, typename VarType2>
   static void propagate_from_var2(VarType1& var1, VarType2& var2) {
     if(var2.isAssigned())
       removeValue(var2.assignedValue(), var1);
+    if(var2.isBound()) {
+      if(var1.isAssigned())
+        removeValue(var1.assignedValue(), var2);
+    }
   }
 
   template <typename VarType1, typename VarType2>
   static void addTriggers(AbstractConstraint* ac, VarType1& var1, VarType2& var2, DomainInt dt) {
-    ac->moveTriggerInt(var1, dt, Assigned);
-    ac->moveTriggerInt(var2, dt + 1, Assigned);
+    if(var1.isBound() || var2.isBound()) {
+      ac->moveTriggerInt(var1, dt, DomainChanged);
+      ac->moveTriggerInt(var2, dt + 1, DomainChanged);
+    } else {
+      ac->moveTriggerInt(var1, dt, Assigned);
+      ac->moveTriggerInt(var2, dt + 1, Assigned);
+    }
   }
 
   template <typename Var>
