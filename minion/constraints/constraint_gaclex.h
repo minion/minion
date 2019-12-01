@@ -86,8 +86,14 @@ struct GacLexLeqConstraint : public AbstractConstraint {
       : alpha(), beta(), F(), x(_x), y(_y) {
     CHECK(x.size() == y.size(), "gaclex only works on vectors of equal length");
     for(SysInt i = 0; i < (SysInt)x.size(); ++i) {
-      if(x[i].getBaseVar() == y[i].getBaseVar())
-        D_FATAL_ERROR("GacLex constraints cannot have a variable repeated at an index");
+      if(x[i].getBaseVar() == y[i].getBaseVar()) {
+        static bool printed = false;
+        if(!printed) {
+          std::cerr << "# A GacLex constraint has a variable repeated at index " << i << ",\n";
+          std::cerr << "# So it will not achieve GAC\n";
+          printed = true;
+        }
+      }
     }
 
     for(SysInt i = 0; i < (SysInt)x.size(); ++i) {
