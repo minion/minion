@@ -90,16 +90,33 @@ pub fn random_sublist_of_size(list: &[i64], target: i64) -> Vec<i64> {
 }
 
 impl MinionVariable {
-    fn random(d: VarType) -> Arc<MinionVariable> {
+    fn random(in_d: VarType) -> Arc<MinionVariable> {
+        let dom_min = match in_d {
+            Bool => 0,
+            _ => -10
+        };
+
+        let dom_max = match in_d {
+            Bool => 1,
+            _ => 10
+        };
+
+        let d = *match in_d {
+            Constant => vec![Constant],
+            Bool => vec![Bool, Bool, Constant],
+            Discrete => vec![Discrete, Discrete, Discrete, Bool, Constant],
+            Bound => vec![Bound, Bound, Bound, Discrete, Bool, Constant]
+        }.choose(&mut rand::thread_rng()).unwrap();
+
         let domain = match d {
-            Constant => vec![random_in_range(-10, 10)],
+            Constant => vec![random_in_range(dom_min, dom_max)],
             Bool => random_sublist(&[0, 1]),
             Discrete => {
-                let v: Vec<i64> = (-10..10).collect();
+                let v: Vec<i64> = (dom_min..dom_max).collect();
                 random_sublist_of_size(&v, random_in_range(1, 8))
             }
             Bound => {
-                let low = random_in_range(-10, 10);
+                let low = random_in_range(dom_min, dom_max);
                 let len = random_in_range(1, 8);
                 (low..(low + len)).collect()
             }
@@ -129,7 +146,7 @@ impl MinionVariable {
 pub struct ConstraintDef {
     pub name: String,
     pub arg: Vec<Arg>,
-    pub checker: Arc<Fn(&ConstraintInstance, &[&[i64]]) -> bool + Sync + Send>,
+    pub checker: Arc<dyn Fn(&ConstraintInstance, &[&[i64]]) -> bool + Sync + Send>,
     pub gac: bool,
     pub reifygac: bool,
     pub valid_instance: fn(&ConstraintInstance) -> bool,
