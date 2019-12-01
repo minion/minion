@@ -81,7 +81,7 @@ struct WatchNotInSetConstraint : public AbstractConstraint {
 
     SysInt upperIndex = (SysInt)vals.size() - 1;
 
-    while(upperIndex > 0 && vals[upperIndex] >= var.max()) {
+    while(upperIndex >= 0 && vals[upperIndex] >= var.max()) {
       var.setMax(vals[upperIndex] - 1);
       upperIndex--;
     }
