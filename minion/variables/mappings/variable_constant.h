@@ -42,9 +42,13 @@ struct ConstantVar {
 
   explicit ConstantVar(DomainInt _val) : val(_val) {}
 
-  ConstantVar() {}
+  ConstantVar() : val(0) {}
 
   ConstantVar(const ConstantVar& b) : val(b.val) {}
+
+  void operator=(const ConstantVar& v) {
+    val = v.val;
+  }
 
   BOOL isAssigned() const {
     return true;

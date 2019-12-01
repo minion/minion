@@ -82,6 +82,13 @@ struct BoolVarRef_internal {
         data_position(b.data_position),
         value_position(b.value_position) {}
 
+  void operator=(const BoolVarRef_internal& b) {
+    shiftOffset = b.shiftOffset;
+    varNum = b.varNum;
+    data_position = b.data_position;
+    value_position = b.value_position;
+  }
+
   BoolVarRef_internal() : shiftOffset(~1), varNum(~1) {}
 
   BoolVarRef_internal(DomainInt value, BoolVarContainer* b_con);

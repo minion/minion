@@ -43,6 +43,10 @@ struct VarRefType {
 
   VarRefType(const InternalRefType& _data) : data(_data) {}
 
+  void operator=(const VarRefType& val) {
+    data = val.data;
+  }
+
   VarRefType() : data() {}
 
   VarRefType(const VarRefType& b) : data(b.data) {}
@@ -171,6 +175,10 @@ struct QuickVarRefType {
 
   QuickVarRefType(const QuickVarRefType& b) : data(b.data) {}
 
+  void operator=(const QuickVarRefType& val) {
+    data = val.data;
+  }
+  
   BOOL isAssigned() const {
     return data.isAssigned();
   }

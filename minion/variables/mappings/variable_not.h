@@ -59,6 +59,10 @@ struct VarNot {
 
   VarNot(const VarNot& b) : data(b.data) {}
 
+  void operator=(const VarNot& val) {
+    data = val.data;
+  }
+
   // There is a good reason this is like this. It is because the 'neg' of an
   // BOOL var
   // might be used in arithmetic. This is an extension to all of the integers
