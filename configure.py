@@ -301,7 +301,7 @@ for c in constraints:
     varcount = sum([ m in ["read_list", "read_var", "read_2_vars"] for m in c["args"]])
     with open(srcname, "a") as conout:
         conout.write('#include "minion.h"\n')
-        conout.write('#include "' + c["filename"] + '"\n\n')
+        conout.write('#include "../' + c["filename"] + '"\n\n')
         conout.write("BUILD_CT("+c["internal_name"] + ", "+str(varcount)+")\n")
 
 
