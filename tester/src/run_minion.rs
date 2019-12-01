@@ -25,49 +25,6 @@ pub struct MinionOutput {
     pub cleanup: CleanupFiles,
 }
 
-pub fn Nodes_more(orig: i64, new: i64) -> Result<()> {
-    if orig > new {
-        Err(anyhow!("Number of nodes has decreased!"))
-    } else {
-        Ok(())
-    }
-}
-pub fn Nodes_equal(orig: i64, new: i64) -> Result<()> {
-    if orig != new {
-        Err(anyhow!("Node counts not equal"))
-    } else {
-        Ok(())
-    }
-}
-pub fn Nodes_nocompare(_orig: i64, _new: i64) -> Result<()> {
-    Ok(())
-}
-
-pub fn Solutions_equal(orig: Vec<Vec<i64>>, new: Vec<Vec<i64>>) -> Result<()> {
-    if orig != new {
-        Err(anyhow!("Solutions not equal as ordered list"))
-    } else {
-        Ok(())
-    }
-}
-pub fn Solutions_unorderedequal(
-    orig: Vec<Vec<i64>>,
-    new: Vec<Vec<i64>>,
-) -> Result<()> {
-    let mut o = orig.clone();
-    let mut n = new.clone();
-    o.sort();
-    n.sort();
-    if o != n {
-        Err(anyhow!("Solutions not equal as unordered list"))
-    } else {
-        Ok(())
-    }
-}
-
-pub type NodeCheck = fn(i64, i64) -> Result<()>;
-pub type SolCheck = fn(Vec<Vec<i64>>, Vec<Vec<i64>>) -> Result<()>;
-
 #[derive(Debug, PartialEq, Eq)]
 pub struct CleanupFiles {
     files: Vec<String>,

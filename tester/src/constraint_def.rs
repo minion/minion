@@ -105,7 +105,7 @@ impl MinionVariable {
             Constant => vec![Constant],
             Bool => vec![Bool, Bool, Constant],
             Discrete => vec![Discrete, Discrete, Discrete, Bool, Constant],
-            Bound => vec![Bound, Bound, Bound, Discrete, Bool, Constant]
+            Bound => vec![Bound, Bound, Discrete, Discrete, Bool, Constant]
         }.choose(&mut rand::thread_rng()).unwrap();
 
         let domain = match d {

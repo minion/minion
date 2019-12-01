@@ -4,48 +4,13 @@ extern crate rand;
 
 use self::rand::seq::SliceRandom;
 
-use crate::run_minion::{NodeCheck, SolCheck};
-
-use anyhow::{Result, anyhow, Context};
+use anyhow::{Result, anyhow};
 
 pub struct MinionConfig<'a> {
     pub minionexec: &'a str,
     pub maxtuples: usize,
 }
 
-pub fn test_constraint_with_flags(
-    config: &MinionConfig,
-    c: &constraint_def::ConstraintDef,
-    flags: &[&str],
-    node_check: NodeCheck,
-    sol_check: SolCheck,
-) -> Result<()> {
-    let instance = constraint_def::build_random_instance(c);
-    let ret = run_minion::get_minion_solutions(
-        config.minionexec,
-        &["-findallsols"],
-        &instance,
-        "original",
-    )?;
-
-    let mut args = flags.to_vec();
-    args.push("-findallsols");
-    let ret2 = run_minion::get_minion_solutions(config.minionexec, &args, &instance, "flags")?;
-
-        node_check(ret.nodes, ret2.nodes).context(format!(
-        "in {} vs {}",
-        ret.filename,
-        ret2.filename))?;
-    
-        sol_check(ret.solutions, ret2.solutions).context(format!(
-        "in {} vs {}",
-        ret.filename,
-        ret2.filename))?;
-
-    ret.cleanup.cleanup();
-    ret2.cleanup.cleanup();
-    Ok(())
-}
 
 pub fn test_constraint(
     config: &MinionConfig,
