@@ -85,7 +85,12 @@ struct RestartNewSearchManager : public Controller::SearchManager {
     bool useBias = getOptions().restart.bias;
     double multiplier = getOptions().restart.multiplier;
 
-    for(int i = 10; i < 10000000; i *= multiplier) {
+    unsigned long long i = 10;
+    while(true) {
+      i *= multiplier;
+      if(i > (1LL << 60)) {
+        i = 1LL << 60;
+      }
       cout << "Increasing backtrack limit to " << i << endl;
       int bias = 0;
       if(useBias)
