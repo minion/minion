@@ -135,7 +135,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-outputCompressed")) {
       INCREMENT_i(-outputCompressed);
       getOptions().outputCompressed = argv[i];
-    } else if(command == string("-instancestats")) {
+    } else if(command == string("-instancestats") || command == string("-X-instancestats")) {
       getOptions().instance_stats = true;
     } else if(command == string("-Xgraph")) {
       getOptions().graph = true;
