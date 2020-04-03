@@ -145,10 +145,8 @@ int main(int argc, char** argv) {
       getOptions().printLine("Using seed: " + tostring(args.randomSeed));
     }
 
-    if(!getOptions().noTimers) {
-      Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
-                           getOptions().time_limit_is_CPUTime);
-    }
+    Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
+                         getOptions().time_limit_is_CPUTime);
 
     vector<string> files(1, getOptions().instance_name);
     readInputFromFiles(instance, files, getOptions().parserVerbose, getOptions().map_long_short,

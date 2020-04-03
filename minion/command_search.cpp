@@ -58,32 +58,48 @@ static void assignLiterals(const CSPInstance& instance, const std::vector<std::p
     }
 }
 
-void doCommandSearch(const CSPInstance& instance, SearchMethod args)
-{
-    cout << "Switching to command mode" << endl;
+static void printAssignment(const CSPInstance& instance, std::unique_ptr<CommandStream>& streams) {
+  auto vars = instance.vars.getAllVars();
+  streams->output << vars.size() << " ";
+  for(auto v : vars) {
+    streams->output << instance.vars.getName(v) << " " << getAnyVarRefFromVar(v).assignedValue()
+                    << " ";
+  }
+}
 
-    std::unique_ptr<CommandStream> streams( new CommandStream(getOptions().commandlistIn, getOptions().commandlistOut));
-    while(true) {
-        int depth = Controller::getWorldDepth();
-        Controller::worldPush();
-        
-        Command c = readCommand(streams->input);
-        
-        assignLiterals(instance, c.lits);
-        getQueue().propagateQueue();
-        if(getState().isFailed()) {
-            streams->output << c.type << " F 0" << std::endl;
+void doCommandSearch(CSPInstance& instance, SearchMethod args) {
+  cout << "Switching to command mode" << endl;
+
+  std::unique_ptr<CommandStream> streams(
+      new CommandStream(getOptions().commandlistIn, getOptions().commandlistOut));
+  while(true) {
+    int depth = Controller::getWorldDepth();
+    Controller::worldPush();
+
+    Command c = readCommand(streams->input);
+    getState().resetSearchCounters();
+    assignLiterals(instance, c.lits);
+    getQueue().propagateQueue();
+    if(getState().isFailed()) {
+      streams->output << c.type << " F 0" << std::endl;
+    } else {
+      if(c.type == "C") {
+        streams->output << c.type << " T 0" << std::endl;
+      } else if(c.type == "Q") {
+        std::cout << "Command mode: Goodbye" << endl;
+        exit(0);
+      } else if(c.type == "S") {
+        SolveCSP(instance, args);
+        if(getState().getSolutionCount() > 0) {
+          streams->output << "T ";
+          printAssignment(instance, streams);
+          streams->output << std::endl;
         } else {
-            if(c.type == "C") {
-                streams->output << c.type << " T 0" << std::endl;
-            } else if(c.type == "Q") {
-                std::cout << "Command mode: Goodbye" << endl;
-                exit(0);
-            } else if(c.type == "S") {
-                D_FATAL_ERROR("missing");
-            }
+          streams->output << "F 0" << std::endl;
         }
-
-        Controller::worldPopToDepth(depth);
+      }
     }
+
+    Controller::worldPopToDepth(depth);
+  }
 }

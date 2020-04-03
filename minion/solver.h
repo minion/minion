@@ -319,9 +319,6 @@ public:
   /// output a compressed list of domains
   bool outputCompressedDomains;
 
-  /// Disable the use of linux timers
-  bool noTimers;
-
   string gapname;
 
   bool parallel = false;
@@ -361,7 +358,6 @@ public:
         noresumefile(true),
         split(false),
         outputCompressedDomains(false),
-        noTimers(false),
         gapname("gap.sh"),
         map_long_short(MLTTS_NoMap),
         ensureBranchOnAllVars(true) {

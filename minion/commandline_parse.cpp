@@ -152,8 +152,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     */
     else if(command == string("-noprintsols")) {
       getOptions().print_solution = false;
-    } else if(command == string("-notimers")) {
-      getOptions().noTimers = true;
     }
     /** @help switches;-printsolsonly Description
     Print only solutions and a summary at the end.
