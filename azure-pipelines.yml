@@ -29,9 +29,6 @@ steps:
     cd test_instances
     ./run_tests.sh ../bin-quick/minion
 - bash: |
-    curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
-  displayName: 'Install rustc'
-- bash: |
     export PATH=$PATH:$HOME/.cargo/bin
     cd tester
     cargo run --release -- --minion ../bin-quick/minion
