@@ -91,11 +91,11 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
       } else if(c.type == "S") {
         SolveCSP(instance, args);
         if(getState().getSolutionCount() > 0) {
-          streams->output << "T ";
+          streams->output << c.type << " T ";
           printAssignment(instance, streams);
           streams->output << std::endl;
         } else {
-          streams->output << "F 0" << std::endl;
+          streams->output << c.type << " F 0" << std::endl;
         }
       }
     }
