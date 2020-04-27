@@ -67,6 +67,25 @@ static void printAssignment(const CSPInstance& instance, std::unique_ptr<Command
   }
 }
 
+static void printDeletedVals(const CSPInstance& instance, std::unique_ptr<CommandStream>& streams) {
+  auto vars = instance.vars.getAllVars();
+  streams->output << vars.size() << " ";
+  for(auto inputvar : vars) {
+    auto v = getAnyVarRefFromVar(inputvar);
+    streams->output << instance.vars.getName(inputvar) << " ";
+    std::vector<DomainInt> del;
+    for(DomainInt d = v.initialMin(); d <= v.initialMax(); ++d) {
+      if(!v.inDomain(d)) {
+        del.push_back(d);
+      }
+    }
+    streams->output << del.size() << " ";
+    for(auto d : del) {
+      streams->output << d << " ";
+    }
+  }
+}
+
 void doCommandSearch(CSPInstance& instance, SearchMethod args) {
   cout << "Switching to command mode" << endl;
 
@@ -77,6 +96,12 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     Controller::worldPush();
 
     Command c = readCommand(streams->input);
+
+    if(c.type == "Q") {
+      std::cout << "Command mode: Goodbye" << endl;
+      exit(0);
+    }
+
     getState().resetSearchCounters();
     assignLiterals(instance, c.lits);
     getQueue().propagateQueue();
@@ -85,9 +110,10 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     } else {
       if(c.type == "C") {
         streams->output << c.type << " T 0" << std::endl;
-      } else if(c.type == "Q") {
-        std::cout << "Command mode: Goodbye" << endl;
-        exit(0);
+      } else if(c.type == "P") {
+        streams->output << c.type << " T ";
+        printDeletedVals(instance, streams);
+        streams->output << std::endl;
       } else if(c.type == "S") {
         SolveCSP(instance, args);
         if(getState().getSolutionCount() > 0) {
