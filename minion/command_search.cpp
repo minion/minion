@@ -89,6 +89,11 @@ static void printDeletedVals(const CSPInstance& instance, std::unique_ptr<Comman
 void doCommandSearch(CSPInstance& instance, SearchMethod args) {
   cout << "Switching to command mode" << endl;
 
+  // Remember if we are supposed to be writing solsout, so we can
+  // enable if we want to.
+  bool origWrite = getOptions().solsoutWrite;
+  bool origJsonWrite = getOptions().solsoutJson;
+
   std::unique_ptr<CommandStream> streams(
       new CommandStream(getOptions().commandlistIn, getOptions().commandlistOut));
   while(true) {
@@ -103,6 +108,10 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     }
 
     getState().resetSearchCounters();
+    getOptions().sollimit = 1;
+    getOptions().solsoutWrite = false;
+    getOptions().solsoutJson = false;
+
     assignLiterals(instance, c.lits);
     getQueue().propagateQueue();
     if(getState().isFailed()) {
@@ -114,14 +123,24 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
         streams->output << c.type << " T ";
         printDeletedVals(instance, streams);
         streams->output << std::endl;
-      } else if(c.type == "S") {
+      } else if(c.type == "S" || c.type == "F" || c.type == "A") {
+        // 'A' means all solutions, 'F' or 'S' means 
+        if(c.type == "A") {
+          getOptions().sollimit = -1;
+        }
+        if(c.type == "A" || c.type == "F") {
+          getOptions().solsoutWrite = origWrite;
+          getOptions().solsoutJson = origJsonWrite;
+        }
         SolveCSP(instance, args);
-        if(getState().getSolutionCount() > 0) {
-          streams->output << c.type << " T ";
-          printAssignment(instance, streams);
-          streams->output << std::endl;
-        } else {
-          streams->output << c.type << " F 0" << std::endl;
+        if(c.type == "S") {
+          if(getState().getSolutionCount() > 0) {
+            streams->output << c.type << " T ";
+            printAssignment(instance, streams);
+            streams->output << std::endl;
+          } else {
+            streams->output << c.type << " F 0" << std::endl;
+          }
         }
       }
     }
