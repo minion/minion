@@ -134,7 +134,7 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
         }
         SolveCSP(instance, args);
         if(c.type == "A" || c.type == "F") {
-          streams->output << c.type << "T " << getState().getSolutionCount() << std::endl;
+          streams->output << c.type << " T " << getState().getSolutionCount() << std::endl;
         }
         else if(c.type == "S") {
           if(getState().getSolutionCount() > 0) {
