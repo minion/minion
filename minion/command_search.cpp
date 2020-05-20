@@ -133,7 +133,10 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
           getOptions().solsoutJson = origJsonWrite;
         }
         SolveCSP(instance, args);
-        if(c.type == "S") {
+        if(c.type == "A" || c.type == "F") {
+          streams->output << c.type << "T " << getState().getSolutionCount() << std::endl;
+        }
+        else if(c.type == "S") {
           if(getState().getSolutionCount() > 0) {
             streams->output << c.type << " T ";
             printAssignment(instance, streams);
