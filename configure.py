@@ -189,7 +189,7 @@ for c in ['domains64', 'quick', 'debug', 'print', 'info', 'profile', 'static']:
 if getattr(arg, 'wdeg'):
     if arg.wdeg == 'yes':
         commandargs = commandargs + ["-DWDEG"]
-    elif arg.wdeg <> 'no':
+    elif arg.wdeg != 'no':
         fatal_error("Invalid argument for --wdeg:" + arg.wdeg)
 else:
     commandargs = commandargs + ["-DWDEG"]
@@ -277,7 +277,7 @@ if arg.constraints:
             fatal_error("Did not find constraint '"+c+"'")
     constraints = newcon
 
-constraints.sort()
+constraints.sort(key=lambda d: sorted(d.items()))
 
 constraintsrclist = []
 constraintsrclistshort = []
