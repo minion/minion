@@ -1,6 +1,11 @@
 #include "command_search.h"
 #include <memory>
 
+
+#define DP(x)
+//#define DP(x) std::cerr << x << endl
+
+
 struct CommandStream {
     ifstream input;
     ofstream output;
@@ -21,6 +26,15 @@ struct CommandStream {
 struct Command {
     string type;
     std::vector<std::pair<string, int> > lits;
+
+    friend std::ostream& operator<<(std::ostream& o, const Command& c)
+    {
+      o << c.type << ":";
+      for(const auto& l: c.lits) {
+        o << " " << l.first << " " << l.second;
+      }
+      return o;
+    }
 };
 
 static Command readCommand(istream& o) {
@@ -101,7 +115,9 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     Controller::worldPush();
 
     Command c = readCommand(streams->input);
-
+ 
+      DP(c);
+    
     if(c.type == "Q") {
       std::cout << "Command mode: Goodbye" << endl;
       exit(0);
@@ -115,6 +131,7 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     assignLiterals(instance, c.lits);
     getQueue().propagateQueue();
     if(getState().isFailed()) {
+      DP("Instant fail");
       streams->output << c.type << " F 0" << std::endl;
     } else {
       if(c.type == "C") {
