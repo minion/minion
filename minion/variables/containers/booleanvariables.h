@@ -178,7 +178,7 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BoolVarContainer {
 
-  BoolVarContainer() : varCount_m(0), triggerList(false), lock_m(false) {}
+  BoolVarContainer() : varCount_m(0), triggerList(false) {}
 
   static const SysInt width = 7;
   ExtendableBlock assignOffset;
@@ -189,9 +189,6 @@ struct BoolVarContainer {
 #endif
   UnsignedSysInt varCount_m;
   TriggerList triggerList;
-  /// When false, no variable can be altered. When true, no variables can be
-  /// created.
-  BOOL lock_m;
 
   data_type* valuePtr() {
     return static_cast<data_type*>(values_mem);
@@ -209,15 +206,10 @@ struct BoolVarContainer {
     return (const data_type*)(assignOffset());
   }
 
-  void lock() {
-    lock_m = true;
-  }
-
   /// Returns a new Boolean Variable.
   // BoolVarRef get_new_var();
 
   void addVariables(SysInt new_bools) {
-    D_ASSERT(!lock_m);
     varCount_m += new_bools;
 
     SysInt required_mem = varCount_m / 8 + 1;
@@ -269,7 +261,7 @@ struct BoolVarContainer {
   }
 
   void removeFromDomain(const BoolVarRef_internal& d, DomainInt b) {
-    D_ASSERT(lock_m && d.varNum < (SysInt)varCount_m);
+    D_ASSERT(d.varNum < (SysInt)varCount_m);
     if((checked_cast<SysInt>(b) | 1) != 1)
       return;
 
@@ -281,7 +273,7 @@ struct BoolVarContainer {
   }
 
   void internalAssign(const BoolVarRef_internal& d, DomainInt b) {
-    D_ASSERT(lock_m && d.varNum < (SysInt)varCount_m);
+    D_ASSERT(d.varNum < (SysInt)varCount_m);
     D_ASSERT(!d.isAssigned());
     if((checked_cast<SysInt>(b) | 1) != 1) {
       getState().setFailed(true);
@@ -318,7 +310,6 @@ struct BoolVarContainer {
   void addDynamicTrigger(BoolVarRef_internal& b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
     D_ASSERT(pos == NoDomainValue || (type == DomainRemoval && pos != NoDomainValue));
-    D_ASSERT(lock_m);
 
     triggerList.addDynamicTrigger(b.varNum, t, type, pos, op);
   }

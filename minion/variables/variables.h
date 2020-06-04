@@ -52,7 +52,6 @@ public:
 
   inline void lock() {
     boundVarContainer.lock();
-    boolVarContainer.lock();
     sparseBoundVarContainer.lock();
   }
 
