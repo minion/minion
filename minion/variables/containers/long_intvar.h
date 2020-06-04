@@ -76,7 +76,7 @@ struct BigRangeVarContainer {
   typedef BigRangeVarRef_internal_template<UnsignedSysInt> BigRangeVarRef_internal;
 
   BigRangeVarContainer()
-      : bms_array(&getMemory().monotonicSet()), triggerList(false), varCount_m(0), lock_m(0) {
+      : bms_array(&getMemory().monotonicSet()), triggerList(false), varCount_m(0) {
     // Store where the first variable will go.
     varOffset.push_back(0);
   }
@@ -98,7 +98,6 @@ struct BigRangeVarContainer {
 #endif
 
   UnsignedSysInt varCount_m;
-  BOOL lock_m;
 
 #define BOUND_DATA_SIZE 3
 
@@ -168,14 +167,7 @@ struct BigRangeVarContainer {
     return old_lowBound;
   }
 
-  void lock() {
-    D_ASSERT(!lock_m);
-    lock_m = true;
-    // bms_array->lock(); // gets locked in constraintSetup.cpp
-  }
-
   void addVariables(const vector<Bounds>& newDomains) {
-    D_ASSERT(!lock_m);
     for(SysInt i = 0; i < (SysInt)newDomains.size(); ++i) {
       initialBounds.push_back(make_pair(newDomains[i].lowerBound, newDomains[i].upperBound));
       DomainInt domainSize;
@@ -222,18 +214,15 @@ struct BigRangeVarContainer {
   }
 
   BOOL isAssigned(BigRangeVarRef_internal d) const {
-    D_ASSERT(lock_m);
     return lowerBound(d) == upperBound(d);
   }
 
   DomainInt getAssignedValue(BigRangeVarRef_internal d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return getMin(d);
   }
 
   BOOL inDomain(BigRangeVarRef_internal d, DomainInt i) const {
-    D_ASSERT(lock_m);
     if(i < lowerBound(d) || i > upperBound(d))
       return false;
     return bms_array->isMember(varOffset[d.varNum] + i);
@@ -243,7 +232,6 @@ struct BigRangeVarContainer {
   // other places
   // where bms_array is used directly.
   BOOL inDomain_noBoundCheck(BigRangeVarRef_internal d, DomainInt i) const {
-    D_ASSERT(lock_m);
     D_ASSERT(i >= lowerBound(d));
     D_ASSERT(i <= upperBound(d));
     return bms_array->isMember(varOffset[d.varNum] + i);
@@ -264,13 +252,11 @@ struct BigRangeVarContainer {
   }
 
   DomainInt getMin(BigRangeVarRef_internal d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
     return lowerBound(d);
   }
 
   DomainInt getMax(BigRangeVarRef_internal d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
     return upperBound(d);
   }
@@ -291,7 +277,6 @@ struct BigRangeVarContainer {
     // bms_pointer(d)->print_state();
     bms_array->print_state();
 #endif
-    D_ASSERT(lock_m);
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
     if((i < lowerBound(d)) || (i > upperBound(d)) ||
        !(bms_array->ifMember_remove(varOffset[d.varNum] + i))) {
@@ -507,7 +492,6 @@ public:
 
   void addDynamicTrigger(BigRangeVarRef_internal b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
-    D_ASSERT(lock_m);
     D_ASSERT(b.varNum >= 0);
     D_ASSERT(b.varNum <= (SysInt)varCount_m);
     D_ASSERT(type != DomainRemoval || (pos >= initialMin(b) && pos <= initialMax(b)));

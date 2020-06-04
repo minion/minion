@@ -29,8 +29,6 @@
 #include "memory_management/MemoryBlock.h"
 #include "memory_management/nonbacktrack_memory.h"
 
-#define MAX_VARS 1000000
-
 struct TriggerObj {
   DomainInt min;
   DomainInt max;
@@ -47,6 +45,11 @@ struct TriggerObj {
     D_ASSERT(val >= min && val <= max);
     return &_dynamicTriggers[checked_cast<SysInt>(val - min + 4)];
   }
+
+  // It is important this object is never copied, but it can be moved
+  TriggerObj(TriggerObj&&) = default;
+  TriggerObj(const TriggerObj*) = delete;
+
 };
 
 class TriggerList {
@@ -58,30 +61,13 @@ class TriggerList {
 
 public:
   TriggerList(bool _onlyBounds) : onlyBounds(_onlyBounds) {
-    varCount_m = 0;
   }
 
   vector<TriggerObj> dynTriggers;
 
-  //  vector<vector<DynamicTriggerList>> dynamicTriggersVec;
-  //  vector<vector<DynamicTriggerList>> dynamicTriggersDomainVec;
-
-  // void* dynamicTriggers;
-
-  SysInt varCount_m;
-
-  //  std::vector<std::pair<DomainInt, DomainInt> > varsDomain;
-
-  void lock(SysInt size, DomainInt minDomainVal, DomainInt maxDomainVal) {
-    std::vector<std::pair<DomainInt, DomainInt>> doms(size,
-                                                      make_pair(minDomainVal, maxDomainVal));
-    addVariables(doms);
-  }
-
   void addVariables(const std::vector<pair<DomainInt, DomainInt>>& doms) {
-    SysInt old_varCount = varCount_m;
-    varCount_m += doms.size();
-    CHECK(varCount_m < MAX_VARS, "Too many variables... increase MAX_VARS");
+    SysInt old_varCount = dynTriggers.size();
+    SysInt varCount_m = old_varCount + doms.size();
     dynTriggers.resize(varCount_m);
     for(int i = 0; i < doms.size(); ++i) {
       dynTriggers[old_varCount + i].min = doms[i].first;

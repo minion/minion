@@ -211,10 +211,6 @@ struct BoolVarContainer {
 
   void lock() {
     lock_m = true;
-    // Min domain value = 0, max domain val = 1.
-    std::vector<std::pair<DomainInt, DomainInt>> doms(varCount_m,
-                                                      make_pair(DomainInt(0), DomainInt(1)));
-    triggerList.addVariables(doms);
   }
 
   /// Returns a new Boolean Variable.
@@ -238,6 +234,9 @@ struct BoolVarContainer {
 #ifdef WDEG
     wdegs.resize(varCount_m);
 #endif
+    std::vector<std::pair<DomainInt, DomainInt>> doms(new_bools,
+                                                      make_pair(DomainInt(0), DomainInt(1)));
+    triggerList.addVariables(doms);
   }
 
   /// Returns a reference to the ith Boolean variable which was previously
