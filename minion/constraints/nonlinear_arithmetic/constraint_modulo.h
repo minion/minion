@@ -173,32 +173,19 @@ struct ModConstraint : public AbstractConstraint {
     }
 
     if(b2.hasSingleValue()) {
-      if(var3.isBound() || var1.isBound()) {
-        if(doDiv<undef>(b1.min(), b2.min()) == doDiv<undef>(b1.max(), b2.min())) {
-          Bounds b = emptyBounds();
-          b = addValue(b, do_mod(b1.min(), b2.min()));
-          b = addValue(b, do_mod(b1.max(), b2.min()));
-          var3.setMin(b.min());
-          var3.setMax(b.max());
-        }
-      } else {
-        std::set<DomainInt> vals;
-        for(DomainInt d1 = var1.min(); d1 <= var1.max(); ++d1) {
-          if(var1.inDomain(d1)) {
-            DomainInt modval = do_mod(d1, b2.min());
-            if(!var3.inDomain(modval)) {
-              var1.removeFromDomain(d1);
-            } else {
-              vals.insert(modval);
-            }
-          }
-        }
-
-        for(DomainInt d3 = var3.min(); d3 <= var3.max(); ++d3) {
-          if(vals.count(d3) == 0) {
-            var3.removeFromDomain(d3);
-          }
-        }
+      DomainInt b2_val = b2.min();
+      DomainInt divoffset_min = doDiv<undef>(b1.min(), b2_val);
+      DomainInt divoffset_max = doDiv<undef>(b1.max(), b2_val);
+      if(divoffset_min == divoffset_max) {
+        Bounds b = emptyBounds();
+        b = addValue(b, do_mod(b1.min(), b2_val));
+        b = addValue(b, do_mod(b1.max(), b2_val));
+        var3.setMin(b.min());
+        var3.setMax(b.max());
+        // This could be reasoned slightly more, for more propagation
+        // by considering when var3.max()-var3.min() is less than b2_val
+        var1.setMin(var3.min() + divoffset_min * b2_val);
+        var1.setMax(var3.max() + divoffset_min * b2_val);
       }
     }
   }
