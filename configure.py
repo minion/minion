@@ -345,7 +345,6 @@ with open(outsrcdir+"BuildDefines.h", "w") as defs:
 minionsrclist = ['minion/BuildVariables.cpp',
 'minion/BuildCSP.cpp',
 'minion/commandline_parse.cpp',
-'minion/lock.cpp',
 'minion/debug_functions.cpp',
 'minion/get_info.cpp',
 'minion/info_dumps.cpp',

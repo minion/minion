@@ -380,7 +380,6 @@ public:
 };
 
 namespace Controller {
-void lock();
 
 /// Pushes the state of the whole world.
 inline void worldPush();

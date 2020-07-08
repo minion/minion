@@ -68,7 +68,6 @@ typedef TrailedMonotonicSet MonotonicSet;
 // be called by all constraints.
 //#include "../constraints/constraint_checkassign.h"
 
-#include "lock.h"
 #ifndef DOMINION
 #include "BuildCSP.h"
 #endif

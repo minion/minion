@@ -394,7 +394,6 @@ void inline initalise_search() {
   getState().setSolutionCount(0);
   getState().setNodeCount(0);
 
-  lock();
   /// Failed initially propagating constraints!
   if(getState().isFailed())
     return;
