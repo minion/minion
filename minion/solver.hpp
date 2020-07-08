@@ -77,12 +77,24 @@ inline void worldPop_all() {
 }
 } // namespace Controller
 
-inline void SearchState::addConstraint(AbstractConstraint* c) {
+inline bool SearchState::addConstraint(AbstractConstraint* c) {
+  if(getState().isFailed()) {
+    return false;
+  }
   constraints.push_back(c);
   vector<AnyVarRef>* vars = c->getVarsSingleton();
   size_t vars_s = vars->size();
   for(size_t i = 0; i < vars_s; i++) // note all constraints the var is involved in
     (*vars)[i].addConstraint(c);
+  
+  c->setup();
+  c->fullPropagate();
+  c->fullPropagateDone = true;
+  if(getState().isFailed()) {
+    return false;
+  }
+  getQueue().propagateQueueRoot();
+  return true;
 }
 
 inline void SearchState::addConstraintMidsearch(AbstractConstraint* c) {

@@ -50,11 +50,6 @@ public:
         bigRangeVarContainer(),
         sparseBoundVarContainer() {}
 
-  inline void lock() {
-    boundVarContainer.lock();
-    sparseBoundVarContainer.lock();
-  }
-
 private:
   template <typename Container, typename Func>
   inline void appendVarsFromContainer(Container& container, const Func& apply) {

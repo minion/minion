@@ -25,24 +25,6 @@ namespace Controller {
 // @todo This could be done more neatly...
 
 void lock() {
-  getVars().lock();
 
-  SysInt size = getState().getConstraintList().size();
-  for(SysInt i = 0; i < size; i++)
-    getState().getConstraintList()[i]->setup();
-
-  // No longer AC1, thank goodness.
-  for(SysInt i = 0; i < size; ++i) {
-    if(getState().isFailed())
-      return;
-    getState().getConstraintList()[i]->fullPropagate();
-    getState().getConstraintList()[i]->fullPropagateDone = true;
-    if(getState().isFailed())
-      return;
-    // If queues not empty, more work to do.
-    if(!getQueue().isQueuesEmpty()) {
-      getQueue().propagateQueueRoot();
-    }
-  }
 }
 } // namespace Controller

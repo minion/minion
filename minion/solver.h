@@ -155,8 +155,8 @@ public:
     maximise = _maximise;
   }
 
-  void addConstraint(AbstractConstraint* c);
-  vector<AbstractConstraint*>& getConstraintList() {
+  bool addConstraint(AbstractConstraint* c);
+  const vector<AbstractConstraint*>& getConstraintList() {
     return constraints;
   }
 

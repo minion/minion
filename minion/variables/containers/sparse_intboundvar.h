@@ -85,9 +85,8 @@ struct SparseBoundVarContainer {
   vector<UnsignedSysInt> wdegs;
 #endif
   UnsignedSysInt varCount_m;
-  BOOL lock_m;
 
-  SparseBoundVarContainer() : triggerList(true), varCount_m(0), lock_m(false) {}
+  SparseBoundVarContainer() : triggerList(true), varCount_m(0) {}
 
   vector<BoundType>& getDomain(SparseBoundVarRef_internal<BoundType> i) {
     return domains[checked_cast<SysInt>(domain_reference[i.varNum])];
@@ -148,13 +147,7 @@ struct SparseBoundVarContainer {
     return *(it - 1);
   }
 
-  void lock() {
-    D_ASSERT(!lock_m);
-    lock_m = true;
-  }
-
   void addVariables(const vector<DomainInt>& bounds, SysInt count = 1) {
-    D_ASSERT(!lock_m);
     D_ASSERT(count > 0);
 
     SysInt oldCount = varCount_m;
@@ -209,18 +202,15 @@ struct SparseBoundVarContainer {
   }
 
   BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const {
-    D_ASSERT(lock_m);
     return lowerBound(d) == upperBound(d);
   }
 
   DomainInt getAssignedValue(SparseBoundVarRef_internal<BoundType> d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lowerBound(d);
   }
 
   BOOL inDomain(SparseBoundVarRef_internal<BoundType> d, DomainInt i) const {
-    D_ASSERT(lock_m);
     // First check against bounds
     if(i < lowerBound(d) || i > upperBound(d)) {
       return false;
@@ -230,7 +220,6 @@ struct SparseBoundVarContainer {
   }
 
   BOOL inDomain_noBoundCheck(SparseBoundVarRef_internal<BoundType> ref, DomainInt i) const {
-    D_ASSERT(lock_m);
     // use binary search to find if the value is in the domain vector.
     // const vector<BoundType>& dom = getDomain(ref);  // why does this not
     // work?
@@ -246,12 +235,10 @@ struct SparseBoundVarContainer {
   }
 
   DomainInt getMin(SparseBoundVarRef_internal<BoundType> d) const {
-    D_ASSERT(lock_m);
     return lowerBound(d);
   }
 
   DomainInt getMax(SparseBoundVarRef_internal<BoundType> d) const {
-    D_ASSERT(lock_m);
     return upperBound(d);
   }
 
@@ -410,7 +397,6 @@ struct SparseBoundVarContainer {
 
   void addDynamicTrigger(SparseBoundVarRef_internal<BoundType> b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
-    D_ASSERT(lock_m);
     if(type == DomainRemoval) {
       USER_ERROR("Some constraint you are using does not work with SPARSEBOUND "
                  "variables\n"
@@ -420,7 +406,6 @@ struct SparseBoundVarContainer {
   }
 
   operator std::string() {
-    D_ASSERT(lock_m);
     stringstream s;
     SysInt charCount = 0;
     for(UnsignedSysInt i = 0; i < varCount_m; i++) {

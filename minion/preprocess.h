@@ -163,6 +163,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
   int upperlimit = std::min(5, (int)log2(vararray.size()));
 
   while(reduced) {
+    //std::cerr << "Loop: " << loops << " " << upperlimit << std::endl;
     // First loop around bounds as long as possible
     while(reduced) {
       if(limit) {
@@ -171,9 +172,10 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
           return;
         }
       }
-
+    //std::cerr << "Inner Loop: " << loops << " " << upperlimit << std::endl;
       reduced = false;
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
+        //std::cerr << "Bound loop: " << i << std::endl;
         Var& var = vararray[i];
         if(!var.isAssigned()) {
           if(pruneDomain_bottom(var, vararray, prop, limit))
@@ -192,6 +194,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
 
     // Then try inside domain
     if(!onlyCheckBounds) {
+     // std::cerr << "Inside bounds" << std::endl;
       for(SysInt i = 0; i < (SysInt)vararray.size(); ++i) {
         Var& var = vararray[i];
         if(!var.isBound()) {
@@ -225,7 +228,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
 
     //  Make a 'collect events' constraint and attach it to listbools.
     CollectEvents<std::vector<Var>>* c = new CollectEvents<std::vector<Var>>(listbools);
-    getState().addConstraintMidsearch((AbstractConstraint*)c);
+    getState().addConstraint((AbstractConstraint*)c);
 
     std::vector<std::pair<int, DomainInt>>& assignments = c->assignments;
 

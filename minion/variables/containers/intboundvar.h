@@ -192,7 +192,7 @@ typedef BoundVarRef_internal<> BoundVarRef;
 template <typename BoundType = DomainInt>
 struct BoundVarContainer {
 
-  BoundVarContainer() : triggerList(true), varCount_m(0), lock_m(0) {}
+  BoundVarContainer() : triggerList(true), varCount_m(0) {}
 
   ExtendableBlock bound_data;
   TriggerList triggerList;
@@ -202,7 +202,6 @@ struct BoundVarContainer {
   vector<UnsignedSysInt> wdegs;
 #endif
   UnsignedSysInt varCount_m;
-  BOOL lock_m;
 
   const BoundType& lowerBound(const BoundVarRef_internal<BoundType>& i) const {
     return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2)];
@@ -220,45 +219,33 @@ struct BoundVarContainer {
     return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2 + 1)];
   }
 
-  void lock() {
-    D_ASSERT(!lock_m);
-    lock_m = true;
-    triggerList.addVariables(initialBounds);
-  }
-
   BOOL isAssigned(const BoundVarRef_internal<BoundType>& d) const {
-    D_ASSERT(lock_m);
     return lowerBound(d) == upperBound(d);
   }
 
   DomainInt getAssignedValue(const BoundVarRef_internal<BoundType>& d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(isAssigned(d));
     return lowerBound(d);
   }
 
   BOOL inDomain(const BoundVarRef_internal<BoundType>& d, DomainInt i) const {
-    D_ASSERT(lock_m);
     if(i < lowerBound(d) || i > upperBound(d))
       return false;
     return true;
   }
 
   BOOL inDomain_noBoundCheck(const BoundVarRef_internal<BoundType>& d, DomainInt i) const {
-    D_ASSERT(lock_m);
     D_ASSERT(i >= lowerBound(d));
     D_ASSERT(i <= upperBound(d));
     return true;
   }
 
   DomainInt getMin(const BoundVarRef_internal<BoundType>& d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(getState().isFailed() || inDomain(d, lowerBound(d)));
     return lowerBound(d);
   }
 
   DomainInt getMax(const BoundVarRef_internal<BoundType>& d) const {
-    D_ASSERT(lock_m);
     D_ASSERT(getState().isFailed() || inDomain(d, upperBound(d)));
     return upperBound(d);
   }
@@ -359,16 +346,25 @@ struct BoundVarContainer {
   BoundVarRef getVarNum(DomainInt i);
 
   void addVariables(Bounds bounds, SysInt count = 1) {
-    D_ASSERT(!lock_m);
     D_ASSERT(count > 0);
+
+
     SysInt old_varCount = varCount_m;
 
     D_ASSERT(bounds.lowerBound >= DomainInt_Min);
     D_ASSERT(bounds.upperBound <= DomainInt_Max);
+
+    vector<pair<BoundType, BoundType>> newInitialBounds;
+
     for(SysInt j = 0; j < count; ++j) {
-      varCount_m++;
-      initialBounds.push_back(make_pair(bounds.lowerBound, bounds.upperBound));
+      newInitialBounds.push_back(make_pair(bounds.lowerBound, bounds.upperBound));
     }
+
+    triggerList.addVariables(newInitialBounds);
+
+    initialBounds.insert(initialBounds.end(), newInitialBounds.begin(), newInitialBounds.end());
+
+    varCount_m += count;
 
     constraints.resize(varCount_m);
 #ifdef WDEG
@@ -426,7 +422,6 @@ struct BoundVarContainer {
 
   void addDynamicTrigger(BoundVarRef_internal<BoundType>& b, Trig_ConRef t, TrigType type,
                          DomainInt pos = NoDomainValue, TrigOp op = TO_Default) {
-    D_ASSERT(lock_m);
     if(type == DomainRemoval) {
       USER_ERROR("Some constraint you are using does not work with BOUND variables\n"
                  "Unfortunatly we cannot tell you which one. Sorry!");
@@ -435,7 +430,6 @@ struct BoundVarContainer {
   }
 
   operator std::string() {
-    D_ASSERT(lock_m);
     stringstream s;
     SysInt charCount = 0;
     for(UnsignedSysInt i = 0; i < varCount_m; i++) {
