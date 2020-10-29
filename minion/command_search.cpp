@@ -100,6 +100,15 @@ static void printDeletedVals(const CSPInstance& instance, std::unique_ptr<Comman
   }
 }
 
+static void printInitialBounds(const CSPInstance& instance, std::unique_ptr<CommandStream>& streams) {
+  auto vars = instance.vars.getAllVars();
+  streams->output << vars.size() << " ";
+  for(auto inputvar : vars) {
+    auto v = getAnyVarRefFromVar(inputvar);
+    streams->output << instance.vars.getName(inputvar) << " " << v.initialMin() << " " << v.initialMax() << " ";
+  }
+}
+
 void doCommandSearch(CSPInstance& instance, SearchMethod args) {
   cout << "Switching to command mode" << endl;
 
@@ -116,7 +125,7 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
 
     Command c = readCommand(streams->input);
  
-      DP(c);
+    DP(c);
     
     if(c.type == "Q") {
       std::cout << "Command mode: Goodbye" << endl;
@@ -162,6 +171,14 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
             streams->output << c.type << " F 0" << std::endl;
           }
         }
+      } else if(c.type == "I") {
+        if(c.lits.size() > 0) {
+          std::cerr << "ERROR: DO NOT PASS ANY LITS TO 'I'" << std::endl;
+          exit(1);
+        }
+        streams->output << c.type << " T ";
+        printInitialBounds(instance, streams);
+        streams->output << std::endl;
       }
     }
 
