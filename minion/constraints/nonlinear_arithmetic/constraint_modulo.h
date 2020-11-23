@@ -172,6 +172,18 @@ struct ModConstraint : public AbstractConstraint {
       return;
     }
 
+    if(b2.hasSingleValue() && b3.hasSingleValue() && !var1.isBound()) {
+      DomainInt v2 = b2.min();
+      DomainInt v3 = b3.min();
+      for(DomainInt d = b1.min(); d <= b2.max(); ++d) {
+        if(!check_modResult(d,v2,v3)) {
+          var1.removeFromDomain(d);
+        }
+      }
+      return;
+    }
+
+
     if(b2.hasSingleValue()) {
       DomainInt b2_val = b2.min();
       DomainInt divoffset_min = doDiv<undef>(b1.min(), b2_val);
