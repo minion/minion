@@ -3,9 +3,8 @@
 use crate::constraint_def::ConstraintInstance;
 use crate::minion_instance::print_minion_file_pair;
 
-use anyhow::{Result,anyhow,Context};
+use anyhow::{anyhow, Context, Result};
 
-use std;
 use std::fs;
 use std::io::*;
 use std::process::{Command, Stdio};
@@ -72,26 +71,23 @@ pub fn get_minion_solutions(
     args.push(minout.clone());
 
     {
-        let mut outfile = 
-            fs::File::create(&minout).context(
-            "Could not open output file for writing")?;
-            print_minion_file_pair(&mut outfile, &instance).context(
-            "failed writing Minion output")?;
+        let mut outfile =
+            fs::File::create(&minout).context("Could not open output file for writing")?;
+        print_minion_file_pair(&mut outfile, &instance).context("failed writing Minion output")?;
     }
 
     let minioncmd = format!("{} {}", minionexec, args.iter().join(" "));
 
-    let child = 
-        Command::new(minionexec)
-            .args(args)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
-            .spawn().context(format!("Failed to start '{}'", minionexec))?;
+    let child = Command::new(minionexec)
+        .args(args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .context(format!("Failed to start '{}'", minionexec))?;
 
-    let output = 
-        child.wait_with_output().context(format!(
-        "failed to capture Minion output: {}",
-        minioncmd))?;
+    let output = child
+        .wait_with_output()
+        .context(format!("failed to capture Minion output: {}", minioncmd))?;
 
     if !output.status.success() {
         print!(
@@ -106,10 +102,8 @@ pub fn get_minion_solutions(
     }
 
     let solutions = {
-        let f = 
-            fs::File::open(&solsout).context(format!(
-            "failed to open solution file: {}",
-            minioncmd))?;
+        let f = fs::File::open(&solsout)
+            .context(format!("failed to open solution file: {}", minioncmd))?;
 
         let reader = BufReader::new(f);
 
@@ -126,23 +120,22 @@ pub fn get_minion_solutions(
     };
 
     let nodes = {
-        let f = 
-            fs::File::open(&tableout).context(format!(
-            "failed to open jsontableout file: {}",
-            minioncmd))?;
+        let f = fs::File::open(&tableout)
+            .context(format!("failed to open jsontableout file: {}", minioncmd))?;
 
         let reader = BufReader::new(f);
 
-        let v: MinionJsonOut = 
-            serde_json::from_reader(reader).context(format!(
-            "jsontableout not valid json!: {}",
-            minioncmd))?;
+        let v: MinionJsonOut = serde_json::from_reader(reader)
+            .context(format!("jsontableout not valid json!: {}", minioncmd))?;
 
-        let nodes = v.Nodes.parse::<i64>().context(format!("invalid node count: {}", minioncmd))?;
-        let solcount = 
-            v.SolutionsFound.parse::<i64>().context(format!(
-            "invalid solution count: {}",
-            minioncmd))?;
+        let nodes = v
+            .Nodes
+            .parse::<i64>()
+            .context(format!("invalid node count: {}", minioncmd))?;
+        let solcount = v
+            .SolutionsFound
+            .parse::<i64>()
+            .context(format!("invalid solution count: {}", minioncmd))?;
 
         if solcount != solutions.len() as i64 {
             return Err(anyhow!(format!(

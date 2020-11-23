@@ -4,18 +4,14 @@ extern crate rand;
 
 use self::rand::seq::SliceRandom;
 
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
 
 pub struct MinionConfig<'a> {
     pub minionexec: &'a str,
     pub maxtuples: usize,
 }
 
-
-pub fn test_constraint(
-    config: &MinionConfig,
-    c: &constraint_def::ConstraintDef,
-) -> Result<()> {
+pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef) -> Result<()> {
     let mut instance;
     let tups;
     loop {
@@ -54,10 +50,7 @@ pub fn test_constraint(
     Ok(())
 }
 
-pub fn test_constraint_par(
-    config: &MinionConfig,
-    c: &constraint_def::ConstraintDef,
-) -> Result<()> {
+pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::ConstraintDef) -> Result<()> {
     let instance = constraint_def::build_random_instance(c);
     let ret = run_minion::get_minion_solutions(
         config.minionexec,

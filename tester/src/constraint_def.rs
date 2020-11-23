@@ -93,20 +93,22 @@ impl MinionVariable {
     fn random(in_d: VarType) -> Arc<MinionVariable> {
         let dom_min = match in_d {
             Bool => 0,
-            _ => -10
+            _ => -10,
         };
 
         let dom_max = match in_d {
             Bool => 1,
-            _ => 10
+            _ => 10,
         };
 
         let d = *match in_d {
             Constant => vec![Constant],
             Bool => vec![Bool, Bool, Constant],
             Discrete => vec![Discrete, Discrete, Discrete, Bool, Constant],
-            Bound => vec![Bound, Bound, Discrete, Discrete, Bool, Constant]
-        }.choose(&mut rand::thread_rng()).unwrap();
+            Bound => vec![Bound, Bound, Discrete, Discrete, Bool, Constant],
+        }
+        .choose(&mut rand::thread_rng())
+        .unwrap();
 
         let domain = match d {
             Constant => vec![random_in_range(dom_min, dom_max)],
@@ -234,7 +236,7 @@ impl ConstraintInstance {
     }
 
     fn check_tuple(&self, tup: &[i64]) -> bool {
-        let mut slices: ArrayVec<[&[i64];16]> = ArrayVec::new();
+        let mut slices: ArrayVec<[&[i64]; 16]> = ArrayVec::new();
         let mut place: usize = 0;
         for var in self.vars().iter() {
             let i = var.len();
@@ -260,9 +262,8 @@ impl ConstraintInstance {
             .iter()
             .map(|x| x.domain.clone())
             .collect();
-        
-        v
-            .iter()
+
+        v.iter()
             .cloned()
             .multi_cartesian_product()
             .filter(|t| self.check_tuple(t))
@@ -315,7 +316,7 @@ pub fn build_random_instance_with_children(
                     let len = rand::random::<usize>() % 5;
                     variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
                 }
-/*
+                /*
                 TwoVars(d) => {
                     variables.push(vec![MinionVariable::random(d), MinionVariable::random(d)]);
                 }
@@ -490,12 +491,12 @@ fn constraint_list() -> Vec<ConstraintDef> {
             "div_undefzero", // CT_DIV_UNDEFZERO
             vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
-                (v[2][0]
+                v[2][0]
                     == (if v[1][0] == 0 {
                         0
                     } else {
                         v[0][0].div_floor(&v[1][0])
-                    }))
+                    })
             },
             false,
             false,
@@ -504,11 +505,11 @@ fn constraint_list() -> Vec<ConstraintDef> {
             "div", // CT_DIV_UNDEFZERO
             vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
-                (if v[1][0] == 0 {
+                if v[1][0] == 0 {
                     false
                 } else {
                     v[2][0] == v[0][0].div_floor(&v[1][0])
-                })
+                }
             },
             false,
             false,
@@ -675,12 +676,12 @@ fn constraint_list() -> Vec<ConstraintDef> {
             "modulo_undefzero", // CT_MODULO_UNDEFZERO
             vec![Var(Bound), Var(Bound), Var(Bound)],
             |v| {
-                (v[2][0]
+                v[2][0]
                     == (if v[1][0] == 0 {
                         0
                     } else {
                         v[0][0].mod_floor(&v[1][0])
-                    }))
+                    })
             },
             false,
             false,
