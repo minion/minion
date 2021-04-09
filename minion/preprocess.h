@@ -198,7 +198,6 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
   if(getOptions().gatherAMOs) {
     // Extra pass to collect the mutexes.
     // Populate listbools.
-    //  Extra stuff for mutexes
     std::vector<Var> listbools;
 
     for(int i = 0; i < vararray.size(); i++) {
@@ -266,6 +265,45 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
         std::cout << " ";
       }
     }
+    std::cout << std::endl;
+  }
+  
+  if(getOptions().gatherAMOsExtra) {
+    // Extra pass to collect the mutexes.  Strong version. 
+    
+    //  List of (var, val, var, val) to test. 
+    vector<Var> testMutexes = getAnyVarRefFromVar(getState().getInstance()->mutexDetectList);
+    
+    // Different output format. Just returns 0 or 1 for each set of 4 entries in testMutexes. 
+    
+    std::cout << "AMO ";
+    
+    for(SysInt i = 0; i < (SysInt)testMutexes.size(); i=i+4) {
+      Var& var1 = testMutexes[i];
+      Var& var2 = testMutexes[i+2];
+
+      DomainInt val1 = testMutexes[i+1].min();
+      DomainInt val2 = testMutexes[i+3].min();
+
+      Controller::worldPush();
+      var1.setMax(val1);
+      var1.setMin(val1);
+      var2.setMax(val2);
+      var2.setMin(val2);
+      prop(vararray);
+
+      if(getState().isFailed()) {
+        //  1 means mutex
+        std::cout << "1";
+      }
+      else {
+        std::cout << "0";
+      }
+      
+      getState().setFailed(false);
+      Controller::worldPop();
+    }
+    
     std::cout << std::endl;
   }
 }

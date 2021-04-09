@@ -320,6 +320,7 @@ public:
 
   // Gather AMOs
   bool gatherAMOs = false;
+  bool gatherAMOsExtra = false;
 
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;

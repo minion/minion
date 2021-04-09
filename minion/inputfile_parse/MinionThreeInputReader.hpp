@@ -329,6 +329,8 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
         instance->constraints.push_back(readConstraint(infile, false));
     } else if(s == "**GADGET**") {
       readGadget(infile);
+    } else if(s == "**MUTEXDETECT**") {
+      readMutexDetect(infile);
     } else if(s == wrong_eof) {
       throw parse_exception("Section terminated with " + wrong_eof + " instead of " + eof);
     } else
@@ -360,6 +362,14 @@ void MinionThreeInputReader<FileReader>::readGadget(FileReader* infile) {
   // Take the CSPInstance out of the Minion3InputReader, and make a copy of it.
   instance->addGadgetSymbol(name, shared_ptr<CSPInstance>(new_instance));
   MAYBE_PARSER_INFO("Exiting gadget parsing");
+}
+
+template <typename FileReader>
+void MinionThreeInputReader<FileReader>::readMutexDetect(FileReader* infile) {
+  MAYBE_PARSER_INFO("Entering mutex detect list parsing");
+  //  Just read an ordinary vector
+  instance->mutexDetectList = readLiteralVector(infile, true);
+  MAYBE_PARSER_INFO("Exiting mutex detect list parsing");
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

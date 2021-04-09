@@ -306,6 +306,8 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().parallel = true;
     } else if(command == string("-X-AMO")) {
       getOptions().gatherAMOs = true;
+    } else if(command == string("-X-AMO-extra")) {
+      getOptions().gatherAMOsExtra = true;
     } else if(command == string("-cores")) {
       INCREMENT_i(-cores);
       getOptions().parallelcores = atoi(argv[i]);

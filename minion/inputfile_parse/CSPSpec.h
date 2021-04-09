@@ -460,7 +460,10 @@ struct CSPInstance {
 
   /// Only used for gadgets.
   vector<Var> constructionSite;
-
+  
+  // Used by mutex detection
+  vector<Var> mutexDetectList;
+  
   bool is_optimisation_problem;
   bool optimiseMinimising;
   vector<Var> optimiseVariables;

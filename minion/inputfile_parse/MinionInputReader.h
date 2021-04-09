@@ -174,6 +174,7 @@ class MinionThreeInputReader {
   ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef* def);
   void readGadget(FileReader* infile);
   std::shared_ptr<TupleList> readConstraintTupleList(FileReader* infile);
+  void readMutexDetect(FileReader* infile);
   Var readIdentifier(FileReader* infile);
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);
   vector<Var> readLiteralVector(FileReader* infile, bool mustBeVector = true);
