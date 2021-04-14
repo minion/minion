@@ -31,18 +31,21 @@ successful application of constraint solving to a wide variety of
 disciplines such as scheduling, industrial design and combinatorial
 mathematics :cite:`wallace:Survey`.
 
-To illustrate, below we show a simple
-puzzle, where two six-digit numbers (DONALD and GERALD) are added
-together to form another six-digit number (ROBERT). Each letter A, B, D,
-E, G, L, N, O, R and T represents a distinct digit :math:`0\ldots9`. The
-puzzle can be represented with the expressions below, given by Bessière
-and Régin :cite:`bessiere-gac-schema`.
+To illustrate, below we show a simple puzzle, where two six-digit
+numbers (DONALD and GERALD) are added together to form another six-digit
+number (ROBERT). Each letter A, B, D, E, G, L, N, O, R and T represents
+a distinct digit :math:`0\ldots9`. The puzzle can be represented with
+the expressions below, given by Bessière and Régin
+:cite:`bessiere-gac-schema`.
 
 .. math::
+
+   \begin{aligned}
    100000*D+10000*O+1000*N+100*A+10*L+D\\
    +100000*G+10000*E+1000*R+100*A+10*L+D\\
    =100000*R+10000*O+1000*B+100*E+10*R+T\\
    \textrm{allDifferent}(A, B, D, E, G, L, N, O, R, T)
+   \end{aligned}
 
 This representation of the puzzle illustrates the main concepts of
 constraint programming. A, B, D, E, G, L, N, O, R and T are variables,
@@ -61,24 +64,17 @@ solving systems of constraints. A great variety of problems can be
 expressed with constraints. The following list of subject areas was
 taken from CSPLib :cite:`csplib`:
 
--  Scheduling (e.g. job shop scheduling
-   :cite:`martin-jobshop-96new`),
-
+-  Scheduling (e.g. job shop scheduling :cite:`martin-jobshop-96new`),
 -  Design, configuration and diagnosis (e.g. template design
    :cite:`proll-smith-templatedesign`),
-
 -  Bin packing and partitioning (e.g. social golfer problem
    :cite:`harvey01symmetry`),
-
 -  Frequency assignment (e.g. the Golomb ruler problem
    :cite:`smith99golomb`),
-
 -  Combinatorial mathematics (e.g. balanced incomplete block design
    :cite:`frisch-symmetry-implied-04`),
-
 -  Games and puzzles (e.g. maximum density still life
    :cite:`smith-model-life`),
-
 -  Bioinformatics (e.g. discovering protein shapes
    :cite:`protein-structure-problems`).
 
@@ -92,20 +88,19 @@ each variable, such that all constraints are simultaneously *satisfied*
 — that is, they are all true under the assignment. Solvers typically
 find one or all solutions, or prove there are no solutions. The decision
 problem (‘does there exist a solution?’) is NP-complete
-:cite:`apt-constraint-programming`, therefore there is no
-known polynomial-time procedure to find a solution.
+:cite:`apt-constraint-programming`, therefore there is no known
+polynomial-time procedure to find a solution.
 
 The most common technique (and the one used by Minion) is to interleave
 splitting (also called branching) and propagation. Splitting is the
 basic operation of search, and propagation simplifies the CSP instance.
 Apt views the solution process as the repeated transformation of the CSP
-until a solution state is reached
-:cite:`apt-constraint-programming`. In this view, both
-splitting and propagation are transformations, where propagation
-simplifies the CSP by removing values which cannot take part in any
-solution. A splitting operation transforms a CSP instance into two or
-more simpler CSP instances, and by recursive application of splitting
-any CSP can be solved.
+until a solution state is reached :cite:`apt-constraint-programming`. In
+this view, both splitting and propagation are transformations, where
+propagation simplifies the CSP by removing values which cannot take part
+in any solution. A splitting operation transforms a CSP instance into
+two or more simpler CSP instances, and by recursive application of
+splitting any CSP can be solved.
 
 Since splitting is an exponential-time solution method, it is important
 that splitting is minimized by effective propagation. Much effort has

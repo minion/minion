@@ -1,11 +1,13 @@
+.. container::
+   :name: zreferences
 
-.. _zreferences:
+   .. container:: only
 
-.. only:: html
+      html
 
-  References
-  ==========
+      .. rubric:: References
+         :name: references
 
-.. bibliography:: refs.bib
-    :all:
+.. container:: bibliography
 
+   refs.bib

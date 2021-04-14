@@ -1,6 +1,5 @@
-
 Variable Types
---------------
+==============
 
 Minion’s input language is purposefully designed to map exactly to
 Minion’s internals. Unlike most other constraint solvers, Minion does
@@ -51,10 +50,8 @@ these here.
    should not change the size of the resulting search. ``BOOL`` should
    always be fastest, followed by ``DISCRETE``, ``BOUND`` and
    ``SPARSEBOUND``.
-
 #. A ``BOUND`` variable will in general produce a search with more nodes
    per second, but more nodes overall, than a ``DISCRETE`` variable.
-
 #. Using ``SPARSEBOUND`` or ``BOUND`` variables with a unary constraint
    imposing the sparse domain should produce identical searches, except
    the ``SPARSEBOUND`` will be faster if the domain is sparse.

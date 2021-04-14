@@ -1,4 +1,3 @@
-
 Minion in Practice
 ==================
 
@@ -12,9 +11,8 @@ the minion developers turn to when modelling a new problem in minion. It
 shows exactly what a minion file can include and what the syntax is for
 all the possible sections. If you are modelling a problem as minion than
 we recommend you take a copy of this file and edit it appropriately, as
-this will help to guide you through the modelling process. 
- These examples can be used as the bases to implement any similar
-problems.
+this will help to guide you through the modelling process. These
+examples can be used as the bases to implement any similar problems.
 
 Minion Example File
 -------------------
@@ -238,7 +236,7 @@ variables and PRINT NONE which turns printing off completely.
 
    PRINT [ [bo, q] ]
 
-The file must end with the \**EOF*\* marker! Any text under that is
+The file must end with the \*\ *EOF*\ \* marker! Any text under that is
 ignored, so you can write whatever you like (or nothing at all...)
 
 ::
@@ -247,7 +245,6 @@ ignored, so you can write whatever you like (or nothing at all...)
 
 The only remaining part of Minion’s input language are its many
 constraints. These are listed in the Appendix.
-
 
 The Farmers Problem
 -------------------
@@ -425,7 +422,6 @@ specification is as follows:
 
 .. figure:: EightPuzzleDiagram.pdf
    :alt: Graph which represents The Eight Number Puzzle
-   :name: fig:8puzzle
 
    Graph which represents The Eight Number Puzzle
 
@@ -633,9 +629,8 @@ have a graceful library. These files can be found in
 
 .. figure:: k4xp2.pdf
    :alt: A :math:`K_4 \times P_2` Graph
-   :name: fig:k4xp2
 
-   A :math:`K_4 \times P_2` Graph 
+   A :math:`K_4 \times P_2` Graph
 
 ::
 
@@ -795,35 +790,21 @@ The Zebra Puzzle is a very famous logic puzzle. There are many different
 versions, but the version we will answer is as follows:
 
 #. There are five houses.
-
 #. The Englishman lives in the red house.
-
 #. The Spaniard owns the dog.
-
 #. Coffee is drunk in the green house.
-
 #. The Ukrainian drinks tea.
-
 #. The green house is immediately to the right of the ivory house.
-
 #. The Old Gold smoker owns snails.
-
 #. Kools are smoked in the yellow house.
-
 #. Milk is drunk in the middle house.
-
 #. The Norwegian lives in the first house.
-
 #. The man who smokes Chesterfields lives in the house next to the man
    with the fox.
-
 #. Kools are smoked in the house next to the house where the horse is
    kept.
-
 #. The Lucky Strike smoker drinks orange juice.
-
 #. The Japanese smokes Parliaments.
-
 #. The Norwegian lives next to the blue house.
 
 Now, who drinks water? Who owns the zebra? In the interest of clarity,
