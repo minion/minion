@@ -76,18 +76,13 @@ alldiff
 
 Forces the input vector of variables to take distinct values.
 
-.. _example-6:
-
-Example
-"""""""
-
 Suppose the input file had the following vector of variables defined:
 
 DISCRETE myVec[9] {1..9}
 
 Then ``alldiff(myVec)`` enforces all variables in ``myVec`` take different values.
 
-This constreaint enforces the same level of consistency as a clique of not equals
+This constraint enforces the same level of consistency as a clique of not equals
 constraints.
 
 Related constraints
@@ -95,6 +90,21 @@ Related constraints
 
 See `gacalldiff <#gacalldiff>`__ for the same constraint that enforces
 GAC.
+
+
+
+gacalldiff
+^^^^^^^^^^
+
+Forces the input vector of variables to take distinct values.
+
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+Then ``gacalldiff(myVec)`` enforces all variables in ``myVec`` take different values.
+This constraint enforces generalized arc consistency.
+
 
 gcc
 ^^^
@@ -151,6 +161,62 @@ Algorithms for the Global Cardinality Constraint (CP 2004).
 
 This constraint provides stronger propagation to the capacity variables
 than the gccweak constraint.
+
+
+gccweak
+^^^^^^^^
+
+The Generalized Cardinality Constraint (GCC) (weak variant) implements
+the same constraint as ``gcc``, with a weaker (but faster) level
+of propagation.
+
+This constraint enforces a hybrid consistency. It reads the bounds of
+the capacity variables, then enforces GAC over the primary variables
+only. Then the bounds of the capacity variables are updated by counting
+values in the domains of the primary variables.
+
+The consistency over the capacity variables is weaker than the gcc
+constraint, hence the name gccweak.
+
+
+
+occurrence
+^^^^^^^^^^
+
+The constraint ``occurrence(vec, elem, count)`` ensures that there are count occurrences of the value elem in the vector
+vec.
+
+elem must be a constant, not a variable.
+
+occurrenceleq
+^^^^^^^^^^^^^
+
+The constraint ``occurrenceleq(vec, elem, count)`` ensures that there are AT MOST count occurrences of the value elem in
+the vector vec.
+
+elem and count must be constants
+
+
+occurrencegeq
+^^^^^^^^^^^^^
+
+The constraint ``occurrencegeq(vec, elem, count)`` ensures that there are AT LEAST count occurrences of the value elem in
+the vector vec.
+
+elem and count must be constants
+
+
+nvalueleq
+^^^^^^^^^
+
+The constraint ``nvalueleq(V,x)`` ensures that there are <= x different values assigned to the list of
+variables V.
+
+nvaluegeq
+^^^^^^^^^
+
+The constraint ``nvaluegeq(V,x)`` ensures that there are >= x different values assigned to the list of
+variables V.
 
 
 Accessing Elements of Arrays
@@ -301,6 +367,17 @@ The constraint ``ineq(x, y, k)`` ensures that ``x <= y + k`` in any solution.
 Minion has no strict inequality (<) constraints. However x < y can be
 achieved by ``ineq(x, y, -1)``
 
+watchless
+^^^^^^^^^
+
+The constraint watchless(x,y) ensures that x is less than y.
+
+Related constraints
+"""""""""""""""""""
+
+   `ineq <#ineq>`__
+
+
 abs
 ^^^
 
@@ -328,8 +405,176 @@ Related constraints
 See `max <#max>`__ for the opposite constraint.
 
 
+
+
+div
+^^^^^^^^
+
+The constraint ``div(x,y,z)``
+
+ensures that floor(x/y)=z.
+
+For example:
+
+- 10/3 = 3
+- (-10)/3 = -4
+- 10/(-3) = -4
+- (-10)/(-3) = 3
+
+div and mod satisfy together the condition that:
+
+y*(x/y) + x % y = x
+
+The constraint is always false when y = 0
+
+
+
+div_undefzero
+^^^^^^^^^^^^^
+
+The constraint ``div_undefzero(x,y,z)``
+
+is the same as ``div`` (it ensures that floor(x/y)=z) except the constraint
+is always true when y = 0, instead of false.
+
+This constraint exists for certain special requirements. In general, if
+you are unsure what constraint to use, then what you want is a plain div
+constraint!
+
+
+modulo
+^^^^^^
+
+The constraint ``modulo(x,y,z)`` ensures that x%y=z i.e. z is the remainder of dividing x by y. For
+negative values, we ensure that:
+
+y(x/y) + x%y = x
+
+To be fully concrete, here are some examples:
+
+- 3 % 5 = 3
+- -3 % 5 = 2
+- 3 % -5 = -2
+- -3 % -5 = -3
+
+
+mod_undefzero
+^^^^^^^^^^^^^
+
+The constraint ``mod_undefzero(x,y,z)`` is the same as ``modulo`` except the constraint is always true when y = 0,
+instead of false.
+
+This constraint exists for certain special requirements. In general, if
+you are unsure what constraint to use, then what you want is a plain mod
+constraint!
+
+
+product
+^^^^^^^^
+
+The constraint ``product(x,y,z)`` ensures that ``z=x*y`` in any solution.
+
+This constraint can be used for (and, in fact, has a specialised
+implementation for) achieving boolean AND, i.e. x & y=z can be modelled
+as ``product(x,y,z)``
+
+The general constraint achieves bounds generalised arc consistency for
+positive numbers.
+
+pow
+^^^^^^^^
+
+The constraint ``pow(x,y,z)``
+
+ensures that x^y=z.
+
+This constraint is only available for positive domains x, y and z.
+
+
+sumleq
+^^^^^^^^
+
+The constraint ``sumleq(vec, c)`` ensures that sum(vec) <= c.
+
+sumgeq
+^^^^^^^^
+
+The constraint ``sumgeq(vec, c)``
+
+
+weightedsumleq
+^^^^^^^^^^^^^^
+
+The constraint ``weightedsumleq(constantVec, varVec, total)``
+
+ensures that constantVec.varVec <= total, where constantVec.varVec is
+the scalar dot product of constantVec and varVec.
+
+
+weightedsumgeq
+^^^^^^^^^^^^^^
+
+The constraint ``weightedsumgeq(constantVec, varVec, total)`` ensures that constantVec.varVec >= total, where constantVec.varVec is
+the scalar dot product of constantVec and varVec.
+
+
+
 Table constraints
 -----------------
+
+
+table
+^^^^^^^^
+
+An extensional constraint that enforces GAC. The constraint is specified
+via a list of tuples.
+
+The variables used in the constraint have to be BOOL or DISCRETE
+variables. Other types are not supported.
+
+To specify a constraint over 3 variables that allows assignments
+(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following.
+
+1) Add a tuplelist to the *``*TUPLELIST**`` section, e.g.:
+
+
+.. code-block::
+
+	**TUPLELIST**
+	myext 4 3
+	0 0 0
+	1 0 0
+	0 1 0
+	0 0 1
+
+N.B. the number 4 is the number of tuples in the constraint, the number
+3 is the -arity.
+
+2) Add a table constraint to the **CONSTRAINTS** section, e.g.:
+
+.. code-block::
+
+	**CONSTRAINTS** 
+	table(myvec, myext)
+
+and now the variables of myvec will satisfy the constraint myext.
+
+The constraints extension can also be specified in the constraint
+definition, e.g.:
+
+``table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})``
+
+negativetable
+^^^^^^^^^^^^^
+
+An extensional constraint that enforces GAC. The constraint is specified
+via a list of disallowed tuples.
+
+See ``table`` for how to specify a table constraint in minion input. The only
+difference for negativetable is that the specified tuples are
+disallowed.
+
+
 
 gacschema
 ^^^^^^^^^
@@ -581,73 +826,71 @@ Related constraints
 
    `watchsumleq <#watchsumleq>`__ `watchsumgeq <#watchsumgeq>`__
 
+
+Constraints which operate on other Constraints
+----------------------------------------------
+
+The input language of Minion is mostly "flat". There are a number of constraints which do accept
+other constraints as arguments, which are given in this section.
+
 watched-and
-^^^^^^^^
+^^^^^^^^^^^
 
-The constraint
+The constraint ``watched-and({C1,...,Cn})`` ensures that the constraints C1,...,Cn are all true.
 
-   watched-and({C1,...,Cn})
-
-ensures that the constraints C1,...,Cn are all true.
-
-.. _notes-21:
-
-Notes
-"""""
-
-   Conjunctions of constraints may seem
-
-pointless, bearing in mind that a CSP is simply a conjunction of
-constraints already! However sometimes it may be necessary to use a
-conjunction as a child of another constraint, for example in a
-reification:
-
-   reify(watched-and({...}),r)
+Conjunctions of constraints may seem pointless, bearing in mind that a CSP is simply a conjunction of
+constraints already! ``watched-and`` is provided to use with other nested constraint, for example in a
+reification: ``reify(watched-and({...}),r)``
 
 Related constraints
 """""""""""""""""""
 
    `watched-or <#watched-or>`__
 
-watchless
-^^^^^^^^
-
-The constraint watchless(x,y) ensures that x is less than y.
-
-Related constraints
-"""""""""""""""""""
-
-   `ineq <#ineq>`__
 
 watched-or
-^^^^^^^^
+^^^^^^^^^^
 
-The constraint
-
-   watched-or({C1,...,Cn})
-
-ensures that at least one of the constraints C1,...,Cn is true.
+The constraint ``watched-or({C1,...,Cn})`` ensures that at least one of the constraints C1,...,Cn is true.
 
 Related constraints
 """""""""""""""""""
 
    `watched-and <#watched-and>`__
 
+   
+reify and reifyimply
+^^^^^^^^^^^^^^^^^^^^
+
+Reification is provided in two forms: reify and reifyimply.
+
+   ``reify(constraint, r)`` where r is a 0/1 var
+
+ensures that r is set to 1 if and only if constraint is satisfied. That
+is, if r is 0 the constraint must NOT be satisfied; and if r is 1 it
+must be satisfied as normal. Conversely, if the constraint is satisfied
+then r must be 1, and if not then r must be 0.
+
+   ``reifyimply(constraint, r)``
+
+only checks that if r is set to 1 then constraint must be satisfied. If
+r is not 1, constraint may be either satisfied or unsatisfied.
+Furthermore r is never set by propagation, only by search; that is,
+satisfaction of constraint does not affect the value of r.
+
+All constraints are reifyable and reifyimplyable, except where explictly stated.
+
+
+Matrix Constraints
+------------------
+
 watchsumgeq
-^^^^^^^^
+^^^^^^^^^^^
 
-   The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
+The constraint ``watchsumgeq(vec, c)`` ensures that sum(vec) >= c, for a list of 0/1 variables ``vec``.
 
-.. _notes-22:
+For this constraint, small values of c are more efficient. This is equivalent to ``litsumgeq(vec, [1,...,1], c), but faster.
 
-Notes
-"""""
-
-   For this constraint, small values of c are more efficient.
-
-   Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
-
-   This constraint works on 0/1 variables only.
 
 Related constraints
 """""""""""""""""""
@@ -655,20 +898,12 @@ Related constraints
    `watchsumleq <#watchsumleq>`__ `litsumgeq <#litsumgeq>`__
 
 watchsumleq
-^^^^^^^^
+^^^^^^^^^^^
 
-   The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
+The constraint ``watchsumleq(vec, c)`` ensures that sum(vec) <= c, for a list of 0/1 variables ``vec``.
 
-.. _notes-23:
 
-Notes
-"""""
-
-   Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
-
-   This constraint works on binary variables only.
-
-   For this constraint, large values of c are more efficient.
+Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster for large values of ``c``.
 
 Related constraints
 """""""""""""""""""
@@ -676,379 +911,29 @@ Related constraints
    `watchsumgeq <#watchsumgeq>`__ `litsumgeq <#litsumgeq>`__
 
 hamming
-^^^^^^^^
+^^^^^^^
 
-The constraint
-
-   hamming(X,Y,c)
-
-ensures that the hamming distance between X and Y is at least c. That
+The constraint ``hamming(X,Y,c)`` ensures that the hamming distance between X and Y is at least c. That
 is, that the size of the set {i \| X[i] != y[i]} is greater than or
 equal to c.
 
 watchvecneq
-^^^^^^^^
+^^^^^^^^^^^
 
-The constraint
-
-   watchvecneq(A, B)
+The constraint watchvecneq(A, B)
 
 ensures that A and B are not the same vector, i.e., there exists some
 index i such that A[i] != B[i].
 
-Related constraints
-"""""""""""""""""""
 
-   `reification <#reification>`__
+Unary constraints
+-----------------
 
-Related constraints
-"""""""""""""""""""
-
-   `reification <#reification>`__
-
-reification
-^^^^^^^^
-
-Reification is provided in two forms: reify and reifyimply.
-
-   reify(constraint, r) where r is a 0/1 var
-
-ensures that r is set to 1 if and only if constraint is satisfied. That
-is, if r is 0 the constraint must NOT be satisfied; and if r is 1 it
-must be satisfied as normal. Conversely, if the constraint is satisfied
-then r must be 1, and if not then r must be 0.
-
-   reifyimply(constraint, r)
-
-only checks that if r is set to 1 then constraint must be satisfied. If
-r is not 1, constraint may be either satisfied or unsatisfied.
-Furthermore r is never set by propagation, only by search; that is,
-satisfaction of constraint does not affect the value of r.
-
-.. _notes-24:
-
-Notes
-"""""
-
-All constraints are reifyable and reifyimplyable.
-
-   Minion supports many constraints and these are regularly being
-   improved and added to. In some cases multiple implementations of the
-   same constraints are provided and we would appreciate additional
-   feedback on their relative merits in your problem.
-
-   Minion does not support nesting of constraints, however this can be
-   achieved by auxiliary variables and reification.
-
-   Variables can be replaced by constants. You can find out more on
-   expressions for variables, vectors, etc. in the section on variables.
-
-.. _eq-1:
-
-eq
-^^^^^^^^
-
-Constrain two variables to take equal values.
-
-.. _example-10:
-
-Example
-"""""""
-
-eq(x0,x1)
-
-.. _notes-25:
-
-Notes
-"""""
-
-Achieves bounds consistency.
-
-Related constraints
-"""""""""""""""""""
-
-`minuseq <#minuseq-1>`__
-
-.. _minuseq-1:
-
-minuseq
-^^^^^^^^
-
-Constraint
-
-   minuseq(x,y)
-
-ensures that x=-y.
-
-Related constraints
-"""""""""""""""""""
-
-`eq <#eq-1>`__
-
-.. _diseq-1:
-
-diseq
-^^^^^^^^
-
-Constrain two variables to take different values.
-
-.. _notes-26:
-
-Notes
-"""""
-
-Achieves arc consistency.
-
-.. _example-11:
-
-Example
-"""""""
-
-diseq(v0,v1)
-
-gacalldiff
-^^^^^^^^
-
-Forces the input vector of variables to take distinct values.
-
-Suppose the input file had the following vector of variables defined:
-
-DISCRETE myVec[9] {1..9}
-
-To ensure that each variable takes a different value include the
-following constraint:
-
-gacalldiff(myVec)
-
-This constraint enforces generalized arc consistency.
-
-table
-^^^^^^^^
-
-An extensional constraint that enforces GAC. The constraint is specified
-via a list of tuples.
-
-The variables used in the constraint have to be BOOL or DISCRETE
-variables. Other types are not supported.
-
-To specify a constraint over 3 variables that allows assignments
-(0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following.
-
-1) Add a tuplelist to the **TUPLELIST** section, e.g.:
-
-**TUPLELIST** myext 4 3 0 0 0 1 0 0 0 1 0 0 0 1
-
-N.B. the number 4 is the number of tuples in the constraint, the number
-3 is the -arity.
-
-2) Add a table constraint to the **CONSTRAINTS** section, e.g.:
-
-**CONSTRAINTS** table(myvec, myext)
-
-and now the variables of myvec will satisfy the constraint myext.
-
-The constraints extension can also be specified in the constraint
-definition, e.g.:
-
-table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
-
-Related Constraints
-"""""""""""""""""""
-
-help input tuplelist help input gacschema help input negativetable help
-input haggisgac
-
-negativetable
-^^^^^^^^
-
-An extensional constraint that enforces GAC. The constraint is specified
-via a list of disallowed tuples.
-
-See entry
-
-   help input negativetable
-
-for how to specify a table constraint in minion input. The only
-difference for negativetable is that the specified tuples are
-disallowed.
-
-.. _related-constraints-1:
-
-Related Constraints
-"""""""""""""""""""
-
-help input table help input tuplelist
-
-div
-^^^^^^^^
-
-The constraint
-
-   div(x,y,z)
-
-ensures that floor(x/y)=z.
-
-For example:
-
-10/3 = 3 (-10)/3 = -4 10/(-3) = -4 (-10)/(-3) = 3
-
-div and mod satisfy together the condition that:
-
-y*(x/y) + x % y = x
-
-The constraint is always false when y = 0
-
-.. _related-constraints-2:
-
-Related Constraints
-"""""""""""""""""""
-
-`modulo <#modulo>`__
-
-div_undefzero
-^^^^^^^^
-
-The constraint
-
-   div_undefzero(x,y,z)
-
-is the same as div (it ensures that floor(x/y)=z) except the constraint
-is always true when y = 0, instead of false.
-
-This constraint exists for certain special requirements. In general, if
-you are unsure what constraint to use, then what you want is a plain div
-constraint!
-
-.. _related-constraints-3:
-
-Related Constraints
-"""""""""""""""""""
-
-`div <#div>`__
-
-gccweak
-^^^^^^^^
-
-The Generalized Cardinality Constraint (GCC) (weak variant) constrains
-the number of each value that a set of variables can take.
-
-gccweak([primary variables], [values of interest], [capacity variables])
-
-For each value of interest, there must be a capacity variable, which
-specifies the number of occurrences of the value in the primary
-variables.
-
-This constraint only restricts the number of occurrences of the values
-in the value list. There is no restriction on the occurrences of other
-values. Therefore the semantics of gccweak are identical to a set of
-occurrence constraints:
-
-occurrence([primary variables], val1, cap1) occurrence([primary
-variables], val2, cap2) ...
-
-Suppose the input file had the following vectors of variables defined:
-
-DISCRETE myVec[9] {1..9} BOUND cap[9] {0..2}
-
-The following constraint would restrict the occurrence of values 1..9 in
-myVec to be at most 2 each initially, and finally equal to the values of
-the cap vector.
-
-gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)
-
-This constraint enforces a hybrid consistency. It reads the bounds of
-the capacity variables, then enforces GAC over the primary variables
-only. Then the bounds of the capacity variables are updated by counting
-values in the domains of the primary variables.
-
-The consistency over the capacity variables is weaker than the gcc
-constraint, hence the name gccweak.
-
-product
-^^^^^^^^
-
-The constraint
-
-   product(x,y,z)
-
-ensures that z=xy in any solution.
-
-This constraint can be used for (and, in fact, has a specialised
-implementation for) achieving boolean AND, i.e. x & y=z can be modelled
-as
-
-   product(x,y,z)
-
-The general constraint achieves bounds generalised arc consistency for
-positive numbers.
-
-sumleq
-^^^^^^^^
-
-The constraint
-
-   sumleq(vec, c)
-
-ensures that sum(vec) <= c.
-
-sumgeq
-^^^^^^^^
-
-The constraint
-
-   sumgeq(vec, c)
-
-ensures that sum(vec) >= c.
-
-weightedsumleq
-^^^^^^^^
-
-The constraint
-
-   weightedsumleq(constantVec, varVec, total)
-
-ensures that constantVec.varVec <= total, where constantVec.varVec is
-the scalar dot product of constantVec and varVec.
-
-.. _related-constraints-4:
-
-Related Constraints
-"""""""""""""""""""
-
-`weightedsumgeq <#weightedsumgeq>`__ `sumleq <#sumleq>`__
-`sumgeq <#sumgeq>`__
-
-weightedsumgeq
-^^^^^^^^
-
-The constraint
-
-   weightedsumgeq(constantVec, varVec, total)
-
-ensures that constantVec.varVec >= total, where constantVec.varVec is
-the scalar dot product of constantVec and varVec.
-
-.. _related-constraints-5:
-
-Related Constraints
-"""""""""""""""""""
-
-`weightedsumleq <#weightedsumleq>`__ `sumleq <#sumleq>`__
-`sumgeq <#sumgeq>`__
 
 w-inrange
-^^^^^^^^
+^^^^^^^^^
 
-   The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
-
-.. _related-constraints-6:
-
-Related Constraints
-"""""""""""""""""""
-
-   See also
-
-   `w-notinrange <#w-notinrange>`__
+The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
 
 w-inset
 ^^^^^^^^
@@ -1056,206 +941,31 @@ w-inset
 The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 {a1,..,an}.
 
-.. _related-constraints-7:
-
-Related Constraints
-"""""""""""""""""""
-
-   See also
-
-   `w-notinset <#w-notinset>`__
-
 w-literal
-^^^^^^^^
+^^^^^^^^^
 
-   The constraint w-literal(x, a) ensures that x=a.
-
-.. _related-constraints-8:
-
-Related Constraints
-"""""""""""""""""""
-
-   See also
-
-   `w-notliteral <#w-notliteral>`__
+The constraint w-literal(x, a) ensures that x=a.
 
 w-notinrange
-^^^^^^^^
+^^^^^^^^^^^^
 
-   The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
-
-.. _related-constraints-9:
-
-Related Constraints
-"""""""""""""""""""
-
-   See also
-
-   `w-inrange <#w-inrange>`__
+The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
 
 w-notinset
-^^^^^^^^
+^^^^^^^^^^
 
 The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong
 to the set {a1,..,an}.
 
-.. _related-constraints-10:
 
-Related Constraints
-"""""""""""""""""""
-
-   See also
-
-   `w-inset <#w-inset>`__
-
-occurrence
-^^^^^^^^
-
-The constraint
-
-   occurrence(vec, elem, count)
-
-ensures that there are count occurrences of the value elem in the vector
-vec.
-
-elem must be a constant, not a variable.
-
-.. _related-constraints-11:
-
-Related Constraints
-"""""""""""""""""""
-
-`occurrenceleq <#occurrenceleq>`__ `occurrencegeq <#occurrencegeq>`__
-
-occurrenceleq
-^^^^^^^^
-
-The constraint
-
-   occurrenceleq(vec, elem, count)
-
-ensures that there are AT MOST count occurrences of the value elem in
-the vector vec.
-
-elem and count must be constants
-
-.. _related-constraints-12:
-
-Related Constraints
-"""""""""""""""""""
-
-`occurrence <#occurrence>`__ `occurrencegeq <#occurrencegeq>`__
-
-occurrencegeq
-^^^^^^^^
-
-The constraint
-
-   occurrencegeq(vec, elem, count)
-
-ensures that there are AT LEAST count occurrences of the value elem in
-the vector vec.
-
-elem and count must be constants
-
-.. _related-constraints-13:
-
-Related Constraints
-"""""""""""""""""""
-
-`occurrence <#occurrence>`__ `occurrenceleq <#occurrenceleq>`__
 
 w-notliteral
-^^^^^^^^
+^^^^^^^^^^^^
 
-   The constraint w-notliteral(x, a) ensures that x =/= a.
-
-.. _related-constraints-14:
-
-Related Constraints
-"""""""""""""""""""
-
-   See also
-
-   `w-literal <#w-literal>`__
-
-modulo
-^^^^^^^^
-
-The constraint
-
-   modulo(x,y,z)
-
-ensures that x%y=z i.e. z is the remainder of dividing x by y. For
-negative values, we ensure that:
-
-y(x/y) + x%y = x
-
-To be fully concrete, here are some examples:
-
-3 % 5 = 3 -3 % 5 = 2 3 % -5 = -2 -3 % -5 = -3
-
-.. _related-constraints-15:
-
-Related Constraints
-"""""""""""""""""""
-
-`div <#div>`__
-
-mod_undefzero
-^^^^^^^^
-
-The constraint
-
-   mod_undefzero(x,y,z)
-
-is the same as mod except the constraint is always true when y = 0,
-instead of false.
-
-This constraint exists for certain special requirements. In general, if
-you are unsure what constraint to use, then what you want is a plain mod
-constraint!
-
-.. _related-constraints-16:
-
-Related Constraints
-"""""""""""""""""""
-
-`mod <>`__
-
-nvalueleq
-^^^^^^^^
-
-The constraint
-
-   nvalueleq(V,x)
-
-ensures that there are <= x different values assigned to the list of
-variables V.
-
-nvaluegeq
-^^^^^^^^
-
-The constraint
-
-   nvaluegeq(V,x)
-
-ensures that there are >= x different values assigned to the list of
-variables V.
-
-pow
-^^^^^^^^
-
-The constraint
-
-   pow(x,y,z)
-
-ensures that x^y=z.
-
-This constraint is only available for positive domains x, y and z.
+The constraint w-notliteral(x, a) ensures that x =/= a.
 
 w-inintervalset
-^^^^^^^^
+^^^^^^^^^^^^^^^
 
 The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the
 value of x belongs to one of the intervals {a1,...,a2}, {b1,...,b2} etc.
