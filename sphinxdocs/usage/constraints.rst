@@ -1,10 +1,8 @@
 .. container::
    :name: constraints
 
-   Constraints =======
-
 Choosing Between Minion’s Constraints
-=====================================
+-------------------------------------
 
 Minion has many constraints which at first glance appear to do almost
 identical things. These each have trade-offs, some of which are
@@ -45,10 +43,10 @@ variables, in particular ``gacalldiff`` and ``watchelement``. These two
 constraints are in general better when they can be used.
 
 Complete List of Constraints
-============================
+----------------------------
 
 alldiffmatrix
--------------
+^^^^^^^^^^^^^
 
 For a latin square this constraint is placed on the whole matrix once
 for each value. It ensures there is a bipartite matching between rows
@@ -57,23 +55,24 @@ column) where the variable in position (row,column) in the matrix may be
 assigned to the given value.
 
 Example
-~~~~~~~
+"""""""
 
 alldiffmatrix(myVec, Value)
 
 Notes
-~~~~~
+"""""
 
 This constraint adds some extra reasoning in addition to the GAC
 Alldifferents on the rows and columns.
 
 element_one
------------
+^^^^^^^^
 
 The constraint element one is identical to element, except that the
 vector is indexed from 1 rather than from 0.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See
 
@@ -83,7 +82,7 @@ for details of the element constraint which is almost identical to this
 one.
 
 element
--------
+^^^^^^^^
 
 The constraint
 
@@ -95,7 +94,7 @@ specifies that, in any solution, vec[i] = e and i is in the range [0 ..
 .. _notes-1:
 
 Notes
-~~~~~
+"""""
 
 Warning: This constraint is not confluent. Depending on the order the
 propagators are called in Minion, the number of search nodes may vary
@@ -128,7 +127,8 @@ However if the two constraints are swapped over, Minion explores 29
 nodes. As a rule of thumb, to get a lower node count, move element
 constraints to the end of the list.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See the `watchelement <#watchelement>`__ for details of an identical
 constraint that enforces generalised arc consistency.
@@ -136,7 +136,7 @@ constraint that enforces generalised arc consistency.
 .. _alldiffmatrix-1:
 
 alldiffmatrix
--------------
+^^^^^^^^
 
 For a latin square this constraint is placed on the whole matrix once
 for each value. It ensures there is a bipartite matching between rows
@@ -147,20 +147,20 @@ assigned to the given value.
 .. _example-1:
 
 Example
-~~~~~~~
+"""""""
 
 alldiffmatrix(myVec, Value)
 
 .. _notes-2:
 
 Notes
-~~~~~
+"""""
 
 This constraint adds some extra reasoning in addition to the GAC
 Alldifferents on the rows and columns.
 
 alldiffciaran
--------------
+^^^^^^^^
 
 Forces the input vector of variables to take distinct values. This is
 for experiment only.
@@ -168,12 +168,12 @@ for experiment only.
 .. _notes-3:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces an unknown consistency.
 
 difference
-----------
+^^^^^^^^
 
 The constraint
 
@@ -184,14 +184,14 @@ ensures that z= in any solution.
 .. _notes-4:
 
 Notes
-~~~~~
+"""""
 
 This constraint can be expressed in a much longer form, this form both
 avoids requiring an extra variable, and also gets better propagation. It
 gets bounds consistency.
 
 gacschema
----------
+^^^^^^^^
 
 An extensional constraint that enforces GAC. The constraint is specified
 via a list of tuples.
@@ -200,12 +200,13 @@ The format, and usage of gacschema, is identical to the 'table'
 constraint. It is difficult to predict which out of 'table' and
 'gacschema' will be faster for any particular problem.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 help input tuplelist help input table help input haggisgac
 
 gcc
----
+^^^^^^^^
 
 The Generalized Cardinality Constraint (GCC) constrains the number of
 each value that a set of variables can take.
@@ -227,7 +228,7 @@ variables], val2, cap2) ...
 .. _example-2:
 
 Example
-~~~~~~~
+"""""""
 
 Suppose the input file had the following vectors of variables defined:
 
@@ -242,7 +243,7 @@ gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
 .. _notes-5:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces a hybrid consistency. It reads the bounds of
 the capacity variables, then enforces GAC over the primary variables
@@ -254,18 +255,19 @@ This constraint provides stronger propagation to the capacity variables
 than the gccweak constraint.
 
 haggisgac-stable
-----------------
+^^^^^^^^
 
 An extensional constraint that enforces GAC. haggisgac-stable is a
 variant of haggisgac which uses less memory in some cases, and can also
 be faster (or slower). The input is identical to haggisgac.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 `haggisgac <#haggisgac>`__
 
 haggisgac
----------
+^^^^^^^^
 
 An extensional constraint that enforces GAC. This constraint make uses
 of 'short tuples', which allow some values to be marked as don't care.
@@ -278,7 +280,7 @@ variables. Other types are not supported.
 .. _example-3:
 
 Example
-~~~~~~~
+"""""""
 
 Consider the constraint 'min([x1,x2,x3],x4)'' on Booleans variables
 x1,x2,x3,x4.
@@ -313,36 +315,38 @@ haggisgac([x1,x2,x3,x4], mycon)
 
 and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 help input shorttuplelist `table <#table>`__
 `negativetable <#negativetable>`__ `shortstr2 <#shortstr2>`__
 
 eq
---
+^^^^^^^^
 
 Constrain two variables to take equal values.
 
 .. _example-4:
 
 Example
-~~~~~~~
+"""""""
 
 eq(x0,x1)
 
 .. _notes-6:
 
 Notes
-~~~~~
+"""""
 
 Achieves bounds consistency.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 `minuseq <#minuseq-1>`__
 
 minuseq
--------
+^^^^^^^^
 
 Constraint
 
@@ -350,31 +354,32 @@ Constraint
 
 ensures that x=-y.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 `eq <#eq-1>`__
 
 diseq
------
+^^^^^^^^
 
 Constrain two variables to take different values.
 
 .. _notes-7:
 
 Notes
-~~~~~
+"""""
 
 Achieves arc consistency.
 
 .. _example-5:
 
 Example
-~~~~~~~
+"""""""
 
 diseq(v0,v1)
 
 lexleq[rv]
-----------
+^^^^^^^^
 
    The constraint
 
@@ -386,19 +391,20 @@ lexleq[rv]
 .. _notes-8:
 
 Notes
-~~~~~
+"""""
 
    This constraint achieves GAC even when some variables are repeated in
    vec0 and vec1. However, the extra propagation this achieves is rarely
    worth the extra work.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    See `lexleq[quick] <>`__ for a much faster logically identical
    constraint, with lower propagation.
 
 lexless
--------
+^^^^^^^^
 
 The constraint
 
@@ -410,17 +416,18 @@ is lexicographically less than vec1 in any solution.
 .. _notes-9:
 
 Notes
-~~~~~
+"""""
 
 This constraint maintains GAC.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See `lexleq <#lexleq>`__ for a similar constraint with non-strict
 lexicographic inequality.
 
 lexleq
-------
+^^^^^^^^
 
 The constraint
 
@@ -432,17 +439,18 @@ is lexicographically less than or equal to vec1 in any solution.
 .. _notes-10:
 
 Notes
-~~~~~
+"""""
 
 This constraints achieves GAC.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See `lexless <#lexless>`__ for a similar constraint with strict
 lexicographic inequality.
 
 ineq
-----
+^^^^^^^^
 
 The constraint
 
@@ -457,7 +465,7 @@ in any solution.
 .. _notes-11:
 
 Notes
-~~~~~
+"""""
 
 Minion has no strict inequality (<) constraints. However x < y can be
 achieved by
@@ -465,7 +473,7 @@ achieved by
    ineq(x, y, -1)
 
 abs
----
+^^^^^^^^
 
 The constraint
 
@@ -473,12 +481,13 @@ The constraint
 
 makes sure that x=, i.e. x is the absolute value of y.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 `abs <#abs>`__
 
 mddc
-----
+^^^^^^^^
 
 MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It
 enforces GAC on a constraint using a multi-valued decision diagram
@@ -494,12 +503,12 @@ For examples on how to call it, see the help for 'table'. Substitute
 .. _notes-12:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces generalized arc consistency.
 
 negativemddc
-------------
+^^^^^^^^
 
 Negative MDDC (negativemddc) is an implementation of MDDC(sp) by Cheng
 and Yap. It enforces GAC on a constraint using a multi-valued decision
@@ -512,19 +521,19 @@ unsatisfying (negative) tuples. The constraint has the same syntax as
 .. _notes-13:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces generalized arc consistency.
 
 alldiff
--------
+^^^^^^^^
 
 Forces the input vector of variables to take distinct values.
 
 .. _example-6:
 
 Example
-~~~~~~~
+"""""""
 
 Suppose the input file had the following vector of variables defined:
 
@@ -538,18 +547,19 @@ alldiff(myVec)
 .. _notes-14:
 
 Notes
-~~~~~
+"""""
 
 Enforces the same level of consistency as a clique of not equals
 constraints.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See `gacalldiff <#gacalldiff>`__ for the same constraint that enforces
 GAC.
 
 max
----
+^^^^^^^^
 
 The constraint
 
@@ -557,12 +567,13 @@ The constraint
 
 ensures that x is equal to the maximum value of any variable in vec.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See `min <#min>`__ for the opposite constraint.
 
 min
----
+^^^^^^^^
 
 The constraint
 
@@ -570,12 +581,13 @@ The constraint
 
 ensures that x is equal to the minimum value of any variable in vec.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See `max <#max>`__ for the opposite constraint.
 
 lighttable
-----------
+^^^^^^^^
 
 An extensional constraint that enforces GAC. The constraint is specified
 via a list of tuples. lighttable is a variant of the table constraint
@@ -592,7 +604,7 @@ domain value per constraint).
 .. _example-7:
 
 Example
-~~~~~~~
+"""""""
 
 Input format is similar to that used by other short tuple constraints,
 such as haggisgac or shortstr2. Refer to the haggisgac and
@@ -612,11 +624,12 @@ Example:
 .. _notes-15:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces generalized arc consistency.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 help input shorttuplelist `table <#table>`__
 `negativetable <#negativetable>`__ `haggisgac <#haggisgac>`__
@@ -627,13 +640,14 @@ watchelement_one --------------
 This constraint is identical to watchelement, except the vector is
 indexed from 1 rather than from 0.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See entry `watchelement <#watchelement>`__ for details of watchelement,
 which watchelement_one is based on.
 
 watchelement
-------------
+^^^^^^^^
 
 The constraint
 
@@ -645,17 +659,18 @@ specifies that, in any solution, vec[i] = e and i is in the range [0 ..
 .. _notes-16:
 
 Notes
-~~~~~
+"""""
 
 Enforces generalised arc consistency.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See entry `element <#element>`__ for details of an identical constraint
 that enforces a lower level of consistency.
 
 watchelement_undefzero
-----------------------
+^^^^^^^^
 
 The constraint
 
@@ -673,18 +688,19 @@ this constraint!
 .. _notes-17:
 
 Notes
-~~~~~
+"""""
 
 Enforces generalised arc consistency.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 See entry `watchelement <#watchelement>`__ for details of the standard
 element constraint, which is false when the array value is out of
 bounds.
 
 shortstr2
----------
+^^^^^^^^
 
 ShortSTR2 is the algorithm described in the IJCAI 2013 paper by
 Jefferson and Nightingale. It is an extension of STR2+ by Christophe
@@ -693,7 +709,7 @@ Lecoutre, adapted for short supports.
 .. _example-8:
 
 Example
-~~~~~~~
+"""""""
 
 Input format is exactly the same as haggisgac. Refer to the haggisgac
 and shorttuplelist pages for more information.
@@ -708,18 +724,19 @@ Example:
 .. _notes-18:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces generalized arc consistency.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 help input shorttuplelist `table <#table>`__
 `negativetable <#negativetable>`__ `haggisgac <#haggisgac>`__
 `haggisgac-stable <#haggisgac-stable>`__
 
 str2plus
---------
+^^^^^^^^
 
 str2plus is an implementation of the STR2+ algorithm by Christophe
 Lecoutre.
@@ -727,7 +744,7 @@ Lecoutre.
 .. _example-9:
 
 Example
-~~~~~~~
+"""""""
 
 str2plus is invoked in the same way as all other table constraints, such
 as table and mddc.
@@ -737,12 +754,12 @@ str2plus([x,y,z], {<1,2,3>, <1,3,2>})
 .. _notes-19:
 
 Notes
-~~~~~
+"""""
 
 This constraint enforces generalized arc consistency.
 
 litsumgeq
----------
+^^^^^^^^
 
 The constraint litsumgeq(vec1, vec2, c) ensures that there exists at
 least c distinct indices i such that vec1[i] = vec2[i].
@@ -750,7 +767,7 @@ least c distinct indices i such that vec1[i] = vec2[i].
 .. _notes-20:
 
 Notes
-~~~~~
+"""""
 
 A SAT clause {x,y,z} can be created using:
 
@@ -761,12 +778,13 @@ c. For large values consider using watchsumleq.
 
 This constraint is not reifiable.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `watchsumleq <#watchsumleq>`__ `watchsumgeq <#watchsumgeq>`__
 
 watched-and
------------
+^^^^^^^^
 
 The constraint
 
@@ -777,7 +795,7 @@ ensures that the constraints C1,...,Cn are all true.
 .. _notes-21:
 
 Notes
-~~~~~
+"""""
 
    Conjunctions of constraints may seem
 
@@ -788,21 +806,23 @@ reification:
 
    reify(watched-and({...}),r)
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `watched-or <#watched-or>`__
 
 watchless
----------
+^^^^^^^^
 
 The constraint watchless(x,y) ensures that x is less than y.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `ineq <#ineq>`__
 
 watched-or
-----------
+^^^^^^^^
 
 The constraint
 
@@ -810,19 +830,20 @@ The constraint
 
 ensures that at least one of the constraints C1,...,Cn is true.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `watched-and <#watched-and>`__
 
 watchsumgeq
------------
+^^^^^^^^
 
    The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
 
 .. _notes-22:
 
 Notes
-~~~~~
+"""""
 
    For this constraint, small values of c are more efficient.
 
@@ -830,19 +851,20 @@ Notes
 
    This constraint works on 0/1 variables only.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `watchsumleq <#watchsumleq>`__ `litsumgeq <#litsumgeq>`__
 
 watchsumleq
------------
+^^^^^^^^
 
    The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
 
 .. _notes-23:
 
 Notes
-~~~~~
+"""""
 
    Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
 
@@ -850,12 +872,13 @@ Notes
 
    For this constraint, large values of c are more efficient.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `watchsumgeq <#watchsumgeq>`__ `litsumgeq <#litsumgeq>`__
 
 hamming
--------
+^^^^^^^^
 
 The constraint
 
@@ -866,7 +889,7 @@ is, that the size of the set {i \| X[i] != y[i]} is greater than or
 equal to c.
 
 watchvecneq
------------
+^^^^^^^^
 
 The constraint
 
@@ -875,16 +898,18 @@ The constraint
 ensures that A and B are not the same vector, i.e., there exists some
 index i such that A[i] != B[i].
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `reification <#reification>`__
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
    `reification <#reification>`__
 
 reification
------------
+^^^^^^^^
 
 Reification is provided in two forms: reify and reifyimply.
 
@@ -905,7 +930,7 @@ satisfaction of constraint does not affect the value of r.
 .. _notes-24:
 
 Notes
-~~~~~
+"""""
 
 All constraints are reifyable and reifyimplyable.
 
@@ -923,32 +948,33 @@ All constraints are reifyable and reifyimplyable.
 .. _eq-1:
 
 eq
---
+^^^^^^^^
 
 Constrain two variables to take equal values.
 
 .. _example-10:
 
 Example
-~~~~~~~
+"""""""
 
 eq(x0,x1)
 
 .. _notes-25:
 
 Notes
-~~~~~
+"""""
 
 Achieves bounds consistency.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 `minuseq <#minuseq-1>`__
 
 .. _minuseq-1:
 
 minuseq
--------
+^^^^^^^^
 
 Constraint
 
@@ -956,33 +982,34 @@ Constraint
 
 ensures that x=-y.
 
-Related Constraints ^^^^^^^^^^^^^^
+Related constraints
+"""""""""""""""""""
 
 `eq <#eq-1>`__
 
 .. _diseq-1:
 
 diseq
------
+^^^^^^^^
 
 Constrain two variables to take different values.
 
 .. _notes-26:
 
 Notes
-~~~~~
+"""""
 
 Achieves arc consistency.
 
 .. _example-11:
 
 Example
-~~~~~~~
+"""""""
 
 diseq(v0,v1)
 
 gacalldiff
-----------
+^^^^^^^^
 
 Forces the input vector of variables to take distinct values.
 
@@ -998,7 +1025,7 @@ gacalldiff(myVec)
 This constraint enforces generalized arc consistency.
 
 table
------
+^^^^^^^^
 
 An extensional constraint that enforces GAC. The constraint is specified
 via a list of tuples.
@@ -1028,13 +1055,13 @@ definition, e.g.:
 table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 help input tuplelist help input gacschema help input negativetable help
 input haggisgac
 
 negativetable
--------------
+^^^^^^^^
 
 An extensional constraint that enforces GAC. The constraint is specified
 via a list of disallowed tuples.
@@ -1050,12 +1077,12 @@ disallowed.
 .. _related-constraints-1:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 help input table help input tuplelist
 
 div
----
+^^^^^^^^
 
 The constraint
 
@@ -1076,12 +1103,12 @@ The constraint is always false when y = 0
 .. _related-constraints-2:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `modulo <#modulo>`__
 
 div_undefzero
--------------
+^^^^^^^^
 
 The constraint
 
@@ -1097,12 +1124,12 @@ constraint!
 .. _related-constraints-3:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `div <#div>`__
 
 gccweak
--------
+^^^^^^^^
 
 The Generalized Cardinality Constraint (GCC) (weak variant) constrains
 the number of each value that a set of variables can take.
@@ -1140,7 +1167,7 @@ The consistency over the capacity variables is weaker than the gcc
 constraint, hence the name gccweak.
 
 product
--------
+^^^^^^^^
 
 The constraint
 
@@ -1158,7 +1185,7 @@ The general constraint achieves bounds generalised arc consistency for
 positive numbers.
 
 sumleq
-------
+^^^^^^^^
 
 The constraint
 
@@ -1167,7 +1194,7 @@ The constraint
 ensures that sum(vec) <= c.
 
 sumgeq
-------
+^^^^^^^^
 
 The constraint
 
@@ -1176,7 +1203,7 @@ The constraint
 ensures that sum(vec) >= c.
 
 weightedsumleq
---------------
+^^^^^^^^
 
 The constraint
 
@@ -1188,13 +1215,13 @@ the scalar dot product of constantVec and varVec.
 .. _related-constraints-4:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `weightedsumgeq <#weightedsumgeq>`__ `sumleq <#sumleq>`__
 `sumgeq <#sumgeq>`__
 
 weightedsumgeq
---------------
+^^^^^^^^
 
 The constraint
 
@@ -1206,27 +1233,27 @@ the scalar dot product of constantVec and varVec.
 .. _related-constraints-5:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `weightedsumleq <#weightedsumleq>`__ `sumleq <#sumleq>`__
 `sumgeq <#sumgeq>`__
 
 w-inrange
----------
+^^^^^^^^
 
    The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
 
 .. _related-constraints-6:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
    See also
 
    `w-notinrange <#w-notinrange>`__
 
 w-inset
--------
+^^^^^^^^
 
 The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 {a1,..,an}.
@@ -1234,42 +1261,42 @@ The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 .. _related-constraints-7:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
    See also
 
    `w-notinset <#w-notinset>`__
 
 w-literal
----------
+^^^^^^^^
 
    The constraint w-literal(x, a) ensures that x=a.
 
 .. _related-constraints-8:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
    See also
 
    `w-notliteral <#w-notliteral>`__
 
 w-notinrange
-------------
+^^^^^^^^
 
    The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
 
 .. _related-constraints-9:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
    See also
 
    `w-inrange <#w-inrange>`__
 
 w-notinset
-----------
+^^^^^^^^
 
 The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong
 to the set {a1,..,an}.
@@ -1277,14 +1304,14 @@ to the set {a1,..,an}.
 .. _related-constraints-10:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
    See also
 
    `w-inset <#w-inset>`__
 
 occurrence
-----------
+^^^^^^^^
 
 The constraint
 
@@ -1298,12 +1325,12 @@ elem must be a constant, not a variable.
 .. _related-constraints-11:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `occurrenceleq <#occurrenceleq>`__ `occurrencegeq <#occurrencegeq>`__
 
 occurrenceleq
--------------
+^^^^^^^^
 
 The constraint
 
@@ -1317,12 +1344,12 @@ elem and count must be constants
 .. _related-constraints-12:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `occurrence <#occurrence>`__ `occurrencegeq <#occurrencegeq>`__
 
 occurrencegeq
--------------
+^^^^^^^^
 
 The constraint
 
@@ -1336,26 +1363,26 @@ elem and count must be constants
 .. _related-constraints-13:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `occurrence <#occurrence>`__ `occurrenceleq <#occurrenceleq>`__
 
 w-notliteral
-------------
+^^^^^^^^
 
    The constraint w-notliteral(x, a) ensures that x =/= a.
 
 .. _related-constraints-14:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
    See also
 
    `w-literal <#w-literal>`__
 
 modulo
-------
+^^^^^^^^
 
 The constraint
 
@@ -1373,12 +1400,12 @@ To be fully concrete, here are some examples:
 .. _related-constraints-15:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `div <#div>`__
 
 mod_undefzero
--------------
+^^^^^^^^
 
 The constraint
 
@@ -1394,12 +1421,12 @@ constraint!
 .. _related-constraints-16:
 
 Related Constraints
-~~~~~~~~~~~~~~~~~~~
+"""""""""""""""""""
 
 `mod <>`__
 
 nvalueleq
----------
+^^^^^^^^
 
 The constraint
 
@@ -1409,7 +1436,7 @@ ensures that there are <= x different values assigned to the list of
 variables V.
 
 nvaluegeq
----------
+^^^^^^^^
 
 The constraint
 
@@ -1419,7 +1446,7 @@ ensures that there are >= x different values assigned to the list of
 variables V.
 
 pow
----
+^^^^^^^^
 
 The constraint
 
@@ -1430,7 +1457,7 @@ ensures that x^y=z.
 This constraint is only available for positive domains x, y and z.
 
 w-inintervalset
----------------
+^^^^^^^^
 
 The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the
 value of x belongs to one of the intervals {a1,...,a2}, {b1,...,b2} etc.
