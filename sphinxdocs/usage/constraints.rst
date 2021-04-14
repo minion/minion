@@ -1,8 +1,12 @@
 .. container::
    :name: constraints
 
-Choosing Between Minion’s Constraints
--------------------------------------
+-----------
+Constraints
+-----------
+
+Choosing which constraint to use
+--------------------------------
 
 Minion has many constraints which at first glance appear to do almost
 identical things. These each have trade-offs, some of which are
@@ -42,22 +46,23 @@ Some constraints in Minion do not work on ``BOUND`` and ``SPARSEBOUND``
 variables, in particular ``gacalldiff`` and ``watchelement``. These two
 constraints are in general better when they can be used.
 
-Complete List of Constraints
-----------------------------
+All Different, Cardinality and Counting Constraints
+---------------------------------------------------
 
 alldiffmatrix
 ^^^^^^^^^^^^^
 
-For a latin square this constraint is placed on the whole matrix once
-for each value. It ensures there is a bipartite matching between rows
+``alldiffmatrix(myVec, dim)``
+
+This constraint takes a 2d matrix of size ``dim*dim``.
+This constraint impose that the matrix forms a latin-square, that the Elements
+of the rows and columns are all different.
+
+It ensures there is a bipartite matching between rows
 and columns where the edges in the matching correspond to a pair (row,
 column) where the variable in position (row,column) in the matrix may be
 assigned to the given value.
 
-Example
-"""""""
-
-alldiffmatrix(myVec, Value)
 
 Notes
 """""
@@ -65,31 +70,72 @@ Notes
 This constraint adds some extra reasoning in addition to the GAC
 Alldifferents on the rows and columns.
 
-element_one
-^^^^^^^^
+gcc
+^^^
 
-The constraint element one is identical to element, except that the
-vector is indexed from 1 rather than from 0.
+The Generalized Cardinality Constraint (GCC) constrains the number of
+each value that a set of variables can take.
 
-Related constraints
-"""""""""""""""""""
+gcc([primary variables], [values of interest], [capacity variables])
 
-See
+For each value of interest, there must be a capacity variable, which
+specifies the number of occurrences of the value in the primary
+variables.
 
-`element <#element>`__
+This constraint only restricts the number of occurrences of the values
+in the value list. There is no restriction on the occurrences of other
+values. Therefore the semantics of gcc are identical to a set of
+occurrence constraints:
 
-for details of the element constraint which is almost identical to this
-one.
+.. code-block::
+	occurrence([primary variables], val1, cap1)
+	occurrence([primary variables], val2, cap2)
+	...
+
+.. _example-2:
+
+Example
+"""""""
+
+Suppose the input file had the following vectors of variables defined:
+
+.. code-block::
+	
+	DISCRETE myVec[9] {1..9}
+	BOUND cap[9] {0..2}
+
+The following constraint would restrict the occurrence of values 1..9 in
+myVec to be at most 2 each initially, and finally equal to the values of
+the cap vector.
+
+.. code-block::
+
+	gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
+
+.. _notes-5:
+
+Notes
+"""""
+
+This constraint enforces a hybrid consistency. It reads the bounds of
+the capacity variables, then enforces GAC over the primary variables
+only. Then the bounds of the capacity variables are updated using flow
+algorithms similar to those proposed by Quimper et al, Improved
+Algorithms for the Global Cardinality Constraint (CP 2004).
+
+This constraint provides stronger propagation to the capacity variables
+than the gccweak constraint.
+
+
+Accessing Elements of Arrays
+----------------------------
+
 
 element
-^^^^^^^^
+^^^^^^^
 
-The constraint
-
-   element(vec, i, e)
-
-specifies that, in any solution, vec[i] = e and i is in the range [0 ..
--1].
+The constraint ``element(vec, i, e)`` specifies that 
+vec[i] = e (treating ``vec`` as a 0-indexed array). This implies that ``i`` is in the range ``[0..len(vec)-1]``.
 
 .. _notes-1:
 
@@ -120,8 +166,14 @@ vary depending on the order in which constraints are listed in the input
 file, or the order they are called in Minion. For example, the following
 input causes Minion to search 41 nodes.
 
-MINION 3 **VARIABLES** DISCRETE x[5] {1..5} **CONSTRAINTS**
-element([x[0],x[1],x[2]], x[3], x[4]) alldiff([x]) **EOF**
+.. code-block::
+
+	MINION 3
+	**VARIABLES**
+	DISCRETE x[5] {1..5}
+	**CONSTRAINTS**
+	element([x[0],x[1],x[2]], x[3], x[4]) alldiff([x]) 
+	**EOF**
 
 However if the two constraints are swapped over, Minion explores 29
 nodes. As a rule of thumb, to get a lower node count, move element
@@ -130,68 +182,28 @@ constraints to the end of the list.
 Related constraints
 """""""""""""""""""
 
-See the `watchelement <#watchelement>`__ for details of an identical
+See `watchelement <#watchelement>`__ for details of a logically identical
 constraint that enforces generalised arc consistency.
 
-.. _alldiffmatrix-1:
+element_one
+^^^^^^^^^^^
 
-alldiffmatrix
-^^^^^^^^
+The constraint element_one is identical to `element <#element>`__, except that the
+vector is indexed from 1 rather than from 0.
 
-For a latin square this constraint is placed on the whole matrix once
-for each value. It ensures there is a bipartite matching between rows
-and columns where the edges in the matching correspond to a pair (row,
-column) where the variable in position (row,column) in the matrix may be
-assigned to the given value.
-
-.. _example-1:
-
-Example
-"""""""
-
-alldiffmatrix(myVec, Value)
-
-.. _notes-2:
-
-Notes
-"""""
-
-This constraint adds some extra reasoning in addition to the GAC
-Alldifferents on the rows and columns.
-
-alldiffciaran
-^^^^^^^^
-
-Forces the input vector of variables to take distinct values. This is
-for experiment only.
-
-.. _notes-3:
-
-Notes
-"""""
-
-This constraint enforces an unknown consistency.
+Arithmetic Constraints
+----------------------
 
 difference
-^^^^^^^^
+^^^^^^^^^^
 
-The constraint
+The constraint ``difference(x,y,z)`` ensures that z=|y-x|. This constraint achieves bounds consistency
 
-   difference(x,y,z)
-
-ensures that z= in any solution.
-
-.. _notes-4:
-
-Notes
-"""""
-
-This constraint can be expressed in a much longer form, this form both
-avoids requiring an extra variable, and also gets better propagation. It
-gets bounds consistency.
+Table constraints
+-----------------
 
 gacschema
-^^^^^^^^
+^^^^^^^^^
 
 An extensional constraint that enforces GAC. The constraint is specified
 via a list of tuples.
@@ -200,62 +212,10 @@ The format, and usage of gacschema, is identical to the 'table'
 constraint. It is difficult to predict which out of 'table' and
 'gacschema' will be faster for any particular problem.
 
-Related constraints
-"""""""""""""""""""
 
-help input tuplelist help input table help input haggisgac
-
-gcc
-^^^^^^^^
-
-The Generalized Cardinality Constraint (GCC) constrains the number of
-each value that a set of variables can take.
-
-gcc([primary variables], [values of interest], [capacity variables])
-
-For each value of interest, there must be a capacity variable, which
-specifies the number of occurrences of the value in the primary
-variables.
-
-This constraint only restricts the number of occurrences of the values
-in the value list. There is no restriction on the occurrences of other
-values. Therefore the semantics of gcc are identical to a set of
-occurrence constraints:
-
-occurrence([primary variables], val1, cap1) occurrence([primary
-variables], val2, cap2) ...
-
-.. _example-2:
-
-Example
-"""""""
-
-Suppose the input file had the following vectors of variables defined:
-
-DISCRETE myVec[9] {1..9} BOUND cap[9] {0..2}
-
-The following constraint would restrict the occurrence of values 1..9 in
-myVec to be at most 2 each initially, and finally equal to the values of
-the cap vector.
-
-gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
-
-.. _notes-5:
-
-Notes
-"""""
-
-This constraint enforces a hybrid consistency. It reads the bounds of
-the capacity variables, then enforces GAC over the primary variables
-only. Then the bounds of the capacity variables are updated using flow
-algorithms similar to those proposed by Quimper et al, Improved
-Algorithms for the Global Cardinality Constraint (CP 2004).
-
-This constraint provides stronger propagation to the capacity variables
-than the gccweak constraint.
 
 haggisgac-stable
-^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 An extensional constraint that enforces GAC. haggisgac-stable is a
 variant of haggisgac which uses less memory in some cases, and can also
@@ -267,7 +227,7 @@ Related constraints
 `haggisgac <#haggisgac>`__
 
 haggisgac
-^^^^^^^^
+^^^^^^^^^
 
 An extensional constraint that enforces GAC. This constraint make uses
 of 'short tuples', which allow some values to be marked as don't care.
@@ -288,8 +248,17 @@ x1,x2,x3,x4.
 Represented as a TUPLELIST for a table or gacschema constraint, this
 would look like:
 
-**TUPLELIST** mycon 8 4 0 0 0 0 0 0 1 0 0 1 0 0 0 1 1 0 1 0 0 0 1 0 1 0
-1 1 0 0 1 1 1 1
+.. code-block::
+
+	**TUPLELIST** mycon 8 4
+	0 0 0 0
+	0 0 1 0
+	0 1 0 0
+	0 1 1 0
+	1 0 0 0
+	1 0 1 0
+	1 1 0 0
+	1 1 1 1
 
 Short tuples give us a way of shrinking this list. Short tuples consist
 of pairs (x,y), where x is a varible position, and y is a value for that
@@ -302,43 +271,25 @@ is 0, then the constraint is true'.
 
 This allows us to represent our constraint as follows:
 
-**SHORTTUPLELIST** mycon 4 [(0,0),(3,0)] [(1,0),(3,0)] [(2,0),(3,0)]
-[(0,1),(1,1),(2,1),(3,1)]
+.. code-block::
+
+	**SHORTTUPLELIST**
+	mycon 4
+	[(0,0),(3,0)]
+	[(1,0),(3,0)]
+	[(2,0),(3,0)]
+	[(0,1),(1,1),(2,1),(3,1)]
 
 Note that some tuples are double-represented here. The first 3 short
-tuples all allow the assignment '0 0 0 0'. This is fine. The important
+tuples all allow the assignment ``0 0 0 0``. This is fine. The important
 thing for efficency is to try to give a small list of short tuples.
 
-We use this tuple by writing:
-
-haggisgac([x1,x2,x3,x4], mycon)
-
-and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
-
-Related constraints
-"""""""""""""""""""
-
-help input shorttuplelist `table <#table>`__
-`negativetable <#negativetable>`__ `shortstr2 <#shortstr2>`__
+We use this tuple by writing ``haggisgac([x1,x2,x3,x4], mycon)`` and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 
 eq
-^^^^^^^^
+^^
 
-Constrain two variables to take equal values.
-
-.. _example-4:
-
-Example
-"""""""
-
-eq(x0,x1)
-
-.. _notes-6:
-
-Notes
-"""""
-
-Achieves bounds consistency.
+``eq(x,y)`` ensures that ``x=y``. This constraint implements bounds consistency.
 
 Related constraints
 """""""""""""""""""
@@ -346,13 +297,9 @@ Related constraints
 `minuseq <#minuseq-1>`__
 
 minuseq
-^^^^^^^^
+^^^^^^^
 
-Constraint
-
-   minuseq(x,y)
-
-ensures that x=-y.
+``minuseq(x,y)`` ensures that ``x=-y``. The constraint implements bounds consistency.
 
 Related constraints
 """""""""""""""""""
@@ -360,65 +307,35 @@ Related constraints
 `eq <#eq-1>`__
 
 diseq
-^^^^^^^^
+^^^^^
 
-Constrain two variables to take different values.
+``diseq(x,y)`` ensures that ``x`` is not equal ``y``. Achieves arc consistency.
 
-.. _notes-7:
 
-Notes
-"""""
-
-Achieves arc consistency.
-
-.. _example-5:
-
-Example
-"""""""
-
-diseq(v0,v1)
+Lexicographic Ordering
+--------------------
 
 lexleq[rv]
-^^^^^^^^
+^^^^^^^^^^
 
-   The constraint
+The constraint ``lexleq[rv](vec0, vec1)`` takes two vectors vec0 and vec1 of the same length and ensures that
+vec0 is lexicographically less than or equal to vec1 in any solution.
 
-   lexle[rv](vec0, vec1)
-
-   takes two vectors vec0 and vec1 of the same length and ensures that
-   vec0 is lexicographically less than or equal to vec1 in any solution.
-
-.. _notes-8:
-
-Notes
-"""""
-
-   This constraint achieves GAC even when some variables are repeated in
-   vec0 and vec1. However, the extra propagation this achieves is rarely
-   worth the extra work.
+This constraint achieves GAC even when some variables are repeated in
+vec0 and vec1. However, the extra propagation this achieves is rarely
+worth the extra work.
 
 Related constraints
 """""""""""""""""""
 
-   See `lexleq[quick] <>`__ for a much faster logically identical
-   constraint, with lower propagation.
+See `lexleq[quick] <>`__ for a much faster logically identical
+constraint, with lower propagation.
 
 lexless
-^^^^^^^^
+^^^^^^^
 
-The constraint
-
-   lexless(vec0, vec1)
-
-takes two vectors vec0 and vec1 of the same length and ensures that vec0
-is lexicographically less than vec1 in any solution.
-
-.. _notes-9:
-
-Notes
-"""""
-
-This constraint maintains GAC.
+The constraint ``lexless(vec0, vec1)`` takes two vectors vec0 and vec1 of the same length and ensures that vec0
+is lexicographically less than vec1 in any solution. This constraint maintains GAC.
 
 Related constraints
 """""""""""""""""""
@@ -427,21 +344,10 @@ See `lexleq <#lexleq>`__ for a similar constraint with non-strict
 lexicographic inequality.
 
 lexleq
-^^^^^^^^
+^^^^^^
 
-The constraint
-
-   lexleq(vec0, vec1)
-
-takes two vectors vec0 and vec1 of the same length and ensures that vec0
-is lexicographically less than or equal to vec1 in any solution.
-
-.. _notes-10:
-
-Notes
-"""""
-
-This constraints achieves GAC.
+The constraint ``lexleq(vec0, vec1)`` takes two vectors vec0 and vec1 of the same length and ensures that vec0
+is lexicographically less than or equal to vec1 in any solution. This constraints achieves GAC.
 
 Related constraints
 """""""""""""""""""
