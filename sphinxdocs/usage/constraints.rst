@@ -3,8 +3,50 @@
 Constraints
 =======
 
-The following file
+Choosing Between Minion’s Constraints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Minion has many constraints which at first glance appear to do almost
+identical things. These each have trade-offs, some of which are
+difficult to guess in advance. This section will provide some basic
+guidance.
+
+One of the major design decisions of Minion’s input language is that it
+provides in the input language exactly what it provides internally.
+Unlike most other constraint solvers, Minion does not break up
+constraints into smaller pieces, introduce new variables or simplify or
+manipulate constraints. This provides complete control over how Minion
+represents your problem, but also leads to a number of annoyances.
+
+Probably the first thing you will notice it that Minion has neither a
+“sum equals” or “weighted sum equals” constraint. This is because the
+most efficiently we could implement such a constraint was simply by
+gluing together the sumleq and the sumgeq constraints. Minion could
+provide a wrapper which generated the two constraints internally, but
+this would go against the transparency. Of course if in the future a
+more efficient implementation of sumeq was found, it may be added.
+
+The ``watchsumgeq`` and ``watchsumleq`` are varients on the algorithm
+used to implement SAT constraints. They are faster than ``sumleq`` and
+``sumgeq``, but only work when summing a list of Booleans to a constant.
+Further ``watchsumgeq`` performs best when the value being summed to is
+small, and ``watchsumleq`` works best when the value being summed to is
+close to the size of the input vector.
+
+Minion does not attempt to simplify constraints, so constraints such as
+``sumgeq([a,a,a], 3)`` are not simplified to ``sumgeq([a],1)``. This
+kind of simplification, done by hand, will often improve models.
+Further, and importantly in practice, Minion pre-allocates memory based
+on the initial domain size of variables. If these are excessively slack,
+this can hurt performance throughout search.
+
+Some constraints in Minion do not work on ``BOUND`` and ``SPARSEBOUND``
+variables, in particular ``gacalldiff`` and ``watchelement``. These two
+constraints are in general better when they can be used.
+
+
+Complete List of Constraints
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  
 alldiffmatrix
 --------------

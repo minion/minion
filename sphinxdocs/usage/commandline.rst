@@ -1,28 +1,56 @@
 
 Command Line Options
-====================
+********************
 
 
-Minion supports a number of switches to augment default behaviour.  To
-see more information on any switch, use the help system. The list
-below contains all available switches. For example to see help on
--quiet type something similar to
-
-   minion help switches -quiet
-
-replacing 'minion' by the name of the executable you're using.
+Minion supports a number of switches to augment default behaviour, these
+are listed here. We begin with the most useful, and then list other,
+less common flags.
 
 
--redump
-----------------
+Choosing how much search to perform (time, number of solutions)
+---------------------------------------------------------------
 
 
-Print the minion input instance file to standard out. No search is
-carried out when this switch is used.
+
+-nodelimit
+^^^^^^^^^^^^^^^^
+
+
+To stop search after N nodes::
+
+   minion -nodelimit N myinput.minion
+
+
+-sollimit
+^^^^^^^^^^^^^^^^
+
+
+To stop search after N solutions have been found::
+
+   minion -sollimit N myinput.minion
+
+
+-timelimit
+^^^^^^^^^^^^^^^^
+
+
+To stop search after N seconds (real time)::
+
+   minion -timelimit N myinput.minion
+
+-cpulimit
+^^^^^^^^^^^^^^^^
+
+
+To stop search after N seconds (CPU time)::
+
+   minion -cpulimit N myinput.minion
+
 
 
 -findallsols
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Find all solutions and count them. This option is ignored if the
@@ -30,7 +58,7 @@ problem contains any minimising or maximising objective.
 
 
 -varorder
-----------------
+^^^^^^^^^^^^^^^^
 
 
 
@@ -62,7 +90,7 @@ The available orders are:
 
 
 -valorder
-----------------
+^^^^^^^^^^^^^^^^
 
 
 
@@ -72,71 +100,42 @@ Current orders are, ascend, descend and random.
 
 
 -quiet
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Do not print parser progress (default)
 
-
--outputCompressedDomains
-----------------
-
-
-Try to rduce the initial domains of variables, and output them.
-This is in general not useful for users, but is provided for other systems.
-
-
--outputCompressed
-----------------
-
-
-Output a Minion instance with some basic reasoning performed to
-reduce the size of the file. This file should produce identical
-output the original instance but may solve faster.
-
-To compress a file 'infile.minion' to a file 'smaller.minion'::
-
-   minion infile.minion -outputCompressed smaller.minion
-
-
 -printsols
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Print solutions (default).
 
 
 -noprintsols
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Do not print solutions.
 
 
 -printsolsonly
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Print only solutions and a summary at the end.
 
 
 -printonlyoptimal
------------------
+^^^^^^^^^^^^^^^^^
 
 
 In optimisation problems, only print the optimal value, and
 not intermediate values.
 
 
--verbose
-----------------
-
-
-Print parser progress
-
-
 -prop-node
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Allows the user to choose the level of consistency to be enforced
@@ -146,24 +145,8 @@ See `-preprocess` for details of the available
 levels of consistency.
 
 
--map-long-short
-----------------
-
-
-Automatically generate a short tuple list from each long tuple list.
-
-The methods of compression are:
-
-* none : No short tuple list generated (default)
-* eager : Use a fast algorithm to produce a reasonable short tuple list (best
-as first choice)
-* lazy : Work harder (possibly exponentially) to produce a shorter short tuple
-list
-* keeplong : Make a 'short tuple list' with no short tuples (only for
-benchmarking)
-
 -preprocess
------------
+^^^^^^^^^^^
 
 This switch allows the user to choose what level of preprocess is
 applied to their model before search commences.
@@ -208,8 +191,106 @@ which stop the algorithms in some situations when they are taking a
 very long time.
 
 
+-randomseed
+^^^^^^^^^^^^^^^^
+
+
+Set the pseudorandom seed to N. This allows 'random' behaviour to be
+repeated in different runs of minion.
+
+
+-tableout
+^^^^^^^^^^^^^^^^
+
+
+Append a line of data about the current run of minion to a named file.
+This data includes minion version information, arguments to the
+executable, build and solve time statistics, etc. See the file itself
+for a precise schema of the supplied information.
+
+To add statistics about solving myproblem.minion to mystats.txt::
+
+    minion -tableout mystats.txt myproblem.minion
+
+
+-solsout
+^^^^^^^^^^^^^^^^
+
+
+Append all solutionsto a named file.
+Each solution is placed on a line, with no extra formatting.
+
+To add the solutions of myproblem.minion to mysols.txt::
+
+    minion -solsout mysols.txt myproblem.minion
+
+
+
+Less common flags
+^^^^^^^^^^^^^^^^^
+
+-outputCompressedDomains
+^^^^^^^^^^^^^^^^
+
+
+Try to reduce the initial domains of variables, and output them.
+This is in general not useful for users, but is provided as a pre-preprocessing
+step for other systems.
+
+
+-outputCompressed
+^^^^^^^^^^^^^^^^
+
+
+Output a Minion instance with some basic reasoning performed to
+reduce the size of the file. This file should produce identical
+output the original instance but may solve faster.
+
+To compress a file 'infile.minion' to a file 'smaller.minion'::
+
+   minion infile.minion -outputCompressed smaller.minion
+
+
+-redump
+^^^^^^^^^^^^^^^^
+
+
+Print the minion input instance file to standard out. No search is
+carried out when this switch is used. This can be used to update
+files in old versions of the Minion file format.
+
+
+
+
+
+-verbose
+^^^^^^^^^^^^^^^^
+
+
+Print parser progress
+
+
+
+
+-map-long-short
+^^^^^^^^^^^^^^^^
+
+
+Automatically generate a short tuple list from each long tuple list.
+
+The methods of compression are:
+
+* none : No short tuple list generated (default)
+* eager : Use a fast algorithm to produce a reasonable short tuple list (best
+as first choice)
+* lazy : Work harder (possibly exponentially) to produce a shorter short tuple
+list
+* keeplong : Make a 'short tuple list' with no short tuples (only for
+benchmarking)
+
+
 -nocheck
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Do not check solutions for correctness before printing them out.
@@ -217,7 +298,7 @@ Do not check solutions for correctness before printing them out.
 
 
 -check
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Check solutions for correctness before printing them out. This should
@@ -226,57 +307,23 @@ only make a difference if Minion contains a bug.
 
 
 -dumptree
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Print out the branching decisions and variable states at each node.
 
 
 -dumptreejson
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Print out the branching decisions and variable states at each node.
 Accepts filename to output tree to
 
 
--nodelimit
-----------------
-
-
-To stop search after N nodes::
-
-   minion -nodelimit N myinput.minion
-
-
--sollimit
-----------------
-
-
-To stop search after N solutions have been found::
-
-   minion -sollimit N myinput.minion
-
-
--timelimit
-----------------
-
-
-To stop search after N seconds (real time)::
-
-   minion -timelimit N myinput.minion
-
--cpulimit
-----------------
-
-
-To stop search after N seconds (CPU time)::
-
-   minion -cpulimit N myinput.minion
-
 
 -skipautoaux
-----------------
+^^^^^^^^^^^^^^^^
 
 
 By default Minion adds all variables to the varorder, to ensure that all
@@ -295,7 +342,7 @@ garbage of course!)
 
 
 -randomiseorder
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Randomises the ordering of the decision variables, and the value ordering.
@@ -304,42 +351,9 @@ ordering is
 specified a random permutation of all the variables is used.
 
 
--randomseed
-----------------
-
-
-Set the pseudorandom seed to N. This allows 'random' behaviour to be
-repeated in different runs of minion.
-
-
--tableout
-----------------
-
-
-Append a line of data about the current run of minion to a named file.
-This data includes minion version information, arguments to the
-executable, build and solve time statistics, etc. See the file itself
-for a precise schema of the supplied information.
-
-To add statistics about solving myproblem.minion to mystats.txt::
-
-    minion -tableout mystats.txt myproblem.minion
-
-
--solsout
-----------------
-
-
-Append all solutionsto a named file.
-Each solution is placed on a line, with no extra formatting.
-
-To add the solutions of myproblem.minion to mysols.txt::
-
-    minion -solsout mysols.txt myproblem.minion
-
 
 -jsonsolsout
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Append all solutions to a named file, as JSON objects.
@@ -351,28 +365,28 @@ To add the solutions of myproblem.minion to mysols.txt::
 
 
 -makeresume
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Write a resume file on timeout or being killed.
 
 
 -noresume
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Do not write a resume file on timeout or being killed. (default)
 
 
 -gap
-----------------
+^^^^^^^^^^^^^^^^
 
 
 Give name of gap executable (defaults to gap.sh)
 
 
 -split
-----------------
+^^^^^^^^^^^^^^^^
 
 
 When Minion is terminated before the end of search, write out two new input
@@ -412,7 +426,7 @@ Implies -makeresume.
 
 
 -split-stderr
-----------------
+^^^^^^^^^^^^^^^^
 
 
 The flag -split-stderr has the same function as the flag -split, however the

@@ -10,12 +10,15 @@ Welcome to Minion's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   welcome
+
    usage/constraints
 
    usage/input
 
    usage/commandline
 
+   zreferences
 
 Indices and tables
 ==================
