@@ -6,27 +6,27 @@ contains links to the download page. Currently, executables with and
 without debug information are provided for Mac, Linux, and Windows.
 
 Installation instructions for Windows
-=====================================
+-------------------------------------
 
 Download the Windows archive ``minion-x.y.z-windows.tar.gz`` and unpack,
 you should find Minion executable ``minion.exe``. The executable should
 work from the Windows command shell ``cmd.exe``.
 
 Installation instructions for Mac
-=================================
+---------------------------------
 
 Download the Mac archive ``minion-x.y.z-mac.tar.gz`` and unpack. The
 contents include universal binary ``minion`` which should work on both
 Intel and ARM Macs.
 
-Installation instructions for Linux-x86 or x64
-==============================================
+Installation instructions for Linux
+-----------------------------------
 
 Download the Linux archive ``minion-x.y.z-linux.tar.gz`` and unpack. It
 contains the binary ``minion``. The executable is linked statically.
 
 Compilation instructions
-========================
+------------------------
 
 If there is no executable which works on your computer, you can use the
 source package (named ``minion-x.y.z-source.tar.gz``).
@@ -37,7 +37,7 @@ is only used during the building process.
 To compile, create a new directory for the build, and issue the
 following commands:
 
-::
+.. code-block:: bash
 
    <path/to/source>/configure.py
    make
