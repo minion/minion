@@ -70,6 +70,32 @@ Notes
 This constraint adds some extra reasoning in addition to the GAC
 Alldifferents on the rows and columns.
 
+
+alldiff
+^^^^^^^^
+
+Forces the input vector of variables to take distinct values.
+
+.. _example-6:
+
+Example
+"""""""
+
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+Then ``alldiff(myVec)`` enforces all variables in ``myVec`` take different values.
+
+This constreaint enforces the same level of consistency as a clique of not equals
+constraints.
+
+Related constraints
+"""""""""""""""""""
+
+See `gacalldiff <#gacalldiff>`__ for the same constraint that enforces
+GAC.
+
 gcc
 ^^^
 
@@ -191,6 +217,49 @@ element_one
 The constraint element_one is identical to `element <#element>`__, except that the
 vector is indexed from 1 rather than from 0.
 
+
+
+watchelement_one
+^^^^^^^^^^^^^^^^
+
+This constraint is identical to watchelement, except the vector is
+indexed from 1 rather than from 0.
+
+Related constraints
+"""""""""""""""""""
+
+See entry `watchelement <#watchelement>`__ for details of watchelement,
+which watchelement_one is based on.
+
+watchelement
+^^^^^^^^^^^^
+
+The constraint ``watchelement(vec, i, e)`` specifies that ``vec[i] = e``. This implies that
+``i`` is in the range ``[0..len(vec)-1]``. Enforces generalised arc consistency.
+
+Related constraints
+"""""""""""""""""""
+
+See entry `element <#element>`__ for details of an identical constraint
+that enforces a lower level of consistency.
+
+watchelement_undefzero
+^^^^^^^^^^^^^^^^^^^^^^
+
+The constraint ``watchelement_undefzero(vec, i, e)``
+
+specifies that, in any solution, either:
+
+- vec[i] = e and i is in the range [0 .. len(v)-1]
+- i is outside the index range of vec, and e = 0
+
+This differs from watchelement (and element) which are false if i is outside the
+index range of vec.
+
+In general, use watchelement unless you have a special reason to use
+this constraint!
+
+
 Arithmetic Constraints
 ----------------------
 
@@ -198,6 +267,66 @@ difference
 ^^^^^^^^^^
 
 The constraint ``difference(x,y,z)`` ensures that z=|y-x|. This constraint achieves bounds consistency
+
+
+eq
+^^^^
+
+``eq(x,y)`` ensures that ``x=y``. This constraint implements bounds consistency.
+
+Related constraints
+"""""""""""""""""""
+
+`minuseq <#minuseq-1>`__
+
+minuseq
+^^^^^^^
+
+``minuseq(x,y)`` ensures that ``x=-y``. The constraint implements bounds consistency.
+
+Related constraints
+"""""""""""""""""""
+
+`eq <#eq-1>`__
+
+diseq
+^^^^^
+
+``diseq(x,y)`` ensures that ``x`` is not equal ``y``. Achieves arc consistency.
+
+ineq
+^^^^
+
+The constraint ``ineq(x, y, k)`` ensures that ``x <= y + k`` in any solution.
+Minion has no strict inequality (<) constraints. However x < y can be
+achieved by ``ineq(x, y, -1)``
+
+abs
+^^^
+
+The constraint ``abs(x,y)`` makes sure that ``x=|y|``, i.e. x is the absolute value of y.
+
+
+max
+^^^^^^^^
+
+The constraint ``max(vec, x)`` ensures that ``x`` is equal to the maximum value of any variable in ``vec``.
+
+Related constraints
+"""""""""""""""""""
+
+See `min <#min>`__ for the opposite constraint.
+
+min
+^^^^^^^^
+
+The constraint ``min(vec, x)`` ensures that ``x`` is equal to the minimum value of any variable in ``vec``.
+
+Related constraints
+"""""""""""""""""""
+
+See `max <#max>`__ for the opposite constraint.
+
 
 Table constraints
 -----------------
@@ -286,34 +415,104 @@ thing for efficency is to try to give a small list of short tuples.
 
 We use this tuple by writing ``haggisgac([x1,x2,x3,x4], mycon)`` and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 
-eq
-^^
+mddc
+^^^^
 
-``eq(x,y)`` ensures that ``x=y``. This constraint implements bounds consistency.
+MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It
+enforces GAC on a constraint using a multi-valued decision diagram
+(MDD).
 
-Related constraints
-"""""""""""""""""""
+The MDD required for the propagator is constructed from a set of
+satisfying tuples. The constraint has the same syntax as 'table' and can
+function as a drop-in replacement.
 
-`minuseq <#minuseq-1>`__
+For examples on how to call it, see the help for 'table'. Substitute
+'mddc' for 'table'. This constraint enforces generalized arc consistency.
 
-minuseq
-^^^^^^^
+negativemddc
+^^^^^^^^^^^^
 
-``minuseq(x,y)`` ensures that ``x=-y``. The constraint implements bounds consistency.
+Negative MDDC (negativemddc) is an implementation of MDDC(sp) by Cheng
+and Yap. It enforces GAC on a constraint using a multi-valued decision
+diagram (MDD).
 
-Related constraints
-"""""""""""""""""""
+The MDD required for the propagator is constructed from a set of
+unsatisfying (negative) tuples. The constraint has the same syntax as
+'negativetable' and can function as a drop-in replacement.
+This constraint enforces generalized arc consistency.
 
-`eq <#eq-1>`__
 
-diseq
-^^^^^
+lighttable
+^^^^^^^^^^
 
-``diseq(x,y)`` ensures that ``x`` is not equal ``y``. Achieves arc consistency.
+An extensional constraint that enforces GAC. The constraint is specified
+via a list of tuples. lighttable is a variant of the table constraint
+that is stateless and potentially faster for small constraints.
+
+For full documentation, see the help for the table constraint.
+
+shortctuplestr2 
+^^^^^^^^^^^^^^^
+
+This constraint extends the ShortSTR2 algorithm to support short
+c-tuples (that is, short tuples which contain can contain more than one
+domain value per constraint).
+
+.. _example-7:
+
+Example
+"""""""
+
+Input format is similar to that used by other short tuple constraints,
+such as haggisgac or shortstr2. Refer to the haggisgac and
+shorttuplelist pages for more information.
+
+The important change is that more than one literal may be given for each
+variable. Variables which are not mentioned are assumed to be allowed to
+take any value
+
+Example:
+
+.. code-block::
+
+	**SHORTTUPLELIST**
+	mycon 4
+	[(0,0),(0,1),(3,0)]
+	[(1,0),(1,2),(3,0)]
+	[(2,0),(3,0),(3,1)]
+	[(0,1),(1,1),(2,1),(3,1)]
+
+	**CONSTRAINTS**
+	shortctuplestr2([x1,x2,x3,x4], mycon)
+
+This constraint enforces generalized arc consistency.
+
+shortstr2
+^^^^^^^^^
+
+ShortSTR2 is the algorithm described in the IJCAI 2013 paper by
+Jefferson and Nightingale. It is an extension of STR2+ by Christophe
+Lecoutre, adapted f
+
+Input format is exactly the same as haggisgac. Refer to the haggisgac
+and shorttuplelist pages for more information.
+
+This constraint enforces generalized arc consistency.
+
+str2plus
+^^^^^^^^
+
+str2plus is an implementation of the STR2+ algorithm by Christophe
+Lecoutre.
+
+str2plus is invoked in the same way as other table constraints, such
+as table and mddc.
+
+This constraint enforces generalized arc consistency.
 
 
 Lexicographic Ordering
---------------------
+----------------------
 
 lexleq[rv]
 ^^^^^^^^^^
@@ -355,317 +554,10 @@ Related constraints
 See `lexless <#lexless>`__ for a similar constraint with strict
 lexicographic inequality.
 
-ineq
-^^^^^^^^
 
-The constraint
-
-   ineq(x, y, k)
-
-ensures that
-
-   x <= y + k
-
-in any solution.
-
-.. _notes-11:
-
-Notes
-"""""
-
-Minion has no strict inequality (<) constraints. However x < y can be
-achieved by
-
-   ineq(x, y, -1)
-
-abs
-^^^^^^^^
-
-The constraint
-
-   abs(x,y)
-
-makes sure that x=, i.e. x is the absolute value of y.
-
-Related constraints
-"""""""""""""""""""
-
-`abs <#abs>`__
-
-mddc
-^^^^^^^^
-
-MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It
-enforces GAC on a constraint using a multi-valued decision diagram
-(MDD).
-
-The MDD required for the propagator is constructed from a set of
-satisfying tuples. The constraint has the same syntax as 'table' and can
-function as a drop-in replacement.
-
-For examples on how to call it, see the help for 'table'. Substitute
-'mddc' for 'table'.
-
-.. _notes-12:
-
-Notes
-"""""
-
-This constraint enforces generalized arc consistency.
-
-negativemddc
-^^^^^^^^
-
-Negative MDDC (negativemddc) is an implementation of MDDC(sp) by Cheng
-and Yap. It enforces GAC on a constraint using a multi-valued decision
-diagram (MDD).
-
-The MDD required for the propagator is constructed from a set of
-unsatisfying (negative) tuples. The constraint has the same syntax as
-'negativetable' and can function as a drop-in replacement.
-
-.. _notes-13:
-
-Notes
-"""""
-
-This constraint enforces generalized arc consistency.
-
-alldiff
-^^^^^^^^
-
-Forces the input vector of variables to take distinct values.
-
-.. _example-6:
-
-Example
-"""""""
-
-Suppose the input file had the following vector of variables defined:
-
-DISCRETE myVec[9] {1..9}
-
-To ensure that each variable takes a different value include the
-following constraint:
-
-alldiff(myVec)
-
-.. _notes-14:
-
-Notes
-"""""
-
-Enforces the same level of consistency as a clique of not equals
-constraints.
-
-Related constraints
-"""""""""""""""""""
-
-See `gacalldiff <#gacalldiff>`__ for the same constraint that enforces
-GAC.
-
-max
-^^^^^^^^
-
-The constraint
-
-   max(vec, x)
-
-ensures that x is equal to the maximum value of any variable in vec.
-
-Related constraints
-"""""""""""""""""""
-
-See `min <#min>`__ for the opposite constraint.
-
-min
-^^^^^^^^
-
-The constraint
-
-   min(vec, x)
-
-ensures that x is equal to the minimum value of any variable in vec.
-
-Related constraints
-"""""""""""""""""""
-
-See `max <#max>`__ for the opposite constraint.
-
-lighttable
-^^^^^^^^
-
-An extensional constraint that enforces GAC. The constraint is specified
-via a list of tuples. lighttable is a variant of the table constraint
-that is stateless and potentially faster for small constraints.
-
-For full documentation, see the help for the table constraint.
-
-shortctuplestr2 --------------
-
-This constraint extends the ShortSTR2 algorithm to support short
-c-tuples (that is, short tuples which contain can contain more than one
-domain value per constraint).
-
-.. _example-7:
-
-Example
-"""""""
-
-Input format is similar to that used by other short tuple constraints,
-such as haggisgac or shortstr2. Refer to the haggisgac and
-shorttuplelist pages for more information.
-
-The important change is that more than one literal may be given for each
-variable. Variables which are not mentioned are assumed to be allowed to
-take any value
-
-Example:
-
-**SHORTTUPLELIST** mycon 4 [(0,0),(0,1),(3,0)] [(1,0),(1,2),(3,0)]
-[(2,0),(3,0),(3,1)] [(0,1),(1,1),(2,1),(3,1)]
-
-**CONSTRAINTS** shortctuplestr2([x1,x2,x3,x4], mycon)
-
-.. _notes-15:
-
-Notes
-"""""
-
-This constraint enforces generalized arc consistency.
-
-Related constraints
-"""""""""""""""""""
-
-help input shorttuplelist `table <#table>`__
-`negativetable <#negativetable>`__ `haggisgac <#haggisgac>`__
-`haggisgac-stable <#haggisgac-stable>`__ `shortstr2 <#shortstr2>`__
-
-watchelement_one --------------
-
-This constraint is identical to watchelement, except the vector is
-indexed from 1 rather than from 0.
-
-Related constraints
-"""""""""""""""""""
-
-See entry `watchelement <#watchelement>`__ for details of watchelement,
-which watchelement_one is based on.
-
-watchelement
-^^^^^^^^
-
-The constraint
-
-   watchelement(vec, i, e)
-
-specifies that, in any solution, vec[i] = e and i is in the range [0 ..
--1].
-
-.. _notes-16:
-
-Notes
-"""""
-
-Enforces generalised arc consistency.
-
-Related constraints
-"""""""""""""""""""
-
-See entry `element <#element>`__ for details of an identical constraint
-that enforces a lower level of consistency.
-
-watchelement_undefzero
-^^^^^^^^
-
-The constraint
-
-   watchelement_undefzero(vec, i, e)
-
-specifies that, in any solution, either: a) vec[i] = e and i is in the
-range [0 .. -1] b) i is outside the index range of vec, and e = 0
-
-Unlike watchelement (and element) which are false if i is outside the
-index range of vec.
-
-In general, use watchelement unless you have a special reason to use
-this constraint!
-
-.. _notes-17:
-
-Notes
-"""""
-
-Enforces generalised arc consistency.
-
-Related constraints
-"""""""""""""""""""
-
-See entry `watchelement <#watchelement>`__ for details of the standard
-element constraint, which is false when the array value is out of
-bounds.
-
-shortstr2
-^^^^^^^^
-
-ShortSTR2 is the algorithm described in the IJCAI 2013 paper by
-Jefferson and Nightingale. It is an extension of STR2+ by Christophe
-Lecoutre, adapted for short supports.
-
-.. _example-8:
-
-Example
-"""""""
-
-Input format is exactly the same as haggisgac. Refer to the haggisgac
-and shorttuplelist pages for more information.
-
-Example:
-
-**SHORTTUPLELIST** mycon 4 [(0,0),(3,0)] [(1,0),(3,0)] [(2,0),(3,0)]
-[(0,1),(1,1),(2,1),(3,1)]
-
-**CONSTRAINTS** shortstr2([x1,x2,x3,x4], mycon)
-
-.. _notes-18:
-
-Notes
-"""""
-
-This constraint enforces generalized arc consistency.
-
-Related constraints
-"""""""""""""""""""
-
-help input shorttuplelist `table <#table>`__
-`negativetable <#negativetable>`__ `haggisgac <#haggisgac>`__
-`haggisgac-stable <#haggisgac-stable>`__
-
-str2plus
-^^^^^^^^
-
-str2plus is an implementation of the STR2+ algorithm by Christophe
-Lecoutre.
-
-.. _example-9:
-
-Example
-"""""""
-
-str2plus is invoked in the same way as all other table constraints, such
-as table and mddc.
-
-str2plus([x,y,z], {<1,2,3>, <1,3,2>})
-
-.. _notes-19:
-
-Notes
-"""""
-
-This constraint enforces generalized arc consistency.
 
 litsumgeq
-^^^^^^^^
+^^^^^^^^^
 
 The constraint litsumgeq(vec1, vec2, c) ensures that there exists at
 least c distinct indices i such that vec1[i] = vec2[i].
