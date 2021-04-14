@@ -12,6 +12,12 @@ Welcome to Minion's documentation!
 
    welcome
 
+   building
+
+   usingminion
+   
+   usage/variables
+
    usage/constraints
 
    usage/input
