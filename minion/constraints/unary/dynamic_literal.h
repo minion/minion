@@ -18,15 +18,9 @@
  * USA.
  */
 
-/** @help constraints;w-literal Description
-  The constraint w-literal(x, a) ensures that x=a.
-*/
 
-/** @help constraints;w-literal References
-  See also
 
-  help constraints w-notliteral
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_UNARY_LITERAL_H
 #define CONSTRAINT_DYNAMIC_UNARY_LITERAL_H

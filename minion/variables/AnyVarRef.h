@@ -18,125 +18,19 @@
  * USA.
  */
 
-/** @help variables General
-Minion supports 4 different variable types, namely
 
-- 0/1 variables,
-- bounds variables,
-- sparse bounds variables, and
-- discrete variables.
 
-Sub-dividing the variable types in this manner affords the greatest
-opportunity for optimisation. In general, we recommend thinking of the
-variable types as a hierarchy, where 1 (0/1 variables) is the most
-efficient type, and 4 (Discrete variables) is the least. The
-user should use the variable which is the highest in the hierarchy,
-yet encompasses enough information to provide a full model for the
-problem they are attempting to solve.
 
-Minion also supports use of constants in place of variables, and constant
-vectors in place of vectors of variables. Using constants will be at least
-as efficient as using variables when the variable has a singleton domain.
 
-See the entry on vectors for information on how vectors, matrices and,
-more generally, tensors are handled in minion input. See also the
-alias entry for information on how to multiply name variables for
-convenience.
-*/
 
-/** @help variables;constants Description
-Minion supports the use of constants anywhere where a variable can be used. For
-example, in a constraint as a replacement for a single variable, or a vector of
-constants as a replacement for a vector of variables.
-*/
 
-/** @help variables;constants Examples
-Use of a constant:
 
-   eq(x,1)
 
-Use of a constant vector:
 
-   element([10,9,8,7,6,5,4,3,2,1],idx,e)
-*/
 
-/** @help variables;vectors Description
-Vectors, matrices and tensors can be declared in minion
-input. Matrices and tensors are for convenience, as constraints do not
-take these as input; they must first undergo a flattening process to
-convert them to a vector before use. Additional commas at the end of
-vectors are ignored (see example below).
-*/
 
-/** @help variables;vectors Examples
-A vector of 0/1 variables:
 
-BOOL myvec[5]
 
-A matrix of discrete variables:
-
-DISCRETE sudoku[9,9] {1..9}
-
-A 3D tensor of 0/1s:
-
-BOOL mycube[3,3,2]
-
-One can create a vector from scalars and elements of vectors, etc.:
-
-alldiff([x,y,myvec[1],mymatrix[3,4]])
-
-When a matrix or tensor is constrained, it is treated as a vector
-whose entries have been strung out into a vector in index order with
-the rightmost index changing most quickly, e.g.
-
-alldiff(sudoku)
-
-is equivalent to
-
-alldiff([sudoku[0,0],...,sudoku[0,8],...,sudoku[8,0],...,sudoku[8,8]])
-
-Furthermore, with indices filled selectively and the remainder filled
-with underscores (_) the flattening applies only to the underscore
-indices:
-
-alldiff(sudoku[4,_])
-
-is equivalent to
-
-alldiff([sudoku[4,0],...,sudoku[4,8]])
-
-Lastly, one can optionally add square brackets ([]) around an
-expression to be flattened to make it look more like a vector:
-
-alldiff([sudoku[4,_]])
-
-is equivalent to
-
-alldiff(sudoku[4,_])
-*/
-
-/** @help variables;vectors Example
-Additional hanging commas at the end of array are ignored, e.g.
-
-lexleq([A,B,C,],[D,E,F,])
-
-is equivalent to
-
-lexleq([A,B,C],[D,E,F])
-
-This feature is provided to make it easier to computer-generate input
-files.
-*/
-
-/** @help variables;alias Description
-Specifying an alias is a way to give a variable another name. Aliases
-appear in the **VARIABLES** section of an input file. It is best
-described using some examples:
-
-ALIAS c = a
-
-ALIAS c[2,2] = [[myvar,b[2]],[b[1],anothervar]]
-*/
 
 #ifndef _ANYVARREF_H
 #define _ANYVARREF_H

@@ -18,15 +18,9 @@
  * USA.
  */
 
-/** @help constraints;reify References
-See
-   help constraints reification
-*/
 
-/** @help constraints;reifyimply References
-See
-   help constraints reification
-*/
+
+
 
 /** @help constraints;reification Description
 Reification is provided in two forms: reify and reifyimply.
@@ -46,12 +40,7 @@ by propagation, only by search; that is, satisfaction of constraint does not
 affect the value of r.
 */
 
-/** @help constraints;reification Notes
-ALMOST ALL constraints are are reifiable. Individual constraint entries mention
-if the constraint is NOT reifiable.
 
-ALL constraints are reifyimplyable.
-*/
 
 // Note: The whole constraintLocked thing is for the following case:
 // Consider the following events are on the queue:

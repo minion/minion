@@ -18,15 +18,9 @@
  * USA.
  */
 
-/** @help constraints;w-notinrange Description
-  The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
-*/
 
-/** @help constraints;w-notinrange References
-  See also
 
-  help constraints w-inrange
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_UNARY_NOTINRANGE_H
 #define CONSTRAINT_DYNAMIC_UNARY_NOTINRANGE_H

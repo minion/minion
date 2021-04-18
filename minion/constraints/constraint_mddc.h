@@ -18,22 +18,9 @@
  * USA.
  */
 
-/** @help constraints;mddc Description
-MDDC (mddc) is an implementation of MDDC(sp) by Cheng and Yap. It enforces GAC
-on a
-constraint using a multi-valued decision diagram (MDD).
 
-The MDD required for the propagator is constructed from a set of satisfying
-tuples. The constraint has the same syntax as 'table' and can function
-as a drop-in replacement.
 
-For examples on how to call it, see the help for 'table'. Substitute 'mddc' for
-'table'.
-*/
 
-/** @help constraints;mddc Notes
-This constraint enforces generalized arc consistency.
-*/
 
 /** @help constraints;negativemddc Description
 Negative MDDC (negativemddc) is an implementation of MDDC(sp) by Cheng and Yap.
@@ -44,9 +31,7 @@ The MDD required for the propagator is constructed from a set of unsatisfying
 can function as a drop-in replacement.
 */
 
-/** @help constraints;negativemddc Notes
-This constraint enforces generalized arc consistency.
-*/
+
 
 #ifndef CONSTRAINT_MDDC_H
 #define CONSTRAINT_MDDC_H

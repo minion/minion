@@ -18,21 +18,9 @@
  * USA.
  */
 
-/** @help constraints;sumleq Description
-The constraint
 
-   sumleq(vec, c)
 
-ensures that sum(vec) <= c.
-*/
 
-/** @help constraints;sumgeq Description
-The constraint
-
-   sumgeq(vec, c)
-
-ensures that sum(vec) >= c.
-*/
 
 // This is the standard implementation of sumleq (and sumgeq)
 

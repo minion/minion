@@ -18,16 +18,9 @@
  * USA.
  */
 
-/** @help constraints;w-notinset Description
-The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong to the
-set {a1,..,an}.
-*/
 
-/** @help constraints;w-notinset References
-  See also
 
-  help constraints w-inset
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_UNARY_NOTINSET_H
 #define CONSTRAINT_DYNAMIC_UNARY_NOTINSET_H

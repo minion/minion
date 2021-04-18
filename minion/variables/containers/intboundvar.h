@@ -18,23 +18,9 @@
  * USA.
  */
 
-/** @help variables;bounds Description
-Bounds variables, where only the upper and lower bounds of the domain
-are maintained. These domains must be continuous ranges of integers
-i.e. holes cannot be put in the domains of the variables.
-*/
 
-/** @help variables;bounds Example
 
-Declaration of a bound variable called myvar with domain between 1
-and 7 in input file:
 
-BOUND myvar {1..7}
-
-Use of this variable in a constraint:
-
-eq(myvar, 4) #variable myvar equals 4
-*/
 
 #include "../../triggering/constraint_abstract.h"
 

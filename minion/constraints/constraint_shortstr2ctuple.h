@@ -50,18 +50,9 @@ shortctuplestr2([x1,x2,x3,x4], mycon)
 
 */
 
-/** @help constraints;shortcuplestr2 Notes
-This constraint enforces generalized arc consistency.
-*/
 
-/** @help constraints;shortctuplestr2 References
-help input shorttuplelist
-help constraints table
-help constraints negativetable
-help constraints haggisgac
-help constraints haggisgac-stable
-help constraints shortstr2
-*/
+
+
 
 #ifndef CONSTRAINT_CTUPLESTR2_H
 #define CONSTRAINT_CTUPLESTR2_H

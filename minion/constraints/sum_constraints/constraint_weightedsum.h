@@ -18,35 +18,13 @@
  * USA.
  */
 
-/** @help constraints;weightedsumleq Description
-The constraint
 
-   weightedsumleq(constantVec, varVec, total)
 
-ensures that constantVec.varVec <= total, where constantVec.varVec is
-the scalar dot product of constantVec and varVec.
-*/
 
-/** @help constraints;weightedsumleq References
-help constraints weightedsumgeq
-help constraints sumleq
-help constraints sumgeq
-*/
 
-/** @help constraints;weightedsumgeq Description
-The constraint
 
-   weightedsumgeq(constantVec, varVec, total)
 
-ensures that constantVec.varVec >= total, where constantVec.varVec is
-the scalar dot product of constantVec and varVec.
-*/
 
-/** @help constraints;weightedsumgeq References
-help constraints weightedsumleq
-help constraints sumleq
-help constraints sumgeq
-*/
 
 #ifndef CONSTRAINT_WEIGHTSUM_H
 #define CONSTRAINT_WEIGHTSUM_H

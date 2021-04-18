@@ -38,28 +38,9 @@ occurrence([primary variables], val2, cap2)
 
 */
 
-/** @help constraints;gccweak Example
-Suppose the input file had the following vectors of variables defined:
 
-DISCRETE myVec[9] {1..9}
-BOUND cap[9] {0..2}
 
-The following constraint would restrict the occurrence of values 1..9 in myVec
-to be at most 2 each initially, and finally equal to the values of the cap
-vector.
 
-gccweak(myVec, [1,2,3,4,5,6,7,8,9], cap)
-*/
-
-/** @help constraints;gccweak Notes
-This constraint enforces a hybrid consistency. It reads the bounds of the
-capacity variables, then enforces GAC over the primary variables only.  Then the
-bounds of the capacity variables are updated by counting values in the domains
-of the primary variables.
-
-The consistency over the capacity variables is weaker than the gcc constraint,
-hence the name gccweak.
-*/
 
 #ifndef CONSTRAINT_GCCWEAK_H_PQWOEI
 #define CONSTRAINT_GCCWEAK_H_PQWOEI

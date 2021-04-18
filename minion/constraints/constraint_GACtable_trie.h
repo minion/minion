@@ -38,13 +38,7 @@
  * USA.
  */
 
-/** @help constraints;table Description
-An extensional constraint that enforces GAC. The constraint is
-specified via a list of tuples.
 
-The variables used in the constraint have to be BOOL or DISCRETE variables.
-Other types are not supported.
-*/
 
 /** @help constraints;table Example
 To specify a constraint over 3 variables that allows assignments
@@ -70,39 +64,15 @@ table(myvec, myext)
 and now the variables of myvec will satisfy the constraint myext.
 */
 
-/** @help constraints;table Example
-The constraints extension can also be specified in the constraint
-definition, e.g.:
 
-table(myvec, {<0,0,0>,<1,0,0>,<0,1,0>,<0,0,1>})
-*/
 
-/** @help constraints;table References
-help input tuplelist
-help input gacschema
-help input negativetable
-help input haggisgac
-*/
 
-/** @help constraints;negativetable Description
-An extensional constraint that enforces GAC. The constraint is
-specified via a list of disallowed tuples.
-*/
 
-/** @help constraints;negativetable Notes
-See entry
 
-   help input negativetable
 
-for how to specify a table constraint in minion input. The only
-difference for negativetable is that the specified tuples are
-disallowed.
-*/
 
-/** @help constraints;negativetable References
-help input table
-help input tuplelist
-*/
+
+
 
 #ifndef CONSTRAINT_GACTABLE_TRIES_H
 #define CONSTRAINT_GACTABLE_TRIES_H

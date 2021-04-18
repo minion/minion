@@ -18,19 +18,9 @@
  * USA.
  */
 
-/** @help constraints;difference Description
-The constraint
 
-   difference(x,y,z)
 
-ensures that z=|x-y| in any solution.
-*/
 
-/** @help constraints;difference Notes
-This constraint can be expressed in a much longer form, this form both avoids
-requiring an extra variable, and also gets better propagation. It gets bounds
-consistency.
-*/
 
 #ifndef CONSTRAINT_DIFFERENCE_H
 #define CONSTRAINT_DIFFERENCE_H

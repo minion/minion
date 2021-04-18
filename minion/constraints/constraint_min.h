@@ -18,37 +18,13 @@
  * USA.
  */
 
-/** @help constraints;max Description
-The constraint
 
-   max(vec, x)
 
-ensures that x is equal to the maximum value of any variable in vec.
-*/
 
-/** @help constraints;max References
-See
 
-   help constraints min
 
-for the opposite constraint.
-*/
 
-/** @help constraints;min Description
-The constraint
 
-   min(vec, x)
-
-ensures that x is equal to the minimum value of any variable in vec.
-*/
-
-/** @help constraints;min References
-See
-
-   help constraints max
-
-for the opposite constraint.
-*/
 
 #ifndef CONSTRAINT_MIN_H
 #define CONSTRAINT_MIN_H

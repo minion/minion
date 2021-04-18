@@ -18,19 +18,9 @@
  * USA.
  */
 
-/** @help constraints;watched-or Description
-The constraint
 
-  watched-or({C1,...,Cn})
 
-ensures that at least one of the constraints C1,...,Cn is true.
-*/
 
-/** @help constraints;watched-or References
-  See also
-
-  help constraints watched-and
-*/
 
 #ifndef DYNAMIC_WATCHED_OR_NEW_H
 #define DYNAMIC_WATCHED_OR_NEW_H

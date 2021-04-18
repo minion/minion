@@ -28,15 +28,9 @@ position
 (row,column) in the matrix may be assigned to the given value.
 */
 
-/** @help constraints;alldiffmatrix Example
 
-alldiffmatrix(myVec, Value)
-*/
 
-/** @help constraints;alldiffmatrix Notes
-This constraint adds some extra reasoning in addition to the GAC Alldifferents
-on the rows and columns.
-*/
+
 
 #include <algorithm>
 #include <cmath>

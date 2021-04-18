@@ -18,45 +18,23 @@
  * USA.
  */
 
-/** @help constraints;eq Description
-Constrain two variables to take equal values.
-*/
 
-/** @help constraints;eq Example
-eq(x0,x1)
-*/
 
-/** @help constraints;eq Notes
-Achieves bounds consistency.
-*/
 
-/** @help constraints;eq Reference
-help constraints minuseq
-*/
 
-/** @help constraints;minuseq Description
-Constraint
 
-   minuseq(x,y)
 
-ensures that x=-y.
-*/
 
-/** @help constraints;minuseq Reference
-help constraints eq
-*/
 
-/** @help constraints;diseq Description
-Constrain two variables to take different values.
-*/
 
-/** @help constraints;diseq Notes
-Achieves arc consistency.
-*/
 
-/** @help constraints;diseq Example
-diseq(v0,v1)
-*/
+
+
+
+
+
+
+
 
 // This will become always true sooner or later.
 

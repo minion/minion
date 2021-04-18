@@ -25,15 +25,7 @@ wherever a 01 variable can appear, the negation of that variable can
 also appear. A boolean variable x's negation is identified by !x.
 */
 
-/** @help variables;01 Example
-Declaration of a 01 variable called bool in input file:
 
-BOOL bool
-
-Use of this variable in a constraint:
-
-eq(bool, 0) #variable bool equals 0
-*/
 
 #ifndef _BOOLEANVARIABLES_H
 #define _BOOLEANVARIABLES_H

@@ -23,20 +23,9 @@
 // Does it place dynamic triggers for the supports.
 //#define SupportsGACUseDT true
 
-/** @help constraints;gacschema Description
-An extensional constraint that enforces GAC. The constraint is
-specified via a list of tuples.
 
-The format, and usage of gacschema, is identical to the 'table' constraint.
-It is difficult to predict which out of 'table' and 'gacschema' will be faster
-for any particular problem.
-*/
 
-/** @help constraints;table References
-help input tuplelist
-help input table
-help input haggisgac
-*/
+
 
 #include "constraint_checkassign.h"
 

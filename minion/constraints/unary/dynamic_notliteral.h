@@ -18,15 +18,9 @@
  * USA.
  */
 
-/** @help constraints;w-notliteral Description
-  The constraint w-notliteral(x, a) ensures that x =/= a.
-*/
 
-/** @help constraints;w-notliteral References
-  See also
 
-  help constraints w-literal
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_UNARY_NOT_INLITERAL_H
 #define CONSTRAINT_DYNAMIC_UNARY_NOT_INLITERAL_H

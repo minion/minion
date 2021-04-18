@@ -18,24 +18,9 @@
  * USA.
  */
 
-/** @help constraints;ineq Description
-The constraint
 
-   ineq(x, y, k)
 
-ensures that
 
-   x <= y + k
-
-in any solution.
-*/
-
-/** @help constraints;ineq Notes
-Minion has no strict inequality (<) constraints. However x < y can be
-achieved by
-
-   ineq(x, y, -1)
-*/
 
 #ifndef CONSTRAINT_LESS_H
 #define CONSTRAINT_LESS_H

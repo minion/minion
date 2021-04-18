@@ -38,29 +38,9 @@ occurrence([primary variables], val2, cap2)
 
 */
 
-/** @help constraints;gcc Example
-Suppose the input file had the following vectors of variables defined:
 
-DISCRETE myVec[9] {1..9}
-BOUND cap[9] {0..2}
 
-The following constraint would restrict the occurrence of values 1..9 in myVec
-to be at most 2 each initially, and finally equal to the values of the cap
-vector.
 
-gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
-*/
-
-/** @help constraints;gcc Notes
-This constraint enforces a hybrid consistency. It reads the bounds of the
-capacity variables, then enforces GAC over the primary variables only.  Then the
-bounds of the capacity variables are updated using flow algorithms similar to
-those proposed by Quimper et al, Improved Algorithms for the Global Cardinality
-Constraint (CP 2004).
-
-This constraint provides stronger propagation to the capacity variables than the
-gccweak constraint.
-*/
 
 #ifndef CONSTRAINT_GCC_H_PQWOEI
 #define CONSTRAINT_GCC_H_PQWOEI

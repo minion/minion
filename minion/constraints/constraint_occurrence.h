@@ -18,59 +18,23 @@
  * USA.
  */
 
-/** @help constraints;occurrence Description
-The constraint
 
-   occurrence(vec, elem, count)
 
-ensures that there are count occurrences of the value elem in the
-vector vec.
-*/
 
-/** @help constraints;occurrence Notes
-elem must be a constant, not a variable.
-*/
 
-/** @help constraints;occurrence References
-help constraints occurrenceleq
-help constraints occurrencegeq
-*/
 
-/** @help constraints;occurrenceleq Description
-The constraint
 
-   occurrenceleq(vec, elem, count)
 
-ensures that there are AT MOST count occurrences of the value elem in
-the vector vec.
-*/
 
-/** @help constraints;occurrenceleq Notes
-elem and count must be constants
-*/
 
-/** @help constraints;occurrenceleq References
-help constraints occurrence
-help constraints occurrencegeq
-*/
 
-/** @help constraints;occurrencegeq Description
-The constraint
 
-   occurrencegeq(vec, elem, count)
 
-ensures that there are AT LEAST count occurrences of the value elem in
-the vector vec.
-*/
 
-/** @help constraints;occurrencegeq Notes
-elem and count must be constants
-*/
 
-/** @help constraints;occurrencegeq References
-help constraints occurrence
-help constraints occurrenceleq
-*/
+
+
+
 
 #ifndef CONSTRAINT_OCCURRENCE_H
 #define CONSTRAINT_OCCURRENCE_H

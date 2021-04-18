@@ -18,19 +18,9 @@
  * USA.
  */
 
-/** @help constraints;element_one Description
-The constraint element one is identical to element, except that the
-vector is indexed from 1 rather than from 0.
-*/
 
-/** @help constraints;element_one References
-See
 
-   help constraints element
 
-for details of the element constraint which is almost identical to this
-one.
-*/
 
 /** @help constraints;element Description
 The constraint
@@ -82,14 +72,7 @@ As a rule of thumb, to get a lower node count, move element constraints
 to the end of the list.
 */
 
-/** @help constraints;element References
-See the entry
 
-   constraints watchelement
-
-for details of an identical constraint that enforces generalised arc
-consistency.
-*/
 
 #ifndef CONSTRAINT_ELEMENT_H_EIFESJKLNDFSNMDFS
 #define CONSTRAINT_ELEMENT_H_EIFESJKLNDFSNMDFS

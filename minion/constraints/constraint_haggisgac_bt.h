@@ -24,26 +24,11 @@
 #include "constraint_haggisgac_tuples.h"
 #include <algorithm>
 
-/** @help constraints;haggisgac-stable Description
-An extensional constraint that enforces GAC. haggisgac-stable
-is a variant of haggisgac which uses less memory in some cases,
-and can also be faster (or slower). The input is identical to
-haggisgac.
-*/
 
-/** @help constraints;haggisgac-stable References
-help constraints haggisgac
-*/
 
-/** @help constraints;haggisgac Description
-An extensional constraint that enforces GAC. This constraint make uses
-of 'short tuples', which allow some values to be marked as don't care.
-When this allows the set of tuples to be reduced in size, this leads to
-performance gains.
 
-The variables used in the constraint have to be BOOL or DISCRETE variables.
-Other types are not supported.
-*/
+
+
 
 /** @help constraints;haggisgac Example
 
@@ -94,12 +79,7 @@ haggisgac([x1,x2,x3,x4], mycon)
 and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 */
 
-/** @help constraints;haggisgac References
-help input shorttuplelist
-help constraints table
-help constraints negativetable
-help constraints shortstr2
-*/
+
 
 // Default will be List.
 // If any special case is defined list will be switched off

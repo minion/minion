@@ -25,14 +25,7 @@ For Licence Information see file LICENSE.txt
  * USA.
  */
 
-/** @help constraints;hamming Description
-The constraint
 
-   hamming(X,Y,c)
-
-ensures that the hamming distance between X and Y is at least c. That is, that
-the size of the set {i | X[i] != y[i]} is greater than or equal to c.
-*/
 
 #ifndef CONSTRAINT_DYNAMIC_SUM_OR_H
 #define CONSTRAINT_DYNAMIC_SUM_OR_H

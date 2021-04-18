@@ -18,12 +18,7 @@
  * USA.
  */
 
-/** @help constraints;shortstr2 Description
-ShortSTR2 is the algorithm described in the IJCAI 2013 paper by Jefferson and
-Nightingale. It is an extension of STR2+ by Christophe Lecoutre, adapted for
-short supports.
 
-*/
 
 /** @help constraints;shortstr2 Example
 
@@ -44,34 +39,15 @@ shortstr2([x1,x2,x3,x4], mycon)
 
 */
 
-/** @help constraints;shortstr2 Notes
-This constraint enforces generalized arc consistency.
-*/
 
-/** @help constraints;shortstr2 References
-help input shorttuplelist
-help constraints table
-help constraints negativetable
-help constraints haggisgac
-help constraints haggisgac-stable
-*/
 
-/** @help constraints;str2plus Description
-str2plus is an implementation of the STR2+ algorithm by Christophe Lecoutre.
-*/
 
-/** @help constraints;str2plus Example
 
-str2plus is invoked in the same way as all other table constraints, such
-as table and mddc.
 
-str2plus([x,y,z], {<1,2,3>, <1,3,2>})
 
-*/
 
-/** @help constraints;shortstr2 Notes
-This constraint enforces generalized arc consistency.
-*/
+
+
 
 #ifndef CONSTRAINT_STR2_H
 #define CONSTRAINT_STR2_H

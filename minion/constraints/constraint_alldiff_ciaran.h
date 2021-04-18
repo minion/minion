@@ -17,13 +17,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-/** @help constraints;alldiffciaran Description
-Forces the input vector of variables to take distinct values. This is for experiment only.
-*/
 
-/** @help constraints;alldiffciaran Notes
-This constraint enforces an unknown consistency.
-*/
+
+
 
 #ifndef CONSTRAINT_ALLDIFF_CIARAN_H
 #define CONSTRAINT_ALLDIFF_CIARAN_H

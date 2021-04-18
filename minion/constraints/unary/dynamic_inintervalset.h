@@ -18,11 +18,7 @@
  * USA.
  */
 
-/** @help constraints;w-inintervalset Description
-The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the value
-of x belongs to one of the intervals  {a1,...,a2}, {b1,...,b2} etc. The list of
-intervals must be given in numerical order.
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_UNARY_ININTERVALSET_H
 #define CONSTRAINT_DYNAMIC_UNARY_ININTERVALSET_H

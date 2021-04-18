@@ -18,17 +18,9 @@
  * USA.
  */
 
-/** @help constraints;pow Description
-The constraint
 
-   pow(x,y,z)
 
-ensures that x^y=z.
-*/
 
-/** @help constraints;pow Notes
-This constraint is only available for positive domains x, y and z.
-*/
 
 #ifndef CONSTRAINT_POW_H
 #define CONSTRAINT_POW_H

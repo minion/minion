@@ -18,29 +18,11 @@
  * USA.
  */
 
-/** @help constraints;lexleq[rv] Description
-  The constraint
 
-  lexle[rv](vec0, vec1)
 
-  takes two vectors vec0 and vec1 of the same length and ensures that
-  vec0 is lexicographically less than or equal to vec1 in any solution.
-*/
 
-/** @help constraints;lexleq[rv] Notes
-  This constraint achieves GAC even when some variables are repeated in
-  vec0 and vec1. However, the extra propagation this achieves is rarely
-  worth the extra work.
-*/
 
-/** @help constraints;lexleq[rv] References
-  See also
 
-  help constraints lexleq[quick]
-
-  for a much faster logically identical constraint, with lower
-  propagation.
-*/
 
 #ifndef CONSTRAINT_GACLEX_H
 #define CONSTRAINT_GACLEX_H

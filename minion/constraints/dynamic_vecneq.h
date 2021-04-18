@@ -25,14 +25,7 @@
 #include "nonlinear_arithmetic/constraint_product.h"
 #include "unary/dynamic_literal.h"
 
-/** @help constraints;watchvecneq Description
-The constraint
 
-   watchvecneq(A, B)
-
-ensures that A and B are not the same vector, i.e., there exists some index i
-such that A[i] != B[i].
-*/
 
 #ifndef _DYNAMIC_VECNEQ_H
 #define _DYNAMIC_VECNEQ_H

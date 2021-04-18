@@ -18,21 +18,9 @@
  * USA.
  */
 
-/** @help variables;discrete Description
-In discrete variables, the domain ranges between the specified lower and upper
-bounds, but during search any domain value may be pruned, i.e., propagation and
-search may punch arbitrary holes in the domain.
-*/
 
-/** @help variables;discrete Example
-Declaration of a discrete variable x with domain {1,2,3,4} in input file:
 
-DISCRETE x {1..4}
 
-Use of this variable in a constraint:
-
-eq(x, 2) #variable x equals 2
-*/
 
 #include "../../triggering/constraint_abstract.h"
 

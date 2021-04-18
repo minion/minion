@@ -18,17 +18,9 @@
  * USA.
  */
 
-/** @help constraints;abs Description
-The constraint
 
-   abs(x,y)
 
-makes sure that x=|y|, i.e. x is the absolute value of y.
-*/
 
-/** @help constraints;abs Reference
-help constraints abs
-*/
 
 #ifndef CONSTRAINT_ABS_H
 #define CONSTRAINT_ABS_H

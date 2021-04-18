@@ -18,15 +18,9 @@
  * USA.
  */
 
-/** @help constraints;watchless Description
-The constraint watchless(x,y) ensures that x is less than y.
-*/
 
-/** @help constraints;watchless References
-  See also
 
-  help constraints ineq
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_LESS_H
 #define CONSTRAINT_DYNAMIC_LESS_H

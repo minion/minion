@@ -18,33 +18,13 @@
  * USA.
  */
 
-/** @help constraints;alldiff Description
-Forces the input vector of variables to take distinct values.
-*/
 
-/** @help constraints;alldiff Example
-Suppose the input file had the following vector of variables defined:
 
-DISCRETE myVec[9] {1..9}
 
-To ensure that each variable takes a different value include the
-following constraint:
 
-alldiff(myVec)
-*/
 
-/** @help constraints;alldiff Notes
-Enforces the same level of consistency as a clique of not equals
-constraints.
-*/
 
-/** @help constraints;alldiff References
-See
 
-   help constraints gacalldiff
-
-for the same constraint that enforces GAC.
-*/
 
 #ifndef CONSTRAINT_NEQ_H
 #define CONSTRAINT_NEQ_H

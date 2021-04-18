@@ -18,72 +18,17 @@
  * USA.
  */
 
-/** @help input Description
 
-Minion expects to be provided with the name of an input file as an
-argument. This file contains a specification of the CSP to be solved
-as well as settings that the search process should use. The format is
 
-Minion3Input::= MINION 3
-                <InputSection>+
-                **EOF**
 
-InputSection::= <VariablesSection>
-              | <SearchSection>
-              | <ConstraintsSection>
-              | <TuplelistSection>
-              | <ShortTuplelistSection>
 
-i.e. 'MINION 3' followed by any number of variable, search,
-constraints and tuplelists sections (can repeat) followed by
-'**EOF**', the end of file marker.
 
-All text from a '#' character to the end of the line is ignored.
 
-See the associated help entries below for information on each section.
-*/
 
-/** @help input Notes
-You can give an input file via standard input by specifying '--' as the file
-name, this might help when minion is being used as a tool in a shell script or
-for compressed input, e.g.,
 
-   gunzip -c myinput.minion.gz | minion
-*/
 
-/** @help input;variables Description
-The variables section consists of any number of variable declarations
-on separate lines.
 
-VariablesSection::= **VARIABLES**
-                    <VarDeclaration>*
-*/
 
-/** @help input;variables Example
- **VARIABLES**
-
-BOOL bool                          #boolean var
-BOUND b {1..3}                     #bounds var
-SPARSEBOUND myvar {1,3,4,6,7,9,11} #sparse bounds var
-DISCRETE d[3] {1..3}               #array of discrete vars
-*/
-
-/** @help input;variables References
-See the help section
-
-   help variables
-
-for detailed information on variable declarations.
-*/
-
-/** @help input;constraints Description
-
-The constraints section consists of any number of constraint
-declarations on separate lines.
-
-ConstraintsSection::= **CONSTRAINTS**
-                      <ConstraintDeclaration>*
-*/
 
 /** @help input;constraints Example
 **CONSTRAINTS**
@@ -91,27 +36,9 @@ eq(bool,0)
 alldiff(d)
 */
 
-/** @help input;constraints References
-See help entries for individual constraints under
 
-   help constraints
 
-for details on constraint declarations.
-*/
 
-/** @help input;tuplelist Description
-A tuplelist section lists of allowed tuples for table constraints
-can be specified. This technique is preferable to specifying the
-tuples in the constraint declaration, since the tuplelists can be
-shared between constraints and named for readability.
-
-The required format is
-
-TuplelistSection::= **TUPLELIST**
-                    <Tuplelist>*
-
-Tuplelist::= <name> <num_tuples> <tupleLength> <numbers>+
-*/
 
 /** @help input;tuplelist Example
 **TUPLELIST**
@@ -122,27 +49,9 @@ AtMostOne 4 3
 1 0 0
 */
 
-/** @help input;tuplelist References
-help constraints table
-help input shorttuplelist
-*/
 
-/** @help input;shorttuplelist Description
-A shorttuplelist section lists of allowed tuples for haggisgac,
-shortstr2, shortctuplestr2 and other constraints which accept
-short tuple lists.
 
-The required format is
 
-TuplelistSection::= **TUPLELIST**
-                    <Tuplelist>*
-
-Tuplelist::= <name> <num_tuples> <shortTuple>+
-
-shortTuple ::= [ <literal>*, ]
-
-literal ::= (<num>, <num>)
-*/
 
 /** @help input;shorttuplelist Example
 **SHORTTUPLELIST**
@@ -188,79 +97,11 @@ The important thing for efficency is to try to give a small list of
 short tuples.
 */
 
-/** @help input;shorttuplelist References
-help constraints haggisgac
-help constraints haggisgac-stable
-help input tuplelist
-*/
 
-/** @help input;search Description
 
-Inside the search section one can specify
 
-- variable orderings,
-- value orderings,
-- optimisation function, and
-- details of how to print out solutions.
 
-   SearchSection::= <VarValOrdering>*
-                    <OptimisationFn>?
-                    <PrintFormat>?
 
-If no varval ordering is given then the variables are assigned in instantiation
-order and the values tried in ascending order.
-
-If a variable order is given as a command line argument it will override
-anything specified in the input file.
-
-Multiple variable orders can be given, each with an optional value ordering:
-
-   VarValOrdering::= <VarOrder>
-                     <ValOrder>?
-
-In each VarOrder an instantiation order is specified for a subset of
-variables. Variables can optionally be \"auxiliary variables\" (add \"AUX\" to
-the varorder) meaning that if there are several solutions to the problem
-differing only in the auxiliary variables, only one is reported by minion.
-
-   VarOrder::= VARORDER AUX? <ORDER>? [ <varname>+ ]
-
-      where
-
-   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT |
-DOMOVERWDEG
-
-The value ordering allows the user to specify an instantiation order
-for the variables involved in the variable order, either ascending (a)
-or descending (d) for each. When no value ordering is specified, the
-default is to use ascending order for every search variable.
-
-   ValOrder::= VALORDER[ (a|d)+ ]
-
-To model an optimisation problem the user can specify to minimise
-or maximise a variable's value, or list of variables (under
-lexicographic ordering)
-
-   OptimisationFn::= MAXIMISING <varname> or <varlist>
-                   | MINIMISING <varname> or <varlist>
-
-Finally, the user can control some aspects of the way solutions are
-printed. By default (no PrintFormat specified) all the variables are
-printed in declaration order. Alternatively a custom vector, or ALL
-variables, or no (NONE) variables can be printed. If a matrix or, more
-generally, a tensor is given instead of a vector, it is automatically
-flattened into a vector as described in 'help variables vectors'.
-
-   PrintFormat::= PRINT <vector>
-                | PRINT ALL
-                | PRINT NONE
-*/
-
-/** @help input;search References
-See also
-
-   switches -varorder
-*/
 
 /** @help input;example Example
 Below is a complete minion input file with commentary, as an example.

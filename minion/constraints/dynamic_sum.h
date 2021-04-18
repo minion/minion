@@ -25,47 +25,19 @@
   that method or not.    It saves going through the whole clause.
  */
 
-/** @help constraints;watchsumgeq Description
-  The constraint watchsumgeq(vec, c) ensures that sum(vec) >= c.
-*/
 
-/** @help constraints;watchsumgeq Notes
-  For this constraint, small values of c are more efficient.
 
-  Equivalent to litsumgeq(vec, [1,...,1], c), but faster.
 
-  This constraint works on 0/1 variables only.
-*/
 
-/** @help constraints;watchsumgeq Reifiability
-  This constraint is not reifiable.
-*/
 
-/** @help constraints;watchsumgeq References
-  See also
 
-  help constraints watchsumleq
-  help constraints litsumgeq
-*/
 
-/** @help constraints;watchsumleq Description
-  The constraint watchsumleq(vec, c) ensures that sum(vec) <= c.
-*/
 
-/** @help constraints;watchsumleq Notes
-  Equivalent to litsumgeq([vec1,...,vecn], [0,...,0], n-c) but faster.
 
-  This constraint works on binary variables only.
 
-  For this constraint, large values of c are more efficient.
-*/
 
-/** @help constraints;watchsumleq References
-  See also
 
-  help constraints watchsumgeq
-  help constraints litsumgeq
-*/
+
 
 #ifndef CONSTRAINT_DYNAMIC_SUM_H
 #define CONSTRAINT_DYNAMIC_SUM_H

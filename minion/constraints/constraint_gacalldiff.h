@@ -18,24 +18,11 @@
  * USA.
  */
 
-/** @help constraints;gacalldiff Description
-Forces the input vector of variables to take distinct values.
-*/
 
-/** @help constraints;gacalldiff Example
-Suppose the input file had the following vector of variables defined:
 
-DISCRETE myVec[9] {1..9}
 
-To ensure that each variable takes a different value include the
-following constraint:
 
-gacalldiff(myVec)
-*/
 
-/** @help constraints;gacalldiff Notes
-This constraint enforces generalized arc consistency.
-*/
 
 #ifndef CONSTRAINT_GACALLDIFF_H
 #define CONSTRAINT_GACALLDIFF_H

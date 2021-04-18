@@ -204,15 +204,17 @@ To add the solutions of myproblem.minion to mysols.txt:
    minion -solsout mysols.txt myproblem.minion
 
 Less common flags
-~~~~~~~~~~~~~~~~~
+-----------------
 
--outputCompressedDomains ^^^^^^^^^^^^^^^^
+-outputCompressedDomains
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 Try to reduce the initial domains of variables, and output them. This is
 in general not useful for users, but is provided as a pre-preprocessing
 step for other systems.
 
--outputCompressed ^^^^^^^^^^^^^^^^
+-outputCompressed
+~~~~~~~~~~~~~~~~~
 
 Output a Minion instance with some basic reasoning performed to reduce
 the size of the file. This file should produce identical output the
