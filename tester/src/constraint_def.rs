@@ -63,7 +63,7 @@ impl Tuples {
 
 fn random_in_range(low: i64, high: i64) -> i64 {
     let mut rng = rand::thread_rng();
-    rng.gen_range(low, high)
+    rng.gen_range(low..=high)
 }
 
 pub fn random_sublist(list: &[i64]) -> Vec<i64> {
@@ -236,7 +236,7 @@ impl ConstraintInstance {
     }
 
     fn check_tuple(&self, tup: &[i64]) -> bool {
-        let mut slices: ArrayVec<[&[i64]; 16]> = ArrayVec::new();
+        let mut slices: ArrayVec<&[i64], 16> = ArrayVec::new();
         let mut place: usize = 0;
         for var in self.vars().iter() {
             let i = var.len();
