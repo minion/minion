@@ -1,0 +1,54 @@
+name: Create Release Builds
+
+on:
+  push:
+    tags:
+      - "v*" # matches v1.0.1, v1.2, v2, etc
+
+jobs:
+  once:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create a release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: true
+
+  build:
+    name: Create cross-platform release build, tag and upload binaries
+    needs: once
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Build release version
+      run: |
+        mkdir bin
+        cd bin
+        ../configure.py
+        make minion -j2
+    - name: Make Zip
+      run: 
+        7z a -tzip ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip ${{ github.workspace }}/bin/minion
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.once.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip
+        asset_name: minion-${{ matrix.os }}.zip
+        asset_content_type: application/octet-stream
