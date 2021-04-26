@@ -182,6 +182,10 @@ verbose_print(1, "Minion base dir: " + scriptdir)
 commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
+# Enable big 64-bit applications
+if platform.system() == 'Windows':
+    commandargs = commandargs + ['-m64' ,'-Wa,-mbig-obj']
+
 for c in ['domains64', 'quick', 'debug', 'print', 'info', 'profile', 'static']:
     if getattr(arg, c) != None:
         commandargs = commandargs + getattr(arg, c)
