@@ -55,7 +55,6 @@ struct TabSearchManager : public StandardSearchManager {
 
   // Most basic search procedure
   virtual void search() {
-    std::cout << "In -X-tabulation search..." << std::endl;
     maybe_print_node();
     
     //  added for tabulation mode.
@@ -86,6 +85,8 @@ struct TabSearchManager : public StandardSearchManager {
       num_vals[i]=n;
     }
     
+    long fails=0;
+    
     while(true) {
       D_ASSERT(getQueue().isQueuesEmpty());
       
@@ -114,7 +115,7 @@ struct TabSearchManager : public StandardSearchManager {
             std::cout << an << " final: " << final_an << " nodelim:" << getOptions().nodelimit <<  "  prop: "<< prop <<std::endl;
             if(prop<1.0) {
               //  Bail out with a message to SR, stopped by failed progress check. 
-              std::cout <<  "STOP-PC\n" << std::endl;
+              std::cout <<  "STOP-PC" << std::endl;
               return;
             }
         }
@@ -140,6 +141,9 @@ struct TabSearchManager : public StandardSearchManager {
         maybe_print_node();
         branch_left(varval);
         prop->prop(varArray);
+        if(getState().isFailed()) {
+          fails++;
+        }
       }
       
       // loop to
@@ -151,6 +155,10 @@ struct TabSearchManager : public StandardSearchManager {
         maybe_print_backtrack();
         bool flag = branch_right();
         if(!flag) { // No remaining left branches to branch right.
+          //std::cout << "prop fails:" << fails <<std::endl;
+          if(fails==0) {
+            std::cout << "STOP-BTFREE" << std::endl;
+          }
           return;
         }
         getState().incrementBacktrackCount();
