@@ -20,6 +20,7 @@
 
 #include "../system/system.h"
 #include "SearchManager.h"
+#include "TabSearchManager.h"
 #include "variable_orderings.h"
 
 namespace Controller {
@@ -134,9 +135,16 @@ shared_ptr<SearchManager> makeSearch_manager(PropagationLevel propMethod,
   }
 
   // need to switch here for different search algorthms. plain, parallel, group
-  shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p, standardTime_ctrlc_checks,
+  
+  if(getOptions().tabulationMode) {
+    shared_ptr<SearchManager> sm(new TabSearchManager(vo, p, standardTime_ctrlc_checks,
                                                          standard_dealWith_solution, opt_handler));
-
-  return sm;
+    return sm;
+  }
+  else {
+    shared_ptr<SearchManager> sm(new StandardSearchManager(vo, p, standardTime_ctrlc_checks,
+                                                         standard_dealWith_solution, opt_handler));
+    return sm;
+  }
 }
 } // namespace Controller
