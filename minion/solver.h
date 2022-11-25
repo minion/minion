@@ -321,6 +321,8 @@ public:
   // Gather AMOs
   bool gatherAMOs = false;
   bool gatherAMOsExtra = false;
+  // Special search procedure for tabulation -- i.e. generating a table constraint.
+  bool tabulationMode = false;
 
   // How (if at all) to autogenerate short tuples from long ones.
   MapLongTuplesToShort map_long_short;
