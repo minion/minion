@@ -55,6 +55,10 @@ struct TabSearchManager : public StandardSearchManager {
 
   // Most basic search procedure
   virtual void search() {
+    if(getOptions().sollimit>0) {
+      getOptions().sollimit=getOptions().sollimit+2;   //  Hack to stop Minion's sol limit triggering, so I can catch that case in here. 
+    }
+    
     maybe_print_node();
     
     //  added for tabulation mode.
@@ -121,7 +125,17 @@ struct TabSearchManager : public StandardSearchManager {
         }
       }
       
-      check_func(varArray, branches);
+      // Doesn't do usual checks from StandardSearch
+      //check_func(varArray, branches);
+      
+      if(getState().getNodeCount()>getOptions().nodelimit) {
+        std::cout << "STOP-NC" << std::endl;
+        return;
+      }
+      if(getOptions().sollimit>0 && getState().getSolutionCount()>getOptions().sollimit-2) {
+        std::cout << "STOP-SC" << std::endl;
+        return;
+      }
       
       pair<SysInt, DomainInt> varval = varOrder->pickVarVal();
 
