@@ -27,6 +27,7 @@
 
 #include "constraint_checkassign.h"
 #include <math.h>
+#include <limits>
 
 template <typename VarArray, typename VarResult>
 struct LessEqualNvalueConstraint : public AbstractConstraint {
@@ -168,8 +169,8 @@ struct GreaterEqualNvalueConstraint : public AbstractConstraint {
 
   void propagateImpl() {
     std::set<DomainInt> assigned;
-    DomainInt min_unassigned = INT_MAX;
-    DomainInt max_unassigned = INT_MIN;
+    DomainInt min_unassigned = std::numeric_limits<int>::max();
+    DomainInt max_unassigned = std::numeric_limits<int>::min();
     DomainInt unassignedCount = 0;
     for(unsigned i = 0; i < vars.size(); ++i) {
       if(vars[i].isAssigned()) {
