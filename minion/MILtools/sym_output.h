@@ -21,8 +21,7 @@
 #include <algorithm>
 #include <cmath>
 #include <set>
-
-#include <limits.h> /* INT_MIN, INT_MAX */
+#include <limits>
 
 std::vector<std::vector<DomainInt>> build_graph(std::vector<std::set<SysInt>> graph,
                                                 const std::vector<std::set<SysInt>>& partition);
@@ -682,8 +681,8 @@ struct InstanceStats {
     case CT_GACALLDIFF: {
       (*alldiff)++;
       SysInt num = 0;
-      DomainInt upper = INT_MIN;
-      DomainInt lower = INT_MAX;
+      DomainInt upper = std::numeric_limits<int>::min();
+      DomainInt lower = std::numeric_limits<int>::max();
       for(SysInt j = 0; j < (SysInt)i.vars.size(); j++) {
         for(SysInt k = 0; k < (SysInt)i.vars[j].size(); k++) {
           num++;
