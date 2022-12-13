@@ -14,6 +14,7 @@
 #include <functional>
 #include <iostream>
 #include <istream>
+#include <limits>
 #include <list>
 #include <map>
 #include <memory>
