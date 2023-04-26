@@ -177,6 +177,9 @@ struct TabSearchManager : public StandardSearchManager {
         }
         getState().incrementBacktrackCount();
         prop->prop(varArray);
+        if(getState().isFailed()) {
+          fails++;
+        }
       }
     }
   }
