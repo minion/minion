@@ -1,9 +1,7 @@
-#include "../minion.h"
-/* Minion Constraint Solver
-   http://minion.sourceforge.net
+// Minion https://github.com/minion/minion
+// SPDX-License-Identifier: MPL-2.0
 
-   For Licence Information see file LICENSE.txt
-*/
+#include "../minion.h"
 
 #include "../constraints/constraint_alldiff_ciaran.h"
 
