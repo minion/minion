@@ -9,8 +9,8 @@ strategy:
       imageName: 'ubuntu-latest'
     mac:
       imageName: 'macos-latest'
-    windows:
-      imageName: 'vs2017-win2016'
+#    windows:
+#      imageName: 'windows-2022'
 
 trigger:
 - master
@@ -22,7 +22,7 @@ steps:
 - bash: |
     mkdir bin-quick
     cd bin-quick
-    python2 ../configure.py --quick
+    python3 ../configure.py --quick
     make -j2
   displayName: 'make'
 - bash: |
