@@ -77,7 +77,7 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
 
 }
 
-int main(int argc, char** argv) {
+int minion_main(int argc, char** argv) {
   // Wrap main in a try/catch just to stop exceptions leaving main,
   // as windows gets really annoyed when that happens.
   try {
