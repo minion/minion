@@ -450,4 +450,4 @@ with open(outname, "w") as out:
         if arg.buildsystem == "make":
             out.write('libminion.a: $(CONOBJS) $(MINLIBOBJS)\n')
         out.write('\t' + 'ar rcs libminion.a' +
-                varsub('MINLIBOBJS') + '\n')
+                varsub('MINLIBOBJS') + varsub('CONOBJS') + '\n')
