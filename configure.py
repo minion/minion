@@ -132,6 +132,9 @@ parser.add_argument('--print', action='store_const', const=['-DMINION_DEBUG_PRIN
 parser.add_argument('--info', action='store_const', const=['-DMORE_SEARCH_INFO'],
                     help="Print info..")
 
+parser.add_argument('--library', action='store_true',
+                    help="Create libminion (requires buildsystem is 'make')")
+
 parser.add_argument('--unoptimised', action='store_true',
                     help="Disable optimisation")
 
@@ -210,6 +213,9 @@ if not arg.unoptimised:
             commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
         else:
             commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
+
+if arg.library:
+    commandargs = commandargs + ["-fPIC"]
 
 if arg.compiler:
     compiler = arg.compiler
@@ -297,7 +303,7 @@ for c in constraints:
         constraintsrclist.append(srcname)
         with open(srcname, "w") as conout:
             conout.write("// Minion constraint file\n")
-            
+
     varcount = sum([ m in ["read_list", "read_var", "read_2_vars"] for m in c["args"]])
     with open(srcname, "a") as conout:
         conout.write('#include "minion.h"\n')
@@ -342,7 +348,7 @@ with open(outsrcdir+"ConstraintEnum.h", "w") as enum:
 with open(outsrcdir+"BuildDefines.h", "w") as defs:
     defs.write('#define GIT_VER ' + getGitVersion() + '\n')
 
-minionsrclist = ['minion/BuildVariables.cpp',
+minionlibsrclist = ['minion/BuildVariables.cpp',
 'minion/BuildCSP.cpp',
 'minion/commandline_parse.cpp',
 'minion/debug_functions.cpp',
@@ -362,7 +368,7 @@ minionsrclist = ['minion/BuildVariables.cpp',
 'minion/command_search.cpp',
 ]
 
-
+minionbinsrclist = minionlibsrclist + ['minion/main.cpp']
 
 if arg.buildsystem == "make":
     outname = currentdir + "/Makefile"
@@ -383,11 +389,13 @@ else:
     print("Build system not supported")
     sys.exit(1)
 
+constraintobjlist = [objname(x) for x in constraintsrclist]
+minionlibobjlist = [objname(x) for x in minionlibsrclist]
+minionbinobjlist = [objname(x) for x in minionbinsrclist]
+print(minionbinsrclist)
+print(minionbinobjlist)
+
 with open(outname, "w") as out:
-    constraintobjlist = [objname(x) for x in constraintsrclist]
-    minionobjlist = [objname(x) for x in minionsrclist]
-    print(minionsrclist)
-    print(minionobjlist)
     if arg.buildsystem == "sh":
         out.write("#!/usr/bin/env bash\n")
 
@@ -395,23 +403,26 @@ with open(outname, "w") as out:
         commandargs = commandargs + ["-MD", "-MP"]
 
     out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
-    
+
     if arg.buildsystem != "tup":
         out.write('CONSRCS=' + qw + ' '.join(constraintsrclist)+ qw +'\n')
         out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
-        out.write('MINOBJS=' + qw + ' '.join(minionobjlist)+ qw +'\n')
-    
+        out.write('MINLIBOBJS=' + qw + ' '.join(minionlibobjlist)+ qw +'\n')
+        out.write('MINBINOBJS=' + qw + ' '.join(minionbinobjlist)+ qw +'\n')
+
     if arg.buildsystem == "tup":
         out.write(": foreach ")
-        out.write(" ".join(constraintsrclistshort + ["src/BuildStaticStart.cpp"] + [ "../"+i for i in minionsrclist]))
+        out.write(" ".join(constraintsrclistshort + ["src/BuildStaticStart.cpp"] + [ "../"+i for i in minionbinsrclist]))
         out.write(" |> ")
         out.write(compiler + ' ' + varsub('FLAGS') + ' -c %f -o %o |> bin/%B.o\n')
         out.write(': bin/*.o |> ' + compiler + ' ' + varsub('FLAGS') + '%f -o %o |> minion\n')
         sys.exit(0)
-        
-    
+
     if arg.buildsystem == "make":
-        out.write('all : minion\n')
+        if arg.library:
+            out.write('all: minion libminion.a\n')
+        else:
+            out.write('all: minion\n')
 
     if arg.buildsystem == "make":
         out.write("-include $(CONOBJS:.o=.d)\n")
@@ -423,13 +434,20 @@ with open(outname, "w") as out:
         out.write('\t'+compiler+' '+varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + i +'\n')
 
-    for i in minionsrclist:
+    for i in minionbinsrclist:
         if arg.buildsystem == "make":
             out.write(objname(i)+ " :\n")
             # out.write(objname(i)+ " : " + scriptdir + "/" + i +'\n')
         out.write('\t'+compiler+' ' + varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + scriptdir + "/" + i +'\n')
+
     if arg.buildsystem == "make":
-        out.write('minion: $(CONOBJS) $(MINOBJS)\n')
+        out.write('minion: $(CONOBJS) $(MINBINOBJS)\n')
     out.write('\t' + compiler + ' ' + varsub('FLAGS') + varsub('CONOBJS') +
-               varsub('MINOBJS') + ' -pthread -o minion\n')
+            varsub('MINBINOBJS') + ' -pthread -o minion\n')
+
+    if arg.library:
+        if arg.buildsystem == "make":
+            out.write('libminion.a: $(CONOBJS) $(MINLIBOBJS)\n')
+        out.write('\t' + 'ar rcs libminion.a' +
+                varsub('MINLIBOBJS') + '\n')
