@@ -162,7 +162,7 @@ scriptdir = os.path.relpath(os.path.dirname(os.path.realpath(__file__)), current
 outsrcdir = "src/"
 objdir = "bin/"
 
-if scriptdir == currentdir:
+if os.path.realpath(scriptdir) == os.path.realpath(currentdir):
     fatal_error("ERROR: Can't build Minion in it's source directory\n",
                 "Run this script from another directory, for example:\n",
                 "mkdir bin; cd bin; ../configure.py")
