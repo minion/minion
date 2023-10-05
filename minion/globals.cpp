@@ -11,8 +11,13 @@
 #define IN_MAIN
 #endif
 
+#include "globals.h"
 #include "minion.h"
 
 #include "constraint_defs.h"
+
+#ifdef LIBMINION
+Globals* globals = new Globals();
+#endif
 
 SysInt numOfConstraints = sizeof(constraint_list) / sizeof(ConstraintDef);

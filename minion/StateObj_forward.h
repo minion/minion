@@ -20,6 +20,7 @@ inline VariableContainer& getVars();
 
 namespace Parallel {
 struct ParallelData;
-inline ParallelData& getParallelData();
 } // namespace Parallel
+  //
+inline Parallel::ParallelData& getParallelData();
 #endif

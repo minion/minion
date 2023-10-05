@@ -10,8 +10,6 @@
 #define PARALLEL
 #endif
 
-
-
 #include <atomic>
 #include <signal.h>
 
@@ -75,7 +73,6 @@ bool shouldDoFork() {
   }
 }
 
-
 bool isAlarmActivated() {
   return getParallelData().alarmTrigger;
 }
@@ -136,7 +133,6 @@ ParallelData* setupParallelData() {
   return pd;
 }
 
-
 int doFork() {
   forkEverCalled = true;
   int f = fork();
@@ -190,8 +186,7 @@ void endParallelMinion() {
       exit(1);
     }
 
-    if(getParallelData().processCount != getParallelData().initialProcessCount + 1)
-    {
+    if(getParallelData().processCount != getParallelData().initialProcessCount + 1) {
       std::cerr << "**ERROR ERROR ERROR ERROR***\n";
       std::cerr << "**AT LEAST ONE CHILD PROCESS WAS LOST**\n";
       std::cerr << "**THE SEARCH IS INCOMPLETE**\n";
@@ -205,16 +200,13 @@ void endParallelMinion() {
   }
 }
 
-}
-
+} // namespace Parallel
 
 #else
 
 namespace Parallel {
 
-void endParallelMinion() {
-
-}
+void endParallelMinion() {}
 
 int doFork() {
   D_FATAL_ERROR("This Minion was built without parallelisation");

@@ -76,14 +76,41 @@
 
 using namespace std;
 
+/*
+ * When using as a library, store globals on heap.
+ * This allows them to be easily reinitialised for multiple runs.
+ *
+ * This globals struct is initialised in globals.cpp.
+ *
+ * For simplicity, it contains set fields that should be hardcoded in.
+ */
+
 #ifndef IN_MAIN
+
+#ifdef LIBMINION
+#define VARDEF_ASSIGN(x, y) extern Globals* globals
+#define VARDEF(x) extern Globals* globals
+#else
 #define VARDEF_ASSIGN(x, y) extern x
 #define VARDEF(x) extern x
-#else
+#endif
+
+#else /* IN MAIN */
+
+#ifdef LIBMINION
+#define VARDEF_ASSIGN(x, y)
+#define VARDEF(x)
+#else 
 #define VARDEF_ASSIGN(x, y) x(y)
 #define VARDEF(x) x
+#endif
 #endif
 
 #define BOOL bool
 
+#ifdef LIBMINION
+#define GET_GLOBAL(x) (::globals->x)
+#else
+#define GET_GLOBAL(x) x
+#endif
 #endif

@@ -1,22 +1,12 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
-
-
-
-
-
-
-
-
 /* @help switches;-varorder Example
 To use smallest domain first ordering (probably the most sensible of
 the available orderings) do:
 
    minion -varorder sdf myinput.minion
 */
-
-
 
 #include "commandline_parse.h"
 #include "search_dump.hpp"
@@ -37,8 +27,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().findAllSolutions();
     }
 
-
-
     else if(command == string("-quiet")) {
       getOptions().parserVerbose = false;
     }
@@ -50,8 +38,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-outputCompressedDomains")) {
       getOptions().outputCompressedDomains = true;
     }
-
-
 
     else if(command == string("-outputCompressed")) {
       INCREMENT_i(-outputCompressed);
@@ -79,15 +65,9 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().printonlyoptimal = true;
     }
 
-
-
     else if(command == string("-verbose")) {
       getOptions().parserVerbose = true;
     }
-
-
-
-
 
     else if(command == string("-prop-node") || command == string("-X-prop-node")) {
       INCREMENT_i(-X - prop - node);
@@ -114,23 +94,15 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       }
     }
 
-
-
-
-
     else if(command == string("-preprocess")) {
       INCREMENT_i(-preprocess);
       string prop_mode(argv[i]);
       args.preprocess = GetPropMethodFromString(prop_mode);
     }
 
-
-
     else if(command == string("-nocheck")) {
       getOptions().nocheck = true;
     }
-
-
 
     else if(command == string("-check")) {
       getOptions().nocheck = false;
@@ -157,8 +129,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().dumptreeobj = makeDumpTreeSQL();
     }
 
-
-
     else if(command == string("-nodelimit")) {
       INCREMENT_i(-nodelimit);
       try {
@@ -171,8 +141,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       }
     }
 
-
-
     else if(command == string("-sollimit")) {
       INCREMENT_i(-sollimit);
       try {
@@ -184,8 +152,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         exit(1);
       }
     }
-
-
 
     else if(command == string("-timelimit")) {
       INCREMENT_i(-timelimit);
@@ -210,8 +176,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
               "care\n";
       getOptions().ensureBranchOnAllVars = false;
     }
-
-
 
     else if(command == string("-cpulimit")) {
       INCREMENT_i(-cpulimit);
@@ -287,7 +251,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       }
     }
 
-
     else if(command == string("-randomiseorder")) {
       getOptions().randomiseValvarorder = true;
     }
@@ -296,8 +259,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-randomseed);
       args.randomSeed = atoi(argv[i]);
     }
-
-
 
     else if(command == string("-tableout") || command == string("-tableout0")) {
       getOptions().tableout = true;
@@ -309,22 +270,19 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getTableOut().set_json_filename(argv[i]);
     }
 
-
-
     else if(command == string("-solsout") || command == string("-solsout0")) {
       if(getOptions().solsoutWrite) {
         outputFatalError("Cannot give two of -jsonsolsout and -solsout");
       }
       getOptions().solsoutWrite = true;
       INCREMENT_i(-solsout);
-      solsoutFile.open(argv[i], ios::app);
-      if(!solsoutFile) {
+      GET_GLOBAL(solsoutfile).open(argv[i], ios::app);
+      if(!GET_GLOBAL(solsoutfile)) {
         ostringstream oss;
         oss << "Cannot open '" << argv[i] << "' for writing.";
         outputFatalError(oss.str());
       }
     }
-
 
     else if(command == string("-jsonsolsout")) {
       if(getOptions().solsoutWrite) {
@@ -333,8 +291,8 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().solsoutWrite = true;
       getOptions().solsoutJson = true;
       INCREMENT_i(-jsonsolsout);
-      solsoutFile.open(argv[i], ios::app);
-      if(!solsoutFile) {
+      GET_GLOBAL(solsoutfile).open(argv[i], ios::app);
+      if(!GET_GLOBAL(solsoutfile)) {
         ostringstream oss;
         oss << "Cannot open '" << argv[i] << "' for writing.";
         outputFatalError(oss.str());
@@ -375,14 +333,12 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().split = true;
       getOptions().noresumefile = false;
       getOptions().splitstderr = true;
-    }
-    else if(command == string("-command-list")) {
-      INCREMENT_i(-command-list);
+    } else if(command == string("-command-list")) {
+      INCREMENT_i(-command - list);
       getOptions().commandlistIn = argv[i];
-      INCREMENT_i(-command-list);
+      INCREMENT_i(-command - list);
       getOptions().commandlistOut = argv[i];
-    }
-    else if(command == string("-restarts")) {
+    } else if(command == string("-restarts")) {
       getOptions().restart.active = true;
     } else if(command == string("-restarts-multiplier")) {
       INCREMENT_i("restarts multiplier");

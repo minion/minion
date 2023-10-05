@@ -10,6 +10,8 @@
 #define DOM_ASSERT
 #endif
 
+#include "globals_forward.h"
+
 #include "minlib/minlib.hpp"
 
 #include "box-helper.h"

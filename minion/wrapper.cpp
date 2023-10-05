@@ -8,4 +8,6 @@
 #include <minion.h>
 #include <wrapper.h>
 
+extern Globals* globals;
+
 void resetMinion() {}

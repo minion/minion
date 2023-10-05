@@ -6,6 +6,7 @@
 
 #include "StateObj_forward.h"
 
+#include "globals.h"
 #include "parallel/parallel.h"
 
 VARDEF(Memory searchMem_m);
@@ -15,53 +16,103 @@ VARDEF(Queues queues_m);
 VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
 
+/*
+ * Libminion case:
+ *
+ * Pointer trickery as compiler doesnt like globals.x when there are still
+ * incomplete types (such as SearchOptions, ...).
+ *
+ * Tried rearranging headerfiles, didn't work, so am lazily creating them when referenced.
+ * instead.
+ */
+
 inline BoolContainer& getBools() {
-  return bools_m;
+#ifdef LIBMINION
+  if(GET_GLOBAL(bools_m) == 0) {
+    GET_GLOBAL(bools_m) = new BoolContainer();
+  }
+  return *GET_GLOBAL(bools_m);
+#else
+  return GET_GLOBAL(bools_m);
+#endif
 }
 inline SearchOptions& getOptions() {
-  return options_m;
+#ifdef LIBMINION
+  if(GET_GLOBAL(options_m) == 0) {
+    GET_GLOBAL(options_m) = new SearchOptions();
+  }
+  return *GET_GLOBAL(options_m);
+#else
+  return GET_GLOBAL(options_m);
+#endif
 }
 inline SearchState& getState() {
-  return state_m;
+#ifdef LIBMINION
+  if(GET_GLOBAL(state_m) == 0) {
+    GET_GLOBAL(state_m) = new SearchState();
+  }
+  return *GET_GLOBAL(state_m);
+#else
+  return GET_GLOBAL(state_m);
+#endif
 }
 inline Queues& getQueue() {
-  return queues_m;
+#ifdef LIBMINION
+  if(GET_GLOBAL(queues_m) == 0) {
+    GET_GLOBAL(queues_m) = new Queues();
+  }
+  return *GET_GLOBAL(queues_m);
+#else
+  return GET_GLOBAL(queues_m);
+#endif
 }
 inline Memory& getMemory() {
-  return searchMem_m;
+#ifdef LIBMINION
+  if(GET_GLOBAL(searchMem_m) == 0) {
+    GET_GLOBAL(searchMem_m) = new Memory();
+  }
+  return *GET_GLOBAL(searchMem_m);
+#else
+  return GET_GLOBAL(searchMem_m);
+#endif
 }
 inline VariableContainer& getVars() {
-  return varContainer_m;
-}
-
-namespace Parallel {
-VARDEF(ParallelData* parData_m);
-
-inline ParallelData& getParallelData() {
-  if(parData_m == 0) {
-    parData_m = setupParallelData();
+#ifdef LIBMINION
+  if(GET_GLOBAL(varContainer_m) == 0) {
+    GET_GLOBAL(varContainer_m) = new VariableContainer();
   }
-  return *parData_m;
+  return *GET_GLOBAL(varContainer_m);
+#else
+  return GET_GLOBAL(varContainer_m);
+#endif
 }
-} // namespace Parallel
+
+VARDEF(Parallel::ParallelData* parData_m);
+inline Parallel::ParallelData& getParallelData() {
+
+  if(GET_GLOBAL(parData_m) == 0) {
+    GET_GLOBAL(parData_m) = Parallel::setupParallelData();
+  }
+  return *GET_GLOBAL(parData_m);
+}
 
 template <typename DomType>
 inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static() {
-  return varContainer_m.boundVarContainer;
+  return getVars().boundVarContainer;
 }
 
 inline BoolVarContainer& BoolVarRef_internal::getCon_Static() {
-  return varContainer_m.boolVarContainer;
+  return getVars().boolVarContainer;
 }
 
 template <typename DomType>
 inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static() {
-  return varContainer_m.sparseBoundVarContainer;
+  return getVars().sparseBoundVarContainer;
 }
 
 template <typename d_type>
 inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::getCon_Static() {
-  return varContainer_m.bigRangeVarContainer;
+  return getVars().bigRangeVarContainer;
 }
 
 // Must be defined later.
