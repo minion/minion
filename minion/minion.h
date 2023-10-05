@@ -24,7 +24,7 @@ static const char MinionVersion[] = "Minion Version 2";
 //  not the current global revision
 #include "get_info/get_info.h"
 #include "solver.h"
-VARDEF(ofstream solsoutFile);
+VARDEF(ofstream solsoutfile);
 
 #include "memory_management/MemoryBlock.h"
 
