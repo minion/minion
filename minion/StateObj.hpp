@@ -28,7 +28,7 @@ VARDEF(BoolContainer bools_m);
 
 inline BoolContainer& getBools() {
 #ifdef LIBMINION
-  if(GET_GLOBAL(bools_m) == 0) {
+  if(!GET_GLOBAL(bools_m)) {
     GET_GLOBAL(bools_m) = new BoolContainer();
   }
   return *GET_GLOBAL(bools_m);
@@ -38,7 +38,7 @@ inline BoolContainer& getBools() {
 }
 inline SearchOptions& getOptions() {
 #ifdef LIBMINION
-  if(GET_GLOBAL(options_m) == 0) {
+  if(!GET_GLOBAL(options_m)) {
     GET_GLOBAL(options_m) = new SearchOptions();
   }
   return *GET_GLOBAL(options_m);
@@ -48,7 +48,7 @@ inline SearchOptions& getOptions() {
 }
 inline SearchState& getState() {
 #ifdef LIBMINION
-  if(GET_GLOBAL(state_m) == 0) {
+  if(!GET_GLOBAL(state_m)) {
     GET_GLOBAL(state_m) = new SearchState();
   }
   return *GET_GLOBAL(state_m);
@@ -58,7 +58,7 @@ inline SearchState& getState() {
 }
 inline Queues& getQueue() {
 #ifdef LIBMINION
-  if(GET_GLOBAL(queues_m) == 0) {
+  if(!GET_GLOBAL(queues_m)) {
     GET_GLOBAL(queues_m) = new Queues();
   }
   return *GET_GLOBAL(queues_m);
@@ -68,7 +68,7 @@ inline Queues& getQueue() {
 }
 inline Memory& getMemory() {
 #ifdef LIBMINION
-  if(GET_GLOBAL(searchMem_m) == 0) {
+  if(!GET_GLOBAL(searchMem_m)) {
     GET_GLOBAL(searchMem_m) = new Memory();
   }
   return *GET_GLOBAL(searchMem_m);
@@ -78,7 +78,7 @@ inline Memory& getMemory() {
 }
 inline VariableContainer& getVars() {
 #ifdef LIBMINION
-  if(GET_GLOBAL(varContainer_m) == 0) {
+  if(!GET_GLOBAL(varContainer_m)) {
     GET_GLOBAL(varContainer_m) = new VariableContainer();
   }
   return *GET_GLOBAL(varContainer_m);
