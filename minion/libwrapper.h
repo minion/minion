@@ -15,6 +15,6 @@
  *
  */
 void resetMinion();
-
+int minion_main(int argc, char** argv);
 
 #endif

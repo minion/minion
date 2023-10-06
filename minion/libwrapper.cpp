@@ -5,9 +5,15 @@
  * Functions for using minion as a library.
  */
 
-#include <minion.h>
-#include <wrapper.h>
+#include "libwrapper.h"
+#include "minion.h"
 
+#if LIBMINION
 extern Globals* globals;
 
-void resetMinion() {}
+void resetMinion() {
+  delete globals;
+  globals = new Globals();
+}
+
+#endif

@@ -18,7 +18,7 @@
 
 #include "basic_headers.h"
 
-#include "wrapper.h"
+#include "./wrapper.h"
 
 #include "sys_constants.h"
 

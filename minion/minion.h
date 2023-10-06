@@ -3,9 +3,8 @@
 #ifndef MINION_H
 #define MINION_H
 
-#include "system/system.h"
-
 #include "BuildDefines.h"
+#include "system/system.h"
 
 #include "globals.h"
 

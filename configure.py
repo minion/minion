@@ -367,7 +367,7 @@ minionlibsrclist = ['minion/BuildVariables.cpp',
 'minion/search_dump.cpp',
 'minion/search_dump_sql.cpp',
 'minion/command_search.cpp',
-'minion/wrapper.cpp'
+'minion/libwrapper.cpp'
 ]
 
 minionbinsrclist = minionlibsrclist + ['minion/main.cpp']
