@@ -8,12 +8,9 @@
 #include "libwrapper.h"
 #include "minion.h"
 
-#if LIBMINION
 extern Globals* globals;
 
 void resetMinion() {
-  delete globals;
   globals = new Globals();
+  // TODO: delete
 }
-
-#endif
