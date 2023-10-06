@@ -18,7 +18,6 @@ struct Globals {
   /*
    * Pointer trickery as compiler doesnt like globals.x when there are still
    * incomplete types (such as SearchOptions, ...).
-   *
    * Tried rearranging headerfiles, didn't work, so am lazily creating them when referenced.
    * instead in StateObj.hpp.
    */
@@ -37,13 +36,11 @@ public:
   }
 
   ~Globals() {
-    delete searchMem_m;
-    delete options_m;
-    delete state_m;
-    delete queues_m;
-    delete varContainer_m;
-    delete bools_m;
-    delete parData_m;
+    /*
+     * FIXME: 
+     * Unfortunately can't be deconstructed properly - 
+     * see libwrapper.cpp:resetMinion
+     */
   }
 };
 
