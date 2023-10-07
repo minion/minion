@@ -192,6 +192,13 @@ public:
   ~BackTrackMemory() {
     for(SysInt i = 0; i < (SysInt)backtrack_stack.size(); ++i)
       block_cache.do_free(backtrack_stack[i].data);
+
+    for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i)
+      free(stored_blocks[i].base);
+
+    for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i)
+      free(extendable_blocks[i].base);
+
   }
 
   /// Copies the current state of backtrackable memory.
