@@ -41,6 +41,11 @@ void readInputFromFiles(ProbSpec::CSPInstance& instance, vector<string> fnames, 
 
     CheapStream cs(*file);
 
+    // After the CheapStream is created, the file is already fully read.
+    if(file != &cin) {
+      delete file;
+    }
+
     ConcreteFileReader<CheapStream> infile(cs, filename);
 
     if(infile.eof()) {
