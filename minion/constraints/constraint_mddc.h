@@ -139,7 +139,7 @@ struct MDDC : public AbstractConstraint {
   // gno is the set of removed mdd nodes.
   arrayset_bt gno;
 
-  TupleList* tuples;
+  std::shared_ptr<TupleList> tuples;
 
   // All nodes of the mdd, used for freeing.
   vector<MDDNode*> mddnodes;
@@ -149,7 +149,7 @@ struct MDDC : public AbstractConstraint {
   vector<arrayset> gacvalues; // Opposite of the sets in the Cheng and Yap
                               // paper: these start empty and are fille d
 
-  MDDC(const VarArray& _varArray, TupleList* _tuples)
+  MDDC(const VarArray& _varArray, std::shared_ptr<TupleList> _tuples)
       :
 
         vars(_varArray),
@@ -177,7 +177,7 @@ struct MDDC : public AbstractConstraint {
 
   //
   // This one accepted an mdd written in a fairly difficult format.
-  /*void old_init(TupleList* tuples) {
+  /*void old_init(std::shared_ptr<TupleList> tuples) {
       // convert tuples into mdd nodes
       int tlsize=tuples->size();
 
@@ -220,7 +220,7 @@ struct MDDC : public AbstractConstraint {
 
   // This one converts a list of tuples (i.e. a standard table constraint) to an
   // mdd.
-  void init(TupleList* tuples) {
+  void init(std::shared_ptr<TupleList> tuples) {
     // First build a trie by inserting the tuples one by one.
 
     SysInt tlsize = checked_cast<SysInt>(tuples->size());
@@ -277,7 +277,7 @@ struct MDDC : public AbstractConstraint {
 
   // This one converts a negative list of tuples (i.e. a negative table
   // constraint) to an mdd.
-  void initNegative(TupleList* tuples) {
+  void initNegative(std::shared_ptr<TupleList> tuples) {
     // First build a trie by inserting the tuples one by one.
 
     SysInt tlsize = checked_cast<SysInt>(tuples->size());

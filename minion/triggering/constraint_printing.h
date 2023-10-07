@@ -23,11 +23,11 @@ string print_vars(const T& t) {
   }
 }
 
-inline string print_vars(TupleList* const& t) {
+inline string print_vars(std::shared_ptr<TupleList> const& t) {
   return t->getName();
 }
 
-inline string print_vars(ShortTupleList* const& t) {
+inline string print_vars(std::shared_ptr<ShortTupleList> const& t) {
   return t->getName();
 }
 

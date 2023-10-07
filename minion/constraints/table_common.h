@@ -9,7 +9,7 @@ struct Literal {
 
 class BaseTableData {
 protected:
-  TupleList* tupleData;
+  std::shared_ptr<TupleList> tupleData;
 
 public:
   DomainInt getVarCount() {
@@ -42,16 +42,16 @@ public:
                      tupleData->domSmallest[var] + tupleData->domSize[var] - 1); // CHECK -1
   }
 
-  BaseTableData(TupleList* _tupleData) : tupleData(_tupleData) {}
+  BaseTableData(std::shared_ptr<TupleList> _tupleData) : tupleData(_tupleData) {}
 };
 
 class TrieData : public BaseTableData {
 
 public:
-  TupleTrieArray* tupleTrieArrayptr;
+  std::shared_ptr<TupleTrieArray> tupleTrieArrayptr;
 
-  TrieData(TupleList* _tupleData)
-      : BaseTableData(_tupleData), tupleTrieArrayptr(_tupleData->getTries()) {}
+  TrieData(std::shared_ptr<TupleList> _tupleData)
+      : BaseTableData(_tupleData), tupleTrieArrayptr(getTries(_tupleData)) {}
 
   // TODO: Optimise possibly?
   bool checkTuple(DomainInt* tuple, SysInt tupleSize) {
@@ -64,10 +64,10 @@ public:
   }
 };
 
-inline TupleTrieArray* TupleList::getTries() {
-  if(triearray == NULL)
-    triearray = new TupleTrieArray(this);
-  return triearray;
+std::shared_ptr<TupleTrieArray> getTries(std::shared_ptr<TupleList> tl) {
+  if(tl->triearray == NULL)
+    tl->triearray = std::make_shared<TupleTrieArray>(tl);
+  return tl->triearray;
 }
 
 #endif

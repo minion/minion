@@ -93,7 +93,7 @@ struct STRData {
   vector<vector<DomainInt>> tuples;
   vector<vector<pair<SysInt, DomainInt>>> compressed_tuples;
 
-  STRData(ShortTupleList* _tuples, size_t varsize) {
+  STRData(std::shared_ptr<ShortTupleList> _tuples, size_t varsize) {
     _tuples->validateShortTuples(varsize);
     compressed_tuples = *(_tuples->tuplePtr());
 
@@ -106,7 +106,7 @@ struct STRData {
     }
   }
 
-  STRData(TupleList* _tuples, size_t varsize) {
+  STRData(std::shared_ptr<TupleList> _tuples, size_t varsize) {
     DomainInt tupleCount = _tuples->size();
     for(SysInt i = 0; i < tupleCount; ++i) {
       vector<DomainInt> t = _tuples->getVector(i);
@@ -137,8 +137,8 @@ struct STR : public AbstractConstraint {
       return ConOutput::printCon(constraintName(), vars, longTupleList);
   }
 
-  ShortTupleList* shortTupleList;
-  TupleList* longTupleList;
+  std::shared_ptr<ShortTupleList> shortTupleList;
+  std::shared_ptr<TupleList> longTupleList;
 
   VarArray vars;
 
@@ -175,7 +175,7 @@ struct STR : public AbstractConstraint {
     std::random_shuffle(tupindices.begin(), tupindices.end());
   }
 
-  STR(const VarArray& _varArray, ShortTupleList* _tuples)
+  STR(const VarArray& _varArray, std::shared_ptr<ShortTupleList> _tuples)
       : shortTupleList(_tuples),
         longTupleList(0),
         vars(_varArray),
@@ -188,7 +188,7 @@ struct STR : public AbstractConstraint {
     init();
   }
 
-  STR(const VarArray& _varArray, TupleList* _tuples)
+  STR(const VarArray& _varArray, std::shared_ptr<TupleList> _tuples)
       : shortTupleList(0),
         longTupleList(_tuples),
         vars(_varArray),

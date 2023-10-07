@@ -173,7 +173,7 @@ class MinionThreeInputReader {
   ConstraintBlob readConstraint(FileReader* infile, BOOL reified = false);
   ConstraintBlob readConstraintTable(FileReader* infile, ConstraintDef* def);
   void readGadget(FileReader* infile);
-  TupleList* readConstraintTupleList(FileReader* infile);
+  std::shared_ptr<TupleList> readConstraintTupleList(FileReader* infile);
   Var readIdentifier(FileReader* infile);
   vector<Var> readPossibleMatrixIdentifier(FileReader* infile, bool mustBeMatrix = false);
   vector<Var> readLiteralVector(FileReader* infile, bool mustBeVector = true);
@@ -190,7 +190,7 @@ class MinionThreeInputReader {
   void readVars(FileReader* infile);
   void readSearch(FileReader* infile);
   vector<pair<SysInt, DomainInt>> readShortTuple(FileReader*);
-  ShortTupleList* readConstraintShortTupleList(FileReader*);
+  std::shared_ptr<ShortTupleList> readConstraintShortTupleList(FileReader*);
   vector<vector<Var>> read2DMatrix(FileReader* infile);
   vector<vector<Var>> read2DMatrixVariable(FileReader* infile);
   void readAliasMatrix(FileReader* infile, const vector<DomainInt>& max_indices,

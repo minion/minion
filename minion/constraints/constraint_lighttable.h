@@ -53,11 +53,11 @@ struct LightTableConstraint : public AbstractConstraint {
 
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
-  TupleList* tuples;
+  std::shared_ptr<TupleList> tuples;
   TableDataType* data; // Assuming this is a TrieData for the time being.
   // Can this be the thing instead of a *??
 
-  LightTableConstraint(const VarArray& _vars, TupleList* _tuples)
+  LightTableConstraint(const VarArray& _vars, std::shared_ptr<TupleList> _tuples)
       : vars(_vars), tuples(_tuples), data(new TableDataType(_tuples)) {
     CheckNotBound(vars, "table constraints", "");
     if(_tuples->tupleSize() != (SysInt)_vars.size()) {
@@ -124,7 +124,7 @@ struct LightTableConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray>
-AbstractConstraint* GACLightTableCon(const VarArray& vars, TupleList* tuples) {
+AbstractConstraint* GACLightTableCon(const VarArray& vars, std::shared_ptr<TupleList> tuples) {
   return new LightTableConstraint<VarArray>(vars, tuples);
 }
 

@@ -141,7 +141,7 @@ struct MinionInstancePrinter {
   }
 
   void print_shortTuples() {
-    typedef map<string, ShortTupleList*>::const_iterator it_type;
+    typedef map<string, std::shared_ptr<ShortTupleList>>::const_iterator it_type;
 
     for(it_type it = csp.shorttable_symboltable.begin(); it != csp.shorttable_symboltable.end();
         ++it) {
@@ -168,7 +168,7 @@ struct MinionInstancePrinter {
   }
 
   void print_tuples() {
-    typedef map<string, TupleList*>::const_iterator it_type;
+    typedef map<string, std::shared_ptr<TupleList>>::const_iterator it_type;
 
     for(it_type it = csp.table_symboltable.begin(); it != csp.table_symboltable.end(); ++it) {
       oss << it->first << " ";

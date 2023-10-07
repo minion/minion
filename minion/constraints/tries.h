@@ -40,7 +40,7 @@ struct TupleTrie {
   static const SysInt max_arity = 100;
   const SysInt arity;
   const SysInt sigIndex;
-  TupleList* tuplelist;
+  std::shared_ptr<TupleList> tuplelist;
   // A temporary tuple to store the most recently found
   // complete assignment.
   DomainInt current_tuple[max_arity];
@@ -59,7 +59,7 @@ struct TupleTrie {
     return tuplesVector[checked_cast<SysInt>(num)][map_depth(depth)];
   }
 
-  TupleTrie(DomainInt _significantIndex, TupleList* tuplelist)
+  TupleTrie(DomainInt _significantIndex, std::shared_ptr<TupleList> tuplelist)
       : arity(checked_cast<SysInt>(tuplelist->tupleSize())),
         sigIndex(checked_cast<SysInt>(_significantIndex)) {
     // TODO : Fix this hard limit.
@@ -401,7 +401,7 @@ struct TupleTrie {
 // template<typename VarArray>
 class TupleTrieArray {
 public:
-  TupleList* tuplelist;
+  //std::shared_ptr<TupleList> tuplelist;
 
   // Would make this const if I could, but it cannot be setup until after
   // 'finalise_tuples'
@@ -416,7 +416,7 @@ public:
     Constructor
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
-  TupleTrieArray(TupleList* _tuplelist) : tuplelist(_tuplelist) {
+  TupleTrieArray(std::shared_ptr<TupleList> tuplelist) {
     tuplelist->finalise_tuples();
     arity = checked_cast<SysInt>(tuplelist->tupleSize());
     vector<DomainInt> domSize(arity);
@@ -429,6 +429,10 @@ public:
     }
     for(SysInt varIndex = 0; varIndex < arity; varIndex++)
       new(tupleTries + varIndex) TupleTrie(varIndex, tuplelist);
+  }
+
+  ~TupleTrieArray() {
+    free(tupleTries);
   }
 };
 

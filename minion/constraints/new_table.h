@@ -14,7 +14,7 @@
 
 class TableData : public BaseTableData {
 public:
-  TableData(TupleList* _tupleData) : BaseTableData(_tupleData) {}
+  TableData(std::shared_ptr<TupleList> _tupleData) : BaseTableData(_tupleData) {}
 
   // TODO : Optimise possibly?
   bool checkTuple(DomainInt* tuple, SysInt tupleSize) {
@@ -126,9 +126,9 @@ struct NewTableConstraint : public AbstractConstraint {
 
   TableStateType state;
 
-  TupleList* tuples;
+  std::shared_ptr<TupleList> tuples;
 
-  NewTableConstraint(const VarArray& _vars, TupleList* _tuples)
+  NewTableConstraint(const VarArray& _vars, std::shared_ptr<TupleList> _tuples)
       : vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples) {
     CheckNotBound(vars, "table constraint");
     if(_tuples->tupleSize() != (SysInt)_vars.size()) {
@@ -259,6 +259,6 @@ struct NewTableConstraint : public AbstractConstraint {
 };
 
 template <typename VarArray>
-AbstractConstraint* GACTableCon(const VarArray& vars, TupleList* tuples) {
+AbstractConstraint* GACTableCon(const VarArray& vars, std::shared_ptr<TupleList> tuples) {
   return new NewTableConstraint<VarArray>(vars, tuples);
 }
