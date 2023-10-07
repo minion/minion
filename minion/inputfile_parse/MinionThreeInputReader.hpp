@@ -499,7 +499,7 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readGeneralConstraint(FileRea
 }
 
 template <typename FileReader>
-ShortTupleList*
+std::shared_ptr<ShortTupleList>
 MinionThreeInputReader<FileReader>::readConstraintShortTupleList(FileReader* infile) {
 
   string name = infile->getString();
@@ -507,8 +507,8 @@ MinionThreeInputReader<FileReader>::readConstraintShortTupleList(FileReader* inf
 }
 
 template <typename FileReader>
-TupleList* MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReader* infile) {
-  TupleList* tuplelist;
+std::shared_ptr<TupleList> MinionThreeInputReader<FileReader>::readConstraintTupleList(FileReader* infile) {
+  std::shared_ptr<TupleList> tuplelist;
 
   if(infile->peekChar() != '{') {
     string name = infile->getString();
@@ -868,7 +868,7 @@ void MinionThreeInputReader<FileReader>::readShortTuples(FileReader* infile) {
     for(DomainInt i = 0; i < numOf_shortTuples; ++i)
       tups.push_back(readShortTuple(infile));
 
-    ShortTupleList* stl = instance->shortTupleListContainer->getNewShortTupleList(tups);
+    std::shared_ptr<ShortTupleList> stl = instance->shortTupleListContainer->getNewShortTupleList(tups);
     instance->addShortTableSymbol(name, stl);
   }
 }
@@ -881,7 +881,7 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile) {
     DomainInt tupleLength = infile->readNum();
     MAYBE_PARSER_INFO("Reading tuplelist '" + name + "', length " + tostring(numOf_tuples) +
                       ", arity " + tostring(tupleLength));
-    TupleList* tuplelist =
+    std::shared_ptr<TupleList> tuplelist =
         instance->tupleListContainer->getNewTupleList(numOf_tuples, tupleLength);
     DomainInt* tuplePtr = tuplelist->getPointer();
     for(DomainInt i = 0; i < numOf_tuples; ++i)
@@ -892,7 +892,7 @@ void MinionThreeInputReader<FileReader>::readTuples(FileReader* infile) {
     instance->addTableSymbol(name, tuplelist);
 
     if(map_long_short_mode != MLTTS_NoMap) {
-      ShortTupleList* stl =
+      std::shared_ptr<ShortTupleList> stl =
           instance->shortTupleListContainer->getNewShortTupleList(tuplelist, map_long_short_mode);
       instance->addShortTableSymbol(name, stl);
     }

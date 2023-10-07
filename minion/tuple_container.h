@@ -57,7 +57,7 @@ class TupleList {
 
   LiteralSpecificLists* litlists;
   Nightingale* nightingale;
-  TupleTrieArray* triearray;
+  std::shared_ptr<TupleTrieArray> triearray;
   Regin* regin;
   EggShellData* egg;
 
@@ -76,11 +76,6 @@ public:
     hash_code = get_hashVal(tupleData, tupleLength * numberOfTuples);
     return hash_code;
   }
-  LiteralSpecificLists* getLitLists();
-  Nightingale* getNightingale();
-  TupleTrieArray* getTries();
-  Regin* getRegin();
-  EggShellData* getEggShellData(size_t varcount);
 
   /// Get raw pointer to the tuples.
   DomainInt* getPointer() {
@@ -224,19 +219,26 @@ public:
     }
     literalNum = literalCount;
   }
+
+//friend Nightingale* getNightingale(std::shared_ptr<TupleList>);
+friend std::shared_ptr<TupleTrieArray> getTries(std::shared_ptr<TupleList>);
+//friend Regin* getRegin(std::shared_ptr<TupleList>);
+//friend EggShellData* getEggShellData(std::shared_ptr<TupleList>, size_t varcount);
+
 };
 
+
 class TupleListContainer {
-  std::vector<TupleList*> InternalTupleList;
+  std::vector<std::shared_ptr<TupleList>> InternalTupleList;
 
 public:
-  TupleList* getNewTupleList(DomainInt numtuples, DomainInt tuplelength) {
-    TupleList* tuplelistPtr = new TupleList(numtuples, tuplelength);
+  std::shared_ptr<TupleList> getNewTupleList(DomainInt numtuples, DomainInt tuplelength) {
+    std::shared_ptr<TupleList> tuplelistPtr = std::make_shared<TupleList>(numtuples, tuplelength);
     InternalTupleList.push_back(tuplelistPtr);
     return tuplelistPtr;
   }
 
-  TupleList* getNewTupleList(const vector<vector<DomainInt>>& tuples) {
+  std::shared_ptr<TupleList> getNewTupleList(const vector<vector<DomainInt>>& tuples) {
     size_t tuple_hash = get_hashVal(tuples);
     for(SysInt i = 0; i < (SysInt)InternalTupleList.size(); ++i) {
       bool equal = true;
@@ -244,7 +246,7 @@ public:
       if(InternalTupleList[i]->get_hash() != tuple_hash)
         equal = false;
       else {
-        TupleList* ptr = InternalTupleList[i];
+        std::shared_ptr<TupleList> ptr = InternalTupleList[i];
         if((SysInt)tuples.size() != ptr->size() || (SysInt)tuples[0].size() != ptr->tupleSize()) {
           equal = false;
         } else {
@@ -261,12 +263,12 @@ public:
       }
     }
 
-    TupleList* tuplelistPtr = new TupleList(tuples);
+    std::shared_ptr<TupleList> tuplelistPtr = std::make_shared<TupleList>(tuples);
     InternalTupleList.push_back(tuplelistPtr);
     return tuplelistPtr;
   }
 
-  TupleList* getTupleList(DomainInt num) {
+  std::shared_ptr<TupleList> getTupleList(DomainInt num) {
     return InternalTupleList[checked_cast<SysInt>(num)];
   }
 
@@ -295,7 +297,7 @@ public:
       : shortTuples(_shortTuples) {}
 
   // method : 0 - nothing, 1 - long tuples, 2 - eager, 3 - lazy
-  ShortTupleList(TupleList* longTuples, MapLongTuplesToShort method) {
+  ShortTupleList(std::shared_ptr<TupleList> longTuples, MapLongTuplesToShort method) {
     D_ASSERT(method != MLTTS_NoMap);
 
     set<vector<DomainInt>> tupleSet;
@@ -384,22 +386,22 @@ public:
 };
 
 class ShortTupleListContainer {
-  std::vector<ShortTupleList*> InternalTupleList;
+  std::vector<std::shared_ptr<ShortTupleList>> InternalTupleList;
 
 public:
-  ShortTupleList* getNewShortTupleList(const vector<vector<pair<SysInt, DomainInt>>>& tuples) {
-    ShortTupleList* tuplelistPtr = new ShortTupleList(tuples);
+  std::shared_ptr<ShortTupleList> getNewShortTupleList(const vector<vector<pair<SysInt, DomainInt>>>& tuples) {
+    std::shared_ptr<ShortTupleList> tuplelistPtr = std::make_shared<ShortTupleList>(tuples);
     InternalTupleList.push_back(tuplelistPtr);
     return tuplelistPtr;
   }
 
-  ShortTupleList* getNewShortTupleList(TupleList* longTuples, MapLongTuplesToShort method) {
-    ShortTupleList* tuplelistPtr = new ShortTupleList(longTuples, method);
+  std::shared_ptr<ShortTupleList> getNewShortTupleList(std::shared_ptr<TupleList> longTuples, MapLongTuplesToShort method) {
+    std::shared_ptr<ShortTupleList> tuplelistPtr = std::make_shared<ShortTupleList>(longTuples, method);
     InternalTupleList.push_back(tuplelistPtr);
     return tuplelistPtr;
   }
 
-  ShortTupleList* getShortTupleList(DomainInt num) {
+  std::shared_ptr<ShortTupleList> getShortTupleList(DomainInt num) {
     return InternalTupleList[checked_cast<SysInt>(num)];
   }
 
@@ -411,12 +413,12 @@ public:
 /// The first GACtable implementation.
 class LiteralSpecificLists {
 public:
-  TupleList* tuples;
+  std::shared_ptr<TupleList> tuples;
 
   /// For each literal, a list of the tuples it is present in.
   vector<vector<vector<DomainInt>>> literalSpecificTuples;
 
-  LiteralSpecificLists(TupleList* _tuples) : tuples(_tuples) {
+  LiteralSpecificLists(std::shared_ptr<TupleList> _tuples) : tuples(_tuples) {
     tuples->finalise_tuples();
     // For each literal, store the set of tuples which it allows.
     for(UnsignedSysInt i = 0; i < tuples->domSize.size(); ++i) {
@@ -434,10 +436,5 @@ public:
   }
 };
 
-inline LiteralSpecificLists* TupleList::getLitLists() {
-  if(litlists == NULL)
-    litlists = new LiteralSpecificLists(this);
-  return litlists;
-}
 
 #endif

@@ -111,12 +111,12 @@ struct ConstraintBlob {
   /// The variables of the problem.
   vector<vector<Var>> vars;
   /// Pointer to list of tuples. Only used in Table Constraints.
-  TupleList* tuples;
+  std::shared_ptr<TupleList> tuples;
 
   /// Pointer to a list of short tuples. Only used in Short Table constraints.
-  ShortTupleList* shortTuples;
+  std::shared_ptr<ShortTupleList> shortTuples;
 
-  TupleList* tuples2;
+  std::shared_ptr<TupleList> tuples2;
 
   /// A vector of signs. Only used for SAT clause "or" constraint.
   vector<DomainInt> negs;
@@ -470,11 +470,11 @@ struct CSPInstance {
   /// A complete list of variables in the order they are defined.
   vector<vector<Var>> allVars_list;
 
-  map<string, TupleList*> table_symboltable;
-  map<TupleList*, string> table_nametable;
+  map<string, std::shared_ptr<TupleList>> table_symboltable;
+  map<std::shared_ptr<TupleList>, string> table_nametable;
 
-  map<string, ShortTupleList*> shorttable_symboltable;
-  map<ShortTupleList*, string> shorttable_nametable;
+  map<string, std::shared_ptr<ShortTupleList>> shorttable_symboltable;
+  map<std::shared_ptr<ShortTupleList>, string> shorttable_nametable;
 
   /// We make these shared_ptrs so they automatically clear up after themselves.
   map<string, shared_ptr<CSPInstance>> gadgetMap;
@@ -498,7 +498,7 @@ public:
     constraints.push_back(b);
   }
 
-  void addUnnamedTableSymbol(TupleList* tuplelist) {
+  void addUnnamedTableSymbol(std::shared_ptr<TupleList> tuplelist) {
     if(table_nametable.count(tuplelist) != 0)
       return;
     SysInt pos = table_symboltable.size();
@@ -510,7 +510,7 @@ public:
     tuplelist->setName("_Unnamed__" + tostring(pos) + "_");
   }
 
-  void addTableSymbol(string name, TupleList* tuplelist) {
+  void addTableSymbol(string name, std::shared_ptr<TupleList> tuplelist) {
     if(table_symboltable.count(name) != 0)
       throw parse_exception("Tuplename '" + name + "' already in use");
     if(table_nametable.count(tuplelist) != 0)
@@ -520,7 +520,7 @@ public:
     tuplelist->setName(name);
   }
 
-  void addShortTableSymbol(string name, ShortTupleList* tuplelist) {
+  void addShortTableSymbol(string name, std::shared_ptr<ShortTupleList> tuplelist) {
     if(shorttable_symboltable.count(name) != 0)
       throw parse_exception("ShortTuplename '" + name + "' already in use");
     if(shorttable_nametable.count(tuplelist) != 0)
@@ -530,31 +530,31 @@ public:
     tuplelist->setName(name);
   }
 
-  TupleList* getTableSymbol(string name) const {
-    map<string, TupleList*>::const_iterator it = table_symboltable.find(name);
+  std::shared_ptr<TupleList> getTableSymbol(string name) const {
+    map<string, std::shared_ptr<TupleList>>::const_iterator it = table_symboltable.find(name);
     if(it == table_symboltable.end())
       throw parse_exception("Undefined tuplelist: '" + name + "'");
     return it->second;
   }
 
-  string getTableName(TupleList* tuples) const {
-    map<TupleList*, string>::const_iterator it = table_nametable.find(tuples);
+  string getTableName(std::shared_ptr<TupleList> tuples) const {
+    map<std::shared_ptr<TupleList>, string>::const_iterator it = table_nametable.find(tuples);
     if(it == table_nametable.end())
-      throw parse_exception("Undefined tuplelist: '" + tostring(size_t(tuples)) + "'");
+      throw parse_exception("Undefined tuplelist: ");
     return it->second;
   }
 
-  ShortTupleList* getShortTableSymbol(string name) const {
-    map<string, ShortTupleList*>::const_iterator it = shorttable_symboltable.find(name);
+  std::shared_ptr<ShortTupleList> getShortTableSymbol(string name) const {
+    map<string, std::shared_ptr<ShortTupleList>>::const_iterator it = shorttable_symboltable.find(name);
     if(it == shorttable_symboltable.end())
       throw parse_exception("Undefined shorttuplelist: '" + name + "'");
     return it->second;
   }
 
-  string getShortTableName(ShortTupleList* tuples) const {
-    map<ShortTupleList*, string>::const_iterator it = shorttable_nametable.find(tuples);
+  string getShortTableName(std::shared_ptr<ShortTupleList> tuples) const {
+    map<std::shared_ptr<ShortTupleList>, string>::const_iterator it = shorttable_nametable.find(tuples);
     if(it == shorttable_nametable.end())
-      throw parse_exception("Undefined shorttuplelist: '" + tostring(size_t(tuples)) + "'");
+      throw parse_exception("Undefined shorttuplelist");
     return it->second;
   }
 

@@ -218,7 +218,7 @@ void dumpSolver(ostream& os, bool justDomains) {
   SearchState& searchState = getState();
 
   for(SysInt i = 0; i < searchState.getTupleListContainer()->size(); ++i) {
-    TupleList* tl = searchState.getTupleListContainer()->getTupleList(i);
+    std::shared_ptr<TupleList> tl = searchState.getTupleListContainer()->getTupleList(i);
     os << tl->getName() << " " << tl->size() << " " << tl->tupleSize() << "\n";
     for(SysInt i = 0; i < tl->size() * tl->tupleSize(); ++i) {
       os << (tl->getPointer())[i] << " ";
@@ -229,7 +229,7 @@ void dumpSolver(ostream& os, bool justDomains) {
   os << "**SHORTTUPLELIST**" << endl;
 
   for(SysInt i = 0; i < searchState.getShortTupleListContainer()->size(); ++i) {
-    ShortTupleList* tl = searchState.getShortTupleListContainer()->getShortTupleList(i);
+    std::shared_ptr<ShortTupleList> tl = searchState.getShortTupleListContainer()->getShortTupleList(i);
     os << tl->getName() << " " << tl->size() << "\n";
 
     const vector<vector<pair<SysInt, DomainInt>>>& tupleRef = *(tl->tuplePtr());

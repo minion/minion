@@ -122,9 +122,9 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
   ////////////////////////////////////////////////////////////////////////////
   // Ctor
 
-  ShortTupleList* data;
+  std::shared_ptr<ShortTupleList> data;
 
-  HaggisGACStable(const VarArray& _varArray, ShortTupleList* tuples)
+  HaggisGACStable(const VarArray& _varArray, std::shared_ptr<ShortTupleList> tuples)
       : vars(_varArray), supportFreeList(0), data(tuples) {
     init();
 

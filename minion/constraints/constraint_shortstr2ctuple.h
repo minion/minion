@@ -193,7 +193,7 @@ struct CTupleSTRData {
   vector<vector<vector<DomainInt>>> tuples;
   vector<vector<pair<SysInt, DomainInt>>> compressed_tuples;
 
-  CTupleSTRData(ShortTupleList* _tuples, size_t varsize) {
+  CTupleSTRData(std::shared_ptr<ShortTupleList> _tuples, size_t varsize) {
     _tuples->validateShortCTuples(varsize);
     compressed_tuples = *(_tuples->tuplePtr());
 
@@ -222,8 +222,8 @@ struct CTupleSTR : public AbstractConstraint {
     return ConOutput::printCon(constraintName(), vars, shortTupleList);
   }
 
-  ShortTupleList* shortTupleList;
-  TupleList* longTupleList;
+  std::shared_ptr<ShortTupleList> shortTupleList;
+  std::shared_ptr<TupleList> longTupleList;
 
   VarArray vars;
 
@@ -260,7 +260,7 @@ struct CTupleSTR : public AbstractConstraint {
     std::random_shuffle(tupindices.begin(), tupindices.end());
   }
 
-  CTupleSTR(const VarArray& _varArray, ShortTupleList* _tuples)
+  CTupleSTR(const VarArray& _varArray, std::shared_ptr<ShortTupleList> _tuples)
       : shortTupleList(_tuples),
         longTupleList(0),
         vars(_varArray),

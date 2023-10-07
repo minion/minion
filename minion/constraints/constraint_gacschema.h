@@ -88,14 +88,14 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   Support* supportFreeList; // singly-linked list of spare Support objects.
 
   // Stuff to do with tuples.
-  TupleList* data;
+  std::shared_ptr<TupleList> data;
   vector<vector<vector<vector<DomainInt>*>>> tuple_lists;
   vector<UnsignedSysInt*> tuple_list_pos; // indexed by var, val.
 
   ////////////////////////////////////////////////////////////////////////////
   // Ctor
 
-  GACSchema(const VarArray& _varArray, TupleList* _data)
+  GACSchema(const VarArray& _varArray, std::shared_ptr<TupleList> _data)
       : vars(_varArray), supportFreeList(0), data(_data) {
     // Register this with the backtracker.
     getState().getGenericBacktracker().add(this);

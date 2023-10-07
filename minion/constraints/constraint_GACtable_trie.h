@@ -64,7 +64,7 @@ struct GACTableConstraint : public AbstractConstraint {
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
 
-  TupleTrieArray* tupleTrieArrayptr;
+  std::shared_ptr<TupleTrieArray> tupleTrieArrayptr;
 
   // Following is setup globally in constraint to be passed by reference &
   // recycled
@@ -84,11 +84,11 @@ struct GACTableConstraint : public AbstractConstraint {
     return true;
   }
 
-  TupleList* tuples;
+  std::shared_ptr<TupleList> tuples;
 
-  GACTableConstraint(const VarArray& _vars, TupleList* _tuples) : vars(_vars), tuples(_tuples) {
+  GACTableConstraint(const VarArray& _vars, std::shared_ptr<TupleList> _tuples) : vars(_vars), tuples(_tuples) {
     CheckNotBound(vars, "table constraints", "");
-    tupleTrieArrayptr = tuples->getTries();
+    tupleTrieArrayptr = getTries(tuples);
     const SysInt arity = checked_cast<SysInt>(tuples->tupleSize());
     D_ASSERT((SysInt)_vars.size() == arity);
     const SysInt litnum = checked_cast<SysInt>(tuples->literalNum);
@@ -313,11 +313,11 @@ struct GACTableConstraint : public AbstractConstraint {
 
 // template<typename VarArray>
 // AbstractConstraint*
-// GACTableCon(const VarArray& vars, TupleList* tuples)
+// GACTableCon(const VarArray& vars, std::shared_ptr<TupleList> tuples)
 //{ return new GACTableConstraint<VarArray, 0>(vars, tuples); }
 
 template <typename VarArray>
-AbstractConstraint* GACNegativeTableCon(const VarArray& vars, TupleList* tuples) {
+AbstractConstraint* GACNegativeTableCon(const VarArray& vars, std::shared_ptr<TupleList> tuples) {
   return new GACTableConstraint<VarArray, 1>(vars, tuples);
 }
 
