@@ -153,7 +153,11 @@ typedef QuickVarRefType<GetBoolVarContainer, BoolVarRef_internal> BoolVarRef;
 /// Container for boolean variables
 struct BoolVarContainer {
 
-  BoolVarContainer() : varCount_m(0), triggerList(false) {}
+  BoolVarContainer() : values_mem(0), varCount_m(0), triggerList(false) {}
+
+  ~BoolVarContainer() {
+      free(values_mem);
+  }
 
   static const SysInt width = 7;
   ExtendableBlock assignOffset;
