@@ -23,25 +23,8 @@ struct Globals {
    */
 
 public:
-  Globals() {
-    std::mt19937 global_random_gen;
-    std::ofstream solsoutfile;
-    Memory* searchMem_m = NULL;
-    SearchOptions* options_m = NULL;
-    SearchState* state_m = NULL;
-    Queues* queues_m = NULL;
-    VariableContainer* varContainer_m = NULL;
-    BoolContainer* bools_m = NULL;
-    Parallel::ParallelData* parData_m = NULL;
-  }
-
-  ~Globals() {
-    /*
-     * FIXME: 
-     * Unfortunately can't be deconstructed properly - 
-     * see libwrapper.cpp:resetMinion
-     */
-  }
+  Globals();
+  ~Globals();
 };
 
 #ifdef LIBMINION

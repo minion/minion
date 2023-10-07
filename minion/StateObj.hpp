@@ -28,60 +28,60 @@ VARDEF(BoolContainer bools_m);
 
 inline BoolContainer& getBools() {
 #ifdef LIBMINION
-  if(!GET_GLOBAL(bools_m)) {
-    GET_GLOBAL(bools_m) = new BoolContainer();
+  if(!globals->bools_m) {
+    globals->bools_m = new BoolContainer;
   }
-  return *GET_GLOBAL(bools_m);
+  return *globals->bools_m;
 #else
-  return GET_GLOBAL(bools_m);
+  return bools_m;
 #endif
 }
 inline SearchOptions& getOptions() {
 #ifdef LIBMINION
-  if(!GET_GLOBAL(options_m)) {
-    GET_GLOBAL(options_m) = new SearchOptions();
+  if(!globals->options_m) {
+    globals->options_m = new SearchOptions;
   }
-  return *GET_GLOBAL(options_m);
+  return *globals->options_m;
 #else
   return GET_GLOBAL(options_m);
 #endif
 }
 inline SearchState& getState() {
 #ifdef LIBMINION
-  if(!GET_GLOBAL(state_m)) {
-    GET_GLOBAL(state_m) = new SearchState();
+  if(!globals->state_m) {
+    globals->state_m = new SearchState;
   }
-  return *GET_GLOBAL(state_m);
+  return *globals->state_m;
 #else
   return GET_GLOBAL(state_m);
 #endif
 }
 inline Queues& getQueue() {
 #ifdef LIBMINION
-  if(!GET_GLOBAL(queues_m)) {
-    GET_GLOBAL(queues_m) = new Queues();
+  if(!globals->queues_m) {
+    globals->queues_m = new Queues;
   }
-  return *GET_GLOBAL(queues_m);
+  return *globals->queues_m;
 #else
   return GET_GLOBAL(queues_m);
 #endif
 }
 inline Memory& getMemory() {
 #ifdef LIBMINION
-  if(!GET_GLOBAL(searchMem_m)) {
-    GET_GLOBAL(searchMem_m) = new Memory();
+  if(!globals->searchMem_m) {
+    globals->searchMem_m = new Memory;
   }
-  return *GET_GLOBAL(searchMem_m);
+  return *globals->searchMem_m;
 #else
   return GET_GLOBAL(searchMem_m);
 #endif
 }
 inline VariableContainer& getVars() {
 #ifdef LIBMINION
-  if(!GET_GLOBAL(varContainer_m)) {
-    GET_GLOBAL(varContainer_m) = new VariableContainer();
+  if(!globals->varContainer_m) {
+    globals->varContainer_m = new VariableContainer;
   }
-  return *GET_GLOBAL(varContainer_m);
+  return *globals->varContainer_m;
 #else
   return GET_GLOBAL(varContainer_m);
 #endif
@@ -90,7 +90,7 @@ inline VariableContainer& getVars() {
 VARDEF(Parallel::ParallelData* parData_m);
 inline Parallel::ParallelData& getParallelData() {
 
-  if(GET_GLOBAL(parData_m) == 0) {
+  if(!GET_GLOBAL(parData_m)) {
     GET_GLOBAL(parData_m) = Parallel::setupParallelData();
   }
   return *GET_GLOBAL(parData_m);
