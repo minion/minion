@@ -16,16 +16,6 @@ VARDEF(Queues queues_m);
 VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
 
-/*
- * Libminion case:
- *
- * Pointer trickery as compiler doesnt like globals.x when there are still
- * incomplete types (such as SearchOptions, ...).
- *
- * Tried rearranging headerfiles, didn't work, so am lazily creating them when referenced.
- * instead.
- */
-
 inline BoolContainer& getBools() {
 #ifdef LIBMINION
   if(!globals->bools_m) {
