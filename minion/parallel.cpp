@@ -89,7 +89,7 @@ ParallelData* setupParallelData() {
     D_FATAL_ERROR("Parallel pipe construction failed");
   }
 
-  ParallelData* pd;
+  ParallelData* pd = 0;
   pd = (ParallelData*)mmap(NULL, sizeof(ParallelData), PROT_READ | PROT_WRITE,
                            MAP_SHARED | MAP_ANON, -1, 0);
   if(pd == MAP_FAILED) {
@@ -103,7 +103,8 @@ ParallelData* setupParallelData() {
   pd->initialProcessCount = cores;
 
   {
-    pthread_mutexattr_t mutexAttr;
+    pthread_mutexattr_t mutexAttr ;
+    pthread_mutexattr_init(&mutexAttr);
     pthread_mutexattr_setpshared(&mutexAttr, PTHREAD_PROCESS_SHARED);
     if(pthread_mutex_init(&(pd->outputLock), &mutexAttr) < 0) {
       D_FATAL_ERROR("Setup outputLock mutex fail");
