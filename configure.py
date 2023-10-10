@@ -150,6 +150,7 @@ parser.add_argument('--setflags', help="Override all other compiler flags (exper
 
 parser.add_argument('--buildsystem', help="Set build system. Current options: make (default), sh, tup", default="make")
 
+parser.add_argument('--sanitize', help="Run clang sanitizers (currently leak and address)", action='store_true')
 arg = parser.parse_args()
 
 
@@ -218,21 +219,25 @@ if arg.library:
     commandargs = commandargs + ["-fPIC"]
     commandargs = commandargs + ["-DLIBMINION"]
 
-if arg.compiler:
-    compiler = arg.compiler
+if arg.sanitize:
+    compiler = "clang++"
+    commandargs = commandargs + ["-fsanitize=address"]
 else:
-    compiler = ""
-    if progexists('ccache'):
-        compiler = "ccache " + compiler
-
-    if progexists('c++'):
-        compiler = compiler + ' c++'
-    elif progexists('g++'):
-        compiler = compiler + ' g++'
-    elif progexists('clang++'):
-        compiler = compiler + ' clang++'
+    if arg.compiler:
+        compiler = arg.compiler
     else:
-        fatal_error("Unable to find working C++ compiler.. please use --compiler")
+        compiler = ""
+        if progexists('ccache'):
+            compiler = "ccache " + compiler
+
+        if progexists('c++'):
+            compiler = compiler + ' c++'
+        elif progexists('g++'):
+            compiler = compiler + ' g++'
+        elif progexists('clang++'):
+            compiler = compiler + ' clang++'
+        else:
+            fatal_error("Unable to find working C++ compiler.. please use --compiler")
 
 verbose_print(1, "Compiler flags" + str(commandargs))
 
