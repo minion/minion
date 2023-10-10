@@ -42,7 +42,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
   VarSum varSum;
 
   LiteralSumConstraintDynamic(const VarArray& _varArray, ValueArray _val_array, VarSum _varSum)
-      : varArray(_varArray), value_array(_val_array), varSum(_varSum) {
+      : varArray(_varArray), value_array(_val_array), unwatchedIndexes(0), varSum(_varSum) {
     SysInt arraySize = varArray.size();
 
     numUnwatched = arraySize - varSum - 1;
@@ -55,6 +55,10 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
         checked_malloc(checked_cast<SysInt>(sizeof(UnsignedSysInt) * numUnwatched));
     // above line might request 0 bytes
     last = 0;
+  }
+
+  ~LiteralSumConstraintDynamic() {
+    free(unwatchedIndexes);
   }
 
   virtual SysInt dynamicTriggerCount() {
