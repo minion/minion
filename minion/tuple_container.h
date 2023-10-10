@@ -21,10 +21,10 @@ using namespace std;
 // as compactly as possible.
 
 class LiteralSpecificLists;
-class Nightingale;
+//class Nightingale;
 class TupleTrieArray;
-class Regin;
-class EggShellData;
+//class Regin;
+//class EggShellData;
 struct HaggisGACTuples;
 
 inline size_t get_hashVal(DomainInt* ptr, SysInt length) {
@@ -55,11 +55,11 @@ inline SysInt get_hashVal(const vector<vector<DomainInt>>& vecs) {
 class TupleList {
   string tuple_name;
 
-  LiteralSpecificLists* litlists;
-  Nightingale* nightingale;
+  //LiteralSpecificLists* litlists;
+  //Nightingale* nightingale;
   std::shared_ptr<TupleTrieArray> triearray;
-  Regin* regin;
-  EggShellData* egg;
+  //Regin* regin;
+  //EggShellData* egg;
 
   DomainInt* tupleData;
   SysInt tupleLength;
@@ -101,11 +101,7 @@ public:
   }
 
   TupleList(const vector<vector<DomainInt>>& tuple_list)
-      : litlists(NULL),
-        nightingale(NULL),
-        triearray(NULL),
-        regin(NULL),
-        egg(NULL),
+      : triearray(NULL),
         tuplesLocked(false),
         hash_code(0) {
     numberOfTuples = tuple_list.size();
@@ -119,11 +115,7 @@ public:
   }
 
   TupleList(DomainInt _numtuples, DomainInt _tuplelength)
-      : litlists(NULL),
-        nightingale(NULL),
-        triearray(NULL),
-        regin(NULL),
-        egg(NULL),
+      : triearray(NULL),
         tupleLength(checked_cast<SysInt>(_tuplelength)),
         numberOfTuples(checked_cast<SysInt>(_numtuples)),
         tuplesLocked(false),
