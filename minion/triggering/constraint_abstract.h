@@ -1,10 +1,6 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
-
-
-
-
 #include <cstdlib>
 
 #ifndef ABSTRACT_CONSTRAINT_H
@@ -15,6 +11,7 @@
 #include "../solver.h"
 
 #include "../variables/AnyVarRef.h"
+#include "../globals.h"
 
 #include <vector>
 
@@ -236,7 +233,7 @@ public:
       for(SysInt j = 0; j < (SysInt)vars.size(); j++) {
         DomainInt dsize = vars[j].initialMax() - vars[j].initialMin() + 1;
         uniform_int_distribution<int> dist(0, checked_cast<SysInt>(dsize));
-        t[j] = dist(global_random_gen) + vars[j].initialMin();
+        t[j] = dist(GET_GLOBAL(global_random_gen)) + vars[j].initialMin();
       }
       if(!checkAssignment(t, vars.size())) {
         unsatcounter++;
@@ -257,7 +254,7 @@ public:
         if(j != var) {
           DomainInt dsize = vars[j].initialMax() - vars[j].initialMin() + 1;
           uniform_int_distribution<int> dist(0, checked_cast<SysInt>(dsize));
-          t[j] = dist(global_random_gen) + vars[j].initialMin();
+          t[j] = dist(GET_GLOBAL(global_random_gen)) + vars[j].initialMin();
         }
       }
       if(!checkAssignment(t, vars.size())) {

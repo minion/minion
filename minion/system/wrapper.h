@@ -1,8 +1,8 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
-#ifndef _WRAPPER_H
-#define _WRAPPER_H
+#ifndef _SYSTEM_WRAPPER_H
+#define _SYSTEM_WRAPPER_H
 
 #include <ostream>
 

@@ -106,17 +106,17 @@ inline void check_sol_is_correct() {
 
     vector<vector<AnyVarRef>> print_matrix = getState().getPrintMatrix();
     if(getOptions().solsoutJson) {
-      json_dump(print_matrix, solsoutFile);
+      json_dump(print_matrix, GET_GLOBAL(solsoutfile));
     } else {
       for(UnsignedSysInt i = 0; i < print_matrix.size(); ++i)
         for(UnsignedSysInt j = 0; j < print_matrix[i].size(); ++j) {
           if(!print_matrix[i][j].isAssigned())
             INPUT_ERROR("Some variable was unassigned while writing solution to file.");
-          solsoutFile << print_matrix[i][j].assignedValue() << " ";
+          GET_GLOBAL(solsoutfile) << print_matrix[i][j].assignedValue() << " ";
         }
     }
-    solsoutFile << "\n";
-    solsoutFile.flush();
+    GET_GLOBAL(solsoutfile) << "\n";
+    GET_GLOBAL(solsoutfile).flush();
 
     Parallel::unlockSolsout();
   }
@@ -172,15 +172,15 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
   if(getOptions().split) {
     if(getState().isOptimisationProblem()) {
       abort();
-/*      const vector<AnyVarRef>& optVarRef = getState().getOptimiseVar();
-      string optVar = getState().getInstance()->vars.getName(optVarRef->getBaseVar());
-      DomainInt optVal = getState().getOptimiseValue();
-      opt += "ineq(";
-      if(getState().isMaximise()) {
-        opt += tostring(optVal) + string(", ") + optVar + string(", 0)\n");
-      } else {
-        opt += optVar + string(", ") + tostring(-optVal) + string(", 0)\n");
-      }*/
+      /*      const vector<AnyVarRef>& optVarRef = getState().getOptimiseVar();
+            string optVar = getState().getInstance()->vars.getName(optVarRef->getBaseVar());
+            DomainInt optVal = getState().getOptimiseValue();
+            opt += "ineq(";
+            if(getState().isMaximise()) {
+              opt += tostring(optVal) + string(", ") + optVar + string(", 0)\n");
+            } else {
+              opt += optVar + string(", ") + tostring(-optVal) + string(", 0)\n");
+            }*/
     }
     if(branches.empty()) {
       // TODO: We should check if any variable has non-empty domain, but this
@@ -279,7 +279,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
 
 /// Check if timelimit has been exceeded.
 inline void standardTime_ctrlc_checks(const vector<AnyVarRef>& varArray,
-                                       const vector<Controller::triple>& branches) {
+                                      const vector<Controller::triple>& branches) {
   if(getState().getNodeCount() >= getOptions().nodelimit) {
     generateRestartFile(varArray, branches);
     throw EndOfSearch();
@@ -320,14 +320,14 @@ void inline standard_dealWith_solution() {
       {
         std::ostringstream oss(getState().storedSolution);
         oss << "Solution found with Value: ";
-        output_mapped_container(oss, rawOptVals,
-        [](DomainInt v){return v;}, true);
+        output_mapped_container(
+            oss, rawOptVals, [](DomainInt v) { return v; }, true);
         oss << "\n";
       }
     } else {
       cout << "Solution found with Value: ";
-      output_mapped_container(cout, rawOptVals,
-      [](DomainInt v){return v;}, true);
+      output_mapped_container(
+          cout, rawOptVals, [](DomainInt v) { return v; }, true);
       cout << endl;
     }
 
@@ -336,8 +336,7 @@ void inline standard_dealWith_solution() {
       optVals.push_back(v.assignedValue());
     }
 
-    if(optVals.size() > 0)
-    {
+    if(optVals.size() > 0) {
       optVals.back()++;
     }
     getState().setOptimiseValue(optVals);
@@ -349,8 +348,8 @@ void inline standard_dealWith_solution() {
 
 void inline maybe_print_node(bool isSolution = false) {
   if(getOptions().dumptree)
-    cout << "Node: " << getState().getNodeCount() << ","
-         << getDom_as_string(getVars().getAllVars()) << endl;
+    cout << "Node: " << getState().getNodeCount() << "," << getDom_as_string(getVars().getAllVars())
+         << endl;
   if(getOptions().dumptreeobj) {
     getOptions().dumptreeobj->output_node(getState().getNodeCount(), getVars().getAllVars(),
                                           isSolution);

@@ -11,8 +11,32 @@
 #define IN_MAIN
 #endif
 
+#include "globals.h"
 #include "minion.h"
 
 #include "constraint_defs.h"
 
+#ifdef LIBMINION
+Globals* globals = new Globals();
+#endif
+
 SysInt numOfConstraints = sizeof(constraint_list) / sizeof(ConstraintDef);
+
+Globals::Globals() {
+    searchMem_m = NULL;
+    options_m = NULL;
+    state_m = NULL;
+    queues_m = NULL;
+    varContainer_m = NULL;
+    bools_m = NULL;
+    parData_m = NULL;
+}
+
+Globals::~Globals() {
+  delete this->bools_m;
+  delete this->state_m;
+  delete this->queues_m;
+  delete this->options_m;
+  delete this->parData_m;
+  delete this->varContainer_m;
+}

@@ -41,40 +41,39 @@ void print_default_help(char** argv) {
 }
 
 void doStandardSearch(CSPInstance& instance, SearchMethod args) {
-    bool preprocess = PreprocessCSP(instance, args);
+  bool preprocess = PreprocessCSP(instance, args);
 
-    getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
-                                                     getTableOut(), !getOptions().silent);
+  getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
+                                                   getTableOut(), !getOptions().silent);
 
-    if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
-      dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
+  if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
+    dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
 
-    // This has to happen here, so the dumpSolver knows if the solver failed or not
-    if(!preprocess) {
-      getState().setFailed(true);
-    }
+  // This has to happen here, so the dumpSolver knows if the solver failed or not
+  if(!preprocess) {
+    getState().setFailed(true);
+  }
 
-    SolveCSP(instance, args);
+  SolveCSP(instance, args);
 
-    getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
-                                                          getTableOut(), !getOptions().silent);
-    getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
+  getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
+                                                        getTableOut(), !getOptions().silent);
+  getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
 
-    getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
+  getOptions().printLine("Solutions Found: " + tostring(getState().getSolutionCount()));
 
-    getTableOut().set("Nodes", tostring(getState().getNodeCount()));
-    getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
-    getTableOut().set("SolutionsFound", getState().getSolutionCount());
+  getTableOut().set("Nodes", tostring(getState().getNodeCount()));
+  getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
+  getTableOut().set("SolutionsFound", getState().getSolutionCount());
 
-    if(getOptions().tableout && !Parallel::isAChildProcess()) {
-      getTableOut().print_line(); // Outputs a line to the table file.
-    }
+  if(getOptions().tableout && !Parallel::isAChildProcess()) {
+    getTableOut().print_line(); // Outputs a line to the table file.
+  }
 
-  #ifdef MORE_SEARCH_INFO
-    if(!getOptions().silent)
-      printSearchInfo();
-  #endif
-
+#ifdef MORE_SEARCH_INFO
+  if(!getOptions().silent)
+    printSearchInfo();
+#endif
 }
 
 int minion_main(int argc, char** argv) {
@@ -83,7 +82,7 @@ int minion_main(int argc, char** argv) {
   try {
 
     // Force parallel data to be created
-    Parallel::getParallelData();
+    getParallelData();
 
     getState().getOldTimer().startClock();
 
@@ -113,7 +112,7 @@ int minion_main(int argc, char** argv) {
 
     parseCommandLine(args, argc, argv);
 
-    global_random_gen.seed(args.randomSeed);
+    GET_GLOBAL(global_random_gen).seed(args.randomSeed);
 
     if(!getOptions().silent) {
       time_t rawtime;
@@ -157,7 +156,6 @@ int minion_main(int argc, char** argv) {
     }
 
     return 0;
-
 
   } catch(...) {
     cerr << "Minion exited abnormally via an exception." << endl;

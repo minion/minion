@@ -6,6 +6,7 @@
 
 #include "StateObj_forward.h"
 
+#include "globals.h"
 #include "parallel/parallel.h"
 
 VARDEF(Memory searchMem_m);
@@ -16,52 +17,92 @@ VARDEF(VariableContainer varContainer_m);
 VARDEF(BoolContainer bools_m);
 
 inline BoolContainer& getBools() {
+#ifdef LIBMINION
+  if(!globals->bools_m) {
+    globals->bools_m = new BoolContainer;
+  }
+  return *globals->bools_m;
+#else
   return bools_m;
+#endif
 }
 inline SearchOptions& getOptions() {
-  return options_m;
+#ifdef LIBMINION
+  if(!globals->options_m) {
+    globals->options_m = new SearchOptions;
+  }
+  return *globals->options_m;
+#else
+  return GET_GLOBAL(options_m);
+#endif
 }
 inline SearchState& getState() {
-  return state_m;
+#ifdef LIBMINION
+  if(!globals->state_m) {
+    globals->state_m = new SearchState;
+  }
+  return *globals->state_m;
+#else
+  return GET_GLOBAL(state_m);
+#endif
 }
 inline Queues& getQueue() {
-  return queues_m;
+#ifdef LIBMINION
+  if(!globals->queues_m) {
+    globals->queues_m = new Queues;
+  }
+  return *globals->queues_m;
+#else
+  return GET_GLOBAL(queues_m);
+#endif
 }
 inline Memory& getMemory() {
-  return searchMem_m;
+#ifdef LIBMINION
+  if(!globals->searchMem_m) {
+    globals->searchMem_m = new Memory;
+  }
+  return *globals->searchMem_m;
+#else
+  return GET_GLOBAL(searchMem_m);
+#endif
 }
 inline VariableContainer& getVars() {
-  return varContainer_m;
-}
-
-namespace Parallel {
-VARDEF(ParallelData* parData_m);
-
-inline ParallelData& getParallelData() {
-  if(parData_m == 0) {
-    parData_m = setupParallelData();
+#ifdef LIBMINION
+  if(!globals->varContainer_m) {
+    globals->varContainer_m = new VariableContainer;
   }
-  return *parData_m;
+  return *globals->varContainer_m;
+#else
+  return GET_GLOBAL(varContainer_m);
+#endif
 }
-} // namespace Parallel
+
+VARDEF(Parallel::ParallelData* parData_m);
+inline Parallel::ParallelData& getParallelData() {
+
+  if(!GET_GLOBAL(parData_m)) {
+    GET_GLOBAL(parData_m) = Parallel::setupParallelData();
+  }
+  return *GET_GLOBAL(parData_m);
+}
 
 template <typename DomType>
 inline BoundVarContainer<DomType>& BoundVarRef_internal<DomType>::getCon_Static() {
-  return varContainer_m.boundVarContainer;
+  return getVars().boundVarContainer;
 }
 
 inline BoolVarContainer& BoolVarRef_internal::getCon_Static() {
-  return varContainer_m.boolVarContainer;
+  return getVars().boolVarContainer;
 }
 
 template <typename DomType>
 inline SparseBoundVarContainer<DomType>& SparseBoundVarRef_internal<DomType>::getCon_Static() {
-  return varContainer_m.sparseBoundVarContainer;
+  return getVars().sparseBoundVarContainer;
 }
 
 template <typename d_type>
 inline BigRangeVarContainer<d_type>& BigRangeVarRef_internal_template<d_type>::getCon_Static() {
-  return varContainer_m.bigRangeVarContainer;
+  return getVars().bigRangeVarContainer;
 }
 
 // Must be defined later.

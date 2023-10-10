@@ -5,8 +5,8 @@
 #define VARIABLE_ORDERINGS_H
 
 #include <cfloat>
-//#include "../system/system.h"
-//#include "../memory_management/reversible_vals.h"
+// #include "../system/system.h"
+// #include "../memory_management/reversible_vals.h"
 
 template <typename T>
 DomainInt chooseVal(T& var, ValOrder vo) {
@@ -19,17 +19,17 @@ DomainInt chooseVal(T& var, ValOrder vo) {
     uniform_int_distribution<int> dist2(0, 1);
     if(vo.bias != 0) {
       if(vo.bias > 0) {
-        if(dist100(global_random_gen) <= vo.bias) {
+        if(dist100(GET_GLOBAL(global_random_gen)) <= vo.bias) {
           return var.max();
         }
       } else {
-        if(dist100(global_random_gen) <= -vo.bias) {
+        if(dist100(GET_GLOBAL(global_random_gen)) <= -vo.bias) {
           return var.min();
         }
       }
     }
     if(var.isBound()) {
-      switch(dist2(global_random_gen)) {
+      switch(dist2(GET_GLOBAL(global_random_gen))) {
       case 0: return var.min();
       case 1: return var.max();
       default: abort();
@@ -38,12 +38,12 @@ DomainInt chooseVal(T& var, ValOrder vo) {
     DomainInt minVal = var.min();
     DomainInt maxVal = var.max();
     uniform_int_distribution<int> distdom(0, checked_cast<SysInt>(maxVal - minVal));
-    DomainInt val = distdom(global_random_gen) + minVal;
+    DomainInt val = distdom(GET_GLOBAL(global_random_gen)) + minVal;
     D_ASSERT(val >= minVal);
     D_ASSERT(val <= maxVal);
     if(var.inDomain(val))
       return val;
-    switch(dist2(global_random_gen)) {
+    switch(dist2(GET_GLOBAL(global_random_gen))) {
     case 0: {
       val--;
       while(!var.inDomain(val))
@@ -264,7 +264,7 @@ struct WdegBranch : public VariableOrder {
 
   pair<SysInt, DomainInt> pickVarVal() {
     SysInt best = varOrder.size(); // the variable with the best score so far (init to none)
-    SysInt best_score = -1;         //... and its score (all true scores are positive)
+    SysInt best_score = -1;        //... and its score (all true scores are positive)
     size_t varOrderSize = varOrder.size();
     for(size_t i = 0; i < varOrderSize; i++) { // we will find the score for each var
       // cout << "i=" << i << endl;
@@ -331,7 +331,7 @@ struct DomOverWdegBranch : VariableOrder {
   pair<SysInt, DomainInt> pickVarVal() {
     // cout << "using domoverwdeg" << endl;
     SysInt best = varOrder.size(); // the variable with the best score so far (init to none)
-    float best_score = FLT_MAX;     //... and its score (all true scores are positive)
+    float best_score = FLT_MAX;    //... and its score (all true scores are positive)
     size_t varOrderSize = varOrder.size();
     bool anyUnassigned = false;
     for(size_t i = 0; i < varOrderSize; i++) { // we will find the score for each var
