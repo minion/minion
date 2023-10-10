@@ -234,7 +234,7 @@ struct CTupleSTR : public AbstractConstraint {
   ReversibleInt limit; // In tupindices, indices less than limit are not known
                        // to be invalid.
 
-  CTupleSTRData* sct;
+  std::unique_ptr<CTupleSTRData> sct;
 
   void init() {
     if((SysInt)sct->tuples.size() > 0) {
@@ -266,7 +266,7 @@ struct CTupleSTR : public AbstractConstraint {
         vars(_varArray),
         constraintLocked(false),
         limit(),
-        sct(new CTupleSTRData(_tuples, _varArray.size()))
+        sct(std::unique_ptr<CTupleSTRData>(new CTupleSTRData(_tuples, _varArray.size())))
   //, ssup_permanent()
   {
     CHECK(UseShort, "Internal error in ShortSTR2");

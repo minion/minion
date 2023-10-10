@@ -1,6 +1,8 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
+#include <memory>
+
 #include "tries.h"
 
 #ifdef P
@@ -28,12 +30,12 @@ public:
 };
 
 class TrieState {
-  TrieData* data;
+  std::shared_ptr<TrieData> data;
   vector<TrieObj**> trieCurrentSupport;
   vector<DomainInt> scratch_tuple;
 
 public:
-  TrieState(TrieData* _data) : data(_data) {
+  TrieState(std::shared_ptr<TrieData> _data) : data(_data) {
     const SysInt litcount = checked_cast<SysInt>(data->getLiteralCount());
     trieCurrentSupport.resize(litcount);
     for(SysInt i = 0; i < litcount; ++i) {
@@ -75,13 +77,13 @@ public:
 };
 
 class TableState {
-  TableData* data;
+  std::shared_ptr<TableData> data;
 
   vector<DomainInt> scratch_tuple;
   /// The constructor of TableState should set up all structures to 'sensible'
   /// default values. It should not look for actual valid supports.
 public:
-  TableState(TableData* _data) : data(_data) {
+  TableState(std::shared_ptr<TableData> _data) : data(_data) {
     scratch_tuple.resize(checked_cast<SysInt>(data->getVarCount()));
   }
 
@@ -128,14 +130,14 @@ struct NewTableConstraint : public AbstractConstraint {
   typedef typename VarArray::value_type VarRef;
   VarArray vars;
 
-  TableDataType* data;
+  std::shared_ptr<TableDataType> data;
 
   TableStateType state;
 
   std::shared_ptr<TupleList> tuples;
 
   NewTableConstraint(const VarArray& _vars, std::shared_ptr<TupleList> _tuples)
-      : vars(_vars), data(new TableDataType(_tuples)), state(data), tuples(_tuples) {
+      : vars(_vars), data(std::make_shared<TableDataType>(_tuples)), state(data), tuples(_tuples) {
     CheckNotBound(vars, "table constraint");
     if(_tuples->tupleSize() != (SysInt)_vars.size()) {
       cout << "Table constraint: Number of variables " << _vars.size()

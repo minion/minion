@@ -20,10 +20,11 @@ struct HaggisGACTuples {
     return tuple_list_cpy;
   }
 
+  vector<vector<pair<SysInt, DomainInt>>*> shortsupports;
+
   template <typename Vars, typename Data>
   HaggisGACTuples(const Vars& vars, Data data) {
     // Read in the short supports.
-    vector<vector<pair<SysInt, DomainInt>>*> shortsupports;
 
     const vector<vector<pair<SysInt, DomainInt>>>& tupleRef = (*data->tuplePtr());
 
@@ -69,6 +70,13 @@ struct HaggisGACTuples {
         }
       }
     }
+  }
+
+  ~HaggisGACTuples() {
+    for(SysInt i = 0; i < (SysInt)shortsupports.size(); i++) {
+      delete shortsupports[i];
+    }
+
   }
 };
 
