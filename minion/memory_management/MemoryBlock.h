@@ -56,6 +56,8 @@ public:
 
   ExtendableBlock(const ExtendableBlock&) = default;
 
+  ExtendableBlock& operator=(const ExtendableBlock&) = default;
+
   char* operator()() const {
     return ptr;
   }
