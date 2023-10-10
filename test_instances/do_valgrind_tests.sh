@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 set -o errexit
-for i in *.minion; do 
-  valgrind --error-exitcode=1 --leak-check=full $* $i -nodelimit 10
-done
+
+if which valgrind; then
+  for i in *.minion; do
+    if ! grep '#FAIL' $i > /dev/null; then
+      valgrind --error-exitcode=1 --leak-check=full $* $i -nodelimit 10
+    fi
+  done
+else
+  echo 'no valgrind, skipping valgrind tests'
+fi
