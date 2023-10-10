@@ -59,7 +59,7 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
   }
 
   BoolLessSumConstraintDynamic(const VarArray& _varArray, VarSum _varSum)
-      : varArray(_varArray), varSum(_varSum), last(0) {
+      : varArray(_varArray), varSum(_varSum), unwatchedIndexes(0), last(0) {
     D_ASSERT((VarToCount == 0) || (VarToCount == 1));
     // Sum of 1's is >= K
     // == Number of 1's is >=K         // this is the one I want to do
@@ -76,6 +76,10 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       D_ASSERT(numUnwatched >= 0);
       unwatchedIndexes = checked_malloc(sizeof(UnsignedSysInt) * numUnwatched);
     }
+  }
+
+  ~BoolLessSumConstraintDynamic() {
+    free(unwatchedIndexes);
   }
 
   virtual SysInt dynamicTriggerCount() {
