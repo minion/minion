@@ -34,9 +34,10 @@ SysInt EventCategory[] = {
 string VarNames[] = {"Bool", "Bound", "SparseBound", "Range", "BigRange"};
 
 string ConEventNames[] = {
-    "DynamicTrigger", "SpecialTrigger", "DynamicMovePtr", "AddSpecialToQueue",
+    "StaticTrigger", "DynamicTrigger", "SpecialTrigger", "DynamicMovePtr", "AddSpecialToQueue",
     "AddConToQueue",  "AddDynToQueue",  "SearchTrie",     "LoopSearchTrie",
 };
+
 
 string PropEventNames[] = {
 #define PROP_EVENT(x) #x,
