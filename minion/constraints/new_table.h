@@ -44,6 +44,12 @@ public:
     scratch_tuple.resize(litcount);
   }
 
+  ~TrieState() {
+    for(SysInt i = 0; i < trieCurrentSupport.size(); ++i) {
+      delete[] trieCurrentSupport[i];
+    }
+  }
+
   template <typename VarArray>
   vector<DomainInt>* findSupportingTuple(const VarArray& vars, Literal lit) {
     // SysInt tupleSize = data->getVarCount();

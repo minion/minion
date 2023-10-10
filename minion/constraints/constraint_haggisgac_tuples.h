@@ -73,14 +73,14 @@ struct HaggisGACTuples {
 };
 
 template <typename Vars>
-inline HaggisGACTuples* ShortTupleList::getHaggisData(const Vars& vars) {
+inline shared_ptr<HaggisGACTuples> ShortTupleList::getHaggisData(const Vars& vars) {
   vector<pair<DomainInt, DomainInt>> doms;
 
   for(SysInt i = 0; i < (SysInt)vars.size(); ++i)
     doms.push_back(std::make_pair(vars[i].initialMin(), vars[i].initialMax()));
 
   if(hgt.count(doms) == 0) {
-    hgt[doms] = new HaggisGACTuples(vars, this);
+    hgt[doms] = std::make_shared<HaggisGACTuples>(vars, this);
   }
 
   return hgt[doms];
