@@ -15,22 +15,6 @@
 
 namespace Parallel {
 
-struct ParallelData {
-
-  std::atomic<int> processCount;
-  int initialProcessCount;
-  pthread_mutex_t outputLock;
-
-  std::atomic<bool> fatalErrorOccurred;
-  std::atomic<bool> process_should_exit;
-  std::atomic<long long> solutions;
-  std::atomic<long long> nodes;
-  std::atomic<long long> children;
-  pid_t parentProcessID;
-  std::atomic<bool> ctrlCPressed;
-  std::atomic<bool> alarmTrigger;
-};
-
 static bool checkIsAChildProcess;
 static bool forkEverCalled;
 
