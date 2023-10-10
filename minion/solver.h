@@ -53,7 +53,6 @@ class SearchState {
   shared_ptr<TupleListContainer> tupleListContainer;
   shared_ptr<ShortTupleListContainer> shortTupleListContainer;
 
-  volatile bool alarmTrigger;
 
   GenericBacktracker generic_backtracker;
 
@@ -205,8 +204,8 @@ public:
         constraintsToPropagate(1),
         solutions(0),
         finished(false),
-        failed(false),
-        alarmTrigger(false) {}
+        failed(false)
+        {}
 
   // Must be defined later.
   ~SearchState();
