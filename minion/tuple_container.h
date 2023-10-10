@@ -131,6 +131,10 @@ public:
     tupleData = new DomainInt[numberOfTuples * tupleLength];
   }
 
+  ~TupleList() {
+    delete[] tupleData;
+  }
+
   const DomainInt* operator[](SysInt pos) const {
     return getTupleptr(pos);
   }
@@ -282,11 +286,11 @@ class ShortTupleList {
   vector<set<DomainInt>> initialDomainList;
   string tuple_name;
 
-  std::map<std::vector<std::pair<DomainInt, DomainInt>>, HaggisGACTuples*> hgt;
+  std::map<std::vector<std::pair<DomainInt, DomainInt>>, std::shared_ptr<HaggisGACTuples>> hgt;
 
 public:
   template <typename Vars>
-  HaggisGACTuples* getHaggisData(const Vars& vars);
+  std::shared_ptr<HaggisGACTuples> getHaggisData(const Vars& vars);
 
   // NOTE: initial domains may be empty, in which case they should be ignored.
   vector<set<DomainInt>> initialDomains() {

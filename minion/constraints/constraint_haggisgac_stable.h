@@ -114,7 +114,7 @@ struct HaggisGACStable : public AbstractConstraint, Backtrackable {
 
   Support* supportFreeList; // singly-linked list of spare Support objects.
 
-  HaggisGACTuples* tuple_list;
+  shared_ptr<HaggisGACTuples> tuple_list;
 
   vector<vector<SysInt>> tuple_list_pos; // current position in tuple_lists (for
                                          // each var and val). Wraps around.
