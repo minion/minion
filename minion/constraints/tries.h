@@ -78,6 +78,10 @@ struct TupleTrie {
     }
   }
 
+  ~TupleTrie() {
+    delete[] trie_data;
+  }
+
   struct EarlyTrieObj {
     DomainInt val;
     DomainInt depth;
@@ -431,7 +435,13 @@ public:
       new(tupleTries + varIndex) TupleTrie(varIndex, tuplelist);
   }
 
+  TupleTrieArray(const TupleTrieArray&) = delete;
+  TupleTrieArray(TupleTrieArray&&) = delete;
+
   ~TupleTrieArray() {
+    for(SysInt varIndex = 0; varIndex < arity; varIndex++) {
+      (((TupleTrie*)(tupleTries)) + varIndex)->~TupleTrie();
+    }
     free(tupleTries);
   }
 };
