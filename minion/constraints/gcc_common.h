@@ -633,7 +633,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     for(SysInt i = 0; i < numvars; i++) {
       if(lbcmatching[i] == domMin - 1) {
         DomainInt minval = varArray[i].min();
-        lbcmatching[i] = minval;
+        lbcmatching[i] = checked_cast<SysInt>(minval);
         lbcusage[minval - domMin]++;
       }
     }

@@ -549,7 +549,7 @@ protected:
             for(DomainInt realval = varArray[tempvar].min();
                 realval <= varArray[tempvar].max(); realval++) {
               if(varArray[tempvar].inDomain(realval)) {
-                SysInt tempval = realval - domMin;
+                SysInt tempval = checked_cast<SysInt>(realval - domMin);
 
                 if(!invprevious.in(tempval)) // if tempval not found in vprevious
                 {
