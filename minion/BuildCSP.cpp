@@ -77,7 +77,9 @@ void BuildCSP(CSPInstance& instance) {
   // Impose Constraints
   for(list<ConstraintBlob>::iterator it = instance.constraints.begin();
       it != instance.constraints.end(); it++) {
-    getState().addConstraint(build_constraint(*it));
+        if(!getState().isFailed()) {
+          getState().addConstraint(build_constraint(*it));
+        }
   }
 
   // Solve!
