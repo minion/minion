@@ -67,12 +67,12 @@ fn main() -> Result<()> {
     let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
         (0..opt.count)
             .into_par_iter()
-            .try_for_each(|_| test_types::test_constraint(&config, &c))
+            .try_for_each(|_| test_types::test_constraint(&config, c))
             .context(format!("failure in {}", c.name))?;
 
         (0..opt.count)
             .into_par_iter()
-            .try_for_each(|_| test_types::test_constraint_nested(&config, &c))
+            .try_for_each(|_| test_types::test_constraint_nested(&config, c))
             .context(format!("failure in {} with nesting", c.name))?;
 
         println!("Tested {}", c.name);
@@ -85,7 +85,7 @@ fn main() -> Result<()> {
     let ret2: Result<()> = v.into_par_iter().try_for_each(|ref c| {
         (0..opt.count)
             .into_par_iter()
-            .try_for_each(|_| test_types::test_constraint_par(&config, &c))
+            .try_for_each(|_| test_types::test_constraint_par(&config, c))
             .context(format!("failure in {}", c.name))?;
 
         println!("Tested {}", c.name);

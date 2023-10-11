@@ -73,7 +73,7 @@ pub fn get_minion_solutions(
     {
         let mut outfile =
             fs::File::create(&minout).context("Could not open output file for writing")?;
-        print_minion_file_pair(&mut outfile, &instance).context("failed writing Minion output")?;
+        print_minion_file_pair(&mut outfile, instance).context("failed writing Minion output")?;
     }
 
     let minioncmd = format!("{} {}", minionexec, args.iter().join(" "));

@@ -280,7 +280,7 @@ impl ConstraintInstance {
             constraint: STANDARD_TABLE_CONSTRAINT.clone(),
             varlist: {
                 let vars: Vec<Arc<MinionVariable>> =
-                    self.vars().iter().cloned().flatten().collect();
+                    self.vars().iter().flatten().cloned().collect();
                 Arc::new(vec![vars])
             },
             tuples: Some(Tuples::new(tuples)),
