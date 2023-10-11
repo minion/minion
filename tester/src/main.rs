@@ -20,8 +20,8 @@ mod test_types;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
 struct Opt {
-    #[structopt(short = "v", long = "verbose")]
-    verbose: bool,
+    //#[structopt(short = "v", long = "verbose")]
+    //verbose: bool,
 
     #[structopt(name = "constraints")]
     constraints: Vec<String>,
@@ -34,11 +34,16 @@ struct Opt {
 
     #[structopt(short = "t", long = "maxtuples", default_value = "10000")]
     maxtuples: usize,
+
+    #[structopt(short = "n", long = "number of threads", default_value = "8")]
+    numthreads: usize
 }
 
 fn main() -> Result<()> {
     let opt = Opt::from_args();
     println!("{:?}", opt);
+
+    rayon::ThreadPoolBuilder::new().num_threads(opt.numthreads).build_global().unwrap();
 
     let mut v;
     if opt.constraints.is_empty() {

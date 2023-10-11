@@ -91,7 +91,7 @@ pub fn get_minion_solutions(
 
     if !output.status.success() {
         print!(
-            "{}\n{}\n",
+            "Minion did not finish successfully (non-zero return value)\n{}\n{}\n",
             String::from_utf8_lossy(&output.stdout),
             String::from_utf8_lossy(&output.stderr)
         );
