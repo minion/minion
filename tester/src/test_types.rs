@@ -7,6 +7,7 @@ use self::rand::seq::SliceRandom;
 use anyhow::{anyhow, Result};
 
 pub struct MinionConfig<'a> {
+    pub minionargs: Vec<String>,
     pub minionexec: &'a str,
     pub maxtuples: usize,
 }
@@ -25,12 +26,18 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
 
     let ret = run_minion::get_minion_solutions(
         config.minionexec,
+        &config.minionargs,
         &["-findallsols"],
         &instance,
         "original",
     )?;
-    let ret2 =
-        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
+    let ret2 = run_minion::get_minion_solutions(
+        config.minionexec,
+        &config.minionargs,
+        &["-findallsols"],
+        &tups,
+        "tuples",
+    )?;
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
@@ -54,12 +61,14 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
     let instance = constraint_def::build_random_instance(c);
     let ret = run_minion::get_minion_solutions(
         config.minionexec,
+        &config.minionargs,
         &["-findallsols"],
         &instance,
         "original",
     )?;
     let ret2 = run_minion::get_minion_solutions(
         config.minionexec,
+        &config.minionargs,
         &["-findallsols", "-parallel"],
         &instance,
         "parallel",
@@ -108,12 +117,18 @@ pub fn test_constraint_nested(
 
     let ret = run_minion::get_minion_solutions(
         config.minionexec,
+        &config.minionargs,
         &["-findallsols"],
         &instance,
         "original",
     )?;
-    let ret2 =
-        run_minion::get_minion_solutions(config.minionexec, &["-findallsols"], &tups, "tuples")?;
+    let ret2 = run_minion::get_minion_solutions(
+        config.minionexec,
+        &config.minionargs,
+        &["-findallsols"],
+        &tups,
+        "tuples",
+    )?;
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
