@@ -46,7 +46,8 @@ struct MinionJsonOut {
 
 pub fn get_minion_solutions(
     minionexec: &str,
-    minionargs: &[&str],
+    baseargs: &Vec<String>,
+    extraargs: &[&str],
     instance: &ConstraintInstance,
     testname: &str,
 ) -> Result<MinionOutput> {
@@ -62,7 +63,10 @@ pub fn get_minion_solutions(
     let solsout = format!("tempdir/sols{}.out", nameid);
     let tableout = format!("tempdir/jsontable{}.out", nameid);
 
-    let mut args: Vec<String> = minionargs.iter().map(|x| x.to_string()).collect();
+    let mut args: Vec<String> = baseargs.clone();
+    for &e in extraargs {
+        args.push(e.to_owned());
+    }
     args.push("-solsout".to_string());
     args.push(solsout.clone());
     args.push("-jsontableout".to_string());

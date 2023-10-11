@@ -20,8 +20,8 @@ mod test_types;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "basic")]
 struct Opt {
-    //#[structopt(short = "v", long = "verbose")]
-    //verbose: bool,
+    #[structopt(short = "v", long = "valgrind")]
+    valgrind: bool,
 
     #[structopt(name = "constraints")]
     constraints: Vec<String>,
@@ -36,14 +36,17 @@ struct Opt {
     maxtuples: usize,
 
     #[structopt(short = "n", long = "number of threads", default_value = "8")]
-    numthreads: usize
+    numthreads: usize,
 }
 
 fn main() -> Result<()> {
     let opt = Opt::from_args();
     println!("{:?}", opt);
 
-    rayon::ThreadPoolBuilder::new().num_threads(opt.numthreads).build_global().unwrap();
+    rayon::ThreadPoolBuilder::new()
+        .num_threads(opt.numthreads)
+        .build_global()
+        .unwrap();
 
     let mut v;
     if opt.constraints.is_empty() {
@@ -59,9 +62,22 @@ fn main() -> Result<()> {
         }
     }
 
-    let config = test_types::MinionConfig {
-        minionexec: &opt.minion,
-        maxtuples: opt.maxtuples,
+    let config = if opt.valgrind {
+        test_types::MinionConfig {
+            minionargs: vec![
+                "--leak-check=full".to_owned(),
+                "--show-leak-kinds=all".to_owned(),
+                opt.minion.clone(),
+            ],
+            minionexec: "valgrind",
+            maxtuples: opt.maxtuples,
+        }
+    } else {
+        test_types::MinionConfig {
+            minionargs: vec![],
+            minionexec: &opt.minion,
+            maxtuples: opt.maxtuples,
+        }
     };
 
     let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
