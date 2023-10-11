@@ -78,25 +78,25 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
     if doms.var_type == VarType::Constant {
         return Ok(());
     }
-    write!(f, "**VARIABLES**\n")?;
+    writeln!(f, "**VARIABLES**")?;
     match doms.var_type {
         VarType::Constant => {}
         VarType::Bool => {
-            write!(f, "BOOL {}\n", doms.name)?;
+            writeln!(f, "BOOL {}", doms.name)?;
         }
         VarType::Bound => {
-            write!(
+            writeln!(
                 f,
-                "BOUND {} {{{}..{}}}\n",
+                "BOUND {} {{{}..{}}}",
                 doms.name,
                 doms.domain.first().unwrap(),
                 doms.domain.last().unwrap()
             )?;
         }
         VarType::Discrete => {
-            write!(
+            writeln!(
                 f,
-                "DISCRETE {} {{{}..{}}}\n",
+                "DISCRETE {} {{{}..{}}}",
                 doms.name,
                 doms.domain.first().unwrap(),
                 doms.domain.last().unwrap()
@@ -104,7 +104,7 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
         }
     }
 
-    write!(f, "**CONSTRAINTS**\n")?;
+    writeln!(f, "**CONSTRAINTS**")?;
     let range = if doms.var_type == VarType::Bool {
         0..2
     } else {
