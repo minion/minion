@@ -39,4 +39,10 @@ steps:
     export PATH=$PATH:$HOME/.cargo/bin
     cd tester
     cargo run --release -- --minion ../bin-quick/minion
+- bash: |
+    export PATH=$PATH:$HOME/.cargo/bin
+    cd tester
+    if which valgrind; then
+      cargo run --release -- --minion ../bin-quick/minion --valgrind --count=3 -n 2
+    fi
   displayName: 'Run minion tests'
