@@ -149,7 +149,7 @@ struct STR : public AbstractConstraint {
   ReversibleInt limit; // In tupindices, indices less than limit are not known
                        // to be invalid.
 
-  STRData* sct;
+  std::unique_ptr<STRData> sct;
 
   void init() {
     if((SysInt)sct->tuples.size() > 0) {
