@@ -78,6 +78,14 @@ void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
 
 namespace Parallel {
 
+
+void setNumberCores(int cores) {
+  if(cores > 0) {
+    getParallelData().processCount = cores;
+    getParallelData().initialProcessCount = cores;
+  }
+}
+
 ParallelData* setupParallelData() {
   // make sure we don't end up with too many children
   signal(SIGCHLD, SIG_IGN);
@@ -95,10 +103,7 @@ ParallelData* setupParallelData() {
   if(pd == MAP_FAILED) {
     D_FATAL_ERROR("Parallel data setup failed");
   }
-  int cores = getOptions().parallelcores;
-  if(cores < 1) {
-    cores = sysconf(_SC_NPROCESSORS_ONLN);
-  }
+  int cores = sysconf(_SC_NPROCESSORS_ONLN);
   pd->processCount = cores;
   pd->initialProcessCount = cores;
 

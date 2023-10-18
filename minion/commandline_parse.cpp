@@ -319,6 +319,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     } else if(command == string("-cores")) {
       INCREMENT_i(-cores);
       getOptions().parallelcores = atoi(argv[i]);
+      Parallel::setNumberCores(getOptions().parallelcores);
     } else if(command == string("-steallow")) {
       getOptions().parallelStealHigh = false;
     }

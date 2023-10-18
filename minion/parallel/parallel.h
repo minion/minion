@@ -23,6 +23,7 @@ struct ParallelData {
   std::atomic<bool> alarmTrigger;
 };
 
+void setNumberCores(int cores);
 ParallelData* setupParallelData();
 void lockSolsout();
 void unlockSolsout();
