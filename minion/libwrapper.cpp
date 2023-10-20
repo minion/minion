@@ -26,7 +26,7 @@ void resetMinion() {
   globals = new Globals();
 }
 
-ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance) {
+ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance, bool(*callback)(void)) {
 
   ReturnCodes returnCode = ReturnCodes::OK;
 
@@ -47,7 +47,6 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   ifstream logOutStream;
   time_t rawtime;
   time(&rawtime);
-  char time[30];
 
   stringstream filenameStream;
   filenameStream << "minion";
@@ -66,6 +65,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
 
     getState().getOldTimer().startClock();
 
+    globals->callback = callback;
     globals->options_m = new SearchOptions(options);
 
     getOptions().printLine("# " + std::string(MinionVersion));
