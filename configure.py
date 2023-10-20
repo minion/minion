@@ -402,6 +402,10 @@ minionbinobjlist = [objname(x) for x in minionbinsrclist]
 print(minionbinsrclist)
 print(minionbinobjlist)
 
+
+with open("Makeflags.mak", "w") as out:
+    out.write('FLAGS=' + ' '.join(commandargs)+ '\n')
+
 with open(outname, "w") as out:
     if arg.buildsystem == "sh":
         out.write("#!/usr/bin/env bash\n")
