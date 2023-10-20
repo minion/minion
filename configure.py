@@ -441,14 +441,14 @@ with open(outname, "w") as out:
     for i in constraintsrclist:
         if arg.buildsystem == "make":
             # out.write(objname(i) + ": " + i + "\n")
-            out.write(objname(i) + ": "+i+'\n')
+            out.write(objname(i) + ": Makeflags.mak "+i+'\n')
         out.write('\t'+compiler+' '+varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + i +'\n')
 
     for i in minionbinsrclist:
         if arg.buildsystem == "make":
             # out.write(objname(i)+ " : \n")
-            out.write(objname(i)+ " : " + scriptdir + "/" + i +'\n')
+            out.write(objname(i)+ " : Makeflags.mak " + scriptdir + "/" + i +'\n')
         out.write('\t'+compiler+' ' + varsub('FLAGS') + ' -c -o ' +
                    objname(i) + " " + scriptdir + "/" + i +'\n')
 
