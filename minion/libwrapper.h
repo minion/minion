@@ -139,7 +139,7 @@ enum ReturnCodes {
  *
  *   An error code is returned. These are described in ReturnCodes.
  */
-ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance);
+ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance, bool(*callback)(void));
 
 
 /* 

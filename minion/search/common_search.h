@@ -9,6 +9,10 @@
 #include "../variables/AnyVarRef.h"
 #include "../variables/mappings/variable_neg.h"
 
+#ifdef LIBMINION
+extern Globals* globals;
+#endif 
+
 namespace Controller {
 
 /// Sets optimisation variable.
@@ -93,6 +97,7 @@ void print_solution(Stream& sout, const PrintMatrix& print_matrix) {
     getState().getOldTimer().printTimestepWithoutReset(sout, "Time:");
     sout << "Nodes: " << getState().getNodeCount() << endl << endl;
   }
+
 }
 
 /// All operations to be performed when a solution is found.
@@ -341,6 +346,14 @@ void inline standard_dealWith_solution() {
     }
     getState().setOptimiseValue(optVals);
   }
+
+  #ifdef LIBMINION
+  if (globals->callback !=NULL) {
+    if (!globals->callback()) {
+      throw EndOfSearch();
+    }
+  }
+  #endif
   // Note that sollimit = -1 if all solutions should be found.
   if(getState().getSolutionCount() == getOptions().sollimit)
     throw EndOfSearch();

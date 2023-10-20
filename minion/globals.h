@@ -2,6 +2,7 @@
 #define _GLOBALS_H
 
 #include "StateObj_forward.h"
+#include "variables/AnyVarRef.h"
 #include <fstream>
 #include <random>
 
@@ -13,6 +14,7 @@ struct Globals {
   VariableContainer* varContainer_m;
   BoolContainer* bools_m;
   Parallel::ParallelData* parData_m;
+  bool(*callback)(void);
   std::mt19937 global_random_gen;
   std::ofstream solsoutfile;
   /*
