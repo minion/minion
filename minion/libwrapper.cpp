@@ -10,6 +10,7 @@
 #include "command_search.h"
 #include "info_dumps.h"
 #include "system/minlib/exceptions.hpp"
+#include <iomanip>
 
 #ifdef LIBMINION
 
@@ -27,6 +28,8 @@ void resetMinion() {
 
 ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance) {
 
+  ReturnCodes returnCode = ReturnCodes::OK;
+
   /*
    * Adapted from minion_main.
    * Whereas minion_main takes in command line arguments, we take in Minion
@@ -34,6 +37,26 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
    */
 
   resetMinion();
+
+
+  // Redirect cout
+  // https://stackoverflow.com/questions/49462524/controlling-output-from-external-libraries
+  // https://stackoverflow.com/questions/4810516/c-redirecting-stdout
+
+  streambuf* oldCoutStreamBuf = cout.rdbuf();
+  ifstream logOutStream;
+  time_t rawtime;
+  time(&rawtime);
+  char time[30];
+
+  stringstream filenameStream;
+  filenameStream << "minion";
+  filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
+  filenameStream << ".log";
+
+  logOutStream.open(filenameStream.str(),ios_base::app);
+  
+  cout.rdbuf(logOutStream.rdbuf());
 
   // Pass error codes across FFI boundaries, not exceptions.
   try {
@@ -50,8 +73,6 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
 
     GET_GLOBAL(global_random_gen).seed(args.randomSeed);
      if(!getOptions().silent) {
-        time_t rawtime;
-        time(&rawtime);
         cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
         cout << "# Input filename: " << getOptions().instance_name << endl;
         getOptions().printLine("Using seed: " + tostring(args.randomSeed));
@@ -84,20 +105,21 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
      } else {
        doStandardSearch(instance, args);
      }
-    
-    return ReturnCodes::OK;
-    
   }
 
-  
-  //TODO (nd60): fill out errors.
   catch(parse_exception e) {
     cout << "Invalid instance: " << e.what() << endl;
-    return ReturnCodes::INVALID_INSTANCE;
+    returnCode =  ReturnCodes::INVALID_INSTANCE;
   }
   catch(...){
-    return ReturnCodes::UNKNOWN_ERROR;
+    returnCode =  ReturnCodes::UNKNOWN_ERROR;
   }
+
+
+  // Restore old cout
+  cout.rdbuf( oldCoutStreamBuf );
+  
+  return returnCode;
 }
 
 /*********************************************************************/
