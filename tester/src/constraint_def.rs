@@ -495,7 +495,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
                     == (if v[1][0] == 0 {
                         0
                     } else {
-                        v[0][0].div_floor(&v[1][0])
+                        num_integer::Integer::div_floor(&v[0][0], &v[1][0])
                     })
             },
             false,
@@ -508,7 +508,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
                 if v[1][0] == 0 {
                     false
                 } else {
-                    v[2][0] == v[0][0].div_floor(&v[1][0])
+                    v[2][0] == num_integer::Integer::div_floor(&v[0][0], &v[1][0])
                 }
             },
             false,
