@@ -200,16 +200,103 @@ void finaliseModel(CSPInstance& instance) {
 /*                    REXPORTING INLINE FUNCTIONS                    */
 /*********************************************************************/
 
-SearchOptions newSearchOptions() {
-  return SearchOptions();
+SearchOptions* newSearchOptions() {
+  return new SearchOptions();
 }
 
-SearchMethod newSearchMethod() {
-  return SearchMethod();
+SearchMethod* newSearchMethod() {
+  return new SearchMethod();
 }
 
 CSPInstance* newInstance() {
   return new CSPInstance();
+}
+
+ConstraintBlob* newConstraintBlob(ConstraintType constraint_type) {
+  return new ConstraintBlob(lib_getConstraint(constraint_type));
+}
+
+SearchOrder* newSearchOrder(std::vector<Var>& vars,VarOrderEnum orderEnum, bool findOneSol) {
+  return new SearchOrder(vars,orderEnum,findOneSol);
+}
+
+void searchOptions_free(SearchOptions* searchOptions) {
+  delete searchOptions;
+}
+
+void searchMethod_free(SearchMethod* searchMethod) {
+  delete searchMethod;
+}
+
+void instance_free(CSPInstance* instance) {
+  delete instance;
+}
+
+void constraint_free(ConstraintBlob* constraint) {
+  delete constraint;
+}
+
+void searchOrder_free(SearchOrder* searchOrder) {
+  delete searchOrder;
+}
+
+Var getVarByName(CSPInstance& instance, char* name) {
+
+  return instance.vars.getSymbol(string(name));
+}
+
+void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2) {
+  newVar(instance, string(name), type, std::vector<DomainInt>({bound1,bound2}));
+}
+
+
+void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder) {
+  instance.searchOrder.push_back(searchOrder);
+}
+
+void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint) {
+  instance.constraints.push_back(constraint);
+}
+
+void printMatrix_addVar(CSPInstance& instance, Var var) {
+  instance.print_matrix.push_back({var});
+}
+
+int printMatrix_getValue(int idx) {
+  // FIXME: does not work with minion debug mode
+  return globals->state_m->getPrintMatrix()[idx][0].assignedValue();
+}
+
+void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars) {
+  constraint.vars.push_back(vars);
+}
+
+void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants) {
+  constraint.constants.push_back(constants);
+}
+
+std::vector<Var>* vec_var_new() {
+  return new std::vector<Var>();
+}
+
+void vec_var_push_back(std::vector<Var>* vec, Var var) {
+  vec->push_back(var);
+}
+
+void vec_var_free(std::vector<Var>* vec) {
+  delete vec;
+}
+
+std::vector<DomainInt>* vec_int_new() {
+  return new std::vector<DomainInt>();
+}
+void vec_int_push_back(std::vector<DomainInt>* vec, int n) {
+  vec->push_back(n);
+}
+
+
+void vec_int_free(std::vector<DomainInt>* vec) {
+  delete vec;
 }
 
 #endif
