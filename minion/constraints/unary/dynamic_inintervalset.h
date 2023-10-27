@@ -84,7 +84,6 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
     }
 
     SysInt pos = intervals.size() - 1;
-    DomainInt maxval = var.max();
     while(pos >= 0 && intervals[pos].first > var.max())
       pos--;
     if(pos < 0) {
