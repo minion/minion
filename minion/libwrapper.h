@@ -1,6 +1,8 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
+
+#include "minion.h"
 /*
  * Functions for using minion as a library.
  *
