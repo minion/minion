@@ -124,9 +124,14 @@ parser.add_argument('--compiler', help="Set compiler")
 
 parser.add_argument('--constraints', help="Comma seperated list of constraints to use")
 
+parser.add_argument('--assertions', action='store_const',
+                    const=['-D_GLIBCXX_DEBUG', '-DMINION_DEBUG', '-DMORE_SEARCH_INFO'],
+                    help='Enable assertions')
+
 parser.add_argument('--debug', action='store_const',
                     const=['-D_GLIBCXX_DEBUG', '-DMINION_DEBUG', '-DMORE_SEARCH_INFO', '-g'],
-                    help='Enable debugging')
+                    help='Enable debugging (also adds --assertions)')
+
 parser.add_argument('--print', action='store_const', const=['-DMINION_DEBUG_PRINT'],
                     help='Enable verbose debug printing')
 parser.add_argument('--info', action='store_const', const=['-DMORE_SEARCH_INFO'],
@@ -186,7 +191,7 @@ verbose_print(1, "Minion base dir: " + scriptdir)
 commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
-for c in ['domains64', 'quick', 'debug', 'print', 'info', 'profile', 'static']:
+for c in ['domains64', 'quick', 'debug', 'assertions', 'print', 'info', 'profile', 'static']:
     if getattr(arg, c) != None:
         commandargs = commandargs + getattr(arg, c)
 
