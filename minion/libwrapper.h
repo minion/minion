@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 
+#include "ConstraintEnum.h"
+#include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
 #include "solver.h"
 /*
@@ -122,6 +124,7 @@
  *
  */
 #include "minion.h"
+#include <vector>
 void resetMinion();
 
 enum ReturnCodes {
@@ -186,10 +189,10 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
 Var constantAsVar(DomainInt n);
 
 
-/*********************************************************************/
-/*                    REXPORTING INLINE FUNCTIONS                    */
-/*********************************************************************/
 
+/*******************************************************/
+/*                    FFI FUNCTIONS                    */
+/*******************************************************/
 /*
  * ConstraintDef* lib_getConstraint:
  *  
@@ -209,14 +212,40 @@ Var constantAsVar(DomainInt n);
  */
 ConstraintDef* lib_getConstraint(ConstraintType t);
 
-//These are inlined constructors, so rust cannot see them
-
-SearchOptions newSearchOptions();
-
-SearchMethod newSearchMethod();
-
+SearchOptions* newSearchOptions();
+SearchMethod* newSearchMethod();
 CSPInstance* newInstance();
+ConstraintBlob* newConstraintBlob(ConstraintType contraint_type);
+SearchOrder* newSearchOrder(std::vector<Var>& vars,VarOrderEnum orderEnum, bool findOneSol);
 
+void searchOptions_free(SearchOptions* searchOptions);
+void searchMethod_free(SearchMethod* searchMethod);
+void instance_free(CSPInstance* instance);
+void constraint_free(ConstraintBlob* constraint);
+void searchOrder_free(SearchOrder* searchOrder);
+
+Var getVarByName(CSPInstance& instance, char* name);
+void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
+
+void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
+void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
+
+// Both these assume print matrix of form [[x],[y],[z]]
+void printMatrix_addVar(CSPInstance& instance, Var var);
+
+// Should be called only when minion has results in a callback
+int printMatrix_getValue(int idx);
+
+void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars);
+void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
+
+std::vector<Var>* vec_var_new();
+void vec_var_push_back(std::vector<Var>* vec, Var var);
+void vec_var_free(std::vector<Var>* vec);
+
+std::vector<DomainInt>* vec_int_new();
+void vec_int_push_back(std::vector<DomainInt>* vec, int n);
+void vec_int_free(std::vector<DomainInt>* vec);
 
 #endif
 
