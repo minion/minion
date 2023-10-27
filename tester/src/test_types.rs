@@ -97,6 +97,51 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
     Ok(())
 }
 
+pub fn test_constraint_options(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    options: &Vec<&Vec<&str>>,
+) -> Result<()> {
+    let instance = constraint_def::build_random_instance(c);
+    let ret = run_minion::get_minion_solutions(
+        config.minionexec,
+        &config.minionargs,
+        &["-findallsols"],
+        &instance,
+        "original",
+    )?;
+    let mut alloptions: Vec<&str> = vec![];
+    for &i in options {
+        for &j in i {
+            alloptions.push(j);
+        }
+    }
+    alloptions.push("-findallsols");
+
+    let ret2 = run_minion::get_minion_solutions(
+        config.minionexec,
+        &config.minionargs,
+        &alloptions[..],
+        &instance,
+        "options",
+    )?;
+    let mut sortsols = ret.solutions.clone();
+    let mut sortsols2 = ret2.solutions.clone();
+    sortsols.sort();
+    sortsols2.sort();
+    if sortsols != sortsols2 {
+        return Err(anyhow!(format!(
+            "Solutions not equal in {} vs {}",
+            ret.filename, ret2.filename
+        )));
+    }
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
+
+    Ok(())
+}
+
 pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
