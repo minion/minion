@@ -132,6 +132,12 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
   instance.allVars_list.push_back(makeVec(v));
 }
 
+
+Var constantAsVar(DomainInt constant) {
+  return Var(VAR_CONSTANT,constant);
+}
+
+
 // Export of inline function get_constraint as bindings dont like inlines!
 ConstraintDef* lib_getConstraint(ConstraintType t) {
   return get_constraint(t);
