@@ -9,6 +9,7 @@
 #include "minion.h"
 #include "command_search.h"
 #include "info_dumps.h"
+#include "solver.h"
 #include "system/minlib/exceptions.hpp"
 #include <iomanip>
 
@@ -193,6 +194,18 @@ void finaliseModel(CSPInstance& instance) {
 
 }
 
+
+/*********************************************************************/
+/*                    REXPORTING INLINE FUNCTIONS                    */
+/*********************************************************************/
+
+SearchOptions newSearchOptions() {
+  return SearchOptions();
+}
+
+SearchMethod newSearchMethod() {
+  return SearchMethod();
+}
 
 #endif
 

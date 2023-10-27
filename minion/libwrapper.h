@@ -3,6 +3,7 @@
 
 
 #include "minion.h"
+#include "solver.h"
 /*
  * Functions for using minion as a library.
  *
@@ -184,6 +185,11 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
  */
 Var constantAsVar(DomainInt n);
 
+
+/*********************************************************************/
+/*                    REXPORTING INLINE FUNCTIONS                    */
+/*********************************************************************/
+
 /*
  * ConstraintDef* lib_getConstraint:
  *  
@@ -202,6 +208,12 @@ Var constantAsVar(DomainInt n);
  *    ```
  */
 ConstraintDef* lib_getConstraint(ConstraintType t);
+
+//These are inlined constructors, so rust cannot see them
+
+SearchOptions newSearchOptions();
+
+SearchMethod newSearchMethod();
 
 
 #endif
