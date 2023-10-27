@@ -11,8 +11,6 @@
  * but low-level way to use Minion as a library.
  */
 
-// TODO: keep updating this as I develop the library
-
 /* MODEL BUILDING - AN EXAMPLE
  * ===========================
  *
@@ -75,7 +73,7 @@
  * leq.vars.push_back({x,y,z});
  * leq.vars.push_back({constantAsVar(4)});
  *                     
- * geq.vars.push_back({constantAsVar(4)});
+ * geq.vars.push_back({x,y,z});
  * geq.vars.push_back({constantAsVar(4)});
 
  * // ineq: var var const
