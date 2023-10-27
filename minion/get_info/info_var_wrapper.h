@@ -26,11 +26,17 @@ struct InfoRefType {
     VAR_INFO_ADDONE(VAR_TYPE, copy);
   }
 
+
   InfoRefType() {
     VAR_INFO_ADDONE(VAR_TYPE, construct);
   }
 
   InfoRefType(const InfoRefType& b) : data(b.data) {
+    VAR_INFO_ADDONE(VAR_TYPE, copy);
+  }
+
+  void operator=(const InfoRefType& i) {
+    data = i.data;
     VAR_INFO_ADDONE(VAR_TYPE, copy);
   }
 
