@@ -215,6 +215,8 @@ SearchOptions newSearchOptions();
 
 SearchMethod newSearchMethod();
 
+CSPInstance* newInstance();
+
 
 #endif
 

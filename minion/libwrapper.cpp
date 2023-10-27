@@ -6,6 +6,7 @@
  */
 
 #include "libwrapper.h"
+#include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
 #include "command_search.h"
 #include "info_dumps.h"
@@ -205,6 +206,10 @@ SearchOptions newSearchOptions() {
 
 SearchMethod newSearchMethod() {
   return SearchMethod();
+}
+
+CSPInstance* newInstance() {
+  return new CSPInstance();
 }
 
 #endif
