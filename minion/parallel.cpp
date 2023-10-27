@@ -133,6 +133,7 @@ int doFork() {
     getState().resetSearchCounters();
     if(!checkIsAChildProcess) {
       checkIsAChildProcess = true;
+      getOptions().silent = true;
       close(childTrackingPipe[0]);
       // std::cout << getpid() << " closing 0" << std::endl;
       // int devNull = open("/dev/null", O_WRONLY);
