@@ -1,19 +1,19 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
-
 #include "ConstraintEnum.h"
 #include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
 #include "solver.h"
+
 /*
  * Functions for using minion as a library.
  *
  * Primarily for use by the Rust bindings - the library abstractions provided
  * here are neither complete nor safe.
  *
- * The Rust bindings (github.com/conjure-cp/conjure-oxide) should provide a safe
- * but low-level way to use Minion as a library.
+ * The Rust bindings (https://github.com/conjure-cp/conjure-oxide/tree/main/solvers/minion) 
+ * should provide a safe but low-level way to use Minion as a library.
  */
 
 /* MODEL BUILDING - AN EXAMPLE
@@ -193,6 +193,22 @@ Var constantAsVar(DomainInt n);
 /*******************************************************/
 /*                    FFI FUNCTIONS                    */
 /*******************************************************/
+
+/*
+ * The below functions are primarily for use by FFI wrappers of Minion.
+ *
+ * This means that:
+ *   - Complex structures that other languages do not understand are returned as
+ *     opaque pointers.
+ *
+ *   - Use of char* instead of string.
+ *
+ *   - Various inline functions are re-exported so they can be seen.
+ *
+ *   - Manual constructors and deconstructors are provided for languages that
+ *     do not use them.
+ */
+
 /*
  * ConstraintDef* lib_getConstraint:
  *  
@@ -212,33 +228,41 @@ Var constantAsVar(DomainInt n);
  */
 ConstraintDef* lib_getConstraint(ConstraintType t);
 
+/***** Constructors *****/
 SearchOptions* newSearchOptions();
 SearchMethod* newSearchMethod();
 CSPInstance* newInstance();
 ConstraintBlob* newConstraintBlob(ConstraintType contraint_type);
 SearchOrder* newSearchOrder(std::vector<Var>& vars,VarOrderEnum orderEnum, bool findOneSol);
 
+/***** Destructors *****/
 void searchOptions_free(SearchOptions* searchOptions);
 void searchMethod_free(SearchMethod* searchMethod);
 void instance_free(CSPInstance* instance);
 void constraint_free(ConstraintBlob* constraint);
 void searchOrder_free(SearchOrder* searchOrder);
 
+/***** Variable Helper Functions *****/
 Var getVarByName(CSPInstance& instance, char* name);
 void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
 
+/***** Class member functions *****/
 void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
 void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
 
-// Both these assume print matrix of form [[x],[y],[z]]
+/*
+ * printMatrix_* functions assume the print matrix is of the form
+ * [[x],[y],[z],...].
+ */
 void printMatrix_addVar(CSPInstance& instance, Var var);
 
-// Should be called only when minion has results in a callback
+// Should be called only when minion has results in a callback.
 int printMatrix_getValue(int idx);
 
 void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars);
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
 
+/***** std::vector Wrappers *****/
 std::vector<Var>* vec_var_new();
 void vec_var_push_back(std::vector<Var>* vec, Var var);
 void vec_var_free(std::vector<Var>* vec);
