@@ -28,8 +28,9 @@ void resetMinion() {
   globals = new Globals();
 }
 
+std::mutex global_minion_lock;
 ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance, bool(*callback)(void)) {
-
+  std::lock_guard<std::mutex> guard(global_minion_lock);
   ReturnCodes returnCode = ReturnCodes::OK;
 
   /*
