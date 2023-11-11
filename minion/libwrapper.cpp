@@ -264,8 +264,7 @@ void printMatrix_addVar(CSPInstance& instance, Var var) {
 }
 
 int printMatrix_getValue(int idx) {
-  // FIXME: does not work with minion debug mode
-  return globals->state_m->getPrintMatrix()[idx][0].assignedValue();
+  return checked_cast<int>(globals->state_m->getPrintMatrix()[idx][0].assignedValue());
 }
 
 void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars) {
