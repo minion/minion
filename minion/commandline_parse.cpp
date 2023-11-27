@@ -201,17 +201,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         args.order = ORDER_STATIC;
       else if(order == "srf")
         args.order = ORDER_SRF;
-      else if(order == "staticlimited") {
-        args.order = ORDER_STATIC_LIMITED;
-        INCREMENT_i(staticlimited);
-        // Parse an integer for the limit.
-        unsigned int tmp;
-        std::istringstream iss(argv[i]);
-        if(!(iss >> tmp)) {
-          outputFatalError("-varorder staticlimited requires a positive integer value");
-        }
-        args.limit = tmp;
-      } else if(order == "srf-random") {
+      else if(order == "srf-random") {
         args.order = ORDER_SRF;
         getOptions().randomiseValvarorder = true;
       } else if(order == "sdf")
