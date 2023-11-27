@@ -30,9 +30,6 @@ shared_ptr<VariableOrder> makeSearchOrder(SearchOrder order) {
     vo2 = new StaticBranch(varArray, order.valOrder);
     vo = new ConflictBranch(varArray, order.valOrder, vo2);
     break;
-  case ORDER_STATIC_LIMITED:
-    vo = new StaticBranchLimited(varArray, order.valOrder, order.limit);
-    break;
 
 #ifdef WDEG
   case ORDER_WDEG: vo = new WdegBranch(varArray, order.valOrder); break;
