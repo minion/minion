@@ -15,34 +15,26 @@ struct BuildConObj {
                                    SysInt pos) DOM_NOINLINE;
 };
 
+
+SysInt same_type_check(ConstraintBlob& b, SysInt pos);
+
+vector<BoolVarRef> make_boolvarref(const vector<Var>& vars);
+
 template <ConstraintType constraint, SysInt size>
 template <typename ConData>
 AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_build,
-                                                         ConstraintBlob& b, SysInt pos) {
+                                                         ConstraintBlob& b, SysInt pos) [[noinline]] {
+
   const vector<Var>& vars = b.vars[pos];
 
-  // type needs to be something for empty arrays
-  SysInt type = VAR_CONSTANT;
-  bool same_type = true;
-  // Suppress unused warning
-  (void)same_type;
+  SysInt type = same_type_check(b,pos);
+  bool same_type = (type != -123);
 
-  if(!vars.empty()) {
-    type = vars[0].type();
-    for(UnsignedSysInt i = 1; i < vars.size(); ++i) {
-      if(vars[i].type() != type) {
-        same_type = false;
-        break;
-      }
-    }
-  }
 #ifndef QUICK_COMPILE
   if(same_type) {
     switch(type) {
     case VAR_BOOL: {
-      vector<BoolVarRef> v(vars.size());
-      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().boolVarContainer.getVarNum(vars[i].pos());
+      vector<BoolVarRef> v = make_boolvarref(vars);
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_NOTBOOL: {

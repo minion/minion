@@ -162,3 +162,40 @@ int minion_main(int argc, char** argv) {
     exit(9);
   }
 }
+
+
+namespace BuildCon {
+
+SysInt same_type_check(ConstraintBlob& b, SysInt pos) {
+  const vector<Var>& vars = b.vars[pos];
+
+  // type needs to be something for empty arrays
+  SysInt type = VAR_CONSTANT;
+  bool same_type = true;
+
+  if(!vars.empty()) {
+    type = vars[0].type();
+    for(UnsignedSysInt i = 1; i < vars.size(); ++i) {
+      if(vars[i].type() != type) {
+        same_type = false;
+        break;
+      }
+    }
+  }
+
+  if(same_type) {
+    return type;
+  }
+  else {
+    return -123;
+  }
+}
+
+vector<BoolVarRef> make_boolvarref(const vector<Var>& vars) {
+      vector<BoolVarRef> v(vars.size());
+      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
+        v[i] = getVars().boolVarContainer.getVarNum(vars[i].pos());
+      return v;
+}
+
+}
