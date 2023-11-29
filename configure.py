@@ -213,12 +213,12 @@ if not arg.unoptimised:
     if arg.profile:
         commandargs = commandargs + ["-O"]
     elif arg.basicopt:
-        commandargs = commandargs + ["-O2"]
+        commandargs = commandargs + ["-O"]
     else:
         if platform.system() == 'Darwin' and ("-static" not in commandargs):
-            commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
+            commandargs = commandargs + ["-O2", "-mdynamic-no-pic", "-fomit-frame-pointer"]
         else:
-            commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
+            commandargs = commandargs + ["-O2", "-fomit-frame-pointer"]
 
 if arg.library:
     commandargs = commandargs + ["-fPIC"]
