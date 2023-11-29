@@ -244,6 +244,9 @@ else:
         else:
             fatal_error("Unable to find working C++ compiler.. please use --compiler")
 
+    if progexists('gold'):
+        commandargs = commandargs + ["-fuse-ld=gold","-Wl,--icf=all","-Wl,--gc-sections","-ffunction-sections"]
+
 verbose_print(1, "Compiler flags" + str(commandargs))
 
 constraints=[]
