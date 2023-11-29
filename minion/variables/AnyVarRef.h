@@ -391,16 +391,16 @@ template <typename T, size_t i>
 struct make_AnyVarRef_type<std::array<T, i>> {
   typedef vector<typename make_AnyVarRef_type<T>::type> type;
 };
-/*
+
 template<typename T>
 typename make_AnyVarRef_type<T>::type
-make_AnyVarRef(T t)
+make_AnyVarRef(const T& t)
 {
   return AnyVarRef(t);
 }
-*/
+
 template <typename T>
-typename make_AnyVarRef_type<vector<T>>::type make_AnyVarRef(vector<T> t) {
+typename make_AnyVarRef_type<vector<T>>::type make_AnyVarRef(const vector<T>& t) {
   vector<AnyVarRef> v;
   for(size_t i = 0; i < t.size(); ++i)
     v.push_back(AnyVarRef(t[i]));
@@ -408,7 +408,7 @@ typename make_AnyVarRef_type<vector<T>>::type make_AnyVarRef(vector<T> t) {
 }
 
 template <typename T, size_t param>
-typename make_AnyVarRef_type<std::array<T, param>>::type make_AnyVarRef(std::array<T, param> t) {
+typename make_AnyVarRef_type<std::array<T, param>>::type make_AnyVarRef(const std::array<T, param>& t) {
   vector<AnyVarRef> v;
   for(size_t i = 0; i < t.size(); ++i)
     v.push_back(AnyVarRef(t[i]));
