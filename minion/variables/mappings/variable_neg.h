@@ -5,6 +5,8 @@
 #define VARIABLE_NEG_H
 
 #include "../../triggering/constraint_abstract.h"
+#include "variable_switch_neg.h"
+#include "variable_stretch.h"
 
 // This is a temporary fix to get around the fact that 'VarNeg' is defined in
 // some windows header.
@@ -170,6 +172,17 @@ struct NegType<VarNeg<T>> {
   typedef T type;
 };
 
+template <typename T>
+struct NegType<SwitchNeg<T>> {
+  typedef SwitchNeg<T> type;
+};
+
+template <typename T>
+struct NegType<MultiplyVar<T>> {
+  typedef MultiplyVar<T> type;
+};
+
+
 template <typename VRef>
 typename NegType<VRef>::type VarNegRef(const VRef& var_ref) {
   return VarNeg<VRef>(var_ref);
@@ -178,6 +191,16 @@ typename NegType<VRef>::type VarNegRef(const VRef& var_ref) {
 template <typename VRef>
 VRef VarNegRef(const VarNeg<VRef>& var_ref) {
   return var_ref.data;
+}
+
+template <typename VRef>
+SwitchNeg<VRef> VarNegRef(const SwitchNeg<VRef>& var_ref) {
+  return var_ref.negateVar();
+}
+
+template <typename VRef>
+MultiplyVar<VRef> VarNegRef(const MultiplyVar<VRef>& var_ref) {
+  return var_ref.negateVar();
 }
 
 template <typename VarRef>
