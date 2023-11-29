@@ -232,7 +232,10 @@ else:
         compiler = arg.compiler
     else:
         compiler = ""
-        if progexists('ccache'):
+
+        if progexists('sccache'):
+            compiler = "sccache " + compiler
+        elif progexists('ccache'):
             compiler = "ccache " + compiler
 
         if progexists('c++'):
