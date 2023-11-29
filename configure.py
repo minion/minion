@@ -216,9 +216,9 @@ if not arg.unoptimised:
         commandargs = commandargs + ["-O"]
     else:
         if platform.system() == 'Darwin' and ("-static" not in commandargs):
-            commandargs = commandargs + ["-O2", "-mdynamic-no-pic", "-fomit-frame-pointer"]
+            commandargs = commandargs + ["-O3", "-mdynamic-no-pic", "-fomit-frame-pointer"]
         else:
-            commandargs = commandargs + ["-O2", "-fomit-frame-pointer"]
+            commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
 
 if arg.library:
     commandargs = commandargs + ["-fPIC"]
