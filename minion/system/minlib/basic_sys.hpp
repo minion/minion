@@ -47,5 +47,6 @@ struct TypeDefs;
 
 #define DOM_NORETURN __attribute__((noreturn))
 #define DOM_NOINLINE __attribute__((noinline))
+#define DOM_COLD __attribute__((cold))
 
 #endif
