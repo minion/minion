@@ -19,6 +19,13 @@ struct BuildConObj {
 SysInt same_type_check(ConstraintBlob& b, SysInt pos);
 
 vector<BoolVarRef> make_boolvarref(const vector<Var>& vars);
+vector<VarNot<BoolVarRef>> make_neg_boolref(const vector<Var>& vars);
+vector<BoundVarRef> make_boundref(const vector<Var>& vars);
+vector<SparseBoundVarRef> make_sparseboundref(const vector<Var>& vars);
+vector<BigRangeVarRef> make_bigrangeref(const vector<Var>& vars);
+vector<ConstantVar> make_constref(const vector<Var>& vars);
+vector<AnyVarRef> make_avrref(const vector<Var>& vars);
+
 
 template <ConstraintType constraint, SysInt size>
 template <typename ConData>
@@ -29,6 +36,8 @@ AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_
 
   SysInt type = same_type_check(b,pos);
   bool same_type = (type != -123);
+  (void)type;
+  (void)same_type;
 
 #ifndef QUICK_COMPILE
   if(same_type) {
@@ -38,45 +47,32 @@ AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_NOTBOOL: {
-      vector<VarNot<BoolVarRef>> v(vars.size());
-      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = VarNotRef(getVars().boolVarContainer.getVarNum(vars[i].pos()));
+      vector<VarNot<BoolVarRef>> v = make_neg_boolref(vars);
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_BOUND: {
-      vector<BoundVarRef> v(vars.size());
-      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().boundVarContainer.getVarNum(vars[i].pos());
+      vector<BoundVarRef> v = make_boundref(vars);
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_SPARSEBOUND: {
-      vector<SparseBoundVarRef> v(vars.size());
-      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().sparseBoundVarContainer.getVarNum(vars[i].pos());
+      vector<SparseBoundVarRef> v = make_sparseboundref(vars);
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_DISCRETE: {
-      vector<BigRangeVarRef> v(vars.size());
-      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = getVars().bigRangeVarContainer.getVarNum(vars[i].pos());
+      vector<BigRangeVarRef> v = make_bigrangeref(vars);
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     case VAR_SPARSEDISCRETE: INPUT_ERROR("Sparse Discrete Variables current broken. Sorry");
 
     case VAR_CONSTANT: {
-      vector<ConstantVar> v(vars.size());
-      for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-        v[i] = ConstantVar(vars[i].pos());
+      vector<ConstantVar> v = make_constref(vars);
       return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
     }
     }
   } else
 #endif
   {
-    vector<AnyVarRef> v(vars.size());
-    for(UnsignedSysInt i = 0; i < vars.size(); ++i)
-      v[i] = getAnyVarRefFromVar(vars[i]);
-
+    vector<AnyVarRef> v = make_avrref(vars);
     return BuildConObj<constraint, size - 1>::build(make_pair(partial_build, &v), b, pos + 1);
   }
   // This FAIL_EXIT is here to stop a "no return in non-void function" warning.
