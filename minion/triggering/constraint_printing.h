@@ -44,11 +44,11 @@ inline string print_vars(const SysInt& i) {
 #endif
 
 template <typename T, T i>
-string print_vars(const compiletimeVal<T, i>) {
+string DOM_COLD print_vars(const compiletimeVal<T, i>) {
   return tostring(i);
 }
 
-inline string print_vars(const std::vector<AbstractConstraint*>& t) {
+inline DOM_COLD string print_vars(const std::vector<AbstractConstraint*>& t) {
   ostringstream o;
   o << "{";
   bool first = true;
@@ -64,7 +64,7 @@ inline string print_vars(const std::vector<AbstractConstraint*>& t) {
 }
 
 template <typename T>
-string print_vars(const std::vector<T>& t) {
+string DOM_COLD print_vars(const std::vector<T>& t) {
   ostringstream o;
   o << "[";
   bool first = true;
@@ -80,7 +80,7 @@ string print_vars(const std::vector<T>& t) {
 }
 
 template <typename T>
-string print_vars(const std::vector<std::pair<T, T>>& t) {
+string DOM_COLD print_vars(const std::vector<std::pair<T, T>>& t) {
   ostringstream o;
   o << "[";
   bool first = true;
@@ -98,7 +98,7 @@ string print_vars(const std::vector<std::pair<T, T>>& t) {
 }
 
 template <typename T, size_t len>
-string print_vars(const std::array<T, len>& t) {
+string DOM_COLD print_vars(const std::array<T, len>& t) {
   ostringstream o;
   o << "[";
   bool first = true;
@@ -126,7 +126,7 @@ inline vector<DomainInt> filter_constants(T& vars) {
   return constants;
 }
 
-inline void compress_arrays(string name, vector<AnyVarRef>& vars, AnyVarRef& result) {
+inline DOM_COLD void compress_arrays(string name, vector<AnyVarRef>& vars, AnyVarRef& result) {
   if(name.find("sum") != string::npos) {
     vector<DomainInt> res = filter_constants(vars);
     DomainInt sum = 0;
@@ -164,25 +164,25 @@ inline void compress_arrays(string name, vector<AnyVarRef>& vars, AnyVarRef& res
   }
 }
 
-inline string printCon(string name) {
+inline DOM_COLD string printCon(string name) {
   return name + "()";
 }
 
 template <typename T>
-string printCon(string name, const T& args) {
+string DOM_COLD printCon(string name, const T& args) {
   string s = print_vars(args);
   return name + "(" + s + ")";
 }
 
 template <typename T1, typename T2>
-string printCon(string name, const T1& args1, const T2& args2) {
+string DOM_COLD printCon(string name, const T1& args1, const T2& args2) {
 
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
   return name + "(" + s1 + "," + s2 + ")";
 }
 
-inline string print_array_var_con(string name, vector<AnyVarRef> args1, AnyVarRef args2) {
+inline DOM_COLD string print_array_var_con(string name, vector<AnyVarRef> args1, AnyVarRef args2) {
   compress_arrays(name, args1, args2);
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
@@ -190,7 +190,7 @@ inline string print_array_var_con(string name, vector<AnyVarRef> args1, AnyVarRe
 }
 
 template <typename T1, typename T2, typename T3>
-string printCon(string name, const T1& args1, const T2& args2, const T3& args3) {
+string DOM_COLD printCon(string name, const T1& args1, const T2& args2, const T3& args3) {
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
   string s3 = print_vars(args3);
@@ -198,7 +198,7 @@ string printCon(string name, const T1& args1, const T2& args2, const T3& args3) 
 }
 
 template <typename T1, typename T2, typename T3, typename T4, typename T5>
-string printCon(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4,
+string DOM_COLD printCon(string name, const T1& args1, const T2& args2, const T3& args3, const T4& args4,
                  const T5& args5) {
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
@@ -208,7 +208,7 @@ string printCon(string name, const T1& args1, const T2& args2, const T3& args3, 
   return name + "(" + s1 + "," + s2 + "," + s3 + "," + s4 + "," + s5 + ")";
 }
 
-inline string print_weight_array_var_con(string name, vector<DomainInt> args1,
+inline DOM_COLD string print_weight_array_var_con(string name, vector<DomainInt> args1,
                                          vector<AnyVarRef> args2, const AnyVarRef& args3) {
   string s1 = print_vars(args1);
   string s2 = print_vars(args2);
@@ -217,7 +217,7 @@ inline string print_weight_array_var_con(string name, vector<DomainInt> args1,
 }
 
 template <typename T1, typename T2>
-string print_reversible_con(string name, string neg_name, const T1& vars, const T2& res) {
+string DOM_COLD print_reversible_con(string name, string neg_name, const T1& vars, const T2& res) {
   vector<Mapper> m = res.getMapperStack();
   if(!m.empty() && m.back() == Mapper(MAP_NEG)) {
     vector<AnyVarRef> pops;
@@ -234,7 +234,7 @@ string print_reversible_con(string name, string neg_name, const T1& vars, const 
 }
 
 template <typename T1, typename T2>
-string print_weighted_con(string weight, string name, const T1& sumvars, const T2& result) {
+string DOM_COLD print_weighted_con(string weight, string name, const T1& sumvars, const T2& result) {
   if(sumvars.empty())
     return printCon(name, sumvars, result);
 
@@ -256,7 +256,7 @@ string print_weighted_con(string weight, string name, const T1& sumvars, const T
 }
 
 template <typename T1, typename T2>
-string print_weighted_reversible_con(string weight, string name, string neg_name, const T1& vars,
+string DOM_COLD print_weighted_reversible_con(string weight, string name, string neg_name, const T1& vars,
                                      const T2& res) {
   vector<Mapper> m = res.getMapperStack();
   if(!m.empty() && m.back() == Mapper(MAP_NEG)) {
@@ -301,7 +301,7 @@ string print_weighted_reversible_con(string weight, string name, string neg_name
 
 #define CONSTRAINT_WEIGHTED_REVERSIBLE_ARG_LIST2(weight, name, revname, x, y)                      \
   virtual string fullOutputName() {                                                              \
-    return ConOutput::print_weighted_reversible_con(weight, name, revname, x, y);                  \
+    return ConOutput::print_weighted_reversible_con(weight, name, revname, make_AnyVarRef(x), make_AnyVarRef(y));                  \
   }
 
 #define CONSTRAINT_ARG_LIST3(x, y, z)                                                              \
