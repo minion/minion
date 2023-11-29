@@ -1,6 +1,9 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
+#ifndef VARIABLE_SWITCH_NEG_H
+#define VARIABLE_SWITCH_NEG_H
+
 #include "../../triggering/constraint_abstract.h"
 
 template <typename VarT>
@@ -8,6 +11,10 @@ struct SwitchNeg {
   static const BOOL isBool = false;
   static const BoundType isBoundConst = VarT::isBoundConst;
   VarT data;
+
+  SwitchNeg<VarT> negateVar() const {
+    return SwitchNeg<VarT>(data, -multiplier);
+  }
 
   BOOL isBound() const {
     return data.isBound();
@@ -201,3 +208,5 @@ std::array<SwitchNeg<VarRef>, i> SwitchNegRef(const std::array<VarRef, i>& varAr
     neg_array[l] = SwitchNegRef(varArray[l]);
   return neg_array;
 }
+
+#endif

@@ -1,6 +1,9 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
+#ifndef VAR_STRETCH_H_NBJFAEJIO
+#define VAR_STRETCH_H_NBJFAEJIO
+
 #include "../../triggering/constraint_abstract.h"
 
 template <typename T>
@@ -220,6 +223,10 @@ struct MultiplyVar {
     return data;
   }
 
+  MultiplyVar<VarRef> negateVar() const {
+    return MultiplyVar<VarRef>(data, -Multiply);
+  }
+
   VarRef data;
   DomainInt Multiply;
   MultiplyVar(const VarRef& _data, DomainInt _Multiply) : data(_data), Multiply(_Multiply) {
@@ -424,3 +431,5 @@ std::array<MultiplyVar<VarRef>, i> MultiplyVarRef(const std::array<VarRef, i>& v
     Multiply_array[l] = MultiplyVarRef(varArray[l], multiplies[i]);
   return Multiply_array;
 }
+
+#endif
