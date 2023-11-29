@@ -35,6 +35,7 @@ class AbstractConstraint;
 
 /// Internal type used by AnyVarRef.
 struct AnyVarRef_Abstract {
+  virtual AnyVarRef_Abstract* ptr_clone() = 0;
   virtual BOOL isBound() const = 0;
   virtual AnyVarRef popOneMapper() const = 0;
   virtual BOOL isAssigned() const = 0;
@@ -74,6 +75,10 @@ struct AnyVarRef_Abstract {
 /// Internal type used by AnyVarRef.
 template <typename VarRef>
 struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
+
+  virtual AnyVarRef_Abstract* ptr_clone() {
+    return new AnyVarRef_Concrete<VarRef>(*this);
+  }
 
   virtual BOOL isBound() const {
     return data.isBound();
@@ -204,7 +209,7 @@ class AnyVarRef {
 public:
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
-  shared_ptr<AnyVarRef_Abstract> data;
+  unique_ptr<AnyVarRef_Abstract> data;
 
   BOOL isBound() const {
     return data->isBound();
@@ -216,15 +221,15 @@ public:
 
   template <typename VarRef>
   AnyVarRef(const VarRef& _data) {
-    data = shared_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data));
+    data = unique_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data));
   }
 
   AnyVarRef() {}
 
-  AnyVarRef(const AnyVarRef& b) : data(b.data) {}
+  AnyVarRef(const AnyVarRef& b) : data(std::unique_ptr<AnyVarRef_Abstract>(b.data->ptr_clone())) {}
 
   void operator=(const AnyVarRef& b) {
-    this->data = b.data;
+    this->data = std::unique_ptr<AnyVarRef_Abstract>(b.data->ptr_clone());
   }
 
   BOOL isAssigned() const {
