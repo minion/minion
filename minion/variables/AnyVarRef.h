@@ -20,7 +20,7 @@
 
 
 #include "../system/system.h"
-
+#include "../system/polymorphic_value.h"
 #include "../solver.h"
 
 #include "../constants.h"
@@ -63,7 +63,7 @@ struct AnyVarRef_Abstract {
   virtual void incWdeg() = 0;
 #endif
 
-  virtual string virtualTostring() = 0;
+  virtual string virtualTostring() const = 0;
 
   virtual ~AnyVarRef_Abstract() {}
 
@@ -182,7 +182,7 @@ struct AnyVarRef_Concrete : public AnyVarRef_Abstract {
   }
 #endif
 
-  virtual string virtualTostring() {
+  virtual string virtualTostring() const {
     return tostring(data);
   }
 
@@ -209,7 +209,7 @@ class AnyVarRef {
 public:
   static const BOOL isBool = false;
   static const BoundType isBoundConst = Bound_Maybe;
-  unique_ptr<AnyVarRef_Abstract> data;
+  stdx::polymorphic_value<AnyVarRef_Abstract> data;
 
   BOOL isBound() const {
     return data->isBound();
@@ -220,16 +220,15 @@ public:
   }
 
   template <typename VarRef>
-  AnyVarRef(const VarRef& _data) {
-    data = unique_ptr<AnyVarRef_Abstract>(new AnyVarRef_Concrete<VarRef>(_data));
+  AnyVarRef(const VarRef& _data) : data(in_place_type_t<AnyVarRef_Concrete<VarRef>>{}, AnyVarRef_Concrete<VarRef>(_data)) {
   }
 
   AnyVarRef() {}
 
-  AnyVarRef(const AnyVarRef& b) : data(std::unique_ptr<AnyVarRef_Abstract>(b.data->ptr_clone())) {}
+  AnyVarRef(const AnyVarRef& b) : data(b.data) {}
 
   void operator=(const AnyVarRef& b) {
-    this->data = std::unique_ptr<AnyVarRef_Abstract>(b.data->ptr_clone());
+    this->data = b.data;
   }
 
   BOOL isAssigned() const {
