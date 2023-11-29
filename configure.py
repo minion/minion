@@ -361,6 +361,7 @@ with open(outsrcdir+"BuildDefines.h", "w") as defs:
 
 minionlibsrclist = ['minion/BuildVariables.cpp',
 'minion/BuildCSP.cpp',
+'minion/buildConstraints.cpp',
 'minion/commandline_parse.cpp',
 'minion/debug_functions.cpp',
 'minion/get_info.cpp',
