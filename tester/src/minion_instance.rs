@@ -102,6 +102,18 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
                 doms.domain.last().unwrap()
             )?;
         }
+        VarType::SparseBound => {
+            writeln!(
+                f,
+                "SPARSEBOUND {} {{ {} }}",
+                doms.name,
+                doms.domain
+                    .iter()
+                    .map(|i| i.to_string())
+                    .collect::<Vec<String>>()
+                    .join(",")
+            )?;
+        }
     }
 
     writeln!(f, "**CONSTRAINTS**")?;
