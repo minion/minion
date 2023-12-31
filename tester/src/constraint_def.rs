@@ -20,6 +20,7 @@ pub enum VarType {
     Constant,
     Bool,
     Bound,
+    SparseBound,
     Discrete,
 }
 
@@ -105,7 +106,24 @@ impl MinionVariable {
             Constant => vec![Constant],
             Bool => vec![Bool, Bool, Constant],
             Discrete => vec![Discrete, Discrete, Discrete, Bool, Constant],
-            Bound => vec![Bound, Bound, Discrete, Discrete, Bool, Constant],
+            Bound => vec![
+                Bound,
+                Bound,
+                SparseBound,
+                Discrete,
+                Discrete,
+                Bool,
+                Constant,
+            ],
+            SparseBound => vec![
+                Bound,
+                Bound,
+                SparseBound,
+                Discrete,
+                Discrete,
+                Bool,
+                Constant,
+            ],
         }
         .choose(&mut rand::thread_rng())
         .unwrap();
@@ -114,6 +132,10 @@ impl MinionVariable {
             Constant => vec![random_in_range(dom_min, dom_max)],
             Bool => random_sublist(&[0, 1]),
             Discrete => {
+                let v: Vec<i64> = (dom_min..dom_max).collect();
+                random_sublist_of_size(&v, random_in_range(1, 8))
+            }
+            SparseBound => {
                 let v: Vec<i64> = (dom_min..dom_max).collect();
                 random_sublist_of_size(&v, random_in_range(1, 8))
             }

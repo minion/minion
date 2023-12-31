@@ -213,8 +213,12 @@ struct SparseBoundVarContainer {
   }
 
   DomainInt getDomSize(SparseBoundVarRef_internal<BoundType> d) const {
-    assert(0);
-    return 0; // Just to shut up compiler complaints.
+    DomainInt domSize = 0;
+    for(DomainInt i = this->getMin(d); i <= this->getMax(d); ++i) {
+      if(this->inDomain(d, i))
+        domSize++;
+    }
+    return domSize;
   }
 
   DomainInt getMin(SparseBoundVarRef_internal<BoundType> d) const {
