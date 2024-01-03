@@ -80,6 +80,15 @@ for i in *.minion; do
         else
           testpass=1
         fi
+      elif grep -q '#TEST EXITCODE1' $i
+        then
+        return_code=`$exec $i $* $extraflags 2>/dev/null >/dev/null; echo $?`
+        if [[ $return_code -eq  1 ]]; then
+          testpass=1
+        else
+          testpass=0
+          errormess="Got return code of $return_code, expected 1 in $i"
+        fi
       else
         echo Test $i is not well-formed.
         exit 1
