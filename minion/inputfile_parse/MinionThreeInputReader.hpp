@@ -1086,6 +1086,9 @@ void MinionThreeInputReader<FileReader>::readVars(FileReader* infile) {
       MAYBE_PARSER_INFO("Is array!");
       isArray = true;
       indices = readConstantVector(infile);
+      if (indices.size() < 1) 
+        throw parse_exception("Matrix " + varname + " has no indicies");
+
       for(UnsignedSysInt i = 0; i < indices.size(); ++i)
         if(indices[i] < 0)
           throw parse_exception("Matrix " + varname + " has a negative size for index " +
