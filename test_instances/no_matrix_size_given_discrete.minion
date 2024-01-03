@@ -1,0 +1,7 @@
+MINION 3
+#TEST EXITCODE1
+
+**VARIABLES**
+DISCRETE a[] {0..9}
+
+**EOF**
