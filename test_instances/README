@@ -13,8 +13,9 @@ following:
      statement).
    #TEST SOLCOUNT x
      There will be x solutions found in the whole search (can be 0)
-   #TEST JUSTPARSE
-     Minion will exit after just parsing the input file.
+   #TEST EXITCODE1
+     Minion will fail with the exit code 1. This is useful to ensure that Minion
+     fails due to a deliberate exception, not by segfault.
 
 There are two other important poss options #FAIL and #BUG, which act the same,
 but have different intentions.
