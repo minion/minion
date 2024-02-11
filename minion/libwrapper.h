@@ -261,6 +261,7 @@ int printMatrix_getValue(int idx);
 
 void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars);
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
+void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& inner_constraint);
 
 /***** std::vector Wrappers *****/
 std::vector<Var>* vec_var_new();

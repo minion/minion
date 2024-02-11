@@ -275,6 +275,10 @@ void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainIn
   constraint.constants.push_back(constants);
 }
 
+void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint) {
+  constraint.internal_constraints.push_back(internal_constraint);
+}
+
 std::vector<Var>* vec_var_new() {
   return new std::vector<Var>();
 }
