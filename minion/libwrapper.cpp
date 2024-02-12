@@ -6,10 +6,10 @@
  */
 
 #include "libwrapper.h"
-#include "inputfile_parse/CSPSpec.h"
-#include "minion.h"
 #include "command_search.h"
 #include "info_dumps.h"
+#include "inputfile_parse/CSPSpec.h"
+#include "minion.h"
 #include "solver.h"
 #include "system/minlib/exceptions.hpp"
 #include <iomanip>
@@ -20,7 +20,6 @@
 void doStandardSearch(CSPInstance& instance, SearchMethod args);
 void finaliseModel(CSPInstance& instance);
 
-
 extern Globals* globals;
 
 void resetMinion() {
@@ -29,7 +28,8 @@ void resetMinion() {
 }
 
 std::mutex global_minion_lock;
-ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance, bool(*callback)(void)) {
+ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance,
+                      bool (*callback)(void)) {
   std::lock_guard<std::mutex> guard(global_minion_lock);
   ReturnCodes returnCode = ReturnCodes::OK;
 
@@ -40,7 +40,6 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
    */
 
   resetMinion();
-
 
   // Redirect cout
   // https://stackoverflow.com/questions/49462524/controlling-output-from-external-libraries
@@ -56,8 +55,8 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
   filenameStream << ".log";
 
-  logOutStream.open(filenameStream.str(),ios_base::app);
-  
+  logOutStream.open(filenameStream.str(), ios_base::app);
+
   cout.rdbuf(logOutStream.rdbuf());
 
   // Pass error codes across FFI boundaries, not exceptions.
@@ -75,12 +74,11 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
     getOptions().printLine("# Git version: \"" + tostring(GIT_VER) + "\"");
 
     GET_GLOBAL(global_random_gen).seed(args.randomSeed);
-     if(!getOptions().silent) {
-        cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
-        cout << "# Input filename: " << getOptions().instance_name << endl;
-        getOptions().printLine("Using seed: " + tostring(args.randomSeed));
-        }
-      
+    if(!getOptions().silent) {
+      cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
+      cout << "# Input filename: " << getOptions().instance_name << endl;
+      getOptions().printLine("Using seed: " + tostring(args.randomSeed));
+    }
 
     Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
                          getOptions().time_limit_is_CPUTime);
@@ -102,26 +100,22 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
     SetupCSPOrdering(instance, args);
     BuildCSP(instance);
 
-    //TODO (nd60): how to replace this??
+    // TODO (nd60): how to replace this??
     if(getOptions().commandlistIn != "") {
-       doCommandSearch(instance, args);
-     } else {
-       doStandardSearch(instance, args);
-     }
+      doCommandSearch(instance, args);
+    } else {
+      doStandardSearch(instance, args);
+    }
   }
 
   catch(parse_exception e) {
     cout << "Invalid instance: " << e.what() << endl;
-    returnCode =  ReturnCodes::INVALID_INSTANCE;
-  }
-  catch(...){
-    returnCode =  ReturnCodes::UNKNOWN_ERROR;
-  }
-
+    returnCode = ReturnCodes::INVALID_INSTANCE;
+  } catch(...) { returnCode = ReturnCodes::UNKNOWN_ERROR; }
 
   // Restore old cout
-  cout.rdbuf( oldCoutStreamBuf );
-  
+  cout.rdbuf(oldCoutStreamBuf);
+
   return returnCode;
 }
 
@@ -135,11 +129,9 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
   instance.allVars_list.push_back(makeVec(v));
 }
 
-
 Var constantAsVar(DomainInt constant) {
-  return Var(VAR_CONSTANT,constant);
+  return Var(VAR_CONSTANT, constant);
 }
-
 
 // Export of inline function get_constraint as bindings dont like inlines!
 ConstraintDef* lib_getConstraint(ConstraintType t) {
@@ -177,25 +169,22 @@ void finaliseModel(CSPInstance& instance) {
     instance.symOrder = instance.vars.getAllVars();
 
   if(instance.symOrder.size() != instance.vars.getAllVars().size()) {
-    //MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
+    // MAYBE_PARSER_INFO("Extending symmetry order with auxillery variables");
     vector<Var> allVars = instance.vars.getAllVars();
     for(typename vector<Var>::iterator i = allVars.begin(); i != allVars.end(); ++i) {
-      if(find(instance.symOrder.begin(), instance.symOrder.end(), *i) ==
-         instance.symOrder.end())
+      if(find(instance.symOrder.begin(), instance.symOrder.end(), *i) == instance.symOrder.end())
         instance.symOrder.push_back(*i);
     }
   }
 
-  // 
+  //
   if(instance.symOrder.size() !=
      set<Var>(instance.symOrder.begin(), instance.symOrder.end()).size())
     throw parse_exception("SYMORDER cannot contain any variable more than once");
 
   if(instance.symOrder.size() != instance.vars.getAllVars().size())
     throw parse_exception("SYMORDER must contain every variable");
-
 }
-
 
 /*********************************************************************/
 /*                    REXPORTING INLINE FUNCTIONS                    */
@@ -217,8 +206,8 @@ ConstraintBlob* newConstraintBlob(ConstraintType constraint_type) {
   return new ConstraintBlob(lib_getConstraint(constraint_type));
 }
 
-SearchOrder* newSearchOrder(std::vector<Var>& vars,VarOrderEnum orderEnum, bool findOneSol) {
-  return new SearchOrder(vars,orderEnum,findOneSol);
+SearchOrder* newSearchOrder(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol) {
+  return new SearchOrder(vars, orderEnum, findOneSol);
 }
 
 void searchOptions_free(SearchOptions* searchOptions) {
@@ -247,9 +236,8 @@ Var getVarByName(CSPInstance& instance, char* name) {
 }
 
 void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2) {
-  newVar(instance, string(name), type, std::vector<DomainInt>({bound1,bound2}));
+  newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
 }
-
 
 void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder) {
   instance.searchOrder.push_back(searchOrder);
@@ -267,8 +255,26 @@ int printMatrix_getValue(int idx) {
   return checked_cast<int>(globals->state_m->getPrintMatrix()[idx][0].assignedValue());
 }
 
-void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars) {
+// mirrors MinionThreeInputReader::readGeneralConstraint, but over FFI.
+// look there for the why/how
+
+void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars) {
   constraint.vars.push_back(vars);
+}
+
+void constraint_addVar(ConstraintBlob& constraint, Var& var) {
+  constraint.vars.push_back(makeVec(var));
+}
+
+void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2) {
+  vector<Var> vars(2);
+  vars[0] = std::move(var1);
+  vars[1] = std::move(var2);
+  constraint.vars.push_back(std::move(vars));
+}
+
+void constraint_addConstant(ConstraintBlob& constraint, DomainInt& constant) {
+  constraint.constants.push_back(makeVec(constant));
 }
 
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants) {
@@ -277,6 +283,11 @@ void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainIn
 
 void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint) {
   constraint.internal_constraints.push_back(internal_constraint);
+}
+
+void constraint_addConstraintList(ConstraintBlob& constraint,
+                                  vector<ConstraintBlob>& internal_constraints) {
+  constraint.internal_constraints = std::move(internal_constraints);
 }
 
 std::vector<Var>* vec_var_new() {
@@ -294,16 +305,29 @@ void vec_var_free(std::vector<Var>* vec) {
 std::vector<DomainInt>* vec_int_new() {
   return new std::vector<DomainInt>();
 }
+
 void vec_int_push_back(std::vector<DomainInt>* vec, int n) {
   vec->push_back(n);
 }
-
 
 void vec_int_free(std::vector<DomainInt>* vec) {
   delete vec;
 }
 
-#endif
+std::vector<ConstraintBlob>* vec_constraints_new() {
+  return new std::vector<ConstraintBlob>();
+}
 
+// TODO: how to memory manage this?
+// move?
+void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint) {
+  vec->push_back(std::move(constraint));
+}
+
+void vec_constraints_free(std::vector<ConstraintBlob>* vec) {
+  delete vec;
+}
+
+#endif
 
 // vim: cc=80 tw=80

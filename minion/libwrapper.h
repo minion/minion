@@ -1,6 +1,5 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
-
 #include "ConstraintEnum.h"
 #include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
@@ -12,7 +11,7 @@
  * Primarily for use by the Rust bindings - the library abstractions provided
  * here are neither complete nor safe.
  *
- * The Rust bindings (https://github.com/conjure-cp/conjure-oxide/tree/main/solvers/minion) 
+ * The Rust bindings (https://github.com/conjure-cp/conjure-oxide/tree/main/solvers/minion)
  * should provide a safe but low-level way to use Minion as a library.
  */
 
@@ -37,13 +36,13 @@
  * ineq(x, y, -1)
  * **EOF**
  *
- *  
+ *
  * CSPInstance instance;
- * 
+ *
  * std::vector<DomainInt> domainx = {1,3};
  * std::vector<DomainInt> domainy = {2,4};
  * std::vector<DomainInt> domainz = {1,5};
- * 
+ *
  * // **VARIABLES**
  * newVar(instance,"x",VAR_DISCRETE,domainx);
  * newVar(instance,"y",VAR_DISCRETE,domainy);
@@ -54,7 +53,7 @@
  * Var z = instance.vars.getSymbol("z");
  *
  * // **SEARCH**
- * 
+ *
  * // PRINT
  * instance.print_matrix.push_back({x});
  * instance.print_matrix.push_back({y});
@@ -68,16 +67,16 @@
 
 
  * // **CONSTRAINTS**
- * 
+ *
  * ConstraintBlob leq(lib_getConstraint(ConstraintType::CT_LEQSUM));
  * ConstraintBlob geq(lib_getConstraint(ConstraintType::CT_GEQSUM));
  * ConstraintBlob ineq(lib_getConstraint(ConstraintType::CT_INEQ));
 
- * 
+ *
  * // leq: [var] var
  * leq.vars.push_back({x,y,z});
  * leq.vars.push_back({constantAsVar(4)});
- *                     
+ *
  * geq.vars.push_back({x,y,z});
  * geq.vars.push_back({constantAsVar(4)});
 
@@ -94,11 +93,11 @@
 /* ADDING CONSTRAINTS
  * ==================
  *
- * You need to know the types of the arguments to the constraints being used 
+ * You need to know the types of the arguments to the constraints being used
  * and add things to the right vectors, or Minion will segfault.
  *
  * (types can be found in bin/src/build_constraints.h).
- 
+
  * Note the different vectors used to add different arguments based on type in
  * the above example.
  *
@@ -127,11 +126,7 @@
 #include <vector>
 void resetMinion();
 
-enum ReturnCodes {
-  OK,
-  INVALID_INSTANCE,
-  UNKNOWN_ERROR=255
-};
+enum ReturnCodes { OK, INVALID_INSTANCE, UNKNOWN_ERROR = 255 };
 
 /*
  * int runMinion:
@@ -143,15 +138,15 @@ enum ReturnCodes {
  *
  *   An error code is returned. These are described in ReturnCodes.
  */
-ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance, bool(*callback)(void));
+ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance,
+                      bool (*callback)(void));
 
-
-/* 
+/*
  * void newVar:
- *  
+ *
  *  Add a named variable to `instance`.
  *
- *  Once created, the variable can be accessed by calling 
+ *  Once created, the variable can be accessed by calling
  *  `instance.vars.getSymbol(name)`.
  *
  * Throws parse_exception if the variable is invalid, or the name is already
@@ -159,9 +154,9 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
  */
 void newVar(CSPInstance& instance, string name, VariableType type, vector<DomainInt> bounds);
 
-/* 
+/*
  * Var constantAsVar(DomainInt constant):
- *   
+ *
  *   Returns a constant as an anomynous variable, for use in constraints which
  *   take variables as arguments.
  *
@@ -177,7 +172,7 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
  *    Var x = instance.vars.getSymbol("x");
  *    Var y = instance.vars.getSymbol("y");
  *    Var z = instance.vars.getSymbol("z");
- *    
+ *
  *    leq.vars.push_back({x,y,z});
  *    leq.vars.push_back(constantAsVar(4));
  *
@@ -187,8 +182,6 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
  *    in the instance (such as the symbol table, or allVars).
  */
 Var constantAsVar(DomainInt n);
-
-
 
 /*******************************************************/
 /*                    FFI FUNCTIONS                    */
@@ -211,7 +204,7 @@ Var constantAsVar(DomainInt n);
 
 /*
  * ConstraintDef* lib_getConstraint:
- *  
+ *
  *  Get the constraint definition for the given ConstraintType.
  *  This is mainly required to define a ConstraintBlob for a model.
  *
@@ -233,7 +226,7 @@ SearchOptions* newSearchOptions();
 SearchMethod* newSearchMethod();
 CSPInstance* newInstance();
 ConstraintBlob* newConstraintBlob(ConstraintType contraint_type);
-SearchOrder* newSearchOrder(std::vector<Var>& vars,VarOrderEnum orderEnum, bool findOneSol);
+SearchOrder* newSearchOrder(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
 
 /***** Destructors *****/
 void searchOptions_free(SearchOptions* searchOptions);
@@ -259,9 +252,20 @@ void printMatrix_addVar(CSPInstance& instance, Var var);
 // Should be called only when minion has results in a callback.
 int printMatrix_getValue(int idx);
 
-void constraint_addVarList(ConstraintBlob& constraint, std::vector<Var>& vars);
+/***** Constraint argument parse types ****/
+
+// as per MinionThreeInput.h and build/src/Constraintdefs.h.
+
+void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars);
+void constraint_addVar(ConstraintBlob& constraint, Var& var);
+void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2);
+
+void constraint_addConstant(ConstraintBlob& constraint, DomainInt& constant);
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
-void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& inner_constraint);
+
+void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint);
+void constraint_addConstraintList(ConstraintBlob& constraint,
+                                  vector<ConstraintBlob>& internal_constraints);
 
 /***** std::vector Wrappers *****/
 std::vector<Var>* vec_var_new();
@@ -271,6 +275,10 @@ void vec_var_free(std::vector<Var>* vec);
 std::vector<DomainInt>* vec_int_new();
 void vec_int_push_back(std::vector<DomainInt>* vec, int n);
 void vec_int_free(std::vector<DomainInt>* vec);
+
+std::vector<ConstraintBlob>* vec_constraints_new();
+void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint);
+void vec_constraints_free(std::vector<ConstraintBlob>* vec);
 
 #endif
 
