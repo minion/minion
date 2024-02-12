@@ -4,6 +4,7 @@
 #include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
 #include "solver.h"
+#include "tuple_container.h"
 
 /*
  * Functions for using minion as a library.
@@ -122,8 +123,7 @@
  *  Reset all global variables in minion to their initial values.
  *
  */
-#include "minion.h"
-#include <vector>
+
 void resetMinion();
 
 enum ReturnCodes { OK, INVALID_INSTANCE, UNKNOWN_ERROR = 255 };
@@ -219,29 +219,23 @@ Var constantAsVar(DomainInt n);
  *    instance.constraints.push_back(leq);
  *    ```
  */
-ConstraintDef* lib_getConstraint(ConstraintType t);
 
-/***** Constructors *****/
-SearchOptions* newSearchOptions();
-SearchMethod* newSearchMethod();
-CSPInstance* newInstance();
-ConstraintBlob* newConstraintBlob(ConstraintType contraint_type);
-SearchOrder* newSearchOrder(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
-
-/***** Destructors *****/
-void searchOptions_free(SearchOptions* searchOptions);
-void searchMethod_free(SearchMethod* searchMethod);
-void instance_free(CSPInstance* instance);
-void constraint_free(ConstraintBlob* constraint);
-void searchOrder_free(SearchOrder* searchOrder);
-
-/***** Variable Helper Functions *****/
+/***** Variable *****/
 Var getVarByName(CSPInstance& instance, char* name);
 void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
 
-/***** Class member functions *****/
+/***** Tuple *****/
+TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList);
+void tupleList_free(TupleList* tupleList);
+
+/***** Instance *****/
+CSPInstance* newInstance();
+void instance_free(CSPInstance* instance);
+
 void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
 void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
+void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist);
+TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name);
 
 /*
  * printMatrix_* functions assume the print matrix is of the form
@@ -256,6 +250,10 @@ int printMatrix_getValue(int idx);
 
 // as per MinionThreeInput.h and build/src/Constraintdefs.h.
 
+ConstraintBlob* newConstraintBlob(ConstraintType contraint_type);
+void constraint_free(ConstraintBlob* constraint);
+
+ConstraintDef* lib_getConstraint(ConstraintType t);
 void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars);
 void constraint_addVar(ConstraintBlob& constraint, Var& var);
 void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2);
@@ -267,7 +265,22 @@ void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& intern
 void constraint_addConstraintList(ConstraintBlob& constraint,
                                   vector<ConstraintBlob>& internal_constraints);
 
+// Note that adding tuples to the symbol table is optional, but useful!
+// A constraint only has one tuple list.
+void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList);
+
+/***** Small misc useful types *****/
+
+SearchOptions* newSearchOptions();
+SearchMethod* newSearchMethod();
+SearchOrder* newSearchOrder(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
+
+void searchOptions_free(SearchOptions* searchOptions);
+void searchMethod_free(SearchMethod* searchMethod);
+void searchOrder_free(SearchOrder* searchOrder);
+
 /***** std::vector Wrappers *****/
+
 std::vector<Var>* vec_var_new();
 void vec_var_push_back(std::vector<Var>* vec, Var var);
 void vec_var_free(std::vector<Var>* vec);
@@ -279,6 +292,11 @@ void vec_int_free(std::vector<DomainInt>* vec);
 std::vector<ConstraintBlob>* vec_constraints_new();
 void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint);
 void vec_constraints_free(std::vector<ConstraintBlob>* vec);
+
+std::vector<std::vector<DomainInt>>* vec_vec_int_new();
+void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
+                           std::vector<DomainInt> new_elem);
+void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
 
 #endif
 
