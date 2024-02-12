@@ -106,8 +106,10 @@ struct CSPInstance;
 struct ConstraintBlob {
   /// The type of constraint.
   ConstraintDef* constraint;
+
   /// The variables of the problem.
   vector<vector<Var>> vars;
+
   /// Pointer to list of tuples. Only used in Table Constraints.
   std::shared_ptr<TupleList> tuples;
 
