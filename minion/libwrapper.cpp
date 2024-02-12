@@ -24,14 +24,16 @@ void finaliseModel(CSPInstance& instance);
 
 extern Globals* globals;
 
-void resetMinion() {
+void resetMinion()
+{
   delete globals;
   globals = new Globals();
 }
 
 std::mutex global_minion_lock;
 ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance,
-                      bool (*callback)(void)) {
+                      bool (*callback)(void))
+{
   std::lock_guard<std::mutex> guard(global_minion_lock);
   ReturnCodes returnCode = ReturnCodes::OK;
 
@@ -113,7 +115,9 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   catch(parse_exception e) {
     cout << "Invalid instance: " << e.what() << endl;
     returnCode = ReturnCodes::INVALID_INSTANCE;
-  } catch(...) { returnCode = ReturnCodes::UNKNOWN_ERROR; }
+  } catch(...) {
+    returnCode = ReturnCodes::UNKNOWN_ERROR;
+  }
 
   // Restore old cout
   cout.rdbuf(oldCoutStreamBuf);
@@ -125,18 +129,21 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
 /*                    Instance building functions                    */
 /*********************************************************************/
 
-void newVar(CSPInstance& instance, string name, VariableType type, vector<DomainInt> bounds) {
+void newVar(CSPInstance& instance, string name, VariableType type, vector<DomainInt> bounds)
+{
   Var v = instance.vars.getNewVar(type, bounds);
   instance.vars.addSymbol(name, v);
   instance.allVars_list.push_back(makeVec(v));
 }
 
-Var constantAsVar(DomainInt constant) {
+Var constantAsVar(DomainInt constant)
+{
   return Var(VAR_CONSTANT, constant);
 }
 
 // Export of inline function get_constraint as bindings dont like inlines!
-ConstraintDef* lib_getConstraint(ConstraintType t) {
+ConstraintDef* lib_getConstraint(ConstraintType t)
+{
   return get_constraint(t);
 }
 
@@ -144,7 +151,8 @@ ConstraintDef* lib_getConstraint(ConstraintType t) {
 /*                    Internal Functions                    */
 /************************************************************/
 
-void finaliseModel(CSPInstance& instance) {
+void finaliseModel(CSPInstance& instance)
+{
   /* Add final touches to model and fill in missing defaults.
    *
    * largely copied from MinionThreeInputReader::finalise, but without
@@ -195,195 +203,237 @@ void finaliseModel(CSPInstance& instance) {
 
 /***** Variable *****/
 
-Var getVarByName(CSPInstance& instance, char* name) {
+Var getVarByName(CSPInstance& instance, char* name)
+{
 
   return instance.vars.getSymbol(string(name));
 }
 
-void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2) {
+void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2)
+{
   newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
 }
 
 /***** Tuple *****/
-TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList) {
+TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList)
+{
   return new TupleList(tupleList);
 }
 
-void tupleList_free(TupleList* tupleList) {
+void tupleList_free(TupleList* tupleList)
+{
   delete tupleList;
 }
 
 /***** Instance *****/
 
-CSPInstance* newInstance() {
+CSPInstance* instance_new()
+{
   return new CSPInstance();
 }
 
-void instance_free(CSPInstance* instance) {
+void instance_free(CSPInstance* instance)
+{
   delete instance;
 }
 
-void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder) {
+void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder)
+{
   instance.searchOrder.push_back(searchOrder);
 }
 
-void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint) {
+void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
+{
   instance.constraints.push_back(constraint);
 }
 
-void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist) {
+void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist)
+{
   instance.addTableSymbol(name, std::shared_ptr<TupleList>(tuplelist));
 }
 
-TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name) {
+TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name)
+{
   return instance.getTableSymbol(name).get();
 }
 
 void instance_addShortTupleTableSymbol(CSPInstance& instance, char* name,
-                                       ShortTupleList* shorttuplelist) {
+                                       ShortTupleList* shorttuplelist)
+{
   instance.addShortTableSymbol(name, std::shared_ptr<ShortTupleList>(shorttuplelist));
 }
 
-ShortTupleList* instance_getShortTupleTableSymbol(CSPInstance& instance, char* name) {
+ShortTupleList* instance_getShortTupleTableSymbol(CSPInstance& instance, char* name)
+{
   return instance.getShortTableSymbol(name).get();
 }
 
-void printMatrix_addVar(CSPInstance& instance, Var var) {
+void printMatrix_addVar(CSPInstance& instance, Var var)
+{
   instance.print_matrix.push_back({var});
 }
 
-int printMatrix_getValue(int idx) {
+int printMatrix_getValue(int idx)
+{
   return checked_cast<int>(globals->state_m->getPrintMatrix()[idx][0].assignedValue());
 }
 
 /***** SearchOptions *****/
 
-SearchOptions* newSearchOptions() {
+SearchOptions* searchOptions_new()
+{
   return new SearchOptions();
 }
 
-void searchOptions_free(SearchOptions* searchOptions) {
+void searchOptions_free(SearchOptions* searchOptions)
+{
   delete searchOptions;
 }
 
 /***** SearchMethod *****/
 
-SearchMethod* newSearchMethod() {
+SearchMethod* searchMethod_new()
+{
   return new SearchMethod();
 }
 
-void searchMethod_free(SearchMethod* searchMethod) {
+void searchMethod_free(SearchMethod* searchMethod)
+{
   delete searchMethod;
 }
 
 /***** SearchOrder *****/
 
-SearchOrder* newSearchOrder(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol) {
+SearchOrder* searchOrder_new(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol)
+{
   return new SearchOrder(vars, orderEnum, findOneSol);
 }
 
-void searchOrder_free(SearchOrder* searchOrder) {
+void searchOrder_free(SearchOrder* searchOrder)
+{
   delete searchOrder;
 }
 
 /***** ConstraintBlob *****/
 
-ConstraintBlob* newConstraintBlob(ConstraintType constraint_type) {
+ConstraintBlob* constraint_new(ConstraintType constraint_type)
+{
   return new ConstraintBlob(lib_getConstraint(constraint_type));
 }
 
-void constraint_free(ConstraintBlob* constraint) {
+void constraint_free(ConstraintBlob* constraint)
+{
   delete constraint;
 }
 
 // mirrors MinionThreeInputReader::readGeneralConstraint, but over FFI.
 // look there for the why/how
 
-void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars) {
+void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars)
+{
   constraint.vars.push_back(vars);
 }
 
-void constraint_addVar(ConstraintBlob& constraint, Var& var) {
+void constraint_addVar(ConstraintBlob& constraint, Var& var)
+{
   constraint.vars.push_back(makeVec(var));
 }
 
-void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2) {
+void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2)
+{
   vector<Var> vars(2);
   vars[0] = std::move(var1);
   vars[1] = std::move(var2);
   constraint.vars.push_back(std::move(vars));
 }
 
-void constraint_addConstant(ConstraintBlob& constraint, DomainInt& constant) {
+void constraint_addConstant(ConstraintBlob& constraint, DomainInt& constant)
+{
   constraint.constants.push_back(makeVec(constant));
 }
 
-void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants) {
+void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants)
+{
   constraint.constants.push_back(constants);
 }
 
-void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint) {
+void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint)
+{
   constraint.internal_constraints.push_back(internal_constraint);
 }
 
 void constraint_addConstraintList(ConstraintBlob& constraint,
-                                  vector<ConstraintBlob>& internal_constraints) {
+                                  vector<ConstraintBlob>& internal_constraints)
+{
   constraint.internal_constraints = std::move(internal_constraints);
 }
 
-void constraint_setTuples(ConstraintBlob* constraint, TupleList* tupleList) {
+void constraint_setTuples(ConstraintBlob* constraint, TupleList* tupleList)
+{
   constraint->tuples = std::shared_ptr<TupleList>(tupleList);
 }
 
 /***** Vector Rexports *****/
 
-std::vector<Var>* vec_var_new() {
+std::vector<Var>* vec_var_new()
+{
   return new std::vector<Var>();
 }
 
-void vec_var_push_back(std::vector<Var>* vec, Var var) {
+void vec_var_push_back(std::vector<Var>* vec, Var var)
+{
   vec->push_back(var);
 }
 
-void vec_var_free(std::vector<Var>* vec) {
+void vec_var_free(std::vector<Var>* vec)
+{
   delete vec;
 }
 
-std::vector<DomainInt>* vec_int_new() {
+std::vector<DomainInt>* vec_int_new()
+{
   return new std::vector<DomainInt>();
 }
 
-void vec_int_push_back(std::vector<DomainInt>* vec, int n) {
+void vec_int_push_back(std::vector<DomainInt>* vec, int n)
+{
   vec->push_back(n);
 }
 
-void vec_int_free(std::vector<DomainInt>* vec) {
+void vec_int_free(std::vector<DomainInt>* vec)
+{
   delete vec;
 }
 
-std::vector<ConstraintBlob>* vec_constraints_new() {
+std::vector<ConstraintBlob>* vec_constraints_new()
+{
   return new std::vector<ConstraintBlob>();
 }
 
-void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint) {
+void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint)
+{
   // TODO: how to memory manage this?
   // move?
   vec->push_back(std::move(constraint));
 }
 
-void vec_constraints_free(std::vector<ConstraintBlob>* vec) {
+void vec_constraints_free(std::vector<ConstraintBlob>* vec)
+{
   delete vec;
 }
 
-std::vector<std::vector<DomainInt>>* vec_vec_int_new() {
+std::vector<std::vector<DomainInt>>* vec_vec_int_new()
+{
   return new std::vector<std::vector<DomainInt>>();
 }
 void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
-                           std::vector<DomainInt> new_elem) {
+                           std::vector<DomainInt> new_elem)
+{
   vec->push_back(new_elem);
 }
 
-void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec) {
+void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec)
+{
   delete vec;
 }
 

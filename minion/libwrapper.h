@@ -126,7 +126,12 @@
 
 void resetMinion();
 
-enum ReturnCodes { OK, INVALID_INSTANCE, UNKNOWN_ERROR = 255 };
+enum ReturnCodes
+{
+  OK,
+  INVALID_INSTANCE,
+  UNKNOWN_ERROR = 255
+};
 
 /*
  * int runMinion:
@@ -229,7 +234,7 @@ TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList);
 void tupleList_free(TupleList* tupleList);
 
 /***** Instance *****/
-CSPInstance* newInstance();
+CSPInstance* instance_new();
 void instance_free(CSPInstance* instance);
 
 void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
@@ -250,7 +255,7 @@ int printMatrix_getValue(int idx);
 
 // as per MinionThreeInput.h and build/src/Constraintdefs.h.
 
-ConstraintBlob* newConstraintBlob(ConstraintType contraint_type);
+ConstraintBlob* constraint_new(ConstraintType contraint_type);
 void constraint_free(ConstraintBlob* constraint);
 
 ConstraintDef* lib_getConstraint(ConstraintType t);
@@ -271,9 +276,9 @@ void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList);
 
 /***** Small misc useful types *****/
 
-SearchOptions* newSearchOptions();
-SearchMethod* newSearchMethod();
-SearchOrder* newSearchOrder(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
+SearchOptions* searchOptions_new();
+SearchMethod* searchMethod_new();
+SearchOrder* searchOrder_new(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
 
 void searchOptions_free(SearchOptions* searchOptions);
 void searchMethod_free(SearchMethod* searchMethod);
