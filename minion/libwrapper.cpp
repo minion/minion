@@ -73,6 +73,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
 
     globals->callback = callback;
     globals->options_m = new SearchOptions(options);
+    globals->options_m->findAllSolutions();
 
     getOptions().printLine("# " + std::string(MinionVersion));
     getOptions().printLine("# Git version: \"" + tostring(GIT_VER) + "\"");
