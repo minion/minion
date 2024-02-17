@@ -137,9 +137,9 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
   instance.allVars_list.push_back(makeVec(v));
 }
 
-Var constantAsVar(DomainInt constant)
+Var constantAsVar(int constant)
 {
-  return Var(VAR_CONSTANT, constant);
+  return Var(VAR_CONSTANT, (DomainInt)constant);
 }
 
 // Export of inline function get_constraint as bindings dont like inlines!
@@ -348,9 +348,9 @@ void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2)
   constraint.vars.push_back(std::move(vars));
 }
 
-void constraint_addConstant(ConstraintBlob& constraint, DomainInt& constant)
+void constraint_addConstant(ConstraintBlob& constraint, int constant)
 {
-  constraint.constants.push_back(makeVec(constant));
+  constraint.constants.push_back(makeVec((DomainInt)constant));
 }
 
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants)
