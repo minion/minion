@@ -186,7 +186,7 @@ void newVar(CSPInstance& instance, string name, VariableType type, vector<Domain
  *    Unlike variables created using newVar, these do not appear anywhere else
  *    in the instance (such as the symbol table, or allVars).
  */
-Var constantAsVar(DomainInt n);
+Var constantAsVar(int n);
 
 /*******************************************************/
 /*                    FFI FUNCTIONS                    */
@@ -263,7 +263,7 @@ void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars);
 void constraint_addVar(ConstraintBlob& constraint, Var& var);
 void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2);
 
-void constraint_addConstant(ConstraintBlob& constraint, DomainInt& constant);
+void constraint_addConstant(ConstraintBlob& constraint, int constant);
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
 
 void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint);
