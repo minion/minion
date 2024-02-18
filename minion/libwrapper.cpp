@@ -10,6 +10,7 @@
 #include "info_dumps.h"
 #include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
+#include "parallel/parallel.h"
 #include "solver.h"
 #include "system/minlib/exceptions.hpp"
 #include "tuple_container.h"
@@ -67,7 +68,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   try {
 
     // No parallel minion in library usage for now
-    // getParallelData();
+    //getParallelData();
 
     getState().getOldTimer().startClock();
 
@@ -111,6 +112,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
     } else {
       doStandardSearch(instance, args);
     }
+
   }
 
   catch(parse_exception e) {
@@ -119,6 +121,8 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   } catch(...) {
     returnCode = ReturnCodes::UNKNOWN_ERROR;
   }
+
+  Parallel::endParallelMinion();
 
   // Restore old cout
   cout.rdbuf(oldCoutStreamBuf);
