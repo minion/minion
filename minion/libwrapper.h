@@ -234,12 +234,36 @@ TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList);
 void tupleList_free(TupleList* tupleList);
 
 /***** Instance *****/
+
+/// Creates a new `CSPInstance`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 CSPInstance* instance_new();
 void instance_free(CSPInstance* instance);
 
+/// Adds a search order to a model instance.
+///
+/// Memory Management:
+///   * `searchOrder` is copied into `instance`.
 void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
+
+/// Adds a constraint to a model instance.
+///
+/// Memory Management:
+///   * `constraint` is copied into `instance`.
 void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
+
+/// Adds a named tuple-table to a model instance.
+///
+/// Memory Management:
+///   * `tuplelist` and `name` are copied into `instance`.
 void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist);
+
+/// Gets a tuple table by name.
+///
+/// Memory Management:
+///   * The returned pointer is callee owned.
 TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name);
 
 /*
@@ -255,18 +279,58 @@ int printMatrix_getValue(int idx);
 
 // as per MinionThreeInput.h and build/src/Constraintdefs.h.
 
+/// Creates a new `ConstraintBlob`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 ConstraintBlob* constraint_new(ConstraintType contraint_type);
+
+/// Frees the given `ConstraintBlob`.
 void constraint_free(ConstraintBlob* constraint);
 
+/// Gets the `ConstraintDef` associated with the given constraint.
+///
+/// Memory Management:
+///   The callee owns the returned pointer.
 ConstraintDef* lib_getConstraint(ConstraintType t);
+
+/// Adds a list of variables argument to the constraint.
+///
+/// Memory Management:
+///   `vars` is copied into `constraint`.
 void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars);
+
+/// Adds a variable argument to the constraint.
+///
+/// Memory Management:
+///   `var` is copied into `constraint`.
 void constraint_addVar(ConstraintBlob& constraint, Var& var);
+
+/// Adds a two variables argument to the constraint.
+///
+/// Memory Management:
+///   `var1` and `var2` are copied into `constraint`.
 void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2);
 
+/// Adds a constant to the constraint.
 void constraint_addConstant(ConstraintBlob& constraint, int constant);
+
+/// Adds a list of constants to the constraint.
+///
+/// Memory Management:
+///   `constants` is copied into `constraint`.
 void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
 
+/// Adds an internal constraint argument to the constraint.
+///
+/// Memory Management:
+///   `internal_constraint` is copied into `constraint`.
 void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint);
+
+/// Adds a list of internal constraint argument to the constraint.
+///
+/// Memory Management:
+///   `internal_constraints` is copied into `constraint`.
 void constraint_addConstraintList(ConstraintBlob& constraint,
                                   vector<ConstraintBlob>& internal_constraints);
 
@@ -276,31 +340,95 @@ void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList);
 
 /***** Small misc useful types *****/
 
+/// Creates a new `SearchOptions` object.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 SearchOptions* searchOptions_new();
+
+/// Creates a new `SearchMethod` object.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 SearchMethod* searchMethod_new();
+
+/// Creates a new `SearchOrder` object.
+///
+/// Memory Management:
+///   * The caller owns the returned pointer.
+///   * The given `vars` is copied into the returned `SearchOrder`.
 SearchOrder* searchOrder_new(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
 
+/// Frees the given `SearchOptions`.
 void searchOptions_free(SearchOptions* searchOptions);
+
+/// Frees the given `SearchMethod`.
 void searchMethod_free(SearchMethod* searchMethod);
+
+/// Frees the given `SearchOrder`.
 void searchOrder_free(SearchOrder* searchOrder);
 
 /***** std::vector Wrappers *****/
 
+/// Creates a new `vector<Var>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 std::vector<Var>* vec_var_new();
+
+/// Adds a `Var` to the end of the given vector.
+///
+/// Memory Management:
+///   `var` is copied into `vec`.
 void vec_var_push_back(std::vector<Var>* vec, Var var);
+
+/// Frees the given `vector<Var>`.
 void vec_var_free(std::vector<Var>* vec);
 
+/// Creates a new `vector<DomainInt>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 std::vector<DomainInt>* vec_int_new();
+
+/// Adds an `int` to the end of the given vector.
+///
+/// Memory Management:
+///   `n` is copied into `vec`.
 void vec_int_push_back(std::vector<DomainInt>* vec, int n);
+
+/// Frees the given `vector<DomainInt>`.
 void vec_int_free(std::vector<DomainInt>* vec);
 
+/// Creates a new `vector<ConstraintBlob>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 std::vector<ConstraintBlob>* vec_constraints_new();
+
+/// Adds a `ConstraintBlob` to the end of the given vector.
+///
+/// Memory Management:
+///   `constraint` is copied into `vec`.
 void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint);
+
+/// Frees the given `vector<ConstraintBlob>`.
 void vec_constraints_free(std::vector<ConstraintBlob>* vec);
 
+/// Creates a new `vector<vector<DomainInt>>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
 std::vector<std::vector<DomainInt>>* vec_vec_int_new();
+
+/// Adds a `vector<DomainInt>` to the end of the given vector.
+///
+/// Memory Management:
+///   `new_elem` is copied into `vec`.
 void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
                            std::vector<DomainInt> new_elem);
+
+/// Frees the given `vector<vector<DomainInt>`.
 void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
 
 #endif
