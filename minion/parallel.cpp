@@ -87,15 +87,6 @@ void setNumberCores(int cores) {
 }
 
 ParallelData* setupParallelData() {
-  // make sure we don't end up with too many children
-  signal(SIGCHLD, SIG_IGN);
-
-  // Setup a pipe so parent can track if children are alive
-  int ret = pipe(childTrackingPipe);
-
-  if(ret < 0) {
-    D_FATAL_ERROR("Parallel pipe construction failed");
-  }
 
   ParallelData* pd = 0;
   pd = (ParallelData*)mmap(NULL, sizeof(ParallelData), PROT_READ | PROT_WRITE,
@@ -123,7 +114,24 @@ ParallelData* setupParallelData() {
   return pd;
 }
 
+void setupParallelSupport() {
+  // make sure we don't end up with too many children
+  signal(SIGCHLD, SIG_IGN);
+
+  // Setup a pipe so parent can track if children are alive
+  int ret = pipe(childTrackingPipe);
+
+  if(ret < 0) {
+    D_FATAL_ERROR("Parallel pipe construction failed");
+  }
+
+}
+
+
 int doFork() {
+  if(!forkEverCalled) {
+    setupParallelSupport();
+  }
   forkEverCalled = true;
   int f = fork();
   if(f < 0) {
