@@ -102,7 +102,7 @@ struct SparseBoundVarContainer {
     typename vector<BoundType>::iterator it =
         std::lower_bound(bounds.begin(), bounds.end(), newLowerBound);
     if(it == bounds.end()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return *(it - 1);
     }
 
@@ -123,7 +123,7 @@ struct SparseBoundVarContainer {
       return newUpperBound;
 
     if(it == bounds.begin()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return bounds.front();
     }
 
@@ -250,11 +250,11 @@ struct SparseBoundVarContainer {
     DomainInt maxVal = getMax(d);
 
     if(!binary_search(bounds.begin(), bounds.end(), i)) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
     if(minVal > i || maxVal < i) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -294,7 +294,7 @@ struct SparseBoundVarContainer {
     DomainInt lowBound = lowerBound(d);
 
     if(i < lowBound) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -318,7 +318,7 @@ struct SparseBoundVarContainer {
     DomainInt upBound = upperBound(d);
 
     if(i > upBound) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

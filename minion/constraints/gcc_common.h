@@ -573,7 +573,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       GCCPRINT("matching:" << flag);
 
       if(!flag) {
-        getState().setFailed(true);
+        getState().setFailed();
         return;
       }
     }
@@ -622,7 +622,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       if(lbcusage[i] < lower[i]) {
         // can't hit the lower bound.
         GCCPRINT("failing because can't construct lower bound matching.");
-        getState().setFailed(true);
+        getState().setFailed();
         return;
       }
     }
@@ -792,7 +792,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           bool flag = bfsmatching_gcc();
           if(!flag) {
             GCCPRINT("Failing because no matching");
-            getState().setFailed(true);
+            getState().setFailed();
             return;
           }
         }

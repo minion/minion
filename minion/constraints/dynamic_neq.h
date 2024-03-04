@@ -28,7 +28,7 @@ struct WatchNeqConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     if(var1.isAssigned() && var2.isAssigned() &&
        var1.assignedValue() == var2.assignedValue()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

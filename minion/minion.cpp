@@ -51,7 +51,7 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
 
   // This has to happen here, so the dumpSolver knows if the solver failed or not
   if(!preprocess) {
-    getState().setFailed(true);
+    getState().setFailed();
   }
 
   SolveCSP(instance, args);

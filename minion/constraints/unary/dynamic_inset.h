@@ -36,7 +36,7 @@ struct WatchInSetConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     if(vals.empty()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
     var.setMin(vals.front());
@@ -60,7 +60,7 @@ struct WatchInSetConstraint : public AbstractConstraint {
     // This is basically lifted from "sparse SysInt bound vars"
     vector<DomainInt>::iterator it_low = std::lower_bound(vals.begin(), vals.end(), var.min());
     if(it_low == vals.end()) {
-      getState().setFailed(true);
+      getState().setFailed();
     } else {
       var.setMin(*it_low);
     }
@@ -75,7 +75,7 @@ struct WatchInSetConstraint : public AbstractConstraint {
       return;
 
     if(it_high == vals.begin()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

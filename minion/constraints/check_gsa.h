@@ -59,7 +59,7 @@ struct Check_GSA : public AbstractConstraint {
     bool flag = false;
     GET_ASSIGNMENT(assignment, child);
     if(!flag) {
-      getState().setFailed(true);
+      getState().setFailed();
     } else {
       watch_assignment(assignment, *(child->getVarsSingleton()), 0);
     }

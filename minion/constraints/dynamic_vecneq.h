@@ -329,7 +329,7 @@ struct VecNeqDynamic : public AbstractConstraint {
 
     // Vectors are assigned and equal.
     if(index == size) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

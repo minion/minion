@@ -57,7 +57,7 @@ struct QuickLexDynamic : public AbstractConstraint {
 
     if(varArray1.size() == 0) {
       if(Less)
-        getState().setFailed(true);
+        getState().setFailed();
       return;
     }
 
@@ -110,7 +110,7 @@ struct QuickLexDynamic : public AbstractConstraint {
     }
 
     if(Less)
-      getState().setFailed(true);
+      getState().setFailed();
     else {
       detachTriggers();
       alpha = n;

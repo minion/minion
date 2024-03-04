@@ -477,7 +477,7 @@ struct CTupleSTR : public AbstractConstraint {
 
       if(limit == 0) {
         // We found no valid tuples!
-        getState().setFailed(true);
+        getState().setFailed();
         return;
       }
     } else {

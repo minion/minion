@@ -72,7 +72,7 @@ struct Forward_Checking : public AbstractConstraint {
     // if all variables assigned
     if(trig1 == -1) {
       if(full_assignmentFailed(size, vars)) {
-        getState().setFailed(true);
+        getState().setFailed();
       }
       return;
     }

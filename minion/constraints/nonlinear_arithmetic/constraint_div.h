@@ -121,7 +121,7 @@ struct DivConstraint : public AbstractConstraint {
 
     if(assigedcount == 3) {
       if(!checkDivResult<undef>(b1.min(), b2.min(), b3.min())) {
-        getState().setFailed(true);
+        getState().setFailed();
       }
       return;
     }

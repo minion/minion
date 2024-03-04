@@ -45,7 +45,7 @@ struct WatchInIntervalSetConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     if(intervals.empty()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
     var.setMin(intervals.front().first);

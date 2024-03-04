@@ -155,7 +155,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
         bool f = update_matching_assignment(row, col);
         if(!f) {
-          getState().setFailed(true);
+          getState().setFailed();
           return;
         }
 
@@ -202,7 +202,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
 
         // If two assignments in one row or column...
         if(rowcolmatching[row] != -1 || colrowmatching[col] != -1) {
-          getState().setFailed(true);
+          getState().setFailed();
           return;
         } else {
           rowcolmatching[row] = col;
@@ -252,7 +252,7 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
     bool matchok = bfsmatching();
 
     if(!matchok) {
-      getState().setFailed(true);
+      getState().setFailed();
     } else {
       tarjan_recursive();
     }

@@ -103,7 +103,7 @@ struct ModConstraint : public AbstractConstraint {
 
     if(assigedcount == 3) {
       if(!check_modResult(b1.min(), b2.min(), b3.min())) {
-        getState().setFailed(true);
+        getState().setFailed();
       }
       return;
     }
@@ -130,7 +130,7 @@ struct ModConstraint : public AbstractConstraint {
         var3.assign(0);
         return;
       } else {
-        getState().setFailed(true);
+        getState().setFailed();
         return;
       }
     }

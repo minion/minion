@@ -90,7 +90,7 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
 
     if(triggers_wanted > 1) // Then we have failed, forget it.
     {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     } else if(triggers_wanted == 1) // Then we can propagate
     {                               // We never even set up triggers

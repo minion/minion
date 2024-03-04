@@ -418,7 +418,7 @@ protected:
       }
 
       if(allowedToFail)
-        getState().setFailed(true);
+        getState().setFailed();
       return false;
     }
 
@@ -725,7 +725,7 @@ protected:
   inline bool hopcroft_wrapper2(vector<SysInt>& vars_in_scc, vector<SysInt>& matching,
                                 vector<SysInt>& upper, vector<SysInt>& usage) {
     if(!hopcroft2(vars_in_scc, matching, upper, usage)) {
-      getState().setFailed(true);
+      getState().setFailed();
       return false;
     }
     return true;

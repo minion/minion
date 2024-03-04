@@ -96,7 +96,7 @@ struct LessEqualSumConstraint : public AbstractConstraint {
 
     DomainInt looseness = varSum.max() - sum;
     if(looseness < 0) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

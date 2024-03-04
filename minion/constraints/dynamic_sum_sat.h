@@ -41,7 +41,7 @@ struct BoolSATConstraintDynamic : public AbstractConstraint {
     trig1 = index;
 
     if(index == arraySize) { // Not enough triggers
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
