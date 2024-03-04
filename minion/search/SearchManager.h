@@ -246,7 +246,9 @@ struct StandardSearchManager : public SearchManager {
         // Deal with optimisation variables
         getState().incrementBacktrackCount();
         handle_opt_func();
-        prop->prop(varArray);
+        if(!getState().isFailed()) {
+          prop->prop(varArray);
+        }
       }
     }
   }
