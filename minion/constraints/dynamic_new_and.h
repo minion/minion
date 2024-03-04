@@ -91,6 +91,7 @@ struct Dynamic_AND : public ParentConstraint {
 
   virtual void specialCheck() {
     D_ASSERT(constraintLocked);
+    D_ASSERT(!getState().isFailed());
     P("Full propagating all constraints in AND");
     if(child_constraints.size() == 0) {
       constraintLocked = false;

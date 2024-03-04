@@ -124,9 +124,9 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     Controller::worldPush();
 
     Command c = readCommand(streams->input);
- 
+
     DP(c);
-    
+
     if(c.type == "Q") {
       std::cout << "Command mode: Goodbye" << endl;
       exit(0);
@@ -138,7 +138,10 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     getOptions().solsoutJson = false;
 
     assignLiterals(instance, c.lits);
-    getQueue().propagateQueue();
+    if(!getState().isFailed()) {
+      getQueue().propagateQueue();
+    }
+
     if(getState().isFailed()) {
       DP("Instant fail");
       streams->output << c.type << " F 0" << std::endl;
@@ -150,7 +153,7 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
         printDeletedVals(instance, streams);
         streams->output << std::endl;
       } else if(c.type == "S" || c.type == "F" || c.type == "A") {
-        // 'A' means all solutions, 'F' or 'S' means 
+        // 'A' means all solutions, 'F' or 'S' means
         if(c.type == "A") {
           getOptions().sollimit = -1;
         }

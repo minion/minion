@@ -34,6 +34,10 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
          << " literals" << endl;
   }
 
+  if(getState().isFailed()) {
+    return;
+  }
+
   if(preprocessLevel.type == PropLevel_SAC || preprocessLevel.type == PropLevel_SACBounds)
     return;
 
