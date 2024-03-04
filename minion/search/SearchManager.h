@@ -167,7 +167,7 @@ struct StandardSearchManager : public SearchManager {
         }
 
         // If we are not finished, then go into the loop below.
-        getState().setFailed(true);
+        getState().setFailed();
       } else {
         maybe_print_node();
         branch_left(varval);
@@ -223,7 +223,7 @@ struct StandardSearchManager : public SearchManager {
             D_CHECK(isParent >= 0);
             if(isParent) {
               // Force to ignore left branch
-              getState().setFailed(true);
+              getState().setFailed();
             } else {
               // Force to stay in left branch
               reset();

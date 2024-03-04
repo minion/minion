@@ -70,7 +70,7 @@ struct LexLeqConstraint : public AbstractConstraint {
     SysInt n = x.size();
     if(Less) {
       if(i == n || i == beta) {
-        getState().setFailed(true);
+        getState().setFailed();
         return;
       }
       if(!x[i].isAssigned() || !y[i].isAssigned() ||
@@ -106,7 +106,7 @@ struct LexLeqConstraint : public AbstractConstraint {
       }
       i--;
     }
-    getState().setFailed(true);
+    getState().setFailed();
   }
 
   virtual void propagateDynInt(SysInt i_in, DomainDelta) {
@@ -119,7 +119,7 @@ struct LexLeqConstraint : public AbstractConstraint {
 
     // Not sure why we need this, but we seem to.
     if(b <= a) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -209,12 +209,12 @@ struct LexLeqConstraint : public AbstractConstraint {
           beta = betaBound;
       }
       if(alpha >= beta)
-        getState().setFailed(true);
+        getState().setFailed();
       propagateDynInt((SysInt)alpha * 4,
                       DomainDelta::empty()); // initial propagation, if necessary.
     } else {
       if(Less)
-        getState().setFailed(true);
+        getState().setFailed();
       else
         F = true;
     }

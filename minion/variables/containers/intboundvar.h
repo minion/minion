@@ -236,7 +236,7 @@ struct BoundVarContainer {
     DomainInt minVal = getMin(d);
     DomainInt maxVal = getMax(d);
     if(minVal > i || maxVal < i) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -273,7 +273,7 @@ struct BoundVarContainer {
     DomainInt upBound = upperBound(d);
 
     if(i < lowBound) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -292,7 +292,7 @@ struct BoundVarContainer {
     DomainInt upBound = upperBound(d);
 
     if(i > upBound) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

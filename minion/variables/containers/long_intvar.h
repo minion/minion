@@ -98,7 +98,7 @@ struct BigRangeVarContainer {
     DomainInt loopvar = oldUpBound;
     // DomainInt lowBound = initialBounds[d.varNum].first;
     if(loopvar < lower) {
-      getState().setFailed(true);
+      getState().setFailed();
       /// Here just remove the value which should lead to the least work.
       return upperBound(d);
     }
@@ -109,7 +109,7 @@ struct BigRangeVarContainer {
       if(bms_array->isMember(varOffset[d.varNum] + loopvar))
         return loopvar;
     }
-    getState().setFailed(true);
+    getState().setFailed();
     return oldUpBound;
   }
 
@@ -123,7 +123,7 @@ struct BigRangeVarContainer {
     DomainInt loopvar = old_lowBound;
     // DomainInt lowBound = initialBounds[d.varNum].first;
     if(loopvar > upper) {
-      getState().setFailed(true);
+      getState().setFailed();
       /// Here just remove the value which should lead to the least work.
       return lowerBound(d);
     }
@@ -134,7 +134,7 @@ struct BigRangeVarContainer {
       if(bms_array->isMember(varOffset[d.varNum] + loopvar))
         return loopvar;
     }
-    getState().setFailed(true);
+    getState().setFailed();
     return old_lowBound;
   }
 
@@ -294,13 +294,13 @@ struct BigRangeVarContainer {
                        DomainInt upper) {
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
     if(!inDomain(d, offset)) {
-      getState().setFailed(true);
+      getState().setFailed();
       return false;
     }
     if(offset == upper && offset == lower)
       return false;
     if(offset > upper || offset < lower) {
-      getState().setFailed(true);
+      getState().setFailed();
       return false;
     }
     return true;
@@ -364,7 +364,7 @@ public:
     DomainInt lowBound = lowerBound(d);
 
     if(offset < lowBound) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -414,7 +414,7 @@ public:
     DomainInt lowBound = lowerBound(d);
 
     if(offset > upBound) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

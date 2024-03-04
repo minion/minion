@@ -575,7 +575,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   virtual void fullPropagate() {
     // D_ASSERT(backtrack_stack.size()==0);
     if(data->size() == 0) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

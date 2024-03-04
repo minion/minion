@@ -214,7 +214,7 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
     if(unassigned == -1) {
       // just check, everything is assigned.
       if(occ == valCount.assignedValue()) {
-        getState().setFailed(true);
+        getState().setFailed();
       }
     } else {
       if(occ == valCount.assignedValue()) { // need another occurrence of the value
@@ -337,7 +337,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       }
     }
     if(valCountMax < occs)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   void not_occurrence_limit_reached() {
@@ -354,7 +354,7 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
       }
     }
     if(valCount_min > static_cast<SysInt>(varArray.size()) - occs)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   virtual void propagateDynInt(SysInt in, DomainDelta) {
@@ -365,13 +365,13 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
     if(varArray[i].assignedValue() == (DomainInt)value) {
       ++occurrencesCount;
       if(valCountMax < occurrencesCount)
-        getState().setFailed(true);
+        getState().setFailed();
       if(occurrencesCount == valCountMax)
         occurrence_limit_reached();
     } else {
       ++not_occurrencesCount;
       if(valCount_min > static_cast<SysInt>(varArray.size()) - not_occurrencesCount)
-        getState().setFailed(true);
+        getState().setFailed();
       if(not_occurrencesCount == static_cast<SysInt>(varArray.size()) - valCount_min)
         not_occurrence_limit_reached();
     }
@@ -396,14 +396,14 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     triggerSetup();
     if(valCountMax < 0 || valCount_min > (SysInt)varArray.size())
-      getState().setFailed(true);
+      getState().setFailed();
     setupCounters();
 
     if(valCountMax < occurrencesCount)
-      getState().setFailed(true);
+      getState().setFailed();
 
     if(valCount_min > static_cast<SysInt>(varArray.size()) - not_occurrencesCount)
-      getState().setFailed(true);
+      getState().setFailed();
 
     if(occurrencesCount == valCountMax)
       occurrence_limit_reached();

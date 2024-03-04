@@ -220,7 +220,7 @@ struct BoolVarContainer {
 
   void setMax(const BoolVarRef_internal& d, DomainInt i) {
     if(i < 0) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -231,7 +231,7 @@ struct BoolVarContainer {
 
   void setMin(const BoolVarRef_internal& d, DomainInt i) {
     if(i > 1) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
     D_ASSERT(i <= 1);
@@ -246,7 +246,7 @@ struct BoolVarContainer {
 
     if(d.isAssigned()) {
       if(b == d.assignedValue())
-        getState().setFailed(true);
+        getState().setFailed();
     } else
       uncheckedAssign(d, 1 - b);
   }
@@ -255,7 +255,7 @@ struct BoolVarContainer {
     D_ASSERT(d.varNum < (SysInt)varCount_m);
     D_ASSERT(!d.isAssigned());
     if((checked_cast<SysInt>(b) | 1) != 1) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
     assign_ptr()[d.dataOffset()] |= d.shiftOffset;
@@ -282,7 +282,7 @@ struct BoolVarContainer {
       internalAssign(d, b);
     else {
       if(d.assignedValue() != b)
-        getState().setFailed(true);
+        getState().setFailed();
     }
   }
 

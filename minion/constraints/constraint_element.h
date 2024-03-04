@@ -115,7 +115,7 @@ struct ElementConstraint : public AbstractConstraint {
       SysInt index = checked_cast<SysInt>(indexvar.assignedValue());
       if(index < 0 || index >= (SysInt)varArray.size()) {
         if(!undefMapsZero) {
-          getState().setFailed(true);
+          getState().setFailed();
           return;
         } else {
           resultvar.assign(0);
@@ -176,7 +176,7 @@ struct ElementConstraint : public AbstractConstraint {
       SysInt index = checked_cast<SysInt>(indexvar.assignedValue());
       if(!undefMapsZero) {
         if(index < 0 || index >= (SysInt)varArray.size()) {
-          getState().setFailed(true);
+          getState().setFailed();
           return;
         }
       } else {

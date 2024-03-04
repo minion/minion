@@ -76,12 +76,12 @@ struct ConstantVar {
 
   void setMax(DomainInt i) {
     if(i < val)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   void setMin(DomainInt i) {
     if(i > val)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   void uncheckedAssign(DomainInt) {
@@ -90,12 +90,12 @@ struct ConstantVar {
 
   void assign(DomainInt b) {
     if(b != val)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   void removeFromDomain(DomainInt b) {
     if(b == val)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   void addDynamicTrigger(Trig_ConRef t, TrigType, DomainInt = NoDomainValue,

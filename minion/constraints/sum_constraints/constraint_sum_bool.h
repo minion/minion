@@ -77,7 +77,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
     }
     // D_ASSERT(oneVars >= occCount());
     if(oneVars > occCount())
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
@@ -99,7 +99,7 @@ struct BoolLessSumConstraint : public AbstractConstraint {
         occs++;
     count = occs;
     if(occs > occCount())
-      getState().setFailed(true);
+      getState().setFailed();
     if(occs == occCount())
       limit_reached();
   }

@@ -20,7 +20,7 @@ struct ConstantConstraint : public AbstractConstraint {
 
   virtual void fullPropagate() {
     if(!truth)
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {

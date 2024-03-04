@@ -91,7 +91,7 @@ struct VecCountDynamic : public AbstractConstraint {
 
     // Failed to find enough watches
     if(found_matches < numTo_watch - 1) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

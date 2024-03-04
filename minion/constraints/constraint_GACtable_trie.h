@@ -186,7 +186,7 @@ struct GACTableConstraint : public AbstractConstraint {
     if(negative == 0 && tuples->size() == 0) { // it seems to work without this
                                                // explicit check, but I put it
                                                // in anyway.
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
     for(SysInt varIndex = 0; varIndex < (SysInt)vars.size(); ++varIndex) {

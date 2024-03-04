@@ -691,7 +691,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     // Is this guaranteed to be called before do_prop is ever called??
     // I hope so, because the following test has to be done first.
     if(numvars > numvals) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 
@@ -1185,7 +1185,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       // The constraint is unsatisfiable (no matching).
       P("No complete matching found. Changed varvalmatching: " << varvalmatching);
       if(allowedToFail)
-        getState().setFailed(true);
+        getState().setFailed();
       return false;
     }
 

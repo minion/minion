@@ -166,6 +166,17 @@ public:
   bool isFailed() {
     return failed;
   }
+
+  void setFailed() {
+    failed = true;
+  }
+
+  // This should only be called by 'pop_world', or with
+  // extreme care.
+  void _unsafeClearFailed() {
+    failed = false;
+  }
+
   void setFailed(bool f) {
     failed = f;
   }

@@ -21,7 +21,7 @@ inline void worldPush() {
 
 /// Pops the state of the whole world.
 inline void worldPop() {
-  getState().setFailed(false);
+  getState()._unsafeClearFailed();
   getQueue().clearQueues();
   getState().getGenericBacktracker().worldPop();
   getMemory().backTrack().worldPop();

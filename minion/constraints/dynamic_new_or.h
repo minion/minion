@@ -220,7 +220,7 @@ struct Dynamic_OR : public ParentConstraint {
     }
 
     if(found_watch == false) {
-      getState().setFailed(true);
+      getState().setFailed();
       return;
     }
 

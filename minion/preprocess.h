@@ -34,8 +34,6 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
   prop(vars);
 
   bool checkFailed = getState().isFailed();
-  getState().setFailed(false);
-
   Controller::worldPop();
 
   return checkFailed;
@@ -44,7 +42,7 @@ bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars
 inline bool checkSACTimeout() {
   if(Parallel::isAlarmActivated()) {
     if(Parallel::isCtrlCPressed()) {
-      getState().setFailed(true);
+      getState().setFailed();
       return true;
     } else {
       getOptions().printLine("Time out in preprocessing.");
@@ -244,8 +242,6 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
       }
       assignments.clear();
 
-      getState().setFailed(false);
-
       Controller::worldPop();
 
       Controller::worldPush();
@@ -259,8 +255,6 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
                                                             : (assignments[j].first + 1));
       }
       assignments.clear();
-
-      getState().setFailed(false);
 
       Controller::worldPop();
     }

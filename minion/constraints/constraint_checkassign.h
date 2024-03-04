@@ -33,7 +33,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   virtual void propagateDynInt(SysInt propVal, DomainDelta) {
     PROP_INFO_ADDONE(CheckAssign);
     if(checkUnsat(propVal, DomainDelta::empty()))
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   virtual BOOL checkUnsat(SysInt, DomainDelta) {
@@ -92,7 +92,7 @@ struct CheckAssignConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     triggerSetup();
     if(fullCheckUnsat())
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {

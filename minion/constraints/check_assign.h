@@ -77,7 +77,7 @@ struct Check_Assign : public AbstractConstraint {
     }
 
     if(!checkAssignment(varptr, size))
-      getState().setFailed(true);
+      getState().setFailed();
   }
 
   virtual void fullPropagate() {

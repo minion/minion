@@ -136,7 +136,7 @@ struct AlldiffCiaran : public AbstractConstraint {
 
       //  if D = emptyset or |A| < n then fail
       if(D.size() == 0 || A.size() < n) {
-        getState(stateObj).setFailed(true);
+        getState(stateObj).setFailed();
         return;
       }
 

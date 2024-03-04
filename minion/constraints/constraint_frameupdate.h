@@ -115,7 +115,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     for(unsigned i = 0; i < idx_source.size(); ++i) {
       DomainInt val = idx_source[i].assignedValue();
       if(idx_source_set.count(val) > 0 || val <= 0 || val > source.size()) {
-        getState().setFailed(true);
+        getState().setFailed();
         return false;
       }
       idx_source_set.insert(val);
@@ -123,7 +123,7 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     for(unsigned i = 0; i < idx_target.size(); ++i) {
       DomainInt val = idx_target[i].assignedValue();
       if(idx_target_set.count(val) > 0 || val <= 0 || val > target.size()) {
-        getState().setFailed(true);
+        getState().setFailed();
         return false;
       }
       idx_target_set.insert(val);

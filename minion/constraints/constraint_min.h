@@ -94,7 +94,7 @@ struct MinConstraint : public AbstractConstraint {
         while(it != varArray.end() && (*it).min() > minvarMax)
           ++it;
         if(it == varArray.end()) {
-          getState().setFailed(true);
+          getState().setFailed();
           return;
         }
         // Possibly this variable is the only one that can be the minimum
@@ -116,7 +116,7 @@ struct MinConstraint : public AbstractConstraint {
     setupTriggers();
     SysInt arraySize = varArray.size();
     if(arraySize == 0) {
-      getState().setFailed(true);
+      getState().setFailed();
     } else {
       for(SysInt i = 0; i < (arraySize + 1) * 2; ++i) {
         propagateDynInt(i, DomainDelta::empty());
