@@ -66,6 +66,7 @@ public:
 
   template <bool is_root_node>
   bool propagateDynamicTriggerLists() {
+    D_ASSERT(!getState().isFailed());
     bool* failPtr = getState().getFailedPtr();
     while(!dynamicTriggerList.empty()) {
       DynamicTriggerEvent dte = dynamicTriggerList.queueTop();
@@ -76,11 +77,6 @@ public:
       SysInt pos = 0;
 
       while(pos < dtl.size()) {
-        if(*failPtr) {
-          clearQueues();
-          return true;
-        }
-
         Trig_ConRef ref = dtl[pos];
         if(!ref.empty() && (!is_root_node || ref.con->fullPropagateDone)) {
           ref.propagate(delta);
@@ -91,6 +87,10 @@ public:
           ref.constraint()->incWdeg();
 #endif
 
+        if(*failPtr) {
+          return true;
+        }
+
         pos++;
       }
       dtl.tryCompressList();
@@ -100,11 +100,17 @@ public:
 
   template <bool is_root_node>
   inline void propagateQueueImpl() {
+    D_ASSERT(!getState().isFailed());
+
     while(true) {
+      D_ASSERT(!getState().isFailed());
+
       while(!dynamicTriggerList.empty()) {
         if(propagateDynamicTriggerLists<is_root_node>())
           return;
       }
+
+      D_ASSERT(!getState().isFailed());
 
       if(specialTriggers.empty())
         return;
@@ -120,7 +126,6 @@ public:
 #endif
 
       if(getState().isFailed()) {
-        clearQueues();
         return;
       }
     } // while(true)

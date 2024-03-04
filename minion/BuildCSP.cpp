@@ -91,6 +91,10 @@ void BuildCSP(CSPInstance& instance) {
 }
 
 bool PreprocessCSP(CSPInstance& instance, SearchMethod args) {
+    if(getState().isFailed()) {
+      return false;
+    }
+
     vector<AnyVarRef> preprocess_anyvars = getAnyVarRefFromVar(instance.preprocess_vars);
 
     try {
