@@ -8,41 +8,29 @@ less common flags.
 Choosing how much search to perform (time, number of solutions)
 ---------------------------------------------------------------
 
--nodelimit
+-nodelimit <N>
 ~~~~~~~~~~
 
 To stop search after N nodes:
 
-::
 
-   minion -nodelimit N myinput.minion
-
--sollimit
+-sollimit <N>
 ~~~~~~~~~
 
 To stop search after N solutions have been found:
 
-::
 
-   minion -sollimit N myinput.minion
-
--timelimit
+-timelimit <N>
 ~~~~~~~~~~
 
 To stop search after N seconds (real time):
 
-::
 
-   minion -timelimit N myinput.minion
-
--cpulimit
+-cpulimit <N>
 ~~~~~~~~~
 
 To stop search after N seconds (CPU time):
 
-::
-
-   minion -cpulimit N myinput.minion
 
 -findallsols
 ~~~~~~~~~~~~
@@ -50,7 +38,11 @@ To stop search after N seconds (CPU time):
 Find all solutions and count them. This option is ignored if the problem
 contains any minimising or maximising objective.
 
--varorder
+Control search
+---------------------------------------------------------------
+
+
+-varorder <order>
 ~~~~~~~~~
 
 Enable a particular variable ordering for the search process.
@@ -70,12 +62,69 @@ The available orders are:
 -  wdeg - Weighted degree
 -  domoverwdeg - Domain size over weighted degree
 
--valorder
+-valorder <order>
 ~~~~~~~~~
 
 Choose the value ordering (overruling any selection in the input file).
 
 Current orders are, ascend, descend and random.
+
+-prop-node <proplevel>
+~~~~~~~~~~
+
+Allows the user to choose the level of consistency to be enforced during each node of search.
+
+See -preprocess for the allowed values for `<proplevel>`
+
+-preprocess <proplevel>
+~~~~~~~~~~~
+
+This switch allows the user to choose what level of preprocess is
+applied to their model before search commences. The default level is "GAC"
+
+The choices are:
+
+-  GAC
+      - Default setting
+      - All propagators are run to a fixed point
+      - Incorrectly named (but kept for historical reasons), because some propagators do not achieve GAC.
+      - Used as the basis for all other, better, levels below.
+
+-  SACBounds
+      - singleton arc consistency on the upper and lower bounds of each variable
+      - GAC is run on every assignment to the upper and lower bound of each variable
+
+-  SAC
+      -  singleton arc consistency
+      - GAC is run on every assignment to every variable
+
+-  SSACBounds
+      -  singleton singleton bounds arc consistency
+      - SAC is run on every assignment to the upper and lower bound of each variable
+
+-  SSAC
+      - singleton singleton arc consistency
+      - SAC is run on every assignment to every variable
+
+These are listed in order of roughly how long they take to achieve.
+Preprocessing is a one off cost at the start of search. The success of
+higher levels of preprocessing is problem specific; SAC preprocesses may
+take a long time to complete, but may reduce search time enough to
+justify the cost.
+
+Each of the SAC variants can have '_limit' added (for example
+SACBound_limit). The '_limit' variants of these algorithm add checks
+which limit the algorithms if they are taking a very long time and not making progress.
+
+-randomseed
+~~~~~~~~~~~
+
+Set the pseudorandom seed to N. This allows 'random' behaviour to be
+repeated in different runs of minion.
+
+
+Control output
+---------------------------------------------------------------
 
 -quiet
 ~~~~~~
@@ -103,81 +152,8 @@ Print only solutions and a summary at the end.
 In optimisation problems, only print the optimal value, and not
 intermediate values.
 
--prop-node
-~~~~~~~~~~
 
-Allows the user to choose the level of consistency to be enforced during
-search.
-
-See -preprocess for details of the available levels of consistency.
-
--preprocess
-~~~~~~~~~~~
-
-This switch allows the user to choose what level of preprocess is
-applied to their model before search commences.
-
-The choices are:
-
--  
-
-   GAC
-      -  generalised arc consistency (default)
-      -  all propagators are run to a fixed point
-
-      - if some propagators enforce less than GAC then the model will
-      not necessarily be fully GAC at the outset
-
--  
-
-   SACBounds
-      -  singleton arc consistency on the bounds of each variable
-
-      - AC can be achieved when any variable lower or upper bound is a
-      singleton in its own domain
-
--  
-
-   SAC
-      -  singleton arc consistency
-
-      - AC can be achieved in the model if any value is a singleton in
-      its own domain
-
--  
-
-   SSACBounds
-      -  singleton singleton bounds arc consistency
-
-      - SAC can be achieved in the model when domains are replaced by
-      either the singleton containing their upper bound, or the
-      singleton containing their lower bound
-
--  
-
-   SSAC
-      -  singleton singleton arc consistency
-      -  SAC can be achieved when any value is a singleton in its own
-         domain
-
-These are listed in order of roughly how long they take to achieve.
-Preprocessing is a one off cost at the start of search. The success of
-higher levels of preprocessing is problem specific; SAC preprocesses may
-take a long time to complete, but may reduce search time enough to
-justify the cost.
-
-Each of the SAC variants can have '_limit' added (for example
-SACBound_limit). The '_limit' variants of these algorithm add checks
-which stop the algorithms in some situations when they are taking a very
-long time.
-
--randomseed
-~~~~~~~~~~~
-
-Set the pseudorandom seed to N. This allows 'random' behaviour to be
-repeated in different runs of minion.
-
--tableout
+-tableout <filename>
 ~~~~~~~~~
 
 Append a line of data about the current run of minion to a named file.
@@ -185,23 +161,13 @@ This data includes minion version information, arguments to the
 executable, build and solve time statistics, etc. See the file itself
 for a precise schema of the supplied information.
 
-To add statistics about solving myproblem.minion to mystats.txt:
 
-::
-
-   minion -tableout mystats.txt myproblem.minion
-
--solsout
+-solsout <filename>
 ~~~~~~~~
 
 Append all solutionsto a named file. Each solution is placed on a line,
 with no extra formatting.
 
-To add the solutions of myproblem.minion to mysols.txt:
-
-::
-
-   minion -solsout mysols.txt myproblem.minion
 
 Less common flags
 -----------------

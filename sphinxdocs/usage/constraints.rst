@@ -128,8 +128,6 @@ occurrence constraints:
 	occurrence([primary variables], val2, cap2)
 	...
 
-.. _example-2:
-
 Example
 """""""
 
@@ -414,7 +412,7 @@ The constraint ``div(x,y,z)``
 
 ensures that floor(x/y)=z.
 
-For example:
+For example,
 
 - 10/3 = 3
 - (-10)/3 = -4
@@ -636,12 +634,8 @@ would look like:
 
 Short tuples give us a way of shrinking this list. Short tuples consist
 of pairs (x,y), where x is a varible position, and y is a value for that
-variable. For example:
-
-[(0,0),(3,0)]
-
-Represents 'If the variable at index 0 is 0, and the variable at index 3
-is 0, then the constraint is true'.
+variable. For example, `[(0,0),(3,0)]` Represents "if the variable at index 0 is 0,
+and the variable at index 3 is 0, then the constraint is true".
 
 This allows us to represent our constraint as follows:
 
@@ -714,9 +708,7 @@ shorttuplelist pages for more information.
 
 The important change is that more than one literal may be given for each
 variable. Variables which are not mentioned are assumed to be allowed to
-take any value
-
-Example:
+take any value. For example,
 
 .. code-block::
 

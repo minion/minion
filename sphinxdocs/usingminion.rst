@@ -155,7 +155,7 @@ first example following is a 1D matrix, the second in 4D.
 | :math:`[ bm[\_,1] ] = [ bm[0,1], bm[1,1] ]`
 | :math:`[ bn[1,\_,0,\_] = [ bn[1,0,0,0], b[1,0,0,1], b[1,1,0,0], b[1,1,0,1] ]`
 | You can string together a list of such expressions as in the following
-  example:
+  example
 
 ::
 
