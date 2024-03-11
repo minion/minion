@@ -18,12 +18,11 @@
 // Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-void help(string request);
+void help();
 
 void print_default_help(char** argv) {
   cout << "Type '" << argv[0] << " help' for usage." << endl;
   cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
-  help("switches");
   cout << endl;
   cout << "This version of Minion was built with internal checking "
        <<
@@ -96,17 +95,10 @@ int minion_main(int argc, char** argv) {
 
     if(argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") ||
        argv[1] == string("-h")) {
-      std::string sect("");
-      if(argc != 2) {
-        for(int i = 2; i < argc - 1; i++)
-          sect.append(argv[i]).append(" ");
-        sect.append(argv[argc - 1]);
-      }
-      help(sect);
+      help();
       return EXIT_SUCCESS;
-    } else {
     }
-
+  
     CSPInstance instance;
     SearchMethod args;
 
