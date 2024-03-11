@@ -121,9 +121,10 @@ variables.
 This constraint only restricts the number of occurrences of the values
 in the value list. There is no restriction on the occurrences of other
 values. Therefore the semantics of gcc are identical to a set of
-occurrence constraints:
+occurrence constraints like this:
 
 .. code-block::
+
 	occurrence([primary variables], val1, cap1)
 	occurrence([primary variables], val2, cap2)
 	...
@@ -533,7 +534,7 @@ variables. Other types are not supported.
 To specify a constraint over 3 variables that allows assignments
 (0,0,0), (1,0,0), (0,1,0) or (0,0,1) do the following.
 
-1) Add a tuplelist to the *``*TUPLELIST**`` section, e.g.:
+1) Add a tuplelist to the `**TUPLELIST**` section, e.g.
 
 
 .. code-block::
@@ -608,8 +609,6 @@ performance gains.
 
 The variables used in the constraint have to be BOOL or DISCRETE
 variables. Other types are not supported.
-
-.. _example-3:
 
 Example
 """""""
@@ -881,7 +880,7 @@ watchsumgeq
 
 The constraint ``watchsumgeq(vec, c)`` ensures that sum(vec) >= c, for a list of 0/1 variables ``vec``.
 
-For this constraint, small values of c are more efficient. This is equivalent to ``litsumgeq(vec, [1,...,1], c), but faster.
+For this constraint, small values of c are more efficient. This is equivalent to ``litsumgeq(vec, [1,...,1], c)``, but faster.
 
 
 Related constraints

@@ -473,8 +473,6 @@ flattened into a vector as described in 'help variables vectors'.:
                 | PRINT ALL
                 | PRINT NONE
 
-.. _example-3:
-
 Example
 -------
 
