@@ -109,3 +109,7 @@ in removing values. Most propagation algorithms are specialized to
 particular types of constraint (e.g. a vector of variables take distinct
 values in any solution, the AllDifferent constraint). They typically run
 in polynomial time.
+
+
+```{bibliography}
+```

@@ -24,11 +24,15 @@ Welcome to Minion's documentation!
 
    usage/commandline
 
-   zreferences
-
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+References
+==========
+
+.. bibliography:: refs.bib
+   :all:

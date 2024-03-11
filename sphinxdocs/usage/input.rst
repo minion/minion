@@ -344,7 +344,6 @@ The required format is:
 
    literal ::= (<num>, <num>)
 
-.. _example-2:
 
 Example
 -------
@@ -377,23 +376,12 @@ Which represents the same constraint as:
 
 Short tuples give us a way of shrinking some constraints. Short tuples
 consist of pairs (x,y), where x is a varible position, and y is a value
-for that variable. For example:
-
-::
-
-   [(0,0),(3,0)]
-
-Represents 'If the variable at index 0 is 0, and the variable at index 3
-is 0, then the constraint is true'.
+for that variable. For example, `[(0,0),(3,0)]` represents "If the variable
+at index 0 is 0, and the variable at index 3 is 0, then the constraint is true".
 
 Some constraints (currently just shortctuplestr2) allow more than one
-literal per variable for example:
-
-::
-
-   [(0,0),(0,1),(3,0)]
-
-Represents 'If the variable at index 0 is 0 or 1, and the variable at
+literal per variable for example, `[(0,0),(0,1),(3,0)]`
+represents 'if the variable at index 0 is 0 or 1, and the variable at
 index 3 is 0, then the constraint is true'.
 
 Note that some tuples are double-represented in the example 'mycon'. The
