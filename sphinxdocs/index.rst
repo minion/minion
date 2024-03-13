@@ -14,7 +14,7 @@ Welcome to Minion's documentation!
 
    building
 
-   usingminion
+   introtominion
    
    usage/variables
 
@@ -23,6 +23,8 @@ Welcome to Minion's documentation!
    usage/input
 
    usage/commandline
+
+   usingminion
 
 Indices and tables
 ==================

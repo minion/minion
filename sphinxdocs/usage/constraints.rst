@@ -20,10 +20,10 @@ constraints into smaller pieces, introduce new variables or simplify or
 manipulate constraints. This provides complete control over how Minion
 represents your problem, but also leads to a number of annoyances.
 
-Probably the first thing you will notice it that Minion has neither a
-“sum equals” or “weighted sum equals” constraint. This is because the
+One obvious omission is that Minion has neither a
+“sum equals” constraint. This is because the
 most efficiently we could implement such a constraint was simply by
-gluing together the sumleq and the sumgeq constraints. Minion could
+gluing together the ``sumleq`` and the ``sumgeq`` constraints. Minion could
 provide a wrapper which generated the two constraints internally, but
 this would go against the transparency. Of course if in the future a
 more efficient implementation of sumeq was found, it may be added.
@@ -31,23 +31,63 @@ more efficient implementation of sumeq was found, it may be added.
 The ``watchsumgeq`` and ``watchsumleq`` are varients on the algorithm
 used to implement SAT constraints. They are faster than ``sumleq`` and
 ``sumgeq``, but only work when summing a list of Booleans to a constant.
-Further ``watchsumgeq`` performs best when the value being summed to is
+Further, ``watchsumgeq`` performs best when the value being summed to is
 small, and ``watchsumleq`` works best when the value being summed to is
 close to the size of the input vector.
 
 Minion does not attempt to simplify constraints, so constraints such as
 ``sumgeq([a,a,a], 3)`` are not simplified to ``sumgeq([a],1)``. This
-kind of simplification, done by hand, will often improve models.
-Further, and importantly in practice, Minion pre-allocates memory based
-on the initial domain size of variables. If these are excessively slack,
-this can hurt performance throughout search.
+kind of simplification will often significantly improve performance. Rather than perform such transformations (which do have trade-offs), Minion leaves this tuning to the user, or alternatively (and much more sensibly!) to specialised tools such `SavileRow <https://www-users.york.ac.uk/peter.nightingale/savilerow/>`_ or `Conjure <https://www.github.com/conjure-cp/conjure>`. t
 
-Some constraints in Minion do not work on ``BOUND`` and ``SPARSEBOUND``
-variables, in particular ``gacalldiff`` and ``watchelement``. These two
-constraints are in general better when they can be used.
+There are two reasons that there are multiple implentations of the same constraint:
+
+* One version achieves more reasoning at the cost of speed.
+* One version does not work on ``BOUND`` and ``SPARSEBOUND`` variables (often, the version for ``BOUND`` and ``SPARSEBOUND`` achieves lower reasoning).
+
+It is impossible to predict if problems will be solved faster with more or less reasoning -- in general using higher levels of reasoning is a good idea at first, as generally changing from higher to lower reasoning can lead to a 10x speedup in the best case, but a 1,000,000x slowdown in the worst case.
+
+We will now go through all the constraints in Minion, grouped into categories.
 
 All Different, Cardinality and Counting Constraints
 ---------------------------------------------------
+
+
+alldiff
+^^^^^^^^
+
+Forces the input vector of variables to take distinct values.
+
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+Then ``alldiff(myVec)`` enforces all variables in ``myVec`` take different values.
+
+This constraint enforces the same level of consistency as a clique of not equals constraints.
+
+Related constraints
+"""""""""""""""""""
+
+See `gacalldiff <#gacalldiff>`__ for an implementation which achieves GAC.
+
+
+
+gacalldiff
+^^^^^^^^^^
+
+Forces the input vector of variables to take distinct values.
+
+Suppose the input file had the following vector of variables defined:
+
+DISCRETE myVec[9] {1..9}
+
+Then ``gacalldiff(myVec)`` enforces all variables in ``myVec`` take different values.
+This constraint enforces generalized arc consistency.
+
+Related constraints
+"""""""""""""""""""
+
+See `alldiff <#alldiff>`__ is faster but performs less reasoning.
 
 alldiffmatrix
 ^^^^^^^^^^^^^
@@ -70,40 +110,6 @@ Notes
 This constraint adds some extra reasoning in addition to the GAC
 Alldifferents on the rows and columns.
 
-
-alldiff
-^^^^^^^^
-
-Forces the input vector of variables to take distinct values.
-
-Suppose the input file had the following vector of variables defined:
-
-DISCRETE myVec[9] {1..9}
-
-Then ``alldiff(myVec)`` enforces all variables in ``myVec`` take different values.
-
-This constraint enforces the same level of consistency as a clique of not equals
-constraints.
-
-Related constraints
-"""""""""""""""""""
-
-See `gacalldiff <#gacalldiff>`__ for the same constraint that enforces
-GAC.
-
-
-
-gacalldiff
-^^^^^^^^^^
-
-Forces the input vector of variables to take distinct values.
-
-Suppose the input file had the following vector of variables defined:
-
-DISCRETE myVec[9] {1..9}
-
-Then ``gacalldiff(myVec)`` enforces all variables in ``myVec`` take different values.
-This constraint enforces generalized arc consistency.
 
 
 gcc
@@ -159,7 +165,7 @@ algorithms similar to those proposed by Quimper et al, Improved
 Algorithms for the Global Cardinality Constraint (CP 2004).
 
 This constraint provides stronger propagation to the capacity variables
-than the gccweak constraint.
+than the `gccweak <#gccweak>`__ constraint.
 
 
 gccweak
@@ -174,7 +180,7 @@ the capacity variables, then enforces GAC over the primary variables
 only. Then the bounds of the capacity variables are updated by counting
 values in the domains of the primary variables.
 
-The consistency over the capacity variables is weaker than the gcc
+The consistency over the capacity variables is weaker than the `gcc <#gcc>`__ 
 constraint, hence the name gccweak.
 
 
@@ -182,40 +188,40 @@ constraint, hence the name gccweak.
 occurrence
 ^^^^^^^^^^
 
-The constraint ``occurrence(vec, elem, count)`` ensures that there are count occurrences of the value elem in the vector
-vec.
+The constraint ``occurrence(vec, elem, count)`` ensures that there are ``count`` occurrences of the value ``elem`` in the vector
+``vec``.
 
-elem must be a constant, not a variable.
+``elem`` must be a constant.
 
 occurrenceleq
 ^^^^^^^^^^^^^
 
-The constraint ``occurrenceleq(vec, elem, count)`` ensures that there are AT MOST count occurrences of the value elem in
-the vector vec.
+The constraint ``occurrenceleq(vec, elem, count)`` ensures that there are AT MOST ``count`` occurrences of the value ``elem`` in
+the vector ``vec``.
 
-elem and count must be constants
+``elem`` and ``count`` must be constants
 
 
 occurrencegeq
 ^^^^^^^^^^^^^
 
-The constraint ``occurrencegeq(vec, elem, count)`` ensures that there are AT LEAST count occurrences of the value elem in
-the vector vec.
+The constraint ``occurrencegeq(vec, elem, count)`` ensures that there are AT LEAST ``count`` occurrences of the value ``elem`` in
+the vector ``vec``.
 
-elem and count must be constants
+``elem`` and ``count`` must be constants
 
 
 nvalueleq
 ^^^^^^^^^
 
-The constraint ``nvalueleq(V,x)`` ensures that there are <= x different values assigned to the list of
-variables V.
+The constraint ``nvalueleq(vec,x)`` ensures that there are <= x different values assigned to the list of
+variables ``vec``.
 
 nvaluegeq
 ^^^^^^^^^
 
-The constraint ``nvaluegeq(V,x)`` ensures that there are >= x different values assigned to the list of
-variables V.
+The constraint ``nvaluegeq(vec,x)`` ensures that there are >= x different values assigned to the list of
+variables ``vec``.
 
 
 Accessing Elements of Arrays
@@ -228,15 +234,13 @@ element
 The constraint ``element(vec, i, e)`` specifies that 
 vec[i] = e (treating ``vec`` as a 0-indexed array). This implies that ``i`` is in the range ``[0..len(vec)-1]``.
 
-.. _notes-1:
-
 Notes
 """""
 
 Warning: This constraint is not confluent. Depending on the order the
 propagators are called in Minion, the number of search nodes may vary
-when using element. To avoid this problem, use watchelement instead.
-More details below.
+when using element. To avoid this problem, use ``watchelement`` instead.
+Technical details below.
 
 The level of propagation enforced by this constraint is not named,
 however it works as follows. For constraint vec[i]=e:
@@ -249,12 +253,10 @@ however it works as follows. For constraint vec[i]=e:
    domain of e.
 
 This level of consistency is designed to avoid the propagator having to
-scan through vec, except when e is assigned. It does a quantity of cheap
-propagation and may work well in practise on certain problems.
+scan through ``vec``, except when e is assigned. It does a quantity of cheap
+propagation and may work well in practice.
 
-Element is not confluent, which may cause the number of search nodes to
-vary depending on the order in which constraints are listed in the input
-file, or the order they are called in Minion. For example, the following
+For example, the following
 input causes Minion to search 41 nodes.
 
 .. code-block::
@@ -267,8 +269,7 @@ input causes Minion to search 41 nodes.
 	**EOF**
 
 However if the two constraints are swapped over, Minion explores 29
-nodes. As a rule of thumb, to get a lower node count, move element
-constraints to the end of the list.
+nodes.
 
 Related constraints
 """""""""""""""""""
@@ -282,28 +283,17 @@ element_one
 The constraint element_one is identical to `element <#element>`__, except that the
 vector is indexed from 1 rather than from 0.
 
-
-
 watchelement_one
 ^^^^^^^^^^^^^^^^
 
-This constraint is identical to watchelement, except the vector is
+This constraint is identical to `watchelement <#watchelement>`__, except the vector is
 indexed from 1 rather than from 0.
-
-Related constraints
-"""""""""""""""""""
-
-See entry `watchelement <#watchelement>`__ for details of watchelement,
-which watchelement_one is based on.
 
 watchelement
 ^^^^^^^^^^^^
 
 The constraint ``watchelement(vec, i, e)`` specifies that ``vec[i] = e``. This implies that
 ``i`` is in the range ``[0..len(vec)-1]``. Enforces generalised arc consistency.
-
-Related constraints
-"""""""""""""""""""
 
 See entry `element <#element>`__ for details of an identical constraint
 that enforces a lower level of consistency.
@@ -321,9 +311,12 @@ specifies that, in any solution, either:
 This differs from watchelement (and element) which are false if i is outside the
 index range of vec.
 
-In general, use watchelement unless you have a special reason to use
-this constraint!
+In general, use watchelement unless you have a special reason to use this constraint!
 
+watchelement_one_undefzero
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This constraint is identical to `watchelement_undefzero<#watchelement_undefzero>`__, except the vector is indexed from 1 rather than from 0.
 
 Arithmetic Constraints
 ----------------------
@@ -362,19 +355,14 @@ diseq
 ineq
 ^^^^
 
-The constraint ``ineq(x, y, k)`` ensures that ``x <= y + k`` in any solution.
+The constraint ``ineq(x, y, k)`` ensures that ``x <= y + k`` in any solution. ``k`` must be a constant.
 Minion has no strict inequality (<) constraints. However x < y can be
 achieved by ``ineq(x, y, -1)``
 
 watchless
 ^^^^^^^^^
 
-The constraint watchless(x,y) ensures that x is less than y.
-
-Related constraints
-"""""""""""""""""""
-
-   `ineq <#ineq>`__
+The constraint ``watchless(x,y)`` ensures that x is less than y.
 
 
 abs
@@ -388,22 +376,11 @@ max
 
 The constraint ``max(vec, x)`` ensures that ``x`` is equal to the maximum value of any variable in ``vec``.
 
-Related constraints
-"""""""""""""""""""
-
-See `min <#min>`__ for the opposite constraint.
 
 min
 ^^^^^^^^
 
 The constraint ``min(vec, x)`` ensures that ``x`` is equal to the minimum value of any variable in ``vec``.
-
-Related constraints
-"""""""""""""""""""
-
-See `max <#max>`__ for the opposite constraint.
-
-
 
 
 div
@@ -436,20 +413,19 @@ The constraint ``div_undefzero(x,y,z)``
 is the same as ``div`` (it ensures that floor(x/y)=z) except the constraint
 is always true when y = 0, instead of false.
 
-This constraint exists for certain special requirements. In general, if
-you are unsure what constraint to use, then what you want is a plain div
-constraint!
+This constraint exists for cases where ``y`` being zero should not lead to the whole model being false. If
+you are unsure what constraint to use, then you probably want the ``div`` constraint!
 
 
 modulo
 ^^^^^^
 
-The constraint ``modulo(x,y,z)`` ensures that x%y=z i.e. z is the remainder of dividing x by y. For
+The constraint ``modulo(x,y,z)`` ensures that x%y=z . For
 negative values, we ensure that:
 
 y(x/y) + x%y = x
 
-To be fully concrete, here are some examples:
+For example:
 
 - 3 % 5 = 3
 - -3 % 5 = 2
@@ -463,9 +439,8 @@ mod_undefzero
 The constraint ``mod_undefzero(x,y,z)`` is the same as ``modulo`` except the constraint is always true when y = 0,
 instead of false.
 
-This constraint exists for certain special requirements. In general, if
-you are unsure what constraint to use, then what you want is a plain mod
-constraint!
+This constraint exists for cases where ``y`` being zero should not lead to the whole model being false. If
+you are unsure what constraint to use, then you probably want the ``mod`` constraint!
 
 
 product
@@ -477,11 +452,11 @@ This constraint can be used for (and, in fact, has a specialised
 implementation for) achieving boolean AND, i.e. x & y=z can be modelled
 as ``product(x,y,z)``
 
-The general constraint achieves bounds generalised arc consistency for
+The general constraint achieves bounds consistency for
 positive numbers.
 
 pow
-^^^^^^^^
+^^^^
 
 The constraint ``pow(x,y,z)``
 
@@ -493,12 +468,12 @@ This constraint is only available for positive domains x, y and z.
 sumleq
 ^^^^^^^^
 
-The constraint ``sumleq(vec, c)`` ensures that sum(vec) <= c.
+The constraint ``sumleq(vec, x)`` ensures that ``sum(vec) <= x``.
 
 sumgeq
 ^^^^^^^^
 
-The constraint ``sumgeq(vec, c)``
+The constraint ``sumgeq(vec, x)`` ensures that ``sum(vec) >= x``.
 
 
 weightedsumleq
@@ -515,6 +490,28 @@ weightedsumgeq
 
 The constraint ``weightedsumgeq(constantVec, varVec, total)`` ensures that constantVec.varVec >= total, where constantVec.varVec is
 the scalar dot product of constantVec and varVec.
+
+
+
+litsumgeq
+^^^^^^^^^
+
+The constraint litsumgeq(vec1, vec2, c) ensures that there exists at
+least c distinct indices i such that vec1[i] = vec2[i].
+
+.. _notes-20:
+
+Notes
+"""""
+
+A SAT clause {x,y,z} can be created using:
+
+   litsumgeq([x,y,z],[1,1,1],1)
+
+Note also that this constraint is more efficient for smaller values of
+c. For large values consider using watchsumleq.
+
+This constraint is not reifiable.
 
 
 
@@ -750,67 +747,17 @@ This constraint enforces generalized arc consistency.
 Lexicographic Ordering
 ----------------------
 
-lexleq[rv]
-^^^^^^^^^^
+Lexicographic ordering constraints all take two lists of variables and compare them lexicographically. They are often used in symmetry breaking.
 
-The constraint ``lexleq[rv](vec0, vec1)`` takes two vectors vec0 and vec1 of the same length and ensures that
-vec0 is lexicographically less than or equal to vec1 in any solution.
+Minion supports both ``lexleq`` ($<=$ ordering) and ``lexless`` ($<$ ordering).
 
-This constraint achieves GAC even when some variables are repeated in
-vec0 and vec1. However, the extra propagation this achieves is rarely
+Each of these comes in three variants:
+
+* standard (``lexleq`` and ``lexless``) : Achieves GAC propagation, assuming no variable is repeated.
+* repeated variables (``lexleq[rv]`` and ``lexless[rv]``) : These achieve GAC propagation even if some variables are repeated. The extra propagation this achieves is rarely
 worth the extra work.
+* quick (``lexleq[quick]`` and ``lexless[quick]``) : A lower level of propagation that runs very quickly. This is usually the best choice, in particular if you have a very large number of constraints (problems using over 100,000 ``lexleq[quick]`` are regularly solved in Minion).
 
-Related constraints
-"""""""""""""""""""
-
-See `lexleq[quick] <>`__ for a much faster logically identical
-constraint, with lower propagation.
-
-lexless
-^^^^^^^
-
-The constraint ``lexless(vec0, vec1)`` takes two vectors vec0 and vec1 of the same length and ensures that vec0
-is lexicographically less than vec1 in any solution. This constraint maintains GAC.
-
-Related constraints
-"""""""""""""""""""
-
-See `lexleq <#lexleq>`__ for a similar constraint with non-strict
-lexicographic inequality.
-
-lexleq
-^^^^^^
-
-The constraint ``lexleq(vec0, vec1)`` takes two vectors vec0 and vec1 of the same length and ensures that vec0
-is lexicographically less than or equal to vec1 in any solution. This constraints achieves GAC.
-
-Related constraints
-"""""""""""""""""""
-
-See `lexless <#lexless>`__ for a similar constraint with strict
-lexicographic inequality.
-
-
-
-litsumgeq
-^^^^^^^^^
-
-The constraint litsumgeq(vec1, vec2, c) ensures that there exists at
-least c distinct indices i such that vec1[i] = vec2[i].
-
-.. _notes-20:
-
-Notes
-"""""
-
-A SAT clause {x,y,z} can be created using:
-
-   litsumgeq([x,y,z],[1,1,1],1)
-
-Note also that this constraint is more efficient for smaller values of
-c. For large values consider using watchsumleq.
-
-This constraint is not reifiable.
 
 Related constraints
 """""""""""""""""""
@@ -849,27 +796,39 @@ Related constraints
 
    `watched-and <#watched-and>`__
 
-   
-reify and reifyimply
-^^^^^^^^^^^^^^^^^^^^
 
-Reification is provided in two forms: reify and reifyimply.
 
-   ``reify(constraint, r)`` where r is a 0/1 var
+Reification allows users to set a boolean to be true or false depending on if a constraint is true.  All constraints are reifyable and reifyimplyable, except where explictly stated.
+
+
+reify 
+^^^^^
+
+
+``reify(constraint, r)`` where r is a 0/1 var
 
 ensures that r is set to 1 if and only if constraint is satisfied. That
 is, if r is 0 the constraint must NOT be satisfied; and if r is 1 it
 must be satisfied as normal. Conversely, if the constraint is satisfied
 then r must be 1, and if not then r must be 0.
 
-   ``reifyimply(constraint, r)``
+reifyimply
+^^^^^^^^^^
 
-only checks that if r is set to 1 then constraint must be satisfied. If
-r is not 1, constraint may be either satisfied or unsatisfied.
-Furthermore r is never set by propagation, only by search; that is,
-satisfaction of constraint does not affect the value of r.
+``reifyimply(constraint, r)``
 
-All constraints are reifyable and reifyimplyable, except where explictly stated.
+checks that if r is set to 1 then constraint must be satisfied. If
+r is 0, ``constraint`` can be true or false.
+
+Minion performs checks to see if ``constraint`` will always be false, in which case it sets ``r`` to 0.
+
+reifyimply-quick
+^^^^^^^^^^^^^^^^
+
+``reifyimply-quick(constraint, r)``, like ``reifyimply``, checks that if r is set to 1 then constraint must be satisfied. If
+r is 0, ``constraint`` can be true or false.
+In ``reifyimply-quick``, r is never set to 0 by propagation, instead Minion waits until r is set to 1, and only then imposes that ``constraint`` is true.
+
 
 
 Matrix Constraints
@@ -920,27 +879,26 @@ index i such that A[i] != B[i].
 Unary constraints
 -----------------
 
+The following unary constraints have two practical applications:
+
+* They can be used with ``DISCRETE`` and ``BOUND`` variables, to remove values from their initial domains.
+* They are used in ``watched-or``, and related constraints, to build up more complex conditions.
 
 w-inrange
 ^^^^^^^^^
 
 The constraint w-inrange(x, [a,b]) ensures that a <= x <= b.
 
+w-notinrange
+^^^^^^^^^^^^
+
+The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
+
 w-inset
 ^^^^^^^^
 
 The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 {a1,..,an}.
-
-w-literal
-^^^^^^^^^
-
-The constraint w-literal(x, a) ensures that x=a.
-
-w-notinrange
-^^^^^^^^^^^^
-
-The constraint w-notinrange(x, [a,b]) ensures that x < a or b < x.
 
 w-notinset
 ^^^^^^^^^^
@@ -949,6 +907,10 @@ The constraint w-notinset(x, [a1,...,an]) ensures that x does not belong
 to the set {a1,..,an}.
 
 
+w-literal
+^^^^^^^^^
+
+The constraint w-literal(x, a) ensures that x=a.
 
 w-notliteral
 ^^^^^^^^^^^^
@@ -961,3 +923,5 @@ w-inintervalset
 The constraint w-inintervalset(x, [a1,a2, b1,b2, ... ]) ensures that the
 value of x belongs to one of the intervals {a1,...,a2}, {b1,...,b2} etc.
 The list of intervals must be given in numerical order.
+
+There is no ``w-notinintervalset``, as this constraint can be expressed using ``w-inintervalset``.
