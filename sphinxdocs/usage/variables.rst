@@ -8,16 +8,12 @@ constraints into small parts. This provides complete control over how
 problems are implemented inside Minion, but also requires understanding
 how Minion works to get the best results.
 
-For those who, quite reasonably, do not wish to get involved in such
-details, ’Tailor’ abstracts away from these details, and also internally
-implements a number of optimisations.
-
 One of the most immediately confusing features of Minion are the
 variable types. Rather than try to provide a "one-size-fits-all"
 variable implementation, Minion provides four different ones; ``BOOL``,
-``DISCRETE``, ``BOUND`` and ``SPARSEBOUND``. First we shall provide a
+``DISCRETE``, ``BOUND`` and ``SPARSEBOUND``. All variables have domains which are a finite of of integers. First we shall provide a
 brief discussion of both what these variables are, and a brief
-discussion of how they are implemented currently.
+discussion of why their advantages and disadvantages.
 
 ``BOOL``
    Variables with domain :math:`\{0,1\}`. Uses special optimised data
@@ -38,27 +34,25 @@ discussion of how they are implemented currently.
    identical to BOUND.
 
 It appears one obvious variable implementation, ``SPARSEDISCRETE``, is
-missing. This did exist in some very early versions of Minion but due to
-bugs and lack of use was removed.
+missing. This turns out not to be useful in practice.
+
+When we want a ``DISCRETE`` variable whose domain is not a complete range of integers, in most cases, rather than use a ``SPARSEBOUND``, it is better to instead just remove the values using the `w-inintervalset` constraint (discussed later, in the constraints).
 
 Some of the differences between the variable types only effect
-performance, whereas some others can effect search size. We provide
-these here.
+performance, whereas some others can effect search size. 
 
 #. In any problem, changing a ``BOOL`` variable to a ``DISCRETE``,
    ``BOUND`` or ``SPARSEBOUND`` variable with domain :math:`\{0,1\}`
-   should not change the size of the resulting search. ``BOOL`` should
+   will not change the size of the resulting search. ``BOOL`` should
    always be fastest, followed by ``DISCRETE``, ``BOUND`` and
    ``SPARSEBOUND``.
-#. A ``BOUND`` variable will in general produce a search with more nodes
-   per second, but more nodes overall, than a ``DISCRETE`` variable.
+#. A ``BOUND`` variable will in general produce a search which explores nodes faster, but may have more search nodes, than a ``DISCRETE`` variable.
 #. Using ``SPARSEBOUND`` or ``BOUND`` variables with a unary constraint
    imposing the sparse domain should produce identical searches, except
-   the ``SPARSEBOUND`` will be faster if the domain is sparse.
+   the ``SPARSEBOUND`` will be faster if the domain is very sparse.
 
 As a basic rule of thumb, Always use ``BOOL`` for Boolean domains,
-``DISCRETE`` for domains of size up to around 100, and the ``BOUND``.
-With ``DISCRETE`` domains, use the ``w-inset`` constraint to limit the
+``DISCRETE`` for domains of size up to around 1000, and then ``BOUND``.
+With ``DISCRETE`` domains, use the ``w-inintervalset`` constraint to limit the
 domain. When to use ``SPARSEBOUND`` over ``BOUND`` is harder, but
-usually the choice is clear, as either the domain will be a range, or a
-set like :math:`\{1,10,100,100\}`.
+usually the choice is clear, as either the domain will be a range, or a very sparse list, like :math:`\{1,100,1000,10000\}`.

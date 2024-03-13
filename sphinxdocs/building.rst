@@ -15,15 +15,12 @@ work from the Windows command shell ``cmd.exe``.
 Installation instructions for Mac
 ---------------------------------
 
-Download the Mac archive ``minion-x.y.z-mac.tar.gz`` and unpack. The
-contents include universal binary ``minion`` which should work on both
-Intel and ARM Macs.
+Download the Mac archive ``minion-x.y.z-mac.tar.gz`` and unpack.
 
 Installation instructions for Linux
 -----------------------------------
 
-Download the Linux archive ``minion-x.y.z-linux.tar.gz`` and unpack. It
-contains the binary ``minion``. The executable is linked statically.
+Download the Linux archive ``minion-x.y.z-linux.tar.gz`` and unpack.
 
 Compilation instructions
 ------------------------
@@ -55,11 +52,9 @@ with ``--help``. We give the most important ones here:
 -  ``--compiler``: Set the name of the compiler to use (this should be
    the name of the executable)
 
-Once the ``minion.exe`` executable is created, you can copy it anywhere
+Once the ``minion`` executable is created, you can copy it anywhere
 you like.
 
-Trying out the executable
-=========================
 
 On all platforms, Minion needs to be run from a command shell so that
 the output can be seen. If you go to the Minion directory in a shell and

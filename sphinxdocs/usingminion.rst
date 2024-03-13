@@ -1,15 +1,12 @@
-Minion in Practice
+Extended Examples
 ==================
+
 
 This chapter discusses 7 minion example files which are clearly
 commented so that the user can see what a minion file looks like in
-practice. Comments in minion start with a :math:`\sharp`, however for
-reasons of ease of reading all lines of actual code be it Minion or
-Essence’ are shown in typewriter text and comments are inserted in
-normal text. The first file is a modified version of the one that all
-the minion developers turn to when modelling a new problem in minion. It
-shows exactly what a minion file can include and what the syntax is for
-all the possible sections. If you are modelling a problem as minion than
+practice. Comments in minion start with a `#`.
+
+We begin with a file which shows all the constructs which can occur in a Minion input file. If you are modelling a problem as minion than
 we recommend you take a copy of this file and edit it appropriately, as
 this will help to guide you through the modelling process. These
 examples can be used as the bases to implement any similar problems.
@@ -22,28 +19,10 @@ although it does parse and run, it is an example which clearly shows all
 of the possible Minion input file constructs. If you are modelling a
 problem as minion than we recommend you take a copy of this file and
 edit it appropriately, as this will help to guide you through the
-modelling process. It can be found in the
+modelling process. It can be found in the `summer_school` subdirectory of the `Minion git repository <https://www.github.com/minion/minion>`, and is called `format_example.minion`.
 
-::
 
-   summer_school
-
-directory and is called
-
-::
-
-   format_example.minion
-
-we have added comments to explain the different sections to the novice
-user.
-
-::
-
-   MINION 3
-
-This file includes an example of all the different inputs you can give
-to Minion. It is a very good place to start from when modelling problem
-in the Minion specification.
+To begin, all minion input files begin `MINION 3` (the 3 refers to this being the 3rd version of Minion's input format. The earlier versions are no longer supported).
 
 The first section is where all the variables are declared.
 
@@ -51,8 +30,7 @@ The first section is where all the variables are declared.
 
    **VARIABLES**
 
-There are 4 type of variables. Booleans don’t need a domain and are
-formatted as follows:
+There are 4 type of variables. Booleans always have the domain `{0,1}`, and are defined as:
 
 ::
 
@@ -150,7 +128,8 @@ first example following is a 1D matrix, the second in 4D.
 | It’s easy to get a row or column from a matrix. You use :math:`\_` in
   the indices you want to vary. Giving a matrix without an index simply
   gives all the variables in that matrix. The following shows how
-  flattening occurs...
+  flattening occurs:
+
 | :math:`[bm] == [ bm[\_,\_] ] == [ bm[0,0], bm[0,1], bm[1,0], bm[1,1] ]`
 | :math:`[ bm[\_,1] ] = [ bm[0,1], bm[1,1] ]`
 | :math:`[ bn[1,\_,0,\_] = [ bn[1,0,0,0], b[1,0,0,1], b[1,1,0,0], b[1,1,0,1] ]`
@@ -161,13 +140,8 @@ first example following is a 1D matrix, the second in 4D.
 
    lexleq( [bn[1,_,0,_], bo, q[0]] , [b, bm, d] )
 
-So the parser can recognise them you must always put [ ] around any
-matrix expression, so lexleq(bm, bm) is invalid, but the following is
-valid:
-
-::
-
-   lexleq( [bm], [bm] )
+You must always put [ ] around any
+matrix expression, so `lexleq(bm, bm)`` is invalid, but the following is valid: `lexleq( [bm], [bm] )`.
 
 An example of a constraint which uses tuples
 
@@ -670,7 +644,7 @@ The Minion model is then:
 There are two 1d arrays of variables one representing all the node
 variables and one representing all the edge variables. The 8 node
 variables have domain 0 to 16 and the edge variables have domain 1 to
-16. There are also 16 auxiliary variables introduced called aux0 to
+1.  There are also 16 auxiliary variables introduced called aux0 to
 aux15 there is one of these for each constraint and there is one
 constraint to represent each edge.
 

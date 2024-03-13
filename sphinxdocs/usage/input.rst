@@ -1,3 +1,6 @@
+.. container::
+   :name: Input Format
+
 Minion expects to be provided with the name of an input file as an
 argument. This file contains a specification of the CSP to be solved as
 well as settings that the search process should use. The format is
