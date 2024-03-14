@@ -300,7 +300,7 @@ public:
 
   ExtendableBlock requestBytesExtendable(UnsignedSysInt baseSize) {
     const SysInt maxSize = 512 * 1024 * 1024;
-    char* block = (char*)calloc(maxSize, 1);
+    char* block = (char*)checked_zeroed_malloc(maxSize);
     extendable_blocks.push_back(BlockDef{block, baseSize, maxSize});
     allocated_extendable_bytes += baseSize;
     return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
@@ -332,10 +332,7 @@ private:
              (stored_blocks.back().remaining_capacity() < byteCount_new_request));
 
     size_t new_block_capacity = max(BLOCK_SIZE, checked_cast<size_t>(byteCount_new_request));
-    char* base = (char*)calloc(new_block_capacity, sizeof(char));
-    if(base == NULL) {
-      D_FATAL_ERROR("calloc failed - Memory exhausted! Aborting.");
-    }
+    char* base = (char*)checked_zeroed_malloc(new_block_capacity);
     BlockDef bd{base, 0, new_block_capacity};
     stored_blocks.push_back(bd);
   }

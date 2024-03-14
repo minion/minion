@@ -153,7 +153,7 @@ parser.add_argument('--extraflags', help="Add extra compiler options")
 
 parser.add_argument('--setflags', help="Override all other compiler flags (experts only!)")
 
-parser.add_argument('--buildsystem', help="Set build system. Current options: make (default), sh, tup", default="make")
+parser.add_argument('--buildsystem', help="Set build system. Current options: make (default), sh, tup, bat", default="make")
 
 parser.add_argument('--sanitize', help="Run clang sanitizers (currently leak and address)", action='store_true')
 arg = parser.parse_args()
@@ -188,7 +188,7 @@ if not os.path.exists(objdir):
 verbose_print(1, "Current dir: " + currentdir)
 verbose_print(1, "Minion base dir: " + scriptdir)
 
-commandargs = ["-Wall", "-std=gnu++11", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
+commandargs = ["-std=gnu++14", "-Wall", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
 for c in ['domains64', 'quick', 'debug', 'assertions', 'print', 'info', 'profile', 'static']:
@@ -391,19 +391,30 @@ minionbinsrclist = minionlibsrclist + ['minion/main.cpp']
 
 if arg.buildsystem == "make":
     outname = currentdir + "/Makefile"
-    qw = ''
     def varsub(x):
         return ' $(' + x + ') '
+    def vardef(x,value):
+        return x + "=" + value
 elif arg.buildsystem == "sh":
     outname = currentdir + "/build.sh"
-    qw = '"'
     def varsub(x):
         return ' ${' + x + '} '
+    def vardef(x,value):
+        return x + '="' + value + '"'
 elif arg.buildsystem == "tup":
     outname = currentdir + "/Tupfile"
     qw = ''
     def varsub(x):
         return ' $(' + x + ') '
+    def vardef(x,value):
+        return x + "=" + value
+elif arg.buildsystem == "bat":
+    outname = currentdir + "/build.bat"
+    qw='"'
+    def varsub(x):
+        return ' %' + x + '% '
+    def vardef(x,value):
+        return 'set "' + x + '=' + value + '"'
 else:
     print("Build system not supported")
     sys.exit(1)
@@ -413,6 +424,13 @@ minionlibobjlist = [objname(x) for x in minionlibsrclist]
 minionbinobjlist = [objname(x) for x in minionbinsrclist]
 print(minionbinsrclist)
 print(minionbinobjlist)
+
+if  'Windows' in platform.system():
+    execname = "minion.exe"
+    thread = ""
+else:
+    thread = "-pthread"
+    execname = "minion"
 
 
 with open("Makeflags.mak", "w") as out:
@@ -425,13 +443,13 @@ with open(outname, "w") as out:
     if arg.buildsystem == "make":
         commandargs = commandargs + ["-MD", "-MP"]
 
-    out.write('FLAGS=' + qw + ' '.join(commandargs)+ qw +'\n')
+    out.write(vardef('FLAGS', ' '.join(commandargs))+'\n')
 
     if arg.buildsystem != "tup":
-        out.write('CONSRCS=' + qw + ' '.join(constraintsrclist)+ qw +'\n')
-        out.write('CONOBJS=' + qw + ' '.join(constraintobjlist)+ qw +'\n')
-        out.write('MINLIBOBJS=' + qw + ' '.join(minionlibobjlist)+ qw +'\n')
-        out.write('MINBINOBJS=' + qw + ' '.join(minionbinobjlist)+ qw +'\n')
+        out.write(vardef('CONSRCS', ' '.join(constraintsrclist)) +'\n')
+        out.write(vardef('CONOBJS', ' '.join(constraintobjlist)) +'\n')
+        out.write(vardef('MINLIBOBJS', ' '.join(minionlibobjlist)) +'\n')
+        out.write(vardef('MINBINOBJS', ' '.join(minionbinobjlist)) +'\n')
 
     if arg.buildsystem == "tup":
         out.write(": foreach ")
@@ -443,9 +461,9 @@ with open(outname, "w") as out:
 
     if arg.buildsystem == "make":
         if arg.library:
-            out.write('all: minion libminion.a\n')
+            out.write('all: ' + execname + ' libminion.a\n')
         else:
-            out.write('all: minion\n')
+            out.write('all: ' + execname + '\n')
 
     if arg.buildsystem == "make":
         out.write("-include $(CONOBJS:.o=.d)\n")
@@ -465,9 +483,10 @@ with open(outname, "w") as out:
                    objname(i) + " " + scriptdir + "/" + i +'\n')
 
     if arg.buildsystem == "make":
-        out.write('minion: $(CONOBJS) $(MINBINOBJS)\n')
+        out.write(execname + ': $(CONOBJS) $(MINBINOBJS)\n')
+
     out.write('\t' + compiler + ' ' + varsub('FLAGS') + varsub('CONOBJS') +
-            varsub('MINBINOBJS') + ' -pthread -o minion\n')
+            varsub('MINBINOBJS') + thread + ' -o ' + execname + '\n')
 
     if arg.library:
         if arg.buildsystem == "make":

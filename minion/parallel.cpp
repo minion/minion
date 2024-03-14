@@ -30,17 +30,6 @@ bool isCtrlCPressed() {
   return getParallelData().ctrlCPressed;
 }
 
-void lockSolsout() {
-  if(getOptions().parallel) {
-    pthread_mutex_lock(&(getParallelData().outputLock));
-  }
-}
-
-void unlockSolsout() {
-  if(getOptions().parallel) {
-    pthread_mutex_unlock(&(getParallelData().outputLock));
-  }
-}
 
 bool shouldDoFork() {
   if(!getOptions().parallel)
@@ -78,6 +67,17 @@ void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
 
 namespace Parallel {
 
+void lockSolsout() {
+  if(getOptions().parallel) {
+    pthread_mutex_lock(&(getParallelData().outputLock));
+  }
+}
+
+void unlockSolsout() {
+  if(getOptions().parallel) {
+    pthread_mutex_unlock(&(getParallelData().outputLock));
+  }
+}
 
 void setNumberCores(int cores) {
   if(cores > 0) {
@@ -204,6 +204,16 @@ void endParallelMinion() {
 #else
 
 namespace Parallel {
+
+void lockSolsout() {
+}
+
+void unlockSolsout() {
+}
+
+void setNumberCores(int cores) {
+}
+
 
 void endParallelMinion() {}
 
