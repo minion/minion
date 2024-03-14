@@ -1,0 +1,55 @@
+name: CI
+
+# Trigger the workflow on push or pull request
+on:
+  workflow_dispatch:
+    inputs:
+      # see https://github.com/marketplace/actions/debugging-with-tmate
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled'
+        type: boolean
+  pull_request:
+  push:
+  schedule:
+    # Every day at 2:30 AM UTC
+    - cron: '30 2 * * *'
+
+
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: win64
+
+      - name: "Config"
+        run: |
+                mkdir bin-quick
+                cd bin-quick
+                python3 ../configure.py --quick --buildsystem bat
+      
+      - name: "Build"
+        run: |
+                cd bin-quick
+                dir
+                .\build.bat
+
+      - uses: hecrj/setup-rust-action@v2
+
+      - name: "Rust tests"
+        run: |
+              cd tester
+              cargo run --release -- --minion ../bin-quick/minion.exe

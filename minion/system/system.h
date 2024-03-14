@@ -42,7 +42,7 @@
 // from sha1.cpp
 std::string sha1_hash(const std::string& s);
 
-inline void* checked_malloc(size_t size) {
+inline void* checked_zeroed_malloc(size_t size) {
   if(size == 0)
     return 0;
   void* ptr = calloc(size, 1);
@@ -51,6 +51,10 @@ inline void* checked_malloc(size_t size) {
     abort();
   }
   return ptr;
+}
+
+inline void* checked_malloc(size_t size) {
+  return checked_zeroed_malloc(size);
 }
 
 inline void* checked_realloc(void* ptr, size_t size) {
