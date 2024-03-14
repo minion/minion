@@ -8,25 +8,19 @@ Constraints
 Choosing which constraint to use
 --------------------------------
 
-Minion has many constraints which at first glance appear to do almost
-identical things. These each have trade-offs, some of which are
-difficult to guess in advance. This section will provide some basic
+Minion offers several constraints which implement the same logical operation.
+These different constraints have different trade-offs and the best one
+to use varies between problems. This section will provide some basic
 guidance.
 
-One of the major design decisions of Minion’s input language is that it
-provides in the input language exactly what it provides internally.
+The philosophy of Minion’s input language is that the input language
+matches the features Minion implements internally.
 Unlike most other constraint solvers, Minion does not break up
 constraints into smaller pieces, introduce new variables or simplify or
 manipulate constraints. This provides complete control over how Minion
-represents your problem, but also leads to a number of annoyances.
+represents your problem, but also introduces challenges.
 
-One obvious omission is that Minion has neither a
-“sum equals” constraint. This is because the
-most efficiently we could implement such a constraint was simply by
-gluing together the ``sumleq`` and the ``sumgeq`` constraints. Minion could
-provide a wrapper which generated the two constraints internally, but
-this would go against the transparency. Of course if in the future a
-more efficient implementation of sumeq was found, it may be added.
+One notable missing constraint is the “sum equals” constraint. Since the most efficient way to implement such a constraint would be by combining ``sumleq`` and ``sumgeq``, Minion doesn't offer a wrapper for it. However, if an efficient implementation of ``sumeq`` is discovered in the future, it may be added.
 
 The ``watchsumgeq`` and ``watchsumleq`` are varients on the algorithm
 used to implement SAT constraints. They are faster than ``sumleq`` and
@@ -37,14 +31,14 @@ close to the size of the input vector.
 
 Minion does not attempt to simplify constraints, so constraints such as
 ``sumgeq([a,a,a], 3)`` are not simplified to ``sumgeq([a],1)``. This
-kind of simplification will often significantly improve performance. Rather than perform such transformations (which do have trade-offs), Minion leaves this tuning to the user, or alternatively (and much more sensibly!) to specialised tools such `SavileRow <https://www-users.york.ac.uk/peter.nightingale/savilerow/>`_ or `Conjure <https://www.github.com/conjure-cp/conjure>`. t
+kind of simplification will often significantly improve performance. Rather than perform such transformations (which do have trade-offs), Minion leaves this tuning to the user, or alternatively (and much more sensibly!) to specialised tools such `SavileRow <https://www-users.york.ac.uk/peter.nightingale/savilerow/>`_ or `Conjure <https://www.github.com/conjure-cp/conjure>`.
 
-There are two reasons that there are multiple implentations of the same constraint:
+There are two main reasons there are multiple implentations of the same constraint:
 
 * One version achieves more reasoning at the cost of speed.
 * One version does not work on ``BOUND`` and ``SPARSEBOUND`` variables (often, the version for ``BOUND`` and ``SPARSEBOUND`` achieves lower reasoning).
 
-It is impossible to predict if problems will be solved faster with more or less reasoning -- in general using higher levels of reasoning is a good idea at first, as generally changing from higher to lower reasoning can lead to a 10x speedup in the best case, but a 1,000,000x slowdown in the worst case.
+It is impossible to predict if problems will be solved faster with more or less reasoning -- in general using higher levels of reasoning is advisable since the possible gains from lower levels of reasoning tend to be smaller than the possible losses (which can be many orders of magnitude).
 
 We will now go through all the constraints in Minion, grouped into categories.
 
@@ -59,7 +53,7 @@ Forces the input vector of variables to take distinct values.
 
 Suppose the input file had the following vector of variables defined:
 
-DISCRETE myVec[9] {1..9}
+``DISCRETE myVec[9] {1..9}``
 
 Then ``alldiff(myVec)`` enforces all variables in ``myVec`` take different values.
 
@@ -95,7 +89,7 @@ alldiffmatrix
 ``alldiffmatrix(myVec, dim)``
 
 This constraint takes a 2d matrix of size ``dim*dim``.
-This constraint impose that the matrix forms a latin-square, that the Elements
+This constraint impose that the matrix forms a latin-square, that is, the elements
 of the rows and columns are all different.
 
 It ensures there is a bipartite matching between rows
@@ -153,7 +147,6 @@ the cap vector.
 
 	gcc(myVec, [1,2,3,4,5,6,7,8,9], cap)
 
-.. _notes-5:
 
 Notes
 """""
@@ -498,8 +491,6 @@ litsumgeq
 
 The constraint litsumgeq(vec1, vec2, c) ensures that there exists at
 least c distinct indices i such that vec1[i] = vec2[i].
-
-.. _notes-20:
 
 Notes
 """""
