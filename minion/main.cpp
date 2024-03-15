@@ -5,6 +5,13 @@
 
 int minion_main(int argc, char** argv);
 
+#include <iostream>
+#include <ostream>
+
 int main(int argc, char** argv) {
+    if(sizeof(void*) == 4) {
+        std::cerr << "Minion does not support 32-bit builds\n";
+        exit(1);
+    }
     minion_main(argc, argv);
 }
