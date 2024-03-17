@@ -1,6 +1,7 @@
 name: Create Release Builds
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*" # matches v1.0.1, v1.2, v2, etc
@@ -39,7 +40,7 @@ jobs:
         python-version: 3.9
 
     - if: runner.os == 'Windows'
-    - name: Build release version - Windows
+      name: Build release version - Windows
       run: |
         mkdir bin
         cd bin
@@ -47,7 +48,7 @@ jobs:
         .\build.bat
 
     - if: runner.os != 'Windows'
-    - name: Build release version - Not windows
+      name: Build release version - Not windows
       run: |
         mkdir bin
         cd bin
