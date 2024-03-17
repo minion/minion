@@ -32,16 +32,31 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-    - name: Build release version
+      uses: actions/checkout@v4
+    - name: "Set up Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.9
+
+    - if: runner.os == 'Windows'
+    - name: Build release version - Windows
       run: |
         mkdir bin
         cd bin
-        ../configure.py
-        make minion -j2
+        python3 ../configure.py --buildsystem bat
+        .\build.bat
+
+    - if: runner.os != 'Windows'
+    - name: Build release version - Not windows
+      run: |
+        mkdir bin
+        cd bin
+        python3 ../configure.py
+        make -j2
+
     - name: Make Zip
       run: 
-        7z a -tzip ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip ${{ github.workspace }}/bin/minion
+        7z a -tzip ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip ${{ github.workspace }}/bin/minion*
     - name: Upload Release Asset
       id: upload-release-asset
       uses: actions/upload-release-asset@v1
@@ -50,5 +65,5 @@ jobs:
       with:
         upload_url: ${{ needs.once.outputs.upload_url }}
         asset_path: ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip
-        asset_name: minion-${{ matrix.os }}.zip
+        asset_name: minion-justbinary-${{ matrix.os }}.zip
         asset_content_type: application/octet-stream
