@@ -44,7 +44,7 @@ jobs:
       run: |
         mkdir bin
         cd bin
-        python3 ../configure.py --buildsystem bat
+        python3 ../configure.py --quick --buildsystem bat
         .\build.bat
 
     - if: runner.os != 'Windows'
