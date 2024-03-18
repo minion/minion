@@ -1,9 +1,11 @@
-.. container::
-   :name: Input Format
+Input Format
+------------
 
-Minion expects to be provided with the name of an input file as an
-argument. This file contains a specification of the CSP to be solved as
-well as settings that the search process should use. The format is
+This section describes the Minion file format. Usually, it is easier to look at an example, as the foramt is fairly self-explanatory, but this section contains full technical deails. This section only describes the file format, the full description of the different types of variables and constraints is given in earlier sections.
+
+The Minion input format is expressed as a series of sections, each section starts with two starts (for example ``**VARIABLES**`` for variables). The format of each section is different.
+
+Files start with the string ``MINION 3``, and end with ``**EOF**``.
 
 Minion3Input::= MINION 3
    <InputSection>+ **EOF**
@@ -14,19 +16,10 @@ InputSection::= <VariablesSection>
    | <TuplelistSection>
    | <ShortTuplelistSection>
 
-i.e. 'MINION 3' followed by any number of variable, search, constraints
-and tuplelists sections (can repeat) followed by '**EOF**', the end of
-file marker.
 
 All text from a '#' character to the end of the line is ignored.
 
 See the associated help entries below for information on each section.
-
-You can give an input file via standard input by specifying '--' as the
-file name, this can be used when minion is being used as a tool in a
-shell script or for compressed input, e.g.,
-
-   gunzip -c myinput.minion.gz \| minion
 
 Variables
 =========
@@ -38,7 +31,7 @@ VariablesSection::= **VARIABLES**
    <VarDeclaration>\*
 
 Example
--------
+^^^^^^^
 
 .. code:: 
 
@@ -49,25 +42,6 @@ Example
    SPARSEBOUND myvar {1,3,4,6,7,9,11} #sparse bounds var
    DISCRETE d[3] {1..3}               #array of discrete vars
 
-Minion supports 4 different variable types, namely
-
--  0/1 variables,
--  bounds variables,
--  sparse bounds variables, and
--  discrete variables.
-
-Sub-dividing the variable types in this manner affords the greatest
-opportunity for optimisation. In general, we recommend thinking of the
-variable types as a hierarchy, where 1 (0/1 variables) is the most
-efficient type, and 4 (Discrete variables) is the least. The user should
-use the variable which is the highest in the hierarchy, yet encompasses
-enough information to provide a full model for the problem they are
-attempting to solve.
-
-Minion also supports use of constants in place of variables, and
-constant vectors in place of vectors of variables. Using constants will
-be at least as efficient as using variables when the variable has a
-singleton domain.
 
 Constants
 ~~~~~~~~~
@@ -77,8 +51,8 @@ used. For example, in a constraint as a replacement for a single
 variable, or a vector of constants as a replacement for a vector of
 variables.
 
-Examples
---------
+Example
+^^^^^^^^
 
 Use of a constant:
 
@@ -101,10 +75,9 @@ input; they must first undergo a flattening process to convert them to a
 vector before use. Additional commas at the end of vectors are ignored
 (see example below).
 
-.. _examples-1:
 
-Examples
---------
+Example
+^^^^^^^^
 
 A vector of 0/1 variables:
 
@@ -140,6 +113,7 @@ rightmost index changing most quickly, e.g.:
 
 is equivalent to
 
+::
    alldiff([sudoku[0,0],...,sudoku[0,8],...,sudoku[8,0],...,sudoku[8,8]]):
 
 Furthermore, with indices filled selectively and the remainder filled
@@ -177,6 +151,7 @@ Additional hanging commas at the end of array are ignored, e.g.:
 
 is equivalent to
 
+::
    lexleq([A,B,C],[D,E,F]):
 
 Aliases
@@ -195,16 +170,14 @@ described using some examples:
 Booleans
 ~~~~~~~~
 
-Booleans, or 01 variablesm are used very commonly for logical
-expressions, and for encoding the characteristic functions of sets and
-relations. Note that wherever a 01 variable can appear, the negation of
-that variable can also appear. A boolean variable x's negation is
+Booleans, or 0/1 variables are used very commonly for logical
+expressions. Note that wherever a 0/1 variable can appear, the negation of
+that variable can also appear. A boolean variable ``x``'s negation is written as ``!x``
 identified by !x.
 
-.. _examples-2:
 
-Examples
---------
+Example
+^^^^^^^^
 
 Declaration of a 01 variable called bool in input file:
 
@@ -221,14 +194,10 @@ Use of this variable in a constraint:
 Discrete
 ~~~~~~~~
 
-In discrete variables, the domain ranges between the specified lower and
-upper bounds, but during search any domain value may be pruned, i.e.,
-propagation and search may punch arbitrary holes in the domain.
+Discrete variables are given a domain with a lower and upper bound.
 
-.. _examples-3:
-
-Examples
---------
+Example
+^^^^^^^^
 
 Declaration of a discrete variable x with domain {1,2,3,4} in input
 file:
@@ -243,18 +212,39 @@ Use of this variable in a constraint:
 
    eq(x, 2) #variable x equals 2
 
-Sparse Bound -----------
+Bounds
+~~~~~~
+
+Bounds variables, where only the upper and lower bounds of the domain
+are maintained. These domains must be continuous ranges of integers i.e.
+holes cannot be put in the domains of the variables.
+
+
+Example
+^^^^^^^^
+
+Declaration of a bound variable called myvar with domain between 1 and 7
+in input file:
+
+::
+
+   BOUND myvar {1..7}
+
+Use of this variable in a constraint:
+
+::
+
+   eq(myvar, 4) #variable myvar equals 4
+
+Sparse Bound
+~~~~~~~~~~~~
 
 In sparse bounds variables the domain is composed of discrete values
-(e.g. {1, 5, 36, 92}), but only the upper and lower bounds of the domain
-may be updated during search. Although the domain of these variables is
-not a continuous range, any holes in the domains must be there at time
-of specification, as they can not be added during the solving process.
+(e.g. {1, 5, 36, 92}).
 
-.. _examples-4:
 
-Examples
---------
+Example
+^^^^^^^
 
 Declaration of a sparse bounds variable called myvar containing values
 {1,3,4,6,7,9,11} in input file:
@@ -269,30 +259,6 @@ Use of this variable in a constraint:
 
    eq(myvar, 3) #myvar equals 3
 
-Bounds
-~~~~~~
-
-Bounds variables, where only the upper and lower bounds of the domain
-are maintained. These domains must be continuous ranges of integers i.e.
-holes cannot be put in the domains of the variables.
-
-.. _examples-5:
-
-Examples
---------
-
-Declaration of a bound variable called myvar with domain between 1 and 7
-in input file:
-
-::
-
-   BOUND myvar {1..7}
-
-Use of this variable in a constraint:
-
-::
-
-   eq(myvar, 4) #variable myvar equals 4
 
 Constraints
 ===========
@@ -320,12 +286,13 @@ TuplelistSection::= **TUPLELIST**
 
 Tuplelist::= <name> <num_tuples> <tupleLength> <numbers>+
 
-.. _example-1:
 
 Example
--------
+^^^^^^^
 
-**TUPLELIST** AtMostOne 4 3 0 0 0 0 0 1 0 1 0 1 0 0
+::
+
+   **TUPLELIST** AtMostOne 4 3 0 0 0 0 0 1 0 1 0 1 0 0
 
 Short Tuple Lists
 ~~~~~~~~~~~~~~~~~
@@ -349,7 +316,7 @@ The required format is:
 
 
 Example
--------
+^^^^^^^
 
 An example is given below:
 
@@ -392,15 +359,11 @@ first 3 short tuples all allow the assignment '0 0 0 0'. This is fine.
 The important thing for efficency is to try to give a small list of
 short tuples.
 
-Related Sections
-----------------
-
-haggisgac, haggisgac-stable, tuplelist
 
 Search
 ======
 
-Inside the search section one can specify
+Inside the ``**SEARCH**`` section one can specify
 
 -  variable orderings,
 -  value orderings,
@@ -441,9 +404,7 @@ where:
 
 ::
 
-   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT |
-
-DOMOVERWDEG
+   <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
 
 The value ordering allows the user to specify an instantiation order for
 the variables involved in the variable order, either ascending (a) or
@@ -477,7 +438,7 @@ flattened into a vector as described in 'help variables vectors'.:
                 | PRINT NONE
 
 Example
--------
+^^^^^^^
 
 Below is a complete minion input file with commentary, as an example.:
 
