@@ -10,7 +10,6 @@ on:
 jobs:
   build:
     name: Create cross-platform release build, tag and upload binaries
-    needs: once
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -56,9 +55,9 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
         
     - name: Make Zip
-      run: 
+      run: |
         7z a -tzip ${{ github.workspace }}/minion.zip ${{ github.workspace }}/bin/minion*
-        cp ${{ github.workspace }}/bin/minion.zip minion-${RELEASE_VERSION}-${{ matrix.release_suffix }}.zip
+        cp ${{ github.workspace }}/minion.zip minion-${RELEASE_VERSION}-${{ matrix.release_suffix }}.zip
 
     - name: Create Release
       id: create_release
