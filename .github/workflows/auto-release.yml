@@ -48,12 +48,12 @@ jobs:
         python3 ../configure.py
         make -j2
 
-      - name: Set version string to the commit hash
-        run: echo "RELEASE_VERSION=${{ github.sha }}" >> "$GITHUB_ENV"
+    - name: Set version string to the commit hash
+      run: echo "RELEASE_VERSION=${{ github.sha }}" >> "$GITHUB_ENV"
 
-      - name: Set version string based on trigger (ref_name if on tag)
-        run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> "$GITHUB_ENV"
-        if: startsWith(github.ref, 'refs/tags/')
+    - name: Set version string based on trigger (ref_name if on tag)
+      run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> "$GITHUB_ENV"
+      if: startsWith(github.ref, 'refs/tags/')
         
     - name: Make Zip
       run: 
