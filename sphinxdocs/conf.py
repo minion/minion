@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Minion'
-copyright = '2019, Chris Jefferson, Peter Nightingale, Lars Kotthoff, Saad Attieh, Neil Moore, Ian Gent, Özgür Akgün, Nguyen Dang'
-author = 'Chris Jefferson, Peter Nightingale, Lars Kotthoff, Saad Attieh, Neil Moore, Ian Gent, Özgür Akgün, Nguyen Dang'
+copyright = 'Chris Jefferson, Peter Nightingale, Lars Kotthoff, Saad Attieh, Neil Moore, Ian Gent, Özgür Akgün, Nguyen Dang'
+author = 'The Minion Team' # This list is too long for Sphinx :( Chris Jefferson, Peter Nightingale, Lars Kotthoff, Saad Attieh, Neil Moore, Ian Gent, Özgür Akgün, Nguyen Dang'
 
 # The full version, including alpha/beta/rc tags
 release = '2.0'
