@@ -6,24 +6,8 @@ on:
     tags:
       - "v*" # matches v1.0.1, v1.2, v2, etc
 
-jobs:
-  once:
-    name: Create GitHub release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: Create a release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: true
 
+jobs:
   build:
     name: Create cross-platform release build, tag and upload binaries
     needs: once
@@ -31,9 +15,18 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+        - os: ubuntu-latest
+          release_suffix: linux
+        - os: macos-latest
+          release_suffix: macos
+        - os: windows-latest
+          release_suffix: windows
+  
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
     - name: "Set up Python"
       uses: actions/setup-python@v5
       with:
@@ -55,16 +48,28 @@ jobs:
         python3 ../configure.py
         make -j2
 
+      - name: Set version string to the commit hash
+        run: echo "RELEASE_VERSION=${{ github.sha }}" >> "$GITHUB_ENV"
+
+      - name: Set version string based on trigger (ref_name if on tag)
+        run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> "$GITHUB_ENV"
+        if: startsWith(github.ref, 'refs/tags/')
+        
     - name: Make Zip
       run: 
-        7z a -tzip ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip ${{ github.workspace }}/bin/minion*
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
+        7z a -tzip ${{ github.workspace }}/minion.zip ${{ github.workspace }}/bin/minion*
+        cp ${{ github.workspace }}/bin/minion.zip minion-${RELEASE_VERSION}-${{ matrix.release_suffix }}.zip
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ needs.once.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/bin/minion-${{ matrix.os }}.zip
-        asset_name: minion-justbinary-${{ matrix.os }}.zip
-        asset_content_type: application/octet-stream
+        name: ${RELEASE_VERSION}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+        files: |
+          minion-${RELEASE_VERSION}-${{ matrix.release_suffix }}.zip
