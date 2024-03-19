@@ -1,3 +1,8 @@
+- March 19, 2024 : Minion 2
+
+While the major version number has increased due to significant internal changes, there are few user-visible updates in this release. The internal changes have both cleaned up a lot of old code, and made Minion usable as a library (but this work is not yet read for general usage). Some small issues were fixed which stopped Minion building on the latest versions of operating systems and compilers.
+
+The most significant change is a overhaul of the documentation, which is now hosted at https://minion-solver.readthedocs.org/
 
 - ** April 20, 2021 ** Minion 1.9 has been released
 
