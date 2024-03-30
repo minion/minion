@@ -442,6 +442,29 @@ void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec)
   delete vec;
 }
 
+char* TableOut_get(char* key) {
+  try {
+    /*
+     * .data() doesn't copy, it just returns a ptr to the internal
+     * representation of the string . As we are interfacing with C and using 
+     * char*, I will just malloc strcpy here (even though it might not be 
+     * idiomatic C++?)
+     *
+     * It needs this many temporary variables due to memory shenanigans!
+     */
+
+    string val_str = getTableOut().get(key);
+    const char* val = val_str.data();
+
+    char* heaped_val = (char*) std::malloc(strlen(val) +1);
+    strcpy(heaped_val,val);
+    return heaped_val;
+
+  } catch(std::out_of_range) {
+    return NULL;
+  }
+}
+
 #endif
 
 // vim: cc=80 tw=80

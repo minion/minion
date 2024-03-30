@@ -431,6 +431,33 @@ void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
 /// Frees the given `vector<vector<DomainInt>`.
 void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
 
+/***** TableOut *****/
+
+/* These functions access the TableOut: a logging class used to store
+ * run statistics about Minion.
+ *
+ * TableOut is a global singleton.
+ *
+ *
+ * Useful Values
+ * =============
+ * Here are some values stored in the table.
+ * This is not an exhaustive list.
+ *
+ * "Nodes" - the number of nodes used.
+ * "Satisfiable" - was the model satisfiable or not?
+ * "SolutionsFound" - number of solutions found
+ * "RandomSeed" - the random seed used.
+ */
+
+/// Gets the value for key from the table.
+///
+/// If there is no such element,
+///
+/// Memory Management:
+///   The returned pointer must be freed by the user.
+char* TableOut_get(char* key); 
+
 #endif
 
 // vim: cc=80 tw=80
