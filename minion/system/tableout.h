@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <stdexcept>
 #include <stdlib.h>
 #include <string>
 #include <utility>
@@ -60,6 +61,12 @@ public:
     for(it = data.begin(); it != data.end(); it++) {
       json.mapElement(it->first, it->second);
     }
+  }
+
+  /// Gets the value (as a string) for the given key.
+  /// Throws an std::out_of_range exception if key is not in the TableOut.
+  string get(string key) {
+      return data.at(key);
   }
 
   void print_table_line() {
