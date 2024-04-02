@@ -4,8 +4,7 @@ extern crate lazy_static;
 #[macro_use]
 extern crate serde_derive;
 
-use structopt::StructOpt;
-
+use clap::Parser;
 use rayon::prelude::*;
 
 use anyhow::Context;
@@ -20,33 +19,32 @@ mod minion_instance;
 mod run_minion;
 mod test_types;
 
-#[derive(StructOpt, Debug)]
-#[structopt(name = "basic")]
+#[derive(clap::Parser, Debug)]
 struct Opt {
-    #[structopt(short = "v", long = "valgrind")]
+    #[arg(long)]
     valgrind: bool,
 
-    #[structopt(name = "constraints")]
+    #[arg(long)]
     constraints: Vec<String>,
 
-    #[structopt(short = "c", long = "count", default_value = "30")]
+    #[arg(short, long, default_value_t = 30)]
     count: u64,
 
-    #[structopt(short = "o", long = "optioncount", default_value = "1000")]
+    #[arg(short, long, default_value_t = 1000)]
     optioncount: u64,
 
-    #[structopt(short = "m", long = "minion")]
+    #[arg(short, long)]
     minion: String,
 
-    #[structopt(short = "t", long = "maxtuples", default_value = "10000")]
+    #[arg(short = 't', long, default_value_t = 10000)]
     maxtuples: usize,
 
-    #[structopt(short = "n", long = "number of threads", default_value = "8")]
+    #[arg(short = 'n', long, default_value_t = 8)]
     numthreads: usize,
 }
 
 fn main() -> Result<()> {
-    let opt = Opt::from_args();
+    let opt = Opt::parse();
     println!("{:?}", opt);
 
     rayon::ThreadPoolBuilder::new()
