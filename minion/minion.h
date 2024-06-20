@@ -33,7 +33,7 @@
 #define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
 
-static const char MinionVersion[] = "Minion Version 2";
+static const char MinionVersion[] = "Minion Version 1.9.2";
 
 // above line will work but only gives revision of this file,
 //  not the current global revision
