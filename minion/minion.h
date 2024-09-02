@@ -3,10 +3,18 @@
 #ifndef MINION_H
 #define MINION_H
 
+// Fix for clangd/clang-tidy/etc: suppress "x.h" is not used errors, and allow transitive includes
+// of the below headers
+
+// IWYU pragma: begin_keep begin_exports
+
 #include "BuildDefines.h"
 #include "system/system.h"
 
 #include "globals.h"
+
+// IWYU pragma: end_keep end_exports
+
 
 // These are just because VC++ sucks.
 #ifndef _CRT_SECURE_NO_DEPRECATE
@@ -21,6 +29,12 @@ static const char MinionVersion[] = "Minion Version 2";
 
 // above line will work but only gives revision of this file,
 //  not the current global revision
+
+// Fix for clangd/clang-tidy/etc: suppress "x.h" is not used errors, and allow transitive includes
+// of the below headers
+
+// IWYU pragma: begin_keep begin_exports
+
 #include "get_info/get_info.h"
 #include "solver.h"
 VARDEF(ofstream solsoutfile);
@@ -67,3 +81,5 @@ inline void inputPrint(std::ostream&, const Var&) {}
 
 #include "triggering/dynamic_trigger.hpp"
 #endif
+
+// IWYU pragma: end_keep end_exports
