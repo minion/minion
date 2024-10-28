@@ -463,6 +463,7 @@ struct CSPInstance {
   
   // Used by mutex detection
   vector<Var> mutexDetectList;
+  vector<Var> mutexDetectList2;
   
   bool is_optimisation_problem;
   bool optimiseMinimising;

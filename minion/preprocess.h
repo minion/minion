@@ -197,75 +197,185 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
 
   if(getOptions().gatherAMOs) {
     // Extra pass to collect the mutexes.
-    // Populate listbools.
-    std::vector<Var> listbools;
-
-    for(int i = 0; i < vararray.size(); i++) {
-      if(vararray[i].min() == 0 && vararray[i].max() == 1) {
-        listbools.push_back(vararray[i]);
+    // Two versions -- a sparse one (where the scopes of the PB constraints have been passed in) and a dense one. 
+    
+    vector<Var> adjlists = getAnyVarRefFromVar(getState().getInstance()->mutexDetectList2);
+    
+    if(adjlists.empty()) {
+      // No adjacency lists passed in. Dense version. 
+      // Populate listbools.
+      std::vector<Var> listbools;
+      
+      for(int i = 0; i < vararray.size(); i++) {
+        if(vararray[i].min() == 0 && vararray[i].max() == 1) {
+          listbools.push_back(vararray[i]);
+        }
       }
+      
+      //  Make a 'collect events' constraint and attach it to listbools.
+      CollectEvents<std::vector<Var>>* c = new CollectEvents<std::vector<Var>>(listbools);
+      getState().addConstraint((AbstractConstraint*)c);
+      
+      std::vector<std::pair<int, DomainInt>>& assignments = c->assignments;
+      
+      std::vector<int> listallpairs;
+      
+      std::cout << "BOOLNAMES ";
+      for(int i = 0; i < listbools.size(); i++) {
+        std::cout << getNameFromVar(listbools[i]);
+        if(i < listbools.size() - 1) {
+          std::cout << " ";
+        }
+      }
+      std::cout << std::endl;
+      
+      for(SysInt i = 0; i < (SysInt)listbools.size(); ++i) {
+        Var& var = listbools[i];
+        
+        c->liftTriggersLessEqual(i);
+        
+        Controller::worldPush();
+        
+        var.setMax(0);
+        prop(vararray);
+        
+        for(int j = 0; j < assignments.size(); j++) {
+          listallpairs.push_back(-i - 1);
+          listallpairs.push_back((assignments[j].second == 1) ? (-assignments[j].first - 1)
+                                                              : (assignments[j].first + 1));
+        }
+        assignments.clear();
+        
+        getState().setFailed(false);
+        
+        Controller::worldPop();
+        
+        Controller::worldPush();
+      
+        var.setMin(1);
+        prop(vararray);
+      
+        for(int j = 0; j < assignments.size(); j++) {
+          listallpairs.push_back(i + 1);
+          listallpairs.push_back((assignments[j].second == 1) ? (-assignments[j].first - 1)
+                                                              : (assignments[j].first + 1));
+        }
+        assignments.clear();
+      
+        getState().setFailed(false);
+      
+        Controller::worldPop();
+      }
+      
+      std::cout << "AMO " << listallpairs.size() / 2 << " ";
+      for(int i = 0; i < listallpairs.size(); i++) {
+        std::cout << listallpairs[i];
+        if(i < listallpairs.size() - 1) {
+          std::cout << " ";
+        }
+      }
+      std::cout << std::endl;
     }
-
-    //  Make a 'collect events' constraint and attach it to listbools.
-    CollectEvents<std::vector<Var>>* c = new CollectEvents<std::vector<Var>>(listbools);
-    getState().addConstraint((AbstractConstraint*)c);
-
-    std::vector<std::pair<int, DomainInt>>& assignments = c->assignments;
-
-    std::vector<int> listallpairs;
-
-    std::cout << "BOOLNAMES ";
-    for(int i = 0; i < listbools.size(); i++) {
-      std::cout << getNameFromVar(listbools[i]);
-      if(i < listbools.size() - 1) {
-        std::cout << " ";
+    else {
+      //  Adjacency lists passed in. Do sparse version. 
+      // Populate listbools with inverse
+      vector<Var> listbools;
+      unordered_map<string, int> listbools_inv;
+      
+      int n=0;
+      for(int i = 0; i < vararray.size(); i++) {
+        if(vararray[i].min() == 0 && vararray[i].max() == 1) {
+          listbools.push_back(vararray[i]);
+          listbools_inv[getNameFromVar(vararray[i])]=n;
+          n++;
+        }
       }
+      
+      std::cout << "BOOLNAMES ";
+      for(int i = 0; i < listbools.size(); i++) {
+        std::cout << getNameFromVar(listbools[i]);
+        if(i < listbools.size() - 1) {
+          std::cout << " ";
+        }
+      }
+      std::cout << std::endl;
+      
+      //  Split the big adjacency list into multiple lists. 
+      vector<vector<AnyVarRef>> adj;
+      vector<AnyVarRef> f;
+      adj.push_back(f);
+      
+      for(int i = 0; i < adjlists.size(); i=i+2) {
+        if(adjlists[i].min()==0 && adjlists[i].max()==0 && adjlists[i+1].min()==0 && adjlists[i+1].max()==0) {
+          // Start a new list.
+          vector<AnyVarRef> n;
+          adj.push_back(n);
+        }
+        else {
+          adj.back().push_back(adjlists[i]);
+          adj.back().push_back(adjlists[i+1]);
+        }
+      }
+      
+      if(adj.back().empty()) {
+        adj.pop_back();
+      }
+      
+      std::vector<int> listallpairs;
+      
+      for(int i=0; i<adj.size(); i++) {
+        vector<AnyVarRef>& adjlist=adj[i];
+        
+        //  First items are a pair var,val to assign 
+        string varname=getNameFromVar(adjlist[0]);
+        if(! (listbools_inv.count(varname)==1)) {
+          continue;
+        }
+        int varidx=listbools_inv[varname];
+        
+        Controller::worldPush();
+        Var& var=adjlist[0];
+        DomainInt val=adjlist[1].min();
+        
+        var.setMax(val);
+        var.setMin(val);
+        prop(vararray);
+        
+        //  Check the other entries for mutexes. 
+        for(int j=2; j<adjlist.size(); j=j+2) {
+          // check if the literal k has been pruned. 
+          if(adjlist[j+1].min()==0 && adjlist[j].min()>0) {
+            string varname2=getNameFromVar(adjlist[j]);
+            if(listbools_inv.count(varname2)==1) {
+              listallpairs.push_back( (val==1) ? (varidx+1) : (-varidx-1) );
+              int varidx2=listbools_inv[varname2];
+              listallpairs.push_back( -varidx2-1 );
+            }
+          }
+          else if(adjlist[j+1].min()==1 && adjlist[j].max()<1) {
+            string varname2=getNameFromVar(adjlist[j]);
+            if(listbools_inv.count(varname2)==1) {
+              listallpairs.push_back( (val==1) ? (varidx+1) : (-varidx-1) );
+              int varidx2=listbools_inv[varname2];
+              listallpairs.push_back( varidx2+1 );
+            }
+          }
+        }
+        // revert.
+        getState().setFailed(false);
+        Controller::worldPop();
+      }
+      
+      //  Output
+      std::cout << "AMO " << listallpairs.size() / 2 << " ";
+      for(int i = 0; i < listallpairs.size(); i++) {
+        std::cout << listallpairs[i];
+        if(i < listallpairs.size() - 1) {
+          std::cout << " ";
+        }
+      }
+      std::cout << std::endl;
     }
-    std::cout << std::endl;
-
-    for(SysInt i = 0; i < (SysInt)listbools.size(); ++i) {
-      Var& var = listbools[i];
-
-      c->liftTriggersLessEqual(i);
-
-      Controller::worldPush();
-
-      var.setMax(0);
-      prop(vararray);
-
-      string vname1 = getNameFromVar(var);
-      for(int j = 0; j < assignments.size(); j++) {
-        listallpairs.push_back(-i - 1);
-        listallpairs.push_back((assignments[j].second == 1) ? (-assignments[j].first - 1)
-                                                            : (assignments[j].first + 1));
-      }
-      assignments.clear();
-
-      Controller::worldPop();
-
-      Controller::worldPush();
-
-      var.setMin(1);
-      prop(vararray);
-
-      for(int j = 0; j < assignments.size(); j++) {
-        listallpairs.push_back(i + 1);
-        listallpairs.push_back((assignments[j].second == 1) ? (-assignments[j].first - 1)
-                                                            : (assignments[j].first + 1));
-      }
-      assignments.clear();
-
-      Controller::worldPop();
-    }
-
-    std::cout << "AMO " << listallpairs.size() / 2 << " ";
-    for(int i = 0; i < listallpairs.size(); i++) {
-      std::cout << listallpairs[i];
-      if(i < listallpairs.size() - 1) {
-        std::cout << " ";
-      }
-    }
-    std::cout << std::endl;
   }
   
   if(getOptions().gatherAMOsExtra) {

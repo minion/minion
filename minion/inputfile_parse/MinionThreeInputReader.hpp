@@ -331,6 +331,8 @@ void MinionThreeInputReader<FileReader>::read(FileReader* infile) {
       readGadget(infile);
     } else if(s == "**MUTEXDETECT**") {
       readMutexDetect(infile);
+    } else if(s == "**MUTEXDETECT2**") {
+      readMutexDetect2(infile);
     } else if(s == wrong_eof) {
       throw parse_exception("Section terminated with " + wrong_eof + " instead of " + eof);
     } else
@@ -369,6 +371,14 @@ void MinionThreeInputReader<FileReader>::readMutexDetect(FileReader* infile) {
   MAYBE_PARSER_INFO("Entering mutex detect list parsing");
   //  Just read an ordinary vector
   instance->mutexDetectList = readLiteralVector(infile, true);
+  MAYBE_PARSER_INFO("Exiting mutex detect list parsing");
+}
+
+template <typename FileReader>
+void MinionThreeInputReader<FileReader>::readMutexDetect2(FileReader* infile) {
+  MAYBE_PARSER_INFO("Entering mutex detect list parsing");
+  //  Just read an ordinary  matrix with 0,0 as the separator between scopes. 
+  instance->mutexDetectList2 = readLiteralVector(infile);
   MAYBE_PARSER_INFO("Exiting mutex detect list parsing");
 }
 
