@@ -453,9 +453,10 @@ pow
 
 The constraint ``pow(x,y,z)``
 
-ensures that x^y=z.
+Ensures that x^y=z. This constraint is false when `y<0` except for `1^y=1` and
+`(-1)^y=z` (where z is 1 if `y` is odd and z is -1 if `y` is even).
 
-This constraint is only available for positive domains x, y and z.
+This constraint is more efficient when x, y and z have positive domains.
 
 
 sumleq
