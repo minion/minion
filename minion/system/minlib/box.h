@@ -270,9 +270,9 @@ public:
   }
 
   void swap(box& x) {
-    std::swap(M_start, x.M_impl.M_start);
-    std::swap(M_finish, x.M_impl.M_finish);
-    std::swap(M_endOf_storage, x.M_impl.M_endOf_storage);
+    std::swap(M_start, x.M_start);
+    std::swap(M_finish, x.M_finish);
+    std::swap(M_endOf_storage, x.M_endOf_storage);
   }
 
   void clear() {
