@@ -269,12 +269,6 @@ public:
     return first;
   }
 
-  void swap(box& x) {
-    std::swap(M_start, x.M_impl.M_start);
-    std::swap(M_finish, x.M_impl.M_finish);
-    std::swap(M_endOf_storage, x.M_impl.M_endOf_storage);
-  }
-
   void clear() {
     erase(begin(), end());
   }
@@ -383,12 +377,6 @@ inline bool operator<=(const box<T>& x, const box<T>& y) {
 template <typename T>
 inline bool operator>=(const box<T>& x, const box<T>& y) {
   return !(x < y);
-}
-
-/// See std::box::swap().
-template <typename T>
-inline void swap(box<T>& x, box<T>& y) {
-  x.swap(y);
 }
 
 template <typename T>
