@@ -128,7 +128,7 @@ struct VecCountDynamic : public AbstractConstraint {
         unwatchedValues.push_back(i);
     }
 
-    random_shuffle(unwatchedValues.begin(), unwatchedValues.end());
+    std::shuffle(unwatchedValues.begin(), unwatchedValues.end(),GET_GLOBAL(global_random_gen));
   }
 
   void propagate_from_var1(DomainInt index_in) {

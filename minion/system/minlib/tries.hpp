@@ -122,7 +122,7 @@ void randomiseTrie(TrieObj<Value>* to) {
       randomiseTrie(end->ptr);
     end++;
   }
-  std::random_shuffle(to, end);
+  std::shuffle(to, end, GET_GLOBAL(global_random_gen));
 }
 
 template <typename Value>

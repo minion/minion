@@ -257,7 +257,7 @@ struct CTupleSTR : public AbstractConstraint {
       gacvalues[i].initialise(vars[i].initialMin(), vars[i].initialMax());
     }
 
-    std::random_shuffle(tupindices.begin(), tupindices.end());
+    std::shuffle(tupindices.begin(), tupindices.end(), GET_GLOBAL(global_random_gen));
   }
 
   CTupleSTR(const VarArray& _varArray, std::shared_ptr<ShortTupleList> _tuples)

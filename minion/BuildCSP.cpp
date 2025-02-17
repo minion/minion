@@ -37,8 +37,8 @@ void SetupCSPOrdering(CSPInstance& instance, SearchMethod args) {
 
     if(getOptions().randomiseValvarorder) {
 
-      std::random_shuffle(instance.searchOrder[i].varOrder.begin(),
-                          instance.searchOrder[i].varOrder.end());
+      std::shuffle(instance.searchOrder[i].varOrder.begin(),
+                          instance.searchOrder[i].varOrder.end(), GET_GLOBAL(global_random_gen));
 
       for(UnsignedSysInt j = 0; j < instance.searchOrder[i].valOrder.size(); ++j) {
         instance.searchOrder[i].valOrder[j] = VALORDER_RANDOM;

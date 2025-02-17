@@ -42,11 +42,11 @@ struct TabSearchManager : public StandardSearchManager {
   double assignmentNumber(vector<DomainInt> assignment) {
     //  Convert an assignment into a number, interpreting each variable assignment as one digit (0..d-1). 
     std::cout << "in assignmentNumber: " << assignment << std::endl;
-    double tmp=tab_mapping[0][assignment[0]-min_domain[0]];
+    double tmp=checked_cast<SysInt>(tab_mapping[0][checked_cast<SysInt>(assignment[0]-min_domain[0])]);
     assert (tmp>-1);
     for(int i=1; i<assignment.size(); i++) {
-      tmp = tmp*num_vals[i];  //  Scale up by the base of the current digit.
-      double current_digit=tab_mapping[i][assignment[i]-min_domain[i]];
+      tmp = tmp*checked_cast<SysInt>(num_vals[i]);  //  Scale up by the base of the current digit.
+      double current_digit=checked_cast<SysInt>(tab_mapping[i][checked_cast<SysInt>(assignment[i]-min_domain[i])]);
       assert (current_digit>-1);
       tmp = tmp+current_digit;  //  Add the 0-based value of the current digit. 
     }
@@ -64,7 +64,7 @@ struct TabSearchManager : public StandardSearchManager {
     //  added for tabulation mode.
     int n_nonaux=varArray.size();
     if(varOrder->hasAuxVars()) {
-      n_nonaux=varOrder->auxVarStart();
+      n_nonaux=checked_cast<SysInt>(varOrder->auxVarStart());
     }
     
     //  Initialise the domain map (from each domain value to 0..d-1 range
