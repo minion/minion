@@ -373,9 +373,9 @@ void constraint_addConstraintList(ConstraintBlob& constraint,
   constraint.internal_constraints = std::move(internal_constraints);
 }
 
-void constraint_setTuples(ConstraintBlob* constraint, TupleList* tupleList)
+void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList)
 {
-  constraint->tuples = std::shared_ptr<TupleList>(tupleList);
+  constraint.tuples = std::shared_ptr<TupleList>(tupleList);
 }
 
 /***** Vector Rexports *****/
