@@ -115,7 +115,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
 
   }
 
-  catch(parse_exception e) {
+  catch(const parse_exception& e) {
     cout << "Invalid instance: " << e.what() << endl;
     returnCode = ReturnCodes::INVALID_INSTANCE;
   } catch(...) {
@@ -460,7 +460,7 @@ char* TableOut_get(char* key) {
     strcpy(heaped_val,val);
     return heaped_val;
 
-  } catch(std::out_of_range) {
+  } catch(const std::out_of_range&) {
     return NULL;
   }
 }
