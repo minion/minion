@@ -127,6 +127,8 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   // Restore old cout
   cout.rdbuf(oldCoutStreamBuf);
 
+  resetMinion();
+  
   return returnCode;
 }
 
