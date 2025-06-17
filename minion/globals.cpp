@@ -40,4 +40,5 @@ Globals::~Globals() {
   // No parallel minion in library usage for now
   //delete this->parData_m; //FIXME: having this in causes runMinion to segfault!
   delete this->varContainer_m;
+  delete this->searchMem_m;
 }
