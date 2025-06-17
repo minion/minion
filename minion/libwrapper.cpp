@@ -16,6 +16,7 @@
 #include "tuple_container.h"
 #include <iomanip>
 #include <memory>
+#include <cstdlib>
 
 #ifdef LIBMINION
 
@@ -55,14 +56,19 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   time_t rawtime;
   time(&rawtime);
 
-  stringstream filenameStream;
-  filenameStream << "minion";
-  filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
-  filenameStream << ".log";
+  // enable logging if LIBMINION_LOG is set
+  if (std::getenv("LIBMINION_LOG")) {
+    stringstream filenameStream;
+    filenameStream << "minion";
+    filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
+    filenameStream << ".log";
 
-  logOutStream.open(filenameStream.str(), ios_base::app);
-
-  cout.rdbuf(logOutStream.rdbuf());
+    logOutStream.open(filenameStream.str(), ios_base::app);
+    cout.rdbuf(logOutStream.rdbuf());
+  } else {
+    // silence cout 
+    cout.rdbuf(NULL);
+  }
 
   // Pass error codes across FFI boundaries, not exceptions.
   try {
