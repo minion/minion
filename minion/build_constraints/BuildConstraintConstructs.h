@@ -29,8 +29,8 @@ vector<AnyVarRef> make_avrref(const vector<Var>& vars);
 
 template <ConstraintType constraint, SysInt size>
 template <typename ConData>
-AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_build,
-                                                         ConstraintBlob& b, SysInt pos) [[noinline]] {
+DOM_NOINLINE AbstractConstraint* BuildConObj<constraint, size>::build(const ConData& partial_build,
+                                                         ConstraintBlob& b, SysInt pos) {
 
   const vector<Var>& vars = b.vars[pos];
 
