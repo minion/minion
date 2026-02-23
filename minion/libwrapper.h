@@ -254,6 +254,14 @@ void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
 ///   * `constraint` is copied into `instance`.
 void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
 
+/// Adds a constraint to the currently running search and propagates it.
+///
+/// Returns `false` if adding the constraint causes immediate failure.
+///
+/// This must only be called while Minion is actively searching.
+bool instance_addConstraintMidsearch(CSPInstance& instance, ConstraintBlob& constraint);
+
+
 /// Adds a named tuple-table to a model instance.
 ///
 /// Memory Management:
