@@ -260,6 +260,16 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
   instance.constraints.push_back(constraint);
 }
 
+bool instance_addConstraintMidsearch(CSPInstance& instance, ConstraintBlob& constraint)
+{
+  // Keep a stable copy of the blob alive for the lifetime of `instance`.
+  // Some built constraints may retain references to blob-owned argument storage.
+  instance.constraints.push_back(constraint);
+
+  AbstractConstraint* c = build_constraint(instance.constraints.back());
+  return getState().addConstraintMidsearch(c);
+}
+
 void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist)
 {
   instance.addTableSymbol(name, std::shared_ptr<TupleList>(tuplelist));
