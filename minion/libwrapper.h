@@ -427,6 +427,8 @@ std::vector<std::vector<DomainInt>>* vec_vec_int_new();
 ///   `new_elem` is copied into `vec`.
 void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
                            std::vector<DomainInt> new_elem);
+void vec_vec_int_push_back_ptr(std::vector<std::vector<DomainInt>>* vec,
+                               std::vector<DomainInt>* new_elem);
 
 /// Frees the given `vector<vector<DomainInt>`.
 void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
