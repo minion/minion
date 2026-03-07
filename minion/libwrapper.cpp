@@ -455,6 +455,12 @@ void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
   vec->push_back(new_elem);
 }
 
+void vec_vec_int_push_back_ptr(std::vector<std::vector<DomainInt>>* vec,
+                               std::vector<DomainInt>* new_elem)
+{
+  vec->push_back(*new_elem);
+}
+
 void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec)
 {
   delete vec;
