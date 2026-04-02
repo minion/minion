@@ -131,11 +131,16 @@ public:
   }
 };
 
-// Provide a global singleton of the above class. Not threadsafe!
+// Provide a global singleton of the above class.
+// In LIBMINION mode, stored per-context for thread safety.
+#ifdef LIBMINION
+TableOut& getTableOut();
+#else
 inline TableOut& getTableOut() {
   static TableOut t;
   return t;
 }
+#endif
 
 // Design assumption: Column headings will always be sorted in alphabetical
 // order. ??

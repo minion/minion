@@ -6,6 +6,8 @@
 #include <fstream>
 #include <random>
 
+class TableOut;
+
 struct Globals {
   Memory* searchMem_m;
   SearchOptions* options_m;
@@ -14,6 +16,7 @@ struct Globals {
   VariableContainer* varContainer_m;
   BoolContainer* bools_m;
   Parallel::ParallelData* parData_m;
+  TableOut* tableOut_m;
   bool(*callback)(void);
   std::mt19937 global_random_gen;
   std::ofstream solsoutfile;
@@ -30,7 +33,11 @@ public:
 };
 
 #ifdef LIBMINION
-extern Globals* globals;
+// Thread-local to allow multiple concurrent Minion instances on different threads.
+// Each thread sets this pointer to its own Globals before calling internal functions.
+// MinionContext is an opaque handle exposed in the public API.
+typedef Globals MinionContext;
+extern thread_local Globals* globals;
 #endif
 
 #endif

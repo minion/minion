@@ -117,15 +117,6 @@
 #ifndef _WRAPPER_H
 #define _WRAPPER_H
 
-/*
- * void resetMinion:
- *
- *  Reset all global variables in minion to their initial values.
- *
- */
-
-void resetMinion();
-
 enum ReturnCodes
 {
   OK,
@@ -133,18 +124,55 @@ enum ReturnCodes
   UNKNOWN_ERROR = 255
 };
 
+#ifdef LIBMINION
+
+/*
+ * MinionContext:
+ *
+ *   Opaque handle to a Minion solver instance. Each context holds its own
+ *   solver state, allowing multiple Minion instances to run concurrently
+ *   on different threads.
+ *
+ *   Create with minion_newContext(), free with minion_freeContext().
+ *   Pass to runMinion() and other functions that access solver state.
+ */
+
+/// Creates a new MinionContext.
+///
+/// Memory Management:
+///   The caller owns the returned pointer. Free with minion_freeContext().
+MinionContext* minion_newContext();
+
+/// Frees the given MinionContext.
+void minion_freeContext(MinionContext* ctx);
+
+/// Activates the given context on the current thread.
+/// After calling this, all internal minion functions (getState(), etc.)
+/// will operate on this context's state.
+/// Asserts if another context is already active on this thread.
+void minion_activateContext(MinionContext* ctx);
+
+/// Deactivates the current context on this thread.
+/// Must be called after minion_activateContext when done.
+void minion_deactivateContext();
+
 /*
  * int runMinion:
  *
- *   Run Minion.
+ *   Run Minion with the given context.
  *
- *   Minion is reset on each invokation of this function, so it is safe to call
- *   sequentially.
+ *   Multiple instances can run concurrently on different threads by using
+ *   separate MinionContext handles.
+ *
+ *   The context's state is reset on each invocation, so it is safe to
+ *   reuse a context for multiple sequential runs.
  *
  *   An error code is returned. These are described in ReturnCodes.
  */
-ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance,
-                      bool (*callback)(void));
+ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
+                      ProbSpec::CSPInstance& instance, bool (*callback)(void));
+
+#endif // LIBMINION
 
 /*
  * void newVar:
@@ -259,7 +287,10 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
 /// Returns `false` if adding the constraint causes immediate failure.
 ///
 /// This must only be called while Minion is actively searching.
-bool instance_addConstraintMidsearch(CSPInstance& instance, ConstraintBlob& constraint);
+/// The context must be the one that is currently running the search.
+#ifdef LIBMINION
+bool instance_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint);
+#endif
 
 
 /// Adds a named tuple-table to a model instance.
@@ -281,7 +312,10 @@ TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name);
 void printMatrix_addVar(CSPInstance& instance, Var var);
 
 // Should be called only when minion has results in a callback.
-int printMatrix_getValue(int idx);
+// The context must be the one currently running the search.
+#ifdef LIBMINION
+int printMatrix_getValue(MinionContext* ctx, int idx);
+#endif
 
 /***** Constraint argument parse types ****/
 
@@ -466,7 +500,9 @@ void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
 ///
 /// Memory Management:
 ///   The returned pointer must be freed by the user.
-char* TableOut_get(char* key); 
+#ifdef LIBMINION
+char* TableOut_get(MinionContext* ctx, char* key);
+#endif 
 
 #endif
 

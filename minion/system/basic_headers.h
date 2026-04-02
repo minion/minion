@@ -88,8 +88,8 @@ using namespace std;
 #ifndef IN_MAIN
 
 #ifdef LIBMINION
-#define VARDEF_ASSIGN(x, y) extern Globals* globals
-#define VARDEF(x) extern Globals* globals
+#define VARDEF_ASSIGN(x, y) extern thread_local Globals* globals
+#define VARDEF(x) extern thread_local Globals* globals
 #else
 #define VARDEF_ASSIGN(x, y) extern x
 #define VARDEF(x) extern x

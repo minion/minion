@@ -24,19 +24,70 @@
 void doStandardSearch(CSPInstance& instance, SearchMethod args);
 void finaliseModel(CSPInstance& instance);
 
-extern Globals* globals;
+extern thread_local Globals* globals;
 
-void resetMinion()
+// RAII guard: sets globals on construction, clears on destruction.
+// If globals is already set to ctx (e.g. callback re-entry), this is a no-op.
+// Asserts if globals is set to a *different* context (re-entrant call with wrong ctx).
+struct ContextGuard {
+  bool isOuterEntry;
+  ContextGuard(MinionContext* ctx) {
+    if(globals == nullptr) {
+      globals = ctx;
+      isOuterEntry = true;
+    } else if(globals == ctx) {
+      // Re-entrant call from callback with same context — allowed
+      isOuterEntry = false;
+    } else {
+      // globals is set to a different context — this is a bug
+      throw std::runtime_error("Re-entrant minion API call with different context");
+    }
+  }
+  ~ContextGuard() {
+    if(isOuterEntry) {
+      globals = nullptr;
+    }
+  }
+};
+
+static void resetContextState(MinionContext* ctx)
 {
-  delete globals;
-  globals = new Globals();
+  // Delete sub-objects to reset state for a fresh run, but keep the context alive
+  delete ctx->bools_m;     ctx->bools_m = NULL;
+  delete ctx->state_m;     ctx->state_m = NULL;
+  delete ctx->queues_m;    ctx->queues_m = NULL;
+  delete ctx->options_m;   ctx->options_m = NULL;
+  delete ctx->varContainer_m; ctx->varContainer_m = NULL;
+  delete ctx->searchMem_m; ctx->searchMem_m = NULL;
+  delete ctx->tableOut_m;  ctx->tableOut_m = NULL;
+  ctx->callback = NULL;
 }
 
-std::mutex global_minion_lock;
-ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPInstance& instance,
-                      bool (*callback)(void))
+MinionContext* minion_newContext()
 {
-  std::lock_guard<std::mutex> guard(global_minion_lock);
+  return new MinionContext();
+}
+
+void minion_freeContext(MinionContext* ctx)
+{
+  delete ctx;
+}
+
+void minion_activateContext(MinionContext* ctx)
+{
+  assert(globals == nullptr && "Cannot activate context: another context is already active on this thread");
+  globals = ctx;
+}
+
+void minion_deactivateContext()
+{
+  globals = nullptr;
+}
+
+ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
+                      ProbSpec::CSPInstance& instance, bool (*callback)(void))
+{
+  ContextGuard guard(ctx);
   ReturnCodes returnCode = ReturnCodes::OK;
 
   /*
@@ -45,7 +96,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
    * objects.
    */
 
-  resetMinion();
+  resetContextState(ctx);
 
   // Redirect cout
   // https://stackoverflow.com/questions/49462524/controlling-output-from-external-libraries
@@ -66,7 +117,7 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
     logOutStream.open(filenameStream.str(), ios_base::app);
     cout.rdbuf(logOutStream.rdbuf());
   } else {
-    // silence cout 
+    // silence cout
     cout.rdbuf(NULL);
   }
 
@@ -133,8 +184,9 @@ ReturnCodes runMinion(SearchOptions& options, SearchMethod& args, ProbSpec::CSPI
   // Restore old cout
   cout.rdbuf(oldCoutStreamBuf);
 
-  resetMinion();
-  
+  // Don't reset context here - caller may still query results via
+  // printMatrix_getValue or TableOut_get
+
   return returnCode;
 }
 
@@ -260,8 +312,9 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
   instance.constraints.push_back(constraint);
 }
 
-bool instance_addConstraintMidsearch(CSPInstance& instance, ConstraintBlob& constraint)
+bool instance_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint)
 {
+  ContextGuard guard(ctx);
   // Keep a stable copy of the blob alive for the lifetime of `instance`.
   // Some built constraints may retain references to blob-owned argument storage.
   instance.constraints.push_back(constraint);
@@ -296,8 +349,9 @@ void printMatrix_addVar(CSPInstance& instance, Var var)
   instance.print_matrix.push_back({var});
 }
 
-int printMatrix_getValue(int idx)
+int printMatrix_getValue(MinionContext* ctx, int idx)
 {
+  ContextGuard guard(ctx);
   return checked_cast<int>(globals->state_m->getPrintMatrix()[idx][0].assignedValue());
 }
 
@@ -466,7 +520,8 @@ void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec)
   delete vec;
 }
 
-char* TableOut_get(char* key) {
+char* TableOut_get(MinionContext* ctx, char* key) {
+  ContextGuard guard(ctx);
   try {
     /*
      * .data() doesn't copy, it just returns a ptr to the internal

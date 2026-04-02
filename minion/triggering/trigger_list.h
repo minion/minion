@@ -147,7 +147,11 @@ public:
 };
 
 inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {
+#ifdef LIBMINION
+  static thread_local DynamicTriggerList dt;
+#else
   static DynamicTriggerList dt;
+#endif
   DynamicTriggerList* queue = &dt;
 
   if(op == TO_Backtrack) {

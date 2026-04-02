@@ -10,8 +10,8 @@
 #include "../variables/mappings/variable_neg.h"
 
 #ifdef LIBMINION
-extern Globals* globals;
-#endif 
+extern thread_local Globals* globals;
+#endif
 
 namespace Controller {
 

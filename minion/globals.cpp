@@ -17,7 +17,7 @@
 #include "constraint_defs.h"
 
 #ifdef LIBMINION
-Globals* globals = new Globals();
+thread_local Globals* globals = nullptr;
 #endif
 
 SysInt numOfConstraints = sizeof(constraint_list) / sizeof(ConstraintDef);
@@ -30,7 +30,17 @@ Globals::Globals() {
     varContainer_m = NULL;
     bools_m = NULL;
     parData_m = NULL;
+    tableOut_m = NULL;
 }
+
+#ifdef LIBMINION
+TableOut& getTableOut() {
+  if(!globals->tableOut_m) {
+    globals->tableOut_m = new TableOut();
+  }
+  return *globals->tableOut_m;
+}
+#endif
 
 Globals::~Globals() {
   delete this->bools_m;
@@ -41,4 +51,5 @@ Globals::~Globals() {
   //delete this->parData_m; //FIXME: having this in causes runMinion to segfault!
   delete this->varContainer_m;
   delete this->searchMem_m;
+  delete this->tableOut_m;
 }

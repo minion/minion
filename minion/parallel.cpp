@@ -222,7 +222,11 @@ int doFork() {
 }
 
 ParallelData* setupParallelData() {
+#ifdef LIBMINION
+  static thread_local ParallelData dummy;
+#else
   static ParallelData dummy;
+#endif
   return &dummy;
 }
 } // namespace Parallel

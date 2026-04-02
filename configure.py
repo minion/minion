@@ -461,7 +461,7 @@ with open(outname, "w") as out:
 
     if arg.buildsystem == "make":
         if arg.library:
-            out.write('all: ' + execname + ' libminion.a\n')
+            out.write('all: ' + execname + ' libminion.a test_multithread\n')
         else:
             out.write('all: ' + execname + '\n')
 
@@ -493,3 +493,14 @@ with open(outname, "w") as out:
             out.write('libminion.a: $(CONOBJS) $(MINLIBOBJS)\n')
         out.write('\t' + 'ar rcs libminion.a' +
                 varsub('MINLIBOBJS') + varsub('CONOBJS') + '\n')
+
+        # test_multithread target: compile and link against libminion.a
+        if arg.buildsystem == "make":
+            testsrc = scriptdir + '/test_instances/test_multithread.cpp'
+            out.write('test_multithread: libminion.a ' + testsrc + '\n')
+            out.write('\t' + compiler + ' ' + varsub('FLAGS') +
+                      ' ' + testsrc + ' -L. -lminion ' + thread +
+                      ' -o test_multithread\n')
+            out.write('test: test_multithread\n')
+            out.write('\t./test_multithread\n')
+            out.write('.PHONY: test\n')
