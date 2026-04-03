@@ -48,7 +48,7 @@ int solve_pairs(MinionContext* ctx, int n) {
     method.preprocess = PropLevel_GAC;
     method.propMethod = PropLevel_GAC;
 
-    ReturnCodes rc = runMinion(ctx, options, method, instance, +[]() -> bool { return true; });
+    ReturnCodes rc = runMinion(ctx, options, method, instance, +[](MinionContext*, void*) -> bool { return true; }, nullptr);
     assert(rc == OK);
 
     // Read solution count from TableOut
@@ -86,7 +86,7 @@ int solve_alldiff(MinionContext* ctx, int k, int n) {
     method.preprocess = PropLevel_GAC;
     method.propMethod = PropLevel_GAC;
 
-    ReturnCodes rc = runMinion(ctx, options, method, instance, +[]() -> bool { return true; });
+    ReturnCodes rc = runMinion(ctx, options, method, instance, +[](MinionContext*, void*) -> bool { return true; }, nullptr);
     assert(rc == OK);
 
     char* sols_str = TableOut_get(ctx, (char*)"SolutionsFound");
@@ -125,7 +125,7 @@ int solve_bounded_sum(MinionContext* ctx, int k, int n, int bound) {
     method.preprocess = PropLevel_GAC;
     method.propMethod = PropLevel_GAC;
 
-    ReturnCodes rc = runMinion(ctx, options, method, instance, +[]() -> bool { return true; });
+    ReturnCodes rc = runMinion(ctx, options, method, instance, +[](MinionContext*, void*) -> bool { return true; }, nullptr);
     assert(rc == OK);
 
     char* sols_str = TableOut_get(ctx, (char*)"SolutionsFound");

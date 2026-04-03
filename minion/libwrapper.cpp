@@ -61,6 +61,7 @@ static void resetContextState(MinionContext* ctx)
   delete ctx->searchMem_m; ctx->searchMem_m = NULL;
   delete ctx->tableOut_m;  ctx->tableOut_m = NULL;
   ctx->callback = NULL;
+  ctx->callbackUserdata = NULL;
 }
 
 MinionContext* minion_newContext()
@@ -85,7 +86,9 @@ void minion_deactivateContext()
 }
 
 ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
-                      ProbSpec::CSPInstance& instance, bool (*callback)(void))
+                      ProbSpec::CSPInstance& instance,
+                      bool (*callback)(MinionContext* ctx, void* userdata),
+                      void* userdata)
 {
   ContextGuard guard(ctx);
   ReturnCodes returnCode = ReturnCodes::OK;
@@ -130,6 +133,7 @@ ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& 
     getState().getOldTimer().startClock();
 
     globals->callback = callback;
+    globals->callbackUserdata = userdata;
     globals->options_m = new SearchOptions(options);
     globals->options_m->findAllSolutions();
 
@@ -175,8 +179,18 @@ ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& 
   catch(const parse_exception& e) {
     cout << "Invalid instance: " << e.what() << endl;
     returnCode = ReturnCodes::INVALID_INSTANCE;
+  } catch(const std::bad_alloc&) {
+    returnCode = ReturnCodes::MEMORY_ERROR;
   } catch(...) {
     returnCode = ReturnCodes::UNKNOWN_ERROR;
+  }
+
+  // Detect timeout: doStandardSearch sets TableOut "TimeOut" to 1
+  if(returnCode == ReturnCodes::OK && ctx->tableOut_m) {
+    try {
+      if(getTableOut().get("TimeOut") == "1")
+        returnCode = ReturnCodes::TIMEOUT;
+    } catch(...) {}
   }
 
   Parallel::endParallelMinion();
@@ -353,6 +367,18 @@ int printMatrix_getValue(MinionContext* ctx, int idx)
 {
   ContextGuard guard(ctx);
   return checked_cast<int>(globals->state_m->getPrintMatrix()[idx][0].assignedValue());
+}
+
+int printMatrix_getValueByName(MinionContext* ctx, CSPInstance& instance, const char* varname)
+{
+  ContextGuard guard(ctx);
+  Var target = instance.vars.getSymbol(string(varname));
+  for(SysInt i = 0; i < (SysInt)instance.print_matrix.size(); ++i) {
+    if(instance.print_matrix[i].size() == 1 && instance.print_matrix[i][0] == target) {
+      return checked_cast<int>(globals->state_m->getPrintMatrix()[i][0].assignedValue());
+    }
+  }
+  throw parse_exception("Variable '" + string(varname) + "' not found in print matrix");
 }
 
 /***** SearchOptions *****/

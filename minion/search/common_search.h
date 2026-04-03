@@ -349,7 +349,7 @@ void inline standard_dealWith_solution() {
 
   #ifdef LIBMINION
   if (globals->callback !=NULL) {
-    if (!globals->callback()) {
+    if (!globals->callback(globals, globals->callbackUserdata)) {
       throw EndOfSearch();
     }
   }

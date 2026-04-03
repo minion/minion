@@ -17,7 +17,8 @@ struct Globals {
   BoolContainer* bools_m;
   Parallel::ParallelData* parData_m;
   TableOut* tableOut_m;
-  bool(*callback)(void);
+  bool(*callback)(Globals*, void*);
+  void* callbackUserdata;
   std::mt19937 global_random_gen;
   std::ofstream solsoutfile;
   /*

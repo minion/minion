@@ -121,6 +121,8 @@ enum ReturnCodes
 {
   OK,
   INVALID_INSTANCE,
+  TIMEOUT,
+  MEMORY_ERROR,
   UNKNOWN_ERROR = 255
 };
 
@@ -167,10 +169,18 @@ void minion_deactivateContext();
  *   The context's state is reset on each invocation, so it is safe to
  *   reuse a context for multiple sequential runs.
  *
+ *   The callback is invoked each time a solution is found. It receives
+ *   the active MinionContext (for querying variable values via
+ *   printMatrix_getValue, etc.) and the caller-supplied userdata pointer.
+ *   Return true to continue searching, false to stop.
+ *   Pass NULL for callback to find all solutions without a callback.
+ *
  *   An error code is returned. These are described in ReturnCodes.
  */
 ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
-                      ProbSpec::CSPInstance& instance, bool (*callback)(void));
+                      ProbSpec::CSPInstance& instance,
+                      bool (*callback)(MinionContext* ctx, void* userdata),
+                      void* userdata);
 
 #endif // LIBMINION
 
@@ -315,6 +325,16 @@ void printMatrix_addVar(CSPInstance& instance, Var var);
 // The context must be the one currently running the search.
 #ifdef LIBMINION
 int printMatrix_getValue(MinionContext* ctx, int idx);
+
+/// Returns the assigned value of a print-matrix variable by name.
+///
+/// Looks up `varname` in the instance's symbol table and finds its
+/// position in the print matrix. Returns the assigned value, or
+/// throws parse_exception if the name is not found in the print matrix.
+///
+/// This is a convenience wrapper around printMatrix_getValue for
+/// consumers that don't want to maintain a name-to-index mapping.
+int printMatrix_getValueByName(MinionContext* ctx, CSPInstance& instance, const char* varname);
 #endif
 
 /***** Constraint argument parse types ****/
@@ -496,13 +516,12 @@ void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
 
 /// Gets the value for key from the table.
 ///
-/// If there is no such element,
-///
 /// Memory Management:
-///   The returned pointer must be freed by the user.
+///   Returns a freshly malloc'd string. Caller must free() the result.
+///   Returns NULL if the key is not found.
 #ifdef LIBMINION
 char* TableOut_get(MinionContext* ctx, char* key);
-#endif 
+#endif
 
 #endif
 
