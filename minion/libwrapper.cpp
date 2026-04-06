@@ -25,6 +25,22 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args);
 void finaliseModel(CSPInstance& instance);
 
 extern thread_local Globals* globals;
+static thread_local std::string ffi_last_error;
+
+static void set_last_error(const std::string& error)
+{
+  ffi_last_error = error;
+}
+
+const char* minion_get_last_error()
+{
+  return ffi_last_error.c_str();
+}
+
+void minion_clear_last_error()
+{
+  ffi_last_error.clear();
+}
 
 // RAII guard: sets globals on construction, clears on destruction.
 // If globals is already set to ctx (e.g. callback re-entry), this is a no-op.
@@ -291,6 +307,36 @@ Var getVarByName(CSPInstance& instance, char* name)
 void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2)
 {
   newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
+}
+
+bool getVarByName_safe(CSPInstance& instance, char* name, Var* out)
+{
+  minion_clear_last_error();
+  try {
+    *out = getVarByName(instance, name);
+    return true;
+  } catch(const std::exception& e) {
+    set_last_error(e.what());
+    return false;
+  } catch(...) {
+    set_last_error("unknown Minion exception");
+    return false;
+  }
+}
+
+bool newVar_ffi_safe(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2)
+{
+  minion_clear_last_error();
+  try {
+    newVar_ffi(instance, name, type, bound1, bound2);
+    return true;
+  } catch(const std::exception& e) {
+    set_last_error(e.what());
+    return false;
+  } catch(...) {
+    set_last_error("unknown Minion exception");
+    return false;
+  }
 }
 
 /***** Tuple *****/
