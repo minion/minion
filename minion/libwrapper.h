@@ -266,6 +266,10 @@ Var constantAsVar(int n);
 /***** Variable *****/
 Var getVarByName(CSPInstance& instance, char* name);
 void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
+bool getVarByName_safe(CSPInstance& instance, char* name, Var* out);
+bool newVar_ffi_safe(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
+const char* minion_get_last_error();
+void minion_clear_last_error();
 
 /***** Tuple *****/
 TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList);
