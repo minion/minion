@@ -117,14 +117,38 @@
 #ifndef _WRAPPER_H
 #define _WRAPPER_H
 
-enum ReturnCodes
+/*
+ * MinionResult: error codes returned by fallible library functions.
+ *
+ * Functions that return MinionResult can fail; all other functions cannot.
+ * On failure, call minion_error_message() for a human-readable detail string
+ * (thread-local, valid until the next MinionResult-returning call).
+ */
+enum MinionResult
 {
-  OK,
-  INVALID_INSTANCE,
-  TIMEOUT,
-  MEMORY_ERROR,
-  UNKNOWN_ERROR = 255
+  MINION_OK = 0,
+  MINION_INVALID_INSTANCE = 1,
+  MINION_TIMEOUT = 2,
+  MINION_MEMORY_ERROR = 3,
+  MINION_PARSE_ERROR = 4,
+  MINION_INVALID_ARGUMENT = 5,
+  MINION_UNKNOWN_ERROR = 255
 };
+
+/*
+ * VarResult: returned by functions that produce a Var and can fail.
+ * Check .result before using .var.
+ */
+struct VarResult
+{
+  MinionResult result;
+  Var var;
+};
+
+/// Returns the error message for the most recent non-OK MinionResult
+/// on the current thread. The returned pointer is valid until the next
+/// MinionResult-returning call on the same thread.
+const char* minion_error_message();
 
 #ifdef LIBMINION
 
@@ -175,12 +199,12 @@ void minion_deactivateContext();
  *   Return true to continue searching, false to stop.
  *   Pass NULL for callback to find all solutions without a callback.
  *
- *   An error code is returned. These are described in ReturnCodes.
+ *   A MinionResult error code is returned.
  */
-ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
-                      ProbSpec::CSPInstance& instance,
-                      bool (*callback)(MinionContext* ctx, void* userdata),
-                      void* userdata);
+MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
+                       ProbSpec::CSPInstance& instance,
+                       bool (*callback)(MinionContext* ctx, void* userdata),
+                       void* userdata);
 
 #endif // LIBMINION
 
@@ -264,8 +288,8 @@ Var constantAsVar(int n);
  */
 
 /***** Variable *****/
-Var getVarByName(CSPInstance& instance, char* name);
-void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
+VarResult minion_getVarByName(CSPInstance& instance, char* name);
+MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
 
 /***** Tuple *****/
 TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList);
@@ -294,12 +318,13 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
 
 /// Adds a constraint to the currently running search and propagates it.
 ///
-/// Returns `false` if adding the constraint causes immediate failure.
+/// Returns MINION_OK on success, or an error code if adding the constraint
+/// causes immediate failure (e.g. propagation wipeout).
 ///
 /// This must only be called while Minion is actively searching.
 /// The context must be the one that is currently running the search.
 #ifdef LIBMINION
-bool instance_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint);
+MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint);
 #endif
 
 

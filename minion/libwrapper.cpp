@@ -26,6 +26,16 @@ void finaliseModel(CSPInstance& instance);
 
 extern thread_local Globals* globals;
 
+static thread_local std::string ffi_error_message;
+
+static void set_error(const std::string& msg) {
+  ffi_error_message = msg;
+}
+
+const char* minion_error_message() {
+  return ffi_error_message.c_str();
+}
+
 // RAII guard: sets globals on construction, clears on destruction.
 // If globals is already set to ctx (e.g. callback re-entry), this is a no-op.
 // Asserts if globals is set to a *different* context (re-entrant call with wrong ctx).
@@ -85,13 +95,13 @@ void minion_deactivateContext()
   globals = nullptr;
 }
 
-ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
-                      ProbSpec::CSPInstance& instance,
-                      bool (*callback)(MinionContext* ctx, void* userdata),
-                      void* userdata)
+MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
+                       ProbSpec::CSPInstance& instance,
+                       bool (*callback)(MinionContext* ctx, void* userdata),
+                       void* userdata)
 {
   ContextGuard guard(ctx);
-  ReturnCodes returnCode = ReturnCodes::OK;
+  MinionResult returnCode = MinionResult::MINION_OK;
 
   /*
    * Adapted from minion_main.
@@ -178,18 +188,26 @@ ReturnCodes runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& 
 
   catch(const parse_exception& e) {
     cout << "Invalid instance: " << e.what() << endl;
-    returnCode = ReturnCodes::INVALID_INSTANCE;
+    set_error(e.what());
+    returnCode = MinionResult::MINION_INVALID_INSTANCE;
   } catch(const std::bad_alloc&) {
-    returnCode = ReturnCodes::MEMORY_ERROR;
+    set_error("out of memory");
+    returnCode = MinionResult::MINION_MEMORY_ERROR;
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    returnCode = MinionResult::MINION_UNKNOWN_ERROR;
   } catch(...) {
-    returnCode = ReturnCodes::UNKNOWN_ERROR;
+    set_error("unknown exception");
+    returnCode = MinionResult::MINION_UNKNOWN_ERROR;
   }
 
   // Detect timeout: doStandardSearch sets TableOut "TimeOut" to 1
-  if(returnCode == ReturnCodes::OK && ctx->tableOut_m) {
+  if(returnCode == MinionResult::MINION_OK && ctx->tableOut_m) {
     try {
-      if(getTableOut().get("TimeOut") == "1")
-        returnCode = ReturnCodes::TIMEOUT;
+      if(getTableOut().get("TimeOut") == "1") {
+        set_error("solver timed out");
+        returnCode = MinionResult::MINION_TIMEOUT;
+      }
     } catch(...) {}
   }
 
@@ -282,15 +300,32 @@ void finaliseModel(CSPInstance& instance)
 
 /***** Variable *****/
 
-Var getVarByName(CSPInstance& instance, char* name)
+VarResult minion_getVarByName(CSPInstance& instance, char* name)
 {
-
-  return instance.vars.getSymbol(string(name));
+  try {
+    Var v = instance.vars.getSymbol(string(name));
+    return {MinionResult::MINION_OK, v};
+  } catch(const parse_exception& e) {
+    set_error(e.what());
+    return {MinionResult::MINION_PARSE_ERROR, Var()};
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    return {MinionResult::MINION_UNKNOWN_ERROR, Var()};
+  }
 }
 
-void newVar_ffi(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2)
+MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2)
 {
-  newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
+  try {
+    newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
+    return MinionResult::MINION_OK;
+  } catch(const parse_exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_PARSE_ERROR;
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_UNKNOWN_ERROR;
+  }
 }
 
 /***** Tuple *****/
@@ -326,15 +361,28 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
   instance.constraints.push_back(constraint);
 }
 
-bool instance_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint)
+MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint)
 {
-  ContextGuard guard(ctx);
-  // Keep a stable copy of the blob alive for the lifetime of `instance`.
-  // Some built constraints may retain references to blob-owned argument storage.
-  instance.constraints.push_back(constraint);
+  try {
+    ContextGuard guard(ctx);
+    // Keep a stable copy of the blob alive for the lifetime of `instance`.
+    // Some built constraints may retain references to blob-owned argument storage.
+    instance.constraints.push_back(constraint);
 
-  AbstractConstraint* c = build_constraint(instance.constraints.back());
-  return getState().addConstraintMidsearch(c);
+    AbstractConstraint* c = build_constraint(instance.constraints.back());
+    bool ok = getState().addConstraintMidsearch(c);
+    if(!ok) {
+      set_error("propagation failure when adding constraint midsearch");
+      return MinionResult::MINION_INVALID_INSTANCE;
+    }
+    return MinionResult::MINION_OK;
+  } catch(const parse_exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_PARSE_ERROR;
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_UNKNOWN_ERROR;
+  }
 }
 
 void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist)
