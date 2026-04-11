@@ -325,6 +325,18 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
 /// The context must be the one that is currently running the search.
 #ifdef LIBMINION
 MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint);
+
+/// Adds a named variable to the instance and registers it in the live
+/// runtime solver containers so that subsequent mid-search constraints
+/// can reference it.
+///
+/// Only VAR_BOUND and VAR_BOOL are currently supported mid-search.
+///
+/// This must only be called while Minion is actively searching.
+/// The context must be the one that is currently running the search.
+MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
+                                    char* name, VariableType type,
+                                    int bound1, int bound2);
 #endif
 
 

@@ -36,6 +36,16 @@ const char* minion_error_message() {
   return ffi_error_message.c_str();
 }
 
+// Abort if called while search is active (globals != nullptr).
+// Pre-search-only functions should call this to prevent misuse from callbacks.
+static void assertNotInSearch(const char* funcName) {
+  if(globals != nullptr) {
+    fprintf(stderr, "FATAL: %s cannot be called during search. "
+                    "Use the *Midsearch variant instead.\n", funcName);
+    abort();
+  }
+}
+
 // RAII guard: sets globals on construction, clears on destruction.
 // If globals is already set to ctx (e.g. callback re-entry), this is a no-op.
 // Asserts if globals is set to a *different* context (re-entrant call with wrong ctx).
@@ -316,6 +326,7 @@ VarResult minion_getVarByName(CSPInstance& instance, char* name)
 
 MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2)
 {
+  assertNotInSearch("minion_newVar");
   try {
     newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
     return MinionResult::MINION_OK;
@@ -353,11 +364,13 @@ void instance_free(CSPInstance* instance)
 
 void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder)
 {
+  assertNotInSearch("instance_addSearchOrder");
   instance.searchOrder.push_back(searchOrder);
 }
 
 void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
 {
+  assertNotInSearch("instance_addConstraint");
   instance.constraints.push_back(constraint);
 }
 
@@ -375,6 +388,42 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
       set_error("propagation failure when adding constraint midsearch");
       return MinionResult::MINION_INVALID_INSTANCE;
     }
+    return MinionResult::MINION_OK;
+  } catch(const parse_exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_PARSE_ERROR;
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_UNKNOWN_ERROR;
+  }
+}
+
+MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
+                                    char* name, VariableType type,
+                                    int bound1, int bound2)
+{
+  try {
+    ContextGuard guard(ctx);
+
+    // 1. Add to the spec (symbol table, allVars_list, etc.)
+    newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
+
+    // 2. Also register in the live runtime container so mid-search
+    //    constraints can reference this variable without segfaulting.
+    Bounds bounds(bound1, bound2);
+    switch(type) {
+    case VAR_BOUND:
+      getVars().boundVarContainer.addVariables(bounds, 1);
+      break;
+    case VAR_BOOL:
+      getVars().boolVarContainer.addVariables(1);
+      break;
+    default:
+      set_error("minion_newVarMidsearch: only VAR_BOUND and VAR_BOOL "
+                "are supported mid-search");
+      return MinionResult::MINION_INVALID_ARGUMENT;
+    }
+
     return MinionResult::MINION_OK;
   } catch(const parse_exception& e) {
     set_error(e.what());
@@ -408,6 +457,7 @@ ShortTupleList* instance_getShortTupleTableSymbol(CSPInstance& instance, char* n
 
 void printMatrix_addVar(CSPInstance& instance, Var var)
 {
+  assertNotInSearch("printMatrix_addVar");
   instance.print_matrix.push_back({var});
 }
 
