@@ -330,7 +330,8 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
 /// runtime solver containers so that subsequent mid-search constraints
 /// can reference it.
 ///
-/// Only VAR_BOUND and VAR_BOOL are currently supported mid-search.
+/// Supported types: VAR_BOUND, VAR_DISCRETE, VAR_SPARSEBOUND, VAR_BOOL.
+/// VAR_CONSTANT does not need this function — use constantAsVar() instead.
 ///
 /// This must only be called while Minion is actively searching.
 /// The context must be the one that is currently running the search.

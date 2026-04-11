@@ -359,6 +359,7 @@ CSPInstance* instance_new()
 
 void instance_free(CSPInstance* instance)
 {
+  assertNotInSearch("instance_free");
   delete instance;
 }
 
@@ -415,12 +416,17 @@ MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
     case VAR_BOUND:
       getVars().boundVarContainer.addVariables(bounds, 1);
       break;
+    case VAR_DISCRETE:
+      getVars().bigRangeVarContainer.addVariables({{bound1, bound2}});
+      break;
+    case VAR_SPARSEBOUND:
+      getVars().sparseBoundVarContainer.addVariables({bound1, bound2}, 1);
+      break;
     case VAR_BOOL:
       getVars().boolVarContainer.addVariables(1);
       break;
     default:
-      set_error("minion_newVarMidsearch: only VAR_BOUND and VAR_BOOL "
-                "are supported mid-search");
+      set_error("minion_newVarMidsearch: unsupported variable type");
       return MinionResult::MINION_INVALID_ARGUMENT;
     }
 
@@ -436,6 +442,7 @@ MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
 
 void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist)
 {
+  assertNotInSearch("instance_addTupleTableSymbol");
   instance.addTableSymbol(name, std::shared_ptr<TupleList>(tuplelist));
 }
 
@@ -447,6 +454,7 @@ TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name)
 void instance_addShortTupleTableSymbol(CSPInstance& instance, char* name,
                                        ShortTupleList* shorttuplelist)
 {
+  assertNotInSearch("instance_addShortTupleTableSymbol");
   instance.addShortTableSymbol(name, std::shared_ptr<ShortTupleList>(shorttuplelist));
 }
 

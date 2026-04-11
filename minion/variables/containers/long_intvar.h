@@ -48,8 +48,6 @@ struct BigRangeVarContainer {
 
   BigRangeVarContainer()
       : bms_array(&getMemory().monotonicSet()), triggerList(false), varCount_m(0) {
-    // Store where the first variable will go.
-    varOffset.push_back(0);
   }
 
   typedef DomainInt domainBound_type;
@@ -139,41 +137,43 @@ struct BigRangeVarContainer {
   }
 
   void addVariables(const vector<Bounds>& newDomains) {
+    SysInt old_varCount = varCount_m;
+
     for(SysInt i = 0; i < (SysInt)newDomains.size(); ++i) {
       initialBounds.push_back(make_pair(newDomains[i].lowerBound, newDomains[i].upperBound));
-      DomainInt domainSize;
-      domainSize = newDomains[i].upperBound - newDomains[i].lowerBound + 1;
-      varOffset.push_back(varOffset.back() + domainSize);
+      DomainInt domainSize = newDomains[i].upperBound - newDomains[i].lowerBound + 1;
+
+      // Allocate bms storage for this variable and compute its varOffset.
+      // varOffset[j] + value == absolute bms position for domain value 'value'.
+      DomainInt bmsPos = bms_array->request_storage(domainSize);
+      varOffset.push_back(bmsPos - newDomains[i].lowerBound);
+
       varCount_m++;
     }
-    constraints.resize(newDomains.size());
+
+    constraints.resize(varCount_m);
 #ifdef WDEG
-    wdegs.resize(newDomains.size());
+    wdegs.resize(varCount_m);
 #endif
 
-    bound_data = getMemory().backTrack().requestBytesExtendable(varCount_m * BOUND_DATA_SIZE *
-                                                                sizeof(domainBound_type));
-    DomainInt temp1 = bms_array->request_storage(varOffset.back());
-
-    // correct varOffsets to start at the start of our block.
-    if(temp1 > 0) {
-      for(SysInt i = 0; i < (SysInt)varOffset.size(); ++i)
-        varOffset[i] += temp1;
+    if(bound_data.empty()) {
+      bound_data = getMemory().backTrack().requestBytesExtendable(
+          varCount_m * BOUND_DATA_SIZE * sizeof(domainBound_type));
+    } else {
+      getMemory().backTrack().resizeExtendableBlock(
+          bound_data, varCount_m * BOUND_DATA_SIZE * sizeof(domainBound_type));
     }
 
-    for(SysInt j = 0; j < (SysInt)varCount_m; ++j) {
-      varOffset[j] = varOffset[j] - initialBounds[j].first;
-    };
-
     domainBound_type* bound_ptr = (domainBound_type*)(bound_data());
-
-    for(UnsignedSysInt i = 0; i < varCount_m; ++i) {
+    for(UnsignedSysInt i = old_varCount; i < varCount_m; ++i) {
       bound_ptr[BOUND_DATA_SIZE * i] = initialBounds[i].first;
       bound_ptr[BOUND_DATA_SIZE * i + 1] = initialBounds[i].second;
       bound_ptr[BOUND_DATA_SIZE * i + 2] = initialBounds[i].second - initialBounds[i].first + 1;
     }
 
-    triggerList.addVariables(initialBounds);
+    vector<pair<DomainInt, DomainInt>> newBounds(
+        initialBounds.begin() + old_varCount, initialBounds.end());
+    triggerList.addVariables(newBounds);
   }
 
   BOOL isAssigned(BigRangeVarRef_internal d) const {
