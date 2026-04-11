@@ -352,20 +352,6 @@ struct BoundVarContainer {
       bound_ptr[2 * i] = initialBounds[i].first;
       bound_ptr[2 * i + 1] = initialBounds[i].second;
     }
-
-    DomainInt minDomainVal = 0;
-    DomainInt maxDomainVal = 0;
-    if(!initialBounds.empty()) {
-      minDomainVal = initialBounds[0].first;
-      maxDomainVal = initialBounds[0].second;
-      for(UnsignedSysInt i = old_varCount; i < varCount_m; ++i) {
-        bound_ptr[2 * i] = initialBounds[i].first;
-        bound_ptr[2 * i + 1] = initialBounds[i].second;
-
-        minDomainVal = mymin(initialBounds[i].first, minDomainVal);
-        maxDomainVal = mymax(initialBounds[i].second, maxDomainVal);
-      }
-    }
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b) {

@@ -167,18 +167,10 @@ struct BigRangeVarContainer {
 
     domainBound_type* bound_ptr = (domainBound_type*)(bound_data());
 
-    DomainInt minDomainVal = 0;
-    DomainInt maxDomainVal = 0;
-    if(!initialBounds.empty()) {
-      minDomainVal = initialBounds[0].first;
-      maxDomainVal = initialBounds[0].second;
-      for(UnsignedSysInt i = 0; i < varCount_m; ++i) {
-        bound_ptr[BOUND_DATA_SIZE * i] = initialBounds[i].first;
-        bound_ptr[BOUND_DATA_SIZE * i + 1] = initialBounds[i].second;
-        bound_ptr[BOUND_DATA_SIZE * i + 2] = initialBounds[i].second - initialBounds[i].first + 1;
-        minDomainVal = mymin(initialBounds[i].first, minDomainVal);
-        maxDomainVal = mymax(initialBounds[i].second, maxDomainVal);
-      }
+    for(UnsignedSysInt i = 0; i < varCount_m; ++i) {
+      bound_ptr[BOUND_DATA_SIZE * i] = initialBounds[i].first;
+      bound_ptr[BOUND_DATA_SIZE * i + 1] = initialBounds[i].second;
+      bound_ptr[BOUND_DATA_SIZE * i + 2] = initialBounds[i].second - initialBounds[i].first + 1;
     }
 
     triggerList.addVariables(initialBounds);
