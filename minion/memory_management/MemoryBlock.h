@@ -166,18 +166,33 @@ private:
 public:
   void retrieveFromPtr(const BacktrackData& storePtr) {
     P("RetrieveMem: ");
+    // Stored blocks: add-and-stay. Restore snapshot bytes [0, snap_stored)
+    // into the corresponding positions, and zero any bytes beyond. The
+    // Reversible<T> wrappers get their contents reverted to the snapshot
+    // value; any byte allocated since the snapshot (e.g. a mid-search
+    // constraint's Reversible<bool>) is zeroed, matching Reversible's
+    // default-constructed state.
+    size_t snap_stored = storePtr.total_stored_bytes;
     UnsignedSysInt currentOffset = 0;
     for(SysInt i = 0; i < (SysInt)stored_blocks.size(); ++i) {
-      copyMemBlock(stored_blocks[i].base, storePtr, currentOffset, stored_blocks[i].size);
-      currentOffset += stored_blocks[i].size;
+      size_t blockSize = stored_blocks[i].size;
+      size_t snapBytes = 0;
+      if(currentOffset < snap_stored)
+        snapBytes = std::min<size_t>(snap_stored - currentOffset, blockSize);
+      if(snapBytes > 0)
+        memcpy(stored_blocks[i].base, storePtr.data + currentOffset, snapBytes);
+      if(blockSize > snapBytes)
+        memset(stored_blocks[i].base + snapBytes, 0, blockSize - snapBytes);
+      currentOffset += blockSize;
     }
 
-    // Extendable blocks follow an "add-and-stay" model: they never shrink
-    // across a push/pop, but they can grow (new blocks, or existing blocks
-    // extended). Snapshot bytes are bounded by the sizes captured at push
+    // Extendable blocks: same add-and-stay model. They never shrink across
+    // a push/pop but can grow (new blocks, or existing blocks extended).
+    // Snapshot bytes are bounded by the per-block sizes captured at push
     // time; any current bytes beyond that are "new" and get zeroed. Per-var
     // reinitialisation (e.g. restoring initial bounds) happens above this
     // layer via varsToReinitialise.
+    currentOffset = snap_stored;
     size_t snap_count = storePtr.extendable_blocksSize.size();
     D_ASSERT(extendable_blocks.size() >= snap_count);
     for(size_t i = 0; i < snap_count; ++i) {
@@ -238,32 +253,12 @@ public:
     D_ASSERT(backtrack_stack.size() > 0);
     BacktrackData bd = backtrack_stack.back();
     backtrack_stack.pop_back();
+
+    // Both stored_blocks and extendable_blocks follow an add-and-stay model:
+    // blocks and bytes allocated since the push remain in place after the
+    // pop. retrieveFromPtr restores the snapshot prefix of each block and
+    // zeroes bytes beyond.
     D_ASSERT(total_stored_bytes >= bd.total_stored_bytes);
-
-    // Clean up stored_blocks
-    if(total_stored_bytes > bd.total_stored_bytes) {
-      while(total_stored_bytes - stored_blocks.back().size > bd.total_stored_bytes) {
-        BlockDef block = stored_blocks.back();
-        stored_blocks.pop_back();
-        free(block.base);
-        total_stored_bytes -= block.size;
-      }
-      if(total_stored_bytes > bd.total_stored_bytes) {
-        D_ASSERT(total_stored_bytes - stored_blocks.back().size <= bd.total_stored_bytes);
-        size_t oldSize = stored_blocks.back().size;
-        size_t diff = total_stored_bytes - bd.total_stored_bytes;
-        size_t newSize = oldSize - diff;
-        memset(stored_blocks.back().base + newSize, 0, diff);
-        stored_blocks.back().size = newSize;
-        total_stored_bytes -= diff;
-      }
-    }
-
-    D_ASSERT(total_stored_bytes == bd.total_stored_bytes);
-
-    // Extendable blocks are add-and-stay: blocks and bytes allocated since
-    // the push remain after the pop. retrieveFromPtr restores the snapshot
-    // prefix of each block and zeroes bytes beyond.
     D_ASSERT(extendable_blocks.size() >= bd.extendable_blocksSize.size());
     D_ASSERT(allocated_extendable_bytes >= bd.allocated_extendable_bytes);
 

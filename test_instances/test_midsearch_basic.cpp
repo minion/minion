@@ -470,17 +470,8 @@ static std::vector<Test> tests = {
     {"midsearch_add_discrete_unconstrained", test_midsearch_add_discrete_unconstrained, false},
     {"midsearch_add_bool_with_eq_constant", test_midsearch_add_bool_with_eq_constant, false},
     {"midsearch_add_var_eq_existing", test_midsearch_add_var_eq_existing, false},
-    // watched-or of two w-literals. Observed: got z=0 for x!=0 where
-    // z=1 was required. Watched-or seems to commit to one child (via
-    // specialCheck + fullPropagate_called = true) and never re-evaluate
-    // when the committed child becomes infeasible. Needs trigger/watch
-    // routing investigation in Dynamic_OR.
-    {"midsearch_add_watched_or_two_wlit", test_midsearch_add_watched_or_two_wlit, true},
-    // watched-or of two eq constraints. Observed: only 3 solutions found
-    // (all with x=0); x!=0 cases absent entirely — the or is incorrectly
-    // failing instead of enforcing z=1. Different symptom, likely same
-    // root cause as the w-literal variant.
-    {"midsearch_add_watched_or_two_eq", test_midsearch_add_watched_or_two_eq, true},
+    {"midsearch_add_watched_or_two_wlit", test_midsearch_add_watched_or_two_wlit, false},
+    {"midsearch_add_watched_or_two_eq", test_midsearch_add_watched_or_two_eq, false},
 };
 
 int main() {

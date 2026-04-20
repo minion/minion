@@ -17,7 +17,7 @@
 #undef P
 #endif
 
-//#define P(x) cout << x << endl;
+//#define P(x) cerr << "Dynamic_OR:" << x << endl;
 #define P(x)
 
 struct Dynamic_OR : public ParentConstraint {
