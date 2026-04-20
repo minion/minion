@@ -361,14 +361,7 @@ static std::vector<Test> tests = {
     {"midsearch_add_bool_unconstrained", test_midsearch_add_bool_unconstrained, false},
     {"midsearch_add_bound_unconstrained", test_midsearch_add_bound_unconstrained, false},
     {"midsearch_add_discrete_unconstrained", test_midsearch_add_discrete_unconstrained, false},
-    // w-literal has no dynamic triggers and relies on its initial
-    // fullPropagate. After backtrack unassigns z, the constraint never
-    // fires again at intermediate depths (constraintsToPropagate only
-    // re-runs fullPropagate on pops past its add-depth minus one), so z
-    // gets freely branched to 0 in the aux block even though z must be 1.
-    // Needs either a generalised re-propagation mechanism or a trigger in
-    // w-literal for fresh-var support.
-    {"midsearch_add_bool_with_eq_constant", test_midsearch_add_bool_with_eq_constant, true},
+    {"midsearch_add_bool_with_eq_constant", test_midsearch_add_bool_with_eq_constant, false},
     {"midsearch_add_var_eq_existing", test_midsearch_add_var_eq_existing, false},
 };
 

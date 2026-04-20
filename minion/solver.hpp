@@ -91,7 +91,16 @@ inline bool SearchState::addConstraint(AbstractConstraint* c) {
 inline bool SearchState::addConstraintMidsearch(AbstractConstraint* c) {
   bool ret = addConstraint(c);
   if(ret) {
-    constraintsToPropagate[Controller::getWorldDepth() - 1].insert(c);
+    // worldPop re-fullPropagates constraints at ctp[propagateDepth] where
+    // propagateDepth = newDepth + 1 = oldDepth. So to make the constraint
+    // fire on the next pop that undoes the current depth's state, we need
+    // it at ctp[currentDepth]. In the healthy invariant ctp.size ==
+    // currentDepth, so currentDepth is one past the last valid index —
+    // grow the vector by one to make room.
+    SysInt insertIdx = Controller::getWorldDepth();
+    if((SysInt)constraintsToPropagate.size() <= insertIdx)
+      constraintsToPropagate.resize(insertIdx + 1);
+    constraintsToPropagate[insertIdx].insert(c);
   }
   return ret;
 }
