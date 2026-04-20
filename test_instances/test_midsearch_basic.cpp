@@ -564,6 +564,52 @@ static bool test_midsearch_add_reifyimply_forced() {
                            tc.solutions_seen, expected);
 }
 
+// reify(eq(x, 0), z): z iff x==0. Adds z mid-search and lets the
+// reification drive z in both directions: x=0 forces z=1, x!=0 forces z=0.
+static bool test_midsearch_add_reify() {
+    TestCtx tc;
+    newVar(tc.instance, "x", VAR_DISCRETE, {0, 2});
+    newVar(tc.instance, "y", VAR_DISCRETE, {0, 2});
+    add_search_order(tc.instance, {tc.instance.vars.getSymbol("x"),
+                                   tc.instance.vars.getSymbol("y")});
+    tc.tracked_vars = {"x", "y", "z"};
+
+    tc.on_callback = [](MinionContext* ctx, TestCtx& tcc) {
+        if(tcc.callback_count == 1) {
+            if(minion_newVarMidsearch(ctx, tcc.instance, (char*)"z",
+                                      VAR_BOOL, 0, 1) != MINION_OK)
+                return false;
+            Var x = tcc.instance.vars.getSymbol("x");
+            Var z = tcc.instance.vars.getSymbol("z");
+
+            ConstraintBlob eq_x(lib_getConstraint(CT_EQ));
+            Var c0 = constantAsVar(0);
+            eq_x.vars.push_back({x});
+            eq_x.vars.push_back({c0});
+
+            ConstraintBlob rfy(lib_getConstraint(CT_REIFY));
+            rfy.internal_constraints.push_back(eq_x);
+            rfy.vars.push_back({z});
+
+            if(minion_addConstraintMidsearch(ctx, tcc.instance, rfy) != MINION_OK)
+                return false;
+        }
+        return true;
+    };
+
+    if(run(tc) != MINION_OK) return false;
+
+    std::vector<Snapshot> expected;
+    expected.push_back({{"x", 0}, {"y", 0}, {"z", MISSING}});
+    for(int xv = 0; xv <= 2; ++xv)
+        for(int yv = 0; yv <= 2; ++yv) {
+            if(xv == 0 && yv == 0) continue;
+            expected.push_back({{"x", xv}, {"y", yv}, {"z", xv == 0 ? 1 : 0}});
+        }
+
+    return check_solutions("midsearch_add_reify", tc.solutions_seen, expected);
+}
+
 struct Test {
     const char* name;
     bool (*run)();
@@ -582,6 +628,7 @@ static std::vector<Test> tests = {
     {"midsearch_add_watched_or_two_eq", test_midsearch_add_watched_or_two_eq, false},
     {"midsearch_add_reifyimply_idle", test_midsearch_add_reifyimply_idle, false},
     {"midsearch_add_reifyimply_forced", test_midsearch_add_reifyimply_forced, false},
+    {"midsearch_add_reify", test_midsearch_add_reify, false},
 };
 
 int main() {

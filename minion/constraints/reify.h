@@ -319,6 +319,10 @@ struct reify : public ParentConstraint {
     if(getState().isFailed())
       return;
 
+    // Clean up triggers
+    for(SysInt i = 0; i < dtcount; ++i)
+      releaseTriggerInt(i);
+
     moveTriggerInt(reify_var, dtcount, Assigned);
 
     if(reify_var.isAssigned()) {
@@ -330,10 +334,6 @@ struct reify : public ParentConstraint {
       fullPropagate_called = true;
       return;
     }
-
-    // Clean up triggers
-    for(SysInt i = 0; i < dtcount; ++i)
-      releaseTriggerInt(i);
 
     bool flag;
     GET_ASSIGNMENT(assignment0, child_constraints[0]);
