@@ -15,9 +15,13 @@
 #include "minion.h"
 
 #include "constraint_defs.h"
+#include "triggering/dynamic_trigger.h"
 
 #ifdef LIBMINION
 thread_local Globals* globals = nullptr;
+thread_local DynamicTriggerList globalNullTriggerList;
+#else
+DynamicTriggerList globalNullTriggerList;
 #endif
 
 SysInt numOfConstraints = sizeof(constraint_list) / sizeof(ConstraintDef);

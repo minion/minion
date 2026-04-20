@@ -267,6 +267,13 @@ struct reify : public ParentConstraint {
       }
     } else // fullPropagate_called
     {
+      if(trig == _dt + dtcount) {
+        P("In stage 2, ignoring reify-var trigger");
+        // Reify var is already assigned and has been fully propagated.
+        // This trigger is not owned by any child.
+        releaseTriggerInt(trig);
+        return;
+      }
       if(trig >= _dt && trig < _dt + dtcount) { // is it a trigger from stage 1 .. if so, ignore.
         P("In stage 2, ignoring trigger from stage 1");
         return;
