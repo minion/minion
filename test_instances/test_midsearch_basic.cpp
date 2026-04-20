@@ -349,6 +349,113 @@ static bool test_midsearch_add_var_eq_existing() {
                            tc.solutions_seen, expected);
 }
 
+// Midsearch: add a watched-or of two w-literals, neither with a dynamic
+// trigger. Semantic: x=0 OR z=1. Aux valorder-ascending picks z=0; for
+// x!=0 the left child fails so the or must assign z=1.
+static bool test_midsearch_add_watched_or_two_wlit() {
+    TestCtx tc;
+    newVar(tc.instance, "x", VAR_DISCRETE, {0, 2});
+    newVar(tc.instance, "y", VAR_DISCRETE, {0, 2});
+    add_search_order(tc.instance, {tc.instance.vars.getSymbol("x"),
+                                   tc.instance.vars.getSymbol("y")});
+    tc.tracked_vars = {"x", "y", "z"};
+
+    tc.on_callback = [](MinionContext* ctx, TestCtx& tcc) {
+        if(tcc.callback_count == 1) {
+            if(minion_newVarMidsearch(ctx, tcc.instance, (char*)"z",
+                                      VAR_BOOL, 0, 1) != MINION_OK)
+                return false;
+            Var x = tcc.instance.vars.getSymbol("x");
+            Var z = tcc.instance.vars.getSymbol("z");
+
+            ConstraintBlob wlit_x(lib_getConstraint(CT_WATCHED_LIT));
+            wlit_x.vars.push_back({x});
+            wlit_x.constants.push_back({0});
+
+            ConstraintBlob wlit_z(lib_getConstraint(CT_WATCHED_LIT));
+            wlit_z.vars.push_back({z});
+            wlit_z.constants.push_back({1});
+
+            ConstraintBlob wor(lib_getConstraint(CT_WATCHED_NEW_OR));
+            wor.internal_constraints.push_back(wlit_x);
+            wor.internal_constraints.push_back(wlit_z);
+
+            if(minion_addConstraintMidsearch(ctx, tcc.instance, wor) != MINION_OK)
+                return false;
+        }
+        return true;
+    };
+
+    if(run(tc) != MINION_OK) return false;
+
+    std::vector<Snapshot> expected;
+    expected.push_back({{"x", 0}, {"y", 0}, {"z", MISSING}});
+    for(int xv = 0; xv <= 2; ++xv)
+        for(int yv = 0; yv <= 2; ++yv) {
+            if(xv == 0 && yv == 0) continue;
+            int zv = (xv == 0) ? 0 : 1;
+            expected.push_back({{"x", xv}, {"y", yv}, {"z", zv}});
+        }
+
+    return check_solutions("midsearch_add_watched_or_two_wlit",
+                           tc.solutions_seen, expected);
+}
+
+// Same shape with eq children. Both eq constraints have dynamic triggers,
+// so the or's internal trigger-routing is exercised differently.
+static bool test_midsearch_add_watched_or_two_eq() {
+    TestCtx tc;
+    newVar(tc.instance, "x", VAR_DISCRETE, {0, 2});
+    newVar(tc.instance, "y", VAR_DISCRETE, {0, 2});
+    add_search_order(tc.instance, {tc.instance.vars.getSymbol("x"),
+                                   tc.instance.vars.getSymbol("y")});
+    tc.tracked_vars = {"x", "y", "z"};
+
+    tc.on_callback = [](MinionContext* ctx, TestCtx& tcc) {
+        if(tcc.callback_count == 1) {
+            if(minion_newVarMidsearch(ctx, tcc.instance, (char*)"z",
+                                      VAR_BOOL, 0, 1) != MINION_OK)
+                return false;
+            Var x = tcc.instance.vars.getSymbol("x");
+            Var z = tcc.instance.vars.getSymbol("z");
+
+            // eq(x, 0)
+            ConstraintBlob eq_x(lib_getConstraint(CT_EQ));
+            Var c0 = constantAsVar(0);
+            eq_x.vars.push_back({x});
+            eq_x.vars.push_back({c0});
+
+            // eq(z, 1)
+            ConstraintBlob eq_z(lib_getConstraint(CT_EQ));
+            Var c1 = constantAsVar(1);
+            eq_z.vars.push_back({z});
+            eq_z.vars.push_back({c1});
+
+            ConstraintBlob wor(lib_getConstraint(CT_WATCHED_NEW_OR));
+            wor.internal_constraints.push_back(eq_x);
+            wor.internal_constraints.push_back(eq_z);
+
+            if(minion_addConstraintMidsearch(ctx, tcc.instance, wor) != MINION_OK)
+                return false;
+        }
+        return true;
+    };
+
+    if(run(tc) != MINION_OK) return false;
+
+    std::vector<Snapshot> expected;
+    expected.push_back({{"x", 0}, {"y", 0}, {"z", MISSING}});
+    for(int xv = 0; xv <= 2; ++xv)
+        for(int yv = 0; yv <= 2; ++yv) {
+            if(xv == 0 && yv == 0) continue;
+            int zv = (xv == 0) ? 0 : 1;
+            expected.push_back({{"x", xv}, {"y", yv}, {"z", zv}});
+        }
+
+    return check_solutions("midsearch_add_watched_or_two_eq",
+                           tc.solutions_seen, expected);
+}
+
 struct Test {
     const char* name;
     bool (*run)();
@@ -363,6 +470,17 @@ static std::vector<Test> tests = {
     {"midsearch_add_discrete_unconstrained", test_midsearch_add_discrete_unconstrained, false},
     {"midsearch_add_bool_with_eq_constant", test_midsearch_add_bool_with_eq_constant, false},
     {"midsearch_add_var_eq_existing", test_midsearch_add_var_eq_existing, false},
+    // watched-or of two w-literals. Observed: got z=0 for x!=0 where
+    // z=1 was required. Watched-or seems to commit to one child (via
+    // specialCheck + fullPropagate_called = true) and never re-evaluate
+    // when the committed child becomes infeasible. Needs trigger/watch
+    // routing investigation in Dynamic_OR.
+    {"midsearch_add_watched_or_two_wlit", test_midsearch_add_watched_or_two_wlit, true},
+    // watched-or of two eq constraints. Observed: only 3 solutions found
+    // (all with x=0); x!=0 cases absent entirely — the or is incorrectly
+    // failing instead of enforcing z=1. Different symptom, likely same
+    // root cause as the w-literal variant.
+    {"midsearch_add_watched_or_two_eq", test_midsearch_add_watched_or_two_eq, true},
 };
 
 int main() {
