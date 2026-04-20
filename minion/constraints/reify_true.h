@@ -192,6 +192,17 @@ struct reify_true : public ParentConstraint {
     D_ASSERT(rar_var.min() >= 0);
     D_ASSERT(rar_var.max() <= 1);
 
+    // Clean up stage-1 triggers (indices [0, dtCount - 1)) before any
+    // early return. Skip the slot at dtCount - 1 = reify_varTrigger() —
+    // the moveTriggerInt below handles that slot. Gating this release
+    // behind the "rar_var not yet assigned" branch (as the old code
+    // did) left stale triggers attached on re-entry, which later fired
+    // with indices that no longer matched the current child-offset
+    // layout.
+    SysInt dtCount = dynamicTriggerCount();
+    for(SysInt i = 0; i < dtCount - 1; ++i)
+      releaseTriggerInt(i);
+
     moveTriggerInt(rar_var, reify_varTrigger(), LowerBound);
 
     if(rar_var.isAssigned() && rar_var.assignedValue() == 1) {
@@ -201,10 +212,6 @@ struct reify_true : public ParentConstraint {
     }
 
     const SysInt dt = 0;
-    SysInt dtCount = dynamicTriggerCount();
-    // Clean up triggers (skip the one watching the reification variable)
-    for(SysInt i = 0; i < dtCount - 1; ++i)
-      releaseTriggerInt(i);
 
     if(DoWatchAssignment && !rar_var.isAssigned()) // don't place when rar_var=0
     {
