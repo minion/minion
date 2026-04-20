@@ -144,23 +144,22 @@ inline void check_sol_is_correct() {
 #include "../MILtools/print_CSP.h"
 #include <fstream>
 
-// repeat declaration
+// A var/val/isAux/isLeft record kept on the search stack. var is a live
+// AnyVarRef, not an index into some flat list — this removes a class of
+// coupling with the VariableOrder's internal layout.
 struct triple {
   bool isLeft;
-  SysInt var;
+  AnyVarRef var;
   DomainInt val;
+  bool isAux;
   bool stolen;
 
-  triple(bool _isLeft, SysInt _var, DomainInt _val)
-      : isLeft(_isLeft), var(_var), val(_val), stolen(false) {}
+  triple(bool _isLeft, AnyVarRef _var, DomainInt _val, bool _isAux)
+      : isLeft(_isLeft), var(_var), val(_val), isAux(_isAux), stolen(false) {}
   friend std::ostream& operator<<(std::ostream& o, const triple& t) {
-    o << "(" << t.isLeft << "," << t.var << "," << t.val << ":" << t.stolen << ")";
+    o << "(" << t.isLeft << "," << t.var << "," << t.val << (t.isAux ? ",aux" : "")
+      << ":" << t.stolen << ")";
     return o;
-  }
-
-  friend bool operator==(triple lhs, triple rhs) {
-    return lhs.isLeft == rhs.isLeft && lhs.var == rhs.var && lhs.val == rhs.val &&
-           lhs.stolen == rhs.stolen;
   }
 };
 
@@ -193,8 +192,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
       // The most likely case is we have just caught the end of search.
       splits.push_back("");
     } else {
-      typedef typename VarArray::value_type VarRef;
-      const VarRef& var = varArray[branches.back().var];
+      const AnyVarRef& var = branches.back().var;
       curvar = getState().getInstance()->vars.getName(var.getBaseVar());
       DomainInt min = var.min();
       DomainInt max = var.max();
@@ -244,11 +242,11 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
           for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
               lb != left_branches_so_far.end(); lb++) {
             fileout << "w-notliteral(";
-            inputPrint(fileout, varArray[lb->var].getBaseVar());
+            inputPrint(fileout, lb->var.getBaseVar());
             fileout << "," << lb->val << "),";
           }
           fileout << "w-notliteral(";
-          inputPrint(fileout, varArray[curr->var].getBaseVar());
+          inputPrint(fileout, curr->var.getBaseVar());
           fileout << "," << curr->val << ")})" << endl;
         }
       }
@@ -269,11 +267,11 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
           for(vector<triple>::const_iterator lb = left_branches_so_far.begin();
               lb != left_branches_so_far.end(); lb++) {
             cerr << "w-notliteral(";
-            inputPrint(cerr, varArray[lb->var].getBaseVar());
+            inputPrint(cerr, lb->var.getBaseVar());
             cerr << "," << lb->val << "),";
           }
           cerr << "w-notliteral(";
-          inputPrint(cerr, varArray[curr->var].getBaseVar());
+          inputPrint(cerr, curr->var.getBaseVar());
           cerr << "," << curr->val << ")})" << endl;
         }
       }

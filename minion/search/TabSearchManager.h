@@ -137,9 +137,9 @@ struct TabSearchManager : public StandardSearchManager {
         return;
       }
       
-      pair<SysInt, DomainInt> varval = varOrder->pickVarVal();
+      BranchChoice varval = varOrder->pickVarVal();
 
-      if(varval.first == -1) {
+      if(!varval.var.data) {
         // We have found a solution!
         check_sol_is_correct();
         maybe_print_node(true);

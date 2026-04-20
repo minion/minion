@@ -5,8 +5,16 @@
 #define VARIABLE_ORDERINGS_H
 
 #include <cfloat>
+#include "../variables/AnyVarRef.h"
 // #include "../system/system.h"
 // #include "../memory_management/reversible_vals.h"
+
+// Result of a branching decision. Empty when search has exhausted the order.
+struct BranchChoice {
+  AnyVarRef var;
+  DomainInt val;
+  bool isAux;
+};
 
 template <typename T>
 DomainInt chooseVal(T& var, ValOrder vo) {
@@ -70,9 +78,9 @@ struct VariableOrder {
   VariableOrder() {}
   VariableOrder(const vector<AnyVarRef>& _varOrder) : varOrder(_varOrder) {}
 
-  // returns a pair of variable index, domain value.
-  // returning the variable index == -1 means no branch possible.
-  virtual pair<SysInt, DomainInt> pickVarVal() = 0;
+  // Returns a chosen (var, val) plus whether it belongs to an aux block.
+  // Empty BranchChoice::var.data means no branch possible.
+  virtual BranchChoice pickVarVal() = 0;
 
   vector<AnyVarRef>& getVars() {
     return varOrder;
@@ -82,6 +90,9 @@ struct VariableOrder {
     return false;
   }
 
+  // Position of the first aux variable in the concatenated getVars() view.
+  // Still used by -X-tabulation (TabSearchManager) to size its tabulation
+  // tables. Branch-level aux detection goes via triple::isAux now.
   virtual DomainInt auxVarStart() const {
     abort();
   }
@@ -123,20 +134,24 @@ struct MultiBranch : public VariableOrder {
     varOrder.insert(varOrder.end(), lastvars.begin(), lastvars.end());
   }
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     SysInt pos2 = pos;
 
-    pair<SysInt, DomainInt> t = vovector[pos2]->pickVarVal();
-    while(t.first == -1) {
+    BranchChoice t = vovector[pos2]->pickVarVal();
+    while(!t.var.data) {
       pos2++;
       if(pos2 == (SysInt)vovector.size()) {
-        return make_pair(-1, 0);
+        return BranchChoice{};
       }
 
       t = vovector[pos2]->pickVarVal();
     }
     pos = pos2;
-    t.first += checked_cast<SysInt>(variableOffset[pos2]);
+    // Aux status is a property of which block we branched from: the last
+    // block is aux iff hasAux.
+    if(hasAux && pos2 == (SysInt)vovector.size() - 1) {
+      t.isAux = true;
+    }
     return t;
   }
 };
@@ -151,18 +166,18 @@ struct StaticBranch : public VariableOrder {
     D_ASSERT(varOrder.size() == valOrder.size());
   }
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     SysInt vSize = varOrder.size();
 
     while(pos < vSize && varOrder[pos].isAssigned())
       pos = pos + 1;
 
     if(pos == vSize)
-      return make_pair(-1, 0);
+      return BranchChoice{};
 
     DomainInt val = chooseVal(varOrder[pos], valOrder[pos]);
 
-    return make_pair(pos, val);
+    return BranchChoice{varOrder[pos], val, false};
   }
 };
 
@@ -174,8 +189,7 @@ struct SDFBranch : public VariableOrder {
 
   // THIS DOES NOT DO SDF -- just an approximation with the bounds.
 
-  pair<SysInt, DomainInt> pickVarVal() {
-    // cout << "In pickVarVal for SDF (approximation)" <<endl;
+  BranchChoice pickVarVal() {
     SysInt length = varOrder.size();
     SysInt smallestDom = -1;
     DomainInt domSize = DomainInt_Max;
@@ -194,12 +208,12 @@ struct SDFBranch : public VariableOrder {
     }
 
     if(smallestDom == -1) { // all assigned
-      return make_pair(-1, 0);
+      return BranchChoice{};
     }
 
     DomainInt val = chooseVal(varOrder[smallestDom], valOrder[smallestDom]);
 
-    return make_pair(smallestDom, val);
+    return BranchChoice{varOrder[smallestDom], val, false};
   }
 };
 
@@ -209,18 +223,18 @@ struct SlowStaticBranch : public VariableOrder {
   SlowStaticBranch(const vector<AnyVarRef>& _varOrder, const vector<ValOrder>& _valOrder)
       : VariableOrder(_varOrder), valOrder(_valOrder) {}
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     UnsignedSysInt vSize = varOrder.size();
     UnsignedSysInt pos = 0;
     while(pos < vSize && varOrder[pos].isAssigned())
       ++pos;
 
     if(pos == vSize)
-      return make_pair(-1, 0);
+      return BranchChoice{};
 
     DomainInt val = chooseVal(varOrder[pos], valOrder[pos]);
 
-    return make_pair(pos, val);
+    return BranchChoice{varOrder[pos], val, false};
   }
 };
 
@@ -232,7 +246,7 @@ struct WdegBranch : public VariableOrder {
   WdegBranch(const vector<AnyVarRef>& _varOrder, const vector<ValOrder>& _valOrder)
       : VariableOrder(_varOrder), valOrder(_valOrder) {}
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     SysInt best = varOrder.size(); // the variable with the best score so far (init to none)
     SysInt best_score = -1;        //... and its score (all true scores are positive)
     size_t varOrderSize = varOrder.size();
@@ -285,10 +299,10 @@ struct WdegBranch : public VariableOrder {
 
     // new bit. pn
     if(best == varOrder.size())
-      return make_pair(-1, 0);
+      return BranchChoice{};
 
     DomainInt val = chooseVal(varOrder[best], valOrder[best]);
-    return make_pair(best, val);
+    return BranchChoice{varOrder[best], val, false};
   }
 };
 
@@ -298,7 +312,7 @@ struct DomOverWdegBranch : VariableOrder {
   DomOverWdegBranch(const vector<AnyVarRef>& _varOrder, const vector<ValOrder>& _valOrder)
       : VariableOrder(_varOrder), valOrder(_valOrder) {}
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     // cout << "using domoverwdeg" << endl;
     SysInt best = varOrder.size(); // the variable with the best score so far (init to none)
     float best_score = FLT_MAX;    //... and its score (all true scores are positive)
@@ -363,10 +377,10 @@ struct DomOverWdegBranch : VariableOrder {
 
     // new bit. pn
     if(best == varOrder.size())
-      return make_pair(-1, 0);
+      return BranchChoice{};
 
     DomainInt val = chooseVal(varOrder[best], valOrder[best]);
-    return make_pair(best, val);
+    return BranchChoice{varOrder[best], val, false};
   }
 };
 #endif
@@ -377,7 +391,7 @@ struct SRFBranch : VariableOrder {
   SRFBranch(const vector<AnyVarRef>& _varOrder, const vector<ValOrder>& _valOrder)
       : VariableOrder(_varOrder), valOrder(_valOrder) {}
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     SysInt length = varOrder.size();
     SysInt smallestDom = length;
 
@@ -399,10 +413,10 @@ struct SRFBranch : VariableOrder {
     }
 
     if(smallestDom == length)
-      return make_pair(-1, 0);
+      return BranchChoice{};
 
     DomainInt val = chooseVal(varOrder[smallestDom], valOrder[smallestDom]);
-    return make_pair(smallestDom, val);
+    return BranchChoice{varOrder[smallestDom], val, false};
   }
 };
 
@@ -412,14 +426,14 @@ struct LDFBranch : VariableOrder {
   LDFBranch(const vector<AnyVarRef>& _varOrder, const vector<ValOrder>& _valOrder)
       : VariableOrder(_varOrder), valOrder(_valOrder) {}
 
-  pair<SysInt, DomainInt> pickVarVal() {
+  BranchChoice pickVarVal() {
     SysInt length = varOrder.size();
 
     SysInt pos = 0;
     while(pos < length && varOrder[pos].isAssigned())
       ++pos;
     if(pos == length) {
-      return make_pair(-1, 0);
+      return BranchChoice{};
     }
 
     SysInt largestDom = pos;
@@ -438,7 +452,7 @@ struct LDFBranch : VariableOrder {
     }
 
     DomainInt val = chooseVal(varOrder[largestDom], valOrder[largestDom]);
-    return make_pair(largestDom, val);
+    return BranchChoice{varOrder[largestDom], val, false};
   }
 };
 
@@ -457,39 +471,34 @@ struct ConflictBranch : VariableOrder {
         valOrder(_valOrder),
         pos(),
         innervarorder(_innervarorder),
-        last_returnedVar(-1),
+        last_returnedValOrder(VALORDER_NONE),
         in_conflict(false) {
     pos = 0;
     pos2 = 0;
   }
 
   // pos maintains a 'depth' which is actually the number of calls to
-  // pickVarVals
-  // last_returnedVar contains the last var returned by pickvarval, or -1
-  // if we were at a solution.
-
-  // pos and pos2 are used to see if we have backtracked.
+  // pickVarVals. pos and pos2 are used to see if we have backtracked.
 
   SysInt pos2;
 
-  SysInt last_returnedVar;
+  // Last variable returned by pickVarVal, and the ValOrder entry it was
+  // paired with. last_returnedVar.data is empty before the first call.
+  AnyVarRef last_returnedVar;
+  ValOrder last_returnedValOrder;
   bool in_conflict;
 
-  pair<SysInt, DomainInt> pickVarVal() {
-    if(in_conflict && varOrder[last_returnedVar].isAssigned()) {
-      // If the conflict variable has been successfully assigned, come out
-      // of conflict mode.
+  BranchChoice pickVarVal() {
+    if(in_conflict && last_returnedVar.isAssigned()) {
+      // Conflict var successfully assigned — come out of conflict mode.
       in_conflict = false;
     }
 
     if(pos2 > pos) {
       pos2 = pos;
 
-      if(last_returnedVar != -1 && !varOrder[last_returnedVar].isAssigned()) {
-        // we backtracked since the last call.
-        // Assume the search procedure made a left branch which failed,
-        // then backtracked.
-        // Go into conflict mode.
+      if(last_returnedVar.data && !last_returnedVar.isAssigned()) {
+        // Backtracked since the last call. Go into conflict mode.
         in_conflict = true;
       }
     }
@@ -498,13 +507,29 @@ struct ConflictBranch : VariableOrder {
     pos2++;
 
     if(in_conflict) {
-
-      DomainInt val = chooseVal(varOrder[last_returnedVar], valOrder[last_returnedVar]);
-      return make_pair(last_returnedVar, val);
+      DomainInt val = chooseVal(last_returnedVar, last_returnedValOrder);
+      return BranchChoice{last_returnedVar, val, false};
     } else {
-      pair<SysInt, DomainInt> temp = innervarorder->pickVarVal();
-      last_returnedVar = temp.first;
-      D_ASSERT(temp.first == -1 || varOrder[temp.first].inDomain(temp.second));
+      BranchChoice temp = innervarorder->pickVarVal();
+      if(temp.var.data) {
+        // Remember the var and its ValOrder entry. varOrder/valOrder are
+        // parallel arrays, so scan by pointer identity to recover the
+        // ValOrder for the var the inner order picked.
+        bool found = false;
+        for(SysInt i = 0; i < (SysInt)varOrder.size(); ++i) {
+          if(varOrder[i].data.get() == temp.var.data.get()) {
+            last_returnedVar = temp.var;
+            last_returnedValOrder = valOrder[i];
+            found = true;
+            break;
+          }
+        }
+        D_ASSERT(found);
+        (void)found;
+        D_ASSERT(temp.var.inDomain(temp.val));
+      } else {
+        last_returnedVar = AnyVarRef{};
+      }
       return temp;
     }
   }

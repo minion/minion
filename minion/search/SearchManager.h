@@ -62,14 +62,15 @@ struct StandardSearchManager : public SearchManager {
   }
 
   // returns false if left branch not possible.
-  inline void branch_left(pair<SysInt, DomainInt> picked) {
-    D_ASSERT(picked.first != -1);
-    D_ASSERT(!varArray[picked.first].isAssigned());
+  inline void branch_left(const BranchChoice& picked) {
+    D_ASSERT(picked.var.data);
+    D_ASSERT(!picked.var.isAssigned());
 
     worldPush();
-    varArray[picked.first].assign(picked.second);
-    maybe_print_search_assignment(varArray[picked.first], picked.second, true);
-    branches.push_back(Controller::triple(true, picked.first, picked.second));
+    AnyVarRef var = picked.var;
+    var.assign(picked.val);
+    maybe_print_search_assignment(var, picked.val, true);
+    branches.push_back(Controller::triple(true, var, picked.val, picked.isAux));
   }
 
   inline bool branch_right() {
@@ -85,8 +86,9 @@ struct StandardSearchManager : public SearchManager {
 
     worldPop();
 
-    SysInt var = branches.back().var;
+    AnyVarRef var = branches.back().var;
     DomainInt val = branches.back().val;
+    bool isAux = branches.back().isAux;
     bool isLeft = branches.back().isLeft;
     (void)isLeft;
 
@@ -96,19 +98,19 @@ struct StandardSearchManager : public SearchManager {
     // remove the left branch.
     branches.pop_back();
 
-    D_ASSERT(varArray[var].inDomain(val));
+    D_ASSERT(var.inDomain(val));
 
     // special case the upper and lower bounds to make it work for bound
     // variables
-    if(varArray[var].min() == val) {
-      varArray[var].setMin(val + 1);
-    } else if(varArray[var].max() == val) {
-      varArray[var].setMax(val - 1);
+    if(var.min() == val) {
+      var.setMin(val + 1);
+    } else if(var.max() == val) {
+      var.setMax(val - 1);
     } else {
-      varArray[var].removeFromDomain(val);
+      var.removeFromDomain(val);
     }
-    maybe_print_search_assignment(varArray[var], val, false);
-    branches.push_back(Controller::triple(false, var, val));
+    maybe_print_search_assignment(var, val, false);
+    branches.push_back(Controller::triple(false, var, val, isAux));
 
     // If this branch was stolen, then we want to carry on
     // backtracking
@@ -119,8 +121,7 @@ struct StandardSearchManager : public SearchManager {
   }
 
   inline bool in_aux_vars() {
-    return varOrder->hasAuxVars() && !branches.empty() &&
-           branches.back().var >= varOrder->auxVarStart();
+    return !branches.empty() && branches.back().isAux;
   }
 
   inline void jump_out_aux_vars() {
@@ -154,9 +155,9 @@ struct StandardSearchManager : public SearchManager {
 
       check_func(varArray, branches);
 
-      pair<SysInt, DomainInt> varval = varOrder->pickVarVal();
+      BranchChoice varval = varOrder->pickVarVal();
 
-      if(varval.first == -1) {
+      if(!varval.var.data) {
         // We have found a solution!
         check_sol_is_correct();
         maybe_print_node(true);
