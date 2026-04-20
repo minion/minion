@@ -100,6 +100,9 @@ struct VariableOrder {
   virtual ~VariableOrder() {}
 };
 
+// Forward decl so MultiBranch::getAuxStaticBranch can return a typed pointer.
+struct StaticBranch;
+
 // Container for multiple variable orderings
 struct MultiBranch : public VariableOrder {
   vector<shared_ptr<VariableOrder>> vovector;
@@ -115,6 +118,11 @@ struct MultiBranch : public VariableOrder {
     D_ASSERT(hasAuxVars());
     return variableOffset.back();
   }
+
+  // Returns the aux sub-branch when it is a StaticBranch; nullptr otherwise.
+  // Used to append mid-search variable additions. makeSearchOrder_multiple
+  // arranges for this to always succeed when no user-supplied aux exists.
+  StaticBranch* getAuxStaticBranch();
 
   // need to patch up the returned variable index
   vector<DomainInt> variableOffset;
@@ -159,6 +167,10 @@ struct MultiBranch : public VariableOrder {
 struct StaticBranch : public VariableOrder {
   vector<ValOrder> valOrder;
   Reversible<SysInt> pos;
+
+  // For midsearch aux blocks created by makeSearchOrder_multiple, valOrder
+  // may start empty; callers append matched pairs via push_back on both
+  // varOrder (base class) and valOrder (here).
 
   StaticBranch(const vector<AnyVarRef>& _varOrder, const vector<ValOrder>& _valOrder)
       : VariableOrder(_varOrder), valOrder(_valOrder), pos() {
@@ -534,5 +546,11 @@ struct ConflictBranch : VariableOrder {
     }
   }
 };
+
+inline StaticBranch* MultiBranch::getAuxStaticBranch() {
+  if(!hasAux || vovector.empty())
+    return nullptr;
+  return dynamic_cast<StaticBranch*>(vovector.back().get());
+}
 
 #endif

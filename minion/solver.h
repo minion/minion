@@ -20,6 +20,10 @@
 class AbstractConstraint;
 class AnyVarRef;
 
+namespace Controller {
+struct SearchManager;
+} // namespace Controller
+
 namespace ProbSpec {
 struct CSPInstance;
 }
@@ -56,6 +60,12 @@ class SearchState {
 
   GenericBacktracker generic_backtracker;
 
+  // Raw pointer into the live SearchManager owned by the top-level driver
+  // (BuildCSP.cpp). Used by minion_newVarMidsearch to route new vars into
+  // the live search's aux block. Valid only between setSearchManager and
+  // the end of sm->search(); nullptr otherwise.
+  Controller::SearchManager* currentSearchManager = nullptr;
+
 public:
   std::string storedSolution;
 
@@ -77,6 +87,14 @@ public:
 
   vector<set<AbstractConstraint*>>& getConstraintsToPropagate() {
     return constraintsToPropagate;
+  }
+
+  Controller::SearchManager* getSearchManager() {
+    return currentSearchManager;
+  }
+
+  void setSearchManager(Controller::SearchManager* sm) {
+    currentSearchManager = sm;
   }
 
   long long getNodeCount() {

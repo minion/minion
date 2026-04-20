@@ -11,6 +11,7 @@
 #include "inputfile_parse/CSPSpec.h"
 #include "minion.h"
 #include "parallel/parallel.h"
+#include "search/SearchManager.h"
 #include "solver.h"
 #include "system/minlib/exceptions.hpp"
 #include "tuple_container.h"
@@ -411,24 +412,47 @@ MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
 
     // 2. Also register in the live runtime container so mid-search
     //    constraints can reference this variable without segfaulting.
+    // 3. Append the new variable into the live search's aux block so it
+    //    actually gets branched on. Without this the solver would report
+    //    solutions with the new var unassigned.
     Bounds bounds(bound1, bound2);
+    AnyVarRef ref;
     switch(type) {
-    case VAR_BOUND:
+    case VAR_BOUND: {
+      UnsignedSysInt idx = getVars().boundVarContainer.varCount();
       getVars().boundVarContainer.addVariables(bounds, 1);
+      ref = AnyVarRef(getVars().boundVarContainer.getVarNum(idx));
       break;
-    case VAR_DISCRETE:
+    }
+    case VAR_DISCRETE: {
+      UnsignedSysInt idx = getVars().bigRangeVarContainer.varCount();
       getVars().bigRangeVarContainer.addVariables({{bound1, bound2}});
+      ref = AnyVarRef(getVars().bigRangeVarContainer.getVarNum(idx));
       break;
-    case VAR_SPARSEBOUND:
+    }
+    case VAR_SPARSEBOUND: {
+      UnsignedSysInt idx = getVars().sparseBoundVarContainer.varCount();
       getVars().sparseBoundVarContainer.addVariables({bound1, bound2}, 1);
+      ref = AnyVarRef(getVars().sparseBoundVarContainer.getVarNum(idx));
       break;
-    case VAR_BOOL:
+    }
+    case VAR_BOOL: {
+      UnsignedSysInt idx = getVars().boolVarContainer.varCount();
       getVars().boolVarContainer.addVariables(1);
+      ref = AnyVarRef(getVars().boolVarContainer.getVarNum(idx));
       break;
+    }
     default:
       set_error("minion_newVarMidsearch: unsupported variable type");
       return MinionResult::MINION_INVALID_ARGUMENT;
     }
+
+    Controller::SearchManager* sm = getState().getSearchManager();
+    if(sm == nullptr) {
+      set_error("minion_newVarMidsearch: no live SearchManager (not in search?)");
+      return MinionResult::MINION_INVALID_INSTANCE;
+    }
+    sm->appendAuxVar(ref, ValOrder(VALORDER_ASCEND));
 
     return MinionResult::MINION_OK;
   } catch(const parse_exception& e) {

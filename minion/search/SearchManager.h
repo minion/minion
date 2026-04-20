@@ -27,6 +27,16 @@ struct SearchManager {
   inline virtual ~SearchManager() {}
 
   virtual void search() = 0;
+
+  // Append a freshly-created variable into the live search's aux block.
+  // Implementations route to the aux StaticBranch and keep any cached
+  // var-list in sync. Default aborts — it's a bug to call this on a
+  // manager type that doesn't support mid-search additions.
+  virtual void appendAuxVar(AnyVarRef v, ValOrder vo) {
+    (void)v;
+    (void)vo;
+    INTERNAL_ERROR("appendAuxVar not implemented on this SearchManager");
+  }
 };
 
 struct StandardSearchManager : public SearchManager {
@@ -59,6 +69,19 @@ struct StandardSearchManager : public SearchManager {
 
   void reset() {
     branches.clear();
+  }
+
+  virtual void appendAuxVar(AnyVarRef v, ValOrder vo) {
+    MultiBranch* mb = dynamic_cast<MultiBranch*>(varOrder.get());
+    CHECK(mb != nullptr, "appendAuxVar: live VariableOrder is not a MultiBranch");
+    StaticBranch* aux = mb->getAuxStaticBranch();
+    CHECK(aux != nullptr, "appendAuxVar: no aux StaticBranch available");
+    aux->varOrder.push_back(v);
+    aux->valOrder.push_back(vo);
+    // Keep the propagator-pass/var-check list consistent with the live
+    // search order. Indices into varArray are no longer load-bearing
+    // (pickVarVal returns AnyVarRef directly), so appending is safe.
+    varArray.push_back(v);
   }
 
   // returns false if left branch not possible.

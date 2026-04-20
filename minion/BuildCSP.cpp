@@ -128,11 +128,13 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
     sm = Controller::makeSearch_manager(args.propMethod, instance.searchOrder);
   }
 
+  getState().setSearchManager(sm.get());
   try {
     if(!getState().isFailed()) {
       sm->search();
     }
   } catch(EndOfSearch) {}
+  getState().setSearchManager(nullptr);
 
   if(getOptions().printonlyoptimal) {
     cout << getState().storedSolution;

@@ -48,29 +48,31 @@ shared_ptr<VariableOrder> makeSearchOrder(SearchOrder order) {
 }
 
 shared_ptr<VariableOrder> makeSearchOrder_multiple(const vector<SearchOrder>& order) {
-  shared_ptr<VariableOrder> vo;
+  vector<shared_ptr<VariableOrder>> vovector;
   bool hasAux = false;
-
-  if(order.size() == 1) {
-    return makeSearchOrder(order[0]);
-  } else {
-    vector<shared_ptr<VariableOrder>> vovector;
-    for(SysInt i = 0; i < (SysInt)order.size(); i++) {
-      vovector.push_back(makeSearchOrder(order[i]));
-      if(order[i].findOneAssignment)
-        hasAux = true;
-      if(order[i].findOneAssignment && i != (SysInt)order.size() - 1) {
-        cout << "Only one VARORDER AUX is allowed, and it must be the final "
-                "VARORDER command."
-             << endl;
-        abort();
-      }
+  for(SysInt i = 0; i < (SysInt)order.size(); i++) {
+    vovector.push_back(makeSearchOrder(order[i]));
+    if(order[i].findOneAssignment)
+      hasAux = true;
+    if(order[i].findOneAssignment && i != (SysInt)order.size() - 1) {
+      cout << "Only one VARORDER AUX is allowed, and it must be the final "
+              "VARORDER command."
+           << endl;
+      abort();
     }
-
-    vo = shared_ptr<VariableOrder>(new MultiBranch(vovector, hasAux));
   }
 
-  return vo;
+  // Always keep a trailing aux StaticBranch so mid-search variable additions
+  // have somewhere to land. If the user already supplied a StaticBranch aux
+  // we append to it; otherwise synthesise an empty one.
+  bool synthesise_aux = !(hasAux && dynamic_cast<StaticBranch*>(vovector.back().get()));
+  if(synthesise_aux) {
+    vovector.push_back(shared_ptr<VariableOrder>(
+        new StaticBranch(vector<AnyVarRef>{}, vector<ValOrder>{})));
+    hasAux = true;
+  }
+
+  return shared_ptr<VariableOrder>(new MultiBranch(vovector, hasAux));
 }
 
 shared_ptr<Propagate> make_propagator(PropagationLevel propMethod) {
