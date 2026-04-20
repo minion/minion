@@ -14,6 +14,7 @@
 #include "search/SearchManager.h"
 #include "solver.h"
 #include "system/minlib/exceptions.hpp"
+#include "triggering/trigger_list.h"
 #include "tuple_container.h"
 #include <iomanip>
 #include <memory>
@@ -73,6 +74,10 @@ struct ContextGuard {
 
 static void resetContextState(MinionContext* ctx)
 {
+  // Clear the process/thread-local null-trigger list so no stale trigger refs
+  // from a previous run survive into the next one.
+  clearNullTriggerList();
+
   // Delete sub-objects to reset state for a fresh run, but keep the context alive
   delete ctx->bools_m;     ctx->bools_m = NULL;
   delete ctx->state_m;     ctx->state_m = NULL;
