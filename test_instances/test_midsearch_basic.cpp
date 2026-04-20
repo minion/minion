@@ -456,6 +456,114 @@ static bool test_midsearch_add_watched_or_two_eq() {
                            tc.solutions_seen, expected);
 }
 
+// reifyimply(eq(x, 0), z): z=1 → x=0; z=0 → no constraint. With z aux
+// and valorder-ascending, z is picked 0 first, so eq(x, 0) is never
+// activated. Exercises reifyimply's idle path — fullPropagate_called
+// should stay false, watches on r and the inner constraint's vars.
+static bool test_midsearch_add_reifyimply_idle() {
+    TestCtx tc;
+    newVar(tc.instance, "x", VAR_DISCRETE, {0, 2});
+    newVar(tc.instance, "y", VAR_DISCRETE, {0, 2});
+    add_search_order(tc.instance, {tc.instance.vars.getSymbol("x"),
+                                   tc.instance.vars.getSymbol("y")});
+    tc.tracked_vars = {"x", "y", "z"};
+
+    tc.on_callback = [](MinionContext* ctx, TestCtx& tcc) {
+        if(tcc.callback_count == 1) {
+            if(minion_newVarMidsearch(ctx, tcc.instance, (char*)"z",
+                                      VAR_BOOL, 0, 1) != MINION_OK)
+                return false;
+            Var x = tcc.instance.vars.getSymbol("x");
+            Var z = tcc.instance.vars.getSymbol("z");
+
+            // eq(x, 0)
+            ConstraintBlob eq_x(lib_getConstraint(CT_EQ));
+            Var c0 = constantAsVar(0);
+            eq_x.vars.push_back({x});
+            eq_x.vars.push_back({c0});
+
+            // reifyimply(eq_x, z)
+            ConstraintBlob rimp(lib_getConstraint(CT_REIFYIMPLY));
+            rimp.internal_constraints.push_back(eq_x);
+            rimp.vars.push_back({z});
+
+            if(minion_addConstraintMidsearch(ctx, tcc.instance, rimp) != MINION_OK)
+                return false;
+        }
+        return true;
+    };
+
+    if(run(tc) != MINION_OK) return false;
+
+    std::vector<Snapshot> expected;
+    expected.push_back({{"x", 0}, {"y", 0}, {"z", MISSING}});
+    for(int xv = 0; xv <= 2; ++xv)
+        for(int yv = 0; yv <= 2; ++yv) {
+            if(xv == 0 && yv == 0) continue;
+            // z aux picks 0; eq(x, 0) not required.
+            expected.push_back({{"x", xv}, {"y", yv}, {"z", 0}});
+        }
+
+    return check_solutions("midsearch_add_reifyimply_idle",
+                           tc.solutions_seen, expected);
+}
+
+// reifyimply(eq(x, 0), z) plus w-literal(z, 1) forcing z=1. Active path:
+// the w-literal pins z=1, reifyimply then has to enforce eq(x, 0), so
+// x=0 in all post-add solutions.
+static bool test_midsearch_add_reifyimply_forced() {
+    TestCtx tc;
+    newVar(tc.instance, "x", VAR_DISCRETE, {0, 2});
+    newVar(tc.instance, "y", VAR_DISCRETE, {0, 2});
+    add_search_order(tc.instance, {tc.instance.vars.getSymbol("x"),
+                                   tc.instance.vars.getSymbol("y")});
+    tc.tracked_vars = {"x", "y", "z"};
+
+    tc.on_callback = [](MinionContext* ctx, TestCtx& tcc) {
+        if(tcc.callback_count == 1) {
+            if(minion_newVarMidsearch(ctx, tcc.instance, (char*)"z",
+                                      VAR_BOOL, 0, 1) != MINION_OK)
+                return false;
+            Var x = tcc.instance.vars.getSymbol("x");
+            Var z = tcc.instance.vars.getSymbol("z");
+
+            // w-literal(z, 1)
+            ConstraintBlob wlit(lib_getConstraint(CT_WATCHED_LIT));
+            wlit.vars.push_back({z});
+            wlit.constants.push_back({1});
+            if(minion_addConstraintMidsearch(ctx, tcc.instance, wlit) != MINION_OK)
+                return false;
+
+            // eq(x, 0)
+            ConstraintBlob eq_x(lib_getConstraint(CT_EQ));
+            Var c0 = constantAsVar(0);
+            eq_x.vars.push_back({x});
+            eq_x.vars.push_back({c0});
+
+            // reifyimply(eq_x, z)
+            ConstraintBlob rimp(lib_getConstraint(CT_REIFYIMPLY));
+            rimp.internal_constraints.push_back(eq_x);
+            rimp.vars.push_back({z});
+            if(minion_addConstraintMidsearch(ctx, tcc.instance, rimp) != MINION_OK)
+                return false;
+        }
+        return true;
+    };
+
+    if(run(tc) != MINION_OK) return false;
+
+    std::vector<Snapshot> expected;
+    expected.push_back({{"x", 0}, {"y", 0}, {"z", MISSING}});
+    // z=1 forced; eq(x, 0) forced; only x=0 survives.
+    for(int yv = 0; yv <= 2; ++yv) {
+        if(yv == 0) continue; // (0,0) is the pre-add solution
+        expected.push_back({{"x", 0}, {"y", yv}, {"z", 1}});
+    }
+
+    return check_solutions("midsearch_add_reifyimply_forced",
+                           tc.solutions_seen, expected);
+}
+
 struct Test {
     const char* name;
     bool (*run)();
@@ -472,6 +580,8 @@ static std::vector<Test> tests = {
     {"midsearch_add_var_eq_existing", test_midsearch_add_var_eq_existing, false},
     {"midsearch_add_watched_or_two_wlit", test_midsearch_add_watched_or_two_wlit, false},
     {"midsearch_add_watched_or_two_eq", test_midsearch_add_watched_or_two_eq, false},
+    {"midsearch_add_reifyimply_idle", test_midsearch_add_reifyimply_idle, false},
+    {"midsearch_add_reifyimply_forced", test_midsearch_add_reifyimply_forced, false},
 };
 
 int main() {
