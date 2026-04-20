@@ -172,12 +172,28 @@ public:
       currentOffset += stored_blocks[i].size;
     }
 
-    for(SysInt i = 0; i < (SysInt)extendable_blocks.size(); ++i) {
-      memcpy(extendable_blocks[i].base, storePtr.data + currentOffset, extendable_blocks[i].size);
-      currentOffset += extendable_blocks[i].size;
+    // Extendable blocks follow an "add-and-stay" model: they never shrink
+    // across a push/pop, but they can grow (new blocks, or existing blocks
+    // extended). Snapshot bytes are bounded by the sizes captured at push
+    // time; any current bytes beyond that are "new" and get zeroed. Per-var
+    // reinitialisation (e.g. restoring initial bounds) happens above this
+    // layer via varsToReinitialise.
+    size_t snap_count = storePtr.extendable_blocksSize.size();
+    D_ASSERT(extendable_blocks.size() >= snap_count);
+    for(size_t i = 0; i < snap_count; ++i) {
+      size_t snap_size = storePtr.extendable_blocksSize[i];
+      D_ASSERT(snap_size <= extendable_blocks[i].size);
+      memcpy(extendable_blocks[i].base, storePtr.data + currentOffset, snap_size);
+      if(extendable_blocks[i].size > snap_size) {
+        memset(extendable_blocks[i].base + snap_size, 0, extendable_blocks[i].size - snap_size);
+      }
+      currentOffset += snap_size;
+    }
+    for(size_t i = snap_count; i < extendable_blocks.size(); ++i) {
+      memset(extendable_blocks[i].base, 0, extendable_blocks[i].size);
     }
 
-    D_ASSERT(getDataSize() == currentOffset);
+    D_ASSERT(storePtr.total_bytes() == currentOffset);
   }
 
   /// Returns the size of the allocated memory in bytes.
@@ -245,19 +261,11 @@ public:
 
     D_ASSERT(total_stored_bytes == bd.total_stored_bytes);
 
-    // If you trigger this, ask Chris and we can generalise!
-    D_ASSERT(extendable_blocks.size() == bd.extendable_blocksSize.size());
-    for(int i = 0; i < extendable_blocks.size(); ++i) {
-      if(bd.extendable_blocksSize[i] != extendable_blocks[i].size) {
-        D_ASSERT(bd.extendable_blocksSize[i] < extendable_blocks[i].size);
-        size_t diff = extendable_blocks[i].size - bd.extendable_blocksSize[i];
-        extendable_blocks[i].size = bd.extendable_blocksSize[i];
-        memset(extendable_blocks[i].base + extendable_blocks[i].size, 0, diff);
-        allocated_extendable_bytes -= diff;
-      }
-    }
-
-    D_ASSERT(allocated_extendable_bytes == bd.allocated_extendable_bytes);
+    // Extendable blocks are add-and-stay: blocks and bytes allocated since
+    // the push remain after the pop. retrieveFromPtr restores the snapshot
+    // prefix of each block and zeroes bytes beyond.
+    D_ASSERT(extendable_blocks.size() >= bd.extendable_blocksSize.size());
+    D_ASSERT(allocated_extendable_bytes >= bd.allocated_extendable_bytes);
 
     this->retrieveFromPtr(bd);
     block_cache.do_free(bd.data);

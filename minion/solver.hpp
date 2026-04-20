@@ -28,6 +28,14 @@ inline void worldPop() {
   getMemory().monotonicSet().undo();
   getQueue().getTbq().worldPop();
 
+  // After the memory pop, any var container whose backtrackable numVarsActive
+  // has now reverted below its live varCount_m needs its newly-orphaned slots
+  // restored to initial bounds. Must happen before re-propagating constraints.
+  getVars().boundVarContainer.reinitIfNeeded();
+  getVars().boolVarContainer.reinitIfNeeded();
+  getVars().bigRangeVarContainer.reinitIfNeeded();
+  getVars().sparseBoundVarContainer.reinitIfNeeded();
+
   vector<set<AbstractConstraint*>>& constraintList = getState().getConstraintsToPropagate();
   SysInt propagateDepth = getWorldDepth() + 1;
   if((SysInt)constraintList.size() > propagateDepth) {

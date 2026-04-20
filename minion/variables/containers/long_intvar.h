@@ -6,6 +6,7 @@
 
 
 #include "../../triggering/constraint_abstract.h"
+#include "../../memory_management/reversible_vals.h"
 
 template <typename d_type>
 struct BigRangeVarContainer;
@@ -67,6 +68,8 @@ struct BigRangeVarContainer {
 #endif
 
   UnsignedSysInt varCount_m;
+  // See BoundVarContainer::numVarsActive.
+  Reversible<UnsignedSysInt> numVarsActive;
 
 #define BOUND_DATA_SIZE 3
 
@@ -174,6 +177,25 @@ struct BigRangeVarContainer {
     vector<pair<DomainInt, DomainInt>> newBounds(
         initialBounds.begin() + old_varCount, initialBounds.end());
     triggerList.addVariables(newBounds);
+    numVarsActive = varCount_m;
+  }
+
+  // See BoundVarContainer::reinitIfNeeded. The bms_array (MonotonicSet) is
+  // trail-based and reverts removals naturally on worldPop, so we only need
+  // to restore bound_data's [lower, upper, domSize] triples.
+  void reinitIfNeeded() {
+    UnsignedSysInt active = numVarsActive;
+    if(active == varCount_m)
+      return;
+    D_ASSERT(active < varCount_m);
+    domainBound_type* bound_ptr = (domainBound_type*)(bound_data());
+    for(UnsignedSysInt i = active; i < varCount_m; ++i) {
+      bound_ptr[BOUND_DATA_SIZE * i] = initialBounds[i].first;
+      bound_ptr[BOUND_DATA_SIZE * i + 1] = initialBounds[i].second;
+      bound_ptr[BOUND_DATA_SIZE * i + 2] =
+          initialBounds[i].second - initialBounds[i].first + 1;
+    }
+    numVarsActive = varCount_m;
   }
 
   BOOL isAssigned(BigRangeVarRef_internal d) const {

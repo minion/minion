@@ -18,6 +18,7 @@ also appear. A boolean variable x's negation is identified by !x.
 #include "../../memory_management/MemoryBlock.h"
 
 #include "../../triggering/constraint_abstract.h"
+#include "../../memory_management/reversible_vals.h"
 
 /// Standard data type used for storing compressed booleans
 typedef unsigned long data_type;
@@ -168,6 +169,8 @@ struct BoolVarContainer {
 #endif
   UnsignedSysInt varCount_m;
   TriggerList triggerList;
+  // See BoundVarContainer::numVarsActive.
+  Reversible<UnsignedSysInt> numVarsActive;
 
   data_type* valuePtr() {
     return static_cast<data_type*>(values_mem);
@@ -208,6 +211,18 @@ struct BoolVarContainer {
     std::vector<std::pair<DomainInt, DomainInt>> doms(new_bools,
                                                       make_pair(DomainInt(0), DomainInt(1)));
     triggerList.addVariables(doms);
+    numVarsActive = varCount_m;
+  }
+
+  // Bool vars have no per-slot data to rewrite: the "assigned" bit in
+  // assignOffset is already zeroed on backtrack (either via snapshot restore
+  // for bytes that existed at push time, or via the memory layer zeroing new
+  // tail bytes). We just need to bump numVarsActive so it's in sync again.
+  void reinitIfNeeded() {
+    if(numVarsActive == varCount_m)
+      return;
+    D_ASSERT((UnsignedSysInt)numVarsActive < varCount_m);
+    numVarsActive = varCount_m;
   }
 
   /// Returns a reference to the ith Boolean variable which was previously

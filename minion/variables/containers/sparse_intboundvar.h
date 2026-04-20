@@ -21,6 +21,7 @@ eq(myvar, 3) #myvar equals 3
 */
 
 #include "../../triggering/constraint_abstract.h"
+#include "../../memory_management/reversible_vals.h"
 
 template <typename T>
 struct SparseBoundVarContainer;
@@ -68,6 +69,8 @@ struct SparseBoundVarContainer {
   vector<UnsignedSysInt> wdegs;
 #endif
   UnsignedSysInt varCount_m;
+  // See BoundVarContainer::numVarsActive.
+  Reversible<UnsignedSysInt> numVarsActive;
 
   SparseBoundVarContainer() : triggerList(true), varCount_m(0) {}
 
@@ -176,6 +179,21 @@ struct SparseBoundVarContainer {
     std::vector<std::pair<DomainInt, DomainInt>> trigBounds(
         count, make_pair(bounds.front(), bounds.back()));
     triggerList.addVariables(trigBounds);
+    numVarsActive = varCount_m;
+  }
+
+  // See BoundVarContainer::reinitIfNeeded.
+  void reinitIfNeeded() {
+    UnsignedSysInt active = numVarsActive;
+    if(active == varCount_m)
+      return;
+    D_ASSERT(active < varCount_m);
+    BoundType* bound_ptr = (BoundType*)(bound_data());
+    for(UnsignedSysInt i = active; i < varCount_m; ++i) {
+      bound_ptr[2 * i] = getDomain_from_int(i).front();
+      bound_ptr[2 * i + 1] = getDomain_from_int(i).back();
+    }
+    numVarsActive = varCount_m;
   }
 
   BOOL isAssigned(SparseBoundVarRef_internal<BoundType> d) const {

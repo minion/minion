@@ -6,6 +6,7 @@
 
 
 #include "../../triggering/constraint_abstract.h"
+#include "../../memory_management/reversible_vals.h"
 
 template <typename BoundType>
 struct BoundVarContainer;
@@ -171,6 +172,11 @@ struct BoundVarContainer {
   vector<UnsignedSysInt> wdegs;
 #endif
   UnsignedSysInt varCount_m;
+  // Backtrackable count: tracks how many vars were "live" at the last push.
+  // When search backtracks past the point at which a mid-search var was added,
+  // this reverts below varCount_m, and reinitIfNeeded restores initial bounds
+  // for the slots in between.
+  Reversible<UnsignedSysInt> numVarsActive;
 
   const BoundType& lowerBound(const BoundVarRef_internal<BoundType>& i) const {
     return ((BoundType*)bound_data())[checked_cast<SysInt>(i.varNum * 2)];
@@ -352,6 +358,24 @@ struct BoundVarContainer {
       bound_ptr[2 * i] = initialBounds[i].first;
       bound_ptr[2 * i + 1] = initialBounds[i].second;
     }
+    numVarsActive = varCount_m;
+  }
+
+  // Called after a backtrack pop: if the search has backtracked past the
+  // depth at which some vars were added, numVarsActive will have reverted
+  // below varCount_m. Restore initial bounds for the affected slots and
+  // bring numVarsActive back up.
+  void reinitIfNeeded() {
+    UnsignedSysInt active = numVarsActive;
+    if(active == varCount_m)
+      return;
+    D_ASSERT(active < varCount_m);
+    BoundType* bound_ptr = (BoundType*)(bound_data());
+    for(UnsignedSysInt i = active; i < varCount_m; ++i) {
+      bound_ptr[2 * i] = initialBounds[i].first;
+      bound_ptr[2 * i + 1] = initialBounds[i].second;
+    }
+    numVarsActive = varCount_m;
   }
 
   vector<AbstractConstraint*>* getConstraints(const BoundVarRef_internal<BoundType>& b) {
