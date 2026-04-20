@@ -143,7 +143,6 @@ public:
   }
 
   bool addConstraintMidsearch(AbstractConstraint* c);
-  void redoFullPropagate(AbstractConstraint* c);
 
   long long int getSolutionCount() {
     return solutions;

@@ -82,13 +82,8 @@ inline bool SearchState::addConstraint(AbstractConstraint* c) {
 
 inline bool SearchState::addConstraintMidsearch(AbstractConstraint* c) {
   bool ret = addConstraint(c);
-  c->setup();
-  redoFullPropagate(c);
-
+  if(ret) {
+    constraintsToPropagate[Controller::getWorldDepth() - 1].insert(c);
+  }
   return ret;
-}
-
-inline void SearchState::redoFullPropagate(AbstractConstraint* c) {
-  constraintsToPropagate[Controller::getWorldDepth()-1].insert(c);
-  c->fullPropagate();
 }
