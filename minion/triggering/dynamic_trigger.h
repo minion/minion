@@ -104,6 +104,11 @@ public:
     elems[pos] = Trig_ConRef{};
     slack.push_back(pos);
   }
+
+  void clear() {
+    elems.clear();
+    slack.clear();
+  }
 };
 
 /// Container for a range of triggers

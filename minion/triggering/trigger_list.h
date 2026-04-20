@@ -12,6 +12,12 @@
 #include "memory_management/MemoryBlock.h"
 #include "memory_management/nonbacktrack_memory.h"
 
+#ifdef LIBMINION
+extern thread_local DynamicTriggerList globalNullTriggerList;
+#else
+extern DynamicTriggerList globalNullTriggerList;
+#endif
+
 struct TriggerObj {
   DomainInt min;
   DomainInt max;
@@ -146,13 +152,14 @@ public:
   }
 };
 
+inline DynamicTriggerList& getNullTriggerList() {
+  return globalNullTriggerList;
+}
+
 inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {
-#ifdef LIBMINION
-  static thread_local DynamicTriggerList dt;
-#else
-  static DynamicTriggerList dt;
-#endif
-  DynamicTriggerList* queue = &dt;
+  DynamicTriggerList& null_list = getNullTriggerList();
+
+  DynamicTriggerList* queue = &null_list;
 
   if(op == TO_Backtrack) {
     getQueue().getTbq().restoreTriggerOnBacktrack(t);
@@ -172,6 +179,10 @@ inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {
   default: abort();
 }*/
   queue->add(t);
+}
+
+inline void clearNullTriggerList() {
+  getNullTriggerList().clear();
 }
 
 #endif // TRIGGERLIST_H
