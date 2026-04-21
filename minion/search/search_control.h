@@ -62,11 +62,17 @@ shared_ptr<VariableOrder> makeSearchOrder_multiple(const vector<SearchOrder>& or
     }
   }
 
-  // Always keep a trailing aux StaticBranch so mid-search variable additions
-  // have somewhere to land. If the user already supplied a StaticBranch aux
-  // we append to it; otherwise synthesise an empty one.
-  bool synthesise_aux = !(hasAux && dynamic_cast<StaticBranch*>(vovector.back().get()));
-  if(synthesise_aux) {
+  // Ensure a trailing aux block exists so mid-search variable additions
+  // have somewhere to land. Only synthesise when the user supplied none
+  // — adding a second aux block breaks MultiBranch::pickVarVal's aux
+  // detection (which only flags the last block), causing picks from the
+  // user's aux block to be treated as non-aux and defeating
+  // jump_out_aux_vars. If the user's aux happens not to be a
+  // StaticBranch (e.g. SDFBranch after -varorder sdf), mid-search
+  // appends will fail loudly via SearchManager::appendAuxVar — that's
+  // fine; mixing command-line varorder overrides with mid-search
+  // additions is an unusual combination.
+  if(!hasAux) {
     vovector.push_back(shared_ptr<VariableOrder>(
         new StaticBranch(vector<AnyVarRef>{}, vector<ValOrder>{})));
     hasAux = true;
