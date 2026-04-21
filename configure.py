@@ -475,8 +475,13 @@ with open(outname, "w") as out:
             out.write('all: ' + execname + '\n')
 
     if arg.buildsystem == "make":
+        # Auto-generated header dependencies (-MD -MP writes one .d per .o).
+        # Previously this second line referenced an undefined MINOBJS, so
+        # none of the minion body .d files were loaded — edits to headers
+        # like solver.hpp or reify.h silently failed to trigger rebuilds.
         out.write("-include $(CONOBJS:.o=.d)\n")
-        out.write("-include $(MINOBJS:.o=.d)\n")
+        out.write("-include $(MINLIBOBJS:.o=.d)\n")
+        out.write("-include $(MINBINOBJS:.o=.d)\n")
     for i in constraintsrclist:
         if arg.buildsystem == "make":
             # out.write(objname(i) + ": " + i + "\n")
