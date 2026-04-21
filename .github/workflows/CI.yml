@@ -57,3 +57,19 @@ jobs:
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
               cargo run --release -- --minion ../bin-quick/minion
+
+      - name: "Library config"
+        run: |
+                mkdir bin-lib
+                cd bin-lib
+                python3 ../configure.py --library
+
+      - name: "Library build"
+        run: |
+                cd bin-lib
+                make -j2
+
+      - name: "Library tests"
+        run: |
+                cd bin-lib
+                make test

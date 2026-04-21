@@ -459,9 +459,18 @@ with open(outname, "w") as out:
         out.write(': bin/*.o |> ' + compiler + ' ' + varsub('FLAGS') + '%f -o %o |> minion\n')
         sys.exit(0)
 
+    # Library-backed tests. Each is a single .cpp in test_instances/ that
+    # links against libminion.a. Add new tests here.
+    library_tests = [
+        'test_multithread',
+        'test_midsearch_basic',
+        'test_reify_midsearch',
+    ]
+
     if arg.buildsystem == "make":
         if arg.library:
-            out.write('all: ' + execname + ' libminion.a test_multithread\n')
+            out.write('all: ' + execname + ' libminion.a ' +
+                      ' '.join(library_tests) + '\n')
         else:
             out.write('all: ' + execname + '\n')
 
@@ -494,13 +503,17 @@ with open(outname, "w") as out:
         out.write('\t' + 'ar rcs libminion.a' +
                 varsub('MINLIBOBJS') + varsub('CONOBJS') + '\n')
 
-        # test_multithread target: compile and link against libminion.a
+        # Build + link each library-backed test against libminion.a, then
+        # chain all of them into the 'test' target so `make test` runs
+        # every mid-search / FFI test in sequence.
         if arg.buildsystem == "make":
-            testsrc = scriptdir + '/test_instances/test_multithread.cpp'
-            out.write('test_multithread: libminion.a ' + testsrc + '\n')
-            out.write('\t' + compiler + ' ' + varsub('FLAGS') +
-                      ' ' + testsrc + ' -L. -lminion ' + thread +
-                      ' -o test_multithread\n')
-            out.write('test: test_multithread\n')
-            out.write('\t./test_multithread\n')
+            for testname in library_tests:
+                testsrc = scriptdir + '/test_instances/' + testname + '.cpp'
+                out.write(testname + ': libminion.a ' + testsrc + '\n')
+                out.write('\t' + compiler + ' ' + varsub('FLAGS') +
+                          ' ' + testsrc + ' -L. -lminion ' + thread +
+                          ' -o ' + testname + '\n')
+            out.write('test: ' + ' '.join(library_tests) + '\n')
+            for testname in library_tests:
+                out.write('\t./' + testname + '\n')
             out.write('.PHONY: test\n')
