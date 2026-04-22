@@ -1,0 +1,7 @@
+debug/
+target/
+# vendor/ holds a packaged copy of Minion for release tarballs.
+# During development minion-sys reads Minion from ../, so vendor/
+# is never populated in the minion-private working tree.
+vendor/
+*.log

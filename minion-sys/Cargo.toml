@@ -1,0 +1,21 @@
+[package]
+name = "minion-sys"
+version = "0.0.1"
+edition = "2024"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.102"
+libc = "0.2.182"
+thiserror = "2.0.18"
+
+[build-dependencies]
+bindgen = "0.72.1"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic_in_result_fn = "warn"
+panic = "warn"
+todo = "warn"
