@@ -17,7 +17,10 @@ mod constraint_def;
 mod counter;
 mod minion_instance;
 mod run_minion;
+mod run_minion_lib;
 mod test_types;
+
+use test_types::Backend;
 
 #[derive(clap::Parser, Debug)]
 struct Opt {
@@ -33,7 +36,7 @@ struct Opt {
     #[arg(short, long, default_value_t = 1000)]
     optioncount: u64,
 
-    #[arg(short, long)]
+    #[arg(short, long, default_value = "")]
     minion: String,
 
     #[arg(short = 't', long, default_value_t = 10000)]
@@ -41,6 +44,16 @@ struct Opt {
 
     #[arg(short = 'n', long, default_value_t = 8)]
     numthreads: usize,
+
+    /// Run minion via libminion (minion-sys) in-process instead of spawning
+    /// the `minion` binary. Each test gets its own MinionContext; the rayon
+    /// threadpool drives many independent solves in parallel, which exercises
+    /// libminion's thread isolation between contexts.
+    ///
+    /// Incompatible with --valgrind and skips the parallel/option test
+    /// sweeps (those are exec-mode features).
+    #[arg(long)]
+    in_process: bool,
 }
 
 fn main() -> Result<()> {
@@ -66,6 +79,13 @@ fn main() -> Result<()> {
         }
     }
 
+    if opt.in_process && opt.valgrind {
+        anyhow::bail!("--in-process cannot be combined with --valgrind");
+    }
+    if !opt.in_process && opt.minion.is_empty() {
+        anyhow::bail!("--minion <path> is required in exec mode (or pass --in-process)");
+    }
+
     let config = if opt.valgrind {
         test_types::MinionConfig {
             minionargs: vec![
@@ -75,12 +95,18 @@ fn main() -> Result<()> {
             ],
             minionexec: "valgrind",
             maxtuples: opt.maxtuples,
+            backend: Backend::Exec,
         }
     } else {
         test_types::MinionConfig {
             minionargs: vec![],
             minionexec: &opt.minion,
             maxtuples: opt.maxtuples,
+            backend: if opt.in_process {
+                Backend::InProcess
+            } else {
+                Backend::Exec
+            },
         }
     };
 
@@ -100,6 +126,11 @@ fn main() -> Result<()> {
     });
 
     ret?;
+
+    if config.backend == Backend::InProcess {
+        println!("In-process mode: skipping parallel and option test sweeps (exec-mode features).");
+        return Ok(());
+    }
 
     println!("Parallel tests\n");
     let ret2: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {

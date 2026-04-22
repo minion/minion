@@ -35,6 +35,10 @@ impl CleanupFiles {
             let _ = fs::remove_file(file);
         }
     }
+
+    pub fn empty() -> Self {
+        CleanupFiles { files: vec![] }
+    }
 }
 
 // We only have to put here what we care about

@@ -257,6 +257,13 @@ impl ConstraintInstance {
         Arc::new(varlist)
     }
 
+    /// Variables belonging directly to this constraint, one entry per argument slot.
+    /// For argument slots whose kind is `Constraint`, the slot is empty — the child
+    /// constraint is stored in `child_constraints` instead.
+    pub fn top_level_vars(&self) -> &Vec<Vec<Arc<MinionVariable>>> {
+        &self.varlist
+    }
+
     fn check_tuple(&self, tup: &[i64]) -> bool {
         let mut slices: ArrayVec<&[i64], 16> = ArrayVec::new();
         let mut place: usize = 0;
