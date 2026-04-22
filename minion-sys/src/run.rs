@@ -362,7 +362,7 @@ unsafe fn get_constraint_type(constraint: &Constraint) -> Result<u32, MinionErro
         Constraint::LexLeq(_, _) => Ok(ffi::ConstraintType_CT_LEXLEQ),
         Constraint::LexLess(_, _) => Ok(ffi::ConstraintType_CT_LEXLESS),
         Constraint::LexLeqQuick(_, _) => Ok(ffi::ConstraintType_CT_QUICK_LEXLEQ),
-        Constraint::LexLessQuick(_, _) => Ok(ffi::ConstraintType_CT_QUICK_LEXLEQ),
+        Constraint::LexLessQuick(_, _) => Ok(ffi::ConstraintType_CT_QUICK_LEXLESS),
         Constraint::WatchVecNeq(_, _) => Ok(ffi::ConstraintType_CT_WATCHED_VECNEQ),
         Constraint::WatchVecExistsLess(_, _) => Ok(ffi::ConstraintType_CT_WATCHED_VEC_OR_LESS),
         Constraint::Hamming(_, _, _) => Ok(ffi::ConstraintType_CT_WATCHED_HAMMING),
@@ -563,93 +563,105 @@ unsafe fn constraint_add_args(
             read_var(i, r_constr, c)?;
             Ok(())
         }
-        Constraint::LexLess(a, b) => {
+        Constraint::LexLess(a, b)
+        | Constraint::LexLeq(a, b)
+        | Constraint::LexLeqRv(a, b)
+        | Constraint::LexLeqQuick(a, b)
+        | Constraint::LexLessQuick(a, b)
+        | Constraint::WatchVecNeq(a, b)
+        | Constraint::WatchVecExistsLess(a, b) => {
             read_list(i, r_constr, a)?;
             read_list(i, r_constr, b)?;
             Ok(())
         }
-        Constraint::LexLeq(a, b) => {
+        Constraint::LitSumGeq(a, b, c) => {
             read_list(i, r_constr, a)?;
-            read_list(i, r_constr, b)?;
+            read_constant_list(r_constr, b)?;
+            read_constant(r_constr, c)?;
             Ok(())
         }
-        //Constraint::LitSumGeq(_, _, _) => todo!(),
-        //Constraint::Gcc(_, _, _) => todo!(),
-        //Constraint::GccWeak(_, _, _) => todo!(),
-        //Constraint::LexLeqRv(_, _) => todo!(),
-        //Constraint::LexLeqQuick(_, _) => todo!(),
-        //Constraint::LexLessQuick(_, _) => todo!(),
-        //Constraint::WatchVecNeq(_, _) => todo!(),
-        //Constraint::WatchVecExistsLess(_, _) => todo!(),
-        //Constraint::Hamming(_, _, _) => todo!(),
-        //Constraint::NotHamming(_, _, _) => todo!(),
-        //Constraint::FrameUpdate(_, _, _, _, _) => todo!(),
-        Constraint::NegativeTable(vars, tuple_list) | Constraint::Table(vars, tuple_list) => {
+        Constraint::Gcc(a, b, c) | Constraint::GccWeak(a, b, c) => {
+            read_list(i, r_constr, a)?;
+            read_constant_list(r_constr, b)?;
+            read_list(i, r_constr, c)?;
+            Ok(())
+        }
+        Constraint::Hamming(a, b, c) | Constraint::NotHamming(a, b, c) => {
+            read_list(i, r_constr, a)?;
+            read_list(i, r_constr, b)?;
+            read_constant(r_constr, c)?;
+            Ok(())
+        }
+        Constraint::FrameUpdate(a, b, c, d, e) => {
+            read_list(i, r_constr, a)?;
+            read_list(i, r_constr, b)?;
+            read_list(i, r_constr, c)?;
+            read_list(i, r_constr, d)?;
+            read_constant(r_constr, e)?;
+            Ok(())
+        }
+        Constraint::NegativeTable(vars, tuple_list)
+        | Constraint::Table(vars, tuple_list)
+        | Constraint::GacSchema(vars, tuple_list)
+        | Constraint::LightTable(vars, tuple_list)
+        | Constraint::Mddc(vars, tuple_list)
+        | Constraint::NegativeMddc(vars, tuple_list) => {
             read_list(i, r_constr, vars)?;
             read_tuple_list(r_constr, tuple_list)?;
             Ok(())
         }
-        //Constraint::GacSchema(_, _) => todo!(),
-        //Constraint::LightTable(_, _) => todo!(),
-        //Constraint::Mddc(_, _) => todo!(),
-        //Constraint::NegativeMddc(_, _) => todo!(),
-        //Constraint::Str2Plus(_, _) => todo!(),
-        //Constraint::Max(_, _) => todo!(),
-        //Constraint::Min(_, _) => todo!(),
-        //Constraint::NvalueGeq(_, _) => todo!(),
-        //Constraint::NvalueLeq(_, _) => todo!(),
-        //Constraint::Element(_, _, _) => todo!(),
-        //Constraint::ElementUndefZero(_, _, _) => todo!(),
-        //Constraint::WatchElement(_, _, _) => todo!(),
-        //Constraint::WatchElementOne(_, _, _) => todo!(),
-        Constraint::ElementOne(vec, j, e) => {
+        Constraint::Str2Plus(vars, table_var) => {
+            read_list(i, r_constr, vars)?;
+            read_var(i, r_constr, table_var)?;
+            Ok(())
+        }
+        Constraint::Max(a, b)
+        | Constraint::Min(a, b)
+        | Constraint::NvalueGeq(a, b)
+        | Constraint::NvalueLeq(a, b) => {
+            read_list(i, r_constr, a)?;
+            read_var(i, r_constr, b)?;
+            Ok(())
+        }
+        Constraint::Element(vec, j, e)
+        | Constraint::ElementOne(vec, j, e)
+        | Constraint::ElementUndefZero(vec, j, e)
+        | Constraint::WatchElement(vec, j, e)
+        | Constraint::WatchElementOne(vec, j, e)
+        | Constraint::WatchElementOneUndefZero(vec, j, e)
+        | Constraint::WatchElementUndefZero(vec, j, e) => {
             read_list(i, r_constr, vec)?;
             read_var(i, r_constr, j)?;
             read_var(i, r_constr, e)?;
             Ok(())
         }
-        //Constraint::WatchElementOneUndefZero(_, _, _) => todo!(),
-        //Constraint::WatchElementUndefZero(_, _, _) => todo!(),
-        Constraint::WLiteral(a, b) => {
+        Constraint::WLiteral(a, b) | Constraint::WNotLiteral(a, b) => {
             read_var(i, r_constr, a)?;
             read_constant(r_constr, b)?;
             Ok(())
         }
-        //Constraint::WNotLiteral(_, _) => todo!(),
-        Constraint::WInIntervalSet(var, consts) => {
+        Constraint::WInIntervalSet(var, consts)
+        | Constraint::WInRange(var, consts)
+        | Constraint::WNotInRange(var, consts)
+        | Constraint::WInset(var, consts)
+        | Constraint::WNotInset(var, consts) => {
             read_var(i, r_constr, var)?;
             read_constant_list(r_constr, consts)?;
             Ok(())
         }
-        //Constraint::WInRange(_, _) => todo!(),
-        Constraint::WInset(a, b) => {
-            read_var(i, r_constr, a)?;
-            read_constant_list(r_constr, b)?;
-            Ok(())
-        }
-        //Constraint::WNotInRange(_, _) => todo!(),
-        //Constraint::WNotInset(_, _) => todo!(),
-        Constraint::Abs(a, b) => {
+        Constraint::Abs(a, b)
+        | Constraint::DisEq(a, b)
+        | Constraint::MinusEq(a, b)
+        | Constraint::GacEq(a, b)
+        | Constraint::WatchLess(a, b)
+        | Constraint::WatchNeq(a, b) => {
             read_var(i, r_constr, a)?;
             read_var(i, r_constr, b)?;
             Ok(())
         }
-        Constraint::DisEq(a, b) => {
-            read_var(i, r_constr, a)?;
-            read_var(i, r_constr, b)?;
-            Ok(())
-        }
-        Constraint::MinusEq(a, b) => {
-            read_var(i, r_constr, a)?;
-            read_var(i, r_constr, b)?;
-            Ok(())
-        }
-        //Constraint::GacEq(_, _) => todo!(),
-        //Constraint::WatchLess(_, _) => todo!(),
-        // TODO: ensure that this is a bool?
-        Constraint::WatchNeq(a, b) => {
-            read_var(i, r_constr, a)?;
-            read_var(i, r_constr, b)?;
+        Constraint::AllDiffMatrix(vars, c) => {
+            read_list(i, r_constr, vars)?;
+            read_constant(r_constr, c)?;
             Ok(())
         }
 
