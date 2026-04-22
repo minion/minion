@@ -19,7 +19,7 @@ public:
   // The constructor must be called before the monotonicset is locked.
   ReversibleMonotonicSet(DomainInt Size)
       : MS(getMemory().monotonicSet())
-#ifndef NO_DEBUG
+#ifdef DOM_ASSERT
         ,
         size(Size)
 #endif
