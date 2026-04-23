@@ -1,0 +1,131 @@
+name: CI-long
+
+# Long-running soak test for the mid-search / in-process test modes.
+# Runs the same sweeps as CI.yml but with much higher trial counts to
+# push corner cases. Intended to run overnight / on a schedule; a
+# single job can take up to 24 hours.
+#
+# Triggered manually via workflow_dispatch, or weekly on a schedule.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Sunday at 02:00 UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  long:
+    name: long-run (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    # GitHub's default job timeout is 360 min. Extend it to 24 h so a
+    # single late-firing corner-case trial doesn't cut the whole run
+    # off early.
+    timeout-minutes: 1440
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      # Same configure + build as CI.yml — we want the long run to
+      # exercise exactly the binaries that ship, not something special.
+      - name: "Config"
+        run: |
+                mkdir bin-quick
+                cd bin-quick
+                python3 ../configure.py --quick
+
+      - name: "Build"
+        run: |
+                cd bin-quick
+                make -j2
+
+      - name: "Library config"
+        run: |
+                mkdir bin-lib
+                cd bin-lib
+                python3 ../configure.py --library
+
+      - name: "Library build"
+        run: |
+                cd bin-lib
+                make -j2
+
+      - name: "Library tests"
+        run: |
+                cd bin-lib
+                make test
+
+      # Exec-mode tester: much higher counts for broader coverage of the
+      # baseline/tableise/option sweep.
+      - name: "Exec tester: big sweep"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --minion ../bin-quick/minion --count 200 --optioncount 5000 --numthreads 4
+
+      # In-process tester: each mode gets many more trials. Counts
+      # chosen so a single mode finishes in ~1–2 hours on public
+      # runners, giving the whole matrix headroom inside the 24 h
+      # budget. --maxtuples is the same cap as CI — per-thread memory
+      # is dominated by minion's ~1.5 GB pre-reservation, not the
+      # solution cache, so raising trial counts is the right knob.
+      - name: "In-process tester: baseline sweep (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --count 50 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search add-vars, no constraint (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch --count 100 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search constraint injection N=1 (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --count 200 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search constraint injection N=2 (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --midsearch-constraints-num-packets 2 --count 100 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search constraint injection N=3 (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --midsearch-constraints-num-packets 3 --count 50 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search nested wrapping (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --midsearch-wrap-nested --count 100 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search nested wrapping N=2 (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --midsearch-wrap-nested --midsearch-constraints-num-packets 2 --count 50 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search add-vars + mixed constraint N=2 (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-add-vars --midsearch-constraints-num-packets 2 --count 5000 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search add-vars + mixed constraint N=3 (long)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-add-vars --midsearch-constraints-num-packets 3 --count 2000 --numthreads 4 --maxtuples 10000

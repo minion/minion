@@ -73,3 +73,45 @@ jobs:
         run: |
                 cd bin-lib
                 make test
+
+      # In-process tester exercises minion-sys (the Rust FFI library
+      # binding), the mid-search injection paths, and the constraint
+      # sweep. Counts are kept small so the whole suite fits in the CI
+      # time budget; --maxtuples bounds the per-run solution cap so
+      # per-thread memory stays under ~1.5 GB (the minion pre-reservation
+      # dominates), times --numthreads.
+      - name: "In-process tester: baseline sweep"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --count 3 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search add-vars (no constraint on new vars)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch --count 5 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search constraint injection (N=1)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --count 10 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search constraint injection (N=2)"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --midsearch-constraints-num-packets 2 --count 5 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search constraint injection wrapped in nested parent"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-constraints --midsearch-wrap-nested --count 5 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: mid-search add-vars + mixed-var constraint"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --in-process --midsearch-add-vars --midsearch-constraints-num-packets 2 --count 30 --numthreads 4 --maxtuples 10000
