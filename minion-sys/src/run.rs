@@ -98,13 +98,95 @@ use crate::{
 /// ```
 pub type Callback<'a> = Box<dyn FnMut(HashMap<VarName, Constant>) -> bool + 'a>;
 
+/// Richer callback that also receives a [`MidSearchContext`] handle so
+/// the caller can add variables or constraints from inside a solution
+/// callback. See [`run_minion_midsearch`].
+pub type MidSearchCallback<'a> =
+    Box<dyn FnMut(&mut MidSearchContext<'_>, HashMap<VarName, Constant>) -> bool + 'a>;
+
+/// Handle for mutating the current search from inside a solution callback.
+///
+/// Callers receive a `&mut MidSearchContext` for the duration of a single
+/// callback invocation and can use it to add fresh variables or new
+/// constraints via [`minion_newVarMidsearch`] and
+/// [`minion_addConstraintMidsearch`] underneath. Any variables added this
+/// way are tracked so subsequent callbacks' solution maps include them.
+///
+/// The handle is not `Send` or `Sync` — it is only valid for the current
+/// callback invocation on the current thread.
+pub struct MidSearchContext<'a> {
+    ctx: *mut ffi::MinionContext,
+    instance: *mut ffi::ProbSpec_CSPInstance,
+    midsearch_vars: &'a mut Vec<VarName>,
+    _not_send: std::marker::PhantomData<*mut ()>,
+}
+
+impl MidSearchContext<'_> {
+    /// Add a fresh variable to the running search.
+    ///
+    /// The variable is branched on as an aux variable at the end of the
+    /// search order, so subsequent solutions will enumerate its values.
+    /// It is tracked so its value appears in the solution map of every
+    /// later callback.
+    pub fn add_var(&mut self, name: &str, domain: VarDomain) -> Result<(), MinionError> {
+        let c_name = CString::new(name).map_err(|_| {
+            anyhow!("Variable name {:?} contains a null character.", name)
+        })?;
+        let (vartype_raw, lo, hi) = match domain {
+            VarDomain::Bool => (ffi::VariableType_VAR_BOOL, 0, 1),
+            VarDomain::Bound(a, b) => (ffi::VariableType_VAR_BOUND, a, b),
+            VarDomain::Discrete(a, b) => (ffi::VariableType_VAR_DISCRETE, a, b),
+            x => return Err(MinionError::NotImplemented(format!("{x:?}"))),
+        };
+        unsafe {
+            check_minion_result(ffi::minion_newVarMidsearch(
+                self.ctx,
+                self.instance,
+                c_name.as_ptr() as *mut c_char,
+                vartype_raw,
+                lo,
+                hi,
+            ))?;
+        }
+        self.midsearch_vars.push(name.to_owned());
+        Ok(())
+    }
+
+    /// Add a new constraint to the running search.
+    ///
+    /// The constraint is propagated immediately; an immediate
+    /// propagation wipeout is reported as a [`MinionError`].
+    pub fn add_constraint(&mut self, constraint: Constraint) -> Result<(), MinionError> {
+        unsafe {
+            let ct = get_constraint_type(&constraint)?;
+            let raw = Scoped::new(ffi::constraint_new(ct), |x| {
+                ffi::constraint_free(x as _)
+            });
+            constraint_add_args(self.instance, raw.ptr, &constraint)?;
+            check_minion_result(ffi::minion_addConstraintMidsearch(
+                self.ctx,
+                self.instance,
+                raw.ptr,
+            ))?;
+        }
+        Ok(())
+    }
+}
+
 /// State passed through the C callback's `void* userdata` pointer.
 ///
 /// This replaces the old thread-local approach — all callback state is now
 /// passed explicitly through the FFI userdata mechanism.
 struct CallbackState<'a> {
-    callback: Callback<'a>,
+    callback: MidSearchCallback<'a>,
+    instance: *mut ffi::ProbSpec_CSPInstance,
+    /// Variables that exist in the print matrix (set up before `runMinion`).
+    /// Read via `printMatrix_getValue` by index.
     print_vars: Vec<VarName>,
+    /// Variables added mid-search via [`MidSearchContext::add_var`]. These
+    /// are not in the print matrix, so we read them via
+    /// `minion_getVarValue` by name.
+    midsearch_vars: Vec<VarName>,
 }
 
 /// Opaque handle to a Minion solver context.
@@ -158,19 +240,31 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
     // and valid for the duration of the runMinion call.
     let state = unsafe { &mut *(userdata as *mut CallbackState<'_>) };
 
-    if state.print_vars.is_empty() {
-        return true;
-    }
-
     // Build solutions HashMap by reading variable values from Minion.
     let mut solutions: HashMap<VarName, Constant> = HashMap::new();
+
+    // Print-matrix variables: read by index — established before runMinion.
     for (i, var) in state.print_vars.iter().enumerate() {
-        let solution_int: i32 = unsafe { ffi::printMatrix_getValue(ctx, i as _) };
-        let solution: Constant = Constant::Integer(solution_int);
-        solutions.insert(var.to_string(), solution);
+        let v: i32 = unsafe { ffi::printMatrix_getValue(ctx, i as _) };
+        solutions.insert(var.clone(), Constant::Integer(v));
     }
 
-    (state.callback)(solutions)
+    // Mid-search variables: not in the print matrix, read by name.
+    for var in state.midsearch_vars.iter() {
+        #[allow(clippy::unwrap_used)]
+        let c_name = CString::new(var.clone()).unwrap();
+        let v: i32 =
+            unsafe { ffi::minion_getVarValue(ctx, state.instance, c_name.as_ptr()) };
+        solutions.insert(var.clone(), Constant::Integer(v));
+    }
+
+    let mut midctx = MidSearchContext {
+        ctx,
+        instance: state.instance,
+        midsearch_vars: &mut state.midsearch_vars,
+        _not_send: std::marker::PhantomData,
+    };
+    (state.callback)(&mut midctx, solutions)
 }
 
 /// Run Minion on the given [Model].
@@ -179,13 +273,23 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
 ///
 /// Returns a [`SolverContext`] on success, which can be used to query run
 /// statistics via [`SolverContext::get_from_table`].
-#[allow(clippy::unwrap_used)]
-pub fn run_minion(model: Model, callback: Callback<'_>) -> Result<SolverContext, MinionError> {
-    let mut state = CallbackState {
-        callback,
-        print_vars: vec![],
-    };
+///
+/// For callbacks that need to add variables or constraints during search,
+/// use [`run_minion_midsearch`].
+pub fn run_minion(model: Model, mut callback: Callback<'_>) -> Result<SolverContext, MinionError> {
+    run_minion_midsearch(
+        model,
+        Box::new(move |_ctx, sol| callback(sol)),
+    )
+}
 
+/// Run Minion on the given [Model] with a callback that can mutate the
+/// running search via a [`MidSearchContext`] handle.
+#[allow(clippy::unwrap_used)]
+pub fn run_minion_midsearch(
+    model: Model,
+    callback: MidSearchCallback<'_>,
+) -> Result<SolverContext, MinionError> {
     unsafe {
         let ctx = ffi::minion_newContext();
         let search_opts = ffi::searchOptions_new();
@@ -197,6 +301,13 @@ pub fn run_minion(model: Model, callback: Callback<'_>) -> Result<SolverContext,
         // themselves instead of going through this wrapper.
         (*search_opts).silent = true;
         (*search_opts).print_solution = false;
+
+        let mut state = CallbackState {
+            callback,
+            instance: search_instance,
+            print_vars: vec![],
+            midsearch_vars: vec![],
+        };
 
         convert_model_to_raw(search_instance, &model, &mut state.print_vars)?;
 
