@@ -304,6 +304,246 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
     Ok(())
 }
 
+/// Output of a constraint-injection run.
+pub struct InjectOutput {
+    pub solutions: Vec<Vec<i64>>,
+    /// Number of scheduled injections that actually fired (i.e. search
+    /// produced ≥ their threshold number of solutions before ending).
+    pub injections_fired: usize,
+    pub nodes: i64,
+}
+
+/// Build a model from a set of [`ConstraintInstance`]s: every instance
+/// in `with_constraints` contributes both its variables (with diseq
+/// constraints for domain holes) AND its top-level constraint; every
+/// instance in `vars_only` contributes only its variables.
+///
+/// Variable declaration order is `with_constraints` first (in the given
+/// order), then `vars_only`. Callers that need solution outputs from
+/// several runs to align must pass the instances in the same sequence.
+fn build_multi_model(
+    with_constraints: &[&ConstraintInstance],
+    vars_only: &[&ConstraintInstance],
+) -> Result<Model> {
+    let mut model = Model::new();
+    for inst in with_constraints {
+        add_variables_and_holes(&mut model, inst)?;
+    }
+    for inst in vars_only {
+        add_variables_and_holes(&mut model, inst)?;
+    }
+    for inst in with_constraints {
+        model
+            .constraints
+            .push(build_constraint(inst).context("building constraint")?);
+    }
+    Ok(model)
+}
+
+/// Run several [`ConstraintInstance`]s together as a single model, with
+/// a pinned seed. `vars_only` instances contribute declared variables
+/// but no top-level constraint.
+pub fn run_multi(
+    with_constraints: &[&ConstraintInstance],
+    vars_only: &[&ConstraintInstance],
+    seed: u32,
+    testname: &str,
+) -> Result<MinionOutput> {
+    let model = build_multi_model(with_constraints, vars_only)?;
+    let variable_order = model.named_variables.get_variable_order();
+
+    if std::env::var("TESTER_DEBUG").is_ok() {
+        eprintln!("--- multi-model for {testname} (seed={seed:#x}) ---");
+        for name in &variable_order {
+            eprintln!(
+                "  {name}: {:?}",
+                model.named_variables.get_vartype(name.clone())
+            );
+        }
+        for c in &model.constraints {
+            eprintln!("  {c:?}");
+        }
+        eprintln!("--- end {testname} ---");
+    }
+
+    let mut solutions: Vec<Vec<i64>> = Vec::new();
+    let callback: minion_sys::Callback<'_> = {
+        let variable_order = &variable_order;
+        let solutions = &mut solutions;
+        Box::new(move |sol: HashMap<VarName, MC>| -> bool {
+            let mut row = Vec::with_capacity(variable_order.len());
+            for name in variable_order.iter() {
+                match sol.get(name).copied() {
+                    Some(MC::Integer(n)) => row.push(n as i64),
+                    Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                    _ => return false,
+                }
+            }
+            solutions.push(row);
+            true
+        })
+    };
+
+    let ctx = minion_sys::run_minion_with_options(
+        model,
+        minion_sys::RunOptions {
+            seed: Some(seed),
+            ..Default::default()
+        },
+        callback,
+    )
+    .map_err(|e| anyhow!("minion ({testname}): {e}"))?;
+
+    let nodes = ctx
+        .get_from_table("Nodes".to_string())
+        .ok_or_else(|| anyhow!("Nodes missing"))?
+        .parse::<i64>()
+        .context("parsing Nodes")?;
+
+    Ok(MinionOutput {
+        solutions,
+        nodes,
+        filename: format!("<{testname}>"),
+        cleanup: CleanupFiles::empty(),
+    })
+}
+
+/// Run the model built from `base` (vars + constraints) plus variables
+/// declared in `vars_only`, and inject each `ConstraintInstance`'s
+/// top-level constraint via [`MidSearchContext::add_constraint`] at its
+/// scheduled callback count.
+///
+/// `injections` must be sorted by callback count ascending. Each
+/// injected constraint can refer to any variable that was declared
+/// before the solve started (i.e. from `base` or `vars_only`).
+pub fn run_multi_injected(
+    base: &[&ConstraintInstance],
+    vars_only: &[&ConstraintInstance],
+    injections: &[(usize, &ConstraintInstance)],
+    seed: u32,
+    testname: &str,
+) -> Result<InjectOutput> {
+    for w in injections.windows(2) {
+        if w[0].0 > w[1].0 {
+            bail!("run_multi_injected: injections must be sorted by count");
+        }
+    }
+
+    let model = build_multi_model(base, vars_only)?;
+    let variable_order = model.named_variables.get_variable_order();
+
+    if std::env::var("TESTER_DEBUG").is_ok() {
+        eprintln!("--- multi-inject model for {testname} (seed={seed:#x}) ---");
+        for name in &variable_order {
+            eprintln!(
+                "  {name}: {:?}",
+                model.named_variables.get_vartype(name.clone())
+            );
+        }
+        eprintln!("  base constraints:");
+        for c in &model.constraints {
+            eprintln!("    {c:?}");
+        }
+        for (cnt, inst) in injections {
+            eprintln!("  inject at {cnt}: {}", inst.constraint.name);
+        }
+        eprintln!("--- end {testname} ---");
+    }
+
+    // Pre-build each injection's constraint so the callback only has to
+    // clone an already-valid AST.
+    let prebuilt: Vec<minion_sys::ast::Constraint> = injections
+        .iter()
+        .map(|(_, inst)| {
+            build_constraint(inst).with_context(|| {
+                format!(
+                    "building injection constraint {:?} for {testname}",
+                    inst.constraint.name
+                )
+            })
+        })
+        .collect::<Result<Vec<_>>>()?;
+
+    let mut solutions: Vec<Vec<i64>> = Vec::new();
+    let mut count: usize = 0;
+    let mut next_injection: usize = 0;
+    let mut fired: usize = 0;
+    let mut cb_err: Option<String> = None;
+
+    let callback: minion_sys::MidSearchCallback<'_> = {
+        let variable_order = &variable_order;
+        let solutions = &mut solutions;
+        let count_ref = &mut count;
+        let next_injection_ref = &mut next_injection;
+        let fired_ref = &mut fired;
+        let cb_err_ref = &mut cb_err;
+        let prebuilt = &prebuilt;
+        let injections = injections;
+        Box::new(
+            move |midctx: &mut minion_sys::MidSearchContext<'_>,
+                  sol: HashMap<VarName, MC>|
+                  -> bool {
+                *count_ref += 1;
+                let mut row = Vec::with_capacity(variable_order.len());
+                for name in variable_order.iter() {
+                    match sol.get(name).copied() {
+                        Some(MC::Integer(n)) => row.push(n as i64),
+                        Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                        other => {
+                            *cb_err_ref = Some(format!(
+                                "callback: var {name} has no value ({other:?})"
+                            ));
+                            return false;
+                        }
+                    }
+                }
+                solutions.push(row);
+                while *next_injection_ref < injections.len()
+                    && injections[*next_injection_ref].0 == *count_ref
+                {
+                    let constr = prebuilt[*next_injection_ref].clone();
+                    if let Err(e) = midctx.add_constraint(constr) {
+                        *cb_err_ref = Some(format!(
+                            "add_constraint for {}: {e}",
+                            injections[*next_injection_ref].1.constraint.name
+                        ));
+                        return false;
+                    }
+                    *next_injection_ref += 1;
+                    *fired_ref += 1;
+                }
+                true
+            },
+        )
+    };
+
+    let ctx = minion_sys::run_minion_midsearch_with_options(
+        model,
+        minion_sys::RunOptions {
+            seed: Some(seed),
+            ..Default::default()
+        },
+        callback,
+    )
+    .map_err(|e| anyhow!("minion midsearch ({testname}): {e}"))?;
+
+    if let Some(err) = cb_err {
+        bail!("callback error ({testname}): {err}");
+    }
+
+    let nodes = ctx
+        .get_from_table("Nodes".to_string())
+        .ok_or_else(|| anyhow!("Nodes missing"))?
+        .parse::<i64>()
+        .context("parsing Nodes")?;
+
+    Ok(InjectOutput {
+        solutions,
+        injections_fired: fired,
+        nodes,
+    })
+}
+
 /// Result of a midsearch variable-injection run.
 #[derive(Debug)]
 pub struct MidsearchOutput {

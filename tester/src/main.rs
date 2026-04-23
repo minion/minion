@@ -69,6 +69,19 @@ struct Opt {
 
     #[arg(long, default_value_t = 1)]
     midsearch_new_vars: usize,
+
+    /// Run the mid-search constraint-injection sweep: for every
+    /// constraint in the built-in list, generate a random instance,
+    /// mid-inject it into a random base problem, and verify the three
+    /// solution sets (baseline / injected / full-from-start) agree.
+    /// Requires --in-process.
+    #[arg(long)]
+    midsearch_constraints: bool,
+
+    /// Number of random constraint instances used as the base problem
+    /// in each constraint-injection trial.
+    #[arg(long, default_value_t = 2)]
+    midsearch_base_size: usize,
 }
 
 fn main() -> Result<()> {
@@ -102,6 +115,12 @@ fn main() -> Result<()> {
     }
     if opt.midsearch && !opt.in_process {
         anyhow::bail!("--midsearch requires --in-process");
+    }
+    if opt.midsearch_constraints && !opt.in_process {
+        anyhow::bail!("--midsearch-constraints requires --in-process");
+    }
+    if opt.midsearch && opt.midsearch_constraints {
+        anyhow::bail!("--midsearch and --midsearch-constraints are mutually exclusive");
     }
 
     let config = if opt.valgrind {
@@ -145,6 +164,93 @@ fn main() -> Result<()> {
             Ok(())
         });
         ret?;
+        return Ok(());
+    }
+
+    if opt.midsearch_constraints {
+        if opt.midsearch_base_size == 0 {
+            anyhow::bail!("--midsearch-base-size must be >= 1");
+        }
+        // Draw bases from the full list of constraints — independent of
+        // what the user selected for injection, so `--constraints eq`
+        // still gets a non-trivial base problem to inject into.
+        let pool: Vec<constraint_def::ConstraintDef> =
+            constraint_def::CONSTRAINT_LIST.clone();
+        // Non-fatal: each trial that fails is recorded for the summary
+        // but doesn't abort the sweep. The point of this test is to
+        // surface minion bugs; aborting on the first one hides the rest.
+        use std::sync::Mutex;
+        struct Report {
+            failures: std::sync::atomic::AtomicUsize,
+            first_error: Mutex<Option<String>>,
+        }
+        let reports: std::collections::HashMap<String, Report> = v
+            .iter()
+            .map(|c| {
+                (
+                    c.name.clone(),
+                    Report {
+                        failures: std::sync::atomic::AtomicUsize::new(0),
+                        first_error: Mutex::new(None),
+                    },
+                )
+            })
+            .collect();
+        // If a C++ abort kills the process mid-sweep, the last trace line
+        // tells you which trial triggered it (look for it in stderr).
+        let trace = std::env::var("TESTER_TRACE").is_ok();
+        v.clone().into_par_iter().for_each(|ref c| {
+            (0..opt.count).into_par_iter().for_each(|_| {
+                let mut rng = thread_rng();
+                let base_defs: Vec<&constraint_def::ConstraintDef> = pool
+                    .iter()
+                    .filter(|d| d.name != c.name)
+                    .collect::<Vec<_>>()
+                    .choose_multiple(&mut rng, opt.midsearch_base_size)
+                    .copied()
+                    .collect();
+                if trace {
+                    let names: Vec<&str> = base_defs.iter().map(|d| d.name.as_str()).collect();
+                    eprintln!("trial inject={} base={names:?}", c.name);
+                }
+                if let Err(e) = test_types::test_constraint_midsearch_inject_constraint(
+                    &config,
+                    &base_defs,
+                    c,
+                    opt.midsearch_inject_after,
+                ) {
+                    let r = &reports[&c.name];
+                    r.failures
+                        .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    let mut first = r.first_error.lock().unwrap();
+                    if first.is_none() {
+                        *first = Some(format!("{e:#}"));
+                    }
+                }
+            });
+            println!("Tested {} (midsearch-constraints)", c.name);
+        });
+
+        // Summary.
+        println!("\n=== midsearch-constraints summary ===");
+        let mut ordered: Vec<&String> = reports.keys().collect();
+        ordered.sort();
+        let mut total_failures = 0usize;
+        for name in ordered {
+            let r = &reports[name];
+            let f = r
+                .failures
+                .load(std::sync::atomic::Ordering::Relaxed);
+            total_failures += f;
+            if f > 0 {
+                let err = r.first_error.lock().unwrap();
+                println!("  {name}: {f}/{} failed — e.g. {}", opt.count, err.as_deref().unwrap_or(""));
+            }
+        }
+        println!("Total: {total_failures} failed trials across {} constraints.", reports.len());
+        if total_failures > 0 {
+            std::process::exit(1);
+        }
         return Ok(());
     }
 

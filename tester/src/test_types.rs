@@ -302,6 +302,172 @@ pub fn test_constraint_midsearch_add_vars(
     Ok(())
 }
 
+/// Mid-search *constraint*-injection test.
+///
+/// The purpose is to exercise each Minion constraint as an *injected*
+/// constraint: does the solver correctly apply a constraint that was
+/// added mid-search? The base problem is a bag of random constraints
+/// purely as a carrier to give the solver something non-trivial to
+/// search through.
+///
+/// Setup (all with a shared seed `s`):
+///   * Build `base_defs.len()` random instances — these form the base
+///     model. All their variables and top-level constraints go into
+///     the model.
+///   * Build one random instance of `inject_def`. Its variables are
+///     also declared up-front (so baseline enumerates over them as
+///     free search vars), but its top-level constraint is NOT in the
+///     model at the start.
+///
+/// Three runs under seed `s`:
+///   * baseline  — base model only; inject-instance's vars are free.
+///   * full      — base model + inject constraint from the start.
+///   * injected  — base model; inject constraint added via
+///                 MidSearchContext::add_constraint after
+///                 `inject_after` solutions.
+///
+/// Invariants (STATIC variable order):
+///   * `injected[0..A] == baseline[0..A]` exactly.
+///   * `injected[A..]` equals `full` with every element of
+///     `full ∩ baseline[0..A]` dropped once, in `full`'s order.
+///
+/// Tests are skipped when baseline has fewer than `inject_after`
+/// solutions (nothing post-injection to compare).
+///
+/// On failure the seed is logged so the trial can be re-run.
+pub fn test_constraint_midsearch_inject_constraint(
+    config: &MinionConfig,
+    base_defs: &[&constraint_def::ConstraintDef],
+    inject_def: &constraint_def::ConstraintDef,
+    inject_after: usize,
+) -> Result<()> {
+    if config.backend == Backend::Exec {
+        return Ok(());
+    }
+
+    let seed: u32 = rand::random();
+
+    let base_instances: Vec<constraint_def::ConstraintInstance> = base_defs
+        .iter()
+        .map(|d| constraint_def::build_random_instance(d))
+        .collect();
+    let base_refs: Vec<&constraint_def::ConstraintInstance> = base_instances.iter().collect();
+    let inject_instance = constraint_def::build_random_instance(inject_def);
+
+    let log_seed = |msg: &str| -> String {
+        format!(
+            "inject={} base={:?} seed={seed:#x} inject_after={inject_after} — {msg}",
+            inject_def.name,
+            base_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
+            msg = msg,
+        )
+    };
+
+    // Baseline.
+    let baseline = crate::run_minion_lib::run_multi(
+        &base_refs,
+        &[&inject_instance],
+        seed,
+        "baseline",
+    )
+    .map_err(|e| anyhow!("{}", log_seed(&format!("baseline: {e}"))))?;
+
+    if baseline.solutions.len() <= inject_after {
+        // Not enough baseline solutions to exercise the post-injection
+        // branch. Silently skip — this isn't a constraint failure, just
+        // a trivial trial.
+        return Ok(());
+    }
+
+    // Injected run.
+    let injected = crate::run_minion_lib::run_multi_injected(
+        &base_refs,
+        &[&inject_instance],
+        &[(inject_after, &inject_instance)],
+        seed,
+        "injected",
+    )
+    .map_err(|e| anyhow!("{}", log_seed(&format!("injected: {e}"))))?;
+
+    if injected.injections_fired != 1 {
+        return Err(anyhow!(
+            "{}",
+            log_seed(&format!(
+                "injection did not fire ({} solutions produced)",
+                injected.solutions.len()
+            ))
+        ));
+    }
+
+    // Full run.
+    let mut full_with_constraints: Vec<&constraint_def::ConstraintInstance> = base_refs.clone();
+    full_with_constraints.push(&inject_instance);
+    let full = crate::run_minion_lib::run_multi(
+        &full_with_constraints,
+        &[],
+        seed,
+        "full",
+    )
+    .map_err(|e| anyhow!("{}", log_seed(&format!("full: {e}"))))?;
+
+    // Invariant 1: pre-injection equals baseline prefix exactly.
+    if injected.solutions[..inject_after] != baseline.solutions[..inject_after] {
+        if std::env::var("TESTER_DEBUG").is_ok() {
+            eprintln!("baseline[..A]: {:?}", &baseline.solutions[..inject_after]);
+            eprintln!("injected[..A]: {:?}", &injected.solutions[..inject_after]);
+        }
+        return Err(anyhow!(
+            "{}",
+            log_seed("pre-injection rows differ from baseline prefix")
+        ));
+    }
+
+    // Invariant 2: injected[A..] == full minus (full ∩ baseline[0..A]).
+    use std::collections::HashSet;
+    let seen: HashSet<&Vec<i64>> = baseline.solutions[..inject_after].iter().collect();
+    let expected_post: Vec<Vec<i64>> = full
+        .solutions
+        .iter()
+        .filter(|r| !seen.contains(*r))
+        .cloned()
+        .collect();
+    let got_post = &injected.solutions[inject_after..];
+    if got_post != expected_post.as_slice() {
+        if std::env::var("TESTER_DEBUG").is_ok() {
+            eprintln!(
+                "baseline ({} sols): {:?}",
+                baseline.solutions.len(),
+                baseline.solutions
+            );
+            eprintln!("full ({} sols): {:?}", full.solutions.len(), full.solutions);
+            eprintln!(
+                "injected[..{inject_after}]: {:?}",
+                &injected.solutions[..inject_after]
+            );
+            eprintln!(
+                "injected[{inject_after}..] ({} sols): {:?}",
+                got_post.len(),
+                got_post
+            );
+            eprintln!(
+                "expected post ({} sols): {:?}",
+                expected_post.len(),
+                expected_post
+            );
+        }
+        return Err(anyhow!(
+            "{}",
+            log_seed(&format!(
+                "post-injection differs (got {} rows, expected {})",
+                got_post.len(),
+                expected_post.len()
+            ))
+        ));
+    }
+
+    Ok(())
+}
+
 pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
