@@ -304,6 +304,129 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
     Ok(())
 }
 
+/// Result of a midsearch variable-injection run.
+#[derive(Debug)]
+pub struct MidsearchOutput {
+    /// Solutions reported before the injection callback fired. Each row
+    /// holds values for the original (pre-injection) named variables in
+    /// declaration order.
+    pub pre_injection: Vec<Vec<i64>>,
+    /// Solutions reported after the injection. Each row holds values
+    /// for the original vars first, then the newly-added vars in the
+    /// order they were added.
+    pub post_injection: Vec<Vec<i64>>,
+    /// Names of the variables that were added mid-search.
+    pub new_var_names: Vec<String>,
+    /// True if the injection callback actually ran. False if baseline
+    /// had fewer than `inject_after` solutions.
+    pub injected: bool,
+    pub nodes: i64,
+}
+
+/// Run `instance`, and after `inject_after` solutions have been reported
+/// add the variables in `new_vars` via `MidSearchContext::add_var`.
+///
+/// The new variables are aux search variables with no constraints on
+/// them, so every "remaining" decision-var assignment should fan out
+/// into the cartesian product of the new vars' domains.
+pub fn run_inject_vars_after(
+    instance: &ConstraintInstance,
+    inject_after: usize,
+    new_vars: &[(String, minion_sys::ast::VarDomain)],
+    testname: &str,
+) -> Result<MidsearchOutput> {
+    let mut model = Model::new();
+    add_variables_and_holes(&mut model, instance)?;
+    let top = build_constraint(instance)
+        .with_context(|| format!("building constraint for {testname}"))?;
+    model.constraints.push(top);
+
+    let variable_order = model.named_variables.get_variable_order();
+    let new_var_names: Vec<String> = new_vars.iter().map(|(n, _)| n.clone()).collect();
+
+    let mut pre_injection: Vec<Vec<i64>> = Vec::new();
+    let mut post_injection: Vec<Vec<i64>> = Vec::new();
+    let mut injected = false;
+    let mut count: usize = 0;
+    let mut cb_err: Option<String> = None;
+
+    let callback: minion_sys::MidSearchCallback<'_> = {
+        let variable_order = &variable_order;
+        let new_var_names = &new_var_names;
+        let pre = &mut pre_injection;
+        let post = &mut post_injection;
+        let injected_ref = &mut injected;
+        let count_ref = &mut count;
+        let cb_err_ref = &mut cb_err;
+        Box::new(move |midctx: &mut minion_sys::MidSearchContext<'_>, sol: HashMap<VarName, MC>| -> bool {
+            *count_ref += 1;
+            // Read original vars.
+            let mut row = Vec::with_capacity(variable_order.len() + new_var_names.len());
+            for name in variable_order.iter() {
+                match sol.get(name).copied() {
+                    Some(MC::Integer(n)) => row.push(n as i64),
+                    Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                    other => {
+                        *cb_err_ref = Some(format!(
+                            "callback: original var {name} has no value ({other:?})"
+                        ));
+                        return false;
+                    }
+                }
+            }
+            if *injected_ref {
+                // Append new vars.
+                for name in new_var_names.iter() {
+                    match sol.get(name).copied() {
+                        Some(MC::Integer(n)) => row.push(n as i64),
+                        Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                        other => {
+                            *cb_err_ref = Some(format!(
+                                "callback: mid-search var {name} has no value ({other:?})"
+                            ));
+                            return false;
+                        }
+                    }
+                }
+                post.push(row);
+            } else {
+                pre.push(row);
+                if *count_ref == inject_after {
+                    for (name, domain) in new_vars {
+                        if let Err(e) = midctx.add_var(name, *domain) {
+                            *cb_err_ref = Some(format!("add_var({name}): {e}"));
+                            return false;
+                        }
+                    }
+                    *injected_ref = true;
+                }
+            }
+            true
+        })
+    };
+
+    let ctx = minion_sys::run_minion_midsearch(model, callback)
+        .map_err(|e| anyhow!("minion midsearch error ({testname}): {e}"))?;
+
+    if let Some(err) = cb_err {
+        bail!("callback error ({testname}): {err}");
+    }
+
+    let nodes: i64 = ctx
+        .get_from_table("Nodes".to_string())
+        .ok_or_else(|| anyhow!("Nodes missing from minion stats"))?
+        .parse()
+        .context("parsing Nodes")?;
+
+    Ok(MidsearchOutput {
+        pre_injection,
+        post_injection,
+        new_var_names,
+        injected,
+        nodes,
+    })
+}
+
 /// In-process equivalent of `run_minion::get_minion_solutions`.
 ///
 /// `find_all_sols` mirrors the `-findallsols` command-line flag — when true,

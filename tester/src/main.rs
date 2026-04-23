@@ -54,6 +54,21 @@ struct Opt {
     /// sweeps (those are exec-mode features).
     #[arg(long)]
     in_process: bool,
+
+    /// Run the mid-search variable-injection test instead of the usual
+    /// baseline-vs-tableised sweep. Requires --in-process. Each constraint
+    /// is solved once, then re-solved with a callback that injects
+    /// --midsearch-new-vars fresh boolean variables after
+    /// --midsearch-inject-after solutions; the resulting solution set is
+    /// checked against the expected cross-product.
+    #[arg(long)]
+    midsearch: bool,
+
+    #[arg(long, default_value_t = 1)]
+    midsearch_inject_after: usize,
+
+    #[arg(long, default_value_t = 1)]
+    midsearch_new_vars: usize,
 }
 
 fn main() -> Result<()> {
@@ -85,6 +100,9 @@ fn main() -> Result<()> {
     if !opt.in_process && opt.minion.is_empty() {
         anyhow::bail!("--minion <path> is required in exec mode (or pass --in-process)");
     }
+    if opt.midsearch && !opt.in_process {
+        anyhow::bail!("--midsearch requires --in-process");
+    }
 
     let config = if opt.valgrind {
         test_types::MinionConfig {
@@ -109,6 +127,26 @@ fn main() -> Result<()> {
             },
         }
     };
+
+    if opt.midsearch {
+        let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| {
+                    test_types::test_constraint_midsearch_add_vars(
+                        &config,
+                        c,
+                        opt.midsearch_inject_after,
+                        opt.midsearch_new_vars,
+                    )
+                })
+                .context(format!("midsearch failure in {}", c.name))?;
+            println!("Tested {} (midsearch)", c.name);
+            Ok(())
+        });
+        ret?;
+        return Ok(());
+    }
 
     let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
         (0..opt.count)

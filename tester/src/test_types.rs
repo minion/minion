@@ -161,6 +161,147 @@ pub fn test_constraint_options(
     Ok(())
 }
 
+/// Mid-search variable-injection test.
+///
+/// Solve the instance once to establish a baseline solution set, then
+/// solve a second time with a callback that adds `new_var_count` fresh
+/// boolean variables after `inject_after` solutions.
+///
+/// `minion_newVarMidsearch` appends the new variable to the solver's
+/// *aux* block, which by design gets a single satisfying assignment per
+/// decision leaf (search jumps out of aux vars after each solution).
+/// So the properties we verify are:
+///   * pre-injection rows equal the baseline's first `inject_after` rows;
+///   * post-injection produces *exactly one* row per remaining baseline
+///     leaf, in the same order;
+///   * each injected var's value lies within its declared domain.
+///
+/// Skipped when baseline has <= `inject_after` solutions — there would
+/// be nothing to verify after injection.
+pub fn test_constraint_midsearch_add_vars(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    inject_after: usize,
+    new_var_count: usize,
+) -> Result<()> {
+    // Exec backend can't mutate a running solver; only in-process supports this.
+    if config.backend == Backend::Exec {
+        return Ok(());
+    }
+
+    let instance = constraint_def::build_random_instance(c);
+
+    let baseline =
+        crate::run_minion_lib::get_minion_solutions_in_process(&instance, true, "baseline")?;
+
+    if baseline.solutions.len() <= inject_after {
+        // Not enough baseline solutions to have anything post-injection.
+        return Ok(());
+    }
+
+    let new_vars: Vec<(String, minion_sys::ast::VarDomain)> = (0..new_var_count)
+        .map(|_| {
+            (
+                format!("mid_{}", crate::counter::get_unique_value()),
+                minion_sys::ast::VarDomain::Bool,
+            )
+        })
+        .collect();
+
+    let got = crate::run_minion_lib::run_inject_vars_after(
+        &instance,
+        inject_after,
+        &new_vars,
+        "midsearch",
+    )?;
+
+    if !got.injected {
+        return Err(anyhow!(
+            "midsearch: expected injection to fire at count {} (baseline has {} solutions)",
+            inject_after,
+            baseline.solutions.len()
+        ));
+    }
+
+    // Pre-injection must equal baseline[..inject_after] exactly.
+    let expected_pre = &baseline.solutions[..inject_after];
+    if got.pre_injection.as_slice() != expected_pre {
+        return Err(anyhow!(
+            "midsearch: pre-injection differs from baseline prefix ({} vs {} rows)",
+            got.pre_injection.len(),
+            expected_pre.len()
+        ));
+    }
+
+    // Post-injection: one row per remaining baseline leaf, in the same order.
+    let remaining = &baseline.solutions[inject_after..];
+    if got.post_injection.len() != remaining.len() {
+        if std::env::var("TESTER_DEBUG").is_ok() {
+            eprintln!("baseline: {:?}", baseline.solutions);
+            eprintln!("pre:      {:?}", got.pre_injection);
+            eprintln!("post:     {:?}", got.post_injection);
+        }
+        return Err(anyhow!(
+            "midsearch: post-injection has {} rows but {} remaining baseline leaves",
+            got.post_injection.len(),
+            remaining.len()
+        ));
+    }
+
+    // Split each post row into (decision-var values, new-var values), then
+    // check:
+    //   * decision-var values match the baseline remaining row at the same index;
+    //   * each new-var value is within its declared domain.
+    let decision_len = baseline
+        .solutions
+        .first()
+        .map(|r| r.len())
+        .unwrap_or(0);
+    for (idx, row) in got.post_injection.iter().enumerate() {
+        if row.len() != decision_len + new_var_count {
+            return Err(anyhow!(
+                "midsearch: post-injection row {} has length {} (expected {})",
+                idx,
+                row.len(),
+                decision_len + new_var_count
+            ));
+        }
+        let (decision_part, new_part) = row.split_at(decision_len);
+        if decision_part != remaining[idx].as_slice() {
+            return Err(anyhow!(
+                "midsearch: post-injection row {} decision part {:?} differs from baseline {:?}",
+                idx,
+                decision_part,
+                remaining[idx]
+            ));
+        }
+        for (k, (_name, domain)) in new_vars.iter().enumerate() {
+            let v = new_part[k];
+            let in_domain = match domain {
+                minion_sys::ast::VarDomain::Bool => v == 0 || v == 1,
+                minion_sys::ast::VarDomain::Bound(lo, hi) => {
+                    v >= *lo as i64 && v <= *hi as i64
+                }
+                minion_sys::ast::VarDomain::Discrete(lo, hi) => {
+                    v >= *lo as i64 && v <= *hi as i64
+                }
+                _ => true,
+            };
+            if !in_domain {
+                return Err(anyhow!(
+                    "midsearch: post-injection row {} new var {} value {} not in domain {:?}",
+                    idx,
+                    k,
+                    v,
+                    domain
+                ));
+            }
+        }
+    }
+
+    Ok(())
+}
+
 pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
