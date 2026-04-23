@@ -14,6 +14,15 @@ pub type TwoVars = (Var, Var);
 pub struct Model {
     pub named_variables: SymbolTable,
     pub constraints: Vec<Constraint>,
+    /// Named tuple tables. Needed by tuple-based constraints that
+    /// reference a table by name rather than carry tuples inline
+    /// (most notably `CT_STR` / `Str2Plus`). Register a table with
+    /// [`Model::add_tuple_table`], then reference it from a
+    /// constraint via `Var::NameRef(table_name)`.
+    ///
+    /// Storage order is preserved so the order in which tables are
+    /// installed into the `CSPInstance` matches insertion order.
+    pub tuple_tables: Vec<(String, Vec<Tuple>)>,
 }
 
 impl Model {
@@ -22,7 +31,21 @@ impl Model {
         Model {
             named_variables: SymbolTable::new(),
             constraints: Vec::new(),
+            tuple_tables: Vec::new(),
         }
+    }
+
+    /// Registers a named tuple table on the model. The table is
+    /// copied into Minion's `CSPInstance` at solve time so constraints
+    /// like `Str2Plus(vars, Var::NameRef(name))` can look it up.
+    ///
+    /// Returns `None` if a table with that name is already registered.
+    pub fn add_tuple_table(&mut self, name: String, tuples: Vec<Tuple>) -> Option<()> {
+        if self.tuple_tables.iter().any(|(n, _)| n == &name) {
+            return None;
+        }
+        self.tuple_tables.push((name, tuples));
+        Some(())
     }
 }
 

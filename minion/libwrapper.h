@@ -450,6 +450,15 @@ void constraint_addConstraintList(ConstraintBlob& constraint,
 // A constraint only has one tuple list.
 void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList);
 
+/// Attach a named tuple table to the constraint. The table must have
+/// already been registered on the instance via
+/// `instance_addTupleTableSymbol`. Unlike `constraint_setTuples`, this
+/// increments the existing `shared_ptr<TupleList>`'s refcount rather
+/// than wrapping a raw pointer, so registering the same table on
+/// multiple constraints (or keeping it available on the instance while
+/// a constraint also references it) is safe.
+void constraint_setTuplesByName(ConstraintBlob& constraint, CSPInstance& instance, const char* name);
+
 /***** Small misc useful types *****/
 
 /// Creates a new `SearchOptions` object.

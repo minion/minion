@@ -452,6 +452,50 @@ unsafe fn convert_model_to_raw(
     ffi::instance_addSearchOrder(instance, search_order.ptr);
 
     /*********************************/
+    /*        Add tuple tables       */
+    /*********************************/
+    //
+    // Must happen BEFORE add-constraint: constraints like
+    // `Str2Plus(vars, Var::NameRef(table_name))` look the table up
+    // by name on the instance.
+
+    for (name, tuples) in &model.tuple_tables {
+        let c_name = CString::new(name.clone()).map_err(|_| {
+            anyhow!(
+                "Tuple-table name {:?} contains a null character.",
+                name.clone()
+            )
+        })?;
+
+        // Build the raw Vec<Vec<DomainInt>> to hand to tupleList_new.
+        // tupleList_new takes ownership semantically (it constructs a
+        // TupleList from the contents); the vec_vec_int_new/free
+        // pair only cleans up the intermediate carrier.
+        let raw_tuples = Scoped::new(ffi::vec_vec_int_new(), |x| ffi::vec_vec_int_free(x as _));
+        for tuple in tuples {
+            let raw_tuple =
+                Scoped::new(ffi::vec_int_new(), |x| ffi::vec_int_free(x as _));
+            for constant in tuple {
+                let val = match constant {
+                    Constant::Integer(n) => *n,
+                    Constant::Bool(true) => 1,
+                    Constant::Bool(false) => 0,
+                    #[allow(unreachable_patterns)]
+                    x => return Err(MinionError::NotImplemented(format!("{x:?}"))),
+                };
+                ffi::vec_int_push_back(raw_tuple.ptr, val);
+            }
+            ffi::vec_vec_int_push_back_ptr(raw_tuples.ptr, raw_tuple.ptr);
+        }
+
+        // `instance_addTupleTableSymbol` copies the name and takes
+        // ownership of the TupleList via `shared_ptr<TupleList>`,
+        // so we do NOT wrap the result of `tupleList_new` in Scoped.
+        let raw_tuple_list = ffi::tupleList_new(raw_tuples.ptr);
+        ffi::instance_addTupleTableSymbol(instance, c_name.as_ptr() as *mut c_char, raw_tuple_list);
+    }
+
+    /*********************************/
     /*        Add constraints        */
     /*********************************/
 
@@ -759,8 +803,25 @@ unsafe fn constraint_add_args(
             Ok(())
         }
         Constraint::Str2Plus(vars, table_var) => {
+            // CT_STR references a tuple table by NAME, not a variable.
+            // Instead of looking it up in the symbol table as a var
+            // (which fails), resolve it against the instance's
+            // tuple-table symbol table via `constraint_setTuplesByName`
+            // — that reuses the existing shared_ptr so refcounts stay
+            // correct.
             read_list(i, r_constr, vars)?;
-            read_var(i, r_constr, table_var)?;
+            let name = match table_var {
+                Var::NameRef(n) => n.clone(),
+                other => {
+                    return Err(MinionError::NotImplemented(format!(
+                        "Str2Plus second argument must be Var::NameRef(tuple_table_name), got {other:?}"
+                    )));
+                }
+            };
+            let c_name = CString::new(name.clone()).map_err(|_| {
+                anyhow!("Tuple-table name {name:?} contains a null character.")
+            })?;
+            ffi::constraint_setTuplesByName(r_constr, i, c_name.as_ptr());
             Ok(())
         }
         Constraint::Max(a, b)

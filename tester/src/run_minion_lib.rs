@@ -224,35 +224,30 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         "check[gsa]" => MCon::CheckGsa(child(0)?),
         "check[assign]" => MCon::CheckAssign(child(0)?),
 
-        // Tableised instance. The tester names this "str2plus" in the text
-        // encoding (minion's CT_STR, which takes a tuple-table symbol by
-        // name). The library Model AST has no way to register named tuple
-        // tables yet, and CT_WATCHED_TABLE / CT_GACSCHEMA / CT_LIGHTTABLE all
-        // reject BOUND / SPARSEBOUND variables. CT_MDDC accepts any domain
-        // type, takes inline tuples, and is GAC — so node counts still match
-        // the original-constraint run for GAC propagators.
+        // Tableised instance. Uses minion's CT_STR (str2plus), the same
+        // universal-tuple-constraint the exec tester uses as its
+        // workhorse. Its tuple table is registered on the Model by
+        // `register_tuple_tables_for_instance` before any constraint
+        // is built; here we just reference the table by name.
+        //
+        // Exec-mode minion's text parser short-circuits the two
+        // degenerate cases at parse time (see MinionThreeInputReader
+        // `tuples->size() == 0` → CT_FALSE); when we go through the
+        // library API we skip the parser, so do the equivalent here.
         "str2plus" => {
             let tups = instance
                 .tuples
                 .as_ref()
                 .ok_or_else(|| anyhow!("str2plus instance has no tuple table"))?;
-            // MDDC chokes on both degenerate corners of the tuple table:
-            //   - empty tuple list (no tuples): no tt nodes are ever made,
-            //     the top node's type=0, propagation segfaults later.
-            //   - zero-arity tuples (vars list empty): the inner build loop
-            //     does nothing, assertion `curnode->type == -1` fails.
-            // The semantics are trivial in both cases, so short-circuit.
             if tups.tupledata.is_empty() {
                 MCon::False
             } else if v[0].is_empty() {
                 MCon::True
             } else {
-                let tuple_vecs: Vec<Vec<MC>> = tups
-                    .tupledata
-                    .iter()
-                    .map(|row| row.iter().map(|n| MC::Integer(*n as i32)).collect())
-                    .collect();
-                MCon::Mddc(list_of_vars(&v[0]), tuple_vecs)
+                MCon::Str2Plus(
+                    list_of_vars(&v[0]),
+                    minion_sys::ast::Var::NameRef(tups.name.clone()),
+                )
             }
         }
 
@@ -354,6 +349,45 @@ pub enum InjectionPacket<'a> {
     },
 }
 
+/// Walk a `ConstraintInstance` (recursively through children) and
+/// register any tuple table it carries onto `model`. Must run before
+/// `build_constraint` for any instance whose constraint references a
+/// tuple table by name (e.g. `str2plus`).
+fn register_tuple_tables_for_instance(
+    model: &mut Model,
+    instance: &ConstraintInstance,
+) -> Result<()> {
+    if let Some(ref tups) = instance.tuples {
+        // Empty tuple tables would be short-circuited to MCon::False at
+        // constraint-build time, so there's no downstream consumer —
+        // and registering an empty table on the CSPInstance triggers a
+        // crash inside TupleList's constructor.
+        if !tups.tupledata.is_empty() {
+            let tuple_vecs: Vec<Vec<minion_sys::ast::Constant>> = tups
+                .tupledata
+                .iter()
+                .map(|row| {
+                    row.iter()
+                        .map(|n| minion_sys::ast::Constant::Integer(*n as i32))
+                        .collect()
+                })
+                .collect();
+            if model
+                .add_tuple_table(tups.name.clone(), tuple_vecs)
+                .is_none()
+            {
+                // get_unique_name should make collisions impossible in
+                // practice, so flag loudly if we ever see one.
+                bail!("duplicate tuple-table name registered: {}", tups.name);
+            }
+        }
+    }
+    for child in &instance.child_constraints {
+        register_tuple_tables_for_instance(model, child)?;
+    }
+    Ok(())
+}
+
 /// Build a model from a set of [`ConstraintInstance`]s: every instance
 /// in `with_constraints` contributes both its variables (with diseq
 /// constraints for domain holes) AND its top-level constraint; every
@@ -367,6 +401,12 @@ fn build_multi_model(
     vars_only: &[&ConstraintInstance],
 ) -> Result<Model> {
     let mut model = Model::new();
+    for inst in with_constraints {
+        register_tuple_tables_for_instance(&mut model, inst)?;
+    }
+    for inst in vars_only {
+        register_tuple_tables_for_instance(&mut model, inst)?;
+    }
     for inst in with_constraints {
         add_variables_and_holes(&mut model, inst)?;
     }
@@ -493,7 +533,14 @@ pub fn run_multi_injected(
         }
     }
 
-    let model = build_multi_model(base, vars_only)?;
+    let mut model = build_multi_model(base, vars_only)?;
+    // Register tuple tables on any injection instance too, so a
+    // mid-search-injected `str2plus` can reference the right table.
+    for (_, pkt) in injections {
+        if let InjectionPacket::ExistingVarsConstraint(inst) = pkt {
+            register_tuple_tables_for_instance(&mut model, inst)?;
+        }
+    }
     let initial_variable_order = model.named_variables.get_variable_order();
 
     if std::env::var("TESTER_DEBUG").is_ok() {
@@ -797,6 +844,7 @@ pub fn get_minion_solutions_in_process(
     testname: &str,
 ) -> Result<MinionOutput> {
     let mut model = Model::new();
+    register_tuple_tables_for_instance(&mut model, instance)?;
     add_variables_and_holes(&mut model, instance)?;
     let top = build_constraint(instance)
         .with_context(|| format!("building constraint for {testname}"))?;

@@ -636,6 +636,15 @@ void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList)
   constraint.tuples = std::shared_ptr<TupleList>(tupleList);
 }
 
+void constraint_setTuplesByName(ConstraintBlob& constraint, CSPInstance& instance, const char* name)
+{
+  // Share the existing shared_ptr<TupleList> from the instance's
+  // symbol table rather than wrapping a raw pointer — otherwise two
+  // independent shared_ptrs would end up managing the same TupleList
+  // and double-free on destruction.
+  constraint.tuples = instance.getTableSymbol(std::string(name));
+}
+
 /***** Vector Rexports *****/
 
 std::vector<Var>* vec_var_new()

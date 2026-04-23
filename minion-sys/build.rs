@@ -161,6 +161,7 @@ fn bind(minion_src: &Path) {
         .allowlist_function("constraint_addConstraint")
         .allowlist_function("constraint_addConstraintList")
         .allowlist_function("constraint_setTuples")
+        .allowlist_function("constraint_setTuplesByName")
         .allowlist_function("searchOptions_new")
         .allowlist_function("searchOptions_free")
         .allowlist_function("searchMethod_new")
