@@ -99,6 +99,18 @@ struct Opt {
     /// setup) on top of the existing single-constraint verification.
     #[arg(long)]
     midsearch_wrap_nested: bool,
+
+    /// Run the mid-search *added-variable* test sweep. Each packet
+    /// adds one boolean variable via minion_newVarMidsearch and a
+    /// DisEq constraint that mixes the new var with a randomly-chosen
+    /// pre-declared base var. Requires --in-process; mutually
+    /// exclusive with --midsearch-constraints and --midsearch.
+    /// Verifies weaker invariants (constraint satisfaction, base-vars
+    /// projection in baseline, distinctness, upper-bound count) since
+    /// aux-block enumeration makes exact equality against an F_k
+    /// reference run intractable.
+    #[arg(long)]
+    midsearch_add_vars: bool,
 }
 
 fn main() -> Result<()> {
@@ -138,6 +150,14 @@ fn main() -> Result<()> {
     }
     if opt.midsearch && opt.midsearch_constraints {
         anyhow::bail!("--midsearch and --midsearch-constraints are mutually exclusive");
+    }
+    if opt.midsearch_add_vars && !opt.in_process {
+        anyhow::bail!("--midsearch-add-vars requires --in-process");
+    }
+    if opt.midsearch_add_vars && (opt.midsearch || opt.midsearch_constraints) {
+        anyhow::bail!(
+            "--midsearch-add-vars is mutually exclusive with --midsearch and --midsearch-constraints"
+        );
     }
 
     let config = if opt.valgrind {
@@ -181,6 +201,61 @@ fn main() -> Result<()> {
             Ok(())
         });
         ret?;
+        return Ok(());
+    }
+
+    if opt.midsearch_add_vars {
+        if opt.midsearch_base_size == 0 {
+            anyhow::bail!("--midsearch-base-size must be >= 1");
+        }
+        let pool: Vec<constraint_def::ConstraintDef> =
+            constraint_def::CONSTRAINT_LIST.clone();
+        use std::sync::Mutex;
+        let failures = std::sync::atomic::AtomicUsize::new(0);
+        let first_error: Mutex<Option<String>> = Mutex::new(None);
+        let trace = std::env::var("TESTER_TRACE").is_ok();
+        // Flat sweep of `count` trials (not per-constraint, since the
+        // injected-constraint shape is fixed to DisEq(new, base)).
+        (0..opt.count).into_par_iter().for_each(|_| {
+            let mut rng = thread_rng();
+            let base_defs: Vec<&constraint_def::ConstraintDef> = pool
+                .choose_multiple(&mut rng, opt.midsearch_base_size)
+                .collect();
+            let seed: u32 = rand::random();
+            if trace {
+                let names: Vec<&str> =
+                    base_defs.iter().map(|d| d.name.as_str()).collect();
+                eprintln!(
+                    "trial add-vars base={names:?} n_packets={} seed={seed:#x}",
+                    opt.midsearch_constraints_num_packets
+                );
+            }
+            if let Err(e) = test_types::test_midsearch_add_new_vars_with_constraint(
+                &config,
+                &base_defs,
+                opt.midsearch_constraints_num_packets,
+                seed,
+            ) {
+                failures.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                let mut first = first_error.lock().unwrap();
+                if first.is_none() {
+                    *first = Some(format!("{e:#}"));
+                }
+            }
+        });
+        let f = failures.load(std::sync::atomic::Ordering::Relaxed);
+        println!("\n=== midsearch-add-vars summary ===");
+        if f > 0 {
+            let err = first_error.lock().unwrap();
+            println!(
+                "  {f}/{} failed — e.g. {}",
+                opt.count,
+                err.as_deref().unwrap_or("")
+            );
+            std::process::exit(1);
+        } else {
+            println!("Total: 0 failed trials out of {}.", opt.count);
+        }
         return Ok(());
     }
 

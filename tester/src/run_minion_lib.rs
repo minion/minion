@@ -328,6 +328,30 @@ pub struct InjectOutput {
     /// true, `solutions` is truncated and should not be trusted as a
     /// complete enumeration.
     pub stopped_at_limit: bool,
+    /// Variable declaration order at the END of the run: the original
+    /// declared vars followed by every mid-search-added var in the
+    /// order they were declared. Solutions produced AFTER a new var
+    /// was added include its value in the corresponding column;
+    /// solutions produced before it exist with fewer columns and are
+    /// left-padded as needed. Use this to map a column index back to
+    /// a variable name.
+    pub final_variable_order: Vec<String>,
+}
+
+/// One mid-search injection step. Each step fires when the solve has
+/// reported its `count`th solution.
+pub enum InjectionPacket<'a> {
+    /// Inject a constraint that uses only variables already declared
+    /// in the model (the existing-vars case).
+    ExistingVarsConstraint(&'a ConstraintInstance),
+    /// Declare `new_vars` mid-search via [`MidSearchContext::add_var`]
+    /// (they land in the aux block), then add `constraint` via
+    /// [`MidSearchContext::add_constraint`]. `constraint` may reference
+    /// either the newly-added vars or any already-declared variable.
+    AddVarsAndConstraint {
+        new_vars: Vec<(String, minion_sys::ast::VarDomain)>,
+        constraint: minion_sys::ast::Constraint,
+    },
 }
 
 /// Build a model from a set of [`ConstraintInstance`]s: every instance
@@ -446,17 +470,19 @@ pub fn run_multi(
 }
 
 /// Run the model built from `base` (vars + constraints) plus variables
-/// declared in `vars_only`, and inject each `ConstraintInstance`'s
-/// top-level constraint via [`MidSearchContext::add_constraint`] at its
+/// declared in `vars_only`, and apply each [`InjectionPacket`] at its
 /// scheduled callback count.
 ///
-/// `injections` must be sorted by callback count ascending. Each
-/// injected constraint can refer to any variable that was declared
-/// before the solve started (i.e. from `base` or `vars_only`).
+/// `injections` must be sorted by callback count ascending. For
+/// [`InjectionPacket::ExistingVarsConstraint`] the constraint can
+/// refer to any variable declared before the solve started; for
+/// [`InjectionPacket::AddVarsAndConstraint`] the added vars land in
+/// the aux block (one aux assignment per decision leaf — see the
+/// Phase 2 midsearch-add-vars test for the surrounding semantics).
 pub fn run_multi_injected(
     base: &[&ConstraintInstance],
     vars_only: &[&ConstraintInstance],
-    injections: &[(usize, &ConstraintInstance)],
+    injections: &[(usize, InjectionPacket<'_>)],
     seed: u32,
     max_solutions: Option<usize>,
     testname: &str,
@@ -468,11 +494,11 @@ pub fn run_multi_injected(
     }
 
     let model = build_multi_model(base, vars_only)?;
-    let variable_order = model.named_variables.get_variable_order();
+    let initial_variable_order = model.named_variables.get_variable_order();
 
     if std::env::var("TESTER_DEBUG").is_ok() {
         eprintln!("--- multi-inject model for {testname} (seed={seed:#x}) ---");
-        for name in &variable_order {
+        for name in &initial_variable_order {
             eprintln!(
                 "  {name}: {:?}",
                 model.named_variables.get_vartype(name.clone())
@@ -482,23 +508,42 @@ pub fn run_multi_injected(
         for c in &model.constraints {
             eprintln!("    {c:?}");
         }
-        for (cnt, inst) in injections {
-            eprintln!("  inject at {cnt}: {}", inst.constraint.name);
+        for (cnt, pkt) in injections {
+            match pkt {
+                InjectionPacket::ExistingVarsConstraint(inst) => {
+                    eprintln!("  inject at {cnt}: {}", inst.constraint.name);
+                }
+                InjectionPacket::AddVarsAndConstraint { new_vars, constraint } => {
+                    let ns: Vec<&str> =
+                        new_vars.iter().map(|(n, _)| n.as_str()).collect();
+                    eprintln!(
+                        "  inject at {cnt}: add_vars={ns:?} + {constraint:?}"
+                    );
+                }
+            }
         }
         eprintln!("--- end {testname} ---");
     }
 
-    // Pre-build each injection's constraint so the callback only has to
-    // clone an already-valid AST.
+    // Pre-build each injection's constraint so the callback only has
+    // to clone an already-valid AST. For existing-vars packets this
+    // comes from the tester-side ConstraintInstance; for
+    // add-vars-and-constraint packets we use the caller-supplied AST
+    // directly.
     let prebuilt: Vec<minion_sys::ast::Constraint> = injections
         .iter()
-        .map(|(_, inst)| {
-            build_constraint(inst).with_context(|| {
-                format!(
-                    "building injection constraint {:?} for {testname}",
-                    inst.constraint.name
-                )
-            })
+        .map(|(_, pkt)| match pkt {
+            InjectionPacket::ExistingVarsConstraint(inst) => {
+                build_constraint(inst).with_context(|| {
+                    format!(
+                        "building injection constraint {:?} for {testname}",
+                        inst.constraint.name
+                    )
+                })
+            }
+            InjectionPacket::AddVarsAndConstraint { constraint, .. } => {
+                Ok(constraint.clone())
+            }
         })
         .collect::<Result<Vec<_>>>()?;
 
@@ -508,9 +553,14 @@ pub fn run_multi_injected(
     let mut fired: usize = 0;
     let mut cb_err: Option<String> = None;
     let mut stopped_at_limit = false;
+    // Track the growing set of variables actually live in the model
+    // so each row we emit has the right column set. Start with the
+    // initial declaration order; as each add-vars packet fires, we
+    // append its new vars (in the order they're declared).
+    let mut live_var_order: Vec<String> = initial_variable_order.clone();
 
     let callback: minion_sys::MidSearchCallback<'_> = {
-        let variable_order = &variable_order;
+        let live_var_order_ref = &mut live_var_order;
         let solutions = &mut solutions;
         let count_ref = &mut count;
         let next_injection_ref = &mut next_injection;
@@ -530,8 +580,8 @@ pub fn run_multi_injected(
                     }
                 }
                 *count_ref += 1;
-                let mut row = Vec::with_capacity(variable_order.len());
-                for name in variable_order.iter() {
+                let mut row = Vec::with_capacity(live_var_order_ref.len());
+                for name in live_var_order_ref.iter() {
                     match sol.get(name).copied() {
                         Some(MC::Integer(n)) => row.push(n as i64),
                         Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
@@ -547,13 +597,34 @@ pub fn run_multi_injected(
                 while *next_injection_ref < injections.len()
                     && injections[*next_injection_ref].0 == *count_ref
                 {
-                    let constr = prebuilt[*next_injection_ref].clone();
-                    if let Err(e) = midctx.add_constraint(constr) {
-                        *cb_err_ref = Some(format!(
-                            "add_constraint for {}: {e}",
-                            injections[*next_injection_ref].1.constraint.name
-                        ));
-                        return false;
+                    match &injections[*next_injection_ref].1 {
+                        InjectionPacket::ExistingVarsConstraint(_) => {
+                            let constr = prebuilt[*next_injection_ref].clone();
+                            if let Err(e) = midctx.add_constraint(constr) {
+                                *cb_err_ref = Some(format!("add_constraint: {e}"));
+                                return false;
+                            }
+                        }
+                        InjectionPacket::AddVarsAndConstraint {
+                            new_vars,
+                            ..
+                        } => {
+                            for (name, domain) in new_vars {
+                                if let Err(e) = midctx.add_var(name, *domain) {
+                                    *cb_err_ref = Some(format!(
+                                        "add_var({name}): {e}"
+                                    ));
+                                    return false;
+                                }
+                                live_var_order_ref.push(name.clone());
+                            }
+                            let constr = prebuilt[*next_injection_ref].clone();
+                            if let Err(e) = midctx.add_constraint(constr) {
+                                *cb_err_ref =
+                                    Some(format!("add_constraint (new-vars packet): {e}"));
+                                return false;
+                            }
+                        }
                     }
                     *next_injection_ref += 1;
                     *fired_ref += 1;
@@ -588,6 +659,7 @@ pub fn run_multi_injected(
         injections_fired: fired,
         nodes,
         stopped_at_limit,
+        final_variable_order: live_var_order,
     })
 }
 

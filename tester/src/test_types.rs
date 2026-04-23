@@ -473,11 +473,16 @@ pub fn test_constraint_midsearch_inject_constraints(
     }
 
     // Actual run: all packets injected at their scheduled callback counts.
-    let injections: Vec<(usize, &constraint_def::ConstraintInstance)> =
+    let injections: Vec<(usize, crate::run_minion_lib::InjectionPacket<'_>)> =
         inject_after_per_packet
             .iter()
             .zip(inject_instances.iter())
-            .map(|(&a, inst)| (a, inst))
+            .map(|(&a, inst)| {
+                (
+                    a,
+                    crate::run_minion_lib::InjectionPacket::ExistingVarsConstraint(inst),
+                )
+            })
             .collect();
     let actual = crate::run_minion_lib::run_multi_injected(
         &base_refs,
@@ -626,6 +631,276 @@ pub fn test_constraint_midsearch_inject_constraint(
         false,
         seed,
     )
+}
+
+/// Mid-search test: each packet adds one Bool variable via
+/// `minion_newVarMidsearch` (aux-block) and a `DisEq(new_var, X)`
+/// constraint where `X` is a randomly-chosen non-constant base
+/// variable — so the injected constraint mixes newly-added and
+/// pre-declared variables.
+///
+/// Aux semantics mean we can't do an exact `expected == actual` check
+/// (F_k built with those vars as decisions has many more rows), so we
+/// verify the weaker invariants:
+///
+/// * `actual[..A_1]` (pre-any-injection rows) equals `baseline[..A_1]`
+///   exactly — same columns, same order.
+/// * each post-injection row has `|base_vars| + k` columns where `k`
+///   is the number of packets that have fired by then.
+/// * each post-injection row's base-vars projection is a solution of
+///   the baseline (every row's base part corresponds to some leaf
+///   that baseline would have visited).
+/// * each active packet's `DisEq(new_var, paired_base_var)` holds on
+///   every row whose packet has fired.
+/// * rows are distinct.
+/// * `actual.solutions.len() <= baseline.solutions.len()` (aux
+///   produces at most one post-injection row per remaining decision
+///   leaf).
+///
+/// Skipped when any run hits `config.maxtuples`, when baseline has
+/// fewer rows than there are packets, when the base model has no
+/// non-constant variables to pair against, or when an injection
+/// pruned away all remaining branches before the next schedule point.
+pub fn test_midsearch_add_new_vars_with_constraint(
+    config: &MinionConfig,
+    base_defs: &[&constraint_def::ConstraintDef],
+    n_packets: usize,
+    seed: u32,
+) -> Result<()> {
+    if config.backend == Backend::Exec {
+        return Ok(());
+    }
+    if n_packets == 0 {
+        return Ok(());
+    }
+
+    let base_instances: Vec<constraint_def::ConstraintInstance> = base_defs
+        .iter()
+        .map(|d| constraint_def::build_random_instance(d))
+        .collect();
+    let base_refs: Vec<&constraint_def::ConstraintInstance> =
+        base_instances.iter().collect();
+
+    // Pool of pre-declared non-constant base-var names to pair
+    // DisEq against.
+    let base_var_names: Vec<String> = base_instances
+        .iter()
+        .flat_map(|inst| {
+            inst.vars()
+                .iter()
+                .flatten()
+                .filter(|v| v.var_type != constraint_def::VarType::Constant)
+                .map(|v| v.name.clone())
+                .collect::<Vec<_>>()
+        })
+        .collect();
+    if base_var_names.is_empty() {
+        return Ok(());
+    }
+
+    let log_id = || -> String {
+        format!(
+            "mode=add-vars base={:?} n_packets={n_packets} seed={seed:#x}",
+            base_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
+        )
+    };
+
+    // Build packets: each one adds 1 bool var and DisEq(new_var, base_var).
+    let mut rng = rand::thread_rng();
+    // Remember each packet's (new_var_name, paired_base_var_name) for
+    // constraint checking.
+    let mut packet_pairs: Vec<(String, String)> = Vec::with_capacity(n_packets);
+    let mut injections: Vec<(usize, crate::run_minion_lib::InjectionPacket<'_>)> =
+        Vec::with_capacity(n_packets);
+    for k in 0..n_packets {
+        let new_var = format!("midv_{}", crate::counter::get_unique_value());
+        let paired_base = base_var_names.choose(&mut rng).unwrap().clone();
+        let constraint = minion_sys::ast::Constraint::DisEq(
+            minion_sys::ast::Var::NameRef(new_var.clone()),
+            minion_sys::ast::Var::NameRef(paired_base.clone()),
+        );
+        packet_pairs.push((new_var.clone(), paired_base));
+        injections.push((
+            k + 1,
+            crate::run_minion_lib::InjectionPacket::AddVarsAndConstraint {
+                new_vars: vec![(new_var, minion_sys::ast::VarDomain::Bool)],
+                constraint,
+            },
+        ));
+    }
+
+    let cap = Some(config.maxtuples);
+
+    // Baseline: only base constraints, no packets.
+    let baseline =
+        crate::run_minion_lib::run_multi(&base_refs, &[], seed, cap, "add-vars-baseline")
+            .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
+    if baseline.stopped_at_limit {
+        return Ok(());
+    }
+    if baseline.solutions.len() < n_packets {
+        return Ok(());
+    }
+
+    let actual = crate::run_minion_lib::run_multi_injected(
+        &base_refs,
+        &[],
+        &injections,
+        seed,
+        cap,
+        "add-vars-actual",
+    )
+    .map_err(|e| anyhow!("{}: actual: {e}", log_id()))?;
+    if actual.stopped_at_limit {
+        return Ok(());
+    }
+    if actual.injections_fired != n_packets {
+        return Ok(());
+    }
+
+    let base_var_count = baseline
+        .solutions
+        .first()
+        .map(|r| r.len())
+        .unwrap_or(0);
+
+    // Invariant 1: actual[..A_1] == baseline[..A_1] exactly.
+    // A_1 = 1, so that's just actual[0] == baseline[0] with
+    // base_var_count columns.
+    let a1 = injections[0].0;
+    for i in 0..a1 {
+        if actual.solutions[i].len() != base_var_count
+            || actual.solutions[i] != baseline.solutions[i]
+        {
+            if std::env::var("TESTER_DEBUG").is_ok() {
+                eprintln!("baseline[..{a1}] = {:?}", &baseline.solutions[..a1]);
+                eprintln!("actual[..{a1}]   = {:?}", &actual.solutions[..a1]);
+            }
+            return Err(anyhow!(
+                "{}: pre-injection row {} differs from baseline",
+                log_id(),
+                i
+            ));
+        }
+    }
+
+    // Map var names to column indices in actual's final_variable_order.
+    let col_of: std::collections::HashMap<&str, usize> = actual
+        .final_variable_order
+        .iter()
+        .enumerate()
+        .map(|(i, n)| (n.as_str(), i))
+        .collect();
+
+    // Baseline base-rows as a lookup set.
+    let baseline_base_rows: std::collections::HashSet<&Vec<i64>> =
+        baseline.solutions.iter().collect();
+
+    let mut seen_actual: std::collections::HashSet<Vec<i64>> =
+        std::collections::HashSet::new();
+
+    for (idx, row) in actual.solutions.iter().enumerate() {
+        // Number of packets fired by (and including) this row:
+        // packet k (1-based count A_k = k) fires in the callback for
+        // the A_k-th solution. So row at 0-based `idx` follows the
+        // `idx+1`-th callback. Packet k is active at row `idx` iff
+        // A_k <= idx (0-based): A_k is the callback count post-which
+        // the constraint is live. With A_k = k (1-based packet
+        // number), packet k is active when idx >= k. Number of active
+        // packets at row idx = min(idx, n_packets) — idx==0 gives 0
+        // active, idx==1 gives 1 active, etc.
+        let active = idx.min(n_packets);
+
+        // Column-count invariant.
+        let expected_cols = base_var_count + active;
+        if row.len() != expected_cols {
+            return Err(anyhow!(
+                "{}: row {} has {} cols, expected {} (base {} + {} active packets)",
+                log_id(),
+                idx,
+                row.len(),
+                expected_cols,
+                base_var_count,
+                active
+            ));
+        }
+
+        if idx < a1 {
+            // Pre-injection rows already checked above.
+            continue;
+        }
+
+        // Base-vars projection is in baseline's solution set.
+        let base_proj: Vec<i64> = row[..base_var_count].to_vec();
+        if !baseline_base_rows.contains(&base_proj) {
+            return Err(anyhow!(
+                "{}: row {} base projection {:?} not in baseline",
+                log_id(),
+                idx,
+                base_proj
+            ));
+        }
+
+        // All active DisEq packets hold.
+        for k in 0..active {
+            let (new_var_name, paired_base_name) = &packet_pairs[k];
+            let new_col = *col_of.get(new_var_name.as_str()).ok_or_else(|| {
+                anyhow!(
+                    "{}: row {}: new var {} not in final_variable_order",
+                    log_id(),
+                    idx,
+                    new_var_name
+                )
+            })?;
+            let paired_col = *col_of.get(paired_base_name.as_str()).ok_or_else(|| {
+                anyhow!(
+                    "{}: row {}: paired base var {} not in final_variable_order",
+                    log_id(),
+                    idx,
+                    paired_base_name
+                )
+            })?;
+            if new_col >= row.len() || paired_col >= row.len() {
+                return Err(anyhow!(
+                    "{}: row {} packet {} column out of bounds",
+                    log_id(),
+                    idx,
+                    k
+                ));
+            }
+            if row[new_col] == row[paired_col] {
+                return Err(anyhow!(
+                    "{}: row {} packet {} DisEq violated: {}={} == {}={}",
+                    log_id(),
+                    idx,
+                    k,
+                    new_var_name,
+                    row[new_col],
+                    paired_base_name,
+                    row[paired_col]
+                ));
+            }
+        }
+
+        // Distinctness.
+        if !seen_actual.insert(row.clone()) {
+            return Err(anyhow!("{}: row {} duplicate", log_id(), idx));
+        }
+    }
+
+    // Upper-bound invariant: aux gives at most one post-injection row
+    // per remaining decision leaf, so `actual` can't be longer than
+    // `baseline`.
+    if actual.solutions.len() > baseline.solutions.len() {
+        return Err(anyhow!(
+            "{}: actual has {} rows but baseline has only {}",
+            log_id(),
+            actual.solutions.len(),
+            baseline.solutions.len()
+        ));
+    }
+
+    Ok(())
 }
 
 pub fn test_constraint_nested(
