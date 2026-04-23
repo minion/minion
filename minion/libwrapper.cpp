@@ -516,6 +516,13 @@ int printMatrix_getValueByName(MinionContext* ctx, CSPInstance& instance, const 
   throw parse_exception("Variable '" + string(varname) + "' not found in print matrix");
 }
 
+int minion_getVarValue(MinionContext* ctx, CSPInstance& instance, const char* varname)
+{
+  ContextGuard guard(ctx);
+  AnyVarRef ref = getAnyVarRefFromString(instance, string(varname));
+  return checked_cast<int>(ref.assignedValue());
+}
+
 /***** SearchOptions *****/
 
 SearchOptions* searchOptions_new()

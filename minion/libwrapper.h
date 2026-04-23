@@ -338,6 +338,18 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
 MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
                                     char* name, VariableType type,
                                     int bound1, int bound2);
+
+/// Returns the assigned value of any named variable during a callback.
+///
+/// Unlike `printMatrix_getValueByName`, this works for any variable in
+/// the symbol table — including variables added via
+/// `minion_newVarMidsearch`, which are not added to the print matrix.
+///
+/// Throws `parse_exception` if the name is not in the symbol table.
+///
+/// This must only be called while Minion is actively searching (i.e.
+/// from inside a solution callback).
+int minion_getVarValue(MinionContext* ctx, CSPInstance& instance, const char* varname);
 #endif
 
 
