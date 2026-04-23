@@ -209,15 +209,20 @@ fn main() -> Result<()> {
                     .choose_multiple(&mut rng, opt.midsearch_base_size)
                     .copied()
                     .collect();
+                let seed: u32 = rand::random();
                 if trace {
                     let names: Vec<&str> = base_defs.iter().map(|d| d.name.as_str()).collect();
-                    eprintln!("trial inject={} base={names:?}", c.name);
+                    eprintln!(
+                        "trial inject={} base={names:?} seed={seed:#x}",
+                        c.name
+                    );
                 }
                 if let Err(e) = test_types::test_constraint_midsearch_inject_constraint(
                     &config,
                     &base_defs,
                     c,
                     opt.midsearch_inject_after,
+                    seed,
                 ) {
                     let r = &reports[&c.name];
                     r.failures

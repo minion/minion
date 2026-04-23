@@ -340,12 +340,11 @@ pub fn test_constraint_midsearch_inject_constraint(
     base_defs: &[&constraint_def::ConstraintDef],
     inject_def: &constraint_def::ConstraintDef,
     inject_after: usize,
+    seed: u32,
 ) -> Result<()> {
     if config.backend == Backend::Exec {
         return Ok(());
     }
-
-    let seed: u32 = rand::random();
 
     let base_instances: Vec<constraint_def::ConstraintInstance> = base_defs
         .iter()
