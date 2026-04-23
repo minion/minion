@@ -267,6 +267,19 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
     (state.callback)(&mut midctx, solutions)
 }
 
+/// Knobs for a single solve. Extend as needed — using a struct keeps the
+/// public call surface stable when we add more options.
+#[derive(Default, Clone, Copy, Debug)]
+pub struct RunOptions {
+    /// Seed for Minion's random heuristics. `None` keeps Minion's own
+    /// default (currently `std::random_device{}()`, i.e. non-deterministic).
+    ///
+    /// Pass `Some(s)` to make a solve reproducible — tests that want to
+    /// diff two runs (e.g. "same prefix before the injection point")
+    /// must set the same seed for both runs.
+    pub seed: Option<u32>,
+}
+
 /// Run Minion on the given [Model].
 ///
 /// The given [callback](Callback) is ran whenever a new solution set is found.
@@ -276,18 +289,38 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
 ///
 /// For callbacks that need to add variables or constraints during search,
 /// use [`run_minion_midsearch`].
-pub fn run_minion(model: Model, mut callback: Callback<'_>) -> Result<SolverContext, MinionError> {
-    run_minion_midsearch(
+pub fn run_minion(model: Model, callback: Callback<'_>) -> Result<SolverContext, MinionError> {
+    run_minion_with_options(model, RunOptions::default(), callback)
+}
+
+/// Like [`run_minion`] but lets the caller pin solver-side knobs
+/// (e.g. the random seed) via [`RunOptions`].
+pub fn run_minion_with_options(
+    model: Model,
+    options: RunOptions,
+    mut callback: Callback<'_>,
+) -> Result<SolverContext, MinionError> {
+    run_minion_midsearch_with_options(
         model,
+        options,
         Box::new(move |_ctx, sol| callback(sol)),
     )
 }
 
 /// Run Minion on the given [Model] with a callback that can mutate the
 /// running search via a [`MidSearchContext`] handle.
-#[allow(clippy::unwrap_used)]
 pub fn run_minion_midsearch(
     model: Model,
+    callback: MidSearchCallback<'_>,
+) -> Result<SolverContext, MinionError> {
+    run_minion_midsearch_with_options(model, RunOptions::default(), callback)
+}
+
+/// Like [`run_minion_midsearch`] but with [`RunOptions`].
+#[allow(clippy::unwrap_used)]
+pub fn run_minion_midsearch_with_options(
+    model: Model,
+    options: RunOptions,
     callback: MidSearchCallback<'_>,
 ) -> Result<SolverContext, MinionError> {
     unsafe {
@@ -301,6 +334,10 @@ pub fn run_minion_midsearch(
         // themselves instead of going through this wrapper.
         (*search_opts).silent = true;
         (*search_opts).print_solution = false;
+
+        if let Some(seed) = options.seed {
+            (*search_method).randomSeed = seed;
+        }
 
         let mut state = CallbackState {
             callback,
