@@ -907,13 +907,31 @@ pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
 ) -> Result<()> {
+    let mut rng = rand::thread_rng();
     let nest_type = constraint_def::NESTED_CONSTRAINT_LIST
-        .choose(&mut rand::thread_rng())
+        .choose(&mut rng)
         .unwrap();
+    // Build enough children for the parent's Constraint-arg slots:
+    // the iterated constraint `c` goes in the first slot; any extra
+    // slots (e.g. watched-and / watched-or with two children) get
+    // random picks from the leaf constraint list.
+    let n_children = nest_type
+        .arg
+        .iter()
+        .filter(|a| matches!(a, constraint_def::Arg::Constraint))
+        .count();
+    let mut children: Vec<&constraint_def::ConstraintDef> = vec![c];
+    for _ in 1..n_children {
+        let extra = constraint_def::CONSTRAINT_LIST
+            .choose(&mut rng)
+            .expect("CONSTRAINT_LIST empty");
+        children.push(extra);
+    }
+
     let mut instance;
     let tups;
     loop {
-        instance = constraint_def::build_random_instance_with_children(nest_type, &[c]);
+        instance = constraint_def::build_random_instance_with_children(nest_type, &children);
         let tupstry = instance.tableise(config.maxtuples);
         if let Some(t) = tupstry {
             tups = t;
