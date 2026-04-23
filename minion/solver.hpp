@@ -69,8 +69,13 @@ inline void worldPop_all() {
 } // namespace Controller
 
 inline bool SearchState::addConstraint(AbstractConstraint* c) {
+  // Catastrophic if true: setup/fullPropagate would not run, but the
+  // constraint pointer would still be silently dropped on the floor —
+  // very hard to diagnose later. Callers must check `isFailed()`
+  // themselves and bail out cleanly (the public mid-search entry points
+  // in libwrapper.cpp do this).
   if(getState().isFailed()) {
-    return false;
+    INTERNAL_ERROR("addConstraint called with solver state already failed");
   }
   constraints.push_back(c);
   vector<AnyVarRef>* vars = c->getVarsSingleton();
@@ -90,13 +95,30 @@ inline bool SearchState::addConstraint(AbstractConstraint* c) {
 
 inline bool SearchState::addConstraintMidsearch(AbstractConstraint* c) {
   bool ret = addConstraint(c);
-  if(ret) {
-    // worldPop re-fullPropagates constraints at ctp[propagateDepth] where
-    // propagateDepth = newDepth + 1 = oldDepth. So to make the constraint
-    // fire on the next pop that undoes the current depth's state, we need
-    // it at ctp[currentDepth]. In the healthy invariant ctp.size ==
-    // currentDepth, so currentDepth is one past the last valid index —
-    // grow the vector by one to make room.
+  // Register for re-propagation on every worldPop that undoes the depth
+  // at which the constraint was added — whenever the constraint was
+  // actually installed (i.e. fullPropagate was called). We must NOT gate
+  // this on `ret`: if the initial fullPropagate wiped out a domain,
+  // addConstraint returns false, but the constraint has already been
+  // pushed into `constraints`, registered with its variables, and placed
+  // its dynamic triggers (triggerSetup inside fullPropagate runs before
+  // any domain operation that could fail). On backtrack the trail then
+  // restores the variables, but unless we re-run fullPropagate, the
+  // propagator's own internal invariants (e.g. `abs` enforcing var1>=0
+  // with var1.setMin(0)) aren't re-established — and any later trigger
+  // firing can then crash the propagator.
+  //
+  // The early-bailout branch in addConstraint (state already failed on
+  // entry) never runs setup/fullPropagate and so leaves fullPropagateDone
+  // as its default false — those constraints correctly skip registration.
+  //
+  // worldPop re-fullPropagates constraints at ctp[propagateDepth] where
+  // propagateDepth = newDepth + 1 = oldDepth. So to make the constraint
+  // fire on the next pop that undoes the current depth's state, we need
+  // it at ctp[currentDepth]. In the healthy invariant ctp.size ==
+  // currentDepth, so currentDepth is one past the last valid index —
+  // grow the vector by one to make room.
+  if(c->fullPropagateDone) {
     SysInt insertIdx = Controller::getWorldDepth();
     if((SysInt)constraintsToPropagate.size() <= insertIdx)
       constraintsToPropagate.resize(insertIdx + 1);

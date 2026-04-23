@@ -385,6 +385,16 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
 {
   try {
     ContextGuard guard(ctx);
+    // Refuse to install a new constraint if the solver is already in a
+    // failed state — addConstraint's setup/fullPropagate would be
+    // skipped (and that path is now an INTERNAL_ERROR), so callers must
+    // wait for the solver to backtrack out of the failed state before
+    // injecting more constraints.
+    if(getState().isFailed()) {
+      set_error("minion_addConstraintMidsearch: solver state is already failed; back out via the search loop before adding more constraints");
+      return MinionResult::MINION_INVALID_ARGUMENT;
+    }
+
     // Keep a stable copy of the blob alive for the lifetime of `instance`.
     // Some built constraints may retain references to blob-owned argument storage.
     instance.constraints.push_back(constraint);
@@ -412,6 +422,13 @@ MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
 {
   try {
     ContextGuard guard(ctx);
+
+    // Refuse if the solver is in a failed state — adding a variable
+    // mid-search assumes the live SearchManager is in a valid state.
+    if(getState().isFailed()) {
+      set_error("minion_newVarMidsearch: solver state is already failed; back out via the search loop before adding more variables");
+      return MinionResult::MINION_INVALID_ARGUMENT;
+    }
 
     // 1. Add to the spec (symbol table, allVars_list, etc.)
     newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
