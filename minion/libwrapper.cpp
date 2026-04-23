@@ -390,11 +390,12 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
     instance.constraints.push_back(constraint);
 
     AbstractConstraint* c = build_constraint(instance.constraints.back());
-    bool ok = getState().addConstraintMidsearch(c);
-    if(!ok) {
-      set_error("propagation failure when adding constraint midsearch");
-      return MinionResult::MINION_INVALID_INSTANCE;
-    }
+    // addConstraintMidsearch returns false when the new constraint wipes
+    // out a domain during its initial fullPropagate. That's a normal
+    // search outcome: getState().isFailed() is already set, so when
+    // control returns to the search loop it backtracks. The caller
+    // shouldn't have to treat this as an API error.
+    (void)getState().addConstraintMidsearch(c);
     return MinionResult::MINION_OK;
   } catch(const parse_exception& e) {
     set_error(e.what());
