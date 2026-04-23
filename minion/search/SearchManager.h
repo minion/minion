@@ -121,7 +121,12 @@ struct StandardSearchManager : public SearchManager {
     // remove the left branch.
     branches.pop_back();
 
-    D_ASSERT(var.inDomain(val));
+    // We can no longer assert var.inDomain(val): a constraint added
+    // mid-search and re-propagated by this worldPop may already have
+    // pruned `val`. The setMin/setMax/removeFromDomain calls below
+    // behave as no-ops in that case (val is neither min nor max, and
+    // removeFromDomain on an absent value is a no-op), so the right
+    // branch marker is still recorded and search progresses correctly.
 
     // special case the upper and lower bounds to make it work for bound
     // variables
