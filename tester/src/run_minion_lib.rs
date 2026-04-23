@@ -311,6 +311,11 @@ pub struct InjectOutput {
     /// produced ≥ their threshold number of solutions before ending).
     pub injections_fired: usize,
     pub nodes: i64,
+    /// True if the solution-count cap passed to the runner was reached
+    /// and the callback returned false to stop search. When this is
+    /// true, `solutions` is truncated and should not be trusted as a
+    /// complete enumeration.
+    pub stopped_at_limit: bool,
 }
 
 /// Build a model from a set of [`ConstraintInstance`]s: every instance
@@ -343,12 +348,25 @@ fn build_multi_model(
 /// Run several [`ConstraintInstance`]s together as a single model, with
 /// a pinned seed. `vars_only` instances contribute declared variables
 /// but no top-level constraint.
+/// Output of a capped run.
+///
+/// Callers that need a complete enumeration must check
+/// `stopped_at_limit`; when it's true the solution list was truncated
+/// by the callback returning false, and any invariant that compares
+/// against the full set is unverifiable.
+pub struct CappedOutput {
+    pub solutions: Vec<Vec<i64>>,
+    pub stopped_at_limit: bool,
+    pub nodes: i64,
+}
+
 pub fn run_multi(
     with_constraints: &[&ConstraintInstance],
     vars_only: &[&ConstraintInstance],
     seed: u32,
+    max_solutions: Option<usize>,
     testname: &str,
-) -> Result<MinionOutput> {
+) -> Result<CappedOutput> {
     let model = build_multi_model(with_constraints, vars_only)?;
     let variable_order = model.named_variables.get_variable_order();
 
@@ -367,10 +385,18 @@ pub fn run_multi(
     }
 
     let mut solutions: Vec<Vec<i64>> = Vec::new();
+    let mut stopped_at_limit = false;
     let callback: minion_sys::Callback<'_> = {
         let variable_order = &variable_order;
         let solutions = &mut solutions;
+        let stopped_at_limit = &mut stopped_at_limit;
         Box::new(move |sol: HashMap<VarName, MC>| -> bool {
+            if let Some(cap) = max_solutions {
+                if solutions.len() >= cap {
+                    *stopped_at_limit = true;
+                    return false;
+                }
+            }
             let mut row = Vec::with_capacity(variable_order.len());
             for name in variable_order.iter() {
                 match sol.get(name).copied() {
@@ -400,11 +426,10 @@ pub fn run_multi(
         .parse::<i64>()
         .context("parsing Nodes")?;
 
-    Ok(MinionOutput {
+    Ok(CappedOutput {
         solutions,
+        stopped_at_limit,
         nodes,
-        filename: format!("<{testname}>"),
-        cleanup: CleanupFiles::empty(),
     })
 }
 
@@ -421,6 +446,7 @@ pub fn run_multi_injected(
     vars_only: &[&ConstraintInstance],
     injections: &[(usize, &ConstraintInstance)],
     seed: u32,
+    max_solutions: Option<usize>,
     testname: &str,
 ) -> Result<InjectOutput> {
     for w in injections.windows(2) {
@@ -469,6 +495,7 @@ pub fn run_multi_injected(
     let mut next_injection: usize = 0;
     let mut fired: usize = 0;
     let mut cb_err: Option<String> = None;
+    let mut stopped_at_limit = false;
 
     let callback: minion_sys::MidSearchCallback<'_> = {
         let variable_order = &variable_order;
@@ -477,12 +504,19 @@ pub fn run_multi_injected(
         let next_injection_ref = &mut next_injection;
         let fired_ref = &mut fired;
         let cb_err_ref = &mut cb_err;
+        let stopped_ref = &mut stopped_at_limit;
         let prebuilt = &prebuilt;
         let injections = injections;
         Box::new(
             move |midctx: &mut minion_sys::MidSearchContext<'_>,
                   sol: HashMap<VarName, MC>|
                   -> bool {
+                if let Some(cap) = max_solutions {
+                    if solutions.len() >= cap {
+                        *stopped_ref = true;
+                        return false;
+                    }
+                }
                 *count_ref += 1;
                 let mut row = Vec::with_capacity(variable_order.len());
                 for name in variable_order.iter() {
@@ -541,6 +575,7 @@ pub fn run_multi_injected(
         solutions,
         injections_fired: fired,
         nodes,
+        stopped_at_limit,
     })
 }
 

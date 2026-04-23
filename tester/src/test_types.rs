@@ -399,9 +399,27 @@ pub fn test_constraint_midsearch_inject_constraints(
 
     let last_a = *inject_after_per_packet.last().unwrap();
 
+    // Cap per-run solution count so a cartesian-exploded baseline (or
+    // F_k) can't eat tens of GB. If any run hits the cap, we can't
+    // verify the invariant against a complete set, so we skip the
+    // trial. `config.maxtuples` is the shared knob with the exec-mode
+    // tester's tableise limit.
+    let cap = Some(config.maxtuples);
+
     // Baseline: no packet constraints, but their vars are declared.
-    let baseline = crate::run_minion_lib::run_multi(&base_refs, &inject_refs, seed, "baseline")
-        .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
+    let baseline = crate::run_minion_lib::run_multi(
+        &base_refs,
+        &inject_refs,
+        seed,
+        cap,
+        "baseline",
+    )
+    .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
+
+    if baseline.stopped_at_limit {
+        // Baseline would have been enormous; skip this trial.
+        return Ok(());
+    }
 
     if baseline.solutions.len() < last_a {
         // Can't fire every injection; trivial trial.
@@ -420,9 +438,14 @@ pub fn test_constraint_midsearch_inject_constraints(
         &inject_refs,
         &injections,
         seed,
+        cap,
         "actual",
     )
     .map_err(|e| anyhow!("{}: actual: {e}", log_id()))?;
+
+    if actual.stopped_at_limit {
+        return Ok(());
+    }
 
     if actual.injections_fired != n {
         // A packet's pruning ended search before the next injection point.
@@ -431,7 +454,7 @@ pub fn test_constraint_midsearch_inject_constraints(
     }
 
     // Reference runs F_k for k=1..N: base + packets[..k] in the model.
-    let mut full_runs: Vec<crate::run_minion::MinionOutput> = Vec::with_capacity(n);
+    let mut full_runs: Vec<crate::run_minion_lib::CappedOutput> = Vec::with_capacity(n);
     for k in 0..n {
         let mut with_c: Vec<&constraint_def::ConstraintInstance> = base_refs.clone();
         with_c.extend(inject_refs[..=k].iter().copied());
@@ -441,9 +464,13 @@ pub fn test_constraint_midsearch_inject_constraints(
             &with_c,
             &vars_only_k,
             seed,
+            cap,
             &format!("F_{}", k + 1),
         )
         .map_err(|e| anyhow!("{}: F_{}: {e}", log_id(), k + 1))?;
+        if f_k.stopped_at_limit {
+            return Ok(());
+        }
         full_runs.push(f_k);
     }
 
