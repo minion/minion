@@ -208,6 +208,18 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         "reify" => MCon::Reify(child(0)?, var_of(&v[1][0])),
         "reifyimply" => MCon::ReifyImply(child(0)?, var_of(&v[1][0])),
         "reifyimply-quick" => MCon::ReifyImplyQuick(child(0)?, var_of(&v[1][0])),
+        "watched-and" => {
+            let cs: Vec<MCon> = (0..children.len())
+                .map(|i| build_constraint(&children[i]))
+                .collect::<Result<Vec<_>>>()?;
+            MCon::WatchedAnd(cs)
+        }
+        "watched-or" => {
+            let cs: Vec<MCon> = (0..children.len())
+                .map(|i| build_constraint(&children[i]))
+                .collect::<Result<Vec<_>>>()?;
+            MCon::WatchedOr(cs)
+        }
         "forwardchecking" => MCon::ForwardChecking(child(0)?),
         "check[gsa]" => MCon::CheckGsa(child(0)?),
         "check[assign]" => MCon::CheckAssign(child(0)?),

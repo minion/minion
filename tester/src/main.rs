@@ -90,6 +90,15 @@ struct Opt {
     /// uniformly at random from the full constraint list.
     #[arg(long, default_value_t = 1)]
     midsearch_constraints_num_packets: usize,
+
+    /// Wrap each injected constraint in a random nested parent
+    /// (reify / reifyimply / watched-and / watched-or), so what gets
+    /// added mid-search is a ParentConstraint with the iterated leaf
+    /// as its child. Exercises the mid-search handling of
+    /// parent-constraint state (trigger activation, stage-1 vs stage-2
+    /// setup) on top of the existing single-constraint verification.
+    #[arg(long)]
+    midsearch_wrap_nested: bool,
 }
 
 fn main() -> Result<()> {
@@ -238,6 +247,7 @@ fn main() -> Result<()> {
                     &base_defs,
                     &inject_defs,
                     &inject_after,
+                    opt.midsearch_wrap_nested,
                     seed,
                 ) {
                     let r = &reports[&c.name];

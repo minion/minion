@@ -349,11 +349,51 @@ pub fn test_constraint_midsearch_add_vars(
 /// point.
 ///
 /// On failure the seed is logged so the trial can be re-run.
+/// Wrap a simple constraint def in a random nested parent chosen from
+/// `reify`, `reifyimply`, `watched-and`, `watched-or`, returning a
+/// `ConstraintInstance` whose top-level is the parent and whose
+/// child(ren) use `inner_def` (plus a random other leaf for two-child
+/// parents).
+fn wrap_in_random_nested(
+    inner_def: &constraint_def::ConstraintDef,
+) -> constraint_def::ConstraintInstance {
+    let mut rng = rand::thread_rng();
+    // Fixed shortlist of parents we want to exercise here. Picked
+    // explicitly (not from NESTED_CONSTRAINT_LIST) so we don't
+    // accidentally pull in forwardchecking / check[gsa] / check[assign]
+    // which aren't the focus of this flag.
+    let wrappers: &[&str] = &["reify", "reifyimply", "watched-and", "watched-or"];
+    let wname = wrappers.choose(&mut rng).unwrap();
+    let parent_def = constraint_def::NESTED_CONSTRAINT_LIST
+        .iter()
+        .find(|d| &d.name.as_str() == wname)
+        .expect("nested parent not in NESTED_CONSTRAINT_LIST");
+
+    // Count the number of Constraint args the parent expects.
+    let n_children = parent_def
+        .arg
+        .iter()
+        .filter(|a| matches!(a, constraint_def::Arg::Constraint))
+        .count();
+
+    // First child is the iterated leaf; any additional children are
+    // random picks from the main constraint list.
+    let mut children: Vec<&constraint_def::ConstraintDef> = vec![inner_def];
+    for _ in 1..n_children {
+        let extra = constraint_def::CONSTRAINT_LIST
+            .choose(&mut rng)
+            .expect("CONSTRAINT_LIST empty");
+        children.push(extra);
+    }
+    constraint_def::build_random_instance_with_children(parent_def, &children)
+}
+
 pub fn test_constraint_midsearch_inject_constraints(
     config: &MinionConfig,
     base_defs: &[&constraint_def::ConstraintDef],
     inject_defs: &[&constraint_def::ConstraintDef],
     inject_after_per_packet: &[usize],
+    wrap_nested: bool,
     seed: u32,
 ) -> Result<()> {
     if config.backend == Backend::Exec {
@@ -383,7 +423,13 @@ pub fn test_constraint_midsearch_inject_constraints(
         .collect();
     let inject_instances: Vec<constraint_def::ConstraintInstance> = inject_defs
         .iter()
-        .map(|d| constraint_def::build_random_instance(d))
+        .map(|d| {
+            if wrap_nested {
+                wrap_in_random_nested(d)
+            } else {
+                constraint_def::build_random_instance(d)
+            }
+        })
         .collect();
     let base_refs: Vec<&constraint_def::ConstraintInstance> = base_instances.iter().collect();
     let inject_refs: Vec<&constraint_def::ConstraintInstance> = inject_instances.iter().collect();
@@ -577,6 +623,7 @@ pub fn test_constraint_midsearch_inject_constraint(
         base_defs,
         &[inject_def],
         &[inject_after],
+        false,
         seed,
     )
 }

@@ -477,6 +477,46 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
+        // watched-and / watched-or with exactly two children. The assign
+        // slices are laid out as: [empty(slot 0)], [empty(slot 1)],
+        // then each child's top-level slots concatenated in order.
+        // A child C contributes C.constraint.arg.len() slots here.
+        ConstraintDef::new_parent(
+            "watched-and", // CT_WATCHED_NEW_AND
+            vec![Constraint, Constraint],
+            |c, assign| {
+                let mut offset = c.constraint.arg.len();
+                for child in &c.child_constraints {
+                    let nslots = child.constraint.arg.len();
+                    let child_assign = &assign[offset..offset + nslots];
+                    if !(child.constraint.checker)(child, child_assign) {
+                        return false;
+                    }
+                    offset += nslots;
+                }
+                true
+            },
+            false,
+            false,
+        ),
+        ConstraintDef::new_parent(
+            "watched-or", // CT_WATCHED_NEW_OR
+            vec![Constraint, Constraint],
+            |c, assign| {
+                let mut offset = c.constraint.arg.len();
+                for child in &c.child_constraints {
+                    let nslots = child.constraint.arg.len();
+                    let child_assign = &assign[offset..offset + nslots];
+                    if (child.constraint.checker)(child, child_assign) {
+                        return true;
+                    }
+                    offset += nslots;
+                }
+                false
+            },
+            false,
+            false,
+        ),
     ]
 }
 
