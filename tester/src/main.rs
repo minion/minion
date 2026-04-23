@@ -82,6 +82,14 @@ struct Opt {
     /// in each constraint-injection trial.
     #[arg(long, default_value_t = 2)]
     midsearch_base_size: usize,
+
+    /// Number of constraint packets injected during the same solve in
+    /// each --midsearch-constraints trial. Packet `k` (1-based) is
+    /// injected after `k` solutions have been reported. The first
+    /// packet uses the constraint being iterated; the rest are picked
+    /// uniformly at random from the full constraint list.
+    #[arg(long, default_value_t = 1)]
+    midsearch_constraints_num_packets: usize,
 }
 
 fn main() -> Result<()> {
@@ -210,18 +218,26 @@ fn main() -> Result<()> {
                     .copied()
                     .collect();
                 let seed: u32 = rand::random();
+                // Build N packets: first one is the iterated constraint
+                // `c`; the rest are random picks from the full pool.
+                let mut inject_defs: Vec<&constraint_def::ConstraintDef> = vec![c];
+                for _ in 1..opt.midsearch_constraints_num_packets {
+                    inject_defs.push(pool.choose(&mut rng).unwrap());
+                }
+                let inject_after: Vec<usize> =
+                    (1..=opt.midsearch_constraints_num_packets).collect();
                 if trace {
                     let names: Vec<&str> = base_defs.iter().map(|d| d.name.as_str()).collect();
+                    let inames: Vec<&str> = inject_defs.iter().map(|d| d.name.as_str()).collect();
                     eprintln!(
-                        "trial inject={} base={names:?} seed={seed:#x}",
-                        c.name
+                        "trial inject={inames:?} base={names:?} schedule={inject_after:?} seed={seed:#x}"
                     );
                 }
-                if let Err(e) = test_types::test_constraint_midsearch_inject_constraint(
+                if let Err(e) = test_types::test_constraint_midsearch_inject_constraints(
                     &config,
                     &base_defs,
-                    c,
-                    opt.midsearch_inject_after,
+                    &inject_defs,
+                    &inject_after,
                     seed,
                 ) {
                     let r = &reports[&c.name];

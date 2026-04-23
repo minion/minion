@@ -302,39 +302,242 @@ pub fn test_constraint_midsearch_add_vars(
     Ok(())
 }
 
-/// Mid-search *constraint*-injection test.
+/// Mid-search *constraint*-injection test, multi-packet generalisation.
 ///
 /// The purpose is to exercise each Minion constraint as an *injected*
-/// constraint: does the solver correctly apply a constraint that was
-/// added mid-search? The base problem is a bag of random constraints
-/// purely as a carrier to give the solver something non-trivial to
-/// search through.
+/// constraint, and to confirm that several injections in the same
+/// solve compose correctly. The base problem is a bag of random
+/// constraints purely as a carrier to give the solver something
+/// non-trivial to search through.
 ///
 /// Setup (all with a shared seed `s`):
-///   * Build `base_defs.len()` random instances — these form the base
-///     model. All their variables and top-level constraints go into
-///     the model.
-///   * Build one random instance of `inject_def`. Its variables are
-///     also declared up-front (so baseline enumerates over them as
-///     free search vars), but its top-level constraint is NOT in the
-///     model at the start.
+///   * Build a random instance per `base_defs[i]` — together these are
+///     the base model.
+///   * Build a random instance per `inject_defs[k]` — these are packets
+///     `P_1..P_N`. Their variables are declared up-front (so baseline
+///     enumerates them freely), but their top-level constraints are
+///     not initially in the model.
 ///
-/// Three runs under seed `s`:
-///   * baseline  — base model only; inject-instance's vars are free.
-///   * full      — base model + inject constraint from the start.
-///   * injected  — base model; inject constraint added via
-///                 MidSearchContext::add_constraint after
-///                 `inject_after` solutions.
+/// Injection schedule: packet `P_k` is added via
+/// `MidSearchContext::add_constraint` once the running solve has
+/// reported `inject_after_per_packet[k-1]` solutions. The schedule
+/// must be strictly increasing.
 ///
-/// Invariants (STATIC variable order):
-///   * `injected[0..A] == baseline[0..A]` exactly.
-///   * `injected[A..]` equals `full` with every element of
-///     `full ∩ baseline[0..A]` dropped once, in `full`'s order.
+/// Reference solves under seed `s`:
+///   * baseline       — base only; packet vars free.
+///   * full_k for k=1..N — base + P_1..P_k from the start; later packet
+///                         vars still declared as free.
+///   * actual         — base only at start; packet `P_k` injected at
+///                      schedule index `k`.
 ///
-/// Tests are skipped when baseline has fewer than `inject_after`
-/// solutions (nothing post-injection to compare).
+/// Invariants (STATIC variable order). Splitting the actual solution
+/// stream at the injection points into N+1 segments, with
+/// `A_0 = 0`, `A_{N+1} = end`:
+///   * Segment 0 (`[A_0, A_1)`): equals `baseline[A_0..A_1]`.
+///   * Segment k for `1 ≤ k < N`: first `(A_{k+1} - A_k)` rows of
+///     `full_k` minus the rows already in `actual[..A_k]`, in
+///     `full_k`'s order.
+///   * Segment N: all of `full_N` minus the rows already in
+///     `actual[..A_N]`, in `full_N`'s order.
+///
+/// Each "minus seen, take in full's order" step is exactly the
+/// single-packet check repeated with a growing prefix.
+///
+/// Skipped when the baseline can't produce enough solutions to fire
+/// every injection, or when the actual run terminates early because a
+/// packet pruned away all remaining branches before the next injection
+/// point.
 ///
 /// On failure the seed is logged so the trial can be re-run.
+pub fn test_constraint_midsearch_inject_constraints(
+    config: &MinionConfig,
+    base_defs: &[&constraint_def::ConstraintDef],
+    inject_defs: &[&constraint_def::ConstraintDef],
+    inject_after_per_packet: &[usize],
+    seed: u32,
+) -> Result<()> {
+    if config.backend == Backend::Exec {
+        return Ok(());
+    }
+    let n = inject_defs.len();
+    if n == 0 {
+        return Ok(());
+    }
+    if inject_after_per_packet.len() != n {
+        return Err(anyhow!(
+            "test_constraint_midsearch_inject_constraints: schedule length {} != packet count {}",
+            inject_after_per_packet.len(),
+            n
+        ));
+    }
+    if !inject_after_per_packet.windows(2).all(|w| w[0] < w[1]) {
+        return Err(anyhow!(
+            "test_constraint_midsearch_inject_constraints: schedule {:?} must be strictly increasing",
+            inject_after_per_packet
+        ));
+    }
+
+    let base_instances: Vec<constraint_def::ConstraintInstance> = base_defs
+        .iter()
+        .map(|d| constraint_def::build_random_instance(d))
+        .collect();
+    let inject_instances: Vec<constraint_def::ConstraintInstance> = inject_defs
+        .iter()
+        .map(|d| constraint_def::build_random_instance(d))
+        .collect();
+    let base_refs: Vec<&constraint_def::ConstraintInstance> = base_instances.iter().collect();
+    let inject_refs: Vec<&constraint_def::ConstraintInstance> = inject_instances.iter().collect();
+
+    let log_id = || -> String {
+        format!(
+            "inject={:?} base={:?} schedule={:?} seed={seed:#x}",
+            inject_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
+            base_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
+            inject_after_per_packet,
+        )
+    };
+
+    let last_a = *inject_after_per_packet.last().unwrap();
+
+    // Baseline: no packet constraints, but their vars are declared.
+    let baseline = crate::run_minion_lib::run_multi(&base_refs, &inject_refs, seed, "baseline")
+        .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
+
+    if baseline.solutions.len() < last_a {
+        // Can't fire every injection; trivial trial.
+        return Ok(());
+    }
+
+    // Actual run: all packets injected at their scheduled callback counts.
+    let injections: Vec<(usize, &constraint_def::ConstraintInstance)> =
+        inject_after_per_packet
+            .iter()
+            .zip(inject_instances.iter())
+            .map(|(&a, inst)| (a, inst))
+            .collect();
+    let actual = crate::run_minion_lib::run_multi_injected(
+        &base_refs,
+        &inject_refs,
+        &injections,
+        seed,
+        "actual",
+    )
+    .map_err(|e| anyhow!("{}: actual: {e}", log_id()))?;
+
+    if actual.injections_fired != n {
+        // A packet's pruning ended search before the next injection point.
+        // Not a test failure; just a degenerate trial.
+        return Ok(());
+    }
+
+    // Reference runs F_k for k=1..N: base + packets[..k] in the model.
+    let mut full_runs: Vec<crate::run_minion::MinionOutput> = Vec::with_capacity(n);
+    for k in 0..n {
+        let mut with_c: Vec<&constraint_def::ConstraintInstance> = base_refs.clone();
+        with_c.extend(inject_refs[..=k].iter().copied());
+        let vars_only_k: Vec<&constraint_def::ConstraintInstance> =
+            inject_refs[k + 1..].iter().copied().collect();
+        let f_k = crate::run_minion_lib::run_multi(
+            &with_c,
+            &vars_only_k,
+            seed,
+            &format!("F_{}", k + 1),
+        )
+        .map_err(|e| anyhow!("{}: F_{}: {e}", log_id(), k + 1))?;
+        full_runs.push(f_k);
+    }
+
+    // Build expected, segment by segment, verifying as we go.
+    use std::collections::HashSet;
+    let mut expected: Vec<Vec<i64>> = Vec::with_capacity(actual.solutions.len());
+
+    // Segment 0: [0, A_1) from baseline.
+    expected.extend(baseline.solutions[..inject_after_per_packet[0]].iter().cloned());
+
+    // Verify segment 0.
+    if actual.solutions[..inject_after_per_packet[0]] != expected[..] {
+        return Err(anyhow!(
+            "{}: segment 0 (baseline prefix) differs",
+            log_id()
+        ));
+    }
+
+    // Segments 1..=N: each uses F_k.
+    for seg in 1..=n {
+        let a_lo = inject_after_per_packet[seg - 1];
+        let a_hi_opt = if seg < n {
+            Some(inject_after_per_packet[seg])
+        } else {
+            None
+        };
+        let f_k = &full_runs[seg - 1].solutions;
+
+        let prefix_seen: HashSet<&Vec<i64>> = expected.iter().collect();
+        let f_unseen: Vec<Vec<i64>> = f_k
+            .iter()
+            .filter(|r| !prefix_seen.contains(*r))
+            .cloned()
+            .collect();
+        let take_n = match a_hi_opt {
+            Some(a_hi) => a_hi - a_lo,
+            None => f_unseen.len(),
+        };
+
+        if f_unseen.len() < take_n {
+            return Err(anyhow!(
+                "{}: segment {} expected {} rows from F_{} \\ seen but only {} available",
+                log_id(),
+                seg,
+                take_n,
+                seg,
+                f_unseen.len()
+            ));
+        }
+        expected.extend(f_unseen[..take_n].iter().cloned());
+
+        let a_hi = expected.len();
+        if actual.solutions.len() < a_hi {
+            return Err(anyhow!(
+                "{}: actual ran out at index {} (segment {} expected ends at {})",
+                log_id(),
+                actual.solutions.len(),
+                seg,
+                a_hi
+            ));
+        }
+        if actual.solutions[a_lo..a_hi] != expected[a_lo..a_hi] {
+            if std::env::var("TESTER_DEBUG").is_ok() {
+                eprintln!(
+                    "segment {seg}: expected[{a_lo}..{a_hi}] = {:?}",
+                    &expected[a_lo..a_hi]
+                );
+                eprintln!(
+                    "segment {seg}: actual[{a_lo}..{a_hi}] = {:?}",
+                    &actual.solutions[a_lo..a_hi]
+                );
+            }
+            return Err(anyhow!(
+                "{}: segment {} mismatch (a_lo={a_lo}, a_hi={a_hi})",
+                log_id(),
+                seg
+            ));
+        }
+    }
+
+    if actual.solutions.len() != expected.len() {
+        return Err(anyhow!(
+            "{}: total length mismatch: actual {} vs expected {}",
+            log_id(),
+            actual.solutions.len(),
+            expected.len()
+        ));
+    }
+
+    Ok(())
+}
+
+/// Single-packet shim that delegates to the multi-packet test with N=1.
+/// Kept so existing callers don't have to construct slices.
 pub fn test_constraint_midsearch_inject_constraint(
     config: &MinionConfig,
     base_defs: &[&constraint_def::ConstraintDef],
@@ -342,129 +545,13 @@ pub fn test_constraint_midsearch_inject_constraint(
     inject_after: usize,
     seed: u32,
 ) -> Result<()> {
-    if config.backend == Backend::Exec {
-        return Ok(());
-    }
-
-    let base_instances: Vec<constraint_def::ConstraintInstance> = base_defs
-        .iter()
-        .map(|d| constraint_def::build_random_instance(d))
-        .collect();
-    let base_refs: Vec<&constraint_def::ConstraintInstance> = base_instances.iter().collect();
-    let inject_instance = constraint_def::build_random_instance(inject_def);
-
-    let log_seed = |msg: &str| -> String {
-        format!(
-            "inject={} base={:?} seed={seed:#x} inject_after={inject_after} — {msg}",
-            inject_def.name,
-            base_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
-            msg = msg,
-        )
-    };
-
-    // Baseline.
-    let baseline = crate::run_minion_lib::run_multi(
-        &base_refs,
-        &[&inject_instance],
+    test_constraint_midsearch_inject_constraints(
+        config,
+        base_defs,
+        &[inject_def],
+        &[inject_after],
         seed,
-        "baseline",
     )
-    .map_err(|e| anyhow!("{}", log_seed(&format!("baseline: {e}"))))?;
-
-    if baseline.solutions.len() <= inject_after {
-        // Not enough baseline solutions to exercise the post-injection
-        // branch. Silently skip — this isn't a constraint failure, just
-        // a trivial trial.
-        return Ok(());
-    }
-
-    // Injected run.
-    let injected = crate::run_minion_lib::run_multi_injected(
-        &base_refs,
-        &[&inject_instance],
-        &[(inject_after, &inject_instance)],
-        seed,
-        "injected",
-    )
-    .map_err(|e| anyhow!("{}", log_seed(&format!("injected: {e}"))))?;
-
-    if injected.injections_fired != 1 {
-        return Err(anyhow!(
-            "{}",
-            log_seed(&format!(
-                "injection did not fire ({} solutions produced)",
-                injected.solutions.len()
-            ))
-        ));
-    }
-
-    // Full run.
-    let mut full_with_constraints: Vec<&constraint_def::ConstraintInstance> = base_refs.clone();
-    full_with_constraints.push(&inject_instance);
-    let full = crate::run_minion_lib::run_multi(
-        &full_with_constraints,
-        &[],
-        seed,
-        "full",
-    )
-    .map_err(|e| anyhow!("{}", log_seed(&format!("full: {e}"))))?;
-
-    // Invariant 1: pre-injection equals baseline prefix exactly.
-    if injected.solutions[..inject_after] != baseline.solutions[..inject_after] {
-        if std::env::var("TESTER_DEBUG").is_ok() {
-            eprintln!("baseline[..A]: {:?}", &baseline.solutions[..inject_after]);
-            eprintln!("injected[..A]: {:?}", &injected.solutions[..inject_after]);
-        }
-        return Err(anyhow!(
-            "{}",
-            log_seed("pre-injection rows differ from baseline prefix")
-        ));
-    }
-
-    // Invariant 2: injected[A..] == full minus (full ∩ baseline[0..A]).
-    use std::collections::HashSet;
-    let seen: HashSet<&Vec<i64>> = baseline.solutions[..inject_after].iter().collect();
-    let expected_post: Vec<Vec<i64>> = full
-        .solutions
-        .iter()
-        .filter(|r| !seen.contains(*r))
-        .cloned()
-        .collect();
-    let got_post = &injected.solutions[inject_after..];
-    if got_post != expected_post.as_slice() {
-        if std::env::var("TESTER_DEBUG").is_ok() {
-            eprintln!(
-                "baseline ({} sols): {:?}",
-                baseline.solutions.len(),
-                baseline.solutions
-            );
-            eprintln!("full ({} sols): {:?}", full.solutions.len(), full.solutions);
-            eprintln!(
-                "injected[..{inject_after}]: {:?}",
-                &injected.solutions[..inject_after]
-            );
-            eprintln!(
-                "injected[{inject_after}..] ({} sols): {:?}",
-                got_post.len(),
-                got_post
-            );
-            eprintln!(
-                "expected post ({} sols): {:?}",
-                expected_post.len(),
-                expected_post
-            );
-        }
-        return Err(anyhow!(
-            "{}",
-            log_seed(&format!(
-                "post-injection differs (got {} rows, expected {})",
-                got_post.len(),
-                expected_post.len()
-            ))
-        ));
-    }
-
-    Ok(())
 }
 
 pub fn test_constraint_nested(
