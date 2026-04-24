@@ -242,9 +242,10 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
 /*                    Instance building functions                    */
 /*********************************************************************/
 
-void newVar(CSPInstance& instance, string name, VariableType type, vector<DomainInt> bounds)
+void newVar(CSPInstance& instance, string name, VariableType type, vector<int> bounds)
 {
-  Var v = instance.vars.getNewVar(type, bounds);
+  vector<DomainInt> dbounds(bounds.begin(), bounds.end());
+  Var v = instance.vars.getNewVar(type, dbounds);
   instance.vars.addSymbol(name, v);
   instance.allVars_list.push_back(makeVec(v));
 }
@@ -334,7 +335,7 @@ MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type,
 {
   assertNotInSearch("minion_newVar");
   try {
-    newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
+    newVar(instance, string(name), type, std::vector<int>({bound1, bound2}));
     return MinionResult::MINION_OK;
   } catch(const parse_exception& e) {
     set_error(e.what());
@@ -346,9 +347,12 @@ MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type,
 }
 
 /***** Tuple *****/
-TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList)
+TupleList* tupleList_new(vector<vector<int>>& tupleList)
 {
-  return new TupleList(tupleList);
+  vector<vector<DomainInt>> dtuples(tupleList.size());
+  for(size_t i = 0; i < tupleList.size(); ++i)
+    dtuples[i].assign(tupleList[i].begin(), tupleList[i].end());
+  return new TupleList(dtuples);
 }
 
 void tupleList_free(TupleList* tupleList)
@@ -431,7 +435,7 @@ MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
     }
 
     // 1. Add to the spec (symbol table, allVars_list, etc.)
-    newVar(instance, string(name), type, std::vector<DomainInt>({bound1, bound2}));
+    newVar(instance, string(name), type, std::vector<int>({bound1, bound2}));
 
     // 2. Also register in the live runtime container so mid-search
     //    constraints can reference this variable without segfaulting.
@@ -624,9 +628,9 @@ void constraint_addConstant(ConstraintBlob& constraint, int constant)
   constraint.constants.push_back(makeVec((DomainInt)constant));
 }
 
-void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants)
+void constraint_addConstantList(ConstraintBlob& constraint, std::vector<int>& constants)
 {
-  constraint.constants.push_back(constants);
+  constraint.constants.push_back(vector<DomainInt>(constants.begin(), constants.end()));
 }
 
 void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint)
@@ -671,17 +675,17 @@ void vec_var_free(std::vector<Var>* vec)
   delete vec;
 }
 
-std::vector<DomainInt>* vec_int_new()
+std::vector<int>* vec_int_new()
 {
-  return new std::vector<DomainInt>();
+  return new std::vector<int>();
 }
 
-void vec_int_push_back(std::vector<DomainInt>* vec, int n)
+void vec_int_push_back(std::vector<int>* vec, int n)
 {
   vec->push_back(n);
 }
 
-void vec_int_free(std::vector<DomainInt>* vec)
+void vec_int_free(std::vector<int>* vec)
 {
   delete vec;
 }
@@ -703,23 +707,23 @@ void vec_constraints_free(std::vector<ConstraintBlob>* vec)
   delete vec;
 }
 
-std::vector<std::vector<DomainInt>>* vec_vec_int_new()
+std::vector<std::vector<int>>* vec_vec_int_new()
 {
-  return new std::vector<std::vector<DomainInt>>();
+  return new std::vector<std::vector<int>>();
 }
-void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
-                           std::vector<DomainInt> new_elem)
+void vec_vec_int_push_back(std::vector<std::vector<int>>* vec,
+                           std::vector<int> new_elem)
 {
   vec->push_back(new_elem);
 }
 
-void vec_vec_int_push_back_ptr(std::vector<std::vector<DomainInt>>* vec,
-                               std::vector<DomainInt>* new_elem)
+void vec_vec_int_push_back_ptr(std::vector<std::vector<int>>* vec,
+                               std::vector<int>* new_elem)
 {
   vec->push_back(*new_elem);
 }
 
-void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec)
+void vec_vec_int_free(std::vector<std::vector<int>>* vec)
 {
   delete vec;
 }

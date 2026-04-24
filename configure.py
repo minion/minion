@@ -137,9 +137,6 @@ parser.add_argument('--print', action='store_const', const=['-DMINION_DEBUG_PRIN
 parser.add_argument('--info', action='store_const', const=['-DMORE_SEARCH_INFO'],
                     help="Print info..")
 
-parser.add_argument('--library', action='store_true',
-                    help="Create libminion (requires buildsystem is 'make')")
-
 parser.add_argument('--unoptimised', action='store_true',
                     help="Disable optimisation")
 
@@ -220,9 +217,7 @@ if not arg.unoptimised:
         else:
             commandargs = commandargs + ["-O3", "-fomit-frame-pointer"]
 
-if arg.library:
-    commandargs = commandargs + ["-fPIC"]
-    commandargs = commandargs + ["-DLIBMINION"]
+commandargs = commandargs + ["-fPIC", "-DLIBMINION"]
 
 if arg.sanitize:
     compiler = "clang++"
@@ -468,11 +463,7 @@ with open(outname, "w") as out:
     ]
 
     if arg.buildsystem == "make":
-        if arg.library:
-            out.write('all: ' + execname + ' libminion.a ' +
-                      ' '.join(library_tests) + '\n')
-        else:
-            out.write('all: ' + execname + '\n')
+        out.write('all: ' + execname + ' libminion.a\n')
 
     if arg.buildsystem == "make":
         # Auto-generated header dependencies (-MD -MP writes one .d per .o).
@@ -502,23 +493,19 @@ with open(outname, "w") as out:
     out.write('\t' + compiler + ' ' + varsub('FLAGS') + varsub('CONOBJS') +
             varsub('MINBINOBJS') + thread + ' -o ' + execname + '\n')
 
-    if arg.library:
-        if arg.buildsystem == "make":
-            out.write('libminion.a: $(CONOBJS) $(MINLIBOBJS)\n')
-        out.write('\t' + 'ar rcs libminion.a' +
-                varsub('MINLIBOBJS') + varsub('CONOBJS') + '\n')
+    if arg.buildsystem == "make":
+        out.write('libminion.a: $(CONOBJS) $(MINLIBOBJS)\n')
+    out.write('\t' + 'ar rcs libminion.a' +
+            varsub('MINLIBOBJS') + varsub('CONOBJS') + '\n')
 
-        # Build + link each library-backed test against libminion.a, then
-        # chain all of them into the 'test' target so `make test` runs
-        # every mid-search / FFI test in sequence.
-        if arg.buildsystem == "make":
-            for testname in library_tests:
-                testsrc = scriptdir + '/test_instances/' + testname + '.cpp'
-                out.write(testname + ': libminion.a ' + testsrc + '\n')
-                out.write('\t' + compiler + ' ' + varsub('FLAGS') +
-                          ' ' + testsrc + ' -L. -lminion ' + thread +
-                          ' -o ' + testname + '\n')
-            out.write('test: ' + ' '.join(library_tests) + '\n')
-            for testname in library_tests:
-                out.write('\t./' + testname + '\n')
-            out.write('.PHONY: test\n')
+    if arg.buildsystem == "make":
+        for testname in library_tests:
+            testsrc = scriptdir + '/test_instances/' + testname + '.cpp'
+            out.write(testname + ': libminion.a ' + testsrc + '\n')
+            out.write('\t' + compiler + ' ' + varsub('FLAGS') +
+                      ' ' + testsrc + ' -L. -lminion ' + thread +
+                      ' -o ' + testname + '\n')
+        out.write('test: ' + ' '.join(library_tests) + '\n')
+        for testname in library_tests:
+            out.write('\t./' + testname + '\n')
+        out.write('.PHONY: test\n')

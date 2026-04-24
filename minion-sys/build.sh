@@ -41,11 +41,11 @@ mkdir -p "$OUT_DIR/build"
 cd "$OUT_DIR/build"
 
 if [[ ${DEBUG_MINION-default} != "default" ]]; then
-  python3 "$MINION_SRC/configure.py" --lib --quick --debug
+  python3 "$MINION_SRC/configure.py" --quick --debug
 else
-  python3 "$MINION_SRC/configure.py" --lib --quick --unoptimised --extraflags "-g -DDOM_ASSERT"
+  python3 "$MINION_SRC/configure.py" --quick --unoptimised --extraflags "-g -DDOM_ASSERT"
 fi
 
 echo "------ BUILD STEP ------"
 cd "$OUT_DIR/build"
-make
+make libminion.a

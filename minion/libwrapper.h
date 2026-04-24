@@ -40,9 +40,9 @@
  *
  * CSPInstance instance;
  *
- * std::vector<DomainInt> domainx = {1,3};
- * std::vector<DomainInt> domainy = {2,4};
- * std::vector<DomainInt> domainz = {1,5};
+ * std::vector<int> domainx = {1,3};
+ * std::vector<int> domainy = {2,4};
+ * std::vector<int> domainz = {1,5};
  *
  * // **VARIABLES**
  * newVar(instance,"x",VAR_DISCRETE,domainx);
@@ -219,10 +219,10 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
  * Throws parse_exception if the variable is invalid, or the name is already
  * used.
  */
-void newVar(CSPInstance& instance, string name, VariableType type, vector<DomainInt> bounds);
+void newVar(CSPInstance& instance, string name, VariableType type, vector<int> bounds);
 
 /*
- * Var constantAsVar(DomainInt constant):
+ * Var constantAsVar(int constant):
  *
  *   Returns a constant as an anomynous variable, for use in constraints which
  *   take variables as arguments.
@@ -292,7 +292,7 @@ VarResult minion_getVarByName(CSPInstance& instance, char* name);
 MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
 
 /***** Tuple *****/
-TupleList* tupleList_new(vector<vector<DomainInt>>& tupleList);
+TupleList* tupleList_new(vector<vector<int>>& tupleList);
 void tupleList_free(TupleList* tupleList);
 
 /***** Instance *****/
@@ -431,7 +431,7 @@ void constraint_addConstant(ConstraintBlob& constraint, int constant);
 ///
 /// Memory Management:
 ///   `constants` is copied into `constraint`.
-void constraint_addConstantList(ConstraintBlob& constraint, std::vector<DomainInt>& constants);
+void constraint_addConstantList(ConstraintBlob& constraint, std::vector<int>& constants);
 
 /// Adds an internal constraint argument to the constraint.
 ///
@@ -513,20 +513,20 @@ void vec_var_push_back(std::vector<Var>* vec, Var var);
 /// Frees the given `vector<Var>`.
 void vec_var_free(std::vector<Var>* vec);
 
-/// Creates a new `vector<DomainInt>`.
+/// Creates a new `vector<int>`.
 ///
 /// Memory Management:
 ///   The caller owns the returned pointer.
-std::vector<DomainInt>* vec_int_new();
+std::vector<int>* vec_int_new();
 
 /// Adds an `int` to the end of the given vector.
 ///
 /// Memory Management:
 ///   `n` is copied into `vec`.
-void vec_int_push_back(std::vector<DomainInt>* vec, int n);
+void vec_int_push_back(std::vector<int>* vec, int n);
 
-/// Frees the given `vector<DomainInt>`.
-void vec_int_free(std::vector<DomainInt>* vec);
+/// Frees the given `vector<int>`.
+void vec_int_free(std::vector<int>* vec);
 
 /// Creates a new `vector<ConstraintBlob>`.
 ///
@@ -543,23 +543,23 @@ void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob&
 /// Frees the given `vector<ConstraintBlob>`.
 void vec_constraints_free(std::vector<ConstraintBlob>* vec);
 
-/// Creates a new `vector<vector<DomainInt>>`.
+/// Creates a new `vector<vector<int>>`.
 ///
 /// Memory Management:
 ///   The caller owns the returned pointer.
-std::vector<std::vector<DomainInt>>* vec_vec_int_new();
+std::vector<std::vector<int>>* vec_vec_int_new();
 
-/// Adds a `vector<DomainInt>` to the end of the given vector.
+/// Adds a `vector<int>` to the end of the given vector.
 ///
 /// Memory Management:
 ///   `new_elem` is copied into `vec`.
-void vec_vec_int_push_back(std::vector<std::vector<DomainInt>>* vec,
-                           std::vector<DomainInt> new_elem);
-void vec_vec_int_push_back_ptr(std::vector<std::vector<DomainInt>>* vec,
-                               std::vector<DomainInt>* new_elem);
+void vec_vec_int_push_back(std::vector<std::vector<int>>* vec,
+                           std::vector<int> new_elem);
+void vec_vec_int_push_back_ptr(std::vector<std::vector<int>>* vec,
+                               std::vector<int>* new_elem);
 
-/// Frees the given `vector<vector<DomainInt>`.
-void vec_vec_int_free(std::vector<std::vector<DomainInt>>* vec);
+/// Frees the given `vector<vector<int>>`.
+void vec_vec_int_free(std::vector<std::vector<int>>* vec);
 
 /***** TableOut *****/
 

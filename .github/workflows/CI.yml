@@ -58,21 +58,33 @@ jobs:
               cd tester
               cargo run --release -- --minion ../bin-quick/minion
 
-      - name: "Library config"
-        run: |
-                mkdir bin-lib
-                cd bin-lib
-                python3 ../configure.py --library
-
-      - name: "Library build"
-        run: |
-                cd bin-lib
-                make -j2
-
       - name: "Library tests"
         run: |
-                cd bin-lib
+                cd bin-quick
                 make test
+
+      # Debug build: verifies MINION_DEBUG (checked-integer DomainInt,
+      # _GLIBCXX_DEBUG) works for both the binary and the library.
+      - name: "Debug config"
+        run: |
+                mkdir bin-debug
+                cd bin-debug
+                python3 ../configure.py --quick --debug
+
+      - name: "Debug build"
+        run: |
+                cd bin-debug
+                make -j2
+
+      - name: "Debug library tests"
+        run: |
+                cd bin-debug
+                make test
+
+      - name: "Debug basic tests"
+        run: |
+              cd test_instances
+              bash ./run_tests.sh ../bin-debug/minion
 
       # In-process tester exercises minion-sys (the Rust FFI library
       # binding), the mid-search injection paths, and the constraint
@@ -115,3 +127,19 @@ jobs:
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
               cargo run --release -- --in-process --midsearch-add-vars --midsearch-constraints-num-packets 2 --count 30 --numthreads 4 --maxtuples 10000
+
+      # Debug in-process test: rebuilds minion-sys with MINION_DEBUG so
+      # the checked-integer DomainInt wrapper is exercised through the
+      # FFI boundary. Placed last to avoid cargo cache thrashing with the
+      # non-debug in-process steps above.
+      - name: "In-process tester: debug baseline"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              DEBUG_MINION=1 cargo run --release -- --in-process --count 2 --numthreads 4 --maxtuples 10000
+
+      - name: "In-process tester: debug mid-search constraint injection"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              DEBUG_MINION=1 cargo run --release -- --in-process --midsearch-constraints --count 3 --numthreads 4 --maxtuples 10000

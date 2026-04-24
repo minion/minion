@@ -46,20 +46,9 @@ jobs:
                 cd bin-quick
                 make -j2
 
-      - name: "Library config"
-        run: |
-                mkdir bin-lib
-                cd bin-lib
-                python3 ../configure.py --library
-
-      - name: "Library build"
-        run: |
-                cd bin-lib
-                make -j2
-
       - name: "Library tests"
         run: |
-                cd bin-lib
+                cd bin-quick
                 make test
 
       # Exec-mode tester: much higher counts for broader coverage of the

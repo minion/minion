@@ -35,6 +35,8 @@ Globals::Globals() {
     bools_m = NULL;
     parData_m = NULL;
     tableOut_m = NULL;
+    callback = NULL;
+    callbackUserdata = NULL;
 }
 
 #ifdef LIBMINION
