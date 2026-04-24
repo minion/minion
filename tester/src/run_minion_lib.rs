@@ -439,7 +439,7 @@ pub struct CappedOutput {
 pub fn run_multi(
     with_constraints: &[&ConstraintInstance],
     vars_only: &[&ConstraintInstance],
-    seed: u32,
+    options: minion_sys::RunOptions,
     max_solutions: Option<usize>,
     testname: &str,
 ) -> Result<CappedOutput> {
@@ -447,7 +447,10 @@ pub fn run_multi(
     let variable_order = model.named_variables.get_variable_order();
 
     if std::env::var("TESTER_DEBUG").is_ok() {
-        eprintln!("--- multi-model for {testname} (seed={seed:#x}) ---");
+        eprintln!(
+            "--- multi-model for {testname} (seed={:?}) ---",
+            options.seed
+        );
         for name in &variable_order {
             eprintln!(
                 "  {name}: {:?}",
@@ -486,15 +489,8 @@ pub fn run_multi(
         })
     };
 
-    let ctx = minion_sys::run_minion_with_options(
-        model,
-        minion_sys::RunOptions {
-            seed: Some(seed),
-            ..Default::default()
-        },
-        callback,
-    )
-    .map_err(|e| anyhow!("minion ({testname}): {e}"))?;
+    let ctx = minion_sys::run_minion_with_options(model, options, callback)
+        .map_err(|e| anyhow!("minion ({testname}): {e}"))?;
 
     let nodes = ctx
         .get_from_table("Nodes".to_string())
@@ -523,7 +519,7 @@ pub fn run_multi_injected(
     base: &[&ConstraintInstance],
     vars_only: &[&ConstraintInstance],
     injections: &[(usize, InjectionPacket<'_>)],
-    seed: u32,
+    options: minion_sys::RunOptions,
     max_solutions: Option<usize>,
     testname: &str,
 ) -> Result<InjectOutput> {
@@ -544,7 +540,10 @@ pub fn run_multi_injected(
     let initial_variable_order = model.named_variables.get_variable_order();
 
     if std::env::var("TESTER_DEBUG").is_ok() {
-        eprintln!("--- multi-inject model for {testname} (seed={seed:#x}) ---");
+        eprintln!(
+            "--- multi-inject model for {testname} (seed={:?}) ---",
+            options.seed
+        );
         for name in &initial_variable_order {
             eprintln!(
                 "  {name}: {:?}",
@@ -681,15 +680,8 @@ pub fn run_multi_injected(
         )
     };
 
-    let ctx = minion_sys::run_minion_midsearch_with_options(
-        model,
-        minion_sys::RunOptions {
-            seed: Some(seed),
-            ..Default::default()
-        },
-        callback,
-    )
-    .map_err(|e| anyhow!("minion midsearch ({testname}): {e}"))?;
+    let ctx = minion_sys::run_minion_midsearch_with_options(model, options, callback)
+        .map_err(|e| anyhow!("minion midsearch ({testname}): {e}"))?;
 
     if let Some(err) = cb_err {
         bail!("callback error ({testname}): {err}");
@@ -739,6 +731,7 @@ pub fn run_inject_vars_after(
     instance: &ConstraintInstance,
     inject_after: usize,
     new_vars: &[(String, minion_sys::ast::VarDomain)],
+    options: minion_sys::RunOptions,
     testname: &str,
 ) -> Result<MidsearchOutput> {
     let mut model = Model::new();
@@ -811,7 +804,7 @@ pub fn run_inject_vars_after(
         })
     };
 
-    let ctx = minion_sys::run_minion_midsearch(model, callback)
+    let ctx = minion_sys::run_minion_midsearch_with_options(model, options, callback)
         .map_err(|e| anyhow!("minion midsearch error ({testname}): {e}"))?;
 
     if let Some(err) = cb_err {
@@ -841,6 +834,7 @@ pub fn run_inject_vars_after(
 pub fn get_minion_solutions_in_process(
     instance: &ConstraintInstance,
     find_all_sols: bool,
+    options: minion_sys::RunOptions,
     testname: &str,
 ) -> Result<MinionOutput> {
     let mut model = Model::new();
@@ -884,7 +878,7 @@ pub fn get_minion_solutions_in_process(
         eprintln!("--- end model ---");
     }
 
-    let ctx = minion_sys::run_minion(model, callback)
+    let ctx = minion_sys::run_minion_with_options(model, options, callback)
         .map_err(|e| anyhow!("minion in-process error ({testname}): {e}"))?;
 
     let nodes_str = ctx

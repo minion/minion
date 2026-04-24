@@ -267,6 +267,40 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
     (state.callback)(&mut midctx, solutions)
 }
 
+/// Variable-ordering heuristic (maps to Minion's `VarOrderEnum`).
+///
+/// `Static` follows the variable declaration order and is state-free;
+/// the rest (SDF, SRF, LDF, WDeg, DOMOverWDeg, Conflict) depend on the
+/// current domain sizes / weight counters at each decision, so their
+/// solution order is sensitive to mid-search mutations. `Original`
+/// is a (non-state-dependent) alias minion uses internally.
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum VarOrder {
+    #[default]
+    Static,
+    SDF,
+    SRF,
+    LDF,
+    Original,
+    WDeg,
+    DOMOverWDeg,
+    Conflict,
+}
+
+/// Value-ordering heuristic (maps to Minion's `ValOrderEnum`).
+///
+/// `Random` consumes the solver RNG, so two runs with the same seed
+/// reach the same leaves only if they made the same number of prior
+/// random draws — i.e. mid-search injection *will* diverge the
+/// solution order, even under `VarOrder::Static`.
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ValOrder {
+    #[default]
+    Ascend,
+    Descend,
+    Random,
+}
+
 /// Knobs for a single solve. Extend as needed — using a struct keeps the
 /// public call surface stable when we add more options.
 #[derive(Default, Clone, Copy, Debug)]
@@ -278,6 +312,37 @@ pub struct RunOptions {
     /// diff two runs (e.g. "same prefix before the injection point")
     /// must set the same seed for both runs.
     pub seed: Option<u32>,
+
+    /// Variable-ordering heuristic. Defaults to [`VarOrder::Static`].
+    pub var_order: VarOrder,
+
+    /// Value-ordering heuristic. Defaults to [`ValOrder::Ascend`].
+    pub val_order: ValOrder,
+}
+
+impl VarOrder {
+    fn to_ffi(self) -> ffi::VarOrderEnum {
+        match self {
+            VarOrder::Static => ffi::VarOrderEnum_ORDER_STATIC,
+            VarOrder::SDF => ffi::VarOrderEnum_ORDER_SDF,
+            VarOrder::SRF => ffi::VarOrderEnum_ORDER_SRF,
+            VarOrder::LDF => ffi::VarOrderEnum_ORDER_LDF,
+            VarOrder::Original => ffi::VarOrderEnum_ORDER_ORIGINAL,
+            VarOrder::WDeg => ffi::VarOrderEnum_ORDER_WDEG,
+            VarOrder::DOMOverWDeg => ffi::VarOrderEnum_ORDER_DOMOVERWDEG,
+            VarOrder::Conflict => ffi::VarOrderEnum_ORDER_CONFLICT,
+        }
+    }
+}
+
+impl ValOrder {
+    fn to_ffi(self) -> ffi::ValOrderEnum {
+        match self {
+            ValOrder::Ascend => ffi::ValOrderEnum_VALORDER_ASCEND,
+            ValOrder::Descend => ffi::ValOrderEnum_VALORDER_DESCEND,
+            ValOrder::Random => ffi::ValOrderEnum_VALORDER_RANDOM,
+        }
+    }
 }
 
 /// Run Minion on the given [Model].
@@ -346,7 +411,7 @@ pub fn run_minion_midsearch_with_options(
             midsearch_vars: vec![],
         };
 
-        convert_model_to_raw(search_instance, &model, &mut state.print_vars)?;
+        convert_model_to_raw(search_instance, &model, &options, &mut state.print_vars)?;
 
         let userdata = &mut state as *mut CallbackState<'_> as *mut c_void;
         let res = ffi::runMinion(
@@ -375,6 +440,7 @@ pub fn run_minion_midsearch_with_options(
 unsafe fn convert_model_to_raw(
     instance: *mut ffi::ProbSpec_CSPInstance,
     model: &Model,
+    options: &RunOptions,
     print_vars: &mut Vec<VarName>,
 ) -> Result<(), MinionError> {
     /*******************************/
@@ -445,9 +511,14 @@ unsafe fn convert_model_to_raw(
     }
 
     let search_order = Scoped::new(
-        ffi::searchOrder_new(search_vars.ptr, ffi::VarOrderEnum_ORDER_STATIC, false),
+        ffi::searchOrder_new(search_vars.ptr, options.var_order.to_ffi(), false),
         |x| ffi::searchOrder_free(x as _),
     );
+    // Minion's text parser defaults every variable's value-ordering to
+    // ASCEND via `SearchOrder::setupValueOrder` during BuildCSP. To set
+    // DESCEND or RANDOM from the library path we have to fill the
+    // per-variable valOrder vector ourselves before BuildCSP runs.
+    ffi::searchOrder_setValOrder(search_order.ptr, options.val_order.to_ffi());
 
     ffi::instance_addSearchOrder(instance, search_order.ptr);
 

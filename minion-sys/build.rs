@@ -168,6 +168,7 @@ fn bind(minion_src: &Path) {
         .allowlist_function("searchMethod_free")
         .allowlist_function("searchOrder_new")
         .allowlist_function("searchOrder_free")
+        .allowlist_function("searchOrder_setValOrder")
         .allowlist_function("vec_var_new")
         .allowlist_function("vec_var_push_back")
         .allowlist_function("vec_var_free")

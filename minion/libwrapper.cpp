@@ -577,6 +577,15 @@ void searchOrder_free(SearchOrder* searchOrder)
   delete searchOrder;
 }
 
+void searchOrder_setValOrder(SearchOrder& searchOrder, ValOrderEnum valOrder)
+{
+  // Replace any existing per-variable value ordering with a uniform
+  // vector sized to match varOrder. BuildCSP's setupValueOrder is a
+  // no-op once valOrder is the right length, so this overwrite is
+  // stable whether called before or after vars are added.
+  searchOrder.valOrder.assign(searchOrder.varOrder.size(), ValOrder(valOrder));
+}
+
 /***** ConstraintBlob *****/
 
 ConstraintBlob* constraint_new(ConstraintType constraint_type)

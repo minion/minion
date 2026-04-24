@@ -480,6 +480,13 @@ SearchMethod* searchMethod_new();
 ///   * The given `vars` is copied into the returned `SearchOrder`.
 SearchOrder* searchOrder_new(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
 
+/// Overwrite the per-variable value ordering on `searchOrder` so every
+/// variable uses `valOrder`. Minion's `SearchOrder::setupValueOrder`
+/// defaults any empty valOrder vector to ASCEND; this function lets
+/// callers pick a different uniform value order (e.g. DESCEND, RANDOM)
+/// from outside the text parser.
+void searchOrder_setValOrder(SearchOrder& searchOrder, ValOrderEnum valOrder);
+
 /// Frees the given `SearchOptions`.
 void searchOptions_free(SearchOptions* searchOptions);
 

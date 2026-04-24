@@ -22,6 +22,43 @@ pub struct MinionConfig<'a> {
     pub minionexec: &'a str,
     pub maxtuples: usize,
     pub backend: Backend,
+    pub var_order: minion_sys::VarOrder,
+    pub val_order: minion_sys::ValOrder,
+}
+
+impl<'a> MinionConfig<'a> {
+    /// Returns true when the configured variable/value ordering is
+    /// (a) state-independent and (b) deterministic — i.e. any two runs
+    /// of the same model under the same seed visit decision leaves in
+    /// the same order. Holds for Static + Ascend/Descend.
+    ///
+    /// When false, even baseline-vs-tableised solves on the same
+    /// instance may report solutions in different orders, so tests
+    /// must compare sets rather than ordered slices.
+    pub fn deterministic_ordering(&self) -> bool {
+        self.var_order == minion_sys::VarOrder::Static
+            && self.val_order != minion_sys::ValOrder::Random
+    }
+
+    /// [`minion_sys::RunOptions`] derived from this config, with the
+    /// given seed.
+    pub fn run_options(&self, seed: u32) -> minion_sys::RunOptions {
+        minion_sys::RunOptions {
+            seed: Some(seed),
+            var_order: self.var_order,
+            val_order: self.val_order,
+        }
+    }
+
+    /// [`minion_sys::RunOptions`] with no pinned seed (for
+    /// `run_minion` callers that never needed reproducibility).
+    pub fn run_options_no_seed(&self) -> minion_sys::RunOptions {
+        minion_sys::RunOptions {
+            seed: None,
+            var_order: self.var_order,
+            val_order: self.val_order,
+        }
+    }
 }
 
 /// Run one solve with whichever backend the config selects.
@@ -57,7 +94,12 @@ fn run_solve(
                     }
                 }
             }
-            run_minion_lib::get_minion_solutions_in_process(instance, find_all, testname)
+            run_minion_lib::get_minion_solutions_in_process(
+                instance,
+                find_all,
+                config.run_options_no_seed(),
+                testname,
+            )
         }
     }
 }
@@ -76,13 +118,36 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
-    if ret.solutions != ret2.solutions {
-        return Err(anyhow!(format!(
-            "Solutions not equal in {} vs {}",
-            ret.filename, ret2.filename
-        )));
+    if config.deterministic_ordering() {
+        if ret.solutions != ret2.solutions {
+            return Err(anyhow!(format!(
+                "Solutions not equal in {} vs {}",
+                ret.filename, ret2.filename
+            )));
+        }
+    } else {
+        // State-dependent or randomised ordering means original and
+        // tableised may enumerate in different orders even though both
+        // saw the same model — compare the solution *sets*.
+        let mut a = ret.solutions.clone();
+        let mut b = ret2.solutions.clone();
+        a.sort();
+        b.sort();
+        if a != b {
+            return Err(anyhow!(format!(
+                "Solution sets not equal in {} vs {}",
+                ret.filename, ret2.filename
+            )));
+        }
     }
-    if instance.constraint.gac && ret.nodes != ret2.nodes {
+    // Node-count equality is a GAC-propagator invariant only when the
+    // ordering is state-free (Static + Ascend/Descend); state-dependent
+    // heuristics explore different trees against the weaker tabulated
+    // propagator even when the solution sets match.
+    if instance.constraint.gac
+        && config.deterministic_ordering()
+        && ret.nodes != ret2.nodes
+    {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -191,8 +256,17 @@ pub fn test_constraint_midsearch_add_vars(
 
     let instance = constraint_def::build_random_instance(c);
 
-    let baseline =
-        crate::run_minion_lib::get_minion_solutions_in_process(&instance, true, "baseline")?;
+    // Pin a seed so baseline and injected runs agree under dynamic /
+    // randomised orderings. Under the default Static + Ascend it's
+    // redundant (order is state-free) but cheap.
+    let seed: u32 = rand::random();
+
+    let baseline = crate::run_minion_lib::get_minion_solutions_in_process(
+        &instance,
+        true,
+        config.run_options(seed),
+        "baseline",
+    )?;
 
     if baseline.solutions.len() <= inject_after {
         // Not enough baseline solutions to have anything post-injection.
@@ -212,6 +286,7 @@ pub fn test_constraint_midsearch_add_vars(
         &instance,
         inject_after,
         &new_vars,
+        config.run_options(seed),
         "midsearch",
     )?;
 
@@ -452,11 +527,13 @@ pub fn test_constraint_midsearch_inject_constraints(
     // tester's tableise limit.
     let cap = Some(config.maxtuples);
 
+    let options = config.run_options(seed);
+
     // Baseline: no packet constraints, but their vars are declared.
     let baseline = crate::run_minion_lib::run_multi(
         &base_refs,
         &inject_refs,
-        seed,
+        options,
         cap,
         "baseline",
     )
@@ -488,7 +565,7 @@ pub fn test_constraint_midsearch_inject_constraints(
         &base_refs,
         &inject_refs,
         &injections,
-        seed,
+        options,
         cap,
         "actual",
     )
@@ -514,7 +591,7 @@ pub fn test_constraint_midsearch_inject_constraints(
         let f_k = crate::run_minion_lib::run_multi(
             &with_c,
             &vars_only_k,
-            seed,
+            options,
             cap,
             &format!("F_{}", k + 1),
         )
@@ -525,90 +602,184 @@ pub fn test_constraint_midsearch_inject_constraints(
         full_runs.push(f_k);
     }
 
-    // Build expected, segment by segment, verifying as we go.
     use std::collections::HashSet;
-    let mut expected: Vec<Vec<i64>> = Vec::with_capacity(actual.solutions.len());
 
-    // Segment 0: [0, A_1) from baseline.
-    expected.extend(baseline.solutions[..inject_after_per_packet[0]].iter().cloned());
+    if config.deterministic_ordering() {
+        // Static + non-random ordering: the search tree is fixed, so
+        // "actual[a_lo..a_hi] is F_k minus what we've already seen, in
+        // F_k's order" holds exactly. Keep the strong slice check.
+        let mut expected: Vec<Vec<i64>> = Vec::with_capacity(actual.solutions.len());
 
-    // Verify segment 0.
-    if actual.solutions[..inject_after_per_packet[0]] != expected[..] {
-        return Err(anyhow!(
-            "{}: segment 0 (baseline prefix) differs",
-            log_id()
-        ));
-    }
+        // Segment 0: [0, A_1) from baseline.
+        expected.extend(baseline.solutions[..inject_after_per_packet[0]].iter().cloned());
 
-    // Segments 1..=N: each uses F_k.
-    for seg in 1..=n {
-        let a_lo = inject_after_per_packet[seg - 1];
-        let a_hi_opt = if seg < n {
-            Some(inject_after_per_packet[seg])
-        } else {
-            None
-        };
-        let f_k = &full_runs[seg - 1].solutions;
-
-        let prefix_seen: HashSet<&Vec<i64>> = expected.iter().collect();
-        let f_unseen: Vec<Vec<i64>> = f_k
-            .iter()
-            .filter(|r| !prefix_seen.contains(*r))
-            .cloned()
-            .collect();
-        let take_n = match a_hi_opt {
-            Some(a_hi) => a_hi - a_lo,
-            None => f_unseen.len(),
-        };
-
-        if f_unseen.len() < take_n {
+        if actual.solutions[..inject_after_per_packet[0]] != expected[..] {
             return Err(anyhow!(
-                "{}: segment {} expected {} rows from F_{} \\ seen but only {} available",
-                log_id(),
-                seg,
-                take_n,
-                seg,
-                f_unseen.len()
+                "{}: segment 0 (baseline prefix) differs",
+                log_id()
             ));
         }
-        expected.extend(f_unseen[..take_n].iter().cloned());
 
-        let a_hi = expected.len();
-        if actual.solutions.len() < a_hi {
+        for seg in 1..=n {
+            let a_lo = inject_after_per_packet[seg - 1];
+            let a_hi_opt = if seg < n {
+                Some(inject_after_per_packet[seg])
+            } else {
+                None
+            };
+            let f_k = &full_runs[seg - 1].solutions;
+
+            let prefix_seen: HashSet<&Vec<i64>> = expected.iter().collect();
+            let f_unseen: Vec<Vec<i64>> = f_k
+                .iter()
+                .filter(|r| !prefix_seen.contains(*r))
+                .cloned()
+                .collect();
+            let take_n = match a_hi_opt {
+                Some(a_hi) => a_hi - a_lo,
+                None => f_unseen.len(),
+            };
+
+            if f_unseen.len() < take_n {
+                return Err(anyhow!(
+                    "{}: segment {} expected {} rows from F_{} \\ seen but only {} available",
+                    log_id(),
+                    seg,
+                    take_n,
+                    seg,
+                    f_unseen.len()
+                ));
+            }
+            expected.extend(f_unseen[..take_n].iter().cloned());
+
+            let a_hi = expected.len();
+            if actual.solutions.len() < a_hi {
+                return Err(anyhow!(
+                    "{}: actual ran out at index {} (segment {} expected ends at {})",
+                    log_id(),
+                    actual.solutions.len(),
+                    seg,
+                    a_hi
+                ));
+            }
+            if actual.solutions[a_lo..a_hi] != expected[a_lo..a_hi] {
+                if std::env::var("TESTER_DEBUG").is_ok() {
+                    eprintln!(
+                        "segment {seg}: expected[{a_lo}..{a_hi}] = {:?}",
+                        &expected[a_lo..a_hi]
+                    );
+                    eprintln!(
+                        "segment {seg}: actual[{a_lo}..{a_hi}] = {:?}",
+                        &actual.solutions[a_lo..a_hi]
+                    );
+                }
+                return Err(anyhow!(
+                    "{}: segment {} mismatch (a_lo={a_lo}, a_hi={a_hi})",
+                    log_id(),
+                    seg
+                ));
+            }
+        }
+
+        if actual.solutions.len() != expected.len() {
             return Err(anyhow!(
-                "{}: actual ran out at index {} (segment {} expected ends at {})",
+                "{}: total length mismatch: actual {} vs expected {}",
                 log_id(),
                 actual.solutions.len(),
-                seg,
-                a_hi
+                expected.len()
             ));
         }
-        if actual.solutions[a_lo..a_hi] != expected[a_lo..a_hi] {
+    } else {
+        // Under state-dependent / randomised orderings, actual's
+        // search tree diverges from F_k's after any injection (their
+        // propagator states differ — actual reaches each post-A_k
+        // leaf from a very different history), so per-segment slice
+        // equality is not an invariant. What still holds with a
+        // shared seed:
+        //
+        //   (a) actual[..A_1] == baseline[..A_1] exact slice equality.
+        //       Before any packet fires the model, seed and ordering
+        //       state are byte-for-byte identical in both runs.
+        //   (b) Segment containment: for each row actual[i], let
+        //       seg(i) = largest k such that A_k ≤ i (with A_0 := 0,
+        //       so seg(0) = 0 when A_1 > 0). Then
+        //         actual[i] ∈ set(F_{seg(i)})   (F_0 := baseline).
+        //       Rationale: actual's model at the moment it reported
+        //       row i is exactly base + P_1..P_{seg(i)} = F_{seg(i)}.
+        //   (c) Bracket: set(F_N) ⊆ set(actual) ⊆ set(baseline). Every
+        //       F_N solution has to appear — DFS reports each reachable
+        //       leaf exactly once, and a leaf that satisfies all
+        //       packets is still a leaf once any subset is active. And
+        //       actual's rows are all reachable under some F_k, all of
+        //       which are subsets of baseline.
+        //   (d) No duplicates.
+        //
+        // These are strictly weaker than the static-ordering slice
+        // invariant, but they still catch "actual invented a row that
+        // shouldn't exist" and "F_N was missed" bugs.
+        let a1 = inject_after_per_packet[0];
+        if actual.solutions[..a1] != baseline.solutions[..a1] {
             if std::env::var("TESTER_DEBUG").is_ok() {
-                eprintln!(
-                    "segment {seg}: expected[{a_lo}..{a_hi}] = {:?}",
-                    &expected[a_lo..a_hi]
-                );
-                eprintln!(
-                    "segment {seg}: actual[{a_lo}..{a_hi}] = {:?}",
-                    &actual.solutions[a_lo..a_hi]
-                );
+                eprintln!("baseline[..{a1}] = {:?}", &baseline.solutions[..a1]);
+                eprintln!("actual[..{a1}]   = {:?}", &actual.solutions[..a1]);
             }
             return Err(anyhow!(
-                "{}: segment {} mismatch (a_lo={a_lo}, a_hi={a_hi})",
-                log_id(),
-                seg
+                "{}: pre-first-injection prefix differs from baseline",
+                log_id()
             ));
         }
-    }
 
-    if actual.solutions.len() != expected.len() {
-        return Err(anyhow!(
-            "{}: total length mismatch: actual {} vs expected {}",
-            log_id(),
-            actual.solutions.len(),
-            expected.len()
-        ));
+        // (b): segment containment.
+        let fk_sets: Vec<HashSet<&Vec<i64>>> = (0..n)
+            .map(|k| full_runs[k].solutions.iter().collect())
+            .collect();
+        let baseline_set: HashSet<&Vec<i64>> = baseline.solutions.iter().collect();
+        for (idx, row) in actual.solutions.iter().enumerate() {
+            // seg(idx) = number of schedule points ≤ idx.
+            let seg = inject_after_per_packet
+                .iter()
+                .take_while(|&&a| a <= idx)
+                .count();
+            let in_model: bool = if seg == 0 {
+                baseline_set.contains(row)
+            } else {
+                fk_sets[seg - 1].contains(row)
+            };
+            if !in_model {
+                return Err(anyhow!(
+                    "{}: row {} (segment {}) not in F_{} solution set",
+                    log_id(),
+                    idx,
+                    seg,
+                    seg
+                ));
+            }
+        }
+
+        // (c): F_N ⊆ actual ⊆ baseline. actual ⊆ baseline already
+        // follows from (b) since every F_k is a subset of baseline —
+        // so only the F_N ⊆ actual side is a new check.
+        let actual_set: HashSet<&Vec<i64>> = actual.solutions.iter().collect();
+        for row in &full_runs[n - 1].solutions {
+            if !actual_set.contains(row) {
+                return Err(anyhow!(
+                    "{}: F_{} solution {:?} missing from actual",
+                    log_id(),
+                    n,
+                    row
+                ));
+            }
+        }
+
+        // (d): no duplicates.
+        if actual_set.len() != actual.solutions.len() {
+            return Err(anyhow!(
+                "{}: actual contains duplicates ({} rows, {} distinct)",
+                log_id(),
+                actual.solutions.len(),
+                actual_set.len(),
+            ));
+        }
     }
 
     Ok(())
@@ -730,10 +901,11 @@ pub fn test_midsearch_add_new_vars_with_constraint(
     }
 
     let cap = Some(config.maxtuples);
+    let options = config.run_options(seed);
 
     // Baseline: only base constraints, no packets.
     let baseline =
-        crate::run_minion_lib::run_multi(&base_refs, &[], seed, cap, "add-vars-baseline")
+        crate::run_minion_lib::run_multi(&base_refs, &[], options, cap, "add-vars-baseline")
             .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
     if baseline.stopped_at_limit {
         return Ok(());
@@ -746,7 +918,7 @@ pub fn test_midsearch_add_new_vars_with_constraint(
         &base_refs,
         &[],
         &injections,
-        seed,
+        options,
         cap,
         "add-vars-actual",
     )
@@ -941,13 +1113,29 @@ pub fn test_constraint_nested(
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
-    if ret.solutions != ret2.solutions {
-        return Err(anyhow!(format!(
-            "Solutions not equal in {} vs {}",
-            ret.filename, ret2.filename
-        )));
+    if config.deterministic_ordering() {
+        if ret.solutions != ret2.solutions {
+            return Err(anyhow!(format!(
+                "Solutions not equal in {} vs {}",
+                ret.filename, ret2.filename
+            )));
+        }
+    } else {
+        let mut a = ret.solutions.clone();
+        let mut b = ret2.solutions.clone();
+        a.sort();
+        b.sort();
+        if a != b {
+            return Err(anyhow!(format!(
+                "Solution sets not equal in {} vs {}",
+                ret.filename, ret2.filename
+            )));
+        }
     }
-    if instance.constraint.gac && ret.nodes != ret2.nodes {
+    if instance.constraint.gac
+        && config.deterministic_ordering()
+        && ret.nodes != ret2.nodes
+    {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename

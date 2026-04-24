@@ -111,6 +111,68 @@ struct Opt {
     /// reference run intractable.
     #[arg(long)]
     midsearch_add_vars: bool,
+
+    /// Variable-ordering heuristic for the in-process backend. The
+    /// default (`static`) matches Minion's text-parser default and is
+    /// state-free, so baseline-vs-tableised and mid-search invariants
+    /// hold as exact slice equality. Any other choice makes the
+    /// ordering state-dependent and the tester falls back to
+    /// set-based comparisons.
+    #[arg(long, value_enum, default_value_t = VarOrderArg::Static)]
+    var_order: VarOrderArg,
+
+    /// Value-ordering heuristic for the in-process backend.
+    /// `random` needs a seed — the tester pins one per trial —
+    /// but even a pinned-seed random val order diverges the search
+    /// tree between baseline and injected runs, so the tester uses
+    /// set-based comparisons whenever this isn't `ascend` or
+    /// `descend`.
+    #[arg(long, value_enum, default_value_t = ValOrderArg::Ascend)]
+    val_order: ValOrderArg,
+}
+
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+enum VarOrderArg {
+    Static,
+    Sdf,
+    Srf,
+    Ldf,
+    Original,
+    Wdeg,
+    Domoverwdeg,
+    Conflict,
+}
+
+impl VarOrderArg {
+    fn into_minion(self) -> minion_sys::VarOrder {
+        match self {
+            VarOrderArg::Static => minion_sys::VarOrder::Static,
+            VarOrderArg::Sdf => minion_sys::VarOrder::SDF,
+            VarOrderArg::Srf => minion_sys::VarOrder::SRF,
+            VarOrderArg::Ldf => minion_sys::VarOrder::LDF,
+            VarOrderArg::Original => minion_sys::VarOrder::Original,
+            VarOrderArg::Wdeg => minion_sys::VarOrder::WDeg,
+            VarOrderArg::Domoverwdeg => minion_sys::VarOrder::DOMOverWDeg,
+            VarOrderArg::Conflict => minion_sys::VarOrder::Conflict,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+enum ValOrderArg {
+    Ascend,
+    Descend,
+    Random,
+}
+
+impl ValOrderArg {
+    fn into_minion(self) -> minion_sys::ValOrder {
+        match self {
+            ValOrderArg::Ascend => minion_sys::ValOrder::Ascend,
+            ValOrderArg::Descend => minion_sys::ValOrder::Descend,
+            ValOrderArg::Random => minion_sys::ValOrder::Random,
+        }
+    }
 }
 
 fn main() -> Result<()> {
@@ -160,6 +222,8 @@ fn main() -> Result<()> {
         );
     }
 
+    let var_order = opt.var_order.into_minion();
+    let val_order = opt.val_order.into_minion();
     let config = if opt.valgrind {
         test_types::MinionConfig {
             minionargs: vec![
@@ -170,6 +234,8 @@ fn main() -> Result<()> {
             minionexec: "valgrind",
             maxtuples: opt.maxtuples,
             backend: Backend::Exec,
+            var_order,
+            val_order,
         }
     } else {
         test_types::MinionConfig {
@@ -181,6 +247,8 @@ fn main() -> Result<()> {
             } else {
                 Backend::Exec
             },
+            var_order,
+            val_order,
         }
     };
 
