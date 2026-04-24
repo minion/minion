@@ -24,6 +24,8 @@ pub struct MinionConfig<'a> {
     pub backend: Backend,
     pub var_order: minion_sys::VarOrder,
     pub val_order: minion_sys::ValOrder,
+    pub preprocess: minion_sys::Propagation,
+    pub prop_node: minion_sys::Propagation,
 }
 
 impl<'a> MinionConfig<'a> {
@@ -40,6 +42,19 @@ impl<'a> MinionConfig<'a> {
             && self.val_order != minion_sys::ValOrder::Random
     }
 
+    /// Returns true when search-tree alignment between a
+    /// mid-search-injected run and its "built with all packets from
+    /// the start" reference is guaranteed: static ordering *and*
+    /// default preprocessing. Non-default preprocess/prop-node
+    /// changes the initial domain state of the reference run
+    /// relative to actual's state post-injection, which diverges the
+    /// trees even under Static + Ascend.
+    pub fn midsearch_slice_exact(&self) -> bool {
+        self.deterministic_ordering()
+            && self.preprocess.is_default_preprocess()
+            && self.prop_node.is_default_prop_node()
+    }
+
     /// [`minion_sys::RunOptions`] derived from this config, with the
     /// given seed.
     pub fn run_options(&self, seed: u32) -> minion_sys::RunOptions {
@@ -47,6 +62,8 @@ impl<'a> MinionConfig<'a> {
             seed: Some(seed),
             var_order: self.var_order,
             val_order: self.val_order,
+            preprocess: self.preprocess,
+            prop_node: self.prop_node,
         }
     }
 
@@ -57,6 +74,8 @@ impl<'a> MinionConfig<'a> {
             seed: None,
             var_order: self.var_order,
             val_order: self.val_order,
+            preprocess: self.preprocess,
+            prop_node: self.prop_node,
         }
     }
 }
@@ -604,10 +623,12 @@ pub fn test_constraint_midsearch_inject_constraints(
 
     use std::collections::HashSet;
 
-    if config.deterministic_ordering() {
-        // Static + non-random ordering: the search tree is fixed, so
-        // "actual[a_lo..a_hi] is F_k minus what we've already seen, in
-        // F_k's order" holds exactly. Keep the strong slice check.
+    if config.midsearch_slice_exact() {
+        // Static + non-random ordering AND default preprocess/
+        // prop-node: the search tree is fixed and the initial state
+        // is identical across baseline / actual / F_k, so
+        // "actual[a_lo..a_hi] is F_k minus what we've already seen,
+        // in F_k's order" holds exactly. Keep the strong slice check.
         let mut expected: Vec<Vec<i64>> = Vec::with_capacity(actual.solutions.len());
 
         // Segment 0: [0, A_1) from baseline.

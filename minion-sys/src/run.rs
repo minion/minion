@@ -267,6 +267,67 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
     (state.callback)(&mut midctx, solutions)
 }
 
+/// Propagation strength, matching minion's `PropagationType`.
+///
+/// Applied either once at preprocess time (via
+/// [`RunOptions::preprocess`]) or at every search node (via
+/// [`RunOptions::prop_node`]). Strengthens from `None` (no
+/// propagation — only valid for preprocess, not prop_node) through
+/// `GAC` (generalised arc consistency, the default per-node level)
+/// up to `SSAC` (singleton-SAC).
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PropLevel {
+    #[default]
+    None,
+    GAC,
+    SACBounds,
+    SAC,
+    SSACBounds,
+    SSAC,
+}
+
+impl PropLevel {
+    fn to_ffi(self) -> ffi::PropagationType {
+        match self {
+            PropLevel::None => ffi::PropagationType_PropLevel_None,
+            PropLevel::GAC => ffi::PropagationType_PropLevel_GAC,
+            PropLevel::SACBounds => ffi::PropagationType_PropLevel_SACBounds,
+            PropLevel::SAC => ffi::PropagationType_PropLevel_SAC,
+            PropLevel::SSACBounds => ffi::PropagationType_PropLevel_SSACBounds,
+            PropLevel::SSAC => ffi::PropagationType_PropLevel_SSAC,
+        }
+    }
+}
+
+/// A propagation level together with minion's `_limit` modifier.
+///
+/// `limit=true` maps to the `*_limit` spellings in exec mode
+/// (`SAC_limit`, `SSACBounds_limit`, etc.), which cap the amount of
+/// work the propagator will do before giving up and falling back to
+/// the next-weaker level.
+#[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Propagation {
+    pub level: PropLevel,
+    pub limit: bool,
+}
+
+impl Propagation {
+    fn to_ffi(self) -> ffi::PropagationLevel {
+        ffi::PropagationLevel {
+            type_: self.level.to_ffi(),
+            limit: self.limit,
+        }
+    }
+
+    pub fn is_default_preprocess(self) -> bool {
+        self.level == PropLevel::None && !self.limit
+    }
+
+    pub fn is_default_prop_node(self) -> bool {
+        self.level == PropLevel::GAC && !self.limit
+    }
+}
+
 /// Variable-ordering heuristic (maps to Minion's `VarOrderEnum`).
 ///
 /// `Static` follows the variable declaration order and is state-free;
@@ -303,7 +364,7 @@ pub enum ValOrder {
 
 /// Knobs for a single solve. Extend as needed — using a struct keeps the
 /// public call surface stable when we add more options.
-#[derive(Default, Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct RunOptions {
     /// Seed for Minion's random heuristics. `None` keeps Minion's own
     /// default (currently `std::random_device{}()`, i.e. non-deterministic).
@@ -318,6 +379,36 @@ pub struct RunOptions {
 
     /// Value-ordering heuristic. Defaults to [`ValOrder::Ascend`].
     pub val_order: ValOrder,
+
+    /// One-shot propagation level applied before search begins.
+    /// Default is `None + no limit` — no preprocessing beyond each
+    /// constraint's own `fullPropagate`.
+    pub preprocess: Propagation,
+
+    /// Propagation level applied at every search node.
+    /// Default is `GAC + no limit` — each constraint runs its own
+    /// propagator. Stronger levels (SAC, SSAC) add global
+    /// propagation on top at every node; weaker levels (None) are
+    /// not meaningful here (a solver has to propagate *something*).
+    pub prop_node: Propagation,
+}
+
+impl Default for RunOptions {
+    fn default() -> Self {
+        Self {
+            seed: None,
+            var_order: VarOrder::default(),
+            val_order: ValOrder::default(),
+            preprocess: Propagation {
+                level: PropLevel::None,
+                limit: false,
+            },
+            prop_node: Propagation {
+                level: PropLevel::GAC,
+                limit: false,
+            },
+        }
+    }
 }
 
 impl VarOrder {
@@ -403,6 +494,8 @@ pub fn run_minion_midsearch_with_options(
         if let Some(seed) = options.seed {
             (*search_method).randomSeed = seed;
         }
+        (*search_method).preprocess = options.preprocess.to_ffi();
+        (*search_method).propMethod = options.prop_node.to_ffi();
 
         let mut state = CallbackState {
             callback,

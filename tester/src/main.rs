@@ -129,6 +129,30 @@ struct Opt {
     /// `descend`.
     #[arg(long, value_enum, default_value_t = ValOrderArg::Ascend)]
     val_order: ValOrderArg,
+
+    /// Preprocessing level: one-shot propagation before search
+    /// begins. Mirrors exec-mode's `-preprocess <level>`. Default
+    /// `none` matches minion's `SearchMethod` default.
+    #[arg(long, value_enum, default_value_t = PropLevelArg::None)]
+    preprocess: PropLevelArg,
+
+    /// Cap preprocessing work with minion's `_limit` modifier
+    /// (equivalent to exec-mode's `-preprocess SAC_limit` etc.).
+    /// Meaningful only when `--preprocess` is non-default.
+    #[arg(long)]
+    preprocess_limit: bool,
+
+    /// Propagation level applied at every search node. Mirrors
+    /// exec-mode's `-prop-node <level>`. Default `gac` matches
+    /// minion's default. `none` is not valid here.
+    #[arg(long, value_enum, default_value_t = PropLevelArg::Gac)]
+    prop_node: PropLevelArg,
+
+    /// Cap per-node propagation work with minion's `_limit`
+    /// modifier. Meaningful only when `--prop-node` is stronger
+    /// than the default GAC.
+    #[arg(long)]
+    prop_node_limit: bool,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -171,6 +195,29 @@ impl ValOrderArg {
             ValOrderArg::Ascend => minion_sys::ValOrder::Ascend,
             ValOrderArg::Descend => minion_sys::ValOrder::Descend,
             ValOrderArg::Random => minion_sys::ValOrder::Random,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, clap::ValueEnum)]
+enum PropLevelArg {
+    None,
+    Gac,
+    Sacbounds,
+    Sac,
+    Ssacbounds,
+    Ssac,
+}
+
+impl PropLevelArg {
+    fn into_minion(self) -> minion_sys::PropLevel {
+        match self {
+            PropLevelArg::None => minion_sys::PropLevel::None,
+            PropLevelArg::Gac => minion_sys::PropLevel::GAC,
+            PropLevelArg::Sacbounds => minion_sys::PropLevel::SACBounds,
+            PropLevelArg::Sac => minion_sys::PropLevel::SAC,
+            PropLevelArg::Ssacbounds => minion_sys::PropLevel::SSACBounds,
+            PropLevelArg::Ssac => minion_sys::PropLevel::SSAC,
         }
     }
 }
@@ -224,6 +271,14 @@ fn main() -> Result<()> {
 
     let var_order = opt.var_order.into_minion();
     let val_order = opt.val_order.into_minion();
+    let preprocess = minion_sys::Propagation {
+        level: opt.preprocess.into_minion(),
+        limit: opt.preprocess_limit,
+    };
+    let prop_node = minion_sys::Propagation {
+        level: opt.prop_node.into_minion(),
+        limit: opt.prop_node_limit,
+    };
     let config = if opt.valgrind {
         test_types::MinionConfig {
             minionargs: vec![
@@ -236,6 +291,8 @@ fn main() -> Result<()> {
             backend: Backend::Exec,
             var_order,
             val_order,
+            preprocess,
+            prop_node,
         }
     } else {
         test_types::MinionConfig {
@@ -249,6 +306,8 @@ fn main() -> Result<()> {
             },
             var_order,
             val_order,
+            preprocess,
+            prop_node,
         }
     };
 
