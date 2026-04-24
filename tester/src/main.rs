@@ -153,6 +153,19 @@ struct Opt {
     /// than the default GAC.
     #[arg(long)]
     prop_node_limit: bool,
+
+    /// Depth of the random parent tree used by the deep-nested
+    /// sweep. `0` runs no deep-nested trials. `1` reproduces the
+    /// existing `test_constraint_nested` shape (one parent wrapping
+    /// the iterated leaf). `2`+ builds cross-type trees where each
+    /// child subtree is itself `depth-1` random parents — exercises
+    /// interactions between different parent types at multiple
+    /// levels (e.g. `reify(watched-or(reifyimply(X), watched-and(Y,
+    /// Z)))`). Trees whose tableisation exceeds `--maxtuples` are
+    /// discarded and re-rolled, so larger depths just mean more
+    /// rejected rolls rather than OOMs.
+    #[arg(long, default_value_t = 0)]
+    nest_depth: usize,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -497,6 +510,17 @@ fn main() -> Result<()> {
             .into_par_iter()
             .try_for_each(|_| test_types::test_constraint_nested(&config, c))
             .context(format!("failure in {} with nesting", c.name))?;
+
+        if opt.nest_depth >= 2 {
+            let depth = opt.nest_depth;
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_constraint_deep_nested(&config, c, depth))
+                .context(format!(
+                    "failure in {} with deep-nested depth={depth}",
+                    c.name
+                ))?;
+        }
 
         println!("Tested {}", c.name);
         Ok(())

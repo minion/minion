@@ -1096,6 +1096,67 @@ pub fn test_midsearch_add_new_vars_with_constraint(
     Ok(())
 }
 
+/// Depth-N cross-type nesting test. Builds a random parent tree of
+/// depth `depth` with `c` at the bottom of one branch
+/// (`build_random_nested_tree`), tableises, and checks
+/// original-vs-tableised. `depth == 1` matches
+/// `test_constraint_nested`; `depth >= 2` is the new coverage.
+///
+/// Uses the same tableise-loop as the other nested tests so a tree
+/// that exceeds `config.maxtuples` is just re-rolled rather than
+/// failing the trial.
+pub fn test_constraint_deep_nested(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    depth: usize,
+) -> Result<()> {
+    let mut instance;
+    let tups;
+    let mut attempts = 0;
+    loop {
+        instance = constraint_def::build_random_nested_tree(c, depth);
+        let tupstry = instance.tableise(config.maxtuples);
+        if let Some(t) = tupstry {
+            tups = t;
+            break;
+        }
+        attempts += 1;
+        if attempts > 100 {
+            return Ok(());
+        }
+    }
+
+    let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
+    let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
+    if config.deterministic_ordering() {
+        if ret.solutions != ret2.solutions {
+            return Err(anyhow!(format!(
+                "Solutions not equal in {} vs {} (deep nest depth={depth})",
+                ret.filename, ret2.filename
+            )));
+        }
+    } else {
+        let mut a = ret.solutions.clone();
+        let mut b = ret2.solutions.clone();
+        a.sort();
+        b.sort();
+        if a != b {
+            return Err(anyhow!(format!(
+                "Solution sets not equal in {} vs {} (deep nest depth={depth})",
+                ret.filename, ret2.filename
+            )));
+        }
+    }
+    // GAC node-count check intentionally skipped here: the `gac` flag
+    // on the top-level parent in NESTED_CONSTRAINT_LIST is set to
+    // `false` for every wrapper, so the assertion would never fire
+    // even with a GAC-propagated leaf.
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
+    Ok(())
+}
+
 pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,

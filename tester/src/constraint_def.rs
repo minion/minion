@@ -252,9 +252,18 @@ impl ConstraintInstance {
     pub fn vars(&self) -> Arc<Vec<Vec<Arc<MinionVariable>>>> {
         let mut varlist = (*self.varlist).clone();
         for child in &self.child_constraints {
-            varlist.extend((*child.varlist).clone().into_iter());
+            varlist.extend(child.vars().iter().cloned());
         }
         Arc::new(varlist)
+    }
+
+    fn total_var_slots(&self) -> usize {
+        self.varlist.len()
+            + self
+                .child_constraints
+                .iter()
+                .map(|c| c.total_var_slots())
+                .sum::<usize>()
     }
 
     /// Variables belonging directly to this constraint, one entry per argument slot.
@@ -265,7 +274,7 @@ impl ConstraintInstance {
     }
 
     fn check_tuple(&self, tup: &[i64]) -> bool {
-        let mut slices: ArrayVec<&[i64], 16> = ArrayVec::new();
+        let mut slices: Vec<&[i64]> = Vec::with_capacity(self.total_var_slots());
         let mut place: usize = 0;
         for var in self.vars().iter() {
             let i = var.len();
@@ -374,6 +383,116 @@ pub fn build_random_instance_with_children(
     }
 }
 
+/// Wrap a parent `ConstraintDef` around pre-built child instances.
+///
+/// Unlike `build_random_instance_with_children`, which takes child
+/// *defs* and always builds 1-level-deep subtrees for them, this
+/// version accepts full `ConstraintInstance` trees — the children
+/// can themselves be parents with grandchildren. Used by the
+/// depth-N nested random-tree generator below.
+pub fn build_nested_instance(
+    parent_def: &ConstraintDef,
+    child_instances: &[ConstraintInstance],
+) -> ConstraintInstance {
+    loop {
+        let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
+        let mut constraints: Vec<ConstraintInstance> = vec![];
+        let mut constraint_child = 0;
+
+        for i in 0..parent_def.arg.len() {
+            match parent_def.arg[i] {
+                Var(d) => {
+                    variables.push(vec![MinionVariable::random(d)]);
+                }
+                List(d) => {
+                    let len = rand::random::<usize>() % 5;
+                    variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
+                }
+                Tuples => unimplemented!(),
+                Constraint => {
+                    variables.push(vec![]);
+                    constraints.push(child_instances[constraint_child].clone());
+                    constraint_child += 1;
+                }
+            }
+        }
+        let c = ConstraintInstance {
+            constraint: parent_def.clone(),
+            varlist: Arc::new(variables),
+            tuples: None,
+            child_constraints: constraints,
+        };
+        if (parent_def.valid_instance)(&c) {
+            return c;
+        }
+    }
+}
+
+/// Build a random depth-`depth` parent tree with `leaf_def` at the
+/// bottom of one branch and random leaves at the bottoms of any
+/// sibling branches.
+///
+/// - `depth == 0` returns `build_random_instance(leaf_def)` — the
+///   bare leaf.
+/// - `depth == 1` picks one parent from the nesting shortlist
+///   (reify / reifyimply / reifyimply-quick / watched-and /
+///   watched-or), puts `leaf_def` in its first child slot and
+///   random leaves in any remaining slots. Matches the existing
+///   1-level `test_constraint_nested`.
+/// - `depth >= 2` does the same, but each child subtree is itself a
+///   depth-(`depth-1`) random tree. Exercises cross-type parent
+///   interactions: e.g. `reify(watched-or(reifyimply(leaf),
+///   watched-and(leaf, leaf)))`. The iterated leaf always sits at
+///   the bottom of the first-child chain; sibling branches pick
+///   random leaves of their own.
+///
+/// The `Constraint`-arg count of each parent decides child fan-out
+/// (1 for reify/reifyimply, 2 for watched-and/watched-or).
+///
+/// The shortlist excludes `forwardchecking` / `check[gsa]` /
+/// `check[assign]` — those are thin wrappers whose interactions
+/// with each other aren't structurally interesting for this test.
+pub fn build_random_nested_tree(
+    leaf_def: &ConstraintDef,
+    depth: usize,
+) -> ConstraintInstance {
+    if depth == 0 {
+        return build_random_instance(leaf_def);
+    }
+    let mut rng = rand::thread_rng();
+
+    let shortlist = ["reify", "reifyimply", "reifyimply-quick", "watched-and", "watched-or"];
+    let name = shortlist
+        .choose(&mut rng)
+        .expect("shortlist is non-empty");
+    let parent_def = NESTED_CONSTRAINT_LIST
+        .iter()
+        .find(|d| d.name == *name)
+        .expect("shortlist name not in NESTED_CONSTRAINT_LIST");
+
+    let n_children = parent_def
+        .arg
+        .iter()
+        .filter(|a| matches!(a, Arg::Constraint))
+        .count();
+
+    let mut child_instances: Vec<ConstraintInstance> = Vec::with_capacity(n_children);
+    for i in 0..n_children {
+        // First child always carries the iterated leaf (via recursion).
+        // Sibling children use a random leaf from the top-level list,
+        // wrapped to the same depth so we actually get cross-type
+        // nesting at multiple levels rather than an asymmetric tree.
+        let inner = if i == 0 {
+            leaf_def
+        } else {
+            CONSTRAINT_LIST.choose(&mut rng).expect("CONSTRAINT_LIST empty")
+        };
+        child_instances.push(build_random_nested_tree(inner, depth - 1));
+    }
+
+    build_nested_instance(parent_def, &child_instances)
+}
+
 fn check_alldiff(v: &[&[i64]]) -> bool {
     assert!(v.len() == 1);
     for i in 0..v[0].len() {
@@ -477,17 +596,13 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
-        // watched-and / watched-or with exactly two children. The assign
-        // slices are laid out as: [empty(slot 0)], [empty(slot 1)],
-        // then each child's top-level slots concatenated in order.
-        // A child C contributes C.constraint.arg.len() slots here.
         ConstraintDef::new_parent(
             "watched-and", // CT_WATCHED_NEW_AND
             vec![Constraint, Constraint],
             |c, assign| {
                 let mut offset = c.constraint.arg.len();
                 for child in &c.child_constraints {
-                    let nslots = child.constraint.arg.len();
+                    let nslots = child.total_var_slots();
                     let child_assign = &assign[offset..offset + nslots];
                     if !(child.constraint.checker)(child, child_assign) {
                         return false;
@@ -505,7 +620,7 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             |c, assign| {
                 let mut offset = c.constraint.arg.len();
                 for child in &c.child_constraints {
-                    let nslots = child.constraint.arg.len();
+                    let nslots = child.total_var_slots();
                     let child_assign = &assign[offset..offset + nslots];
                     if (child.constraint.checker)(child, child_assign) {
                         return true;
