@@ -333,15 +333,14 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
             if v.var_type == VarType::Constant {
                 continue;
             }
-            // Bound, SparseBound and Discrete are all promoted to
-            // Discrete in-process. minion's BOUND variables don't
-            // support interior-value removal (diseq constraints for
-            // domain holes), and the random variable generator may
-            // substitute SparseBound vars for Bound, but many
-            // constraints reject SparseBound. Promoting everything to
-            // Discrete yields the same solution set; node counts may
-            // differ from exec mode but still agree between original
-            // and tableised within a run.
+            // Promote Bound, SparseBound and Discrete to Discrete
+            // in-process. minion's BOUND variables don't support
+            // interior-value removal (diseq constraints for domain
+            // holes), and native Bound/SparseBound cause solution-set
+            // mismatches against tableised models (which use Discrete
+            // [lo,hi] ranges). Promoting everything to Discrete yields
+            // the same solution set. Node counts may differ from exec
+            // mode but agree between original and tableised within a run.
             let domain = match v.var_type {
                 VarType::Bool => VarDomain::Bool,
                 VarType::Bound | VarType::Discrete | VarType::SparseBound => {
@@ -359,9 +358,8 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
                 bail!("duplicate variable name in instance: {}", v.name);
             }
 
-            // Holes (bool has no holes; its domain is always {0,1} after
-            // random_sublist, and the text encoder matches {0..1} too —
-            // emit diseqs if needed).
+            // Holes (bool has no holes; its domain is always {0,1}
+            // after random_sublist).
             let lo = *v.domain.first().unwrap();
             let hi = *v.domain.last().unwrap();
             let range: Vec<i64> = if v.var_type == VarType::Bool {

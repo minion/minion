@@ -1310,7 +1310,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
 
         ConstraintDef::new_full(
             "alldiffmatrix",
-            vec![List(Bound), Var(Constant)],
+            vec![List(Discrete), Var(Constant)],
             check_alldiffmatrix,
             false,
             false,
@@ -1333,9 +1333,11 @@ fn constraint_list() -> Vec<ConstraintDef> {
             valid_gcc,
         ),
         // Table constraints (inline tuples, positive).
+        // table / negativetable / gacschema / lighttable reject Bound
+        // and SparseBound (CheckNotBound in new_table.h / GACtable_trie).
         ConstraintDef::new_full(
             "table",
-            vec![List(Bound), Tuples],
+            vec![List(Discrete), Tuples],
             check_table,
             true,
             true,
@@ -1343,7 +1345,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_full(
             "gacschema",
-            vec![List(Bound), Tuples],
+            vec![List(Discrete), Tuples],
             check_table,
             true,
             true,
@@ -1351,7 +1353,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_full(
             "lighttable",
-            vec![List(Bound), Tuples],
+            vec![List(Discrete), Tuples],
             check_table,
             true,
             true,
@@ -1376,7 +1378,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ),
         ConstraintDef::new_full(
             "negativetable",
-            vec![List(Bound), Tuples],
+            vec![List(Discrete), Tuples],
             check_negative_table,
             true,
             true,
