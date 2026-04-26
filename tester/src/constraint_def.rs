@@ -228,6 +228,24 @@ impl ConstraintDef {
             valid_instance,
         }
     }
+
+    fn new_full(
+        name: &str,
+        arg: Vec<Arg>,
+        checker: fn(&ConstraintInstance, &[&[i64]]) -> bool,
+        gac: bool,
+        reifygac: bool,
+        valid_instance: fn(&ConstraintInstance) -> bool,
+    ) -> ConstraintDef {
+        ConstraintDef {
+            name: name.to_string(),
+            arg,
+            checker: Arc::new(checker),
+            gac,
+            reifygac,
+            valid_instance,
+        }
+    }
 }
 
 impl fmt::Debug for ConstraintDef {
@@ -332,6 +350,47 @@ impl ConstraintInstance {
     */
 }
 
+/// Generate a random non-empty subset of the cartesian product of all
+/// variable domains collected so far. Used by tuple-bearing constraints
+/// (table, negativetable, mddc, gacschema, lighttable, etc.).
+fn generate_random_tuples_from_vars(
+    variables: &[Vec<Arc<MinionVariable>>],
+) -> Option<Tuples> {
+    use self::itertools::Itertools;
+
+    let all_domains: Vec<Vec<i64>> = variables
+        .iter()
+        .flatten()
+        .map(|v| v.domain.clone())
+        .collect();
+
+    if all_domains.is_empty() {
+        return Some(Tuples::new(vec![vec![]]));
+    }
+
+    let mut all_assignments: Vec<Vec<i64>> = all_domains
+        .iter()
+        .cloned()
+        .multi_cartesian_product()
+        .collect();
+
+    // Pick a random non-empty subset, leaving at least one assignment
+    // unpicked (so negative table constraints are satisfiable). If there
+    // is only one possible assignment we still take it — the valid_instance
+    // hook on negative constraints will reject the instance and force a
+    // re-roll.
+    let mut rng = rand::thread_rng();
+    all_assignments.shuffle(&mut rng);
+    let take = if all_assignments.len() > 1 {
+        rng.gen_range(1..all_assignments.len())
+    } else {
+        1
+    };
+    all_assignments.truncate(take);
+    all_assignments.sort();
+    Some(Tuples::new(all_assignments))
+}
+
 pub fn build_random_instance(constraint: &ConstraintDef) -> ConstraintInstance {
     build_random_instance_with_children(constraint, &[])
 }
@@ -344,6 +403,7 @@ pub fn build_random_instance_with_children(
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
         let mut constraint_child = 0;
+        let mut generated_tuples: Option<Tuples> = None;
 
         for i in 0..constraint.arg.len() {
             match constraint.arg[i] {
@@ -354,12 +414,9 @@ pub fn build_random_instance_with_children(
                     let len = rand::random::<usize>() % 5;
                     variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
                 }
-                /*
-                TwoVars(d) => {
-                    variables.push(vec![MinionVariable::random(d), MinionVariable::random(d)]);
+                Tuples => {
+                    generated_tuples = generate_random_tuples_from_vars(&variables);
                 }
-                */
-                Tuples => unimplemented!(),
                 Constraint => {
                     // Leave dummy empty vec in variables
                     variables.push(vec![]);
@@ -374,7 +431,7 @@ pub fn build_random_instance_with_children(
         let c = ConstraintInstance {
             constraint: constraint.clone(),
             varlist: Arc::new(variables),
-            tuples: None,
+            tuples: generated_tuples,
             child_constraints: constraints,
         };
         if (constraint.valid_instance)(&c) {
@@ -398,6 +455,7 @@ pub fn build_nested_instance(
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
         let mut constraint_child = 0;
+        let mut generated_tuples: Option<Tuples> = None;
 
         for i in 0..parent_def.arg.len() {
             match parent_def.arg[i] {
@@ -408,7 +466,9 @@ pub fn build_nested_instance(
                     let len = rand::random::<usize>() % 5;
                     variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
                 }
-                Tuples => unimplemented!(),
+                Tuples => {
+                    generated_tuples = generate_random_tuples_from_vars(&variables);
+                }
                 Constraint => {
                     variables.push(vec![]);
                     constraints.push(child_instances[constraint_child].clone());
@@ -419,7 +479,7 @@ pub fn build_nested_instance(
         let c = ConstraintInstance {
             constraint: parent_def.clone(),
             varlist: Arc::new(variables),
-            tuples: None,
+            tuples: generated_tuples,
             child_constraints: constraints,
         };
         if (parent_def.valid_instance)(&c) {
@@ -503,6 +563,111 @@ fn check_alldiff(v: &[&[i64]]) -> bool {
         }
     }
     true
+}
+
+fn check_alldiffmatrix(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
+    let vars: &[i64] = v[0];
+    let var_count = vars.len();
+    let n = (var_count as f64).sqrt() as usize;
+    if n * n != var_count {
+        return false;
+    }
+    let value = v[1][0];
+
+    // Check for a perfect matching: edge (r,c) exists if vars[r*n + c] == value.
+    fn dfs(
+        r: usize,
+        visited: &mut [bool],
+        match_col: &mut [isize],
+        vars: &[i64],
+        n: usize,
+        value: i64,
+    ) -> bool {
+        for c in 0..n {
+            if vars[r * n + c] != value {
+                continue;
+            }
+            if visited[c] {
+                continue;
+            }
+            visited[c] = true;
+            if match_col[c] == -1
+                || dfs(match_col[c] as usize, visited, match_col, vars, n, value)
+            {
+                match_col[c] = r as isize;
+                return true;
+            }
+        }
+        false
+    }
+
+    let mut match_col = vec![-1isize; n];
+    for r in 0..n {
+        let mut visited = vec![false; n];
+        if !dfs(r, &mut visited, &mut match_col, vars, n, value) {
+            return false;
+        }
+    }
+    true
+}
+
+fn valid_alldiffmatrix(c: &ConstraintInstance) -> bool {
+    let var_count = c.vars()[0].len();
+    let n = (var_count as f64).sqrt() as usize;
+    n * n == var_count && var_count > 0
+}
+
+fn check_gcc(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
+    let primary = &v[0];
+    let values = &v[1];
+    let capacities = &v[2];
+    for j in 0..values.len() {
+        let val = values[j];
+        let count = primary.iter().filter(|&&x| x == val).count();
+        if count as i64 != capacities[j] {
+            return false;
+        }
+    }
+    true
+}
+
+fn valid_gcc(c: &ConstraintInstance) -> bool {
+    // Need at least one primary var, at least one value-of-interest,
+    // matching capacities, and values-of-interest must be distinct.
+    use std::collections::HashSet;
+    if c.vars()[0].is_empty() || c.vars()[1].is_empty() {
+        return false;
+    }
+    if c.vars()[1].len() != c.vars()[2].len() {
+        return false;
+    }
+    let vals: Vec<i64> = c.vars()[1].iter().map(|v| v.get_value()).collect();
+    let unique: HashSet<i64> = vals.iter().cloned().collect();
+    unique.len() == vals.len()
+}
+
+fn check_table(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
+    let tup: Vec<i64> = v[0].to_vec();
+    c.tuples.as_ref().unwrap().tupledata.contains(&tup)
+}
+
+fn check_negative_table(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
+    let tup: Vec<i64> = v[0].to_vec();
+    !c.tuples.as_ref().unwrap().tupledata.contains(&tup)
+}
+
+fn valid_positive_table(c: &ConstraintInstance) -> bool {
+    !c.tuples.as_ref().unwrap().tupledata.is_empty()
+}
+
+fn valid_negative_table(c: &ConstraintInstance) -> bool {
+    let tuples = c.tuples.as_ref().unwrap();
+    if tuples.tupledata.is_empty() {
+        return false;
+    }
+    let all_domains: Vec<Vec<i64>> = c.vars()[0].iter().map(|v| v.domain.clone()).collect();
+    let total: usize = all_domains.iter().map(|d| d.len()).product();
+    tuples.tupledata.len() < total
 }
 
 fn check_element(v: &[&[i64]], offset: i64, undefzero: bool) -> bool {
@@ -655,7 +820,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
-        // TODO: ALLDIFF_MATRIX
         ConstraintDef::new(
             "difference", // CT_DIFFERENCE
             vec![Var(Bound), Var(Bound), Var(Bound)],
@@ -757,9 +921,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             |v| v.vars()[0].len() == v.vars()[1].len(),
         ),
-        // TODO: CT_GACSCHEMA
-
-        // TODO: CT_GCC, CT_GCCWEAK
         ConstraintDef::new(
             "occurrencegeq", // CT_GEQ_OCCURRENCE
             vec![List(Discrete), Var(Constant), Var(Constant)],
@@ -832,7 +993,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             |v| v.vars()[0].len() == v.vars()[1].len(),
         ),
-        // TODO: CT_LIGHTTABLE
         ConstraintDef::new(
             "max", // CT_MAX
             vec![List(Bound), Var(Bound)],
@@ -840,7 +1000,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
-        // TODO: CT_MDDC
         ConstraintDef::new(
             "min", // CT_MIN
             vec![List(Bound), Var(Bound)],
@@ -877,7 +1036,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
-        //TODO: CT_NEGATIVEMDDC
         ConstraintDef::new(
             "occurrence", // CT_OCCURRENCE
             vec![List(Discrete), Var(Constant), Var(Discrete)],
@@ -913,7 +1071,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
-        //TODO: CT_NEGATIVEMDDC
         ConstraintDef::new(
             "product", // CT_PRODUCT
             vec![Var(Bound), Var(Bound), Var(Bound)],
@@ -1072,7 +1229,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
-        // TODO: CT_WATCHED_NEGATIVE_TABLE
         ConstraintDef::new(
             "watchneq", // CT_WATCHED_NEQ
             vec![Var(Discrete), Var(Discrete)],
@@ -1118,7 +1274,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             true,
         ),
-        // TODO: CT_WATCHED_TABLE
         ConstraintDef::new_with_validator(
             "watchvecexists_less", // CT_WATCHED_VEC_OR_LESS
             vec![List(Bound), List(Bound)],
@@ -1150,6 +1305,82 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             true,
             |c| c.vars()[0].len() == c.vars()[1].len(),
+        ),
+        // --- constraints that need instance-aware checkers ---
+
+        ConstraintDef::new_full(
+            "alldiffmatrix",
+            vec![List(Bound), Var(Constant)],
+            check_alldiffmatrix,
+            false,
+            false,
+            valid_alldiffmatrix,
+        ),
+        ConstraintDef::new_full(
+            "gcc",
+            vec![List(Discrete), List(Constant), List(Discrete)],
+            check_gcc,
+            false,
+            false,
+            valid_gcc,
+        ),
+        ConstraintDef::new_full(
+            "gccweak",
+            vec![List(Discrete), List(Constant), List(Discrete)],
+            check_gcc,
+            false,
+            false,
+            valid_gcc,
+        ),
+        // Table constraints (inline tuples, positive).
+        ConstraintDef::new_full(
+            "table",
+            vec![List(Bound), Tuples],
+            check_table,
+            true,
+            true,
+            valid_positive_table,
+        ),
+        ConstraintDef::new_full(
+            "gacschema",
+            vec![List(Bound), Tuples],
+            check_table,
+            true,
+            true,
+            valid_positive_table,
+        ),
+        ConstraintDef::new_full(
+            "lighttable",
+            vec![List(Bound), Tuples],
+            check_table,
+            true,
+            true,
+            valid_positive_table,
+        ),
+        ConstraintDef::new_full(
+            "mddc",
+            vec![List(Bound), Tuples],
+            check_table,
+            true,
+            true,
+            valid_positive_table,
+        ),
+        // Table constraints (inline tuples, negative).
+        ConstraintDef::new_full(
+            "negativemddc",
+            vec![List(Bound), Tuples],
+            check_negative_table,
+            true,
+            true,
+            valid_negative_table,
+        ),
+        ConstraintDef::new_full(
+            "negativetable",
+            vec![List(Bound), Tuples],
+            check_negative_table,
+            true,
+            true,
+            valid_negative_table,
         ),
     ]
 }

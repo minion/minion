@@ -44,6 +44,19 @@ fn list_of_consts(vars: &[Arc<MinionVariable>]) -> Vec<MC> {
     vars.iter().map(|v| const_of(v)).collect()
 }
 
+/// Convert tester-side tuple data (i64 rows) to minion-sys [`minion_sys::ast::Constant`] tuples.
+fn convert_tuples(tuples: &crate::constraint_def::Tuples) -> Vec<Vec<MC>> {
+    tuples
+        .tupledata
+        .iter()
+        .map(|row| {
+            row.iter()
+                .map(|&n| MC::Integer(n as i32))
+                .collect()
+        })
+        .collect()
+}
+
 /// Build a minion-sys `Constraint` tree from a tester `ConstraintInstance`,
 /// dispatched on the constraint's registered `name`.
 fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
@@ -61,6 +74,7 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
     let cons = match name {
         "abs" => MCon::Abs(var_of(&v[0][0]), var_of(&v[1][0])),
         "alldiff" => MCon::AllDiff(list_of_vars(&v[0])),
+        "alldiffmatrix" => MCon::AllDiffMatrix(list_of_vars(&v[0]), const_of(&v[1][0])),
         "gacalldiff" => MCon::GacAllDiff(list_of_vars(&v[0])),
         "difference" => MCon::Difference(
             (var_of(&v[0][0]), var_of(&v[1][0])),
@@ -92,6 +106,16 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         ),
         "eq" => MCon::Eq(var_of(&v[0][0]), var_of(&v[1][0])),
         "gaceq" => MCon::GacEq(var_of(&v[0][0]), var_of(&v[1][0])),
+        "gcc" => MCon::Gcc(
+            list_of_vars(&v[0]),
+            list_of_consts(&v[1]),
+            list_of_vars(&v[2]),
+        ),
+        "gccweak" => MCon::GccWeak(
+            list_of_vars(&v[0]),
+            list_of_consts(&v[1]),
+            list_of_vars(&v[2]),
+        ),
         "false" => MCon::False,
         "true" => MCon::True,
         "ineq" => MCon::Ineq(
@@ -223,6 +247,50 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         "forwardchecking" => MCon::ForwardChecking(child(0)?),
         "check[gsa]" => MCon::CheckGsa(child(0)?),
         "check[assign]" => MCon::CheckAssign(child(0)?),
+
+        // Inline-tuple table constraints.
+        "table" => {
+            let tups = instance
+                .tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("table instance has no tuple data"))?;
+            MCon::Table(list_of_vars(&v[0]), convert_tuples(tups))
+        }
+        "negativetable" => {
+            let tups = instance
+                .tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("negativetable instance has no tuple data"))?;
+            MCon::NegativeTable(list_of_vars(&v[0]), convert_tuples(tups))
+        }
+        "gacschema" => {
+            let tups = instance
+                .tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("gacschema instance has no tuple data"))?;
+            MCon::GacSchema(list_of_vars(&v[0]), convert_tuples(tups))
+        }
+        "lighttable" => {
+            let tups = instance
+                .tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("lighttable instance has no tuple data"))?;
+            MCon::LightTable(list_of_vars(&v[0]), convert_tuples(tups))
+        }
+        "mddc" => {
+            let tups = instance
+                .tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("mddc instance has no tuple data"))?;
+            MCon::Mddc(list_of_vars(&v[0]), convert_tuples(tups))
+        }
+        "negativemddc" => {
+            let tups = instance
+                .tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("negativemddc instance has no tuple data"))?;
+            MCon::NegativeMddc(list_of_vars(&v[0]), convert_tuples(tups))
+        }
 
         // Tableised instance. Uses minion's CT_STR (str2plus), the same
         // universal-tuple-constraint the exec tester uses as its
