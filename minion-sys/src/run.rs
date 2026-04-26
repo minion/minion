@@ -132,21 +132,52 @@ impl MidSearchContext<'_> {
         let c_name = CString::new(name).map_err(|_| {
             anyhow!("Variable name {:?} contains a null character.", name)
         })?;
-        let (vartype_raw, lo, hi) = match domain {
-            VarDomain::Bool => (ffi::VariableType_VAR_BOOL, 0, 1),
-            VarDomain::Bound(a, b) => (ffi::VariableType_VAR_BOUND, a, b),
-            VarDomain::Discrete(a, b) => (ffi::VariableType_VAR_DISCRETE, a, b),
-            x => return Err(MinionError::NotImplemented(format!("{x:?}"))),
-        };
         unsafe {
-            check_minion_result(ffi::minion_newVarMidsearch(
-                self.ctx,
-                self.instance,
-                c_name.as_ptr() as *mut c_char,
-                vartype_raw,
-                lo,
-                hi,
-            ))?;
+            match domain {
+                VarDomain::Bool => {
+                    check_minion_result(ffi::minion_newVarMidsearch(
+                        self.ctx,
+                        self.instance,
+                        c_name.as_ptr() as *mut c_char,
+                        ffi::VariableType_VAR_BOOL,
+                        0,
+                        1,
+                    ))?;
+                }
+                VarDomain::Bound(a, b) => {
+                    check_minion_result(ffi::minion_newVarMidsearch(
+                        self.ctx,
+                        self.instance,
+                        c_name.as_ptr() as *mut c_char,
+                        ffi::VariableType_VAR_BOUND,
+                        a,
+                        b,
+                    ))?;
+                }
+                VarDomain::Discrete(a, b) => {
+                    check_minion_result(ffi::minion_newVarMidsearch(
+                        self.ctx,
+                        self.instance,
+                        c_name.as_ptr() as *mut c_char,
+                        ffi::VariableType_VAR_DISCRETE,
+                        a,
+                        b,
+                    ))?;
+                }
+                VarDomain::SparseBound(ref vals) => {
+                    let raw = Scoped::new(ffi::vec_int_new(), |x| ffi::vec_int_free(x as _));
+                    for v in vals {
+                        ffi::vec_int_push_back(raw.ptr, *v);
+                    }
+                    check_minion_result(ffi::minion_newSparseBoundVarMidsearch(
+                        self.ctx,
+                        self.instance,
+                        c_name.as_ptr() as *mut c_char,
+                        raw.ptr,
+                    ))?;
+                }
+                x => return Err(MinionError::NotImplemented(format!("{x:?}"))),
+            }
         }
         self.midsearch_vars.push(name.to_owned());
         Ok(())
@@ -565,20 +596,47 @@ unsafe fn convert_model_to_raw(
             .get_vartype(var_name.clone())
             .ok_or(anyhow!("Could not get var type for {:?}", var_name.clone()))?;
 
-        let (vartype_raw, domain_low, domain_high) = match vartype {
-            VarDomain::Bound(a, b) => Ok((ffi::VariableType_VAR_BOUND, a, b)),
-            VarDomain::Discrete(a, b) => Ok((ffi::VariableType_VAR_DISCRETE, a, b)),
-            VarDomain::Bool => Ok((ffi::VariableType_VAR_BOOL, 0, 1)), // TODO: will this work?
-            x => Err(MinionError::NotImplemented(format!("{x:?}"))),
-        }?;
-
-        check_minion_result(ffi::minion_newVar(
-            instance,
-            c_str.as_ptr() as *mut c_char,
-            vartype_raw,
-            domain_low,
-            domain_high,
-        ))?;
+        match vartype {
+            VarDomain::Bound(a, b) => {
+                check_minion_result(ffi::minion_newVar(
+                    instance,
+                    c_str.as_ptr() as *mut c_char,
+                    ffi::VariableType_VAR_BOUND,
+                    a,
+                    b,
+                ))?;
+            }
+            VarDomain::Discrete(a, b) => {
+                check_minion_result(ffi::minion_newVar(
+                    instance,
+                    c_str.as_ptr() as *mut c_char,
+                    ffi::VariableType_VAR_DISCRETE,
+                    a,
+                    b,
+                ))?;
+            }
+            VarDomain::Bool => {
+                check_minion_result(ffi::minion_newVar(
+                    instance,
+                    c_str.as_ptr() as *mut c_char,
+                    ffi::VariableType_VAR_BOOL,
+                    0,
+                    1,
+                ))?;
+            }
+            VarDomain::SparseBound(ref vals) => {
+                let raw = Scoped::new(ffi::vec_int_new(), |x| ffi::vec_int_free(x as _));
+                for v in vals {
+                    ffi::vec_int_push_back(raw.ptr, *v);
+                }
+                check_minion_result(ffi::minion_newSparseBoundVar(
+                    instance,
+                    c_str.as_ptr() as *mut c_char,
+                    raw.ptr,
+                ))?;
+            }
+            x => return Err(MinionError::NotImplemented(format!("{x:?}"))),
+        };
 
         let var_result = ffi::minion_getVarByName(instance, c_str.as_ptr() as _);
         check_minion_result(var_result.result)?;

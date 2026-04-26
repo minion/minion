@@ -346,6 +346,24 @@ MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type,
   }
 }
 
+MinionResult minion_newSparseBoundVar(CSPInstance& instance, char* name, std::vector<int>* domain)
+{
+  assertNotInSearch("minion_newSparseBoundVar");
+  try {
+    vector<DomainInt> dbounds(domain->begin(), domain->end());
+    Var v = instance.vars.getNewVar(VAR_SPARSEBOUND, dbounds);
+    instance.vars.addSymbol(string(name), v);
+    instance.allVars_list.push_back(makeVec(v));
+    return MinionResult::MINION_OK;
+  } catch(const parse_exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_PARSE_ERROR;
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_UNKNOWN_ERROR;
+  }
+}
+
 /***** Tuple *****/
 TupleList* tupleList_new(vector<vector<int>>& tupleList)
 {
@@ -477,6 +495,46 @@ MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
     Controller::SearchManager* sm = getState().getSearchManager();
     if(sm == nullptr) {
       set_error("minion_newVarMidsearch: no live SearchManager (not in search?)");
+      return MinionResult::MINION_INVALID_INSTANCE;
+    }
+    sm->appendAuxVar(ref, ValOrder(VALORDER_ASCEND));
+
+    return MinionResult::MINION_OK;
+  } catch(const parse_exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_PARSE_ERROR;
+  } catch(const std::exception& e) {
+    set_error(e.what());
+    return MinionResult::MINION_UNKNOWN_ERROR;
+  }
+}
+
+MinionResult minion_newSparseBoundVarMidsearch(MinionContext* ctx, CSPInstance& instance,
+                                               char* name, std::vector<int>* domain)
+{
+  try {
+    ContextGuard guard(ctx);
+
+    if(getState().isFailed()) {
+      set_error("minion_newSparseBoundVarMidsearch: solver state is already failed");
+      return MinionResult::MINION_INVALID_ARGUMENT;
+    }
+
+    vector<DomainInt> dbounds(domain->begin(), domain->end());
+
+    // Add to the spec (symbol table, allVars_list, etc.)
+    Var v = instance.vars.getNewVar(VAR_SPARSEBOUND, dbounds);
+    instance.vars.addSymbol(string(name), v);
+    instance.allVars_list.push_back(makeVec(v));
+
+    // Register in the live variable container.
+    UnsignedSysInt idx = getVars().sparseBoundVarContainer.varCount();
+    getVars().sparseBoundVarContainer.addVariables(dbounds, 1);
+    AnyVarRef ref = AnyVarRef(getVars().sparseBoundVarContainer.getVarNum(idx));
+
+    Controller::SearchManager* sm = getState().getSearchManager();
+    if(sm == nullptr) {
+      set_error("minion_newSparseBoundVarMidsearch: no live SearchManager (not in search?)");
       return MinionResult::MINION_INVALID_INSTANCE;
     }
     sm->appendAuxVar(ref, ValOrder(VALORDER_ASCEND));

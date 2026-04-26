@@ -290,6 +290,7 @@ Var constantAsVar(int n);
 /***** Variable *****/
 VarResult minion_getVarByName(CSPInstance& instance, char* name);
 MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
+MinionResult minion_newSparseBoundVar(CSPInstance& instance, char* name, std::vector<int>* domain);
 
 /***** Tuple *****/
 TupleList* tupleList_new(vector<vector<int>>& tupleList);
@@ -338,6 +339,8 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
 MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
                                     char* name, VariableType type,
                                     int bound1, int bound2);
+MinionResult minion_newSparseBoundVarMidsearch(MinionContext* ctx, CSPInstance& instance,
+                                               char* name, std::vector<int>* domain);
 
 /// Returns the assigned value of any named variable during a callback.
 ///

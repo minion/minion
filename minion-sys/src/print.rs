@@ -78,6 +78,10 @@ pub fn write_variable_declaration(
         crate::ast::VarDomain::Bound(i, j) => writeln!(writer, "BOUND {name} {{{i}..{j}}}")?,
         crate::ast::VarDomain::Discrete(i, j) => writeln!(writer, "DISCRETE {name}, {{{i}..{j}}}")?,
         crate::ast::VarDomain::Bool => writeln!(writer, "BOOL {name}")?,
+        crate::ast::VarDomain::SparseBound(vals) => {
+            let vals_str: Vec<String> = vals.iter().map(|n| n.to_string()).collect();
+            writeln!(writer, "SPARSEBOUND {name} {{ {} }}", vals_str.join(", "))?
+        }
     };
 
     Ok(())

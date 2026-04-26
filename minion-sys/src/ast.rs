@@ -401,14 +401,15 @@ impl Display for Constant {
 }
 
 /// Representation of variable domains.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum VarDomain {
     Bound(i32, i32),
     Discrete(i32, i32),
-    // FIXME: should be a list of i32!
-    // we don't use this anyways, so commenting out for now...
-    // SparseBound(i32,i32),
+    /// Sparse bound variable with an explicit non-contiguous set of domain values.
+    /// Unlike Bound/Discrete which take [lower, upper] ranges, this carries the
+    /// full domain, e.g. `SparseBound(vec![-5, -2, 0, 3, 7])`.
+    SparseBound(Vec<i32>),
     Bool,
 }
 

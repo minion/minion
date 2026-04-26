@@ -333,13 +333,15 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
             if v.var_type == VarType::Constant {
                 continue;
             }
-            // We always use Discrete in-process. minion's BOUND variables
-            // don't support interior-value removal, and MDDC (our chosen
-            // tableise target, since str2plus with inline tuples isn't yet
-            // exposed in the Model API) propagates aggressively enough to
-            // need it. Promoting Bound and SparseBound to Discrete yields
-            // the same solution set; node counts may differ from exec mode
-            // but still agree between original and tableised within a run.
+            // Bound, SparseBound and Discrete are all promoted to
+            // Discrete in-process. minion's BOUND variables don't
+            // support interior-value removal (diseq constraints for
+            // domain holes), and the random variable generator may
+            // substitute SparseBound vars for Bound, but many
+            // constraints reject SparseBound. Promoting everything to
+            // Discrete yields the same solution set; node counts may
+            // differ from exec mode but still agree between original
+            // and tableised within a run.
             let domain = match v.var_type {
                 VarType::Bool => VarDomain::Bool,
                 VarType::Bound | VarType::Discrete | VarType::SparseBound => {
@@ -357,8 +359,9 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
                 bail!("duplicate variable name in instance: {}", v.name);
             }
 
-            // Holes (bool has no holes; its domain is always {0,1} after random_sublist,
-            // and the text encoder matches {0..1} too — emit diseqs if needed).
+            // Holes (bool has no holes; its domain is always {0,1} after
+            // random_sublist, and the text encoder matches {0..1} too —
+            // emit diseqs if needed).
             let lo = *v.domain.first().unwrap();
             let hi = *v.domain.last().unwrap();
             let range: Vec<i64> = if v.var_type == VarType::Bool {
@@ -724,7 +727,7 @@ pub fn run_multi_injected(
                             ..
                         } => {
                             for (name, domain) in new_vars {
-                                if let Err(e) = midctx.add_var(name, *domain) {
+                                if let Err(e) = midctx.add_var(name, domain.clone()) {
                                     *cb_err_ref = Some(format!(
                                         "add_var({name}): {e}"
                                     ));
@@ -860,7 +863,7 @@ pub fn run_inject_vars_after(
                 pre.push(row);
                 if *count_ref == inject_after {
                     for (name, domain) in new_vars {
-                        if let Err(e) = midctx.add_var(name, *domain) {
+                        if let Err(e) = midctx.add_var(name, domain.clone()) {
                             *cb_err_ref = Some(format!("add_var({name}): {e}"));
                             return false;
                         }
