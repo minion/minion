@@ -139,9 +139,14 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
     if config.deterministic_ordering() {
         if ret.solutions != ret2.solutions {
+            let n = ret.solutions.len().min(10);
+            let m = ret2.solutions.len().min(10);
+            let name = &c.name;
             return Err(anyhow!(format!(
-                "Solutions not equal in {} vs {}",
-                ret.filename, ret2.filename
+                "Solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
+                ret.filename, ret2.filename,
+                ret.solutions.len(), &ret.solutions[..n],
+                ret2.solutions.len(), &ret2.solutions[..m],
             )));
         }
     } else {
@@ -1197,9 +1202,14 @@ pub fn test_constraint_nested(
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
     if config.deterministic_ordering() {
         if ret.solutions != ret2.solutions {
+            let n = ret.solutions.len().min(10);
+            let m = ret2.solutions.len().min(10);
+            let name = &c.name;
             return Err(anyhow!(format!(
-                "Solutions not equal in {} vs {}",
-                ret.filename, ret2.filename
+                "Nested solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
+                ret.filename, ret2.filename,
+                ret.solutions.len(), &ret.solutions[..n],
+                ret2.solutions.len(), &ret2.solutions[..m],
             )));
         }
     } else {

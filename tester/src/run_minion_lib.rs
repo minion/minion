@@ -333,20 +333,32 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
             if v.var_type == VarType::Constant {
                 continue;
             }
-            // Promote Bound, SparseBound and Discrete to Discrete
-            // in-process. minion's BOUND variables don't support
-            // interior-value removal (diseq constraints for domain
-            // holes), and native Bound/SparseBound cause solution-set
-            // mismatches against tableised models (which use Discrete
-            // [lo,hi] ranges). Promoting everything to Discrete yields
-            // the same solution set. Node counts may differ from exec
-            // mode but agree between original and tableised within a run.
+            let tableised = instance.constraint.name == "str2plus";
             let domain = match v.var_type {
                 VarType::Bool => VarDomain::Bool,
-                VarType::Bound | VarType::Discrete | VarType::SparseBound => {
-                    let lo = *v.domain.first().unwrap() as i32;
-                    let hi = *v.domain.last().unwrap() as i32;
-                    VarDomain::Discrete(lo, hi)
+                VarType::Bound => {
+                    VarDomain::Bound(
+                        *v.domain.first().unwrap() as i32,
+                        *v.domain.last().unwrap() as i32,
+                    )
+                }
+                VarType::SparseBound => {
+                    if tableised {
+                        VarDomain::Discrete(
+                            *v.domain.first().unwrap() as i32,
+                            *v.domain.last().unwrap() as i32,
+                        )
+                    } else {
+                        VarDomain::SparseBound(
+                            v.domain.iter().map(|&n| n as i32).collect(),
+                        )
+                    }
+                }
+                VarType::Discrete => {
+                    VarDomain::Discrete(
+                        *v.domain.first().unwrap() as i32,
+                        *v.domain.last().unwrap() as i32,
+                    )
                 }
                 VarType::Constant => unreachable!(),
             };
@@ -358,21 +370,28 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
                 bail!("duplicate variable name in instance: {}", v.name);
             }
 
-            // Holes (bool has no holes; its domain is always {0,1}
-            // after random_sublist).
-            let lo = *v.domain.first().unwrap();
-            let hi = *v.domain.last().unwrap();
-            let range: Vec<i64> = if v.var_type == VarType::Bool {
-                (0..2).collect()
-            } else {
-                (lo..hi).collect()
-            };
-            for val in range {
-                if !v.domain.contains(&val) {
-                    model.constraints.push(MCon::DisEq(
-                        Var::NameRef(v.name.clone()),
-                        Var::ConstantAsVar(val as i32),
-                    ));
+            if v.var_type == VarType::SparseBound && tableised {
+                model.constraints.push(MCon::WInset(
+                    Var::NameRef(v.name.clone()),
+                    v.domain.iter().map(|&n| MC::Integer(n as i32)).collect(),
+                ));
+            } else if v.var_type != VarType::Bound
+                && v.var_type != VarType::SparseBound
+            {
+                let lo = *v.domain.first().unwrap();
+                let hi = *v.domain.last().unwrap();
+                let range: Vec<i64> = if v.var_type == VarType::Bool {
+                    (0..2).collect()
+                } else {
+                    (lo..hi).collect()
+                };
+                for val in range {
+                    if !v.domain.contains(&val) {
+                        model.constraints.push(MCon::DisEq(
+                            Var::NameRef(v.name.clone()),
+                            Var::ConstantAsVar(val as i32),
+                        ));
+                    }
                 }
             }
         }
@@ -520,12 +539,14 @@ pub fn run_multi(
             "--- multi-model for {testname} (seed={:?}) ---",
             options.seed
         );
-        for name in &variable_order {
+        eprintln!("variable order (col: name = domain):");
+        for (i, name) in variable_order.iter().enumerate() {
             eprintln!(
-                "  {name}: {:?}",
+                "  col{i}: {name} = {:?}",
                 model.named_variables.get_vartype(name.clone())
             );
         }
+        eprintln!("constraints:");
         for c in &model.constraints {
             eprintln!("  {c:?}");
         }
@@ -613,9 +634,10 @@ pub fn run_multi_injected(
             "--- multi-inject model for {testname} (seed={:?}) ---",
             options.seed
         );
-        for name in &initial_variable_order {
+        eprintln!("variable order (col: name = domain):");
+        for (i, name) in initial_variable_order.iter().enumerate() {
             eprintln!(
-                "  {name}: {:?}",
+                "  col{i}: {name} = {:?}",
                 model.named_variables.get_vartype(name.clone())
             );
         }
@@ -936,9 +958,9 @@ pub fn get_minion_solutions_in_process(
 
     if std::env::var("TESTER_DEBUG").is_ok() {
         eprintln!("--- in-process model for {testname} ---");
-        eprintln!("variables:");
-        for name in model.named_variables.get_variable_order() {
-            eprintln!("  {name}: {:?}", model.named_variables.get_vartype(name.clone()));
+        eprintln!("variable order (col: name = domain):");
+        for (i, name) in model.named_variables.get_variable_order().iter().enumerate() {
+            eprintln!("  col{i}: {name} = {:?}", model.named_variables.get_vartype(name.clone()));
         }
         eprintln!("constraints:");
         for c in &model.constraints {
