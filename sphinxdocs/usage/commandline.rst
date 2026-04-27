@@ -71,6 +71,7 @@ The available orders are:
 -  ldf - largest domain first, break ties lexicographically
 -  ldf-random - ldf, but break ties randomly
 -  random - random variable ordering
+-  conflict - conflict-directed variable ordering
 -  static - lexicographical ordering
 -  wdeg - Weighted degree
 -  domoverwdeg - Domain size over weighted degree
@@ -81,6 +82,21 @@ The available orders are:
 Choose the value ordering (overruling any selection in the input file).
 
 Current orders are, ascend, descend and random.
+
+-restarts
+~~~~~~~~~
+
+Enable restart-based search. When enabled, Minion restarts the search from the top of the search tree periodically, retaining learned information.
+
+-restarts-multiplier <N>
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Set the restart multiplier. The restart schedule is geometric: the first restart occurs after 10 conflicts, and each subsequent restart occurs after the previous limit multiplied by this value. Default is 1.5.
+
+-no-restarts-bias
+~~~~~~~~~~~~~~~~~
+
+Disable the restart bias heuristic. By default, Minion biases the restart schedule based on the number of variables.
 
 -prop-node <proplevel>
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -180,6 +196,12 @@ This data includes minion version information, arguments to the
 executable, build and solve time statistics, etc. See the file itself
 for a precise schema of the supplied information.
 
+-jsontableout <filename>
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Append a line of data about the current run as JSON to a named file.
+Contains the same information as ``-tableout``, but formatted as a JSON
+object.
 
 -solsout <filename>
 ~~~~~~~~~~~~~~~~~~~~
@@ -296,6 +318,13 @@ Do not write a resume file on timeout or being killed. (default)
 ~~~~
 
 Give name of gap executable (defaults to gap.sh)
+
+-command-list <infile> <outfile>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Read a list of commands from ``infile`` and write the results to ``outfile``.
+This allows batch processing of multiple Minion commands without restarting
+the solver.
 
 -split
 ~~~~~~~~~~~~~~~~~~

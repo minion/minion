@@ -276,6 +276,18 @@ element_one
 The constraint element_one is identical to `element <#element>`__, except that the
 vector is indexed from 1 rather than from 0.
 
+element_undefzero
+^^^^^^^^^^^^^^^^^
+
+The constraint ``element_undefzero(vec, i, e)``
+
+specifies that, in any solution, either:
+
+- vec[i] = e and i is in the range [0 .. len(v)-1]
+- i is outside the index range of vec, and e = 0
+
+This is the non-watched variant; see `watchelement_undefzero <#watchelement_undefzero>`__ for a GAC-enforcing version.
+
 watchelement_one
 ^^^^^^^^^^^^^^^^
 
@@ -340,10 +352,20 @@ Related constraints
 
 `eq <#eq-1>`__
 
+gaceq
+^^^^^
+
+``gaceq(x,y)`` ensures that ``x=y``, enforcing generalised arc consistency. This is a GAC variant of `eq <#eq>`__.
+
 diseq
 ^^^^^
 
 ``diseq(x,y)`` ensures that ``x`` is not equal ``y``. Achieves arc consistency.
+
+watchneq
+^^^^^^^^
+
+``watchneq(x,y)`` ensures that ``x`` is not equal ``y``. This is the watched variant of `diseq <#diseq>`__ and may perform better when one variable is assigned early.
 
 ineq
 ^^^^
@@ -426,14 +448,14 @@ For example:
 - -3 % -5 = -3
 
 
-mod_undefzero
-^^^^^^^^^^^^^
+modulo_undefzero
+^^^^^^^^^^^^^^^^
 
-The constraint ``mod_undefzero(x,y,z)`` is the same as ``modulo`` except the constraint is always true when y = 0,
+The constraint ``modulo_undefzero(x,y,z)`` is the same as ``modulo`` except the constraint is always true when y = 0,
 instead of false.
 
 This constraint exists for cases where ``y`` being zero should not lead to the whole model being false. If
-you are unsure what constraint to use, then you probably want the ``mod`` constraint!
+you are unsure what constraint to use, then you probably want the ``modulo`` constraint!
 
 
 product
@@ -743,11 +765,10 @@ Lexicographic ordering constraints all take two lists of variables and compare t
 
 Minion supports both ``lexleq`` ($<=$ ordering) and ``lexless`` ($<$ ordering).
 
-Each of these comes in three variants:
+Each comes in up to three variants:
 
 * standard (``lexleq`` and ``lexless``) : Achieves GAC propagation, assuming no variable is repeated.
-* repeated variables (``lexleq[rv]`` and ``lexless[rv]``) : These achieve GAC propagation even if some variables are repeated. The extra propagation this achieves is rarely
-worth the extra work.
+* repeated variables (``lexleq[rv]`` only) : Achieves GAC propagation even if some variables are repeated. The extra propagation this achieves is rarely worth the extra work. There is no ``lexless[rv]`` variant.
 * quick (``lexleq[quick]`` and ``lexless[quick]``) : A lower level of propagation that runs very quickly. This is usually the best choice, in particular if you have a very large number of constraints (problems using over 100,000 ``lexleq[quick]`` are regularly solved in Minion).
 
 
@@ -859,6 +880,12 @@ The constraint ``hamming(X,Y,c)`` ensures that the hamming distance between X an
 is, that the size of the set {i \| X[i] != y[i]} is greater than or
 equal to c.
 
+not-hamming
+^^^^^^^^^^^
+
+The constraint ``not-hamming(X,Y,c)`` ensures that the hamming distance between X and Y is less than c.
+That is, that the size of the set {i \| X[i] != y[i]} is strictly less than c.
+
 watchvecneq
 ^^^^^^^^^^^
 
@@ -867,6 +894,19 @@ The constraint watchvecneq(A, B)
 ensures that A and B are not the same vector, i.e., there exists some
 index i such that A[i] != B[i].
 
+
+Constant constraints
+--------------------
+
+true
+^^^^
+
+The constraint ``true`` takes no arguments and is always satisfied.
+
+false
+^^^^^
+
+The constraint ``false`` takes no arguments and is never satisfied. It can be used to explicitly mark a model as unsatisfiable.
 
 Unary constraints
 -----------------

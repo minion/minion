@@ -51,6 +51,19 @@ with ``--help``. We give the most important ones here:
    Minion much slower, but adds many extra internal checks)
 -  ``--compiler``: Set the name of the compiler to use (this should be
    the name of the executable)
+-  ``--assertions``: Enable internal assertion checks (implied by ``--debug``)
+-  ``--sanitize``: Compile with Clang sanitizers (address, undefined behaviour)
+-  ``--domains64``: Use 64-bit integers for domain values (default is 32-bit)
+-  ``--wdeg yes|no``: Enable or disable weighted degree heuristics (default yes)
+-  ``--constraints <list>``: Build only the named constraints, reducing binary
+   size and compile time. Takes a comma-separated list of constraint names.
+-  ``--buildsystem <name>``: Set the build system. Supported values are
+   ``make`` (default), ``tup``, and ``bat`` (Windows batch).
+-  ``--static``: Build a statically linked executable.
+-  ``--extraflags <flags>``: Append extra compiler flags.
+-  ``--setflags <flags>``: Override all compiler flags.
+-  ``--unoptimised``: Disable compiler optimisation.
+-  ``--profile``: Add profiling compiler flags.
 
 Once the ``minion`` executable is created, you can copy it anywhere
 you like.
@@ -60,3 +73,12 @@ On all platforms, Minion needs to be run from a command shell so that
 the output can be seen. If you go to the Minion directory in a shell and
 run the executable, it should output version information and a help
 message.
+
+Rust interface (minion-sys)
+---------------------------
+
+Minion also ships with `minion-sys`, a Rust crate that wraps the Minion
+solver as a library. It provides a Rust API for building models,
+registering tuple tables, running search, and collecting solutions —
+including mid-search callbacks for modifying models during search.
+See the ``minion-sys/README.md`` file in the source tree for details.
