@@ -154,6 +154,75 @@ fn seed_reproducibility_across_models() {
 }
 
 #[test]
+fn named_tuple_table_via_str2plus() {
+    let mut m = Model::new();
+    m.named_variables
+        .add_var("x".into(), VarDomain::Discrete(0, 2));
+    m.named_variables
+        .add_var("y".into(), VarDomain::Discrete(0, 2));
+
+    // Register a named tuple table; only (0,1) and (1,2) are allowed.
+    assert!(m
+        .add_tuple_table(
+            "t".into(),
+            vec![
+                vec![Constant::Integer(0), Constant::Integer(1)],
+                vec![Constant::Integer(1), Constant::Integer(2)],
+            ]
+        )
+        .is_some());
+
+    m.constraints.push(Constraint::Str2Plus(
+        vec![Var::NameRef("x".into()), Var::NameRef("y".into())],
+        Var::NameRef("t".into()),
+    ));
+
+    let mut count = 0u32;
+    let ctx = minion_sys::run_minion(
+        m,
+        Box::new(|sol| {
+            let x = sol["x"];
+            let y = sol["y"];
+            assert!(
+                (x == Constant::Integer(0) && y == Constant::Integer(1))
+                    || (x == Constant::Integer(1) && y == Constant::Integer(2)),
+                "unexpected tuple ({x:?}, {y:?})"
+            );
+            count += 1;
+            true
+        }),
+    );
+    assert!(ctx.is_ok(), "solve failed: {:?}", ctx.err());
+    assert_eq!(count, 2);
+}
+
+#[test]
+fn midsearch_add_var_appears_in_solutions() {
+    let mut m = Model::new();
+    m.named_variables
+        .add_var("x".into(), VarDomain::Discrete(0, 1));
+
+    let solutions = std::cell::RefCell::new(Vec::new());
+
+    let ctx = minion_sys::run_minion_midsearch(
+        m,
+        Box::new(|midctx, sol| {
+            if solutions.borrow().is_empty() {
+                midctx.add_var("y", VarDomain::Discrete(0, 1)).unwrap();
+            }
+            solutions.borrow_mut().push(sol);
+            true
+        }),
+    );
+    assert!(ctx.is_ok(), "solve failed: {:?}", ctx.err());
+
+    let sols = solutions.into_inner();
+    assert!(sols.len() >= 2, "expected ≥2 solutions, got {}", sols.len());
+    let last = sols.last().unwrap();
+    assert!(last.contains_key("y"), "later solutions should contain 'y'");
+}
+
+#[test]
 fn w_inset_with_empty_set_is_false() {
     let mut m = Model::new();
     m.named_variables.add_var("x".into(), VarDomain::Bound(0, 5));
