@@ -94,9 +94,69 @@
 //!
 //! ## `PRINT` and `VARORDER`
 //!
-//! These bindings have no replacement for Minion's `PRINT` and `VARORDER` statements - any
-//! variable given to the model that does not have a constant value is considered a search
-//! variable. Solutions are returned through the [callback function](Callback) as a `HashMap`.
+//! These bindings have no replacement for Minion's `PRINT` and `VARORDER` statements — every
+//! variable added to the model (excluding auxiliary variables) is considered a search
+//! variable. Solutions are returned through the [callback](Callback) as a `HashMap`.
+//!
+//! ## Search options
+//!
+//! Use [`run_minion_with_options`] to set a random seed, variable/value ordering
+//! heuristics, or propagation levels:
+//!
+//! ```
+//! use minion_sys::{RunOptions, run_minion_with_options, VarOrder, ValOrder};
+//! # use minion_sys::ast::*;
+//! # use std::collections::HashMap;
+//! # let model = Model::new();
+//! # let callback = Box::new(|_: HashMap<VarName, Constant>| true);
+//! let opts = RunOptions {
+//!     seed: Some(42),
+//!     var_order: VarOrder::WDeg,
+//!     val_order: ValOrder::Random,
+//!     ..Default::default()
+//! };
+//! let _ctx = run_minion_with_options(model, opts, callback).unwrap();
+//! ```
+//!
+//! ## Tuple tables
+//!
+//! Extensional constraints like [`ast::Constraint::Str2Plus`] reference named tuple tables
+//! registered on the model:
+//!
+//! ```
+//! use minion_sys::ast::*;
+//! # let mut model = Model::new();
+//! # model.named_variables.add_var("x".into(), VarDomain::Bool);
+//! # model.named_variables.add_var("y".into(), VarDomain::Bool);
+//! model.add_tuple_table("allowed".into(), vec![
+//!     vec![Constant::Integer(0), Constant::Integer(1)],
+//!     vec![Constant::Integer(1), Constant::Integer(0)],
+//! ]);
+//! model.constraints.push(Constraint::Str2Plus(
+//!     vec![Var::NameRef("x".into()), Var::NameRef("y".into())],
+//!     Var::NameRef("allowed".into()),
+//! ));
+//! ```
+//!
+//! ## Mid-search mutation
+//!
+//! [`run_minion_midsearch`] lets callbacks add variables or constraints during search
+//! via a [`MidSearchContext`] handle:
+//!
+//! ```
+//! use minion_sys::{run_minion_midsearch, MidSearchContext};
+//! use minion_sys::ast::*;
+//! use std::collections::HashMap;
+//! # let mut model = Model::new();
+//! # model.named_variables.add_var("x".into(), VarDomain::Discrete(0, 1));
+//! let _ctx = run_minion_midsearch(model, Box::new(|midctx, sol| {
+//!     // add a fresh variable on the first solution callback
+//!     if !sol.contains_key("y") {
+//!         midctx.add_var("y", VarDomain::Discrete(0, 1)).unwrap();
+//!     }
+//!     true
+//! })).unwrap();
+//! ```
 
 pub use run::*;
 

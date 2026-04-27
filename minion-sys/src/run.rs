@@ -108,8 +108,8 @@ pub type MidSearchCallback<'a> =
 ///
 /// Callers receive a `&mut MidSearchContext` for the duration of a single
 /// callback invocation and can use it to add fresh variables or new
-/// constraints via [`minion_newVarMidsearch`] and
-/// [`minion_addConstraintMidsearch`] underneath. Any variables added this
+/// constraints via the underlying `minion_newVarMidsearch` and
+/// `minion_addConstraintMidsearch` FFI calls. Any variables added this
 /// way are tracked so subsequent callbacks' solution maps include them.
 ///
 /// The handle is not `Send` or `Sync` — it is only valid for the current

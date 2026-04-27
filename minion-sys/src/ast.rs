@@ -4,8 +4,11 @@ use std::{collections::HashMap, fmt::Display};
 
 use crate::print::{print_const_array, print_constraint_array, print_tuple_array, print_var_array};
 
+/// The name of a variable in a Minion model.
 pub type VarName = String;
+/// A tuple of constants, used in extensional (table) constraints.
 pub type Tuple = Vec<Constant>;
+/// A pair of variables, used by three-operand arithmetic constraints.
 pub type TwoVars = (Var, Var);
 
 /// A Minion model.
@@ -56,87 +59,212 @@ impl Default for Model {
 }
 
 /// All supported Minion constraints.
+///
+/// Each variant corresponds to a Minion input-language constraint (see the
+/// [Minion constraint reference](https://minion-solver.readthedocs.io/en/latest/usage/constraints.html)).
+/// Variants are named to match their Minion input names as closely as Rust's
+/// naming conventions permit.
+///
+/// # Argument conventions
+///
+/// - `Vec<Var>` is a list of variables.
+/// - `Var` alone is a single variable (or `Var::ConstantAsVar` for a constant in
+///   variable position).
+/// - `Vec<Constant>` is a list of integer constants (e.g. weights, values).
+/// - `Constant` alone is a single integer constant.
+/// - `(Var, Var)` in the `TwoVars` position means two variables.
+/// - `Vec<Tuple>` is a list of tuples (a `Tuple` is a `Vec<Constant>`).
+/// - `Box<Constraint>` means the variant wraps another constraint (reification,
+///   nested boolean operators, etc.).
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Constraint {
+    // --- Arithmetic: three-operand (x, y, z) ---
+    /// `difference(x, y, z)` — `z = |x - y|`. Bounds consistency.
     Difference(TwoVars, Var),
+    /// `div(x, y, z)` — `z = floor(x / y)`. False when `y = 0`.
     Div(TwoVars, Var),
+    /// `div_undefzero(x, y, z)` — like `Div`, but true (not false) when `y = 0`.
     DivUndefZero(TwoVars, Var),
+    /// `modulo(x, y, z)` — `z = x % y`. False when `y = 0`.
     Modulo(TwoVars, Var),
+    /// `modulo_undefzero(x, y, z)` — like `Modulo`, but true when `y = 0`.
     ModuloUndefZero(TwoVars, Var),
+    /// `pow(x, y, z)` — `z = x^y`. False when `y < 0` (with exceptions for ±1).
     Pow(TwoVars, Var),
+    /// `product(x, y, z)` — `z = x * y`.
     Product(TwoVars, Var),
+
+    // --- Arithmetic: weighted sums ---
+    /// `weightedsumgeq(weights, vars, total)` — dot product ≥ total.
     WeightedSumGeq(Vec<Constant>, Vec<Var>, Var),
+    /// `weightedsumleq(weights, vars, total)` — dot product ≤ total.
     WeightedSumLeq(Vec<Constant>, Vec<Var>, Var),
+
+    // --- Nested / meta constraints ---
+    /// `check[assign](c)` — internal: checks `c` after each assignment.
     CheckAssign(Box<Constraint>),
+    /// `check[gsa](c)` — internal: checks `c` via GSA (generalised-scope-all).
     CheckGsa(Box<Constraint>),
+    /// `forwardchecking(c)` — internal: run `c` in forward-checking mode.
     ForwardChecking(Box<Constraint>),
+    /// `reify(c, r)` — `r = 1` iff `c` is satisfied. `r` must be 0/1.
     Reify(Box<Constraint>, Var),
+    /// `reifyimply(c, r)` — if `r = 1` then `c` must hold.
     ReifyImply(Box<Constraint>, Var),
+    /// `reifyimply-quick(c, r)` — like `ReifyImply` but only checks `c` when `r` is assigned.
     ReifyImplyQuick(Box<Constraint>, Var),
+    /// `watched-and({c1, ..., cn})` — all `ci` must be true.
     WatchedAnd(Vec<Constraint>),
+    /// `watched-or({c1, ..., cn})` — at least one `ci` must be true.
     WatchedOr(Vec<Constraint>),
+
+    // --- All-different / cardinality / counting ---
+    /// `gacalldiff(vars)` — all variables in `vars` take distinct values. GAC.
     GacAllDiff(Vec<Var>),
+    /// `alldiff(vars)` — like `GacAllDiff` but weaker (clique of ≠ constraints).
     AllDiff(Vec<Var>),
+    /// `alldiffmatrix(matrix, dim)` — Latin-square condition on a `dim×dim` matrix.
     AllDiffMatrix(Vec<Var>, Constant),
+
+    // --- SAT-style sums (Booleans only) ---
+    /// `watchsumgeq(vars, c)` — sum of 0/1 `vars` ≥ `c`. Fast for small `c`.
     WatchSumGeq(Vec<Var>, Constant),
+    /// `watchsumleq(vars, c)` — sum of 0/1 `vars` ≤ `c`. Fast for `c` close to len.
     WatchSumLeq(Vec<Var>, Constant),
+
+    // --- Occurrence ---
+    /// `occurrencegeq(vars, val, count)` — `val` occurs ≥ `count` times. Constants only.
     OccurrenceGeq(Vec<Var>, Constant, Constant),
+    /// `occurrenceleq(vars, val, count)` — `val` occurs ≤ `count` times. Constants only.
     OccurrenceLeq(Vec<Var>, Constant, Constant),
+    /// `occurrence(vars, val, count)` — `val` occurs exactly `count` times.
     Occurrence(Vec<Var>, Constant, Var),
+
+    // --- Literal sum ---
+    /// `litsumgeq(vars, literals, c)` — at least `c` positions where `vars[i] == literals[i]`.
     LitSumGeq(Vec<Var>, Vec<Constant>, Constant),
+
+    // --- Global cardinality ---
+    /// `gcc(vars, values, caps)` — each value in `values` appears exactly `caps[i]` times. Strong propagation.
     Gcc(Vec<Var>, Vec<Constant>, Vec<Var>),
+    /// `gccweak(vars, values, caps)` — like `Gcc` but weaker, faster propagation on `caps`.
     GccWeak(Vec<Var>, Vec<Constant>, Vec<Var>),
+
+    // --- Lexicographic ordering ---
+    /// `lexleq[rv](a, b)` — `a ≤ b` lexicographically. GAC, handles repeated variables.
     LexLeqRv(Vec<Var>, Vec<Var>),
+    /// `lexleq(a, b)` — `a ≤ b` lexicographically. GAC, assumes no repeated variables.
     LexLeq(Vec<Var>, Vec<Var>),
+    /// `lexless(a, b)` — `a < b` lexicographically. GAC, assumes no repeated variables.
     LexLess(Vec<Var>, Vec<Var>),
+    /// `lexleq[quick](a, b)` — `a ≤ b` lexicographically. Fast but weaker propagation.
     LexLeqQuick(Vec<Var>, Vec<Var>),
+    /// `lexless[quick](a, b)` — `a < b` lexicographically. Fast but weaker propagation.
     LexLessQuick(Vec<Var>, Vec<Var>),
+
+    // --- Vector comparison ---
+    /// `watchvecneq(a, b)` — vectors `a` and `b` differ in at least one position.
     WatchVecNeq(Vec<Var>, Vec<Var>),
+    /// `watchvecexists_less(a, b)` — there exists `i` such that `a[i] < b[i]`.
     WatchVecExistsLess(Vec<Var>, Vec<Var>),
+    /// `hamming(a, b, c)` — Hamming distance between `a` and `b` ≥ `c`.
     Hamming(Vec<Var>, Vec<Var>, Constant),
+    /// `not-hamming(a, b, c)` — Hamming distance between `a` and `b` < `c`.
     NotHamming(Vec<Var>, Vec<Var>, Constant),
+
+    // --- Internal ---
+    /// `frameupdate(...)` — internal frame-update constraint.
     FrameUpdate(Vec<Var>, Vec<Var>, Vec<Var>, Vec<Var>, Constant),
-    //HaggisGac(Vec<Var>,Vec<
-    //HaggisGacStable
-    //ShortStr2
-    //ShortcTupleStr2
+
+    // --- Table (extensional) constraints ---
+    /// `negativetable(vars, tuples)` — disallows the given tuples. GAC.
     NegativeTable(Vec<Var>, Vec<Tuple>),
+    /// `table(vars, tuples)` — allows only the given tuples. GAC.
     Table(Vec<Var>, Vec<Tuple>),
+    /// `gacschema(vars, tuples)` — like `Table` with an alternative GAC algorithm.
     GacSchema(Vec<Var>, Vec<Tuple>),
+    /// `lighttable(vars, tuples)` — stateless variant of `Table`, faster for small constraints.
     LightTable(Vec<Var>, Vec<Tuple>),
+    /// `mddc(vars, tuples)` — MDDC propagator (multi-valued decision diagram). GAC.
     Mddc(Vec<Var>, Vec<Tuple>),
+    /// `negativemddc(vars, tuples)` — negative MDDC. GAC on disallowed tuples.
     NegativeMddc(Vec<Var>, Vec<Tuple>),
+    /// `str2plus(vars, table_ref)` — STR2+ algorithm. The second argument is a
+    /// `Var::NameRef` referencing a named tuple table registered with
+    /// [`Model::add_tuple_table`].
     Str2Plus(Vec<Var>, Var),
+
+    // --- Min/max / nvalue ---
+    /// `max(vars, x)` — `x` equals the maximum value in `vars`.
     Max(Vec<Var>, Var),
+    /// `min(vars, x)` — `x` equals the minimum value in `vars`.
     Min(Vec<Var>, Var),
+    /// `nvaluegeq(vars, x)` — at least `x` distinct values appear in `vars`.
     NvalueGeq(Vec<Var>, Var),
+    /// `nvalueleq(vars, x)` — at most `x` distinct values appear in `vars`.
     NvalueLeq(Vec<Var>, Var),
+
+    // --- Sums ---
+    /// `sumleq(vars, x)` — sum of `vars` ≤ `x`.
     SumLeq(Vec<Var>, Var),
+    /// `sumgeq(vars, x)` — sum of `vars` ≥ `x`.
     SumGeq(Vec<Var>, Var),
+
+    // --- Element (array access) ---
+    /// `element(vec, i, e)` — `vec[i] = e`. 0-indexed. Not confluent.
     Element(Vec<Var>, Var, Var),
+    /// `element_one(vec, i, e)` — like `Element`, 1-indexed.
     ElementOne(Vec<Var>, Var, Var),
+    /// `element_undefzero(vec, i, e)` — like `Element`, but true with `e=0` when `i` is out of bounds.
     ElementUndefZero(Vec<Var>, Var, Var),
+    /// `watchelement(vec, i, e)` — like `Element` but watched and GAC.
     WatchElement(Vec<Var>, Var, Var),
+    /// `watchelement_one(vec, i, e)` — like `WatchElement`, 1-indexed.
     WatchElementOne(Vec<Var>, Var, Var),
+    /// `watchelement_one_undefzero(vec, i, e)` — like `WatchElementOne` with undefzero semantics.
     WatchElementOneUndefZero(Vec<Var>, Var, Var),
+    /// `watchelement_undefzero(vec, i, e)` — like `WatchElement` with undefzero semantics.
     WatchElementUndefZero(Vec<Var>, Var, Var),
+
+    // --- Unary constraints ---
+    /// `w-literal(x, a)` — `x = a`.
     WLiteral(Var, Constant),
+    /// `w-notliteral(x, a)` — `x ≠ a`.
     WNotLiteral(Var, Constant),
+    /// `w-inintervalset(x, [a1,a2, b1,b2, ...])` — `x` is in one of the intervals.
     WInIntervalSet(Var, Vec<Constant>),
+    /// `w-inrange(x, [a, b])` — `a ≤ x ≤ b`.
     WInRange(Var, Vec<Constant>),
+    /// `w-inset(x, vals)` — `x` is in the set `vals`.
     WInset(Var, Vec<Constant>),
+    /// `w-notinrange(x, [a, b])` — `x < a` or `x > b`.
     WNotInRange(Var, Vec<Constant>),
+    /// `w-notinset(x, vals)` — `x` is not in the set `vals`.
     WNotInset(Var, Vec<Constant>),
+
+    // --- Binary arithmetic / comparison ---
+    /// `abs(x, y)` — `x = |y|`.
     Abs(Var, Var),
+    /// `diseq(x, y)` — `x ≠ y`. Arc consistency.
     DisEq(Var, Var),
+    /// `eq(x, y)` — `x = y`. Bounds consistency.
     Eq(Var, Var),
+    /// `minuseq(x, y)` — `x = -y`. Bounds consistency.
     MinusEq(Var, Var),
+    /// `gaceq(x, y)` — `x = y`. GAC.
     GacEq(Var, Var),
+    /// `watchless(x, y)` — `x < y`. Watched.
     WatchLess(Var, Var),
+    /// `watchneq(x, y)` — `x ≠ y`. Watched (may be faster when one var is assigned early).
     WatchNeq(Var, Var),
+    /// `ineq(x, y, k)` — `x ≤ y + k`. `k` must be a constant.
     Ineq(Var, Var, Constant),
+
+    // --- Constant ---
+    /// `false` — always false. Makes a model unsatisfiable.
     False,
+    /// `true` — always true.
     True,
 }
 
@@ -148,7 +276,7 @@ impl Display for Constraint {
             Constraint::Div(_, var) => write!(f, "div({var}"),
             Constraint::DivUndefZero(_, var) => write!(f, "div_undefzero({var})"),
             Constraint::Modulo(_, var) => write!(f, "modulo({var})"),
-            Constraint::ModuloUndefZero(_, var) => write!(f, "mod_undefzero({var})"),
+            Constraint::ModuloUndefZero(_, var) => write!(f, "modulo_undefzero({var})"),
             Constraint::Pow(_, var) => write!(f, "pow({var})"),
             Constraint::Product(_, var) => write!(f, "product({var})"),
             Constraint::WeightedSumGeq(constants, vars, var) => {
@@ -448,12 +576,17 @@ impl Display for Constant {
 #[derive(Debug, Clone, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum VarDomain {
+    /// A bound variable with domain `[lower, upper]`. O(1) memory. The solver
+    /// only tracks bound changes during search.
     Bound(i32, i32),
+    /// A discrete variable with domain `[lower, upper]`. O(domain size) memory.
+    /// Supports arbitrary subset removal. Prefer for domains up to ~1000 values.
     Discrete(i32, i32),
     /// Sparse bound variable with an explicit non-contiguous set of domain values.
     /// Unlike Bound/Discrete which take [lower, upper] ranges, this carries the
     /// full domain, e.g. `SparseBound(vec![-5, -2, 0, 3, 7])`.
     SparseBound(Vec<i32>),
+    /// A Boolean variable with domain `{0, 1}`.
     Bool,
 }
 
@@ -536,6 +669,7 @@ impl SymbolTable {
         self.search_var_order.clone()
     }
 
+    /// Returns `true` if a variable with the given name exists in the symbol table.
     pub fn contains(&self, name: VarName) -> bool {
         self.table.contains_key(&name)
     }
