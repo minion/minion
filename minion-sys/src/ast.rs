@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, fmt::Display};
 
-use crate::print::{print_const_array, print_constraint_array, print_var_array};
+use crate::print::{print_const_array, print_constraint_array, print_tuple_array, print_var_array};
 
 pub type VarName = String;
 pub type Tuple = Vec<Constant>;
@@ -167,14 +167,10 @@ impl Display for Constraint {
                     print_var_array(vars)
                 )
             }
-            Constraint::CheckAssign(constraint) => {
-                todo!("don't know how to print checkassign constriant...")
-            }
-            Constraint::CheckGsa(constraint) => {
-                todo!("don't know how to print checkgsa constraint...")
-            }
+            Constraint::CheckAssign(constraint) => write!(f, "check[assign]({constraint})"),
+            Constraint::CheckGsa(constraint) => write!(f, "check[gsa]({constraint})"),
             Constraint::ForwardChecking(constraint) => {
-                todo!("don't know how to print forwardchecking constraint...")
+                write!(f, "forwardchecking({constraint})")
             }
             Constraint::Reify(constraint, var) => write!(f, "reify({constraint},{var})"),
             Constraint::ReifyImply(constraint, var) => write!(f, "reifyimply({constraint},{var})"),
@@ -267,29 +263,77 @@ impl Display for Constraint {
                 print_var_array(vars),
                 print_var_array(vars1)
             ),
-            Constraint::WatchVecExistsLess(vars, vars1) => {
-                todo!("don't know how to print watchvecexistsless...")
-            }
+            Constraint::WatchVecExistsLess(vars, vars1) => write!(
+                f,
+                "watchvecexists_less({},{})",
+                print_var_array(vars),
+                print_var_array(vars1)
+            ),
             Constraint::Hamming(vars, vars1, constant) => write!(
                 f,
                 "hamming({},{},{constant})",
                 print_var_array(vars),
                 print_var_array(vars1)
             ),
-            Constraint::NotHamming(vars, vars1, constant) => {
-                todo!("don't know how to print nothamming...")
+            Constraint::NotHamming(vars, vars1, constant) => write!(
+                f,
+                "not-hamming({},{},{constant})",
+                print_var_array(vars),
+                print_var_array(vars1)
+            ),
+            Constraint::FrameUpdate(vars, vars1, vars2, vars3, constant) => write!(
+                f,
+                "frameupdate({},{},{},{},{constant})",
+                print_var_array(vars),
+                print_var_array(vars1),
+                print_var_array(vars2),
+                print_var_array(vars3)
+            ),
+            Constraint::Table(vars, tuples) => {
+                write!(f, "table({},{})", print_var_array(vars), print_tuple_array(tuples))
             }
-            Constraint::FrameUpdate(vars, vars1, vars2, vars3, constant) => {
-                todo!("don't know how to print frame update...")
+            Constraint::NegativeTable(vars, tuples) => {
+                write!(
+                    f,
+                    "negativetable({},{})",
+                    print_var_array(vars),
+                    print_tuple_array(tuples)
+                )
             }
-            Constraint::NegativeTable(_, _)
-            | Constraint::Table(_, _)
-            | Constraint::GacSchema(_, _)
-            | Constraint::LightTable(_, _)
-            | Constraint::Mddc(_, _)
-            | Constraint::Str2Plus(_, _)
-            | Constraint::NegativeMddc(_, _) => {
-                todo!("tuples not properly implemented yet, so can't print them...")
+            Constraint::GacSchema(vars, tuples) => {
+                write!(
+                    f,
+                    "gacschema({},{})",
+                    print_var_array(vars),
+                    print_tuple_array(tuples)
+                )
+            }
+            Constraint::LightTable(vars, tuples) => {
+                write!(
+                    f,
+                    "lighttable({},{})",
+                    print_var_array(vars),
+                    print_tuple_array(tuples)
+                )
+            }
+            Constraint::Mddc(vars, tuples) => {
+                write!(
+                    f,
+                    "mddc({},{})",
+                    print_var_array(vars),
+                    print_tuple_array(tuples)
+                )
+            }
+            Constraint::NegativeMddc(vars, tuples) => {
+                write!(
+                    f,
+                    "negativemddc({},{})",
+                    print_var_array(vars),
+                    print_tuple_array(tuples)
+                )
+            }
+            Constraint::Str2Plus(vars, table_var) => {
+                write!(f, "str2plus({},{table_var})", print_var_array(vars))
             }
             Constraint::Max(vars, var) => write!(f, "max({},{var})", print_var_array(vars)),
             Constraint::Min(vars, var) => write!(f, "min({},{var})", print_var_array(vars)),
@@ -351,7 +395,7 @@ impl Display for Constraint {
             Constraint::DisEq(var, var1) => write!(f, "diseq({var},{var1})"),
             Constraint::Eq(var, var1) => write!(f, "eq({var},{var1})"),
             Constraint::MinusEq(var, var1) => write!(f, "minuseq({var},{var1})"),
-            Constraint::GacEq(var, var1) => todo!("don't know how to print gaceq..."),
+            Constraint::GacEq(var, var1) => write!(f, "gaceq({var},{var1})"),
             Constraint::WatchLess(var, var1) => write!(f, "watchless({var},{var1})"),
             Constraint::WatchNeq(var, var1) => write!(f, "watchneq({var},{var1})"),
             Constraint::Ineq(var, var1, constant) => write!(f, "ineq({var},{var1},{constant})"),
