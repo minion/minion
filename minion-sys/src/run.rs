@@ -503,6 +503,158 @@ pub fn run_minion_midsearch(
     run_minion_midsearch_with_options(model, RunOptions::default(), callback)
 }
 
+/// Callback type for parallel portfolio search.
+///
+/// The closure must be `Send + Sync` because it may be invoked from any of
+/// the worker threads. The C-side controller serialises invocations with a
+/// mutex (so two workers never call this concurrently) but Rust still needs
+/// the bound for soundness when we cross the FFI boundary from multiple
+/// threads.
+pub type ParallelCallback<'a> =
+    Box<dyn FnMut(HashMap<VarName, Constant>) -> bool + Send + 'a>;
+
+/// State stored behind the parallel callback's userdata pointer. The mutex
+/// gives Rust ownership semantics on the FnMut even though the C-side
+/// already serialises calls — we need the &mut for the closure invocation.
+struct ParallelCallbackState<'a> {
+    callback: std::sync::Mutex<ParallelCallback<'a>>,
+    // Variables that are in the print matrix of every worker context. The
+    // print-matrix order is identical across workers because each worker
+    // builds its CSPInstance from the same shared description.
+    print_vars: Vec<VarName>,
+}
+
+unsafe extern "C" fn parallel_callback_thunk(
+    ctx: *mut ffi::MinionContext,
+    userdata: *mut c_void,
+) -> bool {
+    let state = unsafe { &*(userdata as *mut ParallelCallbackState<'_>) };
+
+    let mut solutions: HashMap<VarName, Constant> = HashMap::new();
+    for (i, var) in state.print_vars.iter().enumerate() {
+        let v: i32 = unsafe { ffi::printMatrix_getValue(ctx, i as _) };
+        solutions.insert(var.clone(), Constant::Integer(v));
+    }
+
+    // The C-side controller has already locked its callback mutex; this
+    // Rust mutex is therefore uncontended in practice. We still take it
+    // because Rust's borrow checker doesn't see the C-side serialisation.
+    #[allow(clippy::unwrap_used)]
+    let mut cb = state.callback.lock().unwrap();
+    cb(solutions)
+}
+
+/// Run Minion as a portfolio search across `num_threads` worker threads.
+///
+/// Each thread builds its own solver from a shared `Model`, with a derived
+/// random seed; the first thread to find `sollimit` solutions (or to prove
+/// unsat) signals the others to stop. The callback is invoked at most once
+/// per solution found by any worker, serialised internally so it never
+/// re-enters itself.
+///
+/// `num_threads` must be >= 1. With `num_threads == 1` behaviour is
+/// equivalent to a sequential `run_minion`.
+///
+/// Mid-search mutation is NOT supported in this mode (each worker has its
+/// own context; mutating one wouldn't propagate). Use the sequential
+/// [`run_minion_midsearch`] path if you need that.
+///
+/// # Concurrency
+///
+/// `run_minion_parallel` itself spawns OS threads internally. It is safe
+/// to call from a single thread of the host process per call, but it is
+/// **not** safe to invoke from multiple host threads concurrently — the
+/// underlying Minion alarm/ctrl-C handlers are per-process and racing
+/// threaded runs can corrupt them. (The fork-based `-parallel` flag has
+/// the same constraint at the process level.) For sequential use across
+/// many models, just call this function repeatedly.
+pub fn run_minion_parallel(
+    num_threads: usize,
+    model: Model,
+    callback: ParallelCallback<'_>,
+) -> Result<(), MinionError> {
+    run_minion_parallel_with_options(num_threads, model, RunOptions::default(), callback)
+}
+
+/// Like [`run_minion_parallel`] but with [`RunOptions`] (random seed, var/
+/// val orderings, propagation levels). The seed (if set) is the controller
+/// base seed; per-thread seeds are derived as `base XOR thread_index`.
+#[allow(clippy::unwrap_used)]
+pub fn run_minion_parallel_with_options(
+    num_threads: usize,
+    model: Model,
+    options: RunOptions,
+    callback: ParallelCallback<'_>,
+) -> Result<(), MinionError> {
+    if num_threads == 0 {
+        return Err(MinionError::Other(anyhow!(
+            "num_threads must be at least 1"
+        )));
+    }
+    if num_threads > i32::MAX as usize {
+        return Err(MinionError::Other(anyhow!("num_threads is too large")));
+    }
+
+    unsafe {
+        let search_opts = ffi::searchOptions_new();
+        let search_method = ffi::searchMethod_new();
+        let search_instance = ffi::instance_new();
+
+        // Quiet by default: workers don't print to cout under runMinionParallel
+        // (they observe getOptions().silent = true via the per-thread copy).
+        // The user receives results via the callback.
+        (*search_opts).silent = true;
+        (*search_opts).print_solution = false;
+        // Library convention: enumerate all solutions and let the caller's
+        // callback decide when to stop by returning false. The C-side
+        // controller enforces this `sollimit = -1` shared value.
+        (*search_opts).sollimit = -1;
+
+        if let Some(seed) = options.seed {
+            (*search_method).randomSeed = seed;
+        }
+        (*search_method).preprocess = options.preprocess.to_ffi();
+        (*search_method).propMethod = options.prop_node.to_ffi();
+
+        let mut print_vars: Vec<VarName> = vec![];
+        let convert_result =
+            convert_model_to_raw(search_instance, &model, &options, &mut print_vars);
+        if let Err(e) = convert_result {
+            ffi::searchMethod_free(search_method);
+            ffi::searchOptions_free(search_opts);
+            ffi::instance_free(search_instance);
+            return Err(e);
+        }
+
+        let state = ParallelCallbackState {
+            callback: std::sync::Mutex::new(callback),
+            print_vars,
+        };
+        let userdata = &state as *const ParallelCallbackState<'_> as *mut c_void;
+
+        let cfg = ffi::MinionThreadConfig {
+            numThreads: num_threads as i32,
+            baseSeed: options.seed.unwrap_or(0),
+        };
+
+        let res = ffi::runMinionParallel(
+            cfg,
+            search_opts,
+            search_method,
+            search_instance,
+            Some(parallel_callback_thunk),
+            userdata,
+        );
+
+        ffi::searchMethod_free(search_method);
+        ffi::searchOptions_free(search_opts);
+        ffi::instance_free(search_instance);
+
+        check_minion_result(res)?;
+        Ok(())
+    }
+}
+
 /// Like [`run_minion_midsearch`] but with [`RunOptions`].
 #[allow(clippy::unwrap_used)]
 pub fn run_minion_midsearch_with_options(

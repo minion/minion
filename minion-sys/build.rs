@@ -133,6 +133,8 @@ fn bind(minion_src: &Path) {
         .allowlist_function("minion_activateContext")
         .allowlist_function("minion_deactivateContext")
         .allowlist_function("runMinion")
+        .allowlist_function("runMinionParallel")
+        .allowlist_type("MinionThreadConfig")
         .allowlist_function("minion_error_message")
         .allowlist_function("constantAsVar")
         .allowlist_function("tupleList_new")

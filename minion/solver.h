@@ -336,8 +336,14 @@ public:
   bool parallelStealHigh = true;
 
   /// Number of worker processes for parallel SAC/SACBounds preprocessing.
-  /// 0 means sequential (today's behaviour). Set via -parallelPreprocess [N].
+  /// 0 means sequential (today's behaviour). Set via the experimental
+  /// -X-parallelPreprocess [N] flag.
   int parallelPreprocessCores = 0;
+
+  /// Number of OS threads for portfolio search. 0 means sequential (today's
+  /// behaviour). Set via the experimental -X-parallelThreads [N] flag.
+  /// Mutually exclusive with -parallel and -X-parallelPreprocess.
+  int numParallelThreads = 0;
 
   // Gather AMOs
   bool gatherAMOs = false;

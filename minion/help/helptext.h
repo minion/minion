@@ -47,9 +47,29 @@ When doing parallel search, "steal low" in the tree (that is, start new
 threads from low pieces of the tree) instead of "steal high" (default,
 take high bits of the tree). Is usually slower.
 
--parallelPreprocess [N]
+-X-parallelThreads N
 
-Run SAC / SACBounds preprocessing in parallel using N worker processes
+EXPERIMENTAL — not for production use. Runs portfolio search across N
+OS threads. Each thread searches the same problem with a different
+random seed; the first thread to find the requested number of solutions
+(or a contradiction) terminates the others. Works on Windows and
+inside a library host process.
+
+Known limitations: with `-findallsols` each worker independently
+enumerates the search space, so the reported solution count is up to
+N times the true count (no cross-thread deduplication). For
+deterministic-first-solution tests (CHECKONESOL-style), the recorded
+solution depends on which thread wins the race. Useful primarily for
+SAT-style `-sollimit 1` workloads.
+
+Mutually exclusive with -parallel, -X-parallelPreprocess, -split, and
+-makeresume. Mid-search mutation (minion_newVarMidsearch /
+minion_addConstraintMidsearch) is not supported in this mode.
+
+-X-parallelPreprocess [N]
+
+EXPERIMENTAL — not for production use. Runs SAC / SACBounds
+preprocessing in parallel using N worker processes
 (or all online cores if N is omitted). Workers fork from the parent and
 each runs the standard SAC algorithm on its slice of variables, with
 prunings collected into shared memory and merged at the end of each

@@ -206,6 +206,48 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
                        bool (*callback)(MinionContext* ctx, void* userdata),
                        void* userdata);
 
+/*
+ * MinionThreadConfig: configuration for runMinionParallel.
+ *
+ * numThreads: number of OS threads to spawn (must be >= 1).
+ * baseSeed:   per-thread random seed is `baseSeed XOR threadIndex`. Pass
+ *             args.randomSeed (or any 32-bit value) to make runs reproducible.
+ *
+ * Reserved fields may be added in future without breaking the ABI for
+ * callers that initialise the struct via aggregate-zero or designated
+ * initialisers.
+ */
+struct MinionThreadConfig {
+  int numThreads;
+  unsigned int baseSeed;
+};
+
+/*
+ * runMinionParallel:
+ *
+ *   Run a portfolio search across `config.numThreads` worker threads on a
+ *   shared CSPInstance. Each thread gets its own MinionContext (created and
+ *   freed internally), a derived random seed, and randomised value/variable
+ *   ordering. The first thread to find `options.sollimit` solutions (or to
+ *   prove unsat) signals the others to stop via shared atomic flags.
+ *
+ *   The callback is invoked at most once per solution found by any worker,
+ *   serialised by an internal mutex (so the callback never re-enters
+ *   itself). The MinionContext passed to the callback belongs to the worker
+ *   that found the solution; query it with printMatrix_getValue etc.
+ *   Returning false stops the entire portfolio.
+ *
+ *   Mid-search mutation (minion_newVarMidsearch / minion_addConstraintMidsearch)
+ *   is NOT supported in this mode and will trigger a runtime error.
+ *
+ *   Returns MINION_OK on normal completion, MINION_TIMEOUT if the alarm
+ *   fired, or another MinionResult on error.
+ */
+MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options,
+                               SearchMethod& args, ProbSpec::CSPInstance& instance,
+                               bool (*callback)(MinionContext* ctx, void* userdata),
+                               void* userdata);
+
 #endif // LIBMINION
 
 /*

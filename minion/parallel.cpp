@@ -11,10 +11,18 @@
 #endif
 
 #include <atomic>
+#include <mutex>
 #include <signal.h>
 #include <errno.h>
 
 namespace Parallel {
+
+// Serialises concurrent setupThreadParallelData / releaseThreadParallelData
+// calls. The signal-handler setters in system/trigger_timer.cpp store into
+// process-static pointers (`trig`, `ctrlCPress`); racing on those from two
+// concurrent threaded runs corrupts the dispatch state. The mutex covers the
+// brief setup/teardown window only — the mutex is NOT held during search.
+static std::mutex threadParallelDataMutex;
 
 static bool checkIsAChildProcess;
 static bool forkEverCalled;
@@ -70,13 +78,13 @@ void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
 namespace Parallel {
 
 void lockSolsout() {
-  if(getOptions().parallel) {
+  if(getOptions().parallel || getOptions().numParallelThreads > 0) {
     pthread_mutex_lock(&(getParallelData().outputLock));
   }
 }
 
 void unlockSolsout() {
-  if(getOptions().parallel) {
+  if(getOptions().parallel || getOptions().numParallelThreads > 0) {
     pthread_mutex_unlock(&(getParallelData().outputLock));
   }
 }
@@ -114,6 +122,41 @@ ParallelData* setupParallelData() {
   pd->parentProcessID = getpid();
 
   return pd;
+}
+
+ParallelData* setupThreadParallelData() {
+  std::lock_guard<std::mutex> lock(threadParallelDataMutex);
+
+  ParallelData* pd = new ParallelData();
+  pd->processCount = 0;
+  pd->initialProcessCount = 0;
+  pd->fatalErrorOccurred = false;
+  pd->process_should_exit = false;
+  pd->solutions = 0;
+  pd->nodes = 0;
+  pd->children = 0;
+  pd->ctrlCPressed = false;
+  pd->alarmTrigger = false;
+
+  {
+    pthread_mutexattr_t mutexAttr;
+    pthread_mutexattr_init(&mutexAttr);
+    if(pthread_mutex_init(&(pd->outputLock), &mutexAttr) != 0) {
+      D_FATAL_ERROR("Setup thread-mode outputLock mutex fail");
+    }
+  }
+
+  install_ctrlcTrigger(&(pd->ctrlCPressed));
+  pd->parentProcessID = getpid();
+  return pd;
+}
+
+void releaseThreadParallelData(ParallelData* pd) {
+  if(pd == nullptr)
+    return;
+  std::lock_guard<std::mutex> lock(threadParallelDataMutex);
+  pthread_mutex_destroy(&(pd->outputLock));
+  delete pd;
 }
 
 void setupParallelSupport() {
@@ -288,6 +331,24 @@ ParallelData* setupParallelData() {
   static ParallelData dummy;
 #endif
   return &dummy;
+}
+
+ParallelData* setupThreadParallelData() {
+  ParallelData* pd = new ParallelData();
+  pd->processCount = 0;
+  pd->initialProcessCount = 0;
+  pd->fatalErrorOccurred = false;
+  pd->process_should_exit = false;
+  pd->solutions = 0;
+  pd->nodes = 0;
+  pd->children = 0;
+  pd->ctrlCPressed = false;
+  pd->alarmTrigger = false;
+  return pd;
+}
+
+void releaseThreadParallelData(ParallelData* pd) {
+  delete pd;
 }
 } // namespace Parallel
 #endif

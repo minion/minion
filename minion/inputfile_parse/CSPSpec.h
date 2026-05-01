@@ -488,10 +488,12 @@ struct CSPInstance {
         shortTupleListContainer(new ShortTupleListContainer),
         is_optimisation_problem(false) {}
 
-private:
-  CSPInstance(const CSPInstance&);
-
-public:
+  // Public copy constructor (defaulted). Required by runMinionParallel,
+  // which deep-copies the instance per worker thread because the
+  // constraint-builder may mutate ConstraintBlobs in place. The
+  // shared_ptr<TupleList*> members are intentionally shared across copies
+  // (shared_ptr is thread-safe for read).
+  CSPInstance(const CSPInstance&) = default;
   void set_optimise(BOOL _minimising, vector<Var> var) {
     is_optimisation_problem = true;
     optimiseMinimising = _minimising;

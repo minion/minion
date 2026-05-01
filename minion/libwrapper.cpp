@@ -111,10 +111,21 @@ void minion_deactivateContext()
   globals = nullptr;
 }
 
-MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
-                       ProbSpec::CSPInstance& instance,
-                       bool (*callback)(MinionContext* ctx, void* userdata),
-                       void* userdata)
+// Internal helper: body of runMinion, parameterised so the parallel-threads
+// controller can call it once per worker without re-installing the
+// process-global alarm/signal handlers (which would clobber each other —
+// see system/trigger_timer.cpp:69 where activateTrigger overwrites the
+// static trig pointer and re-arms alarm()).
+//
+// installAlarms: when true (single-threaded use), call Parallel::setupAlarm
+// and Parallel::endParallelMinion as before. When false (worker thread under
+// a thread controller), the controller is responsible for installing the
+// shared alarm/ctrl-C atomics; workers just observe via getParallelData().
+static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
+                                  SearchMethod& args,
+                                  ProbSpec::CSPInstance& instance,
+                                  bool (*callback)(MinionContext* ctx, void* userdata),
+                                  void* userdata, bool installAlarms)
 {
   ContextGuard guard(ctx);
   MinionResult returnCode = MinionResult::MINION_OK;
@@ -130,24 +141,33 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
   // Redirect cout
   // https://stackoverflow.com/questions/49462524/controlling-output-from-external-libraries
   // https://stackoverflow.com/questions/4810516/c-redirecting-stdout
+  //
+  // Skip cout redirection when running as a worker thread (installAlarms=
+  // false): cout is a process-global object and racing on rdbuf() across N
+  // workers produces garbled, unrecoverable output. The thread controller
+  // sets perThreadOptions.silent in worker copies so search-level chatter is
+  // suppressed; concurrent solution writes are protected by the broadened
+  // Parallel::lockSolsout predicate.
 
   streambuf* oldCoutStreamBuf = cout.rdbuf();
   ifstream logOutStream;
   time_t rawtime;
   time(&rawtime);
 
-  // enable logging if LIBMINION_LOG is set
-  if (std::getenv("LIBMINION_LOG")) {
-    stringstream filenameStream;
-    filenameStream << "minion";
-    filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
-    filenameStream << ".log";
+  if(installAlarms) {
+    // enable logging if LIBMINION_LOG is set
+    if (std::getenv("LIBMINION_LOG")) {
+      stringstream filenameStream;
+      filenameStream << "minion";
+      filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
+      filenameStream << ".log";
 
-    logOutStream.open(filenameStream.str(), ios_base::app);
-    cout.rdbuf(logOutStream.rdbuf());
-  } else {
-    // silence cout
-    cout.rdbuf(NULL);
+      logOutStream.open(filenameStream.str(), ios_base::app);
+      cout.rdbuf(logOutStream.rdbuf());
+    } else {
+      // silence cout
+      cout.rdbuf(NULL);
+    }
   }
 
   // Pass error codes across FFI boundaries, not exceptions.
@@ -173,10 +193,21 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
       getOptions().printLine("Using seed: " + tostring(args.randomSeed));
     }
 
-    Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
-                         getOptions().time_limit_is_CPUTime);
+    if(installAlarms) {
+      Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
+                           getOptions().time_limit_is_CPUTime);
+    }
 
-    finaliseModel(instance);
+    // finaliseModel mutates the CSPInstance (sets default searchOrder /
+    // symOrder, calls setupValueOrder). Worker threads under
+    // runMinionParallel share the same CSPInstance, so the controller
+    // calls finaliseModel ONCE up front and workers skip it. installAlarms
+    // serves as the discriminator: it's true on the standalone runMinion
+    // path (where the instance must be finalised here) and false on the
+    // worker path (where the controller already did it).
+    if(installAlarms) {
+      finaliseModel(instance);
+    }
 
     // Output graphs, stats, or redump (will not return in these cases)
     infoDumps(instance);
@@ -227,15 +258,250 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
     } catch(...) {}
   }
 
-  Parallel::endParallelMinion();
+  if(installAlarms) {
+    Parallel::endParallelMinion();
+  }
 
-  // Restore old cout
-  cout.rdbuf(oldCoutStreamBuf);
+  // Restore old cout (only if we redirected it).
+  if(installAlarms) {
+    cout.rdbuf(oldCoutStreamBuf);
+  }
 
   // Don't reset context here - caller may still query results via
   // printMatrix_getValue or TableOut_get
 
   return returnCode;
+}
+
+MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
+                       ProbSpec::CSPInstance& instance,
+                       bool (*callback)(MinionContext* ctx, void* userdata),
+                       void* userdata)
+{
+  return runMinionImpl(ctx, options, args, instance, callback, userdata,
+                       /*installAlarms=*/true);
+}
+
+/*********************************************************************/
+/*                  Thread-based portfolio search                    */
+/*********************************************************************/
+
+#include "system/trigger_timer.h"
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <vector>
+
+namespace {
+
+// Shared coordinator state for one runMinionParallel invocation. Owned by
+// the parent thread; lives on the stack of runMinionParallel for the entire
+// duration of the parallel run; pointer captured by each worker.
+struct ParallelController {
+  Parallel::ParallelData* sharedParData;  // aliased into every worker's parData_m
+  std::atomic<long long> totalSolutionsFound;
+  std::atomic<bool> stopRequested;
+  std::mutex callbackMutex;
+  long long sollimit;
+  bool (*userCallback)(MinionContext*, void*);
+  void* userUserdata;
+};
+
+// Wrapper callback: invoked on each solution event from any worker. Locks
+// the controller mutex so the user callback never re-enters itself, applies
+// the shared sollimit, and signals the cross-thread alarm/ctrl-C atomics so
+// other workers stop on their next standardTime_ctrlc_checks poll without
+// emitting a "Time out" message.
+static bool parallelWrapperCallback(MinionContext* ctx, void* ud)
+{
+  ParallelController* shared = static_cast<ParallelController*>(ud);
+  std::lock_guard<std::mutex> lock(shared->callbackMutex);
+
+  // If another thread already requested stop, this thread has produced one
+  // more solution but should also exit now.
+  if(shared->stopRequested.load(std::memory_order_acquire))
+    return false;
+
+  long long count = shared->totalSolutionsFound.fetch_add(1) + 1;
+  bool keepGoing = true;
+  if(shared->userCallback) {
+    keepGoing = shared->userCallback(ctx, shared->userUserdata);
+  }
+
+  if(!keepGoing || (shared->sollimit > 0 && count >= shared->sollimit)) {
+    shared->stopRequested.store(true, std::memory_order_release);
+    if(shared->sharedParData) {
+      // Setting BOTH alarm and ctrlC takes the clean-stop branch in
+      // common_search.h's standardTime_ctrlc_checks (throws EndOfSearch
+      // without printing "Time out").
+      shared->sharedParData->alarmTrigger.store(true);
+      shared->sharedParData->ctrlCPressed.store(true);
+    }
+    return false;
+  }
+  return true;
+}
+
+}  // anonymous namespace
+
+MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options,
+                               SearchMethod& args, ProbSpec::CSPInstance& instance,
+                               bool (*callback)(MinionContext* ctx, void* userdata),
+                               void* userdata)
+{
+  if(config.numThreads < 1) {
+    set_error("runMinionParallel: numThreads must be >= 1");
+    return MinionResult::MINION_INVALID_ARGUMENT;
+  }
+
+  // The parent thread may already have a context active (e.g. the CLI main
+  // thread). Save and clear so the worker threads' newly-spawned threads
+  // start from a clean thread_local pointer; restore before returning. The
+  // parent context's solver is not used during the parallel run.
+  Globals* savedGlobals = globals;
+  globals = nullptr;
+
+  const int N = config.numThreads;
+
+  ParallelController shared;
+  shared.sharedParData = Parallel::setupThreadParallelData();
+  shared.totalSolutionsFound.store(0);
+  shared.stopRequested.store(false);
+  shared.sollimit = options.sollimit;
+  shared.userCallback = callback;
+  shared.userUserdata = userdata;
+
+  // Install the process-wide alarm/SIGXCPU trigger ONCE, pointing at the
+  // shared atomic. activateTrigger overwrites a static `trig` pointer; if we
+  // let each worker call setupAlarm, the second worker would clobber the
+  // first.
+  if(options.timeoutActive) {
+    activateTrigger(&shared.sharedParData->alarmTrigger, options.timeoutActive,
+                    options.time_limit, options.time_limit_is_CPUTime);
+  }
+
+  // Each worker creates AND destroys its own context inside its own thread.
+  // This is essential: the context's constraints / triggers pin into a
+  // thread_local DynamicTriggerList (globals.cpp), so freeing a context on a
+  // different thread than the one that built it dereferences invalid
+  // thread-local storage.
+  std::vector<MinionResult> results(N, MinionResult::MINION_OK);
+  std::vector<std::thread> workers;
+  workers.reserve(N);
+
+  // Pre-finalise the shared instance ONCE (it mutates default searchOrder /
+  // symOrder / setupValueOrder; doing it concurrently per worker would
+  // race). Workers' runMinionImpl skips finaliseModel because we passed
+  // installAlarms=false.
+  finaliseModel(instance);
+
+  for(int i = 0; i < N; ++i) {
+    workers.emplace_back([&, i]() {
+      try {
+      MinionContext* ctx = minion_newContext();
+      // Alias the worker's parData_m to the shared struct so
+      // getParallelData() (which lazy-allocates if null) returns the shared
+      // one and Parallel::isAlarmActivated() / isCtrlCPressed() read the
+      // shared atomic.
+      ctx->parData_m = shared.sharedParData;
+
+      // Deep-copy the CSPInstance per worker. BuildCSP holds the
+      // ConstraintBlobs by mutable reference and the constraint-builder
+      // sometimes mutates them in place (e.g., sorting/normalising args).
+      // Sharing the instance across workers therefore races. Copy is cheap
+      // for typical models and keeps the workers fully independent.
+      ProbSpec::CSPInstance perThreadInstance = instance;
+
+      // Per-thread option / args copies so we can diversify the seed
+      // without mutating the caller's structures and without aliasing
+      // across threads.
+      SearchOptions perThreadOptions = options;
+      SearchMethod perThreadArgs = args;
+      perThreadArgs.randomSeed = (int)(args.randomSeed ^ (config.baseSeed + (unsigned int)i));
+      // Set sollimit to "find all" inside each worker; the controller's
+      // wrapper callback enforces the shared sollimit across threads.
+      perThreadOptions.sollimit = -1;
+      // Per-thread RNG seed already differs (baseSeed XOR threadIdx). We do
+      // NOT auto-enable randomiseValvarorder: it can make problems with a
+      // good natural ordering dramatically slower (e.g. graceful k5p2 goes
+      // from <1s to >30s under random ordering). Users wanting a more
+      // diverse portfolio should pass -randomiseorder explicitly.
+      // Prevent infinite recursion: the worker is itself a parallel run, so
+      // its inner doStandardSearch must take the sequential path.
+      perThreadOptions.numParallelThreads = 0;
+      // Workers share the controller's parData; they must not also be flagged
+      // as fork-mode workers (which would re-init signal handlers etc).
+      perThreadOptions.parallel = false;
+      // For N>1, silence per-worker stats prints so the parent's summary is
+      // the single source of truth. With N=1, leave silent untouched so
+      // behaviour matches sequential runMinion exactly (incl. "Sol:" lines
+      // for fixture-style tests).
+      if(N > 1) {
+        perThreadOptions.silent = true;
+      }
+
+      MinionResult r = runMinionImpl(ctx, perThreadOptions, perThreadArgs,
+                                     perThreadInstance, parallelWrapperCallback,
+                                     &shared, /*installAlarms=*/false);
+      results[i] = r;
+
+      // Don't let ~Globals try to free the shared parData_m (the destructor
+      // currently doesn't, but make the intent explicit and future-proof).
+      ctx->parData_m = nullptr;
+      minion_freeContext(ctx);
+      } catch(const std::exception& e) {
+        // Swallow exceptions inside the worker thread lambda — letting them
+        // propagate out of std::thread is undefined / aborts. Mark the
+        // worker as having returned an error and let aggregation pick it up.
+        results[i] = MinionResult::MINION_UNKNOWN_ERROR;
+      } catch(...) {
+        results[i] = MinionResult::MINION_UNKNOWN_ERROR;
+      }
+    });
+  }
+
+  for(auto& t : workers)
+    t.join();
+
+  // Reset alarm so it doesn't carry into a subsequent runMinion call on this
+  // process.
+  if(options.timeoutActive) {
+    activateTrigger(&shared.sharedParData->alarmTrigger, false, 0, false);
+  }
+
+  // Aggregate results: if any worker timed out, report timeout; if any
+  // worker returned a non-OK error, surface it; otherwise OK.
+  MinionResult finalResult = MinionResult::MINION_OK;
+  for(int i = 0; i < N; ++i) {
+    if(results[i] == MinionResult::MINION_TIMEOUT) {
+      // A timeout in one worker counts as a portfolio timeout only if the
+      // alarm actually fired (i.e., not the "stopRequested" stop that also
+      // sets alarm flags in the shared data).
+      if(!shared.stopRequested.load() && options.timeoutActive) {
+        finalResult = MinionResult::MINION_TIMEOUT;
+      }
+    } else if(results[i] != MinionResult::MINION_OK) {
+      finalResult = results[i];
+      break;
+    }
+  }
+
+  Parallel::releaseThreadParallelData(shared.sharedParData);
+
+  // Restore the parent thread's context.
+  globals = savedGlobals;
+
+  // For N>1, the workers were silenced and the parent prints a single
+  // summary line so test scrapers see the aggregated count. For N=1 the
+  // single worker already prints "Solutions Found:" itself; printing
+  // again would duplicate.
+  if(N > 1 && !options.silent) {
+    cout << "Solutions Found: " << shared.totalSolutionsFound.load() << endl;
+  }
+
+  if(finalResult == MinionResult::MINION_TIMEOUT)
+    set_error("solver timed out");
+  return finalResult;
 }
 
 /*********************************************************************/

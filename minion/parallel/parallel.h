@@ -36,6 +36,14 @@ bool isAlarmActivated();
 void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime);
 void endParallelMinion();
 
+// Heap-allocated (non-mmap) ParallelData used for thread-mode portfolio
+// search. The mutex is initialised without PTHREAD_PROCESS_SHARED and the
+// ctrl-C trigger is wired to point at this struct's atomic so a single
+// signal-handler installation reaches all worker threads when several
+// MinionContexts alias their parData_m to it.
+ParallelData* setupThreadParallelData();
+void releaseThreadParallelData(ParallelData* pd);
+
 // Per-round fork machinery used by parallel SAC preprocessing. Independent of
 // the search-time parallel pool: round forks do not consume the -cores budget
 // and do not get tagged as search children. Unix-only; functions assert on

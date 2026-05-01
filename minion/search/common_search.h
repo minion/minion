@@ -106,9 +106,12 @@ inline void check_sol_is_correct() {
 
   getState().incrementSolutionCount();
 
-  if(getOptions().solsoutWrite) {
-    Parallel::lockSolsout();
+  // Lock output for both solsoutfile and cout solution-printing under any
+  // active parallel mode (fork-based -parallel or thread-based
+  // -X-parallelThreads). lockSolsout is a no-op when neither is active.
+  Parallel::lockSolsout();
 
+  if(getOptions().solsoutWrite) {
     vector<vector<AnyVarRef>> print_matrix = getState().getPrintMatrix();
     if(getOptions().solsoutJson) {
       json_dump(print_matrix, GET_GLOBAL(solsoutfile));
@@ -122,8 +125,6 @@ inline void check_sol_is_correct() {
     }
     GET_GLOBAL(solsoutfile) << "\n";
     GET_GLOBAL(solsoutfile).flush();
-
-    Parallel::unlockSolsout();
   }
 
   if(getOptions().print_solution) {
@@ -134,6 +135,8 @@ inline void check_sol_is_correct() {
     } else
       print_solution(cout, getState().getPrintMatrix());
   }
+
+  Parallel::unlockSolsout();
 
   if(!getOptions().nocheck) {
     for(UnsignedSysInt i = 0; i < getState().getConstraintList().size(); i++)

@@ -314,7 +314,15 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-cores);
       getOptions().parallelcores = atoi(argv[i]);
       Parallel::setNumberCores(getOptions().parallelcores);
-    } else if(command == string("-parallelPreprocess")) {
+    } else if(command == string("-X-parallelThreads")) {
+      INCREMENT_i(-X - parallelThreads);
+      int n = atoi(argv[i]);
+      if(n <= 0) {
+        cerr << "-X-parallelThreads requires a positive integer" << endl;
+        exit(1);
+      }
+      getOptions().numParallelThreads = n;
+    } else if(command == string("-X-parallelPreprocess")) {
       // Optional numeric argument. If next arg is missing, starts with '-', or
       // not a positive integer, default to sysconf(_SC_NPROCESSORS_ONLN).
       int cores = 0;
@@ -372,6 +380,29 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       }
     }
   }
+  // -X-parallelThreads is mutually exclusive with other coordination modes
+  // that assume single-threaded execution within a process.
+  if(getOptions().numParallelThreads > 0) {
+    if(getOptions().parallel) {
+      cerr << "-X-parallelThreads is mutually exclusive with -parallel" << endl;
+      exit(1);
+    }
+    if(getOptions().parallelPreprocessCores > 0) {
+      cerr << "-X-parallelThreads is mutually exclusive with -X-parallelPreprocess "
+              "(fork() from a multi-threaded process is unsafe)"
+           << endl;
+      exit(1);
+    }
+    if(getOptions().split) {
+      cerr << "-X-parallelThreads is mutually exclusive with -split" << endl;
+      exit(1);
+    }
+    if(!getOptions().noresumefile) {
+      cerr << "-X-parallelThreads is mutually exclusive with -makeresume" << endl;
+      exit(1);
+    }
+  }
+
   // bundle all options together and store
   string s = string("");
   for(SysInt i = 1; i < argc; ++i) {

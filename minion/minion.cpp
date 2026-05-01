@@ -14,6 +14,10 @@
 
 #include "command_search.h"
 
+#ifdef LIBMINION
+#include "libwrapper.h"
+#endif
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -40,6 +44,23 @@ void print_default_help(char** argv) {
 }
 
 void doStandardSearch(CSPInstance& instance, SearchMethod args) {
+#ifdef LIBMINION
+  // CLI thread-mode portfolio search: skip the parent context's preprocess
+  // and solve, hand the CSPInstance to runMinionParallel which spawns N
+  // worker MinionContexts. The parent's BuildCSP (already done) is leaked
+  // for the lifetime of the process — acceptable for v1.
+  if(getOptions().numParallelThreads > 0) {
+    MinionThreadConfig cfg;
+    cfg.numThreads = getOptions().numParallelThreads;
+    cfg.baseSeed = (unsigned int)args.randomSeed;
+    SearchOptions optsCopy = getOptions();
+    SearchMethod argsCopy = args;
+    runMinionParallel(cfg, optsCopy, argsCopy, instance, /*callback=*/nullptr,
+                      /*userdata=*/nullptr);
+    return;
+  }
+#endif
+
   bool preprocess = PreprocessCSP(instance, args);
 
   getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
