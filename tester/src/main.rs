@@ -528,23 +528,42 @@ fn main() -> Result<()> {
 
     ret?;
 
-    if config.backend == Backend::InProcess {
-        println!("In-process mode: skipping parallel and option test sweeps (exec-mode features).");
-        return Ok(());
+    // -parallel is a fork-based exec-only flag, so the parallel test
+    // sweep is exec-only. Work-stealing is available in both backends
+    // (run_solve translates -X-parallelWorkSteal to the in-process
+    // run_minion_work_steal entry), so we run that sweep in both.
+    if config.backend == Backend::Exec {
+        println!("Parallel tests\n");
+        let ret2: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_constraint_par(&config, c))
+                .context(format!("failure in {}", c.name))?;
+
+            println!("Tested {}", c.name);
+            Ok(())
+        });
+
+        ret2?;
     }
 
-    println!("Parallel tests\n");
-    let ret2: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+    println!("Work-stealing tests\n");
+    let ret_ws: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
         (0..opt.count)
             .into_par_iter()
-            .try_for_each(|_| test_types::test_constraint_par(&config, c))
-            .context(format!("failure in {}", c.name))?;
+            .try_for_each(|_| test_types::test_constraint_workstal(&config, c, 4))
+            .context(format!("failure in {} with -X-parallelWorkSteal 4", c.name))?;
 
-        println!("Tested {}", c.name);
+        println!("Tested {} (work-steal)", c.name);
         Ok(())
     });
 
-    ret2?;
+    ret_ws?;
+
+    if config.backend == Backend::InProcess {
+        println!("In-process mode: skipping option test sweep (exec-mode feature).");
+        return Ok(());
+    }
 
     println!("Option tests\n");
 
@@ -572,6 +591,10 @@ fn main() -> Result<()> {
         vec!["-prop-node", "SACBounds_limit"],
         vec!["-prop-node", "SSACBounds_limit"],
         vec!["-parallel"],
+        // -X-parallelWorkSteal is mutually exclusive with -parallel and
+        // a few other flags, so it can't safely participate in the
+        // random-combination sweep below. The dedicated
+        // test_constraint_workstal pass above already exercises it.
         vec!["-printsols"],
         vec!["-noprintsols"],
         vec!["-printsolsonly"],

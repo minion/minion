@@ -323,6 +323,13 @@ public:
   std::string commandlistIn;
   std::string commandlistOut;
 
+  /// Path of the file -solsout / -jsonsolsout opened (empty if neither
+  /// was given). Recorded so worker-context library entrypoints can
+  /// re-open the same file for their own per-thread ofstream — needed
+  /// under the experimental thread-mode flags where each worker has
+  /// its own globals->solsoutfile.
+  string solsoutFilename;
+
   /// Output a compressed file
   string outputCompressed;
 

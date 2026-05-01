@@ -78,6 +78,10 @@ struct WorkStealController {
   std::atomic<long long> workItemsTaken;
   std::atomic<long long> replayFailures;  // path was infeasible
 
+  // Aggregated across all workers, for the parent's TableOut /
+  // CLI summary. Workers add their per-context counts on exit.
+  std::atomic<long long> totalNodesExplored;
+
   // Solution accounting (mirrors ParallelController's contract).
   std::atomic<long long> totalSolutionsFound;
   std::mutex callbackMutex;
@@ -94,6 +98,7 @@ struct WorkStealController {
         donationsMade(0),
         workItemsTaken(0),
         replayFailures(0),
+        totalNodesExplored(0),
         totalSolutionsFound(0),
         sollimit(-1),
         userCallback(nullptr),

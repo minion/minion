@@ -28,12 +28,26 @@ fn print_minion_constraint_tuples<F: Write>(f: &mut F, con: &ConstraintInstance)
     if let Some(ref tuples) = con.tuples {
         print_minion_tuples(f, tuples)?;
     }
+    // Recurse into nested children so any tuple-table-using constraint
+    // (mddc, str2plus, table, etc.) embedded inside a parent
+    // (watched-or, reify, ...) emits its **TUPLELIST** definition too;
+    // otherwise the parser fails with "Undefined tuplelist: ...".
+    for child in &con.child_constraints {
+        print_minion_constraint_tuples(f, child)?;
+    }
 
     Ok(())
 }
 
 fn print_minion_constraint_contents<F: Write>(f: &mut F, con: &ConstraintInstance) -> Result<()> {
     let mut i: usize = 0;
+
+    // watched-and and watched-or take a constraint LIST (in `{...}`) in
+    // minion syntax, not separate Constraint args. The other parent
+    // constraints (reify, reifyimply, *-quick) interleave a single
+    // Constraint with non-constraint args and are emitted inline.
+    let needs_brace_list =
+        con.constraint.name == "watched-and" || con.constraint.name == "watched-or";
 
     let varlist = (0..con.constraint.arg.len())
         .map(|list| match con.constraint.arg[list] {
@@ -47,12 +61,20 @@ fn print_minion_constraint_contents<F: Write>(f: &mut F, con: &ConstraintInstanc
                 let mut out = Vec::new();
                 print_minion_constraint_contents(&mut out, &(con.child_constraints[i])).unwrap();
                 i += 1;
-                String::from_utf8(out).unwrap()
+                let s = String::from_utf8(out).unwrap();
+                // print_minion_constraint_contents writes a trailing
+                // newline (from `writeln!`). Strip it when we're
+                // embedding inline.
+                s.trim_end_matches('\n').to_string()
             }
         })
         .join(", ");
 
-    writeln!(f, "{}({})", con.constraint.name, varlist)?;
+    if needs_brace_list {
+        writeln!(f, "{}({{{}}})", con.constraint.name, varlist)?;
+    } else {
+        writeln!(f, "{}({})", con.constraint.name, varlist)?;
+    }
 
     Ok(())
 }

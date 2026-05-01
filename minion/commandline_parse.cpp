@@ -266,6 +266,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       }
       getOptions().solsoutWrite = true;
       INCREMENT_i(-solsout);
+      getOptions().solsoutFilename = argv[i];
       GET_GLOBAL(solsoutfile).open(argv[i], ios::app);
       if(!GET_GLOBAL(solsoutfile)) {
         ostringstream oss;
@@ -281,6 +282,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().solsoutWrite = true;
       getOptions().solsoutJson = true;
       INCREMENT_i(-jsonsolsout);
+      getOptions().solsoutFilename = argv[i];
       GET_GLOBAL(solsoutfile).open(argv[i], ios::app);
       if(!GET_GLOBAL(solsoutfile)) {
         ostringstream oss;

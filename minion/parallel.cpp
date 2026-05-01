@@ -78,13 +78,15 @@ void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
 namespace Parallel {
 
 void lockSolsout() {
-  if(getOptions().parallel || getOptions().numParallelThreads > 0) {
+  if(getOptions().parallel || getOptions().numParallelThreads > 0 ||
+     getOptions().workStealController != nullptr) {
     pthread_mutex_lock(&(getParallelData().outputLock));
   }
 }
 
 void unlockSolsout() {
-  if(getOptions().parallel || getOptions().numParallelThreads > 0) {
+  if(getOptions().parallel || getOptions().numParallelThreads > 0 ||
+     getOptions().workStealController != nullptr) {
     pthread_mutex_unlock(&(getParallelData().outputLock));
   }
 }

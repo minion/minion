@@ -922,6 +922,67 @@ pub fn run_inject_vars_after(
 /// `find_all_sols` mirrors the `-findallsols` command-line flag — when true,
 /// the callback returns `true` to keep enumerating; when false, it returns
 /// `false` after the first solution to stop.
+/// In-process work-stealing variant: builds the same model as
+/// [`get_minion_solutions_in_process`] but routes through
+/// `minion_sys::run_minion_work_steal_with_options`. The work-steal
+/// entry doesn't return a `SolverContext`, so we don't have Nodes from
+/// the FFI side — we report 0, which is fine for the tester because
+/// `test_constraint_workstal` doesn't compare node counts (work-steal
+/// changes traversal so node-count equality isn't a sound invariant).
+pub fn get_minion_solutions_in_process_work_steal(
+    instance: &ConstraintInstance,
+    options: minion_sys::RunOptions,
+    num_threads: usize,
+    testname: &str,
+) -> Result<MinionOutput> {
+    let mut model = Model::new();
+    register_tuple_tables_for_instance(&mut model, instance)?;
+    add_variables_and_holes(&mut model, instance)?;
+    let top = build_constraint(instance)
+        .with_context(|| format!("building constraint for {testname}"))?;
+    model.constraints.push(top);
+
+    let variable_order = model.named_variables.get_variable_order();
+
+    // The work-steal callback is invoked from any worker thread (the
+    // C-side controller mutex serialises calls so no two run
+    // concurrently, but the worker that calls in varies). We need a
+    // Send + Sync wrapper around the solutions vec — Mutex<Vec<...>>
+    // does the job.
+    let solutions: std::sync::Mutex<Vec<Vec<i64>>> = std::sync::Mutex::new(Vec::new());
+
+    let cb: minion_sys::ParallelCallback<'_> = {
+        let variable_order = &variable_order;
+        let solutions = &solutions;
+        Box::new(move |sol_map: HashMap<VarName, MC>| -> bool {
+            let mut row = Vec::with_capacity(variable_order.len());
+            for name in variable_order.iter() {
+                match sol_map.get(name).copied() {
+                    Some(MC::Integer(n)) => row.push(n as i64),
+                    Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                    Some(_) | None => return false,
+                }
+            }
+            #[allow(clippy::unwrap_used)]
+            solutions.lock().unwrap().push(row);
+            true
+        })
+    };
+
+    minion_sys::run_minion_work_steal_with_options(num_threads, model, options, cb)
+        .map_err(|e| anyhow!("minion in-process work-steal error ({testname}): {e}"))?;
+
+    #[allow(clippy::unwrap_used)]
+    let solutions = solutions.into_inner().unwrap();
+
+    Ok(MinionOutput {
+        solutions,
+        nodes: 0,
+        filename: format!("<in-process-work-steal:{testname}>"),
+        cleanup: CleanupFiles::empty(),
+    })
+}
+
 pub fn get_minion_solutions_in_process(
     instance: &ConstraintInstance,
     find_all_sols: bool,

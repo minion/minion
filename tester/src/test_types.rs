@@ -101,10 +101,34 @@ fn run_solve(
             testname,
         ),
         Backend::InProcess => {
+            // Tiny flag parser: -findallsols is recognised as before;
+            // -X-parallelWorkSteal <N> routes through the work-steal
+            // variant of the in-process entry. Other flags are
+            // exec-only and rejected.
             let mut find_all = false;
-            for &a in extraargs {
-                match a {
-                    "-findallsols" => find_all = true,
+            let mut work_steal: Option<usize> = None;
+            let mut i = 0;
+            while i < extraargs.len() {
+                match extraargs[i] {
+                    "-findallsols" => {
+                        find_all = true;
+                        i += 1;
+                    }
+                    "-X-parallelWorkSteal" => {
+                        if i + 1 >= extraargs.len() {
+                            return Err(anyhow!(
+                                "-X-parallelWorkSteal needs a thread-count argument"
+                            ));
+                        }
+                        let n: usize = extraargs[i + 1].parse().map_err(|_| {
+                            anyhow!(
+                                "-X-parallelWorkSteal: invalid thread count {:?}",
+                                extraargs[i + 1]
+                            )
+                        })?;
+                        work_steal = Some(n);
+                        i += 2;
+                    }
                     other => {
                         return Err(anyhow!(
                             "in-process backend does not support flag {:?}",
@@ -113,12 +137,22 @@ fn run_solve(
                     }
                 }
             }
-            run_minion_lib::get_minion_solutions_in_process(
-                instance,
-                find_all,
-                config.run_options_no_seed(),
-                testname,
-            )
+            if let Some(n) = work_steal {
+                let _ = find_all;
+                run_minion_lib::get_minion_solutions_in_process_work_steal(
+                    instance,
+                    config.run_options_no_seed(),
+                    n,
+                    testname,
+                )
+            } else {
+                run_minion_lib::get_minion_solutions_in_process(
+                    instance,
+                    find_all,
+                    config.run_options_no_seed(),
+                    testname,
+                )
+            }
         }
     }
 }
@@ -208,6 +242,50 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
+        )));
+    }
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
+
+    Ok(())
+}
+
+/// Work-stealing parallel torture test: solve the same instance with
+/// `-findallsols` sequentially and under `-X-parallelWorkSteal N`, and
+/// require the two solution sets to match. Unlike `-parallel` (fork
+/// portfolio), work-stealing divides the search tree across workers, so
+/// the solution count must equal sequential exactly — not be multiplied
+/// by N. Node counts are NOT compared here even when the constraint is
+/// GAC: work-stealing changes which sub-tree each worker explores, and
+/// per-worker propagation can re-derive the same prunings against
+/// slightly different traversal orders, so node-count equality is not
+/// guaranteed.
+pub fn test_constraint_workstal(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    n: u32,
+) -> Result<()> {
+    let instance = constraint_def::build_random_instance(c);
+    let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
+    let n_str = n.to_string();
+    let ret2 = run_solve(
+        config,
+        &["-findallsols", "-X-parallelWorkSteal", &n_str],
+        &instance,
+        "workstal",
+    )?;
+    let mut a = ret.solutions.clone();
+    let mut b = ret2.solutions.clone();
+    a.sort();
+    b.sort();
+    if a != b {
+        return Err(anyhow!(format!(
+            "Work-stealing solutions not equal in {} vs {}: seq={} ws={}",
+            ret.filename,
+            ret2.filename,
+            ret.solutions.len(),
+            ret2.solutions.len()
         )));
     }
 

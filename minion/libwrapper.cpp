@@ -138,6 +138,17 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
 
   resetContextState(ctx);
 
+  // If the caller supplied a -solsout filename in the SearchOptions, the
+  // worker context's own solsoutfile needs to be opened too — under the
+  // thread-mode flags each worker has its own globals->solsoutfile, and
+  // the parent's open file isn't accessible from here. Each worker
+  // opens its own ofstream onto the same path in append+line-flushed
+  // mode; the broadened Parallel::lockSolsout serialises writes, and
+  // POSIX guarantees small (<PIPE_BUF) writes don't interleave.
+  if(!options.solsoutFilename.empty()) {
+    globals->solsoutfile.open(options.solsoutFilename, ios::app);
+  }
+
   // Redirect cout
   // https://stackoverflow.com/questions/49462524/controlling-output-from-external-libraries
   // https://stackoverflow.com/questions/4810516/c-redirecting-stdout
@@ -626,6 +637,16 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
                                        &ctrl, /*installAlarms=*/false);
         results[i] = r;
 
+        // Contribute this worker's node count to the parent's
+        // aggregate so the parent's TableOut / CLI summary reflects
+        // total cross-thread work (matching what the tester reads
+        // out of -jsontableout).
+        if(ctx->state_m) {
+          ctrl.totalNodesExplored.fetch_add(
+              (long long)ctx->state_m->getNodeCount(),
+              std::memory_order_relaxed);
+        }
+
         ctx->parData_m = nullptr;
         minion_freeContext(ctx);
       } catch(const std::exception&) {
@@ -658,6 +679,20 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
   Parallel::releaseThreadParallelData(sharedParData);
 
   globals = savedGlobals;
+
+  // Stash aggregated counters on the parent's TableOut so callers that
+  // read -jsontableout (e.g. the random tester) see total cross-worker
+  // stats. globals points at the parent's context now, so getTableOut()
+  // returns the parent's. tableout writing is the CLI caller's
+  // responsibility (minion_main calls getTableOut().print_line() after
+  // we return).
+  if(savedGlobals != nullptr) {
+    long long total_sols = ctrl.totalSolutionsFound.load();
+    long long total_nodes = ctrl.totalNodesExplored.load();
+    getTableOut().set("Nodes", tostring(total_nodes));
+    getTableOut().set("Satisfiable", (total_sols == 0 ? 0 : 1));
+    getTableOut().set("SolutionsFound", total_sols);
+  }
 
   if(N > 1 && !options.silent) {
     cout << "Solutions Found: " << ctrl.totalSolutionsFound.load() << endl;

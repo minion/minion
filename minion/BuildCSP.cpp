@@ -145,13 +145,19 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
       // modification lands at the entry trail level and is otherwise
       // never undone. Without this, those modifications corrupt
       // subsequent replays and lose solutions non-deterministically.
-      Controller::worldPush();
-      try {
-        if(!getState().isFailed())
+      //
+      // Skip search entirely if preprocess (or initial propagation)
+      // already determined UNSAT — worldPush asserts isFailed must be
+      // false. Mark idle either way so popOrFinish's all-done
+      // predicate balances the controller's pre-bootstrap busy=1.
+      if(!getState().isFailed()) {
+        Controller::worldPush();
+        try {
           sm->search();
-      } catch(EndOfSearch) {}
-      Controller::worldPop();
-      getState().setFailed(false);
+        } catch(EndOfSearch) {}
+        Controller::worldPop();
+        getState().setFailed(false);
+      }
       WorkSteal::markIdle(*ctrl);
     }
     while(true) {
@@ -171,18 +177,25 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
       // the worker takes its next item. Without this, leaked
       // modifications corrupt variable domains for subsequent replays
       // and cause solutions to disappear non-deterministically.
-      Controller::worldPush();
-      bool feasible = sm->replayPath(item);
-      if(feasible) {
-        try {
-          if(!getState().isFailed())
-            sm->search();
-        } catch(EndOfSearch) {}
-      } else {
-        ctrl->replayFailures.fetch_add(1, std::memory_order_relaxed);
+      //
+      // Skip the worldPush+replay+search if isFailed is set —
+      // worldPush asserts on a clean state. (Can happen if preprocess
+      // already deduced UNSAT and a stale-failed flag survived from
+      // earlier; just drop the work item, no exploration possible.)
+      if(!getState().isFailed()) {
+        Controller::worldPush();
+        bool feasible = sm->replayPath(item);
+        if(feasible) {
+          try {
+            if(!getState().isFailed())
+              sm->search();
+          } catch(EndOfSearch) {}
+        } else {
+          ctrl->replayFailures.fetch_add(1, std::memory_order_relaxed);
+        }
+        Controller::worldPop();
+        getState().setFailed(false);
       }
-      Controller::worldPop();
-      getState().setFailed(false);
       // Normal completion: search() returned because branches drained
       // to empty (sub-tree exhausted). For early termination via
       // EndOfSearch (timeout / stop), branches may still hold entries
