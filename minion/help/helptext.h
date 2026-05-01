@@ -66,6 +66,24 @@ Mutually exclusive with -parallel, -X-parallelPreprocess, -split, and
 -makeresume. Mid-search mutation (minion_newVarMidsearch /
 minion_addConstraintMidsearch) is not supported in this mode.
 
+-X-parallelWorkSteal N
+
+EXPERIMENTAL — not for production use. Runs work-stealing parallel
+search across N OS threads. One thread starts at the root; idle threads
+block on a shared work queue. When some thread is idle, busy threads
+periodically donate one stealable left-branch (the topmost unstolen
+left, mirroring the existing fork-based -parallel) by encoding a
+path-from-root and pushing it to the queue. Idle threads pop a path,
+fast-forward via worldPush + assign + propagate replay, and continue
+search from the resulting sub-tree. Wdeg / domoverwdeg counters drift
+between threads (each thread accumulates its own failure history) —
+this is intended as a diversity source. Helps UNSAT proving by
+splitting the tree across cores; speedup on UNSAT scales roughly with
+1/N modulo replay overhead.
+
+Mutually exclusive with -parallel, -X-parallelThreads,
+-X-parallelPreprocess, -split, -makeresume, and -restarts.
+
 -X-parallelPreprocess [N]
 
 EXPERIMENTAL — not for production use. Runs SAC / SACBounds

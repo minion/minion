@@ -322,6 +322,14 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         exit(1);
       }
       getOptions().numParallelThreads = n;
+    } else if(command == string("-X-parallelWorkSteal")) {
+      INCREMENT_i(-X - parallelWorkSteal);
+      int n = atoi(argv[i]);
+      if(n <= 0) {
+        cerr << "-X-parallelWorkSteal requires a positive integer" << endl;
+        exit(1);
+      }
+      getOptions().numWorkStealThreads = n;
     } else if(command == string("-X-parallelPreprocess")) {
       // Optional numeric argument. If next arg is missing, starts with '-', or
       // not a positive integer, default to sysconf(_SC_NPROCESSORS_ONLN).
@@ -399,6 +407,38 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     }
     if(!getOptions().noresumefile) {
       cerr << "-X-parallelThreads is mutually exclusive with -makeresume" << endl;
+      exit(1);
+    }
+  }
+
+  // -X-parallelWorkSteal: same exclusions as -X-parallelThreads, plus
+  // mutual exclusion with -X-parallelThreads itself (only one parallel
+  // search mode at a time).
+  if(getOptions().numWorkStealThreads > 0) {
+    if(getOptions().parallel) {
+      cerr << "-X-parallelWorkSteal is mutually exclusive with -parallel" << endl;
+      exit(1);
+    }
+    if(getOptions().numParallelThreads > 0) {
+      cerr << "-X-parallelWorkSteal is mutually exclusive with -X-parallelThreads"
+           << endl;
+      exit(1);
+    }
+    if(getOptions().parallelPreprocessCores > 0) {
+      cerr << "-X-parallelWorkSteal is mutually exclusive with -X-parallelPreprocess"
+           << endl;
+      exit(1);
+    }
+    if(getOptions().split) {
+      cerr << "-X-parallelWorkSteal is mutually exclusive with -split" << endl;
+      exit(1);
+    }
+    if(!getOptions().noresumefile) {
+      cerr << "-X-parallelWorkSteal is mutually exclusive with -makeresume" << endl;
+      exit(1);
+    }
+    if(getOptions().restart.active) {
+      cerr << "-X-parallelWorkSteal is mutually exclusive with -restarts (v1)" << endl;
       exit(1);
     }
   }

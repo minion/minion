@@ -4,6 +4,7 @@
 #include "minion.h"
 
 #include "parallel/parallel.h"
+#include "parallel/work_steal.h"
 #include "preprocess.h"
 #include "search/search_control.h"
 
@@ -129,11 +130,74 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   }
 
   getState().setSearchManager(sm.get());
-  try {
-    if(!getState().isFailed()) {
-      sm->search();
+  if(getOptions().workStealController != nullptr && getOptions().workStealWorkerIdx >= 0) {
+    // Work-stealing worker. Worker 0 starts at the root; workers >= 1
+    // skip the initial search and go straight to the queue. After each
+    // sub-tree completes, all workers loop on the queue until the
+    // controller decides we're done.
+    WorkSteal::WorkStealController* ctrl =
+        static_cast<WorkSteal::WorkStealController*>(getOptions().workStealController);
+    int idx = getOptions().workStealWorkerIdx;
+    if(idx == 0) {
+      // Controller pre-set busyWorkers = 1 before spawning, so we
+      // don't re-bootstrap here. Bookend the root search with
+      // worldPush/worldPop: the final branch_right's right-side
+      // modification lands at the entry trail level and is otherwise
+      // never undone. Without this, those modifications corrupt
+      // subsequent replays and lose solutions non-deterministically.
+      Controller::worldPush();
+      try {
+        if(!getState().isFailed())
+          sm->search();
+      } catch(EndOfSearch) {}
+      Controller::worldPop();
+      getState().setFailed(false);
+      WorkSteal::markIdle(*ctrl);
     }
-  } catch(EndOfSearch) {}
+    while(true) {
+      WorkSteal::WorkItem item;
+      if(!WorkSteal::popOrFinish(*ctrl, item))
+        break;
+      // popOrFinish has incremented busy and decremented idle on our
+      // behalf. We now run a sub-tree.
+      sm->reset();
+      // Clear any residual failed flag from a prior sub-tree's terminal
+      // state — search() requires a clean entry.
+      getState().setFailed(false);
+      // Bookend each work item with worldPush/worldPop so any
+      // modifications that survive the search loop (the final
+      // branch_right's right-side modify lands at the entry trail
+      // level and is otherwise never undone) are cleaned up before
+      // the worker takes its next item. Without this, leaked
+      // modifications corrupt variable domains for subsequent replays
+      // and cause solutions to disappear non-deterministically.
+      Controller::worldPush();
+      bool feasible = sm->replayPath(item);
+      if(feasible) {
+        try {
+          if(!getState().isFailed())
+            sm->search();
+        } catch(EndOfSearch) {}
+      } else {
+        ctrl->replayFailures.fetch_add(1, std::memory_order_relaxed);
+      }
+      Controller::worldPop();
+      getState().setFailed(false);
+      // Normal completion: search() returned because branches drained
+      // to empty (sub-tree exhausted). For early termination via
+      // EndOfSearch (timeout / stop), branches may still hold entries
+      // and worldPushes are unmatched; that's fine for v1 because
+      // stopRequested would be set, so popOrFinish will return false on
+      // the next iteration and the worker exits without further replay.
+      WorkSteal::markIdle(*ctrl);
+    }
+  } else {
+    try {
+      if(!getState().isFailed()) {
+        sm->search();
+      }
+    } catch(EndOfSearch) {}
+  }
   getState().setSearchManager(nullptr);
 
   if(getOptions().printonlyoptimal) {

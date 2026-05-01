@@ -59,6 +59,19 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
                       /*userdata=*/nullptr);
     return;
   }
+  // CLI work-stealing parallel search: same shape as the portfolio case
+  // above — parent's pre-built solver is unused for the duration of the
+  // run, workers cooperatively split the search tree.
+  if(getOptions().numWorkStealThreads > 0) {
+    MinionThreadConfig cfg;
+    cfg.numThreads = getOptions().numWorkStealThreads;
+    cfg.baseSeed = (unsigned int)args.randomSeed;
+    SearchOptions optsCopy = getOptions();
+    SearchMethod argsCopy = args;
+    runMinionWorkSteal(cfg, optsCopy, argsCopy, instance, /*callback=*/nullptr,
+                       /*userdata=*/nullptr);
+    return;
+  }
 #endif
 
   bool preprocess = PreprocessCSP(instance, args);

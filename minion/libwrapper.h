@@ -248,6 +248,29 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
                                bool (*callback)(MinionContext* ctx, void* userdata),
                                void* userdata);
 
+/*
+ * runMinionWorkSteal: experimental work-stealing parallel search.
+ *
+ *   Spawns config.numThreads worker threads. Worker 0 starts at the
+ *   search root; others wait on a shared work queue. When any worker
+ *   becomes idle, busy workers (polling at every node) hand off their
+ *   topmost unstolen left-branch by encoding a path-from-root and
+ *   pushing it to the queue. Idle workers fast-forward via worldPush
+ *   + propagate replay and search the resulting sub-tree.
+ *
+ *   Unlike runMinionParallel (pure portfolio), this divides the search
+ *   tree across workers and so speeds up UNSAT proving roughly with
+ *   1/N. Wdeg / domoverwdeg counters drift between workers — this is
+ *   intended as a diversity source rather than a soundness concern.
+ *
+ *   Mid-search mutation is not supported. Restart-based search is not
+ *   supported in this mode.
+ */
+MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& options,
+                                SearchMethod& args, ProbSpec::CSPInstance& instance,
+                                bool (*callback)(MinionContext* ctx, void* userdata),
+                                void* userdata);
+
 #endif // LIBMINION
 
 /*

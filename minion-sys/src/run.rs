@@ -576,6 +576,101 @@ pub fn run_minion_parallel(
     run_minion_parallel_with_options(num_threads, model, RunOptions::default(), callback)
 }
 
+/// Run Minion with thread-based work-stealing: N workers cooperatively
+/// split the search tree. Worker 0 starts at the root; idle workers wait
+/// on a shared queue. Busy workers, on each search node, donate one
+/// stealable left-branch (encoded as a path-from-root) to the queue when
+/// other workers are idle. Idle workers fast-forward via worldPush +
+/// propagate replay and continue search from there.
+///
+/// Unlike [`run_minion_parallel`] (pure portfolio), this *divides* the
+/// search tree across workers and so speeds up UNSAT proving roughly with
+/// 1/N. Wdeg counters drift between workers — intended as a diversity
+/// source.
+///
+/// Mid-search mutation is not supported. See [`run_minion_parallel`] for
+/// the concurrency caveat (don't call this from multiple host threads
+/// concurrently — the underlying alarm/ctrl-C handler state is
+/// process-global).
+pub fn run_minion_work_steal(
+    num_threads: usize,
+    model: Model,
+    callback: ParallelCallback<'_>,
+) -> Result<(), MinionError> {
+    run_minion_work_steal_with_options(num_threads, model, RunOptions::default(), callback)
+}
+
+/// Like [`run_minion_work_steal`] but with [`RunOptions`].
+#[allow(clippy::unwrap_used)]
+pub fn run_minion_work_steal_with_options(
+    num_threads: usize,
+    model: Model,
+    options: RunOptions,
+    callback: ParallelCallback<'_>,
+) -> Result<(), MinionError> {
+    if num_threads == 0 {
+        return Err(MinionError::Other(anyhow!(
+            "num_threads must be at least 1"
+        )));
+    }
+    if num_threads > i32::MAX as usize {
+        return Err(MinionError::Other(anyhow!("num_threads is too large")));
+    }
+
+    unsafe {
+        let search_opts = ffi::searchOptions_new();
+        let search_method = ffi::searchMethod_new();
+        let search_instance = ffi::instance_new();
+
+        (*search_opts).silent = true;
+        (*search_opts).print_solution = false;
+        (*search_opts).sollimit = -1;
+
+        if let Some(seed) = options.seed {
+            (*search_method).randomSeed = seed;
+        }
+        (*search_method).preprocess = options.preprocess.to_ffi();
+        (*search_method).propMethod = options.prop_node.to_ffi();
+
+        let mut print_vars: Vec<VarName> = vec![];
+        let convert_result =
+            convert_model_to_raw(search_instance, &model, &options, &mut print_vars);
+        if let Err(e) = convert_result {
+            ffi::searchMethod_free(search_method);
+            ffi::searchOptions_free(search_opts);
+            ffi::instance_free(search_instance);
+            return Err(e);
+        }
+
+        let state = ParallelCallbackState {
+            callback: std::sync::Mutex::new(callback),
+            print_vars,
+        };
+        let userdata = &state as *const ParallelCallbackState<'_> as *mut c_void;
+
+        let cfg = ffi::MinionThreadConfig {
+            numThreads: num_threads as i32,
+            baseSeed: options.seed.unwrap_or(0),
+        };
+
+        let res = ffi::runMinionWorkSteal(
+            cfg,
+            search_opts,
+            search_method,
+            search_instance,
+            Some(parallel_callback_thunk),
+            userdata,
+        );
+
+        ffi::searchMethod_free(search_method);
+        ffi::searchOptions_free(search_opts);
+        ffi::instance_free(search_instance);
+
+        check_minion_result(res)?;
+        Ok(())
+    }
+}
+
 /// Like [`run_minion_parallel`] but with [`RunOptions`] (random seed, var/
 /// val orderings, propagation levels). The seed (if set) is the controller
 /// base seed; per-thread seeds are derived as `base XOR thread_index`.

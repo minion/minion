@@ -505,6 +505,173 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
 }
 
 /*********************************************************************/
+/*                  Work-stealing parallel search                    */
+/*********************************************************************/
+
+#include "parallel/work_steal.h"
+
+namespace {
+
+// Wrapper callback used by every work-steal worker. Mirrors
+// parallelWrapperCallback (mutex-protected, applies sollimit, signals via
+// shared parData) but routes solution counting through the
+// WorkStealController's own atomics so accounting stays clean even when
+// the same controller is reused across runs.
+static bool workStealWrapperCallback(MinionContext* ctx, void* ud)
+{
+  WorkSteal::WorkStealController* shared =
+      static_cast<WorkSteal::WorkStealController*>(ud);
+  std::lock_guard<std::mutex> lock(shared->callbackMutex);
+
+  if(shared->stopRequested.load(std::memory_order_acquire))
+    return false;
+
+  long long count = shared->totalSolutionsFound.fetch_add(1) + 1;
+  bool keepGoing = true;
+  if(shared->userCallback) {
+    keepGoing = shared->userCallback((void*)ctx, shared->userUserdata);
+  }
+
+  if(!keepGoing || (shared->sollimit > 0 && count >= shared->sollimit)) {
+    shared->stopRequested.store(true, std::memory_order_release);
+    // Wake any worker blocked on the work queue so they observe the
+    // stop and exit.
+    shared->queue_cv.notify_all();
+    // Also poke the cross-thread alarm flags so any worker mid-search
+    // (not at a callback) terminates via standardTime_ctrlc_checks.
+    if(globals && globals->parData_m) {
+      globals->parData_m->alarmTrigger.store(true);
+      globals->parData_m->ctrlCPressed.store(true);
+    }
+    return false;
+  }
+  return true;
+}
+
+}  // anonymous namespace
+
+MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& options,
+                                SearchMethod& args, ProbSpec::CSPInstance& instance,
+                                bool (*callback)(MinionContext* ctx, void* userdata),
+                                void* userdata)
+{
+  if(config.numThreads < 1) {
+    set_error("runMinionWorkSteal: numThreads must be >= 1");
+    return MinionResult::MINION_INVALID_ARGUMENT;
+  }
+
+  Globals* savedGlobals = globals;
+  globals = nullptr;
+
+  const int N = config.numThreads;
+
+  WorkSteal::WorkStealController ctrl;
+  ctrl.numWorkers = N;
+  ctrl.sollimit = options.sollimit;
+  ctrl.userCallback = reinterpret_cast<bool(*)(void*, void*)>(callback);
+  ctrl.userUserdata = userdata;
+  // Pre-mark worker 0 busy BEFORE spawning any threads. Otherwise a
+  // fast-starting worker N>0 can reach popOrFinish, observe busy==0
+  // and idle empty, and declare global termination before worker 0
+  // ever calls bootstrapFirstWorker.
+  ctrl.busyWorkers.store(1, std::memory_order_relaxed);
+
+  Parallel::ParallelData* sharedParData = Parallel::setupThreadParallelData();
+
+  if(options.timeoutActive) {
+    activateTrigger(&sharedParData->alarmTrigger, options.timeoutActive,
+                    options.time_limit, options.time_limit_is_CPUTime);
+  }
+
+  // Pre-finalise the shared instance once (same reasoning as
+  // runMinionParallel — finaliseModel mutates instance state).
+  finaliseModel(instance);
+
+  std::vector<MinionResult> results(N, MinionResult::MINION_OK);
+  std::vector<std::thread> workers;
+  workers.reserve(N);
+
+  for(int i = 0; i < N; ++i) {
+    workers.emplace_back([&, i]() {
+      try {
+        MinionContext* ctx = minion_newContext();
+        ctx->parData_m = sharedParData;
+
+        ProbSpec::CSPInstance perThreadInstance = instance;
+        SearchOptions perThreadOptions = options;
+        SearchMethod perThreadArgs = args;
+        perThreadArgs.randomSeed =
+            (int)(args.randomSeed ^ (config.baseSeed + (unsigned int)i));
+        // Workers find all (the controller wrapper enforces sollimit
+        // across threads). Disable other parallel modes to avoid
+        // recursion into runMinionParallel/runMinionWorkSteal — the
+        // worker's doStandardSearch must take the sequential path while
+        // SolveCSP dispatches into the work-steal worker loop.
+        perThreadOptions.sollimit = -1;
+        perThreadOptions.numParallelThreads = 0;
+        perThreadOptions.numWorkStealThreads = 0;
+        perThreadOptions.parallel = false;
+        // Hand the controller pointer + this worker's index into the
+        // search loop via SearchOptions so SolveCSP dispatches into the
+        // work-steal worker loop.
+        perThreadOptions.workStealController = &ctrl;
+        perThreadOptions.workStealWorkerIdx = i;
+        // Silence per-worker chatter under N>1 (parent prints summary).
+        if(N > 1) {
+          perThreadOptions.silent = true;
+        }
+
+        MinionResult r = runMinionImpl(ctx, perThreadOptions, perThreadArgs,
+                                       perThreadInstance, workStealWrapperCallback,
+                                       &ctrl, /*installAlarms=*/false);
+        results[i] = r;
+
+        ctx->parData_m = nullptr;
+        minion_freeContext(ctx);
+      } catch(const std::exception&) {
+        results[i] = MinionResult::MINION_UNKNOWN_ERROR;
+      } catch(...) {
+        results[i] = MinionResult::MINION_UNKNOWN_ERROR;
+      }
+    });
+  }
+
+  for(auto& t : workers)
+    t.join();
+
+  if(options.timeoutActive) {
+    activateTrigger(&sharedParData->alarmTrigger, false, 0, false);
+  }
+
+  MinionResult finalResult = MinionResult::MINION_OK;
+  for(int i = 0; i < N; ++i) {
+    if(results[i] == MinionResult::MINION_TIMEOUT) {
+      if(!ctrl.stopRequested.load() && options.timeoutActive) {
+        finalResult = MinionResult::MINION_TIMEOUT;
+      }
+    } else if(results[i] != MinionResult::MINION_OK) {
+      finalResult = results[i];
+      break;
+    }
+  }
+
+  Parallel::releaseThreadParallelData(sharedParData);
+
+  globals = savedGlobals;
+
+  if(N > 1 && !options.silent) {
+    cout << "Solutions Found: " << ctrl.totalSolutionsFound.load() << endl;
+    cout << "WorkSteal donations: " << ctrl.donationsMade.load()
+         << ", taken: " << ctrl.workItemsTaken.load()
+         << ", replay-failures: " << ctrl.replayFailures.load() << endl;
+  }
+
+  if(finalResult == MinionResult::MINION_TIMEOUT)
+    set_error("solver timed out");
+  return finalResult;
+}
+
+/*********************************************************************/
 /*                    Instance building functions                    */
 /*********************************************************************/
 

@@ -134,6 +134,7 @@ fn bind(minion_src: &Path) {
         .allowlist_function("minion_deactivateContext")
         .allowlist_function("runMinion")
         .allowlist_function("runMinionParallel")
+        .allowlist_function("runMinionWorkSteal")
         .allowlist_type("MinionThreadConfig")
         .allowlist_function("minion_error_message")
         .allowlist_function("constantAsVar")

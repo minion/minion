@@ -345,6 +345,22 @@ public:
   /// Mutually exclusive with -parallel and -X-parallelPreprocess.
   int numParallelThreads = 0;
 
+  /// Number of OS threads for work-stealing search. 0 means sequential.
+  /// Set via the experimental -X-parallelWorkSteal [N] flag. Each worker
+  /// has its own context but they cooperatively split the search tree
+  /// via path-replay donation. Mutually exclusive with all other parallel
+  /// modes.
+  int numWorkStealThreads = 0;
+  /// Pointer to the WorkStealController for this run; set by the
+  /// orchestrator before workers start, accessed from inside the search
+  /// loop's donation poll. Type-erased here to avoid pulling
+  /// work_steal.h into solver.h.
+  void* workStealController = nullptr;
+  /// Worker index when this context is a work-stealing worker (>= 0) or
+  /// -1 when it is not. Worker 0 bootstraps at the search root; workers
+  /// >= 1 start by waiting on the shared queue.
+  int workStealWorkerIdx = -1;
+
   // Gather AMOs
   bool gatherAMOs = false;
   bool gatherAMOsExtra = false;
