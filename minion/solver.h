@@ -335,6 +335,10 @@ public:
   int parallelcores = 0;
   bool parallelStealHigh = true;
 
+  /// Number of worker processes for parallel SAC/SACBounds preprocessing.
+  /// 0 means sequential (today's behaviour). Set via -parallelPreprocess [N].
+  int parallelPreprocessCores = 0;
+
   // Gather AMOs
   bool gatherAMOs = false;
   bool gatherAMOsExtra = false;

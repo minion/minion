@@ -35,6 +35,30 @@ bool isCtrlCPressed();
 bool isAlarmActivated();
 void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime);
 void endParallelMinion();
+
+// Per-round fork machinery used by parallel SAC preprocessing. Independent of
+// the search-time parallel pool: round forks do not consume the -cores budget
+// and do not get tagged as search children. Unix-only; functions assert on
+// platforms where fork is unavailable.
+struct RoundHandle {
+  int pipeFds[2];  // [0]=read (parent), [1]=write (kept open by children until _exit)
+};
+
+// Idempotent: install SIGCHLD ignore so children auto-reap without waitpid.
+void ensureSignalHandlersInstalled();
+
+// Allocate a fresh tracking pipe for the round. Call once per round in parent.
+RoundHandle beginRound();
+
+// fork(). Returns 0 in the child (which closes its copy of the read end) and
+// the child's PID in the parent. Children should _exit when done so the
+// parent's read() on pipeFds[0] returns EOF after the last child exits.
+int forkForRound(RoundHandle& handle);
+
+// Block in the parent until all children have closed pipeFds[1] (i.e. exited).
+// Closes both fds before returning. Safe to call once per round.
+void endRound(RoundHandle& handle);
+
 } // namespace Parallel
 
 #endif

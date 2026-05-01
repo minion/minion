@@ -47,6 +47,16 @@ When doing parallel search, "steal low" in the tree (that is, start new
 threads from low pieces of the tree) instead of "steal high" (default,
 take high bits of the tree). Is usually slower.
 
+-parallelPreprocess [N]
+
+Run SAC / SACBounds preprocessing in parallel using N worker processes
+(or all online cores if N is omitted). Workers fork from the parent and
+each runs the standard SAC algorithm on its slice of variables, with
+prunings collected into shared memory and merged at the end of each
+round. The final fixpoint is identical to sequential SAC; only the
+number of rounds and wall-clock time differ. Unix only. Has no effect
+on SSAC, SSACBounds, or GAC preprocessing in this version.
+
 -varorder <order>
 
 Enable a particular variable ordering for the search process.

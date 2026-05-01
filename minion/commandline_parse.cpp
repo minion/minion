@@ -314,6 +314,25 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       INCREMENT_i(-cores);
       getOptions().parallelcores = atoi(argv[i]);
       Parallel::setNumberCores(getOptions().parallelcores);
+    } else if(command == string("-parallelPreprocess")) {
+      // Optional numeric argument. If next arg is missing, starts with '-', or
+      // not a positive integer, default to sysconf(_SC_NPROCESSORS_ONLN).
+      int cores = 0;
+      if(i + 1 < argc && argv[i + 1][0] != '-') {
+        char* end = nullptr;
+        long parsed = strtol(argv[i + 1], &end, 10);
+        if(end != argv[i + 1] && *end == '\0' && parsed > 0) {
+          cores = (int)parsed;
+          ++i;
+        }
+      }
+#ifndef _WIN32
+      if(cores == 0)
+        cores = (int)sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+      if(cores <= 0)
+        cores = 1;
+      getOptions().parallelPreprocessCores = cores;
     } else if(command == string("-steallow")) {
       getOptions().parallelStealHigh = false;
     }

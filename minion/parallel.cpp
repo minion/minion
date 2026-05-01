@@ -12,11 +12,13 @@
 
 #include <atomic>
 #include <signal.h>
+#include <errno.h>
 
 namespace Parallel {
 
 static bool checkIsAChildProcess;
 static bool forkEverCalled;
+static bool sigchldHandlerInstalled = false;
 
 // This pipe is just to figure out when all children have exited, because
 // when all children exit, the pipe will automatically close
@@ -153,6 +155,52 @@ int doFork() {
   return f;
 }
 
+void ensureSignalHandlersInstalled() {
+  if(!sigchldHandlerInstalled) {
+    signal(SIGCHLD, SIG_IGN);
+    sigchldHandlerInstalled = true;
+  }
+}
+
+RoundHandle beginRound() {
+  ensureSignalHandlersInstalled();
+  RoundHandle h;
+  if(pipe(h.pipeFds) < 0) {
+    D_FATAL_ERROR("Round pipe construction failed");
+  }
+  return h;
+}
+
+int forkForRound(RoundHandle& handle) {
+  int f = fork();
+  if(f < 0) {
+    D_FATAL_ERROR("Fork failed for parallel preprocess round");
+  } else if(f == 0) {
+    // Child: close the read end; we never read. Suppress per-worker chatter so
+    // each child doesn't independently print things like the SAC timeout line.
+    close(handle.pipeFds[0]);
+    getOptions().silent = true;
+  }
+  return f;
+}
+
+void endRound(RoundHandle& handle) {
+  // Close the parent's copy of the write end so EOF can occur after all
+  // children also close theirs (which they do automatically on _exit).
+  close(handle.pipeFds[1]);
+  char buf[1024];
+  while(true) {
+    ssize_t r = read(handle.pipeFds[0], buf, sizeof(buf));
+    if(r == 0)
+      break;
+    if(r < 0 && errno == EINTR)
+      continue;
+    if(r < 0)
+      D_FATAL_ERROR("Round pipe read failed");
+  }
+  close(handle.pipeFds[0]);
+}
+
 void endParallelMinion() {
   if(!forkEverCalled)
     return;
@@ -220,6 +268,18 @@ void endParallelMinion() {}
 int doFork() {
   D_FATAL_ERROR("This Minion was built without parallelisation");
 }
+
+void ensureSignalHandlersInstalled() {}
+
+RoundHandle beginRound() {
+  D_FATAL_ERROR("Parallel preprocess not supported on this platform");
+}
+
+int forkForRound(RoundHandle&) {
+  D_FATAL_ERROR("Parallel preprocess not supported on this platform");
+}
+
+void endRound(RoundHandle&) {}
 
 ParallelData* setupParallelData() {
 #ifdef LIBMINION
