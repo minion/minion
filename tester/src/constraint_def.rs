@@ -1454,8 +1454,11 @@ fn constraint_list() -> Vec<ConstraintDef> {
             valid_gcc,
         ),
         // Table constraints (inline tuples, positive).
-        // table / negativetable / gacschema / lighttable reject Bound
-        // and SparseBound (CheckNotBound in new_table.h / GACtable_trie).
+        // All of these reject Bound and SparseBound: table/negativetable/
+        // gacschema/lighttable explicitly via CheckNotBound (new_table.h:141,
+        // constraint_GACtable_trie.h:90, constraint_lighttable.h:62), and
+        // mddc/negativemddc implicitly because their propagator removes
+        // individual domain values, which only Discrete supports.
         ConstraintDef::new_full(
             "table",
             vec![List(Discrete), Tuples],
@@ -1480,18 +1483,22 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             valid_positive_table,
         ),
+        // mddc / negativemddc reject Bound and SparseBound: their
+        // propagator (constraint_mddc.h:581) calls
+        // vars[var].removeFromDomain(val) which only Discrete supports.
+        // Same restriction as the other table constraints above —
+        // earlier comment was wrong to single them out.
         ConstraintDef::new_full(
             "mddc",
-            vec![List(Bound), Tuples],
+            vec![List(Discrete), Tuples],
             check_table,
             true,
             true,
             valid_positive_table,
         ),
-        // Table constraints (inline tuples, negative).
         ConstraintDef::new_full(
             "negativemddc",
-            vec![List(Bound), Tuples],
+            vec![List(Discrete), Tuples],
             check_negative_table,
             true,
             true,
