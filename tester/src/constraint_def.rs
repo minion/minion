@@ -905,6 +905,32 @@ lazy_static! {
     pub static ref CONSTRAINT_LIST: Vec<ConstraintDef> = constraint_list();
 }
 
+/// Groups of constraint variants that share the same declarative
+/// semantic — every member of a group, run on the same instance,
+/// must produce the same solution set. Different propagators within
+/// a group differ in *strength* (node count, propagation completeness)
+/// but not in *correctness*.
+///
+/// The first name in each group is the representative whose
+/// `ConstraintDef` is used to generate the random instance: its
+/// argument types must be strict enough that every other member
+/// accepts them. For example, `gacalldiff` requires `Discrete` vars
+/// while `alldiff` accepts any var type, so `gacalldiff` is the
+/// representative — generating with Discrete satisfies both.
+pub static EQUIVALENCE_GROUPS: &[&[&str]] = &[
+    &["gacalldiff", "alldiff"],
+    &["gaceq", "eq"],
+    &["lexleq[rv]", "lexleq", "lexleq[quick]"],
+    &["lexless", "lexless[quick]"],
+    &["table", "gacschema", "lighttable", "mddc"],
+    &["negativetable", "negativemddc"],
+];
+
+/// Look up a registered constraint definition by exact name.
+pub fn find_constraint_def(name: &str) -> Option<&'static ConstraintDef> {
+    CONSTRAINT_LIST.iter().find(|c| c.name == name)
+}
+
 fn constraint_list() -> Vec<ConstraintDef> {
     vec![
         ConstraintDef::new(

@@ -199,6 +199,14 @@ struct Opt {
     /// the cap entirely.
     #[arg(long, default_value_t = 10_000_000)]
     max_solutions: i64,
+
+    /// Trials per equivalence group in the propagator-variant sweep.
+    /// Each trial generates one random instance for the group's
+    /// representative and runs every variant in the group on it,
+    /// asserting the solution sets agree. Defaults to `--count`.
+    /// Set to 0 to skip the variant-equivalence sweep entirely.
+    #[arg(long)]
+    variant_count: Option<u64>,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -679,6 +687,56 @@ fn main() -> Result<()> {
         let _ = (trials, donations, with_donations, ws_max);
     }
 
+    // Restart-search sweep: -restarts forces sollimit=1 and rejects
+    // -findallsols, so it can't ride the option-sweep machinery.
+    // Each trial verifies the restart run finds a single valid
+    // solution (or correctly proves UNSAT). Exec-only because
+    // -restarts isn't currently exposed via RunOptions in the
+    // in-process API.
+    if config.backend == Backend::Exec && opt.count > 0 {
+        println!("Restart-search tests\n");
+        let restart_variants: &[&[&str]] = &[
+            &[],
+            &["-restarts-multiplier", "1.5"],
+            &["-restarts-multiplier", "2.5"],
+            &["-no-restarts-bias"],
+        ];
+        let ret_restart: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|i| {
+                    let extra = restart_variants[(i as usize) % restart_variants.len()];
+                    test_types::test_constraint_restart(&config, c, extra)
+                })
+                .context(format!("restart failure in {}", c.name))?;
+            println!("Tested {} (restart)", c.name);
+            Ok(())
+        });
+        ret_restart?;
+    }
+
+    // Propagator-equivalence sweep: for each group of semantically
+    // identical propagators (alldiff/gacalldiff, table family, etc.),
+    // generate one instance for the representative and verify every
+    // variant produces the same solution set. Bugs in any one
+    // variant's propagator surface as a mismatch against the others.
+    // Runs in both backends — the only difference is how the per-run
+    // dispatch is plumbed.
+    let variant_count = opt.variant_count.unwrap_or(opt.count);
+    if variant_count > 0 {
+        println!("Variant-equivalence tests\n");
+        let groups = constraint_def::EQUIVALENCE_GROUPS;
+        let ret_eq: Result<()> = groups.par_iter().try_for_each(|group| {
+            (0..variant_count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_constraint_variant_equivalence(&config, group))
+                .context(format!("variant-equivalence failure in group {:?}", group))?;
+            println!("Tested variant equivalence: {:?}", group);
+            Ok(())
+        });
+        ret_eq?;
+    }
+
     if config.backend == Backend::InProcess {
         println!("In-process mode: skipping option test sweep (exec-mode feature).");
         return Ok(());
@@ -744,6 +802,11 @@ fn main() -> Result<()> {
         vec!["-randomiseorder"],
         vec!["-randomseed", "0"], // Just test a couple of values
         vec!["-randomseed", "6"],
+        // -restarts is incompatible with -findallsols (forces
+        // sollimit=-1, which BuildCSP.cpp:124 rejects). Tested
+        // separately by test_constraint_restart, which uses
+        // -sollimit 1 and verifies the found solution lies in the
+        // baseline's solution set.
     ];
 
     let mut testlist = vec![];

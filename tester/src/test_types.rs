@@ -375,6 +375,143 @@ pub fn test_constraint_workstal(
     Ok(())
 }
 
+/// Exercise the restart-search code path (`restartNewSearchManager.h`).
+///
+/// `-restarts` forces `sollimit = 1` and is therefore incompatible
+/// with the option-sweep machinery (which always passes
+/// `-findallsols`). Instead, we run a dedicated test:
+///   - baseline: `-findallsols` collects the full solution set;
+///   - restart:  `-restarts -sollimit 1` finds at most one solution.
+///
+/// Soundness invariant: the restart run finds exactly one solution
+/// and that solution lies in the baseline set.
+///
+/// Skipped on UNSAT instances: `-restarts` has no nogood learning,
+/// so the restart strategy loops indefinitely on UNSAT instances
+/// without making progress (it just keeps re-exploring with a
+/// different seed). Restart search isn't designed for proving
+/// infeasibility — it's a SAT-style "find one solution fast"
+/// heuristic. We test only the SAT case.
+///
+/// `extra_restart_args` lets the caller cycle the restart-tuning
+/// flags (`-restarts-multiplier`, `-no-restarts-bias`); empty slice
+/// runs the bare `-restarts` configuration.
+pub fn test_constraint_restart(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    extra_restart_args: &[&str],
+) -> Result<()> {
+    let instance = constraint_def::build_random_instance(c);
+
+    let baseline = run_solve(config, &["-findallsols"], &instance, "restart_baseline")?;
+    if baseline.hit_solution_cap || baseline.solutions.is_empty() {
+        baseline.cleanup.cleanup();
+        return Ok(());
+    }
+
+    let mut args: Vec<&str> = vec!["-restarts", "-sollimit", "1"];
+    args.extend_from_slice(extra_restart_args);
+    let restart = run_solve(config, &args, &instance, "restart")?;
+
+    if restart.solutions.len() != 1 {
+        return Err(anyhow!(format!(
+            "Restart found {} solutions, expected 1 (baseline has {}, in {} vs {})",
+            restart.solutions.len(),
+            baseline.solutions.len(),
+            baseline.filename,
+            restart.filename
+        )));
+    }
+    let found = &restart.solutions[0];
+    if !baseline.solutions.iter().any(|s| s == found) {
+        return Err(anyhow!(format!(
+            "Restart solution {:?} not in baseline ({} sols) ({} vs {})",
+            found,
+            baseline.solutions.len(),
+            baseline.filename,
+            restart.filename
+        )));
+    }
+
+    baseline.cleanup.cleanup();
+    restart.cleanup.cleanup();
+    Ok(())
+}
+
+/// Run the same random instance under every propagator variant in an
+/// equivalence group and verify all variants produce the same
+/// solution set. A mismatch is a real propagator bug in one of the
+/// group members — solution sets are an algorithm-independent
+/// invariant.
+///
+/// `variants[0]` is the representative whose `ConstraintDef` is used
+/// to generate the instance; its argument types must be strict
+/// enough that every other variant accepts them (e.g. Discrete vars
+/// for the alldiff group, since `gacalldiff` rejects Bound).
+///
+/// Skipped silently when any run hits the `hit_solution_cap` — partial
+/// prefixes can disagree even between two correct propagators.
+pub fn test_constraint_variant_equivalence(config: &MinionConfig, variants: &[&str]) -> Result<()> {
+    if variants.len() < 2 {
+        return Err(anyhow!(
+            "equivalence group needs >=2 members, got {:?}",
+            variants
+        ));
+    }
+    let representative = constraint_def::find_constraint_def(variants[0]).ok_or_else(|| {
+        anyhow!(
+            "unknown representative constraint {:?} in equivalence group",
+            variants[0]
+        )
+    })?;
+
+    let instance = constraint_def::build_random_instance(representative);
+    let mut runs: Vec<MinionOutput> = Vec::with_capacity(variants.len());
+
+    for &name in variants {
+        let mut variant_instance = instance.clone();
+        variant_instance.constraint.name = name.to_string();
+        let ret = run_solve(config, &["-findallsols"], &variant_instance, name)?;
+        runs.push(ret);
+    }
+
+    if runs.iter().any(|r| r.hit_solution_cap) {
+        for r in runs {
+            r.cleanup.cleanup();
+        }
+        return Ok(());
+    }
+
+    let mut ref_sols = runs[0].solutions.clone();
+    ref_sols.sort();
+
+    for i in 1..runs.len() {
+        let mut sols = runs[i].solutions.clone();
+        sols.sort();
+        if sols != ref_sols {
+            let n = ref_sols.len().min(5);
+            let m = sols.len().min(5);
+            return Err(anyhow!(format!(
+                "Propagator {} disagrees with {}: \
+                 ref={}×{:?} variant={}×{:?} (files {} vs {})",
+                variants[i],
+                variants[0],
+                ref_sols.len(),
+                &ref_sols[..n],
+                sols.len(),
+                &sols[..m],
+                runs[0].filename,
+                runs[i].filename,
+            )));
+        }
+    }
+
+    for r in runs {
+        r.cleanup.cleanup();
+    }
+    Ok(())
+}
+
 pub fn test_constraint_options(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,

@@ -96,7 +96,12 @@ pub fn get_minion_solutions(
     // after extraargs so it overrides any earlier `-findallsols`
     // (which sets sollimit = -1). The caller checks
     // `hit_solution_cap` and abandons trials that hit the limit.
-    if max_solutions > 0 {
+    //
+    // `-restarts` rejects sollimit != 1 (BuildCSP.cpp:124), so the
+    // dedicated restart sweep already passes `-sollimit 1` in
+    // extraargs and we must not append a second one — detect and skip.
+    let has_sollimit = extraargs.iter().any(|&a| a == "-sollimit");
+    if max_solutions > 0 && !has_sollimit {
         args.push("-sollimit".to_string());
         args.push(max_solutions.to_string());
     }
