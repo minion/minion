@@ -11,8 +11,8 @@ use std::sync::{Arc, Mutex, OnceLock};
 
 use minion_sys::ast::*;
 use minion_sys::{
-    RunOptions, run_minion_with_options, run_minion_work_steal,
-    run_minion_work_steal_with_options, VarOrder,
+    RunOptions, VarOrder, run_minion_with_options, run_minion_work_steal,
+    run_minion_work_steal_with_options,
 };
 
 fn serialise() -> std::sync::MutexGuard<'static, ()> {

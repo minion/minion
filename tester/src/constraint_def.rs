@@ -373,9 +373,7 @@ impl ConstraintInstance {
         // floor at 100k. Lets sparse-predicate small-domain cases
         // succeed (most real tester instances) while bailing fast on
         // wide-list scaled-up instances.
-        let iter_budget: u128 = (limit as u128)
-            .saturating_mul(1000)
-            .max(100_000);
+        let iter_budget: u128 = (limit as u128).saturating_mul(1000).max(100_000);
         if cart > iter_budget {
             return None;
         }
@@ -422,9 +420,7 @@ impl ConstraintInstance {
 /// Generate a random non-empty subset of the cartesian product of all
 /// variable domains collected so far. Used by tuple-bearing constraints
 /// (table, negativetable, mddc, gacschema, lighttable, etc.).
-fn generate_random_tuples_from_vars(
-    variables: &[Vec<Arc<MinionVariable>>],
-) -> Option<Tuples> {
+fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> Option<Tuples> {
     let all_domains: Vec<Vec<i64>> = variables
         .iter()
         .flatten()
@@ -633,19 +629,20 @@ pub fn build_nested_instance(
 /// The shortlist excludes `forwardchecking` / `check[gsa]` /
 /// `check[assign]` — those are thin wrappers whose interactions
 /// with each other aren't structurally interesting for this test.
-pub fn build_random_nested_tree(
-    leaf_def: &ConstraintDef,
-    depth: usize,
-) -> ConstraintInstance {
+pub fn build_random_nested_tree(leaf_def: &ConstraintDef, depth: usize) -> ConstraintInstance {
     if depth == 0 {
         return build_random_instance(leaf_def);
     }
     let mut rng = rand::thread_rng();
 
-    let shortlist = ["reify", "reifyimply", "reifyimply-quick", "watched-and", "watched-or"];
-    let name = shortlist
-        .choose(&mut rng)
-        .expect("shortlist is non-empty");
+    let shortlist = [
+        "reify",
+        "reifyimply",
+        "reifyimply-quick",
+        "watched-and",
+        "watched-or",
+    ];
+    let name = shortlist.choose(&mut rng).expect("shortlist is non-empty");
     let parent_def = NESTED_CONSTRAINT_LIST
         .iter()
         .find(|d| d.name == *name)
@@ -666,7 +663,9 @@ pub fn build_random_nested_tree(
         let inner = if i == 0 {
             leaf_def
         } else {
-            CONSTRAINT_LIST.choose(&mut rng).expect("CONSTRAINT_LIST empty")
+            CONSTRAINT_LIST
+                .choose(&mut rng)
+                .expect("CONSTRAINT_LIST empty")
         };
         child_instances.push(build_random_nested_tree(inner, depth - 1));
     }
@@ -1409,7 +1408,6 @@ fn constraint_list() -> Vec<ConstraintDef> {
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
         // --- constraints that need instance-aware checkers ---
-
         ConstraintDef::new_full(
             "alldiffmatrix",
             vec![List(Discrete), Var(Constant)],

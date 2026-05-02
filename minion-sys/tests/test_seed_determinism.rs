@@ -79,8 +79,5 @@ fn different_seed_ok_with_static_order() {
     // starts reaching for the RNG here, this test will catch it.
     let a = collect_solutions(1);
     let b = collect_solutions(999_999);
-    assert_eq!(
-        a, b,
-        "static/ascend default should not consult the seed"
-    );
+    assert_eq!(a, b, "static/ascend default should not consult the seed");
 }

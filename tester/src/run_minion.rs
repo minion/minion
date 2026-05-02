@@ -59,13 +59,11 @@ struct MinionJsonOut {
     Nodes: String,
     SolutionsFound: String,
     /// Present only when the run used -X-parallelWorkSteal. Reports
-    /// how many donate() calls fired and how many were claimed; the
-    /// tester accumulates these so we can assert that work-steal
-    /// actually exercised the donation/replay path.
+    /// how many donate() calls fired; the tester accumulates these
+    /// so we can assert that work-steal actually exercised the
+    /// donation/replay path.
     #[serde(default)]
     WorkStealDonations: Option<String>,
-    #[serde(default)]
-    WorkStealItemsTaken: Option<String>,
 }
 
 pub fn get_minion_solutions(
@@ -184,7 +182,10 @@ pub fn get_minion_solutions(
             )));
         }
 
-        let donations = v.WorkStealDonations.as_ref().and_then(|s| s.parse::<i64>().ok());
+        let donations = v
+            .WorkStealDonations
+            .as_ref()
+            .and_then(|s| s.parse::<i64>().ok());
 
         (nodes, donations)
     };

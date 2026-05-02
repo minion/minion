@@ -418,7 +418,12 @@ impl Display for Constraint {
                 print_var_array(vars3)
             ),
             Constraint::Table(vars, tuples) => {
-                write!(f, "table({},{})", print_var_array(vars), print_tuple_array(tuples))
+                write!(
+                    f,
+                    "table({},{})",
+                    print_var_array(vars),
+                    print_tuple_array(tuples)
+                )
             }
             Constraint::NegativeTable(vars, tuples) => {
                 write!(

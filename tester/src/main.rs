@@ -274,8 +274,7 @@ fn main() -> Result<()> {
 
     // Wire --size-factor into the global so build_random_instance
     // (called from many places without a config arg) picks it up.
-    constraint_def::SIZE_FACTOR
-        .store(opt.size_factor.max(1), std::sync::atomic::Ordering::Relaxed);
+    constraint_def::SIZE_FACTOR.store(opt.size_factor.max(1), std::sync::atomic::Ordering::Relaxed);
 
     rayon::ThreadPoolBuilder::new()
         .num_threads(opt.numthreads)
@@ -388,8 +387,7 @@ fn main() -> Result<()> {
         if opt.midsearch_base_size == 0 {
             anyhow::bail!("--midsearch-base-size must be >= 1");
         }
-        let pool: Vec<constraint_def::ConstraintDef> =
-            constraint_def::CONSTRAINT_LIST.clone();
+        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.clone();
         use std::sync::Mutex;
         let failures = std::sync::atomic::AtomicUsize::new(0);
         let first_error: Mutex<Option<String>> = Mutex::new(None);
@@ -403,8 +401,7 @@ fn main() -> Result<()> {
                 .collect();
             let seed: u32 = rand::random();
             if trace {
-                let names: Vec<&str> =
-                    base_defs.iter().map(|d| d.name.as_str()).collect();
+                let names: Vec<&str> = base_defs.iter().map(|d| d.name.as_str()).collect();
                 eprintln!(
                     "trial add-vars base={names:?} n_packets={} seed={seed:#x}",
                     opt.midsearch_constraints_num_packets
@@ -446,8 +443,7 @@ fn main() -> Result<()> {
         // Draw bases from the full list of constraints — independent of
         // what the user selected for injection, so `--constraints eq`
         // still gets a non-trivial base problem to inject into.
-        let pool: Vec<constraint_def::ConstraintDef> =
-            constraint_def::CONSTRAINT_LIST.clone();
+        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.clone();
         // Non-fatal: each trial that fails is recorded for the summary
         // but doesn't abort the sweep. The point of this test is to
         // surface minion bugs; aborting on the first one hides the rest.
@@ -524,16 +520,21 @@ fn main() -> Result<()> {
         let mut total_failures = 0usize;
         for name in ordered {
             let r = &reports[name];
-            let f = r
-                .failures
-                .load(std::sync::atomic::Ordering::Relaxed);
+            let f = r.failures.load(std::sync::atomic::Ordering::Relaxed);
             total_failures += f;
             if f > 0 {
                 let err = r.first_error.lock().unwrap();
-                println!("  {name}: {f}/{} failed — e.g. {}", opt.count, err.as_deref().unwrap_or(""));
+                println!(
+                    "  {name}: {f}/{} failed — e.g. {}",
+                    opt.count,
+                    err.as_deref().unwrap_or("")
+                );
             }
         }
-        println!("Total: {total_failures} failed trials across {} constraints.", reports.len());
+        println!(
+            "Total: {total_failures} failed trials across {} constraints.",
+            reports.len()
+        );
         if total_failures > 0 {
             std::process::exit(1);
         }

@@ -84,8 +84,7 @@ fn n1_finds_same_count_as_sequential() {
             seed: Some(1),
             ..Default::default()
         };
-        run_minion_parallel_with_options(1, model_par, opts, cb)
-            .expect("parallel N=1 run failed");
+        run_minion_parallel_with_options(1, model_par, opts, cb).expect("parallel N=1 run failed");
     }
     let par = *par_count.lock().unwrap();
 

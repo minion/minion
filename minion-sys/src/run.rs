@@ -129,9 +129,8 @@ impl MidSearchContext<'_> {
     /// It is tracked so its value appears in the solution map of every
     /// later callback.
     pub fn add_var(&mut self, name: &str, domain: VarDomain) -> Result<(), MinionError> {
-        let c_name = CString::new(name).map_err(|_| {
-            anyhow!("Variable name {:?} contains a null character.", name)
-        })?;
+        let c_name = CString::new(name)
+            .map_err(|_| anyhow!("Variable name {:?} contains a null character.", name))?;
         unsafe {
             match domain {
                 VarDomain::Bool => {
@@ -190,9 +189,7 @@ impl MidSearchContext<'_> {
     pub fn add_constraint(&mut self, constraint: Constraint) -> Result<(), MinionError> {
         unsafe {
             let ct = get_constraint_type(&constraint)?;
-            let raw = Scoped::new(ffi::constraint_new(ct), |x| {
-                ffi::constraint_free(x as _)
-            });
+            let raw = Scoped::new(ffi::constraint_new(ct), |x| ffi::constraint_free(x as _));
             constraint_add_args(self.instance, raw.ptr, &constraint)?;
             check_minion_result(ffi::minion_addConstraintMidsearch(
                 self.ctx,
@@ -284,8 +281,7 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
     for var in state.midsearch_vars.iter() {
         #[allow(clippy::unwrap_used)]
         let c_name = CString::new(var.clone()).unwrap();
-        let v: i32 =
-            unsafe { ffi::minion_getVarValue(ctx, state.instance, c_name.as_ptr()) };
+        let v: i32 = unsafe { ffi::minion_getVarValue(ctx, state.instance, c_name.as_ptr()) };
         solutions.insert(var.clone(), Constant::Integer(v));
     }
 
@@ -487,11 +483,7 @@ pub fn run_minion_with_options(
     options: RunOptions,
     mut callback: Callback<'_>,
 ) -> Result<SolverContext, MinionError> {
-    run_minion_midsearch_with_options(
-        model,
-        options,
-        Box::new(move |_ctx, sol| callback(sol)),
-    )
+    run_minion_midsearch_with_options(model, options, Box::new(move |_ctx, sol| callback(sol)))
 }
 
 /// Run Minion on the given [Model] with a callback that can mutate the
@@ -510,8 +502,7 @@ pub fn run_minion_midsearch(
 /// mutex (so two workers never call this concurrently) but Rust still needs
 /// the bound for soundness when we cross the FFI boundary from multiple
 /// threads.
-pub type ParallelCallback<'a> =
-    Box<dyn FnMut(HashMap<VarName, Constant>) -> bool + Send + 'a>;
+pub type ParallelCallback<'a> = Box<dyn FnMut(HashMap<VarName, Constant>) -> bool + Send + 'a>;
 
 /// State stored behind the parallel callback's userdata pointer. The mutex
 /// gives Rust ownership semantics on the FnMut even though the C-side
@@ -976,8 +967,7 @@ unsafe fn convert_model_to_raw(
         // pair only cleans up the intermediate carrier.
         let raw_tuples = Scoped::new(ffi::vec_vec_int_new(), |x| ffi::vec_vec_int_free(x as _));
         for tuple in tuples {
-            let raw_tuple =
-                Scoped::new(ffi::vec_int_new(), |x| ffi::vec_int_free(x as _));
+            let raw_tuple = Scoped::new(ffi::vec_int_new(), |x| ffi::vec_int_free(x as _));
             for constant in tuple {
                 let val = match constant {
                     Constant::Integer(n) => *n,
@@ -1321,9 +1311,8 @@ unsafe fn constraint_add_args(
                     )));
                 }
             };
-            let c_name = CString::new(name.clone()).map_err(|_| {
-                anyhow!("Tuple-table name {name:?} contains a null character.")
-            })?;
+            let c_name = CString::new(name.clone())
+                .map_err(|_| anyhow!("Tuple-table name {name:?} contains a null character."))?;
             ffi::constraint_setTuplesByName(r_constr, i, c_name.as_ptr());
             Ok(())
         }

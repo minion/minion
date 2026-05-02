@@ -6,7 +6,7 @@ extern crate rand;
 
 use self::rand::seq::SliceRandom;
 
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Backend {
@@ -205,9 +205,12 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
             let name = &c.name;
             return Err(anyhow!(format!(
                 "Solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
-                ret.filename, ret2.filename,
-                ret.solutions.len(), &ret.solutions[..n],
-                ret2.solutions.len(), &ret2.solutions[..m],
+                ret.filename,
+                ret2.filename,
+                ret.solutions.len(),
+                &ret.solutions[..n],
+                ret2.solutions.len(),
+                &ret2.solutions[..m],
             )));
         }
     } else {
@@ -229,10 +232,7 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
     // ordering is state-free (Static + Ascend/Descend); state-dependent
     // heuristics explore different trees against the weaker tabulated
     // propagator even when the solution sets match.
-    if instance.constraint.gac
-        && config.deterministic_ordering()
-        && ret.nodes != ret2.nodes
-    {
+    if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -515,11 +515,7 @@ pub fn test_constraint_midsearch_add_vars(
     // check:
     //   * decision-var values match the baseline remaining row at the same index;
     //   * each new-var value is within its declared domain.
-    let decision_len = baseline
-        .solutions
-        .first()
-        .map(|r| r.len())
-        .unwrap_or(0);
+    let decision_len = baseline.solutions.first().map(|r| r.len()).unwrap_or(0);
     for (idx, row) in got.post_injection.iter().enumerate() {
         if row.len() != decision_len + new_var_count {
             return Err(anyhow!(
@@ -542,12 +538,8 @@ pub fn test_constraint_midsearch_add_vars(
             let v = new_part[k];
             let in_domain = match domain {
                 minion_sys::ast::VarDomain::Bool => v == 0 || v == 1,
-                minion_sys::ast::VarDomain::Bound(lo, hi) => {
-                    v >= *lo as i64 && v <= *hi as i64
-                }
-                minion_sys::ast::VarDomain::Discrete(lo, hi) => {
-                    v >= *lo as i64 && v <= *hi as i64
-                }
+                minion_sys::ast::VarDomain::Bound(lo, hi) => v >= *lo as i64 && v <= *hi as i64,
+                minion_sys::ast::VarDomain::Discrete(lo, hi) => v >= *lo as i64 && v <= *hi as i64,
                 _ => true,
             };
             if !in_domain {
@@ -700,8 +692,14 @@ pub fn test_constraint_midsearch_inject_constraints(
     let log_id = || -> String {
         format!(
             "inject={:?} base={:?} schedule={:?} seed={seed:#x}",
-            inject_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
-            base_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
+            inject_defs
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect::<Vec<_>>(),
+            base_defs
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect::<Vec<_>>(),
             inject_after_per_packet,
         )
     };
@@ -718,14 +716,9 @@ pub fn test_constraint_midsearch_inject_constraints(
     let options = config.run_options(seed);
 
     // Baseline: no packet constraints, but their vars are declared.
-    let baseline = crate::run_minion_lib::run_multi(
-        &base_refs,
-        &inject_refs,
-        options,
-        cap,
-        "baseline",
-    )
-    .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
+    let baseline =
+        crate::run_minion_lib::run_multi(&base_refs, &inject_refs, options, cap, "baseline")
+            .map_err(|e| anyhow!("{}: baseline: {e}", log_id()))?;
 
     if baseline.stopped_at_limit {
         // Baseline would have been enormous; skip this trial.
@@ -801,13 +794,14 @@ pub fn test_constraint_midsearch_inject_constraints(
         let mut expected: Vec<Vec<i64>> = Vec::with_capacity(actual.solutions.len());
 
         // Segment 0: [0, A_1) from baseline.
-        expected.extend(baseline.solutions[..inject_after_per_packet[0]].iter().cloned());
+        expected.extend(
+            baseline.solutions[..inject_after_per_packet[0]]
+                .iter()
+                .cloned(),
+        );
 
         if actual.solutions[..inject_after_per_packet[0]] != expected[..] {
-            return Err(anyhow!(
-                "{}: segment 0 (baseline prefix) differs",
-                log_id()
-            ));
+            return Err(anyhow!("{}: segment 0 (baseline prefix) differs", log_id()));
         }
 
         for seg in 1..=n {
@@ -1039,8 +1033,7 @@ pub fn test_midsearch_add_new_vars_with_constraint(
         .iter()
         .map(|d| constraint_def::build_random_instance(d))
         .collect();
-    let base_refs: Vec<&constraint_def::ConstraintInstance> =
-        base_instances.iter().collect();
+    let base_refs: Vec<&constraint_def::ConstraintInstance> = base_instances.iter().collect();
 
     // Pool of pre-declared non-constant base-var names to pair
     // DisEq against.
@@ -1062,7 +1055,10 @@ pub fn test_midsearch_add_new_vars_with_constraint(
     let log_id = || -> String {
         format!(
             "mode=add-vars base={:?} n_packets={n_packets} seed={seed:#x}",
-            base_defs.iter().map(|d| d.name.as_str()).collect::<Vec<_>>(),
+            base_defs
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect::<Vec<_>>(),
         )
     };
 
@@ -1120,11 +1116,7 @@ pub fn test_midsearch_add_new_vars_with_constraint(
         return Ok(());
     }
 
-    let base_var_count = baseline
-        .solutions
-        .first()
-        .map(|r| r.len())
-        .unwrap_or(0);
+    let base_var_count = baseline.solutions.first().map(|r| r.len()).unwrap_or(0);
 
     // Invariant 1: actual[..A_1] == baseline[..A_1] exactly.
     // A_1 = 1, so that's just actual[0] == baseline[0] with
@@ -1158,8 +1150,7 @@ pub fn test_midsearch_add_new_vars_with_constraint(
     let baseline_base_rows: std::collections::HashSet<&Vec<i64>> =
         baseline.solutions.iter().collect();
 
-    let mut seen_actual: std::collections::HashSet<Vec<i64>> =
-        std::collections::HashSet::new();
+    let mut seen_actual: std::collections::HashSet<Vec<i64>> = std::collections::HashSet::new();
 
     for (idx, row) in actual.solutions.iter().enumerate() {
         // Number of packets fired by (and including) this row:
@@ -1386,9 +1377,12 @@ pub fn test_constraint_nested(
             let name = &c.name;
             return Err(anyhow!(format!(
                 "Nested solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
-                ret.filename, ret2.filename,
-                ret.solutions.len(), &ret.solutions[..n],
-                ret2.solutions.len(), &ret2.solutions[..m],
+                ret.filename,
+                ret2.filename,
+                ret.solutions.len(),
+                &ret.solutions[..n],
+                ret2.solutions.len(),
+                &ret2.solutions[..m],
             )));
         }
     } else {
@@ -1403,10 +1397,7 @@ pub fn test_constraint_nested(
             )));
         }
     }
-    if instance.constraint.gac
-        && config.deterministic_ordering()
-        && ret.nodes != ret2.nodes
-    {
+    if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename

@@ -9,7 +9,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{anyhow, bail, Context, Result};
 
 use minion_sys::ast::{Constant as MC, Constraint as MCon, Model, Var, VarDomain, VarName};
 
@@ -49,11 +49,7 @@ fn convert_tuples(tuples: &crate::constraint_def::Tuples) -> Vec<Vec<MC>> {
     tuples
         .tupledata
         .iter()
-        .map(|row| {
-            row.iter()
-                .map(|&n| MC::Integer(n as i32))
-                .collect()
-        })
+        .map(|row| row.iter().map(|&n| MC::Integer(n as i32)).collect())
         .collect()
 }
 
@@ -76,34 +72,17 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         "alldiff" => MCon::AllDiff(list_of_vars(&v[0])),
         "alldiffmatrix" => MCon::AllDiffMatrix(list_of_vars(&v[0]), const_of(&v[1][0])),
         "gacalldiff" => MCon::GacAllDiff(list_of_vars(&v[0])),
-        "difference" => MCon::Difference(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
+        "difference" => MCon::Difference((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0])),
         "diseq" => MCon::DisEq(var_of(&v[0][0]), var_of(&v[1][0])),
-        "div" => MCon::Div(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
-        "div_undefzero" => MCon::DivUndefZero(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
-        "element" => MCon::Element(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
-        "element_one" => MCon::ElementOne(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
-        "element_undefzero" => MCon::ElementUndefZero(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
+        "div" => MCon::Div((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0])),
+        "div_undefzero" => {
+            MCon::DivUndefZero((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0]))
+        }
+        "element" => MCon::Element(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0])),
+        "element_one" => MCon::ElementOne(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0])),
+        "element_undefzero" => {
+            MCon::ElementUndefZero(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0]))
+        }
         "eq" => MCon::Eq(var_of(&v[0][0]), var_of(&v[1][0])),
         "gaceq" => MCon::GacEq(var_of(&v[0][0]), var_of(&v[1][0])),
         "gcc" => MCon::Gcc(
@@ -118,11 +97,7 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         ),
         "false" => MCon::False,
         "true" => MCon::True,
-        "ineq" => MCon::Ineq(
-            var_of(&v[0][0]),
-            var_of(&v[1][0]),
-            const_of(&v[2][0]),
-        ),
+        "ineq" => MCon::Ineq(var_of(&v[0][0]), var_of(&v[1][0]), const_of(&v[2][0])),
         "lexleq" => MCon::LexLeq(list_of_vars(&v[0]), list_of_vars(&v[1])),
         "lexleq[rv]" => MCon::LexLeqRv(list_of_vars(&v[0]), list_of_vars(&v[1])),
         "lexleq[quick]" => MCon::LexLeqQuick(list_of_vars(&v[0]), list_of_vars(&v[1])),
@@ -131,75 +106,43 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
         "max" => MCon::Max(list_of_vars(&v[0]), var_of(&v[1][0])),
         "min" => MCon::Min(list_of_vars(&v[0]), var_of(&v[1][0])),
         "minuseq" => MCon::MinusEq(var_of(&v[0][0]), var_of(&v[1][0])),
-        "modulo" => MCon::Modulo(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
-        "modulo_undefzero" => MCon::ModuloUndefZero(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
+        "modulo" => MCon::Modulo((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0])),
+        "modulo_undefzero" => {
+            MCon::ModuloUndefZero((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0]))
+        }
         "nvaluegeq" => MCon::NvalueGeq(list_of_vars(&v[0]), var_of(&v[1][0])),
         "nvalueleq" => MCon::NvalueLeq(list_of_vars(&v[0]), var_of(&v[1][0])),
-        "occurrence" => MCon::Occurrence(
-            list_of_vars(&v[0]),
-            const_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
-        "occurrencegeq" => MCon::OccurrenceGeq(
-            list_of_vars(&v[0]),
-            const_of(&v[1][0]),
-            const_of(&v[2][0]),
-        ),
-        "occurrenceleq" => MCon::OccurrenceLeq(
-            list_of_vars(&v[0]),
-            const_of(&v[1][0]),
-            const_of(&v[2][0]),
-        ),
-        "pow" => MCon::Pow(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
-        "product" => MCon::Product(
-            (var_of(&v[0][0]), var_of(&v[1][0])),
-            var_of(&v[2][0]),
-        ),
+        "occurrence" => MCon::Occurrence(list_of_vars(&v[0]), const_of(&v[1][0]), var_of(&v[2][0])),
+        "occurrencegeq" => {
+            MCon::OccurrenceGeq(list_of_vars(&v[0]), const_of(&v[1][0]), const_of(&v[2][0]))
+        }
+        "occurrenceleq" => {
+            MCon::OccurrenceLeq(list_of_vars(&v[0]), const_of(&v[1][0]), const_of(&v[2][0]))
+        }
+        "pow" => MCon::Pow((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0])),
+        "product" => MCon::Product((var_of(&v[0][0]), var_of(&v[1][0])), var_of(&v[2][0])),
         "sumgeq" => MCon::SumGeq(list_of_vars(&v[0]), var_of(&v[1][0])),
         "sumleq" => MCon::SumLeq(list_of_vars(&v[0]), var_of(&v[1][0])),
-        "watchelement" => MCon::WatchElement(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
-        "watchelement_one" => MCon::WatchElementOne(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
-        "watchelement_one_undefzero" => MCon::WatchElementOneUndefZero(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
-        "watchelement_undefzero" => MCon::WatchElementUndefZero(
-            list_of_vars(&v[0]),
-            var_of(&v[1][0]),
-            var_of(&v[2][0]),
-        ),
+        "watchelement" => {
+            MCon::WatchElement(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0]))
+        }
+        "watchelement_one" => {
+            MCon::WatchElementOne(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0]))
+        }
+        "watchelement_one_undefzero" => {
+            MCon::WatchElementOneUndefZero(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0]))
+        }
+        "watchelement_undefzero" => {
+            MCon::WatchElementUndefZero(list_of_vars(&v[0]), var_of(&v[1][0]), var_of(&v[2][0]))
+        }
         "watchsumgeq" => MCon::WatchSumGeq(list_of_vars(&v[0]), const_of(&v[1][0])),
         "watchsumleq" => MCon::WatchSumLeq(list_of_vars(&v[0]), const_of(&v[1][0])),
         "watchless" => MCon::WatchLess(var_of(&v[0][0]), var_of(&v[1][0])),
         "watchneq" => MCon::WatchNeq(var_of(&v[0][0]), var_of(&v[1][0])),
-        "hamming" => MCon::Hamming(
-            list_of_vars(&v[0]),
-            list_of_vars(&v[1]),
-            const_of(&v[2][0]),
-        ),
-        "not-hamming" => MCon::NotHamming(
-            list_of_vars(&v[0]),
-            list_of_vars(&v[1]),
-            const_of(&v[2][0]),
-        ),
+        "hamming" => MCon::Hamming(list_of_vars(&v[0]), list_of_vars(&v[1]), const_of(&v[2][0])),
+        "not-hamming" => {
+            MCon::NotHamming(list_of_vars(&v[0]), list_of_vars(&v[1]), const_of(&v[2][0]))
+        }
         "w-literal" => MCon::WLiteral(var_of(&v[0][0]), const_of(&v[1][0])),
         "w-notliteral" => MCon::WNotLiteral(var_of(&v[0][0]), const_of(&v[1][0])),
         "w-inintervalset" => MCon::WInIntervalSet(var_of(&v[0][0]), list_of_consts(&v[1])),
@@ -213,20 +156,13 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
             const_of(&v[2][0]),
         ),
         "watchvecneq" => MCon::WatchVecNeq(list_of_vars(&v[0]), list_of_vars(&v[1])),
-        "watchvecexists_less" => MCon::WatchVecExistsLess(
-            list_of_vars(&v[0]),
-            list_of_vars(&v[1]),
-        ),
-        "weightedsumgeq" => MCon::WeightedSumGeq(
-            list_of_consts(&v[0]),
-            list_of_vars(&v[1]),
-            var_of(&v[2][0]),
-        ),
-        "weightedsumleq" => MCon::WeightedSumLeq(
-            list_of_consts(&v[0]),
-            list_of_vars(&v[1]),
-            var_of(&v[2][0]),
-        ),
+        "watchvecexists_less" => MCon::WatchVecExistsLess(list_of_vars(&v[0]), list_of_vars(&v[1])),
+        "weightedsumgeq" => {
+            MCon::WeightedSumGeq(list_of_consts(&v[0]), list_of_vars(&v[1]), var_of(&v[2][0]))
+        }
+        "weightedsumleq" => {
+            MCon::WeightedSumLeq(list_of_consts(&v[0]), list_of_vars(&v[1]), var_of(&v[2][0]))
+        }
 
         // Nested parent constraints.
         "reify" => MCon::Reify(child(0)?, var_of(&v[1][0])),
@@ -336,12 +272,10 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
             let tableised = instance.constraint.name == "str2plus";
             let domain = match v.var_type {
                 VarType::Bool => VarDomain::Bool,
-                VarType::Bound => {
-                    VarDomain::Bound(
-                        *v.domain.first().unwrap() as i32,
-                        *v.domain.last().unwrap() as i32,
-                    )
-                }
+                VarType::Bound => VarDomain::Bound(
+                    *v.domain.first().unwrap() as i32,
+                    *v.domain.last().unwrap() as i32,
+                ),
                 VarType::SparseBound => {
                     if tableised {
                         VarDomain::Discrete(
@@ -349,17 +283,13 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
                             *v.domain.last().unwrap() as i32,
                         )
                     } else {
-                        VarDomain::SparseBound(
-                            v.domain.iter().map(|&n| n as i32).collect(),
-                        )
+                        VarDomain::SparseBound(v.domain.iter().map(|&n| n as i32).collect())
                     }
                 }
-                VarType::Discrete => {
-                    VarDomain::Discrete(
-                        *v.domain.first().unwrap() as i32,
-                        *v.domain.last().unwrap() as i32,
-                    )
-                }
+                VarType::Discrete => VarDomain::Discrete(
+                    *v.domain.first().unwrap() as i32,
+                    *v.domain.last().unwrap() as i32,
+                ),
                 VarType::Constant => unreachable!(),
             };
             if model
@@ -375,9 +305,7 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
                     Var::NameRef(v.name.clone()),
                     v.domain.iter().map(|&n| MC::Integer(n as i32)).collect(),
                 ));
-            } else if v.var_type != VarType::Bound
-                && v.var_type != VarType::SparseBound
-            {
+            } else if v.var_type != VarType::Bound && v.var_type != VarType::SparseBound {
                 let lo = *v.domain.first().unwrap();
                 let hi = *v.domain.last().unwrap();
                 let range: Vec<i64> = if v.var_type == VarType::Bool {
@@ -650,12 +578,12 @@ pub fn run_multi_injected(
                 InjectionPacket::ExistingVarsConstraint(inst) => {
                     eprintln!("  inject at {cnt}: {}", inst.constraint.name);
                 }
-                InjectionPacket::AddVarsAndConstraint { new_vars, constraint } => {
-                    let ns: Vec<&str> =
-                        new_vars.iter().map(|(n, _)| n.as_str()).collect();
-                    eprintln!(
-                        "  inject at {cnt}: add_vars={ns:?} + {constraint:?}"
-                    );
+                InjectionPacket::AddVarsAndConstraint {
+                    new_vars,
+                    constraint,
+                } => {
+                    let ns: Vec<&str> = new_vars.iter().map(|(n, _)| n.as_str()).collect();
+                    eprintln!("  inject at {cnt}: add_vars={ns:?} + {constraint:?}");
                 }
             }
         }
@@ -678,9 +606,7 @@ pub fn run_multi_injected(
                     )
                 })
             }
-            InjectionPacket::AddVarsAndConstraint { constraint, .. } => {
-                Ok(constraint.clone())
-            }
+            InjectionPacket::AddVarsAndConstraint { constraint, .. } => Ok(constraint.clone()),
         })
         .collect::<Result<Vec<_>>>()?;
 
@@ -723,9 +649,8 @@ pub fn run_multi_injected(
                         Some(MC::Integer(n)) => row.push(n as i64),
                         Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
                         other => {
-                            *cb_err_ref = Some(format!(
-                                "callback: var {name} has no value ({other:?})"
-                            ));
+                            *cb_err_ref =
+                                Some(format!("callback: var {name} has no value ({other:?})"));
                             return false;
                         }
                     }
@@ -742,15 +667,10 @@ pub fn run_multi_injected(
                                 return false;
                             }
                         }
-                        InjectionPacket::AddVarsAndConstraint {
-                            new_vars,
-                            ..
-                        } => {
+                        InjectionPacket::AddVarsAndConstraint { new_vars, .. } => {
                             for (name, domain) in new_vars {
                                 if let Err(e) = midctx.add_var(name, domain.clone()) {
-                                    *cb_err_ref = Some(format!(
-                                        "add_var({name}): {e}"
-                                    ));
+                                    *cb_err_ref = Some(format!("add_var({name}): {e}"));
                                     return false;
                                 }
                                 live_var_order_ref.push(name.clone());
@@ -848,51 +768,55 @@ pub fn run_inject_vars_after(
         let injected_ref = &mut injected;
         let count_ref = &mut count;
         let cb_err_ref = &mut cb_err;
-        Box::new(move |midctx: &mut minion_sys::MidSearchContext<'_>, sol: HashMap<VarName, MC>| -> bool {
-            *count_ref += 1;
-            // Read original vars.
-            let mut row = Vec::with_capacity(variable_order.len() + new_var_names.len());
-            for name in variable_order.iter() {
-                match sol.get(name).copied() {
-                    Some(MC::Integer(n)) => row.push(n as i64),
-                    Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
-                    other => {
-                        *cb_err_ref = Some(format!(
-                            "callback: original var {name} has no value ({other:?})"
-                        ));
-                        return false;
-                    }
-                }
-            }
-            if *injected_ref {
-                // Append new vars.
-                for name in new_var_names.iter() {
+        Box::new(
+            move |midctx: &mut minion_sys::MidSearchContext<'_>,
+                  sol: HashMap<VarName, MC>|
+                  -> bool {
+                *count_ref += 1;
+                // Read original vars.
+                let mut row = Vec::with_capacity(variable_order.len() + new_var_names.len());
+                for name in variable_order.iter() {
                     match sol.get(name).copied() {
                         Some(MC::Integer(n)) => row.push(n as i64),
                         Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
                         other => {
                             *cb_err_ref = Some(format!(
-                                "callback: mid-search var {name} has no value ({other:?})"
+                                "callback: original var {name} has no value ({other:?})"
                             ));
                             return false;
                         }
                     }
                 }
-                post.push(row);
-            } else {
-                pre.push(row);
-                if *count_ref == inject_after {
-                    for (name, domain) in new_vars {
-                        if let Err(e) = midctx.add_var(name, domain.clone()) {
-                            *cb_err_ref = Some(format!("add_var({name}): {e}"));
-                            return false;
+                if *injected_ref {
+                    // Append new vars.
+                    for name in new_var_names.iter() {
+                        match sol.get(name).copied() {
+                            Some(MC::Integer(n)) => row.push(n as i64),
+                            Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                            other => {
+                                *cb_err_ref = Some(format!(
+                                    "callback: mid-search var {name} has no value ({other:?})"
+                                ));
+                                return false;
+                            }
                         }
                     }
-                    *injected_ref = true;
+                    post.push(row);
+                } else {
+                    pre.push(row);
+                    if *count_ref == inject_after {
+                        for (name, domain) in new_vars {
+                            if let Err(e) = midctx.add_var(name, domain.clone()) {
+                                *cb_err_ref = Some(format!("add_var({name}): {e}"));
+                                return false;
+                            }
+                        }
+                        *injected_ref = true;
+                    }
                 }
-            }
-            true
-        })
+                true
+            },
+        )
     };
 
     let ctx = minion_sys::run_minion_midsearch_with_options(model, options, callback)
@@ -976,10 +900,8 @@ pub fn get_minion_solutions_in_process_work_steal(
         })
     };
 
-    let stats = minion_sys::run_minion_work_steal_with_options(
-        num_threads, model, options, cb,
-    )
-    .map_err(|e| anyhow!("minion in-process work-steal error ({testname}): {e}"))?;
+    let stats = minion_sys::run_minion_work_steal_with_options(num_threads, model, options, cb)
+        .map_err(|e| anyhow!("minion in-process work-steal error ({testname}): {e}"))?;
 
     #[allow(clippy::unwrap_used)]
     let solutions = solutions.into_inner().unwrap();
@@ -1040,8 +962,16 @@ pub fn get_minion_solutions_in_process(
     if std::env::var("TESTER_DEBUG").is_ok() {
         eprintln!("--- in-process model for {testname} ---");
         eprintln!("variable order (col: name = domain):");
-        for (i, name) in model.named_variables.get_variable_order().iter().enumerate() {
-            eprintln!("  col{i}: {name} = {:?}", model.named_variables.get_vartype(name.clone()));
+        for (i, name) in model
+            .named_variables
+            .get_variable_order()
+            .iter()
+            .enumerate()
+        {
+            eprintln!(
+                "  col{i}: {name} = {:?}",
+                model.named_variables.get_vartype(name.clone())
+            );
         }
         eprintln!("constraints:");
         for c in &model.constraints {

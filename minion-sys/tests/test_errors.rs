@@ -6,9 +6,17 @@ use minion_sys::error::{MinionError, RuntimeError};
 #[test]
 fn duplicate_variable_name_rejected() {
     let mut m = Model::new();
-    assert!(m.named_variables.add_var("x".into(), VarDomain::Bool).is_some());
+    assert!(
+        m.named_variables
+            .add_var("x".into(), VarDomain::Bool)
+            .is_some()
+    );
     // Second add with same name should return None.
-    assert!(m.named_variables.add_var("x".into(), VarDomain::Bool).is_none());
+    assert!(
+        m.named_variables
+            .add_var("x".into(), VarDomain::Bool)
+            .is_none()
+    );
 }
 
 #[test]
@@ -38,8 +46,11 @@ fn constraint_with_missing_var_fails() {
     let result = minion_sys::run_minion(m, Box::new(|_| true));
     match result {
         Err(e) => assert!(
-            matches!(e, MinionError::RuntimeError(RuntimeError::ParseError(_))
-                  | MinionError::RuntimeError(RuntimeError::InvalidInstance(_))),
+            matches!(
+                e,
+                MinionError::RuntimeError(RuntimeError::ParseError(_))
+                    | MinionError::RuntimeError(RuntimeError::InvalidInstance(_))
+            ),
             "expected ParseError or InvalidInstance, got {e:?}"
         ),
         Ok(_) => panic!("expected error for missing var, got success"),
@@ -129,8 +140,10 @@ fn seed_reproducibility_across_models() {
             .add_var("x".into(), VarDomain::Discrete(1, 3));
         m.named_variables
             .add_var("y".into(), VarDomain::Discrete(1, 3));
-        m.constraints
-            .push(Constraint::SumGeq(vec![Var::NameRef("x".into()), Var::NameRef("y".into())], Var::ConstantAsVar(4)));
+        m.constraints.push(Constraint::SumGeq(
+            vec![Var::NameRef("x".into()), Var::NameRef("y".into())],
+            Var::ConstantAsVar(4),
+        ));
         m
     };
     let run = |m: Model| {
@@ -140,8 +153,14 @@ fn seed_reproducibility_across_models() {
             opts,
             Box::new(|sol: HashMap<String, Constant>| {
                 sols.borrow_mut().push(vec![
-                    match sol["x"] { Constant::Integer(n) => n, _ => 0 },
-                    match sol["y"] { Constant::Integer(n) => n, _ => 0 },
+                    match sol["x"] {
+                        Constant::Integer(n) => n,
+                        _ => 0,
+                    },
+                    match sol["y"] {
+                        Constant::Integer(n) => n,
+                        _ => 0,
+                    },
                 ]);
                 true
             }),
@@ -162,15 +181,16 @@ fn named_tuple_table_via_str2plus() {
         .add_var("y".into(), VarDomain::Discrete(0, 2));
 
     // Register a named tuple table; only (0,1) and (1,2) are allowed.
-    assert!(m
-        .add_tuple_table(
+    assert!(
+        m.add_tuple_table(
             "t".into(),
             vec![
                 vec![Constant::Integer(0), Constant::Integer(1)],
                 vec![Constant::Integer(1), Constant::Integer(2)],
             ]
         )
-        .is_some());
+        .is_some()
+    );
 
     m.constraints.push(Constraint::Str2Plus(
         vec![Var::NameRef("x".into()), Var::NameRef("y".into())],
@@ -225,7 +245,8 @@ fn midsearch_add_var_appears_in_solutions() {
 #[test]
 fn w_inset_with_empty_set_is_false() {
     let mut m = Model::new();
-    m.named_variables.add_var("x".into(), VarDomain::Bound(0, 5));
+    m.named_variables
+        .add_var("x".into(), VarDomain::Bound(0, 5));
     m.constraints
         .push(Constraint::WInset(Var::NameRef("x".into()), vec![]));
     let mut count = 0u32;
