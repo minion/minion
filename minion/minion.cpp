@@ -69,7 +69,7 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
     SearchOptions optsCopy = getOptions();
     SearchMethod argsCopy = args;
     runMinionWorkSteal(cfg, optsCopy, argsCopy, instance, /*callback=*/nullptr,
-                       /*userdata=*/nullptr);
+                       /*userdata=*/nullptr, /*outStats=*/nullptr);
     // The work-steal controller stashes aggregated counters on the parent's
     // TableOut so -jsontableout reports total cross-worker stats; emit the
     // tableout line here, mirroring doStandardSearch's normal tail.

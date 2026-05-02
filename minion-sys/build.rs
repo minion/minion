@@ -136,6 +136,7 @@ fn bind(minion_src: &Path) {
         .allowlist_function("runMinionParallel")
         .allowlist_function("runMinionWorkSteal")
         .allowlist_type("MinionThreadConfig")
+        .allowlist_type("MinionWorkStealStats")
         .allowlist_function("minion_error_message")
         .allowlist_function("constantAsVar")
         .allowlist_function("tupleList_new")

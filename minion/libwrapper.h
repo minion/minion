@@ -249,6 +249,34 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
                                void* userdata);
 
 /*
+ * MinionWorkStealStats: aggregate diagnostics from a single
+ * runMinionWorkSteal invocation. Filled in by the runtime when the
+ * caller passes a non-null pointer to runMinionWorkSteal.
+ *
+ *   donations:      number of donate() calls that fired (a busy worker
+ *                   handed off a sub-tree to an idle worker).
+ *   itemsTaken:     number of work items popped and replayed by idle
+ *                   workers. donations - itemsTaken is the count
+ *                   currently in flight at termination (always 0 for
+ *                   completed runs).
+ *   replayFailures: number of replays that found infeasibility before
+ *                   beginning sub-tree search — a sound prune the
+ *                   donor's propagation hadn't yet reached.
+ *   totalNodes:     sum of per-worker getNodeCount() across all
+ *                   workers. Same value the runtime stashes on
+ *                   getTableOut() under "Nodes".
+ *
+ * All fields are zero on entry and only meaningful for the run that
+ * just completed; no values from prior runs persist.
+ */
+struct MinionWorkStealStats {
+  long long donations;
+  long long itemsTaken;
+  long long replayFailures;
+  long long totalNodes;
+};
+
+/*
  * runMinionWorkSteal: experimental work-stealing parallel search.
  *
  *   Spawns config.numThreads worker threads. Worker 0 starts at the
@@ -265,11 +293,16 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
  *
  *   Mid-search mutation is not supported. Restart-based search is not
  *   supported in this mode.
+ *
+ *   `outStats`, if non-null, receives aggregate work-stealing
+ *   counters on return (donations, items taken, replay failures,
+ *   total nodes). Pass nullptr to discard them.
  */
 MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& options,
                                 SearchMethod& args, ProbSpec::CSPInstance& instance,
                                 bool (*callback)(MinionContext* ctx, void* userdata),
-                                void* userdata);
+                                void* userdata,
+                                MinionWorkStealStats* outStats);
 
 #endif // LIBMINION
 

@@ -564,8 +564,14 @@ static bool workStealWrapperCallback(MinionContext* ctx, void* ud)
 MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& options,
                                 SearchMethod& args, ProbSpec::CSPInstance& instance,
                                 bool (*callback)(MinionContext* ctx, void* userdata),
-                                void* userdata)
+                                void* userdata, MinionWorkStealStats* outStats)
 {
+  if(outStats != nullptr) {
+    outStats->donations = 0;
+    outStats->itemsTaken = 0;
+    outStats->replayFailures = 0;
+    outStats->totalNodes = 0;
+  }
   if(config.numThreads < 1) {
     set_error("runMinionWorkSteal: numThreads must be >= 1");
     return MinionResult::MINION_INVALID_ARGUMENT;
@@ -692,6 +698,12 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     getTableOut().set("Nodes", tostring(total_nodes));
     getTableOut().set("Satisfiable", (total_sols == 0 ? 0 : 1));
     getTableOut().set("SolutionsFound", total_sols);
+    // Diagnostics: how much donation/stealing actually happened. The
+    // tester reads these to confirm work-stealing is exercised, not
+    // just spawned-then-idle.
+    getTableOut().set("WorkStealDonations", tostring(ctrl.donationsMade.load()));
+    getTableOut().set("WorkStealItemsTaken", tostring(ctrl.workItemsTaken.load()));
+    getTableOut().set("WorkStealReplayFailures", tostring(ctrl.replayFailures.load()));
   }
 
   if(N > 1 && !options.silent) {
@@ -699,6 +711,13 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     cout << "WorkSteal donations: " << ctrl.donationsMade.load()
          << ", taken: " << ctrl.workItemsTaken.load()
          << ", replay-failures: " << ctrl.replayFailures.load() << endl;
+  }
+
+  if(outStats != nullptr) {
+    outStats->donations = ctrl.donationsMade.load();
+    outStats->itemsTaken = ctrl.workItemsTaken.load();
+    outStats->replayFailures = ctrl.replayFailures.load();
+    outStats->totalNodes = ctrl.totalNodesExplored.load();
   }
 
   if(finalResult == MinionResult::MINION_TIMEOUT)

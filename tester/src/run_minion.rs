@@ -22,6 +22,18 @@ pub struct MinionOutput {
     pub nodes: i64,
     pub filename: String,
     pub cleanup: CleanupFiles,
+    /// Number of work-stealing donations the run made (None if the
+    /// run wasn't a work-steal run; Some(0) if work-steal was active
+    /// but no donation fired — useful for confirming the test
+    /// exercises the donation path).
+    pub work_steal_donations: Option<i64>,
+    /// True when the run hit the configured solution cap (`-sollimit`
+    /// for exec mode, the per-trial counter for the in-process path)
+    /// and stopped before exhausting search. Callers must treat the
+    /// solution set as a partial prefix and skip any equality
+    /// comparison — the random instance is too large to be a useful
+    /// signal at this size.
+    pub hit_solution_cap: bool,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -46,6 +58,14 @@ impl CleanupFiles {
 struct MinionJsonOut {
     Nodes: String,
     SolutionsFound: String,
+    /// Present only when the run used -X-parallelWorkSteal. Reports
+    /// how many donate() calls fired and how many were claimed; the
+    /// tester accumulates these so we can assert that work-steal
+    /// actually exercised the donation/replay path.
+    #[serde(default)]
+    WorkStealDonations: Option<String>,
+    #[serde(default)]
+    WorkStealItemsTaken: Option<String>,
 }
 
 pub fn get_minion_solutions(
@@ -54,6 +74,7 @@ pub fn get_minion_solutions(
     extraargs: &[&str],
     instance: &ConstraintInstance,
     testname: &str,
+    max_solutions: i64,
 ) -> Result<MinionOutput> {
     let nameid = format!(
         "{:?}_{}_{}",
@@ -70,6 +91,16 @@ pub fn get_minion_solutions(
     let mut args: Vec<String> = baseargs.to_owned();
     for &e in extraargs {
         args.push(e.to_owned());
+    }
+    // Cap solution gathering — protects against memory blow-up when a
+    // random instance happens to have a huge solution space (e.g. wide
+    // alldiff with the cartesian product of many domains). Appended
+    // after extraargs so it overrides any earlier `-findallsols`
+    // (which sets sollimit = -1). The caller checks
+    // `hit_solution_cap` and abandons trials that hit the limit.
+    if max_solutions > 0 {
+        args.push("-sollimit".to_string());
+        args.push(max_solutions.to_string());
     }
     args.push("-solsout".to_string());
     args.push(solsout.clone());
@@ -127,7 +158,7 @@ pub fn get_minion_solutions(
         solutions
     };
 
-    let nodes = {
+    let nodes: (i64, Option<i64>) = {
         let f = fs::File::open(&tableout)
             .context(format!("failed to open jsontableout file: {}", minioncmd))?;
 
@@ -153,8 +184,17 @@ pub fn get_minion_solutions(
             )));
         }
 
-        nodes
+        let donations = v.WorkStealDonations.as_ref().and_then(|s| s.parse::<i64>().ok());
+
+        (nodes, donations)
     };
+    let (nodes, work_steal_donations) = nodes;
+
+    // hit_solution_cap is true when the search stopped at the
+    // -sollimit cap. Solution count == cap → cap was hit (search may
+    // or may not have been complete; in either case the caller should
+    // treat the prefix as untrustworthy for set-equality checks).
+    let hit_solution_cap = max_solutions > 0 && solutions.len() as i64 >= max_solutions;
 
     Ok(MinionOutput {
         solutions,
@@ -163,5 +203,7 @@ pub fn get_minion_solutions(
         cleanup: CleanupFiles {
             files: vec![minout, solsout, tableout],
         },
+        work_steal_donations,
+        hit_solution_cap,
     })
 }

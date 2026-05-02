@@ -166,6 +166,39 @@ struct Opt {
     /// rejected rolls rather than OOMs.
     #[arg(long, default_value_t = 0)]
     nest_depth: usize,
+
+    /// Scales the size of randomly-generated test instances. `1` is
+    /// the historical default — small instances that solve in
+    /// microseconds. Higher values multiply integer-domain bounds,
+    /// sublist target sizes, and list lengths linearly, so the
+    /// search-tree size grows roughly polynomially. Use `--size-factor
+    /// 4` or higher when you want trials that take long enough for
+    /// work-stealing to actually exercise the donation path.
+    ///
+    /// Note: the work-steal pass also runs an *adaptive* growth loop
+    /// per constraint that overrides this — see `--ws-max-size`.
+    #[arg(long, default_value_t = 1)]
+    size_factor: u32,
+
+    /// Cap for the per-constraint adaptive growth in the work-steal
+    /// pass. Each constraint starts at `--size-factor` (or 1) and
+    /// doubles until at least one trial reports a non-zero donation
+    /// count, or this cap is hit. Larger caps give donation coverage
+    /// even for fast-to-solve constraints, at the cost of wall-clock
+    /// per trial.
+    #[arg(long, default_value_t = 32)]
+    ws_max_size: u32,
+
+    /// Hard cap on the number of solutions any single solver run
+    /// will gather. Protects against memory blow-up when a scaled-up
+    /// random instance has a huge solution space — without this, a
+    /// wide `alldiff` at `--size-factor 4` can produce billions of
+    /// solutions and OOM the process. Trials whose sequential or
+    /// comparison run hits this cap are abandoned silently (treated
+    /// as "instance too large at this size"). Set to 0 to disable
+    /// the cap entirely.
+    #[arg(long, default_value_t = 10_000_000)]
+    max_solutions: i64,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -239,6 +272,11 @@ fn main() -> Result<()> {
     let opt = Opt::parse();
     println!("{:?}", opt);
 
+    // Wire --size-factor into the global so build_random_instance
+    // (called from many places without a config arg) picks it up.
+    constraint_def::SIZE_FACTOR
+        .store(opt.size_factor.max(1), std::sync::atomic::Ordering::Relaxed);
+
     rayon::ThreadPoolBuilder::new()
         .num_threads(opt.numthreads)
         .build_global()
@@ -306,6 +344,7 @@ fn main() -> Result<()> {
             val_order,
             preprocess,
             prop_node,
+            max_solutions: opt.max_solutions,
         }
     } else {
         test_types::MinionConfig {
@@ -321,6 +360,7 @@ fn main() -> Result<()> {
             val_order,
             preprocess,
             prop_node,
+            max_solutions: opt.max_solutions,
         }
     };
 
@@ -547,18 +587,93 @@ fn main() -> Result<()> {
         ret2?;
     }
 
+    // Work-stealing sweep with adaptive sizing. Each constraint
+    // starts at the global SIZE_FACTOR and doubles its instance size
+    // until at least one trial reports a donation, or we hit
+    // --ws-max-size. Without this, tiny random instances finish in
+    // microseconds and the donation/replay path is never exercised
+    // (workers haven't finished marking themselves idle by the time
+    // the search is done).
     println!("Work-stealing tests\n");
+    let ws_initial = opt.size_factor.max(1);
+    let ws_max = opt.ws_max_size.max(ws_initial);
     let ret_ws: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
-        (0..opt.count)
-            .into_par_iter()
-            .try_for_each(|_| test_types::test_constraint_workstal(&config, c, 4))
-            .context(format!("failure in {} with -X-parallelWorkSteal 4", c.name))?;
-
-        println!("Tested {} (work-steal)", c.name);
+        let mut size = ws_initial;
+        loop {
+            let donated_before =
+                test_types::WS_TRIALS_WITH_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
+            let capped_before =
+                test_types::WS_TRIALS_CAPPED.load(std::sync::atomic::Ordering::Relaxed);
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_constraint_workstal(&config, c, 4, size))
+                .context(format!(
+                    "failure in {} with -X-parallelWorkSteal 4 (size_factor={size})",
+                    c.name
+                ))?;
+            let donated_after =
+                test_types::WS_TRIALS_WITH_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
+            let capped_after =
+                test_types::WS_TRIALS_CAPPED.load(std::sync::atomic::Ordering::Relaxed);
+            let saw_donation = donated_after > donated_before;
+            let capped_this_round = capped_after - capped_before;
+            if saw_donation {
+                println!(
+                    "Tested {} (work-steal, size_factor={size}, donations confirmed)",
+                    c.name
+                );
+                break;
+            }
+            // If most trials at this size hit the solution cap, the
+            // random instance has more solutions than we'll
+            // materialise — growing further makes that worse, not
+            // better. Stop and report.
+            if capped_this_round * 2 >= opt.count {
+                println!(
+                    "Tested {} (work-steal, size_factor={size}, \
+                     {capped_this_round}/{} trials hit --max-solutions — instance too \
+                     large to compare; giving up before donations confirmed)",
+                    c.name, opt.count
+                );
+                break;
+            }
+            if size >= ws_max {
+                println!(
+                    "Tested {} (work-steal, size_factor={size}, no donations seen — \
+                     instance still too small at --ws-max-size cap)",
+                    c.name
+                );
+                break;
+            }
+            size = (size * 2).min(ws_max);
+        }
         Ok(())
     });
-
     ret_ws?;
+
+    {
+        let trials = test_types::WS_TRIALS.load(std::sync::atomic::Ordering::Relaxed);
+        let donations = test_types::WS_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
+        let with_donations =
+            test_types::WS_TRIALS_WITH_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
+        println!(
+            "Work-steal coverage: {trials} trials, {donations} donations total \
+             ({with_donations} trials had >=1 donation, \
+             {} avg donations/trial)",
+            if trials > 0 {
+                donations as f64 / trials as f64
+            } else {
+                0.0
+            }
+        );
+        if trials > 0 && with_donations == 0 {
+            anyhow::bail!(
+                "Work-steal sweep ran {trials} trials at sizes up to {ws_max} but no \
+                 donation ever fired. Either work-stealing is broken, or instances \
+                 still aren't big enough — raise --ws-max-size."
+            );
+        }
+    }
 
     if config.backend == Backend::InProcess {
         println!("In-process mode: skipping option test sweep (exec-mode feature).");

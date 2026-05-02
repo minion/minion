@@ -11,9 +11,25 @@ use std::iter::FromIterator;
 use self::rand::seq::SliceRandom;
 use self::rand::Rng;
 
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
 use arrayvec::ArrayVec;
+
+/// Scales the size of randomly-generated instances. `1` is the
+/// historical default (lists up to 4, integer domain ±10, sublist
+/// target up to 8). `main` sets this from `--size-factor`. The
+/// adaptive work-steal pass overrides it per-trial via
+/// [`build_random_instance_sized`].
+///
+/// Integer domain bounds, sublist target sizes, and list lengths all
+/// scale linearly with this factor; the search-space size scales
+/// roughly polynomially because all three multiply together.
+pub static SIZE_FACTOR: AtomicU32 = AtomicU32::new(1);
+
+fn current_size_factor() -> u32 {
+    SIZE_FACTOR.load(Ordering::Relaxed).max(1)
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum VarType {
@@ -92,15 +108,27 @@ pub fn random_sublist_of_size(list: &[i64], target: i64) -> Vec<i64> {
 
 impl MinionVariable {
     fn random(in_d: VarType) -> Arc<MinionVariable> {
+        Self::random_sized(in_d, current_size_factor())
+    }
+
+    fn random_sized(in_d: VarType, size_factor: u32) -> Arc<MinionVariable> {
+        let f = size_factor.max(1) as i64;
+        // Bool domain stays {0,1} regardless of size_factor — it's
+        // structurally fixed by the constraint signature. Integer
+        // domains scale ±10 → ±10*f.
         let dom_min = match in_d {
             Bool => 0,
-            _ => -10,
+            _ => -10 * f,
         };
 
         let dom_max = match in_d {
             Bool => 1,
-            _ => 10,
+            _ => 10 * f,
         };
+
+        // Sublist target / bound length: 1..=8 unscaled. Scaling makes
+        // domains denser, which is what increases search-tree size.
+        let sublist_max: i64 = 8 * f;
 
         let d = *match in_d {
             Constant => vec![Constant],
@@ -133,15 +161,15 @@ impl MinionVariable {
             Bool => random_sublist(&[0, 1]),
             Discrete => {
                 let v: Vec<i64> = (dom_min..dom_max).collect();
-                random_sublist_of_size(&v, random_in_range(1, 8))
+                random_sublist_of_size(&v, random_in_range(1, sublist_max))
             }
             SparseBound => {
                 let v: Vec<i64> = (dom_min..dom_max).collect();
-                random_sublist_of_size(&v, random_in_range(1, 8))
+                random_sublist_of_size(&v, random_in_range(1, sublist_max))
             }
             Bound => {
                 let low = random_in_range(dom_min, dom_max);
-                let len = random_in_range(1, 8);
+                let len = random_in_range(1, sublist_max);
                 (low..(low + len)).collect()
             }
         };
@@ -302,32 +330,73 @@ impl ConstraintInstance {
         (self.constraint.checker)(self, &slices)
     }
 
-    fn build_tuples(&self) -> Vec<Vec<i64>> {
+    /// Enumerate the truth table of this constraint up to `limit`
+    /// satisfying tuples, returning `None` if either:
+    ///
+    ///   - more than `limit` satisfying tuples are found (the
+    ///     constraint is too wide to tabulate at the configured
+    ///     `--maxtuples`); or
+    ///   - the unfiltered Cartesian product exceeds an iteration
+    ///     budget proportional to `limit` (a sparse predicate over
+    ///     huge domains would walk billions of candidates and
+    ///     never collect enough — bail before time/memory blows up).
+    ///
+    /// `--size-factor 4` and beyond can produce wide-list random
+    /// instances whose Cartesian product is 10^20+; without these
+    /// caps the iteration alone OOMs the process well before any
+    /// `tuples.len() > limit` post-check.
+    fn build_tuples_capped(&self, limit: usize) -> Option<Vec<Vec<i64>>> {
         use self::itertools::Itertools;
 
-        // Special case 0 variables
+        // Special case 0 variables.
         if self.vars().concat().is_empty() {
             if self.check_tuple(&[]) {
-                return vec![vec![]];
+                return Some(vec![vec![]]);
             } else {
-                return vec![];
+                return Some(vec![]);
             }
         }
-        let v: Vec<Vec<i64>> = (*self.vars())
+        let domains: Vec<Vec<i64>> = (*self.vars())
             .concat()
             .iter()
             .map(|x| x.domain.clone())
             .collect();
 
-        v.iter()
-            .cloned()
-            .multi_cartesian_product()
-            .filter(|t| self.check_tuple(t))
-            .collect()
+        // Pre-check the Cartesian product size. u128 saturates at a
+        // huge ceiling; if the product overflows or exceeds the
+        // iteration budget, bail without iterating.
+        let mut cart: u128 = 1;
+        for d in &domains {
+            cart = cart.saturating_mul(d.len() as u128);
+        }
+        // Iteration budget: 1000× the satisfying-tuple cap, with a
+        // floor at 100k. Lets sparse-predicate small-domain cases
+        // succeed (most real tester instances) while bailing fast on
+        // wide-list scaled-up instances.
+        let iter_budget: u128 = (limit as u128)
+            .saturating_mul(1000)
+            .max(100_000);
+        if cart > iter_budget {
+            return None;
+        }
+
+        let mut out: Vec<Vec<i64>> = Vec::new();
+        for t in domains.iter().cloned().multi_cartesian_product() {
+            if self.check_tuple(&t) {
+                out.push(t);
+                if out.len() > limit {
+                    return None;
+                }
+            }
+        }
+        Some(out)
     }
 
     pub fn tableise(&self, limit: usize) -> Option<ConstraintInstance> {
-        let tuples = self.build_tuples();
+        let tuples = match self.build_tuples_capped(limit) {
+            Some(t) => t,
+            None => return None,
+        };
         if tuples.len() > limit {
             return None;
         }
@@ -356,8 +425,6 @@ impl ConstraintInstance {
 fn generate_random_tuples_from_vars(
     variables: &[Vec<Arc<MinionVariable>>],
 ) -> Option<Tuples> {
-    use self::itertools::Itertools;
-
     let all_domains: Vec<Vec<i64>> = variables
         .iter()
         .flatten()
@@ -368,27 +435,56 @@ fn generate_random_tuples_from_vars(
         return Some(Tuples::new(vec![vec![]]));
     }
 
-    let mut all_assignments: Vec<Vec<i64>> = all_domains
-        .iter()
-        .cloned()
-        .multi_cartesian_product()
-        .collect();
+    // Cap on the Cartesian product size we're willing to materialise.
+    // Below this we keep the original enumerate-shuffle-truncate path
+    // (preserves the "leave at least one out" property exactly). Above
+    // it we sample tuples directly from the per-variable domains —
+    // statistically sound for the tester (random non-empty subset)
+    // and avoids OOM on `--size-factor 4`-style wide-list instances
+    // where the product is 10^20+.
+    const ENUM_CAP: u128 = 1_000_000;
 
-    // Pick a random non-empty subset, leaving at least one assignment
-    // unpicked (so negative table constraints are satisfiable). If there
-    // is only one possible assignment we still take it — the valid_instance
-    // hook on negative constraints will reject the instance and force a
-    // re-roll.
+    let mut cart: u128 = 1;
+    for d in &all_domains {
+        cart = cart.saturating_mul(d.len() as u128);
+    }
+
     let mut rng = rand::thread_rng();
-    all_assignments.shuffle(&mut rng);
-    let take = if all_assignments.len() > 1 {
-        rng.gen_range(1..all_assignments.len())
+
+    if cart <= ENUM_CAP {
+        use self::itertools::Itertools;
+        let mut all_assignments: Vec<Vec<i64>> = all_domains
+            .iter()
+            .cloned()
+            .multi_cartesian_product()
+            .collect();
+        all_assignments.shuffle(&mut rng);
+        let take = if all_assignments.len() > 1 {
+            rng.gen_range(1..all_assignments.len())
+        } else {
+            1
+        };
+        all_assignments.truncate(take);
+        all_assignments.sort();
+        Some(Tuples::new(all_assignments))
     } else {
-        1
-    };
-    all_assignments.truncate(take);
-    all_assignments.sort();
-    Some(Tuples::new(all_assignments))
+        // Sample path: pick K random points directly. For huge
+        // products K ≪ cart so leaving "at least one out" is
+        // automatic with overwhelming probability.
+        const TUPLE_SAMPLE_CAP: usize = 10_000;
+        let take = rng.gen_range(1..=TUPLE_SAMPLE_CAP);
+        let mut sampled: Vec<Vec<i64>> = (0..take)
+            .map(|_| {
+                all_domains
+                    .iter()
+                    .map(|d| *d.choose(&mut rand::thread_rng()).unwrap())
+                    .collect()
+            })
+            .collect();
+        sampled.sort();
+        sampled.dedup();
+        Some(Tuples::new(sampled))
+    }
 }
 
 pub fn build_random_instance(constraint: &ConstraintDef) -> ConstraintInstance {
@@ -399,6 +495,25 @@ pub fn build_random_instance_with_children(
     constraint: &ConstraintDef,
     children: &[&ConstraintDef],
 ) -> ConstraintInstance {
+    build_random_instance_with_children_sized(constraint, children, current_size_factor())
+}
+
+/// Like [`build_random_instance`] but with an explicit `size_factor`
+/// override. The adaptive work-steal pass uses this to grow instances
+/// per-trial without touching the global SIZE_FACTOR.
+pub fn build_random_instance_sized(
+    constraint: &ConstraintDef,
+    size_factor: u32,
+) -> ConstraintInstance {
+    build_random_instance_with_children_sized(constraint, &[], size_factor)
+}
+
+pub fn build_random_instance_with_children_sized(
+    constraint: &ConstraintDef,
+    children: &[&ConstraintDef],
+    size_factor: u32,
+) -> ConstraintInstance {
+    let f = size_factor.max(1) as usize;
     loop {
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
@@ -408,11 +523,15 @@ pub fn build_random_instance_with_children(
         for i in 0..constraint.arg.len() {
             match constraint.arg[i] {
                 Var(d) => {
-                    variables.push(vec![MinionVariable::random(d)]);
+                    variables.push(vec![MinionVariable::random_sized(d, size_factor)]);
                 }
                 List(d) => {
-                    let len = rand::random::<usize>() % 5;
-                    variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
+                    let len = rand::random::<usize>() % (5 * f);
+                    variables.push(
+                        (0..len)
+                            .map(|_x| MinionVariable::random_sized(d, size_factor))
+                            .collect(),
+                    );
                 }
                 Tuples => {
                     generated_tuples = generate_random_tuples_from_vars(&variables);
@@ -420,9 +539,10 @@ pub fn build_random_instance_with_children(
                 Constraint => {
                     // Leave dummy empty vec in variables
                     variables.push(vec![]);
-                    constraints.push(build_random_instance_with_children(
+                    constraints.push(build_random_instance_with_children_sized(
                         children[constraint_child],
                         &[],
+                        size_factor,
                     ));
                     constraint_child += 1;
                 }
@@ -451,6 +571,7 @@ pub fn build_nested_instance(
     parent_def: &ConstraintDef,
     child_instances: &[ConstraintInstance],
 ) -> ConstraintInstance {
+    let f = current_size_factor() as usize;
     loop {
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
@@ -463,7 +584,7 @@ pub fn build_nested_instance(
                     variables.push(vec![MinionVariable::random(d)]);
                 }
                 List(d) => {
-                    let len = rand::random::<usize>() % 5;
+                    let len = rand::random::<usize>() % (5 * f);
                     variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
                 }
                 Tuples => {

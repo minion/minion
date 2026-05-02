@@ -934,6 +934,7 @@ pub fn get_minion_solutions_in_process_work_steal(
     options: minion_sys::RunOptions,
     num_threads: usize,
     testname: &str,
+    max_solutions: i64,
 ) -> Result<MinionOutput> {
     let mut model = Model::new();
     register_tuple_tables_for_instance(&mut model, instance)?;
@@ -964,22 +965,34 @@ pub fn get_minion_solutions_in_process_work_steal(
                 }
             }
             #[allow(clippy::unwrap_used)]
-            solutions.lock().unwrap().push(row);
+            let mut sols = solutions.lock().unwrap();
+            sols.push(row);
+            // Stop when the cap is reached. Returning false signals
+            // the controller to broadcast stop to the other workers.
+            if max_solutions > 0 && sols.len() as i64 >= max_solutions {
+                return false;
+            }
             true
         })
     };
 
-    minion_sys::run_minion_work_steal_with_options(num_threads, model, options, cb)
-        .map_err(|e| anyhow!("minion in-process work-steal error ({testname}): {e}"))?;
+    let stats = minion_sys::run_minion_work_steal_with_options(
+        num_threads, model, options, cb,
+    )
+    .map_err(|e| anyhow!("minion in-process work-steal error ({testname}): {e}"))?;
 
     #[allow(clippy::unwrap_used)]
     let solutions = solutions.into_inner().unwrap();
 
+    let hit_solution_cap = max_solutions > 0 && solutions.len() as i64 >= max_solutions;
+
     Ok(MinionOutput {
         solutions,
-        nodes: 0,
+        nodes: stats.total_nodes,
         filename: format!("<in-process-work-steal:{testname}>"),
         cleanup: CleanupFiles::empty(),
+        work_steal_donations: Some(stats.donations),
+        hit_solution_cap,
     })
 }
 
@@ -988,6 +1001,7 @@ pub fn get_minion_solutions_in_process(
     find_all_sols: bool,
     options: minion_sys::RunOptions,
     testname: &str,
+    max_solutions: i64,
 ) -> Result<MinionOutput> {
     let mut model = Model::new();
     register_tuple_tables_for_instance(&mut model, instance)?;
@@ -1013,6 +1027,12 @@ pub fn get_minion_solutions_in_process(
                 }
             }
             solutions.push(row);
+            // Stop when the per-trial cap is reached (mirrors exec
+            // mode's -sollimit). Caller checks `hit_solution_cap` and
+            // skips comparison when the cap was hit.
+            if max_solutions > 0 && solutions.len() as i64 >= max_solutions {
+                return false;
+            }
             find_all_sols
         })
     };
@@ -1040,10 +1060,14 @@ pub fn get_minion_solutions_in_process(
         .parse()
         .with_context(|| format!("parsing Nodes={nodes_str:?}"))?;
 
+    let hit_solution_cap = max_solutions > 0 && solutions.len() as i64 >= max_solutions;
+
     Ok(MinionOutput {
         solutions,
         nodes,
         filename: format!("<in-process:{testname}>"),
         cleanup: CleanupFiles::empty(),
+        work_steal_donations: None,
+        hit_solution_cap,
     })
 }

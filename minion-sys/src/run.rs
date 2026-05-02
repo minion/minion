@@ -596,8 +596,29 @@ pub fn run_minion_work_steal(
     num_threads: usize,
     model: Model,
     callback: ParallelCallback<'_>,
-) -> Result<(), MinionError> {
+) -> Result<WorkStealStats, MinionError> {
     run_minion_work_steal_with_options(num_threads, model, RunOptions::default(), callback)
+}
+
+/// Aggregate work-stealing diagnostics, populated by
+/// [`run_minion_work_steal`] and [`run_minion_work_steal_with_options`].
+///
+/// `donations` counts donate() calls that fired (a busy worker handed off
+/// a sub-tree). `items_taken` counts work items popped and replayed by
+/// idle workers. `replay_failures` counts replays that found
+/// infeasibility before beginning sub-tree search. `total_nodes` is the
+/// sum of per-worker node counts.
+///
+/// `donations == 0` after a run means the donation/replay path was never
+/// exercised — typically because the search finished before idle workers
+/// reached their wait. Useful for confirming a test instance is large
+/// enough to stress the work-stealing protocol.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct WorkStealStats {
+    pub donations: i64,
+    pub items_taken: i64,
+    pub replay_failures: i64,
+    pub total_nodes: i64,
 }
 
 /// Like [`run_minion_work_steal`] but with [`RunOptions`].
@@ -607,7 +628,7 @@ pub fn run_minion_work_steal_with_options(
     model: Model,
     options: RunOptions,
     callback: ParallelCallback<'_>,
-) -> Result<(), MinionError> {
+) -> Result<WorkStealStats, MinionError> {
     if num_threads == 0 {
         return Err(MinionError::Other(anyhow!(
             "num_threads must be at least 1"
@@ -653,6 +674,13 @@ pub fn run_minion_work_steal_with_options(
             baseSeed: options.seed.unwrap_or(0),
         };
 
+        let mut raw_stats = ffi::MinionWorkStealStats {
+            donations: 0,
+            itemsTaken: 0,
+            replayFailures: 0,
+            totalNodes: 0,
+        };
+
         let res = ffi::runMinionWorkSteal(
             cfg,
             search_opts,
@@ -660,6 +688,7 @@ pub fn run_minion_work_steal_with_options(
             search_instance,
             Some(parallel_callback_thunk),
             userdata,
+            &mut raw_stats,
         );
 
         ffi::searchMethod_free(search_method);
@@ -667,7 +696,12 @@ pub fn run_minion_work_steal_with_options(
         ffi::instance_free(search_instance);
 
         check_minion_result(res)?;
-        Ok(())
+        Ok(WorkStealStats {
+            donations: raw_stats.donations,
+            items_taken: raw_stats.itemsTaken,
+            replay_failures: raw_stats.replayFailures,
+            total_nodes: raw_stats.totalNodes,
+        })
     }
 }
 

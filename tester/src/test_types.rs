@@ -26,6 +26,13 @@ pub struct MinionConfig<'a> {
     pub val_order: minion_sys::ValOrder,
     pub preprocess: minion_sys::Propagation,
     pub prop_node: minion_sys::Propagation,
+    /// Hard cap on the number of solutions any single solver run will
+    /// gather. Protects against memory blow-up when scaled-up random
+    /// instances happen to have huge solution spaces. A run that hits
+    /// the cap sets `MinionOutput.hit_solution_cap`; callers (test
+    /// functions) skip the trial silently rather than comparing
+    /// possibly-divergent prefixes.
+    pub max_solutions: i64,
 }
 
 impl<'a> MinionConfig<'a> {
@@ -99,6 +106,7 @@ fn run_solve(
             extraargs,
             instance,
             testname,
+            config.max_solutions,
         ),
         Backend::InProcess => {
             // Tiny flag parser: -findallsols is recognised as before;
@@ -144,6 +152,7 @@ fn run_solve(
                     config.run_options_no_seed(),
                     n,
                     testname,
+                    config.max_solutions,
                 )
             } else {
                 run_minion_lib::get_minion_solutions_in_process(
@@ -151,6 +160,7 @@ fn run_solve(
                     find_all,
                     config.run_options_no_seed(),
                     testname,
+                    config.max_solutions,
                 )
             }
         }
@@ -160,6 +170,7 @@ fn run_solve(
 pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef) -> Result<()> {
     let mut instance;
     let tups;
+    let mut attempts = 0;
     loop {
         instance = constraint_def::build_random_instance(c);
         let tupstry = instance.tableise(config.maxtuples);
@@ -167,10 +178,26 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
             tups = t;
             break;
         }
+        attempts += 1;
+        // At high --size-factor most random rolls produce instances
+        // whose Cartesian product exceeds maxtuples and tableise
+        // refuses. Skip the trial after a bounded retry budget rather
+        // than spinning forever.
+        if attempts > 100 {
+            return Ok(());
+        }
     }
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
+    // If either side hit the solution cap, the random instance is too
+    // big to compare reliably — solution lists are partial prefixes.
+    // Skip the trial silently rather than report a spurious mismatch.
+    if ret.hit_solution_cap || ret2.hit_solution_cap {
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
     if config.deterministic_ordering() {
         if ret.solutions != ret2.solutions {
             let n = ret.solutions.len().min(10);
@@ -227,6 +254,11 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
         &instance,
         "parallel",
     )?;
+    if ret.hit_solution_cap || ret2.hit_solution_cap {
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
     let mut sortsols = ret.solutions.clone();
     let mut sortsols2 = ret2.solutions.clone();
     sortsols.sort();
@@ -251,6 +283,27 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
     Ok(())
 }
 
+use std::sync::atomic::{AtomicI64, AtomicU64, Ordering};
+
+/// Process-wide diagnostic counters for the work-steal sweep:
+/// - `WS_TRIALS` counts how many test_constraint_workstal calls ran.
+/// - `WS_DONATIONS` accumulates the total `donate()` calls across all
+///   trials (only meaningful for Exec backend; in-process path doesn't
+///   currently surface this).
+/// - `WS_TRIALS_WITH_DONATIONS` counts trials whose donation count was
+///   non-zero.
+///
+/// `main` reads these after the sweep and reports them so the user
+/// can confirm work-stealing actually exercised the donation path.
+pub static WS_TRIALS: AtomicU64 = AtomicU64::new(0);
+pub static WS_DONATIONS: AtomicI64 = AtomicI64::new(0);
+pub static WS_TRIALS_WITH_DONATIONS: AtomicU64 = AtomicU64::new(0);
+/// Trials abandoned because the random instance hit the configured
+/// solution cap. Tracked separately from `WS_TRIALS` so the adaptive
+/// growth loop can detect when a constraint's instances at the
+/// current size are too big to compare and stop growing.
+pub static WS_TRIALS_CAPPED: AtomicU64 = AtomicU64::new(0);
+
 /// Work-stealing parallel torture test: solve the same instance with
 /// `-findallsols` sequentially and under `-X-parallelWorkSteal N`, and
 /// require the two solution sets to match. Unlike `-parallel` (fork
@@ -265,9 +318,19 @@ pub fn test_constraint_workstal(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
     n: u32,
+    size_factor: u32,
 ) -> Result<()> {
-    let instance = constraint_def::build_random_instance(c);
+    let instance = constraint_def::build_random_instance_sized(c, size_factor);
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
+    if ret.hit_solution_cap {
+        // Sequential blew through the cap — the random instance has
+        // more solutions than we're willing to materialise. Skip
+        // comparison and record the trial as capped so the adaptive
+        // growth loop knows not to grow further.
+        WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
+        ret.cleanup.cleanup();
+        return Ok(());
+    }
     let n_str = n.to_string();
     let ret2 = run_solve(
         config,
@@ -275,6 +338,12 @@ pub fn test_constraint_workstal(
         &instance,
         "workstal",
     )?;
+    if ret2.hit_solution_cap {
+        WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
     let mut a = ret.solutions.clone();
     let mut b = ret2.solutions.clone();
     a.sort();
@@ -287,6 +356,17 @@ pub fn test_constraint_workstal(
             ret.solutions.len(),
             ret2.solutions.len()
         )));
+    }
+
+    // Accumulate donation diagnostics. Both backends now surface the
+    // donation count: exec via -jsontableout, in-process via the
+    // WorkStealStats returned from run_minion_work_steal_with_options.
+    WS_TRIALS.fetch_add(1, Ordering::Relaxed);
+    if let Some(donations) = ret2.work_steal_donations {
+        WS_DONATIONS.fetch_add(donations, Ordering::Relaxed);
+        if donations > 0 {
+            WS_TRIALS_WITH_DONATIONS.fetch_add(1, Ordering::Relaxed);
+        }
     }
 
     ret.cleanup.cleanup();
@@ -311,6 +391,11 @@ pub fn test_constraint_options(
     alloptions.push("-findallsols");
 
     let ret2 = run_solve(config, &alloptions[..], &instance, "options")?;
+    if ret.hit_solution_cap || ret2.hit_solution_cap {
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
     let mut sortsols = ret.solutions.clone();
     let mut sortsols2 = ret2.solutions.clone();
     sortsols.sort();
@@ -368,6 +453,7 @@ pub fn test_constraint_midsearch_add_vars(
         true,
         config.run_options(seed),
         "baseline",
+        config.max_solutions,
     )?;
 
     if baseline.solutions.len() <= inject_after {
@@ -1211,6 +1297,11 @@ pub fn test_constraint_deep_nested(
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
+    if ret.hit_solution_cap || ret2.hit_solution_cap {
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
     if config.deterministic_ordering() {
         if ret.solutions != ret2.solutions {
             return Err(anyhow!(format!(
@@ -1267,6 +1358,7 @@ pub fn test_constraint_nested(
 
     let mut instance;
     let tups;
+    let mut attempts = 0;
     loop {
         instance = constraint_def::build_random_instance_with_children(nest_type, &children);
         let tupstry = instance.tableise(config.maxtuples);
@@ -1274,10 +1366,19 @@ pub fn test_constraint_nested(
             tups = t;
             break;
         }
+        attempts += 1;
+        if attempts > 100 {
+            return Ok(());
+        }
     }
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
+    if ret.hit_solution_cap || ret2.hit_solution_cap {
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
     if config.deterministic_ordering() {
         if ret.solutions != ret2.solutions {
             let n = ret.solutions.len().min(10);
