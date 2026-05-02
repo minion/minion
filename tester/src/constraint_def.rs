@@ -695,37 +695,18 @@ fn check_alldiffmatrix(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     }
     let value = v[1][0];
 
-    // Check for a perfect matching: edge (r,c) exists if vars[r*n + c] == value.
-    fn dfs(
-        r: usize,
-        visited: &mut [bool],
-        match_col: &mut [isize],
-        vars: &[i64],
-        n: usize,
-        value: i64,
-    ) -> bool {
-        for c in 0..n {
-            if vars[r * n + c] != value {
-                continue;
-            }
-            if visited[c] {
-                continue;
-            }
-            visited[c] = true;
-            if match_col[c] == -1
-                || dfs(match_col[c] as usize, visited, match_col, vars, n, value)
-            {
-                match_col[c] = r as isize;
-                return true;
-            }
+    // Match minion's checkAssignment (constraint_alldiffmatrix.h:220):
+    // every row AND every column must contain exactly one cell equal
+    // to `value`. The bipartite-matching reading is strictly weaker —
+    // it admits assignments where extra cells equal the value, which
+    // minion's propagator (correctly) rejects.
+    for i in 0..n {
+        let row_count = (0..n).filter(|&j| vars[i * n + j] == value).count();
+        if row_count != 1 {
+            return false;
         }
-        false
-    }
-
-    let mut match_col = vec![-1isize; n];
-    for r in 0..n {
-        let mut visited = vec![false; n];
-        if !dfs(r, &mut visited, &mut match_col, vars, n, value) {
+        let col_count = (0..n).filter(|&j| vars[j * n + i] == value).count();
+        if col_count != 1 {
             return false;
         }
     }
