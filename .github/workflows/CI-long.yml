@@ -52,12 +52,38 @@ jobs:
                 make test
 
       # Exec-mode tester: much higher counts for broader coverage of the
-      # baseline/tableise/option sweep.
+      # baseline/tableise/option sweep, plus the work-steal,
+      # variant-equivalence, and restart sweeps that ride the same
+      # exec-mode entry point. --variant-count defaults to --count, so
+      # 6 × 1000 = 6000 cross-propagator equivalence trials per run.
       - name: "Exec tester: big sweep"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --minion ../bin-quick/minion --count 200 --optioncount 5000 --numthreads 4
+              cargo run --release -- --minion ../bin-quick/minion \
+                --count 1000 --variant-count 1000 --optioncount 10000 --numthreads 4
+
+      # Bigger instances + deep-nested cross-type parent trees. These
+      # paths need wall-clock time to actually exercise the
+      # work-stealing donation/replay code (instances at size_factor=1
+      # finish before workers can mark themselves idle), and depth-3
+      # builds the wider parent-of-parent surface that the default
+      # depth-1 nesting doesn't reach.
+      - name: "Exec tester: deep-nest + size-factor stress"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --minion ../bin-quick/minion \
+                --count 200 --variant-count 200 --optioncount 1000 \
+                --nest-depth 3 --size-factor 4 --ws-max-size 128 --numthreads 4
+
+      # minion-sys integration tests via FFI. Single pass — the
+      # individual tests inside the suite already loop internally.
+      - name: "minion-sys cargo test"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd minion-sys
+              cargo test --release
 
       # In-process tester: each mode gets many more trials. Counts
       # chosen so a single mode finishes in ~1–2 hours on public

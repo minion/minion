@@ -1,0 +1,4 @@
+# Per-run log output. The orchestrator (run.sh) writes timestamped
+# subdirectories here; those are ephemeral and shouldn't be tracked.
+*/
+orchestrator.log

@@ -58,6 +58,28 @@ jobs:
               cd tester
               cargo run --release -- --minion ../bin-quick/minion
 
+      # Exercises the deep-nested (cross-type parent trees) and
+      # size-factor=2 paths that the default Rust tests step doesn't
+      # touch. Counts kept small to fit the CI budget; this is a smoke
+      # test, not full coverage. Variant-equivalence and restart sweeps
+      # already run inside the default-args sweep above.
+      - name: "Rust tests: nested + size-factor smoke"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --minion ../bin-quick/minion \
+                --count 10 --variant-count 20 --optioncount 100 \
+                --nest-depth 2 --size-factor 2 --numthreads 4
+
+      # minion-sys integration tests (test_work_steal, test_parallel_search,
+      # test_seed_determinism, etc.). These exercise the FFI surface of
+      # libminion via Rust, which the C++ `make test` doesn't cover.
+      - name: "minion-sys cargo test"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd minion-sys
+              cargo test --release
+
       - name: "Library tests"
         run: |
                 cd bin-quick
