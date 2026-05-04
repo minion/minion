@@ -604,12 +604,23 @@ pub fn run_minion_work_steal(
 /// exercised — typically because the search finished before idle workers
 /// reached their wait. Useful for confirming a test instance is large
 /// enough to stress the work-stealing protocol.
+///
+/// Contention diagnostics (cumulative across all workers, nanoseconds):
+/// `queue_lock_wait_nanos` is total time spent acquiring the donation
+/// queue mutex. `idle_wait_nanos` is total time blocked inside
+/// `popOrFinish` waiting for a donation — divide by `num_threads *
+/// wall_time` for "fraction of available CPU spent idle".
+/// `callback_lock_wait_nanos` is total time spent acquiring the
+/// per-solution lock; rises with enumeration-heavy SAT runs.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct WorkStealStats {
     pub donations: i64,
     pub items_taken: i64,
     pub replay_failures: i64,
     pub total_nodes: i64,
+    pub queue_lock_wait_nanos: i64,
+    pub idle_wait_nanos: i64,
+    pub callback_lock_wait_nanos: i64,
 }
 
 /// Like [`run_minion_work_steal`] but with [`RunOptions`].
@@ -670,6 +681,9 @@ pub fn run_minion_work_steal_with_options(
             itemsTaken: 0,
             replayFailures: 0,
             totalNodes: 0,
+            queueLockWaitNanos: 0,
+            idleWaitNanos: 0,
+            callbackLockWaitNanos: 0,
         };
 
         let res = ffi::runMinionWorkSteal(
@@ -692,6 +706,9 @@ pub fn run_minion_work_steal_with_options(
             items_taken: raw_stats.itemsTaken,
             replay_failures: raw_stats.replayFailures,
             total_nodes: raw_stats.totalNodes,
+            queue_lock_wait_nanos: raw_stats.queueLockWaitNanos,
+            idle_wait_nanos: raw_stats.idleWaitNanos,
+            callback_lock_wait_nanos: raw_stats.callbackLockWaitNanos,
         })
     }
 }

@@ -4,7 +4,19 @@
 #include "../minion.h"
 #include "work_steal.h"
 
+#include <chrono>
+
 namespace WorkSteal {
+
+// Two steady_clock::now() calls per probe (~50ns total on M-series
+// silicon). The donate/popOrFinish paths fire at most once per node so
+// this overhead is negligible relative to per-node propagation cost.
+static inline long long elapsedNanos(
+    std::chrono::steady_clock::time_point start) {
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(
+             std::chrono::steady_clock::now() - start)
+      .count();
+}
 
 void bootstrapFirstWorker(WorkStealController& c) {
   c.busyWorkers.fetch_add(1, std::memory_order_acq_rel);
@@ -29,14 +41,19 @@ void donate(WorkStealController& c, WorkItem item) {
   c.donationInFlight.fetch_add(1, std::memory_order_acq_rel);
   c.donationsMade.fetch_add(1, std::memory_order_relaxed);
   {
+    auto t0 = std::chrono::steady_clock::now();
     std::lock_guard<std::mutex> lock(c.queue_mutex);
+    c.queueLockWaitNanos.fetch_add(elapsedNanos(t0), std::memory_order_relaxed);
     c.queue.push(std::move(item));
   }
   c.queue_cv.notify_one();
 }
 
 bool popOrFinish(WorkStealController& c, WorkItem& out) {
+  auto lockStart = std::chrono::steady_clock::now();
   std::unique_lock<std::mutex> lock(c.queue_mutex);
+  c.queueLockWaitNanos.fetch_add(elapsedNanos(lockStart),
+                                 std::memory_order_relaxed);
   // Mark this worker idle on entry. Donating workers check
   // idleWorkers > 0 before picking a branch to donate; we want them to
   // see us right away so we don't block waiting for a donation that
@@ -77,7 +94,15 @@ bool popOrFinish(WorkStealController& c, WorkItem& out) {
       return false;
     }
     // Someone is busy; wait for either a donation or for them to go idle.
+    // queue_cv.wait releases the mutex while waiting and re-acquires on
+    // wake, so the time recorded here is "starvation" — worker had no
+    // work, was waiting for a donation. The cumulative figure across
+    // all workers is the headline contention number for "is donation
+    // supply keeping up with worker demand?".
+    auto waitStart = std::chrono::steady_clock::now();
     c.queue_cv.wait(lock);
+    c.idleWaitNanos.fetch_add(elapsedNanos(waitStart),
+                              std::memory_order_relaxed);
   }
 }
 

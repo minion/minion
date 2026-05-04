@@ -575,7 +575,17 @@ static bool workStealWrapperCallback(MinionContext* ctx, void* ud)
 {
   WorkSteal::WorkStealController* shared =
       static_cast<WorkSteal::WorkStealController*>(ud);
+  // Probe how long we waited to acquire the per-solution lock. On
+  // enumeration-heavy SAT workloads this is the dominant contention
+  // point — every solution from every worker queues here.
+  auto t0 = std::chrono::steady_clock::now();
   std::lock_guard<std::mutex> lock(shared->callbackMutex);
+  {
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                       std::chrono::steady_clock::now() - t0)
+                       .count();
+    shared->callbackLockWaitNanos.fetch_add(elapsed, std::memory_order_relaxed);
+  }
 
   if(shared->stopRequested.load(std::memory_order_acquire))
     return false;
@@ -614,6 +624,9 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     outStats->itemsTaken = 0;
     outStats->replayFailures = 0;
     outStats->totalNodes = 0;
+    outStats->queueLockWaitNanos = 0;
+    outStats->idleWaitNanos = 0;
+    outStats->callbackLockWaitNanos = 0;
   }
   if(config.numThreads < 1) {
     set_error("runMinionWorkSteal: numThreads must be >= 1");
@@ -755,6 +768,17 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     getTableOut().set("WorkStealDonations", tostring(ctrl.donationsMade.load()));
     getTableOut().set("WorkStealItemsTaken", tostring(ctrl.workItemsTaken.load()));
     getTableOut().set("WorkStealReplayFailures", tostring(ctrl.replayFailures.load()));
+    // Contention diagnostics. Cumulative wall time (ns) summed across
+    // all workers for each blocking primitive — see work_steal.h for
+    // interpretation. Headline ratio: idleWaitNanos / (numWorkers *
+    // wallTimeNanos) is "fraction of available CPU spent idle waiting
+    // on donations" — if high, donation supply isn't keeping up.
+    getTableOut().set("WorkStealQueueLockWaitNs",
+                      tostring(ctrl.queueLockWaitNanos.load()));
+    getTableOut().set("WorkStealIdleWaitNs",
+                      tostring(ctrl.idleWaitNanos.load()));
+    getTableOut().set("WorkStealCallbackLockWaitNs",
+                      tostring(ctrl.callbackLockWaitNanos.load()));
   }
 
   if(N > 1 && !options.silent) {
@@ -762,6 +786,16 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     cout << "WorkSteal donations: " << ctrl.donationsMade.load()
          << ", taken: " << ctrl.workItemsTaken.load()
          << ", replay-failures: " << ctrl.replayFailures.load() << endl;
+    // Contention numbers: total wait time across all workers for each
+    // blocking primitive. Print in ms for human readability.
+    long long qNs = ctrl.queueLockWaitNanos.load();
+    long long iNs = ctrl.idleWaitNanos.load();
+    long long cNs = ctrl.callbackLockWaitNanos.load();
+    cout << "WorkSteal contention (cumulative across "
+         << N << " workers, ms): queue-lock="
+         << (qNs / 1000000) << ", idle-wait="
+         << (iNs / 1000000) << ", callback-lock="
+         << (cNs / 1000000) << endl;
   }
 
   if(outStats != nullptr) {
@@ -769,6 +803,9 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     outStats->itemsTaken = ctrl.workItemsTaken.load();
     outStats->replayFailures = ctrl.replayFailures.load();
     outStats->totalNodes = ctrl.totalNodesExplored.load();
+    outStats->queueLockWaitNanos = ctrl.queueLockWaitNanos.load();
+    outStats->idleWaitNanos = ctrl.idleWaitNanos.load();
+    outStats->callbackLockWaitNanos = ctrl.callbackLockWaitNanos.load();
   }
 
   if(finalResult == MinionResult::MINION_TIMEOUT)

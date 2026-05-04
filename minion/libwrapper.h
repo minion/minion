@@ -266,6 +266,18 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
  *                   workers. Same value the runtime stashes on
  *                   getTableOut() under "Nodes".
  *
+ * Contention counters (nanoseconds, cumulative across all workers):
+ *   queueLockWaitNanos:    total time spent acquiring queue_mutex
+ *                          (donate + popOrFinish entry).
+ *   idleWaitNanos:         total time blocked in queue_cv.wait
+ *                          inside popOrFinish — i.e. workers idle
+ *                          because no work was available. The
+ *                          headline "is supply meeting demand?"
+ *                          number.
+ *   callbackLockWaitNanos: total time spent acquiring callbackMutex
+ *                          (per-solution serialisation). High on
+ *                          enumeration-heavy SAT runs.
+ *
  * All fields are zero on entry and only meaningful for the run that
  * just completed; no values from prior runs persist.
  */
@@ -274,6 +286,9 @@ struct MinionWorkStealStats {
   long long itemsTaken;
   long long replayFailures;
   long long totalNodes;
+  long long queueLockWaitNanos;
+  long long idleWaitNanos;
+  long long callbackLockWaitNanos;
 };
 
 /*

@@ -78,6 +78,32 @@ struct WorkStealController {
   std::atomic<long long> workItemsTaken;
   std::atomic<long long> replayFailures;  // path was infeasible
 
+  // Contention diagnostics. All in nanoseconds, summed across all
+  // workers for the lifetime of the run. Each is the cumulative wall
+  // time spent in a specific blocking primitive — e.g. if eight
+  // workers each waited 100 ms on the queue mutex, queueLockWaitNanos
+  // is 800 ms. Divide by (numWorkers * wallTimeNanos) for "fraction
+  // of available CPU spent here". Captured via steady_clock probes
+  // around lock/wait acquisitions; see work_steal.cpp.
+  //
+  //   queueLockWaitNanos:    blocking on queue_mutex (donate +
+  //                          popOrFinish acquire). High value means
+  //                          workers are contending for the donation
+  //                          queue itself.
+  //   idleWaitNanos:         time blocked in queue_cv.wait inside
+  //                          popOrFinish — i.e. worker had no work
+  //                          and was waiting for a donation. High
+  //                          value means donation supply isn't
+  //                          keeping up with worker demand.
+  //   callbackLockWaitNanos: blocking on callbackMutex (per-solution
+  //                          serialisation in the wrapper callback,
+  //                          libwrapper.cpp). High value means
+  //                          solution-output is the bottleneck —
+  //                          common on enumeration-heavy SAT runs.
+  std::atomic<long long> queueLockWaitNanos;
+  std::atomic<long long> idleWaitNanos;
+  std::atomic<long long> callbackLockWaitNanos;
+
   // Aggregated across all workers, for the parent's TableOut /
   // CLI summary. Workers add their per-context counts on exit.
   std::atomic<long long> totalNodesExplored;
@@ -98,6 +124,9 @@ struct WorkStealController {
         donationsMade(0),
         workItemsTaken(0),
         replayFailures(0),
+        queueLockWaitNanos(0),
+        idleWaitNanos(0),
+        callbackLockWaitNanos(0),
         totalNodesExplored(0),
         totalSolutionsFound(0),
         sollimit(-1),
