@@ -32,6 +32,25 @@ class SearchState {
 
   long long nodes;
   long long backtracks;
+  // Cumulative parallel-SAC fixpoint rounds executed across all
+  // -X-parallelPreprocess invocations in this run. A "round" is one
+  // fork-join wave where every worker independently re-derives SAC on
+  // its slice, then prunings are merged into the parent. Rounds == 0
+  // means parallel preprocess never fired (e.g. flag wasn't set, or
+  // only ran sequential SAC). Rounds >= 2 means the first round found
+  // prunings AND at least one further round was needed to prove
+  // convergence. Surfaced via TableOut so the random tester can grow
+  // instance size adaptively until the parallel path is actually
+  // exercised, mirroring the work-steal sweep's adaptive-sizing
+  // strategy.
+  long long parallelPreprocessRounds = 0;
+  // Total prunings (setMin + setMax + removeVal entries) emitted by
+  // worker slots and applied to the parent across all rounds. A
+  // direct "did parallel preprocess do useful work" signal — rounds
+  // can be 1 with prunings == 0 if the instance was already SAC at
+  // entry, in which case the parallel path ran but discovered
+  // nothing.
+  long long parallelPreprocessPrunings = 0;
   vector<AnyVarRef> optimiseVars;
   vector<AnyVarRef> raw_optimiseVars;
   vector<DomainInt> current_optimise_positions;
@@ -102,6 +121,18 @@ public:
   }
   long long getBacktrackCount() {
     return backtracks;
+  }
+  long long getParallelPreprocessRounds() {
+    return parallelPreprocessRounds;
+  }
+  void incrementParallelPreprocessRounds(long long n = 1) {
+    parallelPreprocessRounds += n;
+  }
+  long long getParallelPreprocessPrunings() {
+    return parallelPreprocessPrunings;
+  }
+  void incrementParallelPreprocessPrunings(long long n = 1) {
+    parallelPreprocessPrunings += n;
   }
   void setNodeCount(long long _nodes) {
     nodes = _nodes;

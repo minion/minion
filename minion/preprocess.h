@@ -341,9 +341,16 @@ void runParallelSACFixpoint(vector<Var>& vararray, Prop prop, bool onlyCheckBoun
     // Parent: wait for all children.
     Parallel::endRound(round);
 
+    // This is one full fork-join round; record it for the random
+    // tester's adaptive-sizing sweep so we can tell if the parallel
+    // path actually fired more than once (rounds >= 2 means at least
+    // one round produced prunings AND another was needed to converge).
+    getState().incrementParallelPreprocessRounds();
+
     // Scan slot statuses and merge prunings.
     bool anyEOS = false;
     bool anyProvedFailure = false;
+    long long roundPrunings = 0;
     for(int w = 0; w < N; ++w) {
       uint32_t s = slots[w]->status.load();
       if(s == STATUS_RUNNING || s == STATUS_FATAL) {
@@ -365,23 +372,27 @@ void runParallelSACFixpoint(vector<Var>& vararray, Prop prop, bool onlyCheckBoun
           if(v > var.min()) {
             var.setMin(v);
             anythingReduced = true;
+            ++roundPrunings;
           }
           break;
         case KIND_SET_MAX:
           if(v < var.max()) {
             var.setMax(v);
             anythingReduced = true;
+            ++roundPrunings;
           }
           break;
         case KIND_REMOVE_VAL:
           if(var.inDomain(v)) {
             var.removeFromDomain(v);
             anythingReduced = true;
+            ++roundPrunings;
           }
           break;
         }
       }
     }
+    getState().incrementParallelPreprocessPrunings(roundPrunings);
 
     for(int w = 0; w < N; ++w)
       releaseSlot(slots[w]);

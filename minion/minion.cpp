@@ -85,6 +85,16 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
   getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
                                                    getTableOut(), !getOptions().silent);
 
+  // Surface parallel-preprocess accounting so the random tester can
+  // tell whether -X-parallelPreprocess actually fired more than once
+  // (which is what its adaptive-sizing sweep grows the instance until
+  // it sees). 0 / 0 is reported even when the flag is off, so the
+  // tester always has a key to read.
+  getTableOut().set("ParallelPreprocessRounds",
+                    tostring(getState().getParallelPreprocessRounds()));
+  getTableOut().set("ParallelPreprocessPrunings",
+                    tostring(getState().getParallelPreprocessPrunings()));
+
   if(getOptions().outputCompressed != "" || getOptions().outputCompressedDomains)
     dumpSolver(getOptions().outputCompressed, getOptions().outputCompressedDomains);
 

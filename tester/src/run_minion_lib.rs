@@ -925,6 +925,12 @@ pub fn get_minion_solutions_in_process_work_steal(
         filename: format!("<in-process-work-steal:{testname}>"),
         cleanup: CleanupFiles::empty(),
         work_steal_donations: Some(stats.donations),
+        // In-process backend doesn't currently surface the parallel-
+        // preprocess counters (they're only emitted in the exec
+        // backend's TableOut). Work-steal is mutex with -X-parallel
+        // Preprocess so this combination never fires anyway.
+        parallel_preprocess_rounds: None,
+        parallel_preprocess_prunings: None,
         hit_solution_cap,
     })
 }
@@ -1020,6 +1026,11 @@ pub fn get_minion_solutions_in_process(
         filename: format!("<in-process:{testname}>"),
         cleanup: CleanupFiles::empty(),
         work_steal_donations: None,
+        // In-process backend doesn't currently surface the parallel-
+        // preprocess counters; the parallel-preprocess sweep is
+        // exec-only.
+        parallel_preprocess_rounds: None,
+        parallel_preprocess_prunings: None,
         hit_solution_cap,
     })
 }

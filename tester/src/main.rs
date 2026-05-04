@@ -725,6 +725,83 @@ fn main() -> Result<()> {
         ret_wsp?;
     }
 
+    // Parallel-preprocess sweep: same adaptive-sizing strategy as
+    // work-steal. Tiny random instances are usually SAC-stable on
+    // entry (the parallel SAC fixpoint converges in one round
+    // without finding any prunings), which doesn't exercise the
+    // merge / cross-worker prune-application logic. Grow the
+    // instance until at least one trial reports
+    // ParallelPreprocessRounds >= 2, or hit the cap.
+    //
+    // Exec-only because the in-process API doesn't surface the
+    // parallel-preprocess counters and the flag itself isn't plumbed
+    // through RunOptions.
+    if config.backend == Backend::Exec {
+        println!("Parallel-preprocess tests\n");
+        let ret_pp: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            let mut size = ws_initial;
+            loop {
+                // Per-constraint local counters so the adaptive-sizing
+                // decision isn't contaminated by other constraints'
+                // outcomes in the parallel sweep — global atomics
+                // would observe sibling constraints' rounds and lie.
+                let local_with_rounds = std::sync::atomic::AtomicU64::new(0);
+                let local_capped = std::sync::atomic::AtomicU64::new(0);
+                (0..opt.count)
+                    .into_par_iter()
+                    .try_for_each(|_| -> Result<()> {
+                        let outcome =
+                            test_types::test_constraint_parallel_preprocess(&config, c, 4, size)?;
+                        if outcome.had_rounds_ge2 {
+                            local_with_rounds
+                                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        }
+                        if outcome.was_capped {
+                            local_capped.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                        }
+                        Ok(())
+                    })
+                    .context(format!(
+                        "failure in {} with -X-parallelPreprocess 4 (size_factor={size})",
+                        c.name
+                    ))?;
+                let saw_rounds =
+                    local_with_rounds.load(std::sync::atomic::Ordering::Relaxed) > 0;
+                let capped_this_round =
+                    local_capped.load(std::sync::atomic::Ordering::Relaxed);
+                if saw_rounds {
+                    println!(
+                        "Tested {} (parallel-preprocess, size_factor={size}, \
+                         multi-round runs confirmed)",
+                        c.name
+                    );
+                    break;
+                }
+                if capped_this_round * 2 >= opt.count {
+                    println!(
+                        "Tested {} (parallel-preprocess, size_factor={size}, \
+                         {capped_this_round}/{} trials hit --max-solutions — \
+                         instance too large; giving up before multi-round seen)",
+                        c.name, opt.count
+                    );
+                    break;
+                }
+                if size >= ws_max {
+                    println!(
+                        "Tested {} (parallel-preprocess, size_factor={size}, \
+                         no multi-round runs seen — instance still SAC-trivial \
+                         at --ws-max-size cap)",
+                        c.name
+                    );
+                    break;
+                }
+                size = (size * 2).min(ws_max);
+            }
+            Ok(())
+        });
+        ret_pp?;
+    }
+
     {
         let trials = test_types::WS_TRIALS.load(std::sync::atomic::Ordering::Relaxed);
         let donations = test_types::WS_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
@@ -739,6 +816,16 @@ fn main() -> Result<()> {
             } else {
                 0.0
             }
+        );
+        let pp_trials = test_types::PP_TRIALS.load(std::sync::atomic::Ordering::Relaxed);
+        let pp_with_rounds =
+            test_types::PP_TRIALS_WITH_ROUNDS.load(std::sync::atomic::Ordering::Relaxed);
+        let pp_prunings =
+            test_types::PP_TOTAL_PRUNINGS.load(std::sync::atomic::Ordering::Relaxed);
+        println!(
+            "Parallel-preprocess coverage: {pp_trials} trials, \
+             {pp_with_rounds} trials with rounds>=2, \
+             {pp_prunings} prunings total"
         );
         // No bail here — the per-constraint loop already prints
         // "no donations seen — instance still too small at

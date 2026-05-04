@@ -37,6 +37,15 @@ pub struct MinionOutput {
     /// but no donation fired — useful for confirming the test
     /// exercises the donation path).
     pub work_steal_donations: Option<i64>,
+    /// Total parallel-SAC fork-join rounds. None if the run didn't
+    /// emit the key (older binaries); Some(0) when -X-parallelPreprocess
+    /// was off; Some(>=1) when parallel SAC fired. Used by the
+    /// adaptive parallel-preprocess sweep to detect whether the
+    /// parallel code path was actually exercised.
+    pub parallel_preprocess_rounds: Option<i64>,
+    /// Total prunings applied during parallel-SAC. Same None /
+    /// Some(0) / Some(>=1) semantics as `parallel_preprocess_rounds`.
+    pub parallel_preprocess_prunings: Option<i64>,
     /// True when the run hit the configured solution cap (`-sollimit`
     /// for exec mode, the per-trial counter for the in-process path)
     /// and stopped before exhausting search. Callers must treat the
@@ -87,6 +96,19 @@ struct MinionJsonOut {
     /// donation/replay path.
     #[serde(default)]
     WorkStealDonations: Option<String>,
+    /// Total fork-join rounds run by the parallel-SAC fixpoint.
+    /// 0 means the parallel path didn't fire (flag was off, or only
+    /// sequential SAC was selected). >= 2 means the first round
+    /// found prunings AND a further round was needed to confirm
+    /// convergence — the strongest "parallel preprocess actually
+    /// did meaningful work" signal we can read out.
+    #[serde(default)]
+    ParallelPreprocessRounds: Option<String>,
+    /// Cumulative prunings (setMin + setMax + removeVal) merged from
+    /// worker slots into the parent. Useful diagnostic alongside
+    /// rounds.
+    #[serde(default)]
+    ParallelPreprocessPrunings: Option<String>,
 }
 
 pub fn get_minion_solutions(
@@ -195,7 +217,7 @@ pub fn get_minion_solutions(
         (digest, raw)
     };
 
-    let nodes: (i64, Option<i64>) = {
+    let parsed = {
         let f = fs::File::open(&tableout)
             .context(format!("failed to open jsontableout file: {}", minioncmd))?;
 
@@ -225,10 +247,19 @@ pub fn get_minion_solutions(
             .WorkStealDonations
             .as_ref()
             .and_then(|s| s.parse::<i64>().ok());
+        let pp_rounds = v
+            .ParallelPreprocessRounds
+            .as_ref()
+            .and_then(|s| s.parse::<i64>().ok());
+        let pp_prunings = v
+            .ParallelPreprocessPrunings
+            .as_ref()
+            .and_then(|s| s.parse::<i64>().ok());
 
-        (nodes, donations)
+        (nodes, donations, pp_rounds, pp_prunings)
     };
-    let (nodes, work_steal_donations) = nodes;
+    let (nodes, work_steal_donations, parallel_preprocess_rounds, parallel_preprocess_prunings) =
+        parsed;
 
     // hit_solution_cap is true when the search stopped at the
     // -sollimit cap. Solution count == cap → cap was hit (search may
@@ -245,6 +276,8 @@ pub fn get_minion_solutions(
             files: vec![minout, solsout, tableout],
         },
         work_steal_donations,
+        parallel_preprocess_rounds,
+        parallel_preprocess_prunings,
         hit_solution_cap,
     })
 }

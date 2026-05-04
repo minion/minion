@@ -319,6 +319,19 @@ pub static WS_TRIALS_WITH_DONATIONS: AtomicU64 = AtomicU64::new(0);
 /// current size are too big to compare and stop growing.
 pub static WS_TRIALS_CAPPED: AtomicU64 = AtomicU64::new(0);
 
+/// Parallel-preprocess sweep diagnostics (mirrors the WS_* set above).
+/// `PP_TRIALS` counts trials that ran the parallel-preprocess
+/// comparison. `PP_TRIALS_WITH_ROUNDS` counts trials whose parallel
+/// run reported `rounds >= 2` — the strongest "parallel SAC actually
+/// did meaningful work" signal (one round found prunings, another
+/// confirmed convergence). `PP_TOTAL_PRUNINGS` accumulates merged
+/// prunings across trials. `PP_TRIALS_CAPPED` mirrors WS_TRIALS_CAPPED
+/// for the parallel-preprocess sweep's adaptive-sizing loop.
+pub static PP_TRIALS: AtomicU64 = AtomicU64::new(0);
+pub static PP_TRIALS_WITH_ROUNDS: AtomicU64 = AtomicU64::new(0);
+pub static PP_TOTAL_PRUNINGS: AtomicI64 = AtomicI64::new(0);
+pub static PP_TRIALS_CAPPED: AtomicU64 = AtomicU64::new(0);
+
 /// Work-stealing parallel torture test: solve the same instance with
 /// `-findallsols` sequentially and under `-X-parallelWorkSteal N`, and
 /// require the two solution sets to match. Unlike `-parallel` (fork
@@ -448,6 +461,118 @@ pub fn test_constraint_workstal_portfolio(
     ret2.cleanup.cleanup();
 
     Ok(())
+}
+
+/// Per-trial outcome from `test_constraint_parallel_preprocess`. The
+/// global PP_* counters update too, but the per-constraint adaptive-
+/// sizing loop in `main.rs` needs a *local* signal — global atomics
+/// would observe other constraints' rounds in the parallel sweep and
+/// declare every constraint "multi-round confirmed" the moment any
+/// constraint fires.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PPTrialOutcome {
+    pub had_rounds_ge2: bool,
+    pub was_capped: bool,
+}
+
+/// Parallel-preprocess correctness test.
+///
+/// Solve the same instance with `-preprocess SAC` sequentially and
+/// then with `-preprocess SAC -X-parallelPreprocess N`. Parallel SAC
+/// is mathematically required to reach the same fixpoint as sequential
+/// SAC, so the solution sets must match exactly — same correctness
+/// contract as work-stealing.
+///
+/// Random tester instances at `size_factor = 1` typically have
+/// SAC-trivial domains (the fixpoint converges in one round before any
+/// pruning happens), so the parallel path can run without ever doing
+/// meaningful work. The caller drives an adaptive-sizing loop in
+/// `main.rs` that grows the instance until at least one trial reports
+/// `rounds >= 2` — the strongest "parallel SAC actually fired" signal
+/// available, because rounds == 1 just means "first round found
+/// nothing" while rounds >= 2 means "first round found prunings AND a
+/// second round was needed to confirm convergence".
+///
+/// Exec-only: the in-process API doesn't surface the parallel-
+/// preprocess counters (and the flag itself isn't plumbed through
+/// `RunOptions`). The exec backend's `-jsontableout` already reports
+/// `ParallelPreprocessRounds` and `ParallelPreprocessPrunings`.
+pub fn test_constraint_parallel_preprocess(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    n: u32,
+    size_factor: u32,
+) -> Result<PPTrialOutcome> {
+    let instance = constraint_def::build_random_instance_sized(c, size_factor);
+    let ret = run_solve(
+        config,
+        &["-findallsols", "-preprocess", "SAC"],
+        &instance,
+        "pp_seq",
+    )?;
+    if ret.hit_solution_cap {
+        PP_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
+        ret.cleanup.cleanup();
+        return Ok(PPTrialOutcome {
+            was_capped: true,
+            ..Default::default()
+        });
+    }
+    let n_str = n.to_string();
+    let ret2 = run_solve(
+        config,
+        &[
+            "-findallsols",
+            "-preprocess",
+            "SAC",
+            "-X-parallelPreprocess",
+            &n_str,
+        ],
+        &instance,
+        "pp_par",
+    )?;
+    if ret2.hit_solution_cap {
+        PP_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(PPTrialOutcome {
+            was_capped: true,
+            ..Default::default()
+        });
+    }
+
+    if ret.solutions != ret2.solutions {
+        return Err(anyhow!(format!(
+            "Parallel-preprocess solutions not equal in {} vs {}: seq={} par={}",
+            ret.filename,
+            ret2.filename,
+            ret.solutions.count,
+            ret2.solutions.count
+        )));
+    }
+
+    PP_TRIALS.fetch_add(1, Ordering::Relaxed);
+    let mut outcome = PPTrialOutcome::default();
+    if let Some(rounds) = ret2.parallel_preprocess_rounds {
+        // rounds >= 2 means the parallel path fired AND did meaningful
+        // work (a round found prunings, another confirmed convergence).
+        // rounds == 1 means parallel SAC ran but the instance was
+        // already SAC-stable so nothing was pruned — still a valid run
+        // through the parallel code path, but doesn't tell us anything
+        // about the merge / cross-worker prune handling.
+        if rounds >= 2 {
+            PP_TRIALS_WITH_ROUNDS.fetch_add(1, Ordering::Relaxed);
+            outcome.had_rounds_ge2 = true;
+        }
+    }
+    if let Some(prunings) = ret2.parallel_preprocess_prunings {
+        PP_TOTAL_PRUNINGS.fetch_add(prunings, Ordering::Relaxed);
+    }
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
+
+    Ok(outcome)
 }
 
 /// Exercise the restart-search code path (`restartNewSearchManager.h`).
