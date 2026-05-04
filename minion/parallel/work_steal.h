@@ -26,6 +26,7 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <limits>
 #include <mutex>
 #include <queue>
 #include <vector>
@@ -108,6 +109,16 @@ struct WorkStealController {
   // CLI summary. Workers add their per-context counts on exit.
   std::atomic<long long> totalNodesExplored;
 
+  // Cross-worker optimisation bound channel. Workers push their
+  // post-bump optVals[0] here on each solution (CAS-max) and read
+  // it back during opt_handler to tighten further than their own
+  // local bound. Direction: minion internally maximises
+  // OptimiseVars (negating user-side minimisation), so "tighter" =
+  // LARGER. Single-objective only — multi-objective lex
+  // optimisation needs a vector and is skipped silently. The
+  // sentinel "no bound seen yet" is LLONG_MIN.
+  std::atomic<long long> sharedOptBound;
+
   // Solution accounting (mirrors ParallelController's contract).
   std::atomic<long long> totalSolutionsFound;
   std::mutex callbackMutex;
@@ -128,6 +139,7 @@ struct WorkStealController {
         idleWaitNanos(0),
         callbackLockWaitNanos(0),
         totalNodesExplored(0),
+        sharedOptBound(std::numeric_limits<long long>::min()),
         totalSolutionsFound(0),
         sollimit(-1),
         userCallback(nullptr),

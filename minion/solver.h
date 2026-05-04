@@ -382,6 +382,27 @@ public:
   /// behaviour). Set via the experimental -X-parallelThreads [N] flag.
   /// Mutually exclusive with -parallel and -X-parallelPreprocess.
   int numParallelThreads = 0;
+  /// Optional pointer to a `std::atomic<long long>` shared by all
+  /// workers in a parallel run, used to broadcast the tightest
+  /// optimisation bound seen by any worker so others can prune
+  /// further branches without waiting to find a solution of their
+  /// own. Stored as void* to avoid pulling <atomic> into solver.h.
+  ///
+  /// Direction: minion internally maximises OptimiseVars (negating
+  /// user-side minimisation in optimiseMinimiseVars), so "tighter"
+  /// bound = LARGER. The atomic stores the running max across all
+  /// workers' post-bump optVals[0]; workers apply it as
+  /// `vars[0].setMin(shared)` whenever shared exceeds their own
+  /// current bound.
+  ///
+  /// Single-objective only — multi-objective lex optimisation needs
+  /// a vector of bounds, which a single atomic can't hold. Workers
+  /// skip the broadcast when optVals.size() != 1.
+  ///
+  /// Set by runMinionParallel and runMinionWorkSteal before workers
+  /// start; nullptr when no parallel run is active. The sentinel
+  /// "no bound seen yet" value is `LLONG_MIN`.
+  void* parallelBoundChannel = nullptr;
 
   /// Number of OS threads for work-stealing search. 0 means sequential.
   /// Set via the experimental -X-parallelWorkSteal [N] flag. Each worker

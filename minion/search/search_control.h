@@ -117,6 +117,24 @@ shared_ptr<SearchManager> makeSearch_manager(PropagationLevel propMethod,
           return;
         }
       }
+
+      // Parallel bound channel: if any sibling worker has found a
+      // tighter bound, adopt it. We always apply our local optVals
+      // first (above) so a thread with a strictly tighter local
+      // bound never weakens it; we then push to setMin again only if
+      // the shared value is greater than the current variable min.
+      // The setMin call is a no-op when the shared bound doesn't
+      // exceed the local one. Single-objective only — the
+      // controller never broadcasts for multi-objective runs.
+      if(getOptions().parallelBoundChannel != nullptr && vars.size() == 1) {
+        auto* shared = static_cast<std::atomic<long long>*>(
+            getOptions().parallelBoundChannel);
+        long long sentinel = std::numeric_limits<long long>::min();
+        long long s = shared->load(std::memory_order_relaxed);
+        if(s != sentinel && DomainInt(checked_cast<SysInt>(s)) > vars[0].min()) {
+          vars[0].setMin(DomainInt(checked_cast<SysInt>(s)));
+        }
+      }
     };
   } else {
     opt_handler = []() {};

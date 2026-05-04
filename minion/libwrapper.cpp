@@ -17,6 +17,7 @@
 #include "triggering/trigger_list.h"
 #include "tuple_container.h"
 #include <iomanip>
+#include <limits>
 #include <memory>
 #include <cstdlib>
 
@@ -316,6 +317,13 @@ struct ParallelController {
   long long sollimit;
   bool (*userCallback)(MinionContext*, void*);
   void* userUserdata;
+  // Cross-worker optimisation bound channel. Workers push their
+  // post-bump optVals[0] here on each solution (CAS-max) and read it
+  // back during opt_handler to tighten further than their own local
+  // bound. LLONG_MIN sentinel = no bound seen yet. Only used when
+  // OptimiseVars.size() == 1 (single-objective). See solver.h's
+  // SearchOptions::parallelBoundChannel for direction details.
+  std::atomic<long long> sharedOptBound{std::numeric_limits<long long>::min()};
 };
 
 // Wrapper callback: invoked on each solution event from any worker. Locks
@@ -443,6 +451,10 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
       // Workers share the controller's parData; they must not also be flagged
       // as fork-mode workers (which would re-init signal handlers etc).
       perThreadOptions.parallel = false;
+      // Bound channel: each worker reads/writes the controller's
+      // shared atomic to coordinate optimisation pruning. See
+      // SearchOptions::parallelBoundChannel for the full contract.
+      perThreadOptions.parallelBoundChannel = &shared.sharedOptBound;
       // For N>1, silence per-worker stats prints so the parent's summary is
       // the single source of truth. With N=1, leave silent untouched so
       // behaviour matches sequential runMinion exactly (incl. "Sol:" lines
@@ -692,6 +704,9 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
         perThreadOptions.parallel = false;
         // Inner workers must NOT recurse into portfolio setup themselves.
         perThreadOptions.parallelWorkStealPortfolio = false;
+        // Optimisation bound channel — see SearchOptions::
+        // parallelBoundChannel for the contract.
+        perThreadOptions.parallelBoundChannel = &ctrl.sharedOptBound;
         // Hand the controller pointer + this worker's index into the
         // search loop via SearchOptions so SolveCSP dispatches into the
         // work-steal worker loop.

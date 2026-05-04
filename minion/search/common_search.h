@@ -346,6 +346,27 @@ void inline standard_dealWith_solution() {
       optVals.back()++;
     }
     getState().setOptimiseValue(optVals);
+
+    // Parallel bound channel: broadcast our (post-bump) bound to
+    // sibling workers via CAS-max. Direction: minion always
+    // maximises OptimiseVars internally (negating user-side
+    // minimisation), so the tightest bound is the LARGEST optVals[0]
+    // across all workers. Single-objective only — multi-objective
+    // lex optimisation would need a vector channel.
+    if(getOptions().parallelBoundChannel != nullptr && optVals.size() == 1) {
+      auto* shared =
+          static_cast<std::atomic<long long>*>(getOptions().parallelBoundChannel);
+      long long val = checked_cast<long long>(optVals[0]);
+      long long current = shared->load(std::memory_order_relaxed);
+      while(val > current &&
+            !shared->compare_exchange_weak(current, val,
+                                           std::memory_order_relaxed,
+                                           std::memory_order_relaxed)) {
+        // current is reloaded by compare_exchange_weak on failure;
+        // loop until either our CAS wins or our value is no longer
+        // larger (some other worker found a tighter bound first).
+      }
+    }
   }
 
   #ifdef LIBMINION
