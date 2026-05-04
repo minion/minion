@@ -99,6 +99,33 @@ fn run_solve(
     instance: &constraint_def::ConstraintInstance,
     testname: &str,
 ) -> Result<MinionOutput> {
+    // Default: digest-only — WE ARE HASHING SOLUTIONS, NOT STORING
+    // THEM (see solution_digest.rs). Callers that need indexed access
+    // to all solutions go through `run_solve_keep_full` below.
+    run_solve_inner(config, extraargs, instance, testname, false)
+}
+
+/// Same as [`run_solve`], but populates `MinionOutput::raw_solutions`
+/// with the full Vec of solutions. Use only when the caller needs
+/// indexed access (mid-search prefix slices, membership checks, etc.).
+/// Heavy-traffic set-equality call sites should use [`run_solve`] and
+/// compare digests.
+fn run_solve_keep_full(
+    config: &MinionConfig,
+    extraargs: &[&str],
+    instance: &constraint_def::ConstraintInstance,
+    testname: &str,
+) -> Result<MinionOutput> {
+    run_solve_inner(config, extraargs, instance, testname, true)
+}
+
+fn run_solve_inner(
+    config: &MinionConfig,
+    extraargs: &[&str],
+    instance: &constraint_def::ConstraintInstance,
+    testname: &str,
+    keep_full_solutions: bool,
+) -> Result<MinionOutput> {
     match config.backend {
         Backend::Exec => run_minion::get_minion_solutions(
             config.minionexec,
@@ -107,6 +134,7 @@ fn run_solve(
             instance,
             testname,
             config.max_solutions,
+            keep_full_solutions,
         ),
         Backend::InProcess => {
             // Tiny flag parser: -findallsols is recognised as before;
@@ -153,6 +181,7 @@ fn run_solve(
                     n,
                     testname,
                     config.max_solutions,
+                    keep_full_solutions,
                 )
             } else {
                 run_minion_lib::get_minion_solutions_in_process(
@@ -161,6 +190,7 @@ fn run_solve(
                     config.run_options_no_seed(),
                     testname,
                     config.max_solutions,
+                    keep_full_solutions,
                 )
             }
         }
@@ -198,35 +228,24 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    if config.deterministic_ordering() {
-        if ret.solutions != ret2.solutions {
-            let n = ret.solutions.len().min(10);
-            let m = ret2.solutions.len().min(10);
-            let name = &c.name;
-            return Err(anyhow!(format!(
-                "Solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
-                ret.filename,
-                ret2.filename,
-                ret.solutions.len(),
-                &ret.solutions[..n],
-                ret2.solutions.len(),
-                &ret2.solutions[..m],
-            )));
-        }
-    } else {
-        // State-dependent or randomised ordering means original and
-        // tableised may enumerate in different orders even though both
-        // saw the same model — compare the solution *sets*.
-        let mut a = ret.solutions.clone();
-        let mut b = ret2.solutions.clone();
-        a.sort();
-        b.sort();
-        if a != b {
-            return Err(anyhow!(format!(
-                "Solution sets not equal in {} vs {}",
-                ret.filename, ret2.filename
-            )));
-        }
+    // Comparison is now a digest equality check. The digest sums each
+    // solution's hash mod 2^64 (order-independent), so the previously-
+    // distinct deterministic-vs-set comparison paths collapse into one:
+    // both check multiset equality. The bounded `sample` field gives us
+    // up to 16 concrete solutions per side for failure messages.
+    if ret.solutions != ret2.solutions {
+        let name = &c.name;
+        let n = ret.solutions.sample.len().min(10);
+        let m = ret2.solutions.sample.len().min(10);
+        return Err(anyhow!(format!(
+            "Solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
+            ret.filename,
+            ret2.filename,
+            ret.solutions.count,
+            &ret.solutions.sample[..n],
+            ret2.solutions.count,
+            &ret2.solutions.sample[..m],
+        )));
     }
     // Node-count equality is a GAC-propagator invariant only when the
     // ordering is state-free (Static + Ascend/Descend); state-dependent
@@ -259,11 +278,7 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    let mut sortsols = ret.solutions.clone();
-    let mut sortsols2 = ret2.solutions.clone();
-    sortsols.sort();
-    sortsols2.sort();
-    if sortsols != sortsols2 {
+    if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -344,17 +359,13 @@ pub fn test_constraint_workstal(
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    let mut a = ret.solutions.clone();
-    let mut b = ret2.solutions.clone();
-    a.sort();
-    b.sort();
-    if a != b {
+    if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Work-stealing solutions not equal in {} vs {}: seq={} ws={}",
             ret.filename,
             ret2.filename,
-            ret.solutions.len(),
-            ret2.solutions.len()
+            ret.solutions.count,
+            ret2.solutions.count
         )));
     }
 
@@ -415,17 +426,13 @@ pub fn test_constraint_workstal_portfolio(
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    let mut a = ret.solutions.clone();
-    let mut b = ret2.solutions.clone();
-    a.sort();
-    b.sort();
-    if a != b {
+    if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Work-steal portfolio solutions not equal in {} vs {}: seq={} portfolio={}",
             ret.filename,
             ret2.filename,
-            ret.solutions.len(),
-            ret2.solutions.len()
+            ret.solutions.count,
+            ret2.solutions.count
         )));
     }
 
@@ -471,31 +478,44 @@ pub fn test_constraint_restart(
 ) -> Result<()> {
     let instance = constraint_def::build_random_instance(c);
 
-    let baseline = run_solve(config, &["-findallsols"], &instance, "restart_baseline")?;
-    if baseline.hit_solution_cap || baseline.solutions.is_empty() {
+    // Restart needs membership testing (does the restart's single
+    // solution lie in the baseline set?), so the baseline opts into
+    // raw_solutions storage. The restart itself uses -sollimit 1 so
+    // its single-row Vec is stored regardless of digest mode.
+    let baseline =
+        run_solve_keep_full(config, &["-findallsols"], &instance, "restart_baseline")?;
+    if baseline.hit_solution_cap || baseline.solutions.count == 0 {
         baseline.cleanup.cleanup();
         return Ok(());
     }
 
     let mut args: Vec<&str> = vec!["-restarts", "-sollimit", "1"];
     args.extend_from_slice(extra_restart_args);
-    let restart = run_solve(config, &args, &instance, "restart")?;
+    let restart = run_solve_keep_full(config, &args, &instance, "restart")?;
 
-    if restart.solutions.len() != 1 {
+    let restart_sols = restart
+        .raw_solutions
+        .as_ref()
+        .expect("run_solve_keep_full populates raw_solutions");
+    if restart_sols.len() != 1 {
         return Err(anyhow!(format!(
             "Restart found {} solutions, expected 1 (baseline has {}, in {} vs {})",
-            restart.solutions.len(),
-            baseline.solutions.len(),
+            restart_sols.len(),
+            baseline.solutions.count,
             baseline.filename,
             restart.filename
         )));
     }
-    let found = &restart.solutions[0];
-    if !baseline.solutions.iter().any(|s| s == found) {
+    let found = &restart_sols[0];
+    let baseline_sols = baseline
+        .raw_solutions
+        .as_ref()
+        .expect("run_solve_keep_full populates raw_solutions");
+    if !baseline_sols.iter().any(|s| s == found) {
         return Err(anyhow!(format!(
             "Restart solution {:?} not in baseline ({} sols) ({} vs {})",
             found,
-            baseline.solutions.len(),
+            baseline.solutions.count,
             baseline.filename,
             restart.filename
         )));
@@ -550,24 +570,21 @@ pub fn test_constraint_variant_equivalence(config: &MinionConfig, variants: &[&s
         return Ok(());
     }
 
-    let mut ref_sols = runs[0].solutions.clone();
-    ref_sols.sort();
-
     for i in 1..runs.len() {
-        let mut sols = runs[i].solutions.clone();
-        sols.sort();
-        if sols != ref_sols {
-            let n = ref_sols.len().min(5);
-            let m = sols.len().min(5);
+        if runs[i].solutions != runs[0].solutions {
+            let ref_sample = &runs[0].solutions.sample;
+            let var_sample = &runs[i].solutions.sample;
+            let n = ref_sample.len().min(5);
+            let m = var_sample.len().min(5);
             return Err(anyhow!(format!(
                 "Propagator {} disagrees with {}: \
                  ref={}×{:?} variant={}×{:?} (files {} vs {})",
                 variants[i],
                 variants[0],
-                ref_sols.len(),
-                &ref_sols[..n],
-                sols.len(),
-                &sols[..m],
+                runs[0].solutions.count,
+                &ref_sample[..n],
+                runs[i].solutions.count,
+                &var_sample[..m],
                 runs[0].filename,
                 runs[i].filename,
             )));
@@ -601,11 +618,7 @@ pub fn test_constraint_options(
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    let mut sortsols = ret.solutions.clone();
-    let mut sortsols2 = ret2.solutions.clone();
-    sortsols.sort();
-    sortsols2.sort();
-    if sortsols != sortsols2 {
+    if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Solutions not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -659,9 +672,10 @@ pub fn test_constraint_midsearch_add_vars(
         config.run_options(seed),
         "baseline",
         config.max_solutions,
+        true, // keep_full_solutions: mid-search needs indexed access
     )?;
 
-    if baseline.solutions.len() <= inject_after {
+    if baseline.solutions.count as usize <= inject_after {
         // Not enough baseline solutions to have anything post-injection.
         return Ok(());
     }
@@ -683,16 +697,18 @@ pub fn test_constraint_midsearch_add_vars(
         "midsearch",
     )?;
 
+    let baseline_sols = baseline.raw_sols();
+
     if !got.injected {
         return Err(anyhow!(
             "midsearch: expected injection to fire at count {} (baseline has {} solutions)",
             inject_after,
-            baseline.solutions.len()
+            baseline_sols.len()
         ));
     }
 
     // Pre-injection must equal baseline[..inject_after] exactly.
-    let expected_pre = &baseline.solutions[..inject_after];
+    let expected_pre = &baseline_sols[..inject_after];
     if got.pre_injection.as_slice() != expected_pre {
         return Err(anyhow!(
             "midsearch: pre-injection differs from baseline prefix ({} vs {} rows)",
@@ -702,10 +718,10 @@ pub fn test_constraint_midsearch_add_vars(
     }
 
     // Post-injection: one row per remaining baseline leaf, in the same order.
-    let remaining = &baseline.solutions[inject_after..];
+    let remaining = &baseline_sols[inject_after..];
     if got.post_injection.len() != remaining.len() {
         if std::env::var("TESTER_DEBUG").is_ok() {
-            eprintln!("baseline: {:?}", baseline.solutions);
+            eprintln!("baseline: {:?}", baseline_sols);
             eprintln!("pre:      {:?}", got.pre_injection);
             eprintln!("post:     {:?}", got.post_injection);
         }
@@ -720,7 +736,7 @@ pub fn test_constraint_midsearch_add_vars(
     // check:
     //   * decision-var values match the baseline remaining row at the same index;
     //   * each new-var value is within its declared domain.
-    let decision_len = baseline.solutions.first().map(|r| r.len()).unwrap_or(0);
+    let decision_len = baseline_sols.first().map(|r| r.len()).unwrap_or(0);
     for (idx, row) in got.post_injection.iter().enumerate() {
         if row.len() != decision_len + new_var_count {
             return Err(anyhow!(
@@ -1498,24 +1514,14 @@ pub fn test_constraint_deep_nested(
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    if config.deterministic_ordering() {
-        if ret.solutions != ret2.solutions {
-            return Err(anyhow!(format!(
-                "Solutions not equal in {} vs {} (deep nest depth={depth})",
-                ret.filename, ret2.filename
-            )));
-        }
-    } else {
-        let mut a = ret.solutions.clone();
-        let mut b = ret2.solutions.clone();
-        a.sort();
-        b.sort();
-        if a != b {
-            return Err(anyhow!(format!(
-                "Solution sets not equal in {} vs {} (deep nest depth={depth})",
-                ret.filename, ret2.filename
-            )));
-        }
+    // Multiset digest comparison — order-independent regardless of
+    // ordering heuristic, so the deterministic vs randomised paths
+    // collapse into one.
+    if ret.solutions != ret2.solutions {
+        return Err(anyhow!(format!(
+            "Solutions not equal in {} vs {} (deep nest depth={depth})",
+            ret.filename, ret2.filename
+        )));
     }
     // GAC node-count check intentionally skipped here: the `gac` flag
     // on the top-level parent in NESTED_CONSTRAINT_LIST is set to
@@ -1575,32 +1581,19 @@ pub fn test_constraint_nested(
         ret2.cleanup.cleanup();
         return Ok(());
     }
-    if config.deterministic_ordering() {
-        if ret.solutions != ret2.solutions {
-            let n = ret.solutions.len().min(10);
-            let m = ret2.solutions.len().min(10);
-            let name = &c.name;
-            return Err(anyhow!(format!(
-                "Nested solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
-                ret.filename,
-                ret2.filename,
-                ret.solutions.len(),
-                &ret.solutions[..n],
-                ret2.solutions.len(),
-                &ret2.solutions[..m],
-            )));
-        }
-    } else {
-        let mut a = ret.solutions.clone();
-        let mut b = ret2.solutions.clone();
-        a.sort();
-        b.sort();
-        if a != b {
-            return Err(anyhow!(format!(
-                "Solution sets not equal in {} vs {}",
-                ret.filename, ret2.filename
-            )));
-        }
+    if ret.solutions != ret2.solutions {
+        let name = &c.name;
+        let n = ret.solutions.sample.len().min(10);
+        let m = ret2.solutions.sample.len().min(10);
+        return Err(anyhow!(format!(
+            "Nested solutions not equal in {}/{} ({name}): orig={}×{:?} tup={}×{:?}",
+            ret.filename,
+            ret2.filename,
+            ret.solutions.count,
+            &ret.solutions.sample[..n],
+            ret2.solutions.count,
+            &ret2.solutions.sample[..m],
+        )));
     }
     if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
         return Err(anyhow!(format!(

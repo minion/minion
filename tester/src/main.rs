@@ -18,6 +18,7 @@ mod counter;
 mod minion_instance;
 mod run_minion;
 mod run_minion_lib;
+mod solution_digest;
 mod test_types;
 
 use test_types::Backend;

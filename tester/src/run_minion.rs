@@ -2,6 +2,7 @@
 
 use crate::constraint_def::ConstraintInstance;
 use crate::minion_instance::print_minion_file_pair;
+use crate::solution_digest::SolutionDigest;
 
 use anyhow::{anyhow, Context, Result};
 
@@ -18,7 +19,16 @@ use self::itertools::Itertools;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct MinionOutput {
-    pub solutions: Vec<Vec<i64>>,
+    /// Compact digest of the solution multiset (sum of per-solution
+    /// hashes mod 2^64). Always populated. See `solution_digest.rs`
+    /// for the rationale — WE ARE HASHING SOLUTIONS, NOT STORING
+    /// THEM, to keep memory O(1) regardless of solution count.
+    pub solutions: SolutionDigest,
+    /// Full solution list, only populated when the caller passes
+    /// `keep_full_solutions=true`. The mid-search tests need indexed
+    /// access (prefix slices, membership checks); the heavy parallel
+    /// sweeps don't and rely on `solutions` (the digest) only.
+    pub raw_solutions: Option<Vec<Vec<i64>>>,
     pub nodes: i64,
     pub filename: String,
     pub cleanup: CleanupFiles,
@@ -34,6 +44,19 @@ pub struct MinionOutput {
     /// comparison — the random instance is too large to be a useful
     /// signal at this size.
     pub hit_solution_cap: bool,
+}
+
+impl MinionOutput {
+    /// Access the full solution Vec. Panics if the run was started
+    /// without `keep_full_solutions=true` (digest-only mode). Use only
+    /// in callers that explicitly request raw storage via
+    /// `run_solve_keep_full` or by passing `keep_full_solutions: true`
+    /// to the in-process API directly.
+    pub fn raw_sols(&self) -> &[Vec<i64>] {
+        self.raw_solutions
+            .as_deref()
+            .expect("solutions Vec only available with keep_full_solutions=true")
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -73,6 +96,7 @@ pub fn get_minion_solutions(
     instance: &ConstraintInstance,
     testname: &str,
     max_solutions: i64,
+    keep_full_solutions: bool,
 ) -> Result<MinionOutput> {
     let nameid = format!(
         "{:?}_{}_{}",
@@ -143,22 +167,32 @@ pub fn get_minion_solutions(
         )));
     }
 
-    let solutions = {
+    // Stream the -solsout file line by line into the digest. Each line
+    // is one solution (whitespace-separated decimal values). We avoid
+    // building a `Vec<Vec<i64>>` of every solution unless the caller
+    // explicitly asks for it via `keep_full_solutions`. WE ARE HASHING
+    // SOLUTIONS, NOT STORING THEM — this is the central memory win:
+    // tests that previously OOM'd at the 10 M-solution cap now use
+    // O(1) memory regardless of solution count.
+    let (digest, raw_solutions) = {
         let f = fs::File::open(&solsout)
             .context(format!("failed to open solution file: {}", minioncmd))?;
-
         let reader = BufReader::new(f);
-
-        let mut solutions: Vec<Vec<i64>> = Vec::new();
+        let mut digest = SolutionDigest::new();
+        let mut raw: Option<Vec<Vec<i64>>> =
+            if keep_full_solutions { Some(Vec::new()) } else { None };
         for tryline in reader.lines() {
             let line = tryline.context(format!("failure reading solutions: {}", minioncmd))?;
-            solutions.push(
-                line.split_whitespace()
-                    .map(|x| x.parse::<i64>().unwrap())
-                    .collect(),
-            )
+            let sol: Vec<i64> = line
+                .split_whitespace()
+                .map(|x| x.parse::<i64>().unwrap())
+                .collect();
+            if let Some(v) = raw.as_mut() {
+                v.push(sol.clone());
+            }
+            digest.add(sol);
         }
-        solutions
+        (digest, raw)
     };
 
     let nodes: (i64, Option<i64>) = {
@@ -179,10 +213,10 @@ pub fn get_minion_solutions(
             .parse::<i64>()
             .context(format!("invalid solution count: {}", minioncmd))?;
 
-        if solcount != solutions.len() as i64 {
+        if solcount != digest.count as i64 {
             return Err(anyhow!(format!(
-                "Solutions files contains {} solutions, but SolutionsFound is {}",
-                solutions.len(),
+                "Solutions file contains {} solutions, but SolutionsFound is {}",
+                digest.count,
                 solcount
             )));
         }
@@ -200,10 +234,11 @@ pub fn get_minion_solutions(
     // -sollimit cap. Solution count == cap → cap was hit (search may
     // or may not have been complete; in either case the caller should
     // treat the prefix as untrustworthy for set-equality checks).
-    let hit_solution_cap = max_solutions > 0 && solutions.len() as i64 >= max_solutions;
+    let hit_solution_cap = max_solutions > 0 && digest.count as i64 >= max_solutions;
 
     Ok(MinionOutput {
-        solutions,
+        solutions: digest,
+        raw_solutions,
         nodes,
         filename: minout.clone(),
         cleanup: CleanupFiles {

@@ -15,6 +15,7 @@ use minion_sys::ast::{Constant as MC, Constraint as MCon, Model, Var, VarDomain,
 
 use crate::constraint_def::{ConstraintInstance, MinionVariable, VarType};
 use crate::run_minion::{CleanupFiles, MinionOutput};
+use crate::solution_digest::SolutionDigest;
 
 /// Convert a tester `MinionVariable` to a minion-sys `Var`.
 /// Constants become anonymous `ConstantAsVar`; everything else is a named ref.
@@ -859,6 +860,7 @@ pub fn get_minion_solutions_in_process_work_steal(
     num_threads: usize,
     testname: &str,
     max_solutions: i64,
+    keep_full_solutions: bool,
 ) -> Result<MinionOutput> {
     let mut model = Model::new();
     register_tuple_tables_for_instance(&mut model, instance)?;
@@ -871,14 +873,19 @@ pub fn get_minion_solutions_in_process_work_steal(
 
     // The work-steal callback is invoked from any worker thread (the
     // C-side controller mutex serialises calls so no two run
-    // concurrently, but the worker that calls in varies). We need a
-    // Send + Sync wrapper around the solutions vec — Mutex<Vec<...>>
-    // does the job.
-    let solutions: std::sync::Mutex<Vec<Vec<i64>>> = std::sync::Mutex::new(Vec::new());
+    // concurrently, but the worker that calls in varies). The shared
+    // state is a (digest, optional Vec) pair under one mutex. WE ARE
+    // HASHING SOLUTIONS, NOT STORING THEM by default — see
+    // solution_digest.rs for the rationale and collision analysis.
+    let shared: std::sync::Mutex<(SolutionDigest, Option<Vec<Vec<i64>>>)> =
+        std::sync::Mutex::new((
+            SolutionDigest::new(),
+            if keep_full_solutions { Some(Vec::new()) } else { None },
+        ));
 
     let cb: minion_sys::ParallelCallback<'_> = {
         let variable_order = &variable_order;
-        let solutions = &solutions;
+        let shared = &shared;
         Box::new(move |sol_map: HashMap<VarName, MC>| -> bool {
             let mut row = Vec::with_capacity(variable_order.len());
             for name in variable_order.iter() {
@@ -889,11 +896,14 @@ pub fn get_minion_solutions_in_process_work_steal(
                 }
             }
             #[allow(clippy::unwrap_used)]
-            let mut sols = solutions.lock().unwrap();
-            sols.push(row);
+            let mut s = shared.lock().unwrap();
+            if let Some(v) = s.1.as_mut() {
+                v.push(row.clone());
+            }
+            s.0.add(row);
             // Stop when the cap is reached. Returning false signals
             // the controller to broadcast stop to the other workers.
-            if max_solutions > 0 && sols.len() as i64 >= max_solutions {
+            if max_solutions > 0 && s.0.count as i64 >= max_solutions {
                 return false;
             }
             true
@@ -904,12 +914,13 @@ pub fn get_minion_solutions_in_process_work_steal(
         .map_err(|e| anyhow!("minion in-process work-steal error ({testname}): {e}"))?;
 
     #[allow(clippy::unwrap_used)]
-    let solutions = solutions.into_inner().unwrap();
+    let (digest, raw_solutions) = shared.into_inner().unwrap();
 
-    let hit_solution_cap = max_solutions > 0 && solutions.len() as i64 >= max_solutions;
+    let hit_solution_cap = max_solutions > 0 && digest.count as i64 >= max_solutions;
 
     Ok(MinionOutput {
-        solutions,
+        solutions: digest,
+        raw_solutions,
         nodes: stats.total_nodes,
         filename: format!("<in-process-work-steal:{testname}>"),
         cleanup: CleanupFiles::empty(),
@@ -924,6 +935,7 @@ pub fn get_minion_solutions_in_process(
     options: minion_sys::RunOptions,
     testname: &str,
     max_solutions: i64,
+    keep_full_solutions: bool,
 ) -> Result<MinionOutput> {
     let mut model = Model::new();
     register_tuple_tables_for_instance(&mut model, instance)?;
@@ -934,11 +946,17 @@ pub fn get_minion_solutions_in_process(
 
     let variable_order = model.named_variables.get_variable_order();
 
-    let mut solutions: Vec<Vec<i64>> = Vec::new();
+    // WE ARE HASHING SOLUTIONS, NOT STORING THEM by default —
+    // `keep_full_solutions` opts callers (mid-search tests) into Vec
+    // storage when they need indexed access. See solution_digest.rs.
+    let mut digest = SolutionDigest::new();
+    let mut raw_solutions: Option<Vec<Vec<i64>>> =
+        if keep_full_solutions { Some(Vec::new()) } else { None };
 
     let callback: minion_sys::Callback<'_> = {
         let variable_order = &variable_order;
-        let solutions = &mut solutions;
+        let digest = &mut digest;
+        let raw_solutions = &mut raw_solutions;
         Box::new(move |sol_map: HashMap<VarName, MC>| -> bool {
             let mut row = Vec::with_capacity(variable_order.len());
             for name in variable_order.iter() {
@@ -948,11 +966,14 @@ pub fn get_minion_solutions_in_process(
                     Some(_) | None => return false,
                 }
             }
-            solutions.push(row);
+            if let Some(v) = raw_solutions.as_mut() {
+                v.push(row.clone());
+            }
+            digest.add(row);
             // Stop when the per-trial cap is reached (mirrors exec
             // mode's -sollimit). Caller checks `hit_solution_cap` and
             // skips comparison when the cap was hit.
-            if max_solutions > 0 && solutions.len() as i64 >= max_solutions {
+            if max_solutions > 0 && digest.count as i64 >= max_solutions {
                 return false;
             }
             find_all_sols
@@ -990,10 +1011,11 @@ pub fn get_minion_solutions_in_process(
         .parse()
         .with_context(|| format!("parsing Nodes={nodes_str:?}"))?;
 
-    let hit_solution_cap = max_solutions > 0 && solutions.len() as i64 >= max_solutions;
+    let hit_solution_cap = max_solutions > 0 && digest.count as i64 >= max_solutions;
 
     Ok(MinionOutput {
-        solutions,
+        solutions: digest,
+        raw_solutions,
         nodes,
         filename: format!("<in-process:{testname}>"),
         cleanup: CleanupFiles::empty(),
