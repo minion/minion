@@ -332,6 +332,8 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         exit(1);
       }
       getOptions().numWorkStealThreads = n;
+    } else if(command == string("-X-parallelWorkStealPortfolio")) {
+      getOptions().parallelWorkStealPortfolio = true;
     } else if(command == string("-X-parallelPreprocess")) {
       // Optional numeric argument. If next arg is missing, starts with '-', or
       // not a positive integer, default to sysconf(_SC_NPROCESSORS_ONLN).
@@ -443,6 +445,14 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       cerr << "-X-parallelWorkSteal is mutually exclusive with -restarts (v1)" << endl;
       exit(1);
     }
+  }
+
+  // -X-parallelWorkStealPortfolio is meaningless without an active
+  // work-steal pool; reject up front rather than silently no-op.
+  if(getOptions().parallelWorkStealPortfolio &&
+     getOptions().numWorkStealThreads <= 0) {
+    cerr << "-X-parallelWorkStealPortfolio requires -X-parallelWorkSteal N" << endl;
+    exit(1);
   }
 
   // bundle all options together and store

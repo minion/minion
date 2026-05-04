@@ -375,6 +375,74 @@ pub fn test_constraint_workstal(
     Ok(())
 }
 
+/// Work-stealing portfolio variant: same as `test_constraint_workstal`,
+/// but the parallel run also passes `-X-parallelWorkStealPortfolio` so
+/// each worker uses a different (var-order, val-order, randomisation)
+/// strategy. The crucial invariant — portfolio must enumerate exactly
+/// the same solution set as sequential — is unchanged: path replay is
+/// heuristic-independent, so cooperating workers on diverse strategies
+/// are still required to cover the whole tree.
+///
+/// Exec-only: the in-process API does not expose the portfolio flag.
+pub fn test_constraint_workstal_portfolio(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    n: u32,
+    size_factor: u32,
+) -> Result<()> {
+    let instance = constraint_def::build_random_instance_sized(c, size_factor);
+    let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
+    if ret.hit_solution_cap {
+        WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
+        ret.cleanup.cleanup();
+        return Ok(());
+    }
+    let n_str = n.to_string();
+    let ret2 = run_solve(
+        config,
+        &[
+            "-findallsols",
+            "-X-parallelWorkSteal",
+            &n_str,
+            "-X-parallelWorkStealPortfolio",
+        ],
+        &instance,
+        "workstal_portfolio",
+    )?;
+    if ret2.hit_solution_cap {
+        WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
+        ret.cleanup.cleanup();
+        ret2.cleanup.cleanup();
+        return Ok(());
+    }
+    let mut a = ret.solutions.clone();
+    let mut b = ret2.solutions.clone();
+    a.sort();
+    b.sort();
+    if a != b {
+        return Err(anyhow!(format!(
+            "Work-steal portfolio solutions not equal in {} vs {}: seq={} portfolio={}",
+            ret.filename,
+            ret2.filename,
+            ret.solutions.len(),
+            ret2.solutions.len()
+        )));
+    }
+
+    WS_TRIALS.fetch_add(1, Ordering::Relaxed);
+    if let Some(donations) = ret2.work_steal_donations {
+        WS_DONATIONS.fetch_add(donations, Ordering::Relaxed);
+        if donations > 0 {
+            WS_TRIALS_WITH_DONATIONS.fetch_add(1, Ordering::Relaxed);
+        }
+    }
+
+    ret.cleanup.cleanup();
+    ret2.cleanup.cleanup();
+
+    Ok(())
+}
+
 /// Exercise the restart-search code path (`restartNewSearchManager.h`).
 ///
 /// `-restarts` forces `sollimit = 1` and is therefore incompatible

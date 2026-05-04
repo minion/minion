@@ -523,6 +523,49 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
 
 namespace {
 
+// Diversify per-worker heuristics for the work-stealing portfolio mode.
+// Mutates `args` (var/val ordering) and `opts` (randomiseValvarorder) in
+// place. Worker 0 is left untouched so the user's chosen heuristic always
+// runs on at least one worker; workers 1..N-1 cycle through a fixed
+// palette of (var-order, val-order, randomise) triples designed to give
+// genuinely different traversal shapes.
+//
+// Path replay in StandardSearchManager::replayPath is heuristic-
+// independent: it walks recorded BranchSteps applying assignments via
+// worldPush/assign/prop, never consulting the receiver's varOrder. So a
+// donor on heuristic A and a receiver on heuristic B can cooperate on
+// the same shared tree — donor's prefix is replayed verbatim, receiver
+// then continues with its own heuristic on the rest of the subtree.
+static void applyPortfolioStrategy(int workerIdx, SearchMethod& args,
+                                   SearchOptions& opts) {
+  if(workerIdx <= 0) return;  // worker 0 keeps user's choice
+  // Palette: ordered roughly by likelihood of being a useful diversifier.
+  struct Strategy {
+    VarOrderEnum order;
+    ValOrderEnum valorder;
+    bool randomiseShuffle;
+  };
+  static const Strategy palette[] = {
+      {ORDER_SDF,         VALORDER_ASCEND,  false},
+      {ORDER_DOMOVERWDEG, VALORDER_ASCEND,  false},
+      {ORDER_WDEG,        VALORDER_ASCEND,  false},
+      {ORDER_STATIC,      VALORDER_ASCEND,  false},
+      {ORDER_SRF,         VALORDER_DESCEND, false},
+      {ORDER_CONFLICT,    VALORDER_ASCEND,  false},
+      {ORDER_LDF,         VALORDER_ASCEND,  false},
+      {ORDER_SDF,         VALORDER_ASCEND,  true },
+      {ORDER_DOMOVERWDEG, VALORDER_DESCEND, true },
+      {ORDER_STATIC,      VALORDER_DESCEND, false},
+      {ORDER_WDEG,        VALORDER_ASCEND,  true },
+      {ORDER_SRF,         VALORDER_ASCEND,  true },
+  };
+  const int paletteSize = (int)(sizeof(palette) / sizeof(palette[0]));
+  const Strategy& s = palette[(workerIdx - 1) % paletteSize];
+  args.order = s.order;
+  args.valorder = ValOrder(s.valorder);
+  if(s.randomiseShuffle) opts.randomiseValvarorder = true;
+}
+
 // Wrapper callback used by every work-steal worker. Mirrors
 // parallelWrapperCallback (mutex-protected, applies sollimit, signals via
 // shared parData) but routes solution counting through the
@@ -619,6 +662,12 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
         SearchMethod perThreadArgs = args;
         perThreadArgs.randomSeed =
             (int)(args.randomSeed ^ (config.baseSeed + (unsigned int)i));
+        // Portfolio mode: diversify worker heuristics. Worker 0 keeps
+        // the user's chosen ordering; later workers cycle through a
+        // palette of var/val orderings + optional randomisation.
+        if(options.parallelWorkStealPortfolio && N > 1) {
+          applyPortfolioStrategy(i, perThreadArgs, perThreadOptions);
+        }
         // Workers find all (the controller wrapper enforces sollimit
         // across threads). Disable other parallel modes to avoid
         // recursion into runMinionParallel/runMinionWorkSteal — the
@@ -628,6 +677,8 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
         perThreadOptions.numParallelThreads = 0;
         perThreadOptions.numWorkStealThreads = 0;
         perThreadOptions.parallel = false;
+        // Inner workers must NOT recurse into portfolio setup themselves.
+        perThreadOptions.parallelWorkStealPortfolio = false;
         // Hand the controller pointer + this worker's index into the
         // search loop via SearchOptions so SolveCSP dispatches into the
         // work-steal worker loop.

@@ -358,6 +358,12 @@ public:
   /// via path-replay donation. Mutually exclusive with all other parallel
   /// modes.
   int numWorkStealThreads = 0;
+  /// Portfolio mode for work-stealing: each worker uses a different
+  /// (varorder, valorder, randomiseValvarorder) combination. Worker 0
+  /// keeps the user's chosen heuristic; workers >= 1 cycle through a
+  /// palette. Donation/replay is heuristic-independent so different
+  /// strategies cooperate on the same shared tree.
+  bool parallelWorkStealPortfolio = false;
   /// Pointer to the WorkStealController for this run; set by the
   /// orchestrator before workers start, accessed from inside the search
   /// loop's donation poll. Type-erased here to avoid pulling

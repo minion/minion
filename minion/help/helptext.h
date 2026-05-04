@@ -84,6 +84,24 @@ splitting the tree across cores; speedup on UNSAT scales roughly with
 Mutually exclusive with -parallel, -X-parallelThreads,
 -X-parallelPreprocess, -split, -makeresume, and -restarts.
 
+-X-parallelWorkStealPortfolio
+
+EXPERIMENTAL — not for production use. Augments -X-parallelWorkSteal N
+by giving each worker a different (var-order, val-order, randomisation)
+strategy. Worker 0 uses the user's chosen heuristic (or minion's
+default); workers 1..N-1 cycle through a palette including SDF,
+DOMOVERWDEG, WDEG, STATIC, SRF, CONFLICT, LDF, and randomised variants.
+The work-stealing path-replay machinery is heuristic-independent
+(branches are recorded as concrete (var, value) assignments, not as
+heuristic choices), so workers running different strategies cooperate
+on the same shared search tree: a donor's prefix is replayed verbatim
+by any receiver, regardless of what heuristic produced it. Donor and
+receiver then continue exploring their respective subtrees with their
+own heuristics. Best for SAT instances where one strategy dramatically
+outperforms others — the right strategy "wins the race" while the
+others contribute spare work-steal cycles. Requires -X-parallelWorkSteal
+N with N >= 2 to have any effect.
+
 -X-parallelPreprocess [N]
 
 EXPERIMENTAL — not for production use. Runs SAC / SACBounds

@@ -660,6 +660,70 @@ fn main() -> Result<()> {
     });
     ret_ws?;
 
+    // Work-stealing portfolio sweep: same shared-tree donation/replay
+    // mechanism, but each worker runs a different (var-order, val-order,
+    // randomisation) combination. Exec-only — the in-process API does
+    // not expose the portfolio flag. Reuses the same instance-size
+    // adaptation as the plain work-steal sweep so donations get
+    // exercised on instances large enough to actually trigger them.
+    if config.backend == Backend::Exec {
+        println!("Work-stealing portfolio tests\n");
+        let ret_wsp: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            let mut size = ws_initial;
+            loop {
+                let donated_before = test_types::WS_TRIALS_WITH_DONATIONS
+                    .load(std::sync::atomic::Ordering::Relaxed);
+                let capped_before =
+                    test_types::WS_TRIALS_CAPPED.load(std::sync::atomic::Ordering::Relaxed);
+                (0..opt.count)
+                    .into_par_iter()
+                    .try_for_each(|_| {
+                        test_types::test_constraint_workstal_portfolio(&config, c, 4, size)
+                    })
+                    .context(format!(
+                        "failure in {} with -X-parallelWorkSteal 4 \
+                         -X-parallelWorkStealPortfolio (size_factor={size})",
+                        c.name
+                    ))?;
+                let donated_after = test_types::WS_TRIALS_WITH_DONATIONS
+                    .load(std::sync::atomic::Ordering::Relaxed);
+                let capped_after =
+                    test_types::WS_TRIALS_CAPPED.load(std::sync::atomic::Ordering::Relaxed);
+                let saw_donation = donated_after > donated_before;
+                let capped_this_round = capped_after - capped_before;
+                if saw_donation {
+                    println!(
+                        "Tested {} (work-steal portfolio, size_factor={size}, \
+                         donations confirmed)",
+                        c.name
+                    );
+                    break;
+                }
+                if capped_this_round * 2 >= opt.count {
+                    println!(
+                        "Tested {} (work-steal portfolio, size_factor={size}, \
+                         {capped_this_round}/{} trials hit --max-solutions — \
+                         instance too large; giving up before donations confirmed)",
+                        c.name, opt.count
+                    );
+                    break;
+                }
+                if size >= ws_max {
+                    println!(
+                        "Tested {} (work-steal portfolio, size_factor={size}, \
+                         no donations seen — instance still too small at \
+                         --ws-max-size cap)",
+                        c.name
+                    );
+                    break;
+                }
+                size = (size * 2).min(ws_max);
+            }
+            Ok(())
+        });
+        ret_wsp?;
+    }
+
     {
         let trials = test_types::WS_TRIALS.load(std::sync::atomic::Ordering::Relaxed);
         let donations = test_types::WS_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
