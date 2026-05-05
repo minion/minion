@@ -127,7 +127,25 @@ All `-varorder` choices (`static`, `sdf`, `sdf-random`, `srf`, `srf-random`, `ld
 |------|----------|
 | Standard depth-first | default everywhere |
 | Restart search (`-restarts`, `-restarts-multiplier`, `-no-restarts-bias`) | dedicated tester sweep with 4 restart-flag variants |
-| Optimisation (minimising / maximising) | regression suite only — no fuzz coverage |
+| Optimisation (minimising / maximising) | regression suite + tester `--optimisation-sweep` (metamorphic comparison across 5 strategies — see below) |
+
+#### Optimisation sweep — `--optimisation-sweep`
+
+For each random constraint instance, the sweep wraps it with `aux = sum(real_vars)` plus a randomly-chosen `MINIMISING aux` or `MAXIMISING aux`, then solves under five strategies and asserts they all report the same optimum:
+
+- baseline (default everything)
+- `-preprocess SAC`
+- `-varorder sdf -valorder descend`
+- `-X-parallelWorkSteal 4`
+- `-X-parallelThreads 4`
+
+A per-trial `-nodelimit 100000` caps pathological rolls; if any strategy hits the cap the trial is abandoned silently (a partial "best so far" can't be metamorphic-compared with a "proven optimal"). Disagreement among complete runs is reported as a failure with both `.minion` files preserved on disk for post-mortem.
+
+The premise: we already trust constraint propagators for satisfaction (the existing tableisation sweep covers that broadly). Optimisation bugs therefore live mostly in optimisation-specific code — bound tracking, parallel bound broadcast, restart-with-optimisation interaction. Different (propagator, heuristic, parallel) combinations stress that surface differently, so disagreement is a strong signal of a bound-tracking bug.
+
+Plumbing: minion's `-jsontableout` reports `OptimumValue` and `OptimumDirection`; the tester's exec-mode runner reads them. Sequential, work-steal, and `-X-parallelThreads` all aggregate cross-worker. `-parallel` (fork-based) is not covered; the in-process backend rejects `--optimisation-sweep` because optimisation isn't yet plumbed through the FFI.
+
+Notably absent from the strategy set: `-restarts`. minion currently rejects that combination at `BuildCSP.cpp:124` (`-restarts is not compatible with -sollimit, or optimisation problems`). Once that restriction is lifted, restarts should be added.
 
 ### Library API (libminion / minion-sys)
 | Surface | Coverage |
@@ -192,7 +210,9 @@ The CI matrix builds `bin-quick` and `bin-debug` and runs the full light suite o
 
 ## Known gaps to plug
 
-- **Optimisation has no fuzz coverage.** Fixing this means teaching `tester` to emit `MAXIMISING` / `MINIMISING` instances and verifying the optimum against an oracle.
+- **`-restarts` not covered by the optimisation sweep.** `BuildCSP.cpp:124` rejects restarts on optimisation problems; the restriction predates the metamorphic sweep. Lifting it (and verifying restarts handle the bound channel correctly) would close a real coverage gap — restart-with-optimisation is exactly the kind of subtle interaction the metamorphic test was designed to catch.
+- **In-process backend doesn't expose optimisation.** `--optimisation-sweep` errors out cleanly under `--in-process`; making it work needs `optimiseMinimiseVars`/`optimiseMaximiseVars` bindings in `minion-sys` and a routing path through the existing FFI runner.
+- **`-parallel` (fork-based) is not in the optimisation strategy set.** Each forked child writes its own `-jsontableout` and the parent doesn't aggregate cross-process for optimisation. Adding it would need a small post-process step.
 - **Resume / dump / Xgraph are completely untested.** A single round-trip test (dump → reload → verify same solutions) per format would suffice.
 - **`-X-AMO`, `-X-tabulation`, `-X-prop-node` have no coverage.** These are experimental, so this may be deliberate.
 - **Five constraints have no fuzz coverage**: `haggisgac`, `haggisgac-stable`, `shortstr2`, `shortctuplestr2`, `frameupdate`. They have minimal regression coverage. Adding them to `tester/src/constraint_def.rs::CONSTRAINT_LIST` would close this.

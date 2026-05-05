@@ -28,6 +28,9 @@
 #   9. per-constraint isolation sweep (each constraint in its own
 #      tester process, 5 in parallel — crash isolation)
 #  10. tester size_factor=8 (very long; only if budget permits)
+#  11. metamorphic optimisation sweep (5 strategies must agree on
+#      optimum; catches bound-tracking / parallel-bound-broadcast
+#      bugs)
 
 set -u
 set -o pipefail
@@ -270,6 +273,18 @@ if skip_if_no_budget 240; then
       --minion '$MINION' \
       --count 50 --variant-count 50 --optioncount 200 \
       --size-factor 8 --ws-max-size 256 --numthreads 4"
+fi
+
+# Phase 11: metamorphic optimisation sweep. For every constraint,
+# wrap it with an aux objective and check five strategies (baseline,
+# SAC preprocess, var-sdf-val-desc, work-steal 4, threads 4) all
+# agree on the optimum. Catches bound-tracking and parallel-bound-
+# broadcast bugs that the satisfaction sweeps miss.
+if skip_if_no_budget 60; then
+  run_phase 11 "tester-optimisation-sweep" \
+    bash -c "cd '$TESTER_DIR' && cargo run --release -- \
+      --minion '$MINION' \
+      --optimisation-sweep --count 200 --numthreads 4"
 fi
 
 # --- summary ---
