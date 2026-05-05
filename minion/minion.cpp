@@ -57,6 +57,13 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
     SearchMethod argsCopy = args;
     runMinionParallel(cfg, optsCopy, argsCopy, instance, /*callback=*/nullptr,
                       /*userdata=*/nullptr);
+    // Mirror the work-steal path below: runMinionParallel populates
+    // OptimumValue (and any other cross-worker aggregates added in
+    // the future) on the parent's TableOut. Without this print_line
+    // the -jsontableout file is never written for portfolio mode.
+    if(getOptions().tableout && !Parallel::isAChildProcess()) {
+      getTableOut().print_line();
+    }
     return;
   }
   // CLI work-stealing parallel search: same shape as the portfolio case

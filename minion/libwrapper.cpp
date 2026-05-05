@@ -405,6 +405,13 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
   // different thread than the one that built it dereferences invalid
   // thread-local storage.
   std::vector<MinionResult> results(N, MinionResult::MINION_OK);
+  // Per-worker copy of State::lastOptimumValues, taken before each
+  // worker frees its context. Aggregated by the parent after all
+  // workers join — we don't need a cross-worker atomic during search
+  // because the in-search shared bound channel (sharedOptBound) is
+  // already pruning, and each worker's own lastOptimumValues
+  // monotonically improves under its local lock.
+  std::vector<std::vector<DomainInt>> perWorkerOptValues(N);
   std::vector<std::thread> workers;
   workers.reserve(N);
 
@@ -468,6 +475,13 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
                                      &shared, /*installAlarms=*/false);
       results[i] = r;
 
+      // Snapshot best optimum found by this worker (empty if it never
+      // saw a non-dominated solution). Done before freeContext while
+      // ctx->state_m is still alive.
+      if(ctx->state_m && ctx->state_m->isOptimisationProblem()) {
+        perWorkerOptValues[i] = ctx->state_m->getLastOptimumValues();
+      }
+
       // Don't let ~Globals try to free the shared parData_m (the destructor
       // currently doesn't, but make the intent explicit and future-proof).
       ctx->parData_m = nullptr;
@@ -520,6 +534,34 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
   // again would duplicate.
   if(N > 1 && !options.silent) {
     cout << "Solutions Found: " << shared.totalSolutionsFound.load() << endl;
+  }
+
+  // Aggregate cross-worker best objective onto the parent's TableOut so
+  // -jsontableout in CLI mode and TableOut_get in FFI mode see the
+  // portfolio's combined optimum (not whatever a single worker found).
+  // Single-objective only — multi-objective lex skipped silently.
+  if(savedGlobals != nullptr && instance.is_optimisation_problem &&
+     instance.optimiseVariables.size() == 1) {
+    bool haveValue = false;
+    DomainInt best = 0;
+    for(int i = 0; i < N; ++i) {
+      const auto& vals = perWorkerOptValues[i];
+      if(vals.size() != 1) continue;
+      if(!haveValue) {
+        best = vals[0];
+        haveValue = true;
+      } else if(instance.optimiseMinimising) {
+        if(vals[0] < best) best = vals[0];
+      } else {
+        if(vals[0] > best) best = vals[0];
+      }
+    }
+    if(haveValue) {
+      getTableOut().set("OptimumValue", tostring(best));
+      getTableOut().set("OptimumDirection",
+                        instance.optimiseMinimising ? std::string("min")
+                                                    : std::string("max"));
+    }
   }
 
   if(finalResult == MinionResult::MINION_TIMEOUT)
@@ -673,6 +715,10 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
   finaliseModel(instance);
 
   std::vector<MinionResult> results(N, MinionResult::MINION_OK);
+  // See runMinionParallel for rationale: per-worker snapshot taken
+  // before each worker frees its context, then aggregated by the
+  // parent after join.
+  std::vector<std::vector<DomainInt>> perWorkerOptValues(N);
   std::vector<std::thread> workers;
   workers.reserve(N);
 
@@ -730,6 +776,9 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
           ctrl.totalNodesExplored.fetch_add(
               (long long)ctx->state_m->getNodeCount(),
               std::memory_order_relaxed);
+          if(ctx->state_m->isOptimisationProblem()) {
+            perWorkerOptValues[i] = ctx->state_m->getLastOptimumValues();
+          }
         }
 
         ctx->parData_m = nullptr;
@@ -794,6 +843,33 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
                       tostring(ctrl.idleWaitNanos.load()));
     getTableOut().set("WorkStealCallbackLockWaitNs",
                       tostring(ctrl.callbackLockWaitNanos.load()));
+
+    // Cross-worker best objective. Same single-objective restriction
+    // and direction handling as runMinionParallel above; see there
+    // for rationale.
+    if(instance.is_optimisation_problem &&
+       instance.optimiseVariables.size() == 1) {
+      bool haveValue = false;
+      DomainInt best = 0;
+      for(int i = 0; i < N; ++i) {
+        const auto& vals = perWorkerOptValues[i];
+        if(vals.size() != 1) continue;
+        if(!haveValue) {
+          best = vals[0];
+          haveValue = true;
+        } else if(instance.optimiseMinimising) {
+          if(vals[0] < best) best = vals[0];
+        } else {
+          if(vals[0] > best) best = vals[0];
+        }
+      }
+      if(haveValue) {
+        getTableOut().set("OptimumValue", tostring(best));
+        getTableOut().set("OptimumDirection",
+                          instance.optimiseMinimising ? std::string("min")
+                                                      : std::string("max"));
+      }
+    }
   }
 
   if(N > 1 && !options.silent) {
