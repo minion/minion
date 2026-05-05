@@ -312,6 +312,11 @@ namespace {
 struct ParallelController {
   Parallel::ParallelData* sharedParData;  // aliased into every worker's parData_m
   std::atomic<long long> totalSolutionsFound;
+  // Aggregated node count across all workers, contributed before each
+  // worker frees its context. Surfaced via parent's TableOut so
+  // -jsontableout reports cross-worker work, matching the work-steal
+  // path's contract.
+  std::atomic<long long> totalNodesExplored{0};
   std::atomic<bool> stopRequested;
   std::mutex callbackMutex;
   long long sollimit;
@@ -475,11 +480,18 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
                                      &shared, /*installAlarms=*/false);
       results[i] = r;
 
-      // Snapshot best optimum found by this worker (empty if it never
-      // saw a non-dominated solution). Done before freeContext while
-      // ctx->state_m is still alive.
-      if(ctx->state_m && ctx->state_m->isOptimisationProblem()) {
-        perWorkerOptValues[i] = ctx->state_m->getLastOptimumValues();
+      // Contribute this worker's node count to the parent aggregate so
+      // -jsontableout reports total cross-thread work.
+      if(ctx->state_m) {
+        shared.totalNodesExplored.fetch_add(
+            (long long)ctx->state_m->getNodeCount(),
+            std::memory_order_relaxed);
+        // Snapshot best optimum found by this worker (empty if it
+        // never saw a non-dominated solution). Done before freeContext
+        // while ctx->state_m is still alive.
+        if(ctx->state_m->isOptimisationProblem()) {
+          perWorkerOptValues[i] = ctx->state_m->getLastOptimumValues();
+        }
       }
 
       // Don't let ~Globals try to free the shared parData_m (the destructor
@@ -534,6 +546,17 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
   // again would duplicate.
   if(N > 1 && !options.silent) {
     cout << "Solutions Found: " << shared.totalSolutionsFound.load() << endl;
+  }
+
+  // Stash aggregated counters on the parent's TableOut so callers
+  // reading -jsontableout (and the CLI flush path in minion.cpp) see
+  // total cross-worker stats. Mirrors the work-steal aggregator.
+  if(savedGlobals != nullptr) {
+    long long total_sols = shared.totalSolutionsFound.load();
+    long long total_nodes = shared.totalNodesExplored.load();
+    getTableOut().set("Nodes", tostring(total_nodes));
+    getTableOut().set("Satisfiable", (total_sols == 0 ? 0 : 1));
+    getTableOut().set("SolutionsFound", total_sols);
   }
 
   // Aggregate cross-worker best objective onto the parent's TableOut so
