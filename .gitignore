@@ -1,0 +1,4 @@
+sphinxdocs/_build
+sphinxdocs/venv-tmp/
+tester/target/
+bin-*/

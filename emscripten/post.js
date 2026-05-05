@@ -1,4 +1,0 @@
-
-        // FS.unlink("input.minion");
-    }
-};
