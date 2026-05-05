@@ -144,7 +144,9 @@ A per-trial `-nodelimit 100000` caps pathological rolls; if any strategy hits th
 
 The premise: we already trust constraint propagators for satisfaction (the existing tableisation sweep covers that broadly). Optimisation bugs therefore live mostly in optimisation-specific code — bound tracking, parallel bound broadcast, restart-with-optimisation interaction. Different (propagator, heuristic, parallel) combinations stress that surface differently, so disagreement is a strong signal of a bound-tracking bug.
 
-Plumbing: minion's `-jsontableout` reports `OptimumValue` and `OptimumDirection`; the tester's exec-mode runner reads them. Sequential, work-steal, and `-X-parallelThreads` all aggregate cross-worker. `-parallel` (fork-based) is not covered; the in-process backend rejects `--optimisation-sweep` because optimisation isn't yet plumbed through the FFI.
+Plumbing: minion's `-jsontableout` reports `OptimumValue` and `OptimumDirection`; the tester's exec-mode runner reads them. Sequential, work-steal, and `-X-parallelThreads` all aggregate cross-worker. `-parallel` (fork-based) is not covered.
+
+The in-process backend is also covered, with a smaller four-strategy subset (no `-restarts`, no parallel modes, no `-nodelimit` — the FFI doesn't expose those). It exercises the `Model::optimise` plumbing under varying `varorder`/`valorder`/`preprocess` settings, which is enough to catch FFI-level regressions. `minion-sys/tests/test_optimise.rs` adds direct unit coverage of the `Optimise` field against an independent baseline.
 
 `-restarts` is in the strategy set. The restart manager's solution handler delegates to `standard_dealWith_solution` for optimisation problems (so the bound is tightened on every solution and the LIBMINION callback fires), and the new `optimisationHandler` mirrors `search_control.h`'s `opt_handler` (applying the running bound and the cross-worker shared bound at every right-branch step). Each restart attempt is then a complete DFS under the running bound; a natural exhaustion means the bound is provably optimal.
 
@@ -211,8 +213,7 @@ The CI matrix builds `bin-quick` and `bin-debug` and runs the full light suite o
 
 ## Known gaps to plug
 
-- **In-process backend doesn't expose optimisation.** `--optimisation-sweep` errors out cleanly under `--in-process`; making it work needs `optimiseMinimiseVars`/`optimiseMaximiseVars` bindings in `minion-sys` and a routing path through the existing FFI runner.
-- **`-parallel` (fork-based) is not in the optimisation strategy set.** Each forked child writes its own `-jsontableout` and the parent doesn't aggregate cross-process for optimisation. Adding it would need a small post-process step.
+- **`-parallel` (fork-based) is not in the optimisation strategy set.** Each forked child writes its own `-jsontableout` and the parent doesn't aggregate cross-process for optimisation. Adding it would need a small post-process step. Also: the user is reconsidering whether `-parallel` justifies its maintenance cost vs. the thread-based modes (see ROADMAP).
 - **Resume / dump / Xgraph are completely untested.** A single round-trip test (dump → reload → verify same solutions) per format would suffice.
 - **`-X-AMO`, `-X-tabulation`, `-X-prop-node` have no coverage.** These are experimental, so this may be deliberate.
 - **Five constraints have no fuzz coverage**: `haggisgac`, `haggisgac-stable`, `shortstr2`, `shortctuplestr2`, `frameupdate`. They have minimal regression coverage. Adding them to `tester/src/constraint_def.rs::CONSTRAINT_LIST` would close this.

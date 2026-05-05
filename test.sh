@@ -129,10 +129,14 @@ if [ "$MODE" = "light" ]; then
     bash -c "cd '$REPO/tester' && DEBUG_MINION=1 cargo run --release -- \
       --in-process --count 2 --numthreads 4 --maxtuples 10000"
 
-  run_phase "metamorphic optimisation sweep" \
+  run_phase "metamorphic optimisation sweep (exec)" \
     bash -c "cd '$REPO/tester' && cargo run --release -- \
       --minion '$REPO/bin-quick/minion' \
       --optimisation-sweep --count 10 --numthreads 4"
+
+  run_phase "metamorphic optimisation sweep (in-process)" \
+    bash -c "cd '$REPO/tester' && cargo run --release -- \
+      --in-process --optimisation-sweep --count 5 --numthreads 4"
 
   echo
   echo "Light tests passed."
