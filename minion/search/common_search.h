@@ -185,6 +185,12 @@ inline void check_sol_is_correct() {
     for(auto& v : getState().getRawOptimiseVars()) {
       rawOptVals.push_back(v.assignedValue());
     }
+    // Record under the lock so end-of-search readers (TableOut, FFI)
+    // see exactly the value matching the last printed "Solution found
+    // with Value: X" line — even with -noprintsols, when no print
+    // happens. The non-dominated guard ensures monotonic improvement
+    // across parallel workers.
+    getState().setLastOptimumValues(rawOptVals);
     if(getOptions().printonlyoptimal) {
       std::ostringstream oss(getState().storedSolution);
       oss << "Solution found with Value: ";
@@ -453,6 +459,7 @@ void inline initalise_search() {
     return;
 
   getState().setOptimiseValue(vector<DomainInt>{});
+  getState().setLastOptimumValues(vector<DomainInt>{});
 }
 } // namespace Controller
 

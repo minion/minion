@@ -115,6 +115,22 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
   getTableOut().set("Satisfiable", (getState().getSolutionCount() == 0 ? 0 : 1));
   getTableOut().set("SolutionsFound", getState().getSolutionCount());
 
+  // Surface the best objective value found so the random tester (and
+  // anyone else reading -jsontableout) can metamorphic-compare runs of
+  // the same model under different propagator/heuristic combinations
+  // without storing solution sets. Only emitted for single-objective
+  // problems with at least one solution; multi-objective is rare and
+  // would need a list-typed encoding here. OptimumDirection is "min"
+  // or "max" so the consumer doesn't have to track it separately.
+  if(getState().isOptimisationProblem() && getState().getSolutionCount() > 0) {
+    const auto& vals = getState().getLastOptimumValues();
+    if(vals.size() == 1) {
+      getTableOut().set("OptimumValue", tostring(vals[0]));
+      getTableOut().set("OptimumDirection",
+                        getState().isMaximise() ? std::string("max") : std::string("min"));
+    }
+  }
+
   if(getOptions().tableout && !Parallel::isAChildProcess()) {
     getTableOut().print_line(); // Outputs a line to the table file.
   }

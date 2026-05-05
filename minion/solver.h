@@ -54,6 +54,13 @@ class SearchState {
   vector<AnyVarRef> optimiseVars;
   vector<AnyVarRef> raw_optimiseVars;
   vector<DomainInt> current_optimise_positions;
+  // Raw values of the optimisation variables at the last non-dominated
+  // solution. Set under the same lock as the "Solution found with Value:"
+  // print in check_sol_is_correct, so it always reflects the
+  // best-so-far solution that minion has actually committed to. Empty
+  // until the first non-dominated solution is found. Read at end of
+  // search to surface OptimumValue in TableOut.
+  vector<DomainInt> last_optimum_values;
   bool optimise;
   bool maximise;
 
@@ -181,6 +188,14 @@ public:
 
   void setOptimiseValue(const vector<DomainInt>& optimise_pos) {
     current_optimise_positions = optimise_pos;
+  }
+
+  const vector<DomainInt>& getLastOptimumValues() {
+    return last_optimum_values;
+  }
+
+  void setLastOptimumValues(const vector<DomainInt>& vals) {
+    last_optimum_values = vals;
   }
 
   bool isOptimisationProblem() {
