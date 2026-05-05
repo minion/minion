@@ -31,6 +31,9 @@
 #  11. metamorphic optimisation sweep (5 strategies must agree on
 #      optimum; catches bound-tracking / parallel-bound-broadcast
 #      bugs)
+#  12. AddressSanitizer build + regression suite + tester baseline
+#      (catches heap UB / use-after-free / stack overflow that
+#      _GLIBCXX_DEBUG misses)
 
 set -u
 set -o pipefail
@@ -285,6 +288,35 @@ if skip_if_no_budget 60; then
     bash -c "cd '$TESTER_DIR' && cargo run --release -- \
       --minion '$MINION' \
       --optimisation-sweep --count 200 --numthreads 4"
+fi
+
+# Phase 12: AddressSanitizer pass. Builds a separate bin-asan/
+# binary with -fsanitize=address (clang) and runs the .minion
+# regression suite plus a moderate tester sweep under it. Catches
+# heap UB, use-after-free, and stack-overflow bugs that the
+# debug build's _GLIBCXX_DEBUG misses.
+#
+# ASan adds ~2x runtime overhead and ~3x memory; the trial counts
+# below are scaled down so this phase fits in roughly an hour.
+# Skips cleanly if clang isn't available — configure.py forces
+# clang++ when --sanitize is set, so a pure-gcc system won't have
+# it. Also skips on architectures where ASan isn't supported (the
+# build will fail and the phase will report rc!=0).
+if skip_if_no_budget 30 && command -v clang++ >/dev/null 2>&1; then
+  ASAN_DIR="$REPO_DIR/bin-asan"
+  if [ ! -x "$ASAN_DIR/minion" ]; then
+    run_phase 12 "asan-build" \
+      bash -c "mkdir -p '$ASAN_DIR' && cd '$ASAN_DIR' && \
+        python3 '$REPO_DIR/configure.py' --sanitize && make -j4"
+  fi
+  if [ -x "$ASAN_DIR/minion" ]; then
+    run_phase 13 "asan-regression-suite" \
+      bash -c "cd '$REPO_DIR/test_instances' && ./run_tests.sh '$ASAN_DIR/minion'"
+    run_phase 14 "asan-tester-baseline" \
+      bash -c "cd '$TESTER_DIR' && cargo run --release -- \
+        --minion '$ASAN_DIR/minion' \
+        --count 30 --variant-count 30 --optioncount 200 --numthreads 2"
+  fi
 fi
 
 # --- summary ---
