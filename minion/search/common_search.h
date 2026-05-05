@@ -111,7 +111,45 @@ inline void check_sol_is_correct() {
   // -X-parallelThreads). lockSolsout is a no-op when neither is active.
   Parallel::lockSolsout();
 
-  if(getOptions().solsoutWrite) {
+  // Parallel optimisation: under the cross-worker output lock,
+  // atomically decide whether this solution improves on the global
+  // bound, and if so update the bound. Solutions whose post-bump value
+  // doesn't strictly improve are marked dominated — both the var-row
+  // print here AND the "Solution found with Value: X" line in
+  // standard_dealWith_solution suppress when dominated, so the
+  // user-visible printed sequence is monotonically improving across
+  // workers.
+  //
+  // Under the lock, the shared atomic is effectively single-writer
+  // (every solution event passes through here), so a plain store
+  // suffices for the update — opt_handler reads with relaxed memory
+  // order and may briefly see a stale value, but bound monotonicity
+  // means stale = "looser than current" which is always sound.
+  bool dominated = false;
+  if(getState().isOptimisationProblem() &&
+     getOptions().parallelBoundChannel != nullptr) {
+    const auto& vars = getState().getOptimiseVars();
+    if(vars.size() == 1 && vars[0].isAssigned()) {
+      auto* shared = static_cast<std::atomic<long long>*>(
+          getOptions().parallelBoundChannel);
+      long long shared_val = shared->load(std::memory_order_relaxed);
+      long long sentinel = std::numeric_limits<long long>::min();
+      // Internal direction: minion always maximises OptimiseVars[0],
+      // so post-bump = assignedValue + 1, and "tighter" = LARGER.
+      // Strictly improving iff post_bump > shared_val (or shared is
+      // sentinel = "no solution yet").
+      long long post_bump =
+          checked_cast<long long>(vars[0].assignedValue()) + 1;
+      if(shared_val != sentinel && post_bump <= shared_val) {
+        dominated = true;
+      } else {
+        shared->store(post_bump, std::memory_order_relaxed);
+      }
+    }
+  }
+  getState().lastSolutionDominated = dominated;
+
+  if(!dominated && getOptions().solsoutWrite) {
     vector<vector<AnyVarRef>> print_matrix = getState().getPrintMatrix();
     if(getOptions().solsoutJson) {
       json_dump(print_matrix, GET_GLOBAL(solsoutfile));
@@ -127,13 +165,41 @@ inline void check_sol_is_correct() {
     GET_GLOBAL(solsoutfile).flush();
   }
 
-  if(getOptions().print_solution) {
+  if(!dominated && getOptions().print_solution) {
     if(getOptions().printonlyoptimal) {
       std::ostringstream oss;
       print_solution(oss, getState().getPrintMatrix());
       getState().storedSolution = oss.str();
     } else
       print_solution(cout, getState().getPrintMatrix());
+  }
+
+  // For optimisation problems, also print the "Solution found with
+  // Value: X" line under the SAME lock as the var-row above. This was
+  // historically in standard_dealWith_solution but is now here so the
+  // gate decision, var-row print, and value-line print all happen in
+  // one critical section — guaranteeing the printed sequence is
+  // monotonically improving across parallel workers.
+  if(!dominated && getState().isOptimisationProblem()) {
+    std::vector<DomainInt> rawOptVals;
+    for(auto& v : getState().getRawOptimiseVars()) {
+      rawOptVals.push_back(v.assignedValue());
+    }
+    if(getOptions().printonlyoptimal) {
+      std::ostringstream oss(getState().storedSolution);
+      oss << "Solution found with Value: ";
+      output_mapped_container(
+          oss, rawOptVals, [](DomainInt v) { return v; }, true);
+      oss << "\n";
+      // Note: storedSolution is a single string overwritten per
+      // call. The non-dominated condition above ensures it only
+      // gets overwritten with strictly-improving solutions.
+    } else if(getOptions().print_solution) {
+      cout << "Solution found with Value: ";
+      output_mapped_container(
+          cout, rawOptVals, [](DomainInt v) { return v; }, true);
+      cout << endl;
+    }
   }
 
   Parallel::unlockSolsout();
@@ -317,25 +383,13 @@ void inline standard_dealWith_solution() {
       }
     }
 
-    std::vector<DomainInt> rawOptVals;
-    for(auto& v : getState().getRawOptimiseVars()) {
-      rawOptVals.push_back(v.assignedValue());
-    }
-
-    if(getOptions().printonlyoptimal) {
-      {
-        std::ostringstream oss(getState().storedSolution);
-        oss << "Solution found with Value: ";
-        output_mapped_container(
-            oss, rawOptVals, [](DomainInt v) { return v; }, true);
-        oss << "\n";
-      }
-    } else {
-      cout << "Solution found with Value: ";
-      output_mapped_container(
-          cout, rawOptVals, [](DomainInt v) { return v; }, true);
-      cout << endl;
-    }
+    // The "Solution found with Value: X" print used to live here, but
+    // was moved into check_sol_is_correct so it can sit under the
+    // SAME lockSolsout critical section as the var-row print and the
+    // bound-channel gate decision. Without that, the two prints
+    // could interleave with sibling workers' prints, allowing a
+    // dominated solution's "Value:" line to appear after a better
+    // solution's "Value:" line — breaking monotonicity.
 
     std::vector<DomainInt> optVals;
     for(auto& v : getState().getOptimiseVars()) {
@@ -347,26 +401,9 @@ void inline standard_dealWith_solution() {
     }
     getState().setOptimiseValue(optVals);
 
-    // Parallel bound channel: broadcast our (post-bump) bound to
-    // sibling workers via CAS-max. Direction: minion always
-    // maximises OptimiseVars internally (negating user-side
-    // minimisation), so the tightest bound is the LARGEST optVals[0]
-    // across all workers. Single-objective only — multi-objective
-    // lex optimisation would need a vector channel.
-    if(getOptions().parallelBoundChannel != nullptr && optVals.size() == 1) {
-      auto* shared =
-          static_cast<std::atomic<long long>*>(getOptions().parallelBoundChannel);
-      long long val = checked_cast<long long>(optVals[0]);
-      long long current = shared->load(std::memory_order_relaxed);
-      while(val > current &&
-            !shared->compare_exchange_weak(current, val,
-                                           std::memory_order_relaxed,
-                                           std::memory_order_relaxed)) {
-        // current is reloaded by compare_exchange_weak on failure;
-        // loop until either our CAS wins or our value is no longer
-        // larger (some other worker found a tighter bound first).
-      }
-    }
+    // The shared bound was already updated atomically under
+    // lockSolsout in check_sol_is_correct (when this solution was
+    // not dominated); no additional broadcast is needed here.
   }
 
   #ifdef LIBMINION

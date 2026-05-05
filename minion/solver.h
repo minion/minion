@@ -88,6 +88,17 @@ class SearchState {
 public:
   std::string storedSolution;
 
+  // Set by check_sol_is_correct when running under
+  // SearchOptions::parallelBoundChannel and the just-found solution's
+  // post-bump optimisation value does NOT strictly improve on the
+  // shared bound (i.e. another worker has already found at least as
+  // good a solution). Read by standard_dealWith_solution to suppress
+  // its "Solution found with Value: X" print, keeping the printed
+  // sequence monotonically improving across workers. Reset on every
+  // call to check_sol_is_correct so its lifetime is one solution
+  // event.
+  bool lastSolutionDominated = false;
+
   vector<vector<AnyVarRef>>& getPrintMatrix() {
     return print_matrix;
   }

@@ -77,16 +77,25 @@ void setupAlarm(bool alarmActive, SysInt timeout, bool CPUTime) {
 
 namespace Parallel {
 
+// Take/release the cross-worker output lock. Triggers under any
+// active parallel mode — note `numParallelThreads > 0` only fires
+// for the parent context that sets up the workers; libwrapper sets
+// `numParallelThreads = 0` on each per-thread copy to prevent worker
+// recursion, so workers are detected via `parallelBoundChannel !=
+// nullptr` (set by both the parallel-portfolio and work-steal
+// controllers as part of bound sharing).
 void lockSolsout() {
   if(getOptions().parallel || getOptions().numParallelThreads > 0 ||
-     getOptions().workStealController != nullptr) {
+     getOptions().workStealController != nullptr ||
+     getOptions().parallelBoundChannel != nullptr) {
     pthread_mutex_lock(&(getParallelData().outputLock));
   }
 }
 
 void unlockSolsout() {
   if(getOptions().parallel || getOptions().numParallelThreads > 0 ||
-     getOptions().workStealController != nullptr) {
+     getOptions().workStealController != nullptr ||
+     getOptions().parallelBoundChannel != nullptr) {
     pthread_mutex_unlock(&(getParallelData().outputLock));
   }
 }
