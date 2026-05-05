@@ -1092,6 +1092,13 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
   instance.constraints.push_back(constraint);
 }
 
+void instance_setOptimise(CSPInstance& instance, bool minimising, Var& var)
+{
+  assertNotInSearch("instance_setOptimise");
+  std::vector<Var> vars{var};
+  instance.set_optimise(minimising, vars);
+}
+
 MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint)
 {
   try {

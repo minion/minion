@@ -430,6 +430,12 @@ void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
 ///   * `constraint` is copied into `instance`.
 void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
 
+/// Marks `instance` as a single-objective optimisation problem.
+/// `minimising = true` means MINIMISING, false means MAXIMISING.
+/// `var` is copied into the instance. Internally calls
+/// `CSPInstance::set_optimise`. Must be called before search starts.
+void instance_setOptimise(CSPInstance& instance, bool minimising, Var& var);
+
 /// Adds a constraint to the currently running search and propagates it.
 ///
 /// Returns MINION_OK on success, or an error code if adding the constraint

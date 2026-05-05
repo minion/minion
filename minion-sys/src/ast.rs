@@ -26,6 +26,21 @@ pub struct Model {
     /// Storage order is preserved so the order in which tables are
     /// installed into the `CSPInstance` matches insertion order.
     pub tuple_tables: Vec<(String, Vec<Tuple>)>,
+    /// Optional single-objective optimisation directive. When set,
+    /// minion treats the run as `MINIMISING`/`MAXIMISING` on the
+    /// chosen variable; the best objective value found is reported
+    /// via [`SolverContext::get_from_table`] under the key
+    /// `"OptimumValue"` (with `"OptimumDirection"` returning
+    /// `"min"` or `"max"`).
+    pub optimise: Option<Optimise>,
+}
+
+/// Single-objective optimisation directive carried on
+/// [`Model::optimise`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Optimise {
+    pub minimise: bool,
+    pub var: Var,
 }
 
 impl Model {
@@ -35,6 +50,7 @@ impl Model {
             named_variables: SymbolTable::new(),
             constraints: Vec::new(),
             tuple_tables: Vec::new(),
+            optimise: None,
         }
     }
 

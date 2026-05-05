@@ -152,6 +152,7 @@ fn bind(minion_src: &Path) {
         .allowlist_function("instance_free")
         .allowlist_function("instance_addSearchOrder")
         .allowlist_function("instance_addConstraint")
+        .allowlist_function("instance_setOptimise")
         .allowlist_function("instance_addTupleTableSymbol")
         .allowlist_function("instance_getTupleTableSymbol")
         .allowlist_function("printMatrix_addVar")

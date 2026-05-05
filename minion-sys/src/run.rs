@@ -1023,6 +1023,14 @@ unsafe fn convert_model_to_raw(
         ffi::instance_addConstraint(instance, raw_constraint.ptr);
     }
 
+    /**********************************/
+    /*       Optimisation directive   */
+    /**********************************/
+    if let Some(opt) = &model.optimise {
+        let mut raw_var = resolve_var(instance, &opt.var)?;
+        ffi::instance_setOptimise(instance, opt.minimise, &mut raw_var);
+    }
+
     Ok(())
 }
 
