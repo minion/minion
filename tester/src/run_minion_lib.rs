@@ -932,6 +932,9 @@ pub fn get_minion_solutions_in_process_work_steal(
         parallel_preprocess_rounds: None,
         parallel_preprocess_prunings: None,
         hit_solution_cap,
+        // In-process backend doesn't yet expose optimisation through
+        // the FFI — the optimisation sweep is exec-only for now.
+        optimum_value: None,
     })
 }
 
@@ -1032,5 +1035,8 @@ pub fn get_minion_solutions_in_process(
         parallel_preprocess_rounds: None,
         parallel_preprocess_prunings: None,
         hit_solution_cap,
+        // In-process backend doesn't yet expose optimisation through
+        // the FFI — the optimisation sweep is exec-only for now.
+        optimum_value: None,
     })
 }

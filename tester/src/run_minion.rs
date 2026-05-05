@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 
 use crate::constraint_def::ConstraintInstance;
-use crate::minion_instance::print_minion_file_pair;
+use crate::minion_instance::{
+    print_minion_file_pair, print_minion_file_pair_optimisation, OptimisationWrapper,
+};
 use crate::solution_digest::SolutionDigest;
 
 use anyhow::{anyhow, Context, Result};
@@ -53,6 +55,12 @@ pub struct MinionOutput {
     /// comparison — the random instance is too large to be a useful
     /// signal at this size.
     pub hit_solution_cap: bool,
+    /// Best objective value found (raw, in the user's direction).
+    /// `None` when the run wasn't an optimisation problem, found no
+    /// solution, or had multiple objectives. The optimisation sweep
+    /// compares this across strategies; equal => everyone agrees on
+    /// the optimum, mismatch => bug.
+    pub optimum_value: Option<i64>,
 }
 
 impl MinionOutput {
@@ -109,6 +117,17 @@ struct MinionJsonOut {
     /// rounds.
     #[serde(default)]
     ParallelPreprocessPrunings: Option<String>,
+    /// Best objective value found (raw, in the user's direction).
+    /// Present only when the run was an optimisation problem with at
+    /// least one solution AND a single objective variable. Used by
+    /// the metamorphic optimisation sweep to compare runs of the
+    /// same model under different propagator/heuristic combinations.
+    #[serde(default)]
+    OptimumValue: Option<String>,
+    /// "min" or "max" — surfaced for the consumer's convenience so
+    /// it doesn't have to track direction separately.
+    #[serde(default)]
+    OptimumDirection: Option<String>,
 }
 
 pub fn get_minion_solutions(
@@ -119,6 +138,54 @@ pub fn get_minion_solutions(
     testname: &str,
     max_solutions: i64,
     keep_full_solutions: bool,
+) -> Result<MinionOutput> {
+    get_minion_solutions_inner(
+        minionexec,
+        baseargs,
+        extraargs,
+        instance,
+        testname,
+        max_solutions,
+        keep_full_solutions,
+        None,
+    )
+}
+
+/// Optimisation variant. Writes the .minion file with an aux objective
+/// var equal to `sum(real_vars)` and a `MINIMISING`/`MAXIMISING`
+/// directive. The caller compares `MinionOutput::optimum_value` across
+/// runs of the same wrapper under different propagator/heuristic
+/// combinations.
+pub fn get_minion_solutions_optimisation(
+    minionexec: &str,
+    baseargs: &[String],
+    extraargs: &[&str],
+    instance: &ConstraintInstance,
+    testname: &str,
+    max_solutions: i64,
+    optimisation: &OptimisationWrapper,
+) -> Result<MinionOutput> {
+    get_minion_solutions_inner(
+        minionexec,
+        baseargs,
+        extraargs,
+        instance,
+        testname,
+        max_solutions,
+        false,
+        Some(optimisation),
+    )
+}
+
+fn get_minion_solutions_inner(
+    minionexec: &str,
+    baseargs: &[String],
+    extraargs: &[&str],
+    instance: &ConstraintInstance,
+    testname: &str,
+    max_solutions: i64,
+    keep_full_solutions: bool,
+    optimisation: Option<&OptimisationWrapper>,
 ) -> Result<MinionOutput> {
     let nameid = format!(
         "{:?}_{}_{}",
@@ -161,7 +228,11 @@ pub fn get_minion_solutions(
     {
         let mut outfile =
             fs::File::create(&minout).context("Could not open output file for writing")?;
-        print_minion_file_pair(&mut outfile, instance).context("failed writing Minion output")?;
+        match optimisation {
+            None => print_minion_file_pair(&mut outfile, instance),
+            Some(opt) => print_minion_file_pair_optimisation(&mut outfile, instance, opt),
+        }
+        .context("failed writing Minion output")?;
     }
 
     let minioncmd = format!("{} {}", minionexec, args.iter().join(" "));
@@ -196,7 +267,16 @@ pub fn get_minion_solutions(
     // SOLUTIONS, NOT STORING THEM — this is the central memory win:
     // tests that previously OOM'd at the 10 M-solution cap now use
     // O(1) memory regardless of solution count.
-    let (digest, raw_solutions) = {
+    //
+    // Optimisation runs skip this entirely: the metamorphic sweep
+    // doesn't compare solutions across strategies, only OptimumValue.
+    // Reading is also wrong for parallel optimisation modes — only
+    // the parent context's solsoutfile is open, so the file misses
+    // worker-emitted solutions and the digest count won't match the
+    // aggregated SolutionsFound.
+    let (digest, raw_solutions) = if optimisation.is_some() {
+        (SolutionDigest::new(), None)
+    } else {
         let f = fs::File::open(&solsout)
             .context(format!("failed to open solution file: {}", minioncmd))?;
         let reader = BufReader::new(f);
@@ -235,7 +315,9 @@ pub fn get_minion_solutions(
             .parse::<i64>()
             .context(format!("invalid solution count: {}", minioncmd))?;
 
-        if solcount != digest.count as i64 {
+        // Optimisation runs skipped the digest, so don't enforce the
+        // file/SolutionsFound consistency invariant for them.
+        if optimisation.is_none() && solcount != digest.count as i64 {
             return Err(anyhow!(format!(
                 "Solutions file contains {} solutions, but SolutionsFound is {}",
                 digest.count,
@@ -255,11 +337,20 @@ pub fn get_minion_solutions(
             .ParallelPreprocessPrunings
             .as_ref()
             .and_then(|s| s.parse::<i64>().ok());
+        let opt_value = v
+            .OptimumValue
+            .as_ref()
+            .and_then(|s| s.parse::<i64>().ok());
 
-        (nodes, donations, pp_rounds, pp_prunings)
+        (nodes, donations, pp_rounds, pp_prunings, opt_value)
     };
-    let (nodes, work_steal_donations, parallel_preprocess_rounds, parallel_preprocess_prunings) =
-        parsed;
+    let (
+        nodes,
+        work_steal_donations,
+        parallel_preprocess_rounds,
+        parallel_preprocess_prunings,
+        optimum_value,
+    ) = parsed;
 
     // hit_solution_cap is true when the search stopped at the
     // -sollimit cap. Solution count == cap → cap was hit (search may
@@ -279,5 +370,6 @@ pub fn get_minion_solutions(
         parallel_preprocess_rounds,
         parallel_preprocess_prunings,
         hit_solution_cap,
+        optimum_value,
     })
 }

@@ -173,3 +173,62 @@ pub fn print_minion_file_pair<F: Write>(fcon: &mut F, con: &ConstraintInstance) 
 
     Ok(())
 }
+
+/// Description of an optimisation wrapper added on top of an existing
+/// `ConstraintInstance`: minion's `MINIMISING`/`MAXIMISING` directive on
+/// a fresh `aux` BOUND variable, plus the two `sumleq`/`sumgeq`
+/// constraints encoding `aux = sum(real_vars)`. The metamorphic
+/// optimisation sweep wraps every constraint instance with one of
+/// these so it always has a non-trivial objective.
+pub struct OptimisationWrapper<'a> {
+    pub aux_name: &'a str,
+    pub aux_min: i64,
+    pub aux_max: i64,
+    pub minimise: bool,
+    /// Names of the variables whose sum equals `aux`. Drawn from the
+    /// instance's flat var list, with constants filtered out.
+    pub sum_var_names: Vec<String>,
+}
+
+pub fn print_minion_file_pair_optimisation<F: Write>(
+    fcon: &mut F,
+    con: &ConstraintInstance,
+    opt: &OptimisationWrapper,
+) -> Result<()> {
+    print_minion_prefix(fcon)?;
+    print_variables_def(fcon, con)?;
+
+    // Aux variable plus its containing **VARIABLES**/**CONSTRAINTS**
+    // pair (mirroring print_variable_def's per-var emission shape).
+    writeln!(fcon, "**VARIABLES**")?;
+    writeln!(
+        fcon,
+        "BOUND {} {{{}..{}}}",
+        opt.aux_name, opt.aux_min, opt.aux_max
+    )?;
+    writeln!(fcon, "**CONSTRAINTS**")?;
+
+    // Search section. VARORDER must contain at least the objective
+    // var so it gets assigned at solution nodes (otherwise minion
+    // aborts with "The optimisation variable isn't assigned at a
+    // solution node!"). Listing *only* the aux var is fine — minion
+    // augments with the real vars at finaliseModel.
+    writeln!(fcon, "**SEARCH**")?;
+    writeln!(fcon, "VARORDER [{}]", opt.aux_name)?;
+    if opt.minimise {
+        writeln!(fcon, "MINIMISING {}", opt.aux_name)?;
+    } else {
+        writeln!(fcon, "MAXIMISING {}", opt.aux_name)?;
+    }
+
+    // Re-open **CONSTRAINTS** for the original constraint plus the
+    // pair encoding aux = sum(vars).
+    print_minion_constraint(fcon, con)?;
+    let names = opt.sum_var_names.iter().join(", ");
+    writeln!(fcon, "sumleq([{}], {})", names, opt.aux_name)?;
+    writeln!(fcon, "sumgeq([{}], {})", names, opt.aux_name)?;
+
+    print_minion_postfix(fcon)?;
+
+    Ok(())
+}

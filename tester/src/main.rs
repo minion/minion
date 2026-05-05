@@ -208,6 +208,16 @@ struct Opt {
     /// Set to 0 to skip the variant-equivalence sweep entirely.
     #[arg(long)]
     variant_count: Option<u64>,
+
+    /// Run the metamorphic optimisation sweep. For each random
+    /// constraint instance, wraps it with `aux = sum(real_vars)` and
+    /// `MINIMISING`/`MAXIMISING aux`, then solves under several
+    /// (propagator, heuristic, parallel) strategies and asserts they
+    /// all report the same optimum value. Skips the other sweeps.
+    /// Exec backend only; the in-process FFI doesn't yet plumb
+    /// optimisation through.
+    #[arg(long)]
+    optimisation_sweep: bool,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -327,6 +337,19 @@ fn main() -> Result<()> {
             "--midsearch-add-vars is mutually exclusive with --midsearch and --midsearch-constraints"
         );
     }
+    if opt.optimisation_sweep && opt.in_process {
+        anyhow::bail!(
+            "--optimisation-sweep currently requires the exec backend; \
+             optimisation is not yet plumbed through the minion-sys FFI"
+        );
+    }
+    if opt.optimisation_sweep
+        && (opt.midsearch || opt.midsearch_constraints || opt.midsearch_add_vars)
+    {
+        anyhow::bail!(
+            "--optimisation-sweep is mutually exclusive with the midsearch sweeps"
+        );
+    }
 
     let var_order = opt.var_order.into_minion();
     let val_order = opt.val_order.into_minion();
@@ -386,6 +409,19 @@ fn main() -> Result<()> {
                 })
                 .context(format!("midsearch failure in {}", c.name))?;
             println!("Tested {} (midsearch)", c.name);
+            Ok(())
+        });
+        ret?;
+        return Ok(());
+    }
+
+    if opt.optimisation_sweep {
+        let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_constraint_optimisation(&config, c))
+                .context(format!("optimisation-sweep failure in {}", c.name))?;
+            println!("Tested {} (optimisation-sweep)", c.name);
             Ok(())
         });
         ret?;

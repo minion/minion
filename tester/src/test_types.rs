@@ -1,10 +1,12 @@
 use crate::constraint_def;
+use crate::minion_instance::OptimisationWrapper;
 use crate::run_minion;
 use crate::run_minion::MinionOutput;
 use crate::run_minion_lib;
 extern crate rand;
 
 use self::rand::seq::SliceRandom;
+use self::rand::Rng;
 
 use anyhow::{anyhow, Result};
 
@@ -1729,5 +1731,167 @@ pub fn test_constraint_nested(
 
     ret.cleanup.cleanup();
     ret2.cleanup.cleanup();
+    Ok(())
+}
+
+/// Metamorphic optimisation sweep: build a random constraint instance,
+/// wrap it with `aux = sum(real_vars)` plus `MINIMISING`/`MAXIMISING aux`,
+/// and verify every strategy in a fixed set reports the same optimum.
+///
+/// The premise: we already trust the constraint propagators for
+/// satisfaction (the existing tableisation sweep covers that broadly).
+/// Optimisation bugs therefore live mostly in *optimisation-specific*
+/// code — bound tracking, parallel bound broadcast, restart-with-
+/// optimisation interaction. Different propagator/heuristic/parallel
+/// combinations stress that surface differently, so disagreement
+/// across them is a strong signal of a bound-tracking bug.
+///
+/// Skips silently when:
+///   - backend is in-process (FFI doesn't yet expose optimisation);
+///   - instance has no real (non-constant) variables (no objective);
+///   - aux range is degenerate (all real vars constant);
+///   - any strategy hits the per-trial node limit (incomplete run —
+///     "best so far" can't be metamorphic-compared with "proven
+///     optimal").
+///
+/// Fails when complete runs disagree on the optimum value (bug).
+pub fn test_constraint_optimisation(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+) -> Result<()> {
+    if config.backend != Backend::Exec {
+        // Optimisation directives aren't plumbed through the
+        // minion-sys FFI yet. Skip in-process runs cleanly.
+        return Ok(());
+    }
+
+    let instance = constraint_def::build_random_instance(c);
+
+    // Flatten and pick out the real (non-constant) variables.
+    // Constants contribute a fixed offset to the sum but no slack to
+    // optimise over, so dropping them is fine.
+    let flat: Vec<_> = instance
+        .vars()
+        .concat()
+        .into_iter()
+        .filter(|v| v.var_type != constraint_def::VarType::Constant)
+        .collect();
+    if flat.is_empty() {
+        return Ok(());
+    }
+
+    let mut sum_min: i64 = 0;
+    let mut sum_max: i64 = 0;
+    for v in &flat {
+        let lo = *v.domain.first().unwrap();
+        let hi = *v.domain.last().unwrap();
+        sum_min += lo;
+        sum_max += hi;
+    }
+    if sum_min >= sum_max {
+        // No slack to optimise over — every assignment yields the
+        // same aux value, so the test wouldn't shake out propagator
+        // bugs.
+        return Ok(());
+    }
+
+    let mut rng = rand::thread_rng();
+    let minimise: bool = rng.gen();
+
+    // Aux name uses a `__opt_` prefix that can't collide with any
+    // generated variable name (those use `var_*`, `tup_*`, etc. via
+    // get_unique_name).
+    let aux_name = format!("__opt_aux_{}", crate::counter::get_unique_value());
+    let names: Vec<String> = flat.iter().map(|v| v.name.clone()).collect();
+    let wrapper = OptimisationWrapper {
+        aux_name: &aux_name,
+        aux_min: sum_min,
+        aux_max: sum_max,
+        minimise,
+        sum_var_names: names,
+    };
+
+    // Per-trial node cap. Big enough that small random instances
+    // complete (typical needs <1k nodes), small enough that a
+    // pathological roll doesn't eat tens of seconds. If any strategy
+    // hits this we abandon the trial — comparing partial results
+    // would manufacture false bugs.
+    const NODE_LIMIT: i64 = 100_000;
+    let nl_str = NODE_LIMIT.to_string();
+
+    // Strategy set: combinations chosen to hit different code paths
+    // in the optimisation flow. Notably absent: `-restarts`. minion
+    // currently rejects that combination at BuildCSP.cpp:124
+    // ("-restarts is not compatible with -sollimit, or optimisation
+    // problems"). Once that restriction is lifted, add a
+    // ("restarts", &["-restarts", "-restarts-multiplier", "1.5"])
+    // entry here.
+    let strategies: [(&str, &[&str]); 5] = [
+        ("baseline", &[]),
+        ("preprocess-SAC", &["-preprocess", "SAC"]),
+        ("var-sdf-val-desc", &["-varorder", "sdf", "-valorder", "descend"]),
+        ("worksteal-4", &["-X-parallelWorkSteal", "4"]),
+        ("threads-4", &["-X-parallelThreads", "4"]),
+    ];
+
+    let mut results: Vec<(String, MinionOutput)> = Vec::new();
+    for (name, args) in &strategies {
+        let mut full: Vec<&str> = (*args).to_vec();
+        full.push("-nodelimit");
+        full.push(&nl_str);
+
+        // max_solutions=0 disables the solution cap. Optimisation
+        // runs emit one solution per non-dominated improvement; with
+        // bounded-domain random instances the count is small (tens at
+        // most), so the cap would never fire usefully and we'd lose
+        // the "complete run" signal.
+        let ret = run_minion::get_minion_solutions_optimisation(
+            config.minionexec,
+            &config.minionargs,
+            &full,
+            &instance,
+            &format!("opt_{}", name),
+            0,
+            &wrapper,
+        )?;
+        results.push(((*name).to_string(), ret));
+    }
+
+    // If any run hit the node cap, abandon the trial. We can't tell
+    // whether divergent "best so far" values are bugs or just
+    // different cut-off points.
+    let any_capped = results.iter().any(|(_, r)| r.nodes >= NODE_LIMIT);
+    if any_capped {
+        for (_, r) in &results {
+            r.cleanup.cleanup();
+        }
+        return Ok(());
+    }
+
+    // All runs are complete. They MUST agree on the optimum (or all
+    // agree the problem is UNSAT, which surfaces as None).
+    let baseline = results[0].1.optimum_value;
+    for (name, r) in &results[1..] {
+        if r.optimum_value != baseline {
+            let dir = if minimise { "MIN" } else { "MAX" };
+            let msg = format!(
+                "optimisation disagreement on {} ({}): \
+                 baseline ({}, {:?}) vs {} ({}, {:?})",
+                c.name,
+                dir,
+                results[0].1.filename,
+                baseline,
+                name,
+                r.filename,
+                r.optimum_value,
+            );
+            // Leave .minion files in place for post-mortem.
+            return Err(anyhow!(msg));
+        }
+    }
+
+    for (_, r) in &results {
+        r.cleanup.cleanup();
+    }
     Ok(())
 }
