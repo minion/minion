@@ -131,13 +131,14 @@ All `-varorder` choices (`static`, `sdf`, `sdf-random`, `srf`, `srf-random`, `ld
 
 #### Optimisation sweep — `--optimisation-sweep`
 
-For each random constraint instance, the sweep wraps it with `aux = sum(real_vars)` plus a randomly-chosen `MINIMISING aux` or `MAXIMISING aux`, then solves under five strategies and asserts they all report the same optimum:
+For each random constraint instance, the sweep wraps it with `aux = sum(real_vars)` plus a randomly-chosen `MINIMISING aux` or `MAXIMISING aux`, then solves under six strategies and asserts they all report the same optimum:
 
 - baseline (default everything)
 - `-preprocess SAC`
 - `-varorder sdf -valorder descend`
 - `-X-parallelWorkSteal 4`
 - `-X-parallelThreads 4`
+- `-restarts -restarts-multiplier 1.5`
 
 A per-trial `-nodelimit 100000` caps pathological rolls; if any strategy hits the cap the trial is abandoned silently (a partial "best so far" can't be metamorphic-compared with a "proven optimal"). Disagreement among complete runs is reported as a failure with both `.minion` files preserved on disk for post-mortem.
 
@@ -145,7 +146,7 @@ The premise: we already trust constraint propagators for satisfaction (the exist
 
 Plumbing: minion's `-jsontableout` reports `OptimumValue` and `OptimumDirection`; the tester's exec-mode runner reads them. Sequential, work-steal, and `-X-parallelThreads` all aggregate cross-worker. `-parallel` (fork-based) is not covered; the in-process backend rejects `--optimisation-sweep` because optimisation isn't yet plumbed through the FFI.
 
-Notably absent from the strategy set: `-restarts`. minion currently rejects that combination at `BuildCSP.cpp:124` (`-restarts is not compatible with -sollimit, or optimisation problems`). Once that restriction is lifted, restarts should be added.
+`-restarts` is in the strategy set. The restart manager's solution handler delegates to `standard_dealWith_solution` for optimisation problems (so the bound is tightened on every solution and the LIBMINION callback fires), and the new `optimisationHandler` mirrors `search_control.h`'s `opt_handler` (applying the running bound and the cross-worker shared bound at every right-branch step). Each restart attempt is then a complete DFS under the running bound; a natural exhaustion means the bound is provably optimal.
 
 ### Library API (libminion / minion-sys)
 | Surface | Coverage |
@@ -210,7 +211,6 @@ The CI matrix builds `bin-quick` and `bin-debug` and runs the full light suite o
 
 ## Known gaps to plug
 
-- **`-restarts` not covered by the optimisation sweep.** `BuildCSP.cpp:124` rejects restarts on optimisation problems; the restriction predates the metamorphic sweep. Lifting it (and verifying restarts handle the bound channel correctly) would close a real coverage gap — restart-with-optimisation is exactly the kind of subtle interaction the metamorphic test was designed to catch.
 - **In-process backend doesn't expose optimisation.** `--optimisation-sweep` errors out cleanly under `--in-process`; making it work needs `optimiseMinimiseVars`/`optimiseMaximiseVars` bindings in `minion-sys` and a routing path through the existing FFI runner.
 - **`-parallel` (fork-based) is not in the optimisation strategy set.** Each forked child writes its own `-jsontableout` and the parent doesn't aggregate cross-process for optimisation. Adding it would need a small post-process step.
 - **Resume / dump / Xgraph are completely untested.** A single round-trip test (dump → reload → verify same solutions) per format would suffice.
