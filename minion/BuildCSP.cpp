@@ -120,10 +120,18 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   shared_ptr<Controller::SearchManager> sm;
 
   if(getOptions().restart.active) {
-    if(getOptions().sollimit != 1) {
-      D_FATAL_ERROR("-restarts is not compatible with -sollimit, or optimisation problems");
+    // Optimisation forces sollimit=-1 (findAllSolutions) so that
+    // dealWith_solution doesn't terminate after the first solution
+    // and search can continue tightening the bound. SAT mode under
+    // restarts uses sollimit=1 (find one solution then stop). Any
+    // other sollimit is meaningless for restarts — reject.
+    bool isOpt = getState().isOptimisationProblem();
+    if(!isOpt && getOptions().sollimit != 1) {
+      D_FATAL_ERROR("-restarts is not compatible with -sollimit unless optimising");
     }
-    // sm = Controller::make_restart_search_manager(args.propMethod, instance.searchOrder);
+    if(isOpt && getOptions().sollimit != -1) {
+      D_FATAL_ERROR("-restarts on an optimisation problem requires sollimit=-1 (findAllSolutions)");
+    }
     sm = Controller::make_restart_new_search_manager(args.propMethod, instance.searchOrder);
   } else {
     sm = Controller::makeSearch_manager(args.propMethod, instance.searchOrder);

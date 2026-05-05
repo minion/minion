@@ -1820,18 +1820,17 @@ pub fn test_constraint_optimisation(
     let nl_str = NODE_LIMIT.to_string();
 
     // Strategy set: combinations chosen to hit different code paths
-    // in the optimisation flow. Notably absent: `-restarts`. minion
-    // currently rejects that combination at BuildCSP.cpp:124
-    // ("-restarts is not compatible with -sollimit, or optimisation
-    // problems"). Once that restriction is lifted, add a
-    // ("restarts", &["-restarts", "-restarts-multiplier", "1.5"])
-    // entry here.
-    let strategies: [(&str, &[&str]); 5] = [
+    // in the optimisation flow. `-restarts` is in: each restart
+    // attempt is a complete depth-first search under the running
+    // best bound, so the optimum found must agree with all the
+    // other strategies.
+    let strategies: [(&str, &[&str]); 6] = [
         ("baseline", &[]),
         ("preprocess-SAC", &["-preprocess", "SAC"]),
         ("var-sdf-val-desc", &["-varorder", "sdf", "-valorder", "descend"]),
         ("worksteal-4", &["-X-parallelWorkSteal", "4"]),
         ("threads-4", &["-X-parallelThreads", "4"]),
+        ("restarts", &["-restarts", "-restarts-multiplier", "1.5"]),
     ];
 
     let mut results: Vec<(String, MinionOutput)> = Vec::new();
