@@ -337,12 +337,6 @@ fn main() -> Result<()> {
             "--midsearch-add-vars is mutually exclusive with --midsearch and --midsearch-constraints"
         );
     }
-    if opt.optimisation_sweep && opt.in_process {
-        anyhow::bail!(
-            "--optimisation-sweep currently requires the exec backend; \
-             optimisation is not yet plumbed through the minion-sys FFI"
-        );
-    }
     if opt.optimisation_sweep
         && (opt.midsearch || opt.midsearch_constraints || opt.midsearch_add_vars)
     {

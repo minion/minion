@@ -11,9 +11,10 @@ use std::sync::Arc;
 
 use anyhow::{anyhow, bail, Context, Result};
 
-use minion_sys::ast::{Constant as MC, Constraint as MCon, Model, Var, VarDomain, VarName};
+use minion_sys::ast::{Constant as MC, Constraint as MCon, Model, Optimise, Var, VarDomain, VarName};
 
 use crate::constraint_def::{ConstraintInstance, MinionVariable, VarType};
+use crate::minion_instance::OptimisationWrapper;
 use crate::run_minion::{CleanupFiles, MinionOutput};
 use crate::solution_digest::SolutionDigest;
 
@@ -1035,8 +1036,120 @@ pub fn get_minion_solutions_in_process(
         parallel_preprocess_rounds: None,
         parallel_preprocess_prunings: None,
         hit_solution_cap,
-        // In-process backend doesn't yet expose optimisation through
-        // the FFI — the optimisation sweep is exec-only for now.
+        // The non-optimisation entry point never sets an optimisation
+        // directive, so the FFI never reports OptimumValue.
         optimum_value: None,
+    })
+}
+
+/// In-process optimisation runner. Mirrors
+/// [`get_minion_solutions_in_process`] but augments the model with an
+/// auxiliary objective variable equal to the sum of the named real
+/// vars, plus a `MINIMISING`/`MAXIMISING` directive on it. Reads
+/// `OptimumValue` out of TableOut after solve.
+///
+/// Exec mode does the equivalent textually via
+/// [`crate::minion_instance::print_minion_file_pair_optimisation`].
+/// This function lets `--optimisation-sweep` participate under
+/// `--in-process` once the FFI plumbing for optimisation lands.
+pub fn get_minion_solutions_in_process_optimisation(
+    instance: &ConstraintInstance,
+    options: minion_sys::RunOptions,
+    testname: &str,
+    optimisation: &OptimisationWrapper,
+) -> Result<MinionOutput> {
+    let mut model = Model::new();
+    register_tuple_tables_for_instance(&mut model, instance)?;
+    add_variables_and_holes(&mut model, instance)?;
+
+    // Aux objective variable as a Bound var spanning the sum range.
+    model
+        .named_variables
+        .add_var(
+            optimisation.aux_name.to_string(),
+            VarDomain::Bound(optimisation.aux_min as i32, optimisation.aux_max as i32),
+        )
+        .ok_or_else(|| anyhow!("aux variable name {:?} already in use", optimisation.aux_name))?;
+
+    let top = build_constraint(instance)
+        .with_context(|| format!("building constraint for {testname}"))?;
+    model.constraints.push(top);
+
+    // aux = sum(real_vars) — encoded as a sumleq + sumgeq pair (minion
+    // doesn't have a native sum-equality constraint, and tying through
+    // a tabulated relation would be overkill at the sizes the tester
+    // generates).
+    let sum_vars: Vec<Var> = optimisation
+        .sum_var_names
+        .iter()
+        .map(|n| Var::NameRef(n.clone()))
+        .collect();
+    let aux_var = Var::NameRef(optimisation.aux_name.to_string());
+    model
+        .constraints
+        .push(MCon::SumLeq(sum_vars.clone(), aux_var.clone()));
+    model
+        .constraints
+        .push(MCon::SumGeq(sum_vars, aux_var.clone()));
+
+    model.optimise = Some(Optimise {
+        minimise: optimisation.minimise,
+        var: aux_var,
+    });
+
+    let variable_order = model.named_variables.get_variable_order();
+
+    // Optimisation runs don't need solution storage — the metamorphic
+    // sweep only compares OptimumValue. Still install a callback to
+    // count nodes and let minion's findAllSolutions logic drive
+    // search through the bound-tightening loop.
+    let mut digest = SolutionDigest::new();
+
+    let callback: minion_sys::Callback<'_> = {
+        let variable_order = &variable_order;
+        let digest = &mut digest;
+        Box::new(move |sol_map: HashMap<VarName, MC>| -> bool {
+            // Touch each var to keep parity with the satisfaction
+            // path's invariant ("every search var appears in the
+            // print matrix on a solution").
+            let mut row = Vec::with_capacity(variable_order.len());
+            for name in variable_order.iter() {
+                match sol_map.get(name).copied() {
+                    Some(MC::Integer(n)) => row.push(n as i64),
+                    Some(MC::Bool(b)) => row.push(if b { 1 } else { 0 }),
+                    Some(_) | None => return false,
+                }
+            }
+            digest.add(row);
+            true
+        })
+    };
+
+    let ctx = minion_sys::run_minion_with_options(model, options, callback)
+        .map_err(|e| anyhow!("minion in-process error ({testname}): {e}"))?;
+
+    let nodes_str = ctx
+        .get_from_table("Nodes".to_string())
+        .ok_or_else(|| anyhow!("Nodes key missing from minion stats"))?;
+    let nodes: i64 = nodes_str
+        .parse()
+        .with_context(|| format!("parsing Nodes={nodes_str:?}"))?;
+
+    // Parse OptimumValue if present (absent under UNSAT).
+    let optimum_value = ctx
+        .get_from_table("OptimumValue".to_string())
+        .and_then(|s| s.parse::<i64>().ok());
+
+    Ok(MinionOutput {
+        solutions: digest,
+        raw_solutions: None,
+        nodes,
+        filename: format!("<in-process-opt:{testname}>"),
+        cleanup: CleanupFiles::empty(),
+        work_steal_donations: None,
+        parallel_preprocess_rounds: None,
+        parallel_preprocess_prunings: None,
+        hit_solution_cap: false,
+        optimum_value,
     })
 }

@@ -1759,12 +1759,6 @@ pub fn test_constraint_optimisation(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
 ) -> Result<()> {
-    if config.backend != Backend::Exec {
-        // Optimisation directives aren't plumbed through the
-        // minion-sys FFI yet. Skip in-process runs cleanly.
-        return Ok(());
-    }
-
     let instance = constraint_def::build_random_instance(c);
 
     // Flatten and pick out the real (non-constant) variables.
@@ -1824,7 +1818,13 @@ pub fn test_constraint_optimisation(
     // attempt is a complete depth-first search under the running
     // best bound, so the optimum found must agree with all the
     // other strategies.
-    let strategies: [(&str, &[&str]); 6] = [
+    //
+    // The in-process backend can only express a subset (the FFI
+    // doesn't expose `-restarts`, parallel modes, prop_node levels,
+    // or `-nodelimit`). It picks up the in-process flavour of the
+    // exec sweep via `run_with_options`-style varorder/valorder/
+    // preprocess overrides — see the dispatch below.
+    let exec_strategies: [(&str, &[&str]); 6] = [
         ("baseline", &[]),
         ("preprocess-SAC", &["-preprocess", "SAC"]),
         ("var-sdf-val-desc", &["-varorder", "sdf", "-valorder", "descend"]),
@@ -1832,33 +1832,79 @@ pub fn test_constraint_optimisation(
         ("threads-4", &["-X-parallelThreads", "4"]),
         ("restarts", &["-restarts", "-restarts-multiplier", "1.5"]),
     ];
+    let in_process_strategies: [(&str, minion_sys::VarOrder, minion_sys::ValOrder,
+                                 minion_sys::PropLevel); 4] = [
+        ("baseline",
+         minion_sys::VarOrder::Static, minion_sys::ValOrder::Ascend,
+         minion_sys::PropLevel::None),
+        ("preprocess-SAC",
+         minion_sys::VarOrder::Static, minion_sys::ValOrder::Ascend,
+         minion_sys::PropLevel::SAC),
+        ("preprocess-SACBounds",
+         minion_sys::VarOrder::Static, minion_sys::ValOrder::Ascend,
+         minion_sys::PropLevel::SACBounds),
+        ("var-sdf-val-desc",
+         minion_sys::VarOrder::SDF, minion_sys::ValOrder::Descend,
+         minion_sys::PropLevel::None),
+    ];
 
     let mut results: Vec<(String, MinionOutput)> = Vec::new();
-    for (name, args) in &strategies {
-        let mut full: Vec<&str> = (*args).to_vec();
-        full.push("-nodelimit");
-        full.push(&nl_str);
+    if config.backend == Backend::Exec {
+        for (name, args) in &exec_strategies {
+            let mut full: Vec<&str> = (*args).to_vec();
+            full.push("-nodelimit");
+            full.push(&nl_str);
 
-        // max_solutions=0 disables the solution cap. Optimisation
-        // runs emit one solution per non-dominated improvement; with
-        // bounded-domain random instances the count is small (tens at
-        // most), so the cap would never fire usefully and we'd lose
-        // the "complete run" signal.
-        let ret = run_minion::get_minion_solutions_optimisation(
-            config.minionexec,
-            &config.minionargs,
-            &full,
-            &instance,
-            &format!("opt_{}", name),
-            0,
-            &wrapper,
-        )?;
-        results.push(((*name).to_string(), ret));
+            // max_solutions=0 disables the solution cap. Optimisation
+            // runs emit one solution per non-dominated improvement;
+            // with bounded-domain random instances the count is small
+            // (tens at most), so the cap would never fire usefully and
+            // we'd lose the "complete run" signal.
+            let ret = run_minion::get_minion_solutions_optimisation(
+                config.minionexec,
+                &config.minionargs,
+                &full,
+                &instance,
+                &format!("opt_{}", name),
+                0,
+                &wrapper,
+            )?;
+            results.push(((*name).to_string(), ret));
+        }
+    } else {
+        // In-process: smaller strategy set (no -restarts, no parallel
+        // modes via FFI, no -nodelimit). Still useful — covers the
+        // FFI optimisation plumbing under different propagator
+        // settings, and any disagreement vs the Model::optimise
+        // contract surfaces immediately.
+        for (name, vo, valo, pp) in &in_process_strategies {
+            let opts = minion_sys::RunOptions {
+                seed: None,
+                var_order: *vo,
+                val_order: *valo,
+                preprocess: minion_sys::Propagation { level: *pp, limit: false },
+                prop_node: minion_sys::Propagation {
+                    level: minion_sys::PropLevel::GAC,
+                    limit: false,
+                },
+            };
+            let ret = run_minion_lib::get_minion_solutions_in_process_optimisation(
+                &instance,
+                opts,
+                &format!("opt_{}", name),
+                &wrapper,
+            )?;
+            results.push(((*name).to_string(), ret));
+        }
     }
 
     // If any run hit the node cap, abandon the trial. We can't tell
     // whether divergent "best so far" values are bugs or just
     // different cut-off points.
+    //
+    // Only meaningful for the exec strategies; the in-process flow
+    // doesn't currently apply -nodelimit, but its small instances
+    // typically complete in <1k nodes so this check is harmless.
     let any_capped = results.iter().any(|(_, r)| r.nodes >= NODE_LIMIT);
     if any_capped {
         for (_, r) in &results {
