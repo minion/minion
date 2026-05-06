@@ -96,12 +96,13 @@ Heavy is also where you'd run a longer `CI-long.yml` equivalent — that workflo
 
 ### Constraints
 
-The random tester currently registers 64 user-facing constraint variants (the `CONSTRAINT_LIST` in `tester/src/constraint_def.rs`, plus six equivalence groups in `EQUIVALENCE_GROUPS`). Every one is exercised by the standard, nested, work-steal, parallel-preprocess, restart, and option sweeps in both `--light` and `--heavy`.
+The random tester currently registers 69 user-facing constraint variants (the `CONSTRAINT_LIST` in `tester/src/constraint_def.rs`, plus seven equivalence groups in `EQUIVALENCE_GROUPS`). Every one is exercised by the standard, nested, work-steal, parallel-preprocess, restart, and option sweeps in both `--light` and `--heavy`.
+
+The four short-tuple constraints (`shortstr2`, `haggisgac`, `haggisgac-stable`, `shortctuplestr2`) form one equivalence group: they all read `**SHORTTUPLELIST**` data and have the same declarative semantics. The fuzzer generates random short tuples with single-literal-per-variable positions (the form accepted by all four propagators; `shortctuplestr2`'s multi-literal extension is not yet exercised). `str2plus` is the standard-table reference target — every metamorphic comparison expands a constraint's truth table to a `str2plus` instance.
+
+`frameupdate` is registered with tight bounds on its argument sizes (`source.len() ≤ 4`, `blocksize ∈ {1, 2}`, idx-list length `≤ 1`). The propagator only detects "idx out of range" once *all* idx variables are assigned, so wider idx lists with wide Bound domains explode the search tree without solutions; the bounds keep enumeration tractable.
 
 **Constraints registered in the source but NOT in the random tester:**
-- `haggisgac`, `haggisgac-stable` — short-tuple constraints. Regression coverage: 8 `.minion` files exercising `haggisgac`, but no fuzz coverage.
-- `shortstr2`, `shortctuplestr2`, `str2plus` — short-tuple table family. Regression coverage: 1 `.minion` file (`basic_shortstr2_table_1.minion`); `str2plus` is referenced inside the tester as the standard-table reference but not tested as a target.
-- `frameupdate` — 1 regression file, no fuzz coverage.
 - `forwardchecking` — registered in tester (CT_FORWARD_CHECKING), so this *is* covered.
 - `()()collectevents()()`, `__reify_eq`, `__reify_diseq`, `__reify_minuseq`, `check[assign]`, `check[gsa]` — internal helpers, not user-facing.
 
@@ -216,5 +217,5 @@ The CI matrix builds `bin-quick` and `bin-debug` and runs the full light suite o
 - **`-parallel` (fork-based) is not in the optimisation strategy set.** Each forked child writes its own `-jsontableout` and the parent doesn't aggregate cross-process for optimisation. Adding it would need a small post-process step. Also: the user is reconsidering whether `-parallel` justifies its maintenance cost vs. the thread-based modes (see ROADMAP).
 - **Resume / dump / Xgraph are completely untested.** A single round-trip test (dump → reload → verify same solutions) per format would suffice.
 - **`-X-AMO`, `-X-tabulation`, `-X-prop-node` have no coverage.** These are experimental, so this may be deliberate.
-- **Five constraints have no fuzz coverage**: `haggisgac`, `haggisgac-stable`, `shortstr2`, `shortctuplestr2`, `frameupdate`. They have minimal regression coverage. Adding them to `tester/src/constraint_def.rs::CONSTRAINT_LIST` would close this.
-- **No sanitiser run is in `--heavy`.** Adding an `--sanitize`-built binary as an extra phase would catch UB and leaks that the debug build misses.
+- **`shortctuplestr2`'s multi-literal-per-variable feature is not exercised**: the fuzzer only generates single-literal short tuples (the form accepted by `shortstr2` / `haggisgac` / `haggisgac-stable`). A separate generator that emits `[(0,0),(0,1),(3,0)]`-style cTuples would close this.
+- **In-process backend coverage of short tuples**: libminion does not expose a constructor for `ShortTupleList` or a `constraint_setShortTuples` FFI call, so the four short-tuple constraints are exec-only. Adding the FFI surface would round out coverage.

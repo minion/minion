@@ -49,7 +49,11 @@ pub enum Arg {
     // TwoVars(VarType),
     //    ConstantList,
     Tuples,
-    //    Short_Tuples,
+    /// Short-tuple list (`**SHORTTUPLELIST**`). Triggers
+    /// generation of a [`ShortTuples`] from the variables seen so
+    /// far. Used by `shortstr2`, `haggisgac`, `haggisgac-stable`,
+    /// and `shortctuplestr2`.
+    ShortTuples,
     Constraint,
     //    Constraint_List,
 }
@@ -74,6 +78,28 @@ impl Tuples {
         Tuples {
             tupledata,
             name: get_unique_name("tuples", ""),
+        }
+    }
+}
+
+/// A `**SHORTTUPLELIST**` value. Each inner `Vec<(usize, i64)>` is
+/// one short tuple — a list of `(variable_index, value)` literals.
+/// Variable indexes refer to the position within the constraint's
+/// variable list. Multiple literals for the same `usize` in one
+/// short tuple are only meaningful for `shortctuplestr2` (OR
+/// semantics); the other propagators reject such input. This
+/// generator never produces them.
+#[derive(Clone)]
+pub struct ShortTuples {
+    pub data: Vec<Vec<(usize, i64)>>,
+    pub name: String,
+}
+
+impl ShortTuples {
+    fn new(data: Vec<Vec<(usize, i64)>>) -> ShortTuples {
+        ShortTuples {
+            data,
+            name: get_unique_name("shorttuples", ""),
         }
     }
 }
@@ -291,6 +317,7 @@ pub struct ConstraintInstance {
     pub constraint: ConstraintDef,
     varlist: Arc<Vec<Vec<Arc<MinionVariable>>>>,
     pub tuples: Option<Tuples>,
+    pub short_tuples: Option<ShortTuples>,
     pub child_constraints: Vec<ConstraintInstance>,
 }
 
@@ -407,6 +434,7 @@ impl ConstraintInstance {
                 Arc::new(vec![vars])
             },
             tuples: Some(Tuples::new(tuples)),
+            short_tuples: None,
             child_constraints: vec![],
         })
     }
@@ -483,6 +511,55 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
     }
 }
 
+/// Generate a random short-tuple list over the variables collected
+/// so far. Each short tuple selects a random non-empty subset of
+/// the variable positions and assigns each chosen position a value
+/// drawn uniformly from that variable's domain. Positions are
+/// distinct within a short tuple (so the result satisfies
+/// `validateShortTuples`'s "no two literals for the same variable"
+/// rule used by shortstr2/haggisgac/haggisgac-stable; shortctuplestr2
+/// is more permissive and accepts the same input).
+fn generate_random_short_tuples_from_vars(
+    variables: &[Vec<Arc<MinionVariable>>],
+) -> Option<ShortTuples> {
+    let mut rng = rand::thread_rng();
+    let all_vars: Vec<Arc<MinionVariable>> =
+        variables.iter().flatten().cloned().collect();
+    let n_vars = all_vars.len();
+    if n_vars == 0 {
+        // Zero-variable corner case. An empty data list = constraint
+        // false everywhere; an empty short tuple = trivially true.
+        // The 0-var instance is uninteresting either way; pick "true".
+        return Some(ShortTuples::new(vec![vec![]]));
+    }
+
+    // Number of short tuples in the list. Cap by the number of
+    // assignments any short tuple could rule in (≤ 2^n_vars-ish), so
+    // we don't generate redundant short tuples that all map to the
+    // same dense truth table.
+    let upper = (2_usize).saturating_pow(n_vars as u32).min(20).max(2);
+    let num_short = rng.gen_range(1..=upper);
+
+    let mut tuples: Vec<Vec<(usize, i64)>> = Vec::with_capacity(num_short);
+    for _ in 0..num_short {
+        // Pick 1..=n_vars distinct positions for this short tuple.
+        let len = rng.gen_range(1..=n_vars);
+        let mut positions: Vec<usize> = (0..n_vars).collect();
+        positions.shuffle(&mut rng);
+        positions.truncate(len);
+        positions.sort();
+        let short: Vec<(usize, i64)> = positions
+            .iter()
+            .map(|&p| {
+                let val = *all_vars[p].domain.choose(&mut rng).unwrap();
+                (p, val)
+            })
+            .collect();
+        tuples.push(short);
+    }
+    Some(ShortTuples::new(tuples))
+}
+
 pub fn build_random_instance(constraint: &ConstraintDef) -> ConstraintInstance {
     build_random_instance_with_children(constraint, &[])
 }
@@ -515,6 +592,7 @@ pub fn build_random_instance_with_children_sized(
         let mut constraints: Vec<ConstraintInstance> = vec![];
         let mut constraint_child = 0;
         let mut generated_tuples: Option<Tuples> = None;
+        let mut generated_short_tuples: Option<ShortTuples> = None;
 
         for i in 0..constraint.arg.len() {
             match constraint.arg[i] {
@@ -532,6 +610,9 @@ pub fn build_random_instance_with_children_sized(
                 Tuples => {
                     generated_tuples = generate_random_tuples_from_vars(&variables);
                 }
+                ShortTuples => {
+                    generated_short_tuples = generate_random_short_tuples_from_vars(&variables);
+                }
                 Constraint => {
                     // Leave dummy empty vec in variables
                     variables.push(vec![]);
@@ -548,6 +629,7 @@ pub fn build_random_instance_with_children_sized(
             constraint: constraint.clone(),
             varlist: Arc::new(variables),
             tuples: generated_tuples,
+            short_tuples: generated_short_tuples,
             child_constraints: constraints,
         };
         if (constraint.valid_instance)(&c) {
@@ -573,6 +655,7 @@ pub fn build_nested_instance(
         let mut constraints: Vec<ConstraintInstance> = vec![];
         let mut constraint_child = 0;
         let mut generated_tuples: Option<Tuples> = None;
+        let mut generated_short_tuples: Option<ShortTuples> = None;
 
         for i in 0..parent_def.arg.len() {
             match parent_def.arg[i] {
@@ -586,6 +669,9 @@ pub fn build_nested_instance(
                 Tuples => {
                     generated_tuples = generate_random_tuples_from_vars(&variables);
                 }
+                ShortTuples => {
+                    generated_short_tuples = generate_random_short_tuples_from_vars(&variables);
+                }
                 Constraint => {
                     variables.push(vec![]);
                     constraints.push(child_instances[constraint_child].clone());
@@ -597,6 +683,7 @@ pub fn build_nested_instance(
             constraint: parent_def.clone(),
             varlist: Arc::new(variables),
             tuples: generated_tuples,
+            short_tuples: generated_short_tuples,
             child_constraints: constraints,
         };
         if (parent_def.valid_instance)(&c) {
@@ -771,6 +858,151 @@ fn valid_negative_table(c: &ConstraintInstance) -> bool {
     tuples.tupledata.len() < total
 }
 
+fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
+    let assignment = v[0];
+    let st = c.short_tuples.as_ref().unwrap();
+    // An empty short-tuple list = constraint false everywhere.
+    // An empty individual short tuple = trivially satisfied.
+    for short in &st.data {
+        let mut all_match = true;
+        for &(idx, val) in short {
+            if assignment[idx] != val {
+                all_match = false;
+                break;
+            }
+        }
+        if all_match {
+            return true;
+        }
+    }
+    false
+}
+
+/// Reject degenerate short-tuple instances:
+///   - an empty short-tuple list (constraint false everywhere — solvers
+///     differ in how they short-circuit, and the trial is uninteresting);
+///   - any short tuple that is empty (collapses the constraint to true).
+/// Both are uninteresting for metamorphic testing and the second
+/// hides bugs in the literal-iteration logic.
+fn valid_short_tuples_instance(c: &ConstraintInstance) -> bool {
+    let st = match c.short_tuples.as_ref() {
+        Some(s) => s,
+        None => return false,
+    };
+    if st.data.is_empty() {
+        return false;
+    }
+    if st.data.iter().any(|t| t.is_empty()) {
+        return false;
+    }
+    true
+}
+
+fn check_frameupdate(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
+    // Argument order in the minion input file
+    // (frameupdate(source, target, idx_source, idx_target, blocksize)),
+    // confirmed against test_frameupdate.minion and BuildCT_FRAMEUPDATE.
+    let src = v[0];
+    let tgt = v[1];
+    let idx_src = v[2];
+    let idx_tgt = v[3];
+    let blocksize = v[4][0];
+    if blocksize <= 0 {
+        return false;
+    }
+    let bs = blocksize as usize;
+    if src.len() != tgt.len() || src.len() % bs != 0 {
+        return false;
+    }
+    let numblocks = (src.len() / bs) as i64;
+
+    // Per minion (constraint_frameupdate.h:checkAssignment), idx
+    // values must be distinct, positive, and ≤ source.size() (NOT
+    // ≤ numblocks — values above numblocks are allowed but never
+    // get matched in the block-walking loop).
+    use std::collections::HashSet;
+    let src_len = src.len() as i64;
+    let tgt_len = tgt.len() as i64;
+    let mut idx_src_set: HashSet<i64> = HashSet::new();
+    for &val in idx_src {
+        if val <= 0 || val > src_len || !idx_src_set.insert(val) {
+            return false;
+        }
+    }
+    let mut idx_tgt_set: HashSet<i64> = HashSet::new();
+    for &val in idx_tgt {
+        if val <= 0 || val > tgt_len || !idx_tgt_set.insert(val) {
+            return false;
+        }
+    }
+
+    // walk surviving blocks in lockstep, comparing block contents
+    let mut idxsource: i64 = 1;
+    let mut idxtarget: i64 = 1;
+    while idxsource <= numblocks && idxtarget <= numblocks {
+        while idx_src_set.contains(&idxsource) {
+            idxsource += 1;
+        }
+        while idx_tgt_set.contains(&idxtarget) {
+            idxtarget += 1;
+        }
+        if idxsource <= numblocks && idxtarget <= numblocks {
+            for i in 0..bs {
+                let s_pos = (idxsource as usize - 1) * bs + i;
+                let t_pos = (idxtarget as usize - 1) * bs + i;
+                if src[s_pos] != tgt[t_pos] {
+                    return false;
+                }
+            }
+            idxsource += 1;
+            idxtarget += 1;
+        }
+    }
+    true
+}
+
+/// Frameupdate has structural relations between argument sizes
+/// (`source.len() == target.len()`, divisible by `blocksize`,
+/// `blocksize >= 1`). Random rolls satisfy these only sometimes;
+/// the generator retries until they do. We also cap source.len()
+/// here because the truth-table enumeration walks the Cartesian
+/// product of *all* variables — long lists blow past --maxtuples
+/// trivially.
+fn valid_frameupdate(c: &ConstraintInstance) -> bool {
+    let blocksize = c.vars()[4][0].get_value();
+    // Tight bounds (independent of --size-factor) so retry-based
+    // generation lands on a valid config quickly AND the search
+    // space is small enough to enumerate fully via tableise.
+    if !(1..=2).contains(&blocksize) {
+        return false;
+    }
+    let source_len = c.vars()[0].len();
+    let target_len = c.vars()[1].len();
+    if source_len == 0 || source_len != target_len {
+        return false;
+    }
+    if source_len > 4 {
+        return false;
+    }
+    if source_len as i64 % blocksize != 0 {
+        return false;
+    }
+    // idx variables have huge default Bound domains (±10) but only
+    // values 1..=source.size() are feasible; the propagator only
+    // detects the failure once all idx vars are assigned, so a
+    // long idx list with wide domains explodes the search tree.
+    // Cap the idx lists at length 1 to keep cost manageable —
+    // still exercises the skip path (one block on each side may
+    // be skipped) without the combinatorial blow-up.
+    if c.vars()[2].len() > 1 {
+        return false;
+    }
+    if c.vars()[3].len() > 1 {
+        return false;
+    }
+    true
+}
+
 fn check_element(v: &[&[i64]], offset: i64, undefzero: bool) -> bool {
     let index = v[1][0] - offset;
     if index < 0 || index >= v[0].len() as i64 {
@@ -924,6 +1156,7 @@ pub static EQUIVALENCE_GROUPS: &[&[&str]] = &[
     &["lexless", "lexless[quick]"],
     &["table", "gacschema", "lighttable", "mddc"],
     &["negativetable", "negativemddc"],
+    &["shortstr2", "haggisgac", "haggisgac-stable", "shortctuplestr2"],
 ];
 
 /// Look up a registered constraint definition by exact name.
@@ -1025,7 +1258,22 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             true,
         ),
-        // TODO: CT_FRAMEUPDATE
+        ConstraintDef::new_full(
+            "frameupdate", // CT_FRAMEUPDATE
+            // (source, target, idx_source, idx_target, blocksize)
+            // All var lists are Bound; blocksize is a constant.
+            vec![
+                List(Bound),
+                List(Bound),
+                List(Bound),
+                List(Bound),
+                Var(Constant),
+            ],
+            check_frameupdate,
+            false,
+            false,
+            valid_frameupdate,
+        ),
         ConstraintDef::new(
             "gacalldiff",
             vec![List(Discrete)],
@@ -1072,7 +1320,22 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             false,
         ),
-        // TODO: CT_HAGGISGAC_STABLE, CT_HAGGISGAC
+        ConstraintDef::new_full(
+            "haggisgac", // CT_HAGGISGAC
+            vec![List(Discrete), ShortTuples],
+            check_short_tuples,
+            true,
+            true,
+            valid_short_tuples_instance,
+        ),
+        ConstraintDef::new_full(
+            "haggisgac-stable", // CT_HAGGISGAC_STABLE
+            vec![List(Discrete), ShortTuples],
+            check_short_tuples,
+            true,
+            true,
+            valid_short_tuples_instance,
+        ),
         ConstraintDef::new(
             "ineq", // CT_INEQ
             vec![Var(Bound), Var(Bound), Var(Constant)],
@@ -1221,7 +1484,29 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             |v| v.vars()[0].len() == v.vars()[1].len(),
         ),
-        // TODO: CT_SHORTSTR_TUPLE, CT_SHORTSTR, CT_STR
+        ConstraintDef::new_full(
+            "shortstr2", // CT_SHORTSTR
+            // shortstr2 itself accepts any var type, but the
+            // equivalence group includes haggisgac/-stable which
+            // call removeFromDomain → Discrete only.
+            vec![List(Discrete), ShortTuples],
+            check_short_tuples,
+            true,
+            true,
+            valid_short_tuples_instance,
+        ),
+        ConstraintDef::new_full(
+            "shortctuplestr2", // CT_SHORTSTR_CTUPLE
+            // Accepts the same single-literal short tuples as the
+            // others; its multi-literal-per-var feature is not
+            // exercised by this generator (would need a separate
+            // test entry point).
+            vec![List(Discrete), ShortTuples],
+            check_short_tuples,
+            true,
+            true,
+            valid_short_tuples_instance,
+        ),
         ConstraintDef::new(
             "true", // CT_TRUEArc
             vec![],

@@ -24,9 +24,26 @@ fn print_minion_tuples<F: Write>(f: &mut F, tuples: &Tuples) -> Result<()> {
     Ok(())
 }
 
+fn print_minion_short_tuples<F: Write>(f: &mut F, st: &ShortTuples) -> Result<()> {
+    f.write_all(b"**SHORTTUPLELIST**\n")?;
+    writeln!(f, "{} {}", st.name, st.data.len())?;
+    for short in &st.data {
+        let pairs = short
+            .iter()
+            .map(|(i, v)| format!("({},{})", i, v))
+            .join(",");
+        writeln!(f, "[{}]", pairs)?;
+    }
+    f.write_all(b"\n")?;
+    Ok(())
+}
+
 fn print_minion_constraint_tuples<F: Write>(f: &mut F, con: &ConstraintInstance) -> Result<()> {
     if let Some(ref tuples) = con.tuples {
         print_minion_tuples(f, tuples)?;
+    }
+    if let Some(ref st) = con.short_tuples {
+        print_minion_short_tuples(f, st)?;
     }
     // Recurse into nested children so any tuple-table-using constraint
     // (mddc, str2plus, table, etc.) embedded inside a parent
@@ -57,6 +74,7 @@ fn print_minion_constraint_contents<F: Write>(f: &mut F, con: &ConstraintInstanc
                 format!("[{}]", commalist)
             }
             Arg::Tuples => con.tuples.as_ref().unwrap().name.clone(),
+            Arg::ShortTuples => con.short_tuples.as_ref().unwrap().name.clone(),
             Arg::Constraint => {
                 let mut out = Vec::new();
                 print_minion_constraint_contents(&mut out, &(con.child_constraints[i])).unwrap();
