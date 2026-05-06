@@ -1067,6 +1067,28 @@ void tupleList_free(TupleList* tupleList)
   delete tupleList;
 }
 
+ShortTupleList* shortTupleList_new(vector<vector<int>>& flat_short_tuples)
+{
+  vector<vector<pair<SysInt, DomainInt>>> dshort(flat_short_tuples.size());
+  for(size_t i = 0; i < flat_short_tuples.size(); ++i) {
+    const vector<int>& flat = flat_short_tuples[i];
+    if(flat.size() % 2 != 0)
+      throw std::runtime_error("shortTupleList_new: each short tuple must be flat-encoded "
+                               "as alternating (idx, val) ints — got an odd-length entry");
+    dshort[i].reserve(flat.size() / 2);
+    for(size_t k = 0; k < flat.size(); k += 2) {
+      dshort[i].emplace_back(static_cast<SysInt>(flat[k]),
+                             DomainInt(flat[k + 1]));
+    }
+  }
+  return new ShortTupleList(dshort);
+}
+
+void shortTupleList_free(ShortTupleList* shortTupleList)
+{
+  delete shortTupleList;
+}
+
 /***** Instance *****/
 
 CSPInstance* instance_new()
@@ -1410,6 +1432,17 @@ void constraint_setTuplesByName(ConstraintBlob& constraint, CSPInstance& instanc
   // independent shared_ptrs would end up managing the same TupleList
   // and double-free on destruction.
   constraint.tuples = instance.getTableSymbol(std::string(name));
+}
+
+void constraint_setShortTuples(ConstraintBlob& constraint, ShortTupleList* shortTupleList)
+{
+  constraint.shortTuples = std::shared_ptr<ShortTupleList>(shortTupleList);
+}
+
+void constraint_setShortTuplesByName(ConstraintBlob& constraint, CSPInstance& instance,
+                                     const char* name)
+{
+  constraint.shortTuples = instance.getShortTableSymbol(std::string(name));
 }
 
 /***** Vector Rexports *****/

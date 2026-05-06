@@ -98,7 +98,7 @@ Heavy is also where you'd run a longer `CI-long.yml` equivalent — that workflo
 
 The random tester currently registers 69 user-facing constraint variants (the `CONSTRAINT_LIST` in `tester/src/constraint_def.rs`, plus seven equivalence groups in `EQUIVALENCE_GROUPS`). Every one is exercised by the standard, nested, work-steal, parallel-preprocess, restart, and option sweeps in both `--light` and `--heavy`.
 
-The four short-tuple constraints (`shortstr2`, `haggisgac`, `haggisgac-stable`, `shortctuplestr2`) form one equivalence group: they all read `**SHORTTUPLELIST**` data and have the same declarative semantics. The fuzzer generates random short tuples with single-literal-per-variable positions (the form accepted by all four propagators; `shortctuplestr2`'s multi-literal extension is not yet exercised). `str2plus` is the standard-table reference target — every metamorphic comparison expands a constraint's truth table to a `str2plus` instance.
+The four short-tuple constraints (`shortstr2`, `haggisgac`, `haggisgac-stable`, `shortctuplestr2`) form one equivalence group: they all read `**SHORTTUPLELIST**` data and have the same declarative semantics. The fuzzer generates random short tuples with single-literal-per-variable positions (the form accepted by all four propagators; `shortctuplestr2`'s multi-literal extension is not yet exercised). `str2plus` is the standard-table reference target — every metamorphic comparison expands a constraint's truth table to a `str2plus` instance. Both backends are covered: exec-mode emits `**SHORTTUPLELIST**` blocks, and in-process mode plumbs the data through the new `shortTupleList_new` / `constraint_setShortTuples` FFI calls (added to libminion + minion-sys).
 
 `frameupdate` is registered with tight bounds on its argument sizes (`source.len() ≤ 4`, `blocksize ∈ {1, 2}`, idx-list length `≤ 1`). The propagator only detects "idx out of range" once *all* idx variables are assigned, so wider idx lists with wide Bound domains explode the search tree without solutions; the bounds keep enumeration tractable.
 
@@ -160,6 +160,7 @@ The in-process backend is also covered, with a smaller four-strategy subset (no 
 | `minion_newVarMidsearch` | tester `--midsearch`, `--midsearch-add-vars` |
 | `minion_addConstraintMidsearch` | tester `--midsearch-constraints` (with N=1, 2, 3 packet variants and nested-parent wrap variants) |
 | `tupleList_new` / `instance_addTupleTableSymbol` | minion-sys `test_tables`, `test_negative_tables` |
+| `shortTupleList_new` / `constraint_setShortTuples` | minion-sys `test_short_tuples` (5 cases), tester in-process sweep |
 | `printMatrix_*` | exercised by every in-process run that compares solutions |
 
 ### Output / diagnostic features
@@ -218,4 +219,3 @@ The CI matrix builds `bin-quick` and `bin-debug` and runs the full light suite o
 - **Resume / dump / Xgraph are completely untested.** A single round-trip test (dump → reload → verify same solutions) per format would suffice.
 - **`-X-AMO`, `-X-tabulation`, `-X-prop-node` have no coverage.** These are experimental, so this may be deliberate.
 - **`shortctuplestr2`'s multi-literal-per-variable feature is not exercised**: the fuzzer only generates single-literal short tuples (the form accepted by `shortstr2` / `haggisgac` / `haggisgac-stable`). A separate generator that emits `[(0,0),(0,1),(3,0)]`-style cTuples would close this.
-- **In-process backend coverage of short tuples**: libminion does not expose a constructor for `ShortTupleList` or a `constraint_setShortTuples` FFI call, so the four short-tuple constraints are exec-only. Adding the FFI surface would round out coverage.

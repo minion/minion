@@ -11,7 +11,10 @@ use std::sync::Arc;
 
 use anyhow::{anyhow, bail, Context, Result};
 
-use minion_sys::ast::{Constant as MC, Constraint as MCon, Model, Optimise, Var, VarDomain, VarName};
+use minion_sys::ast::{
+    Constant as MC, Constraint as MCon, Model, Optimise, ShortTuple as MShort, Var, VarDomain,
+    VarName,
+};
 
 use crate::constraint_def::{ConstraintInstance, MinionVariable, VarType};
 use crate::minion_instance::OptimisationWrapper;
@@ -52,6 +55,20 @@ fn convert_tuples(tuples: &crate::constraint_def::Tuples) -> Vec<Vec<MC>> {
         .tupledata
         .iter()
         .map(|row| row.iter().map(|&n| MC::Integer(n as i32)).collect())
+        .collect()
+}
+
+/// Convert tester-side short-tuple data (`Vec<Vec<(usize, i64)>>`) to
+/// minion-sys [`MShort`] (`Vec<(usize, Constant)>`).
+fn convert_short_tuples(st: &crate::constraint_def::ShortTuples) -> Vec<MShort> {
+    st.data
+        .iter()
+        .map(|short| {
+            short
+                .iter()
+                .map(|&(idx, val)| (idx, MC::Integer(val as i32)))
+                .collect()
+        })
         .collect()
 }
 
@@ -98,6 +115,13 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
             list_of_vars(&v[2]),
         ),
         "false" => MCon::False,
+        "frameupdate" => MCon::FrameUpdate(
+            list_of_vars(&v[0]),
+            list_of_vars(&v[1]),
+            list_of_vars(&v[2]),
+            list_of_vars(&v[3]),
+            const_of(&v[4][0]),
+        ),
         "true" => MCon::True,
         "ineq" => MCon::Ineq(var_of(&v[0][0]), var_of(&v[1][0]), const_of(&v[2][0])),
         "lexleq" => MCon::LexLeq(list_of_vars(&v[0]), list_of_vars(&v[1])),
@@ -228,6 +252,38 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
                 .as_ref()
                 .ok_or_else(|| anyhow!("negativemddc instance has no tuple data"))?;
             MCon::NegativeMddc(list_of_vars(&v[0]), convert_tuples(tups))
+        }
+
+        // Short-tuple constraints. All four read `**SHORTTUPLELIST**`
+        // data and have the same declarative semantics; the tester
+        // generates the same data shape for all of them.
+        "shortstr2" => {
+            let st = instance
+                .short_tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("shortstr2 instance has no short-tuple data"))?;
+            MCon::ShortStr2(list_of_vars(&v[0]), convert_short_tuples(st))
+        }
+        "haggisgac" => {
+            let st = instance
+                .short_tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("haggisgac instance has no short-tuple data"))?;
+            MCon::HaggisGac(list_of_vars(&v[0]), convert_short_tuples(st))
+        }
+        "haggisgac-stable" => {
+            let st = instance
+                .short_tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("haggisgac-stable instance has no short-tuple data"))?;
+            MCon::HaggisGacStable(list_of_vars(&v[0]), convert_short_tuples(st))
+        }
+        "shortctuplestr2" => {
+            let st = instance
+                .short_tuples
+                .as_ref()
+                .ok_or_else(|| anyhow!("shortctuplestr2 instance has no short-tuple data"))?;
+            MCon::ShortCTupleStr2(list_of_vars(&v[0]), convert_short_tuples(st))
         }
 
         // Tableised instance. Uses minion's CT_STR (str2plus), the same

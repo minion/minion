@@ -3,7 +3,7 @@
 
 use std::io::Write;
 
-use crate::ast::{Constant, Constraint, Model, Tuple, Var, VarName};
+use crate::ast::{Constant, Constraint, Model, ShortTuple, Tuple, Var, VarName};
 
 /// Writes a complete Minion file for this model to `writer`.
 pub fn write_minion_file(writer: &mut impl Write, model: &Model) -> Result<(), std::io::Error> {
@@ -106,6 +106,20 @@ pub(crate) fn print_tuple_array(array: &[Tuple]) -> String {
         .collect();
     let string = string_array.join(",");
     format!("[{string}]")
+}
+
+pub(crate) fn print_short_tuple_array(array: &[ShortTuple]) -> String {
+    let string_array: Vec<String> = array
+        .iter()
+        .map(|short| {
+            let pairs: Vec<String> = short
+                .iter()
+                .map(|(idx, val)| format!("({idx},{val})"))
+                .collect();
+            format!("[{}]", pairs.join(","))
+        })
+        .collect();
+    format!("[{}]", string_array.join(","))
 }
 
 pub(crate) fn print_constraint_array(array: &[Constraint]) -> String {

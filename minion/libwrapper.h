@@ -409,6 +409,18 @@ MinionResult minion_newSparseBoundVar(CSPInstance& instance, char* name, std::ve
 TupleList* tupleList_new(vector<vector<int>>& tupleList);
 void tupleList_free(TupleList* tupleList);
 
+/***** Short tuples *****/
+
+/// Build a `ShortTupleList` from a flat encoding. Each inner
+/// vector is one short tuple expressed as alternating
+/// `[var_idx_0, value_0, var_idx_1, value_1, ...]` ints (so each
+/// inner vector must have even length). The caller owns the
+/// returned pointer; either pass it to `constraint_setShortTuples`
+/// or `instance_addShortTupleTableSymbol` (both transfer ownership
+/// via shared_ptr) or call `shortTupleList_free`.
+ShortTupleList* shortTupleList_new(vector<vector<int>>& flat_short_tuples);
+void shortTupleList_free(ShortTupleList* shortTupleList);
+
 /***** Instance *****/
 
 /// Creates a new `CSPInstance`.
@@ -486,6 +498,20 @@ void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* 
 /// Memory Management:
 ///   * The returned pointer is callee owned.
 TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name);
+
+/// Adds a named short-tuple table to a model instance.
+///
+/// Memory Management:
+///   * `shorttuplelist` is taken into the instance via `shared_ptr`.
+///   * `name` is copied into `instance`.
+void instance_addShortTupleTableSymbol(CSPInstance& instance, char* name,
+                                       ShortTupleList* shorttuplelist);
+
+/// Gets a short-tuple table by name.
+///
+/// Memory Management:
+///   * The returned pointer is callee owned.
+ShortTupleList* instance_getShortTupleTableSymbol(CSPInstance& instance, char* name);
 
 /*
  * printMatrix_* functions assume the print matrix is of the form
@@ -580,6 +606,18 @@ void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList);
 /// multiple constraints (or keeping it available on the instance while
 /// a constraint also references it) is safe.
 void constraint_setTuplesByName(ConstraintBlob& constraint, CSPInstance& instance, const char* name);
+
+/// Attach a short-tuple list to the constraint. Ownership of
+/// `shortTupleList` is taken via shared_ptr, so do not free it
+/// after this call.
+void constraint_setShortTuples(ConstraintBlob& constraint, ShortTupleList* shortTupleList);
+
+/// Attach a named short-tuple table (previously registered via
+/// `instance_addShortTupleTableSymbol`) to the constraint. Reuses
+/// the existing shared_ptr so multiple constraints can share one
+/// table safely.
+void constraint_setShortTuplesByName(ConstraintBlob& constraint, CSPInstance& instance,
+                                     const char* name);
 
 /***** Small misc useful types *****/
 

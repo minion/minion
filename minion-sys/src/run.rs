@@ -9,7 +9,7 @@ use std::{
 use anyhow::anyhow;
 
 use crate::{
-    ast::Tuple,
+    ast::{ShortTuple, Tuple},
     ffi::{self},
 };
 use crate::{
@@ -1085,6 +1085,10 @@ unsafe fn get_constraint_type(constraint: &Constraint) -> Result<u32, MinionErro
         Constraint::Mddc(_, _) => Ok(ffi::ConstraintType_CT_MDDC),
         Constraint::NegativeMddc(_, _) => Ok(ffi::ConstraintType_CT_NEGATIVEMDDC),
         Constraint::Str2Plus(_, _) => Ok(ffi::ConstraintType_CT_STR),
+        Constraint::ShortStr2(_, _) => Ok(ffi::ConstraintType_CT_SHORTSTR),
+        Constraint::HaggisGac(_, _) => Ok(ffi::ConstraintType_CT_HAGGISGAC),
+        Constraint::HaggisGacStable(_, _) => Ok(ffi::ConstraintType_CT_HAGGISGAC_STABLE),
+        Constraint::ShortCTupleStr2(_, _) => Ok(ffi::ConstraintType_CT_SHORTSTR_CTUPLE),
         Constraint::Max(_, _) => Ok(ffi::ConstraintType_CT_MAX),
         Constraint::Min(_, _) => Ok(ffi::ConstraintType_CT_MIN),
         Constraint::NvalueGeq(_, _) => Ok(ffi::ConstraintType_CT_GEQNVALUE),
@@ -1341,6 +1345,14 @@ unsafe fn constraint_add_args(
             ffi::constraint_setTuplesByName(r_constr, i, c_name.as_ptr());
             Ok(())
         }
+        Constraint::ShortStr2(vars, short_tuples)
+        | Constraint::HaggisGac(vars, short_tuples)
+        | Constraint::HaggisGacStable(vars, short_tuples)
+        | Constraint::ShortCTupleStr2(vars, short_tuples) => {
+            read_list(i, r_constr, vars)?;
+            read_short_tuple_list(r_constr, short_tuples)?;
+            Ok(())
+        }
         Constraint::Max(a, b)
         | Constraint::Min(a, b)
         | Constraint::NvalueGeq(a, b)
@@ -1571,6 +1583,40 @@ unsafe fn read_tuple_list(
     // Do not wrap this pointer in `Scoped` or it will be freed too early.
     let raw_tuple_list = ffi::tupleList_new(raw_tuples.ptr);
     ffi::constraint_setTuples(raw_constraint, raw_tuple_list);
+
+    Ok(())
+}
+
+/// Build a `ShortTupleList` from a slice of [`ShortTuple`] and
+/// attach it to `raw_constraint`. The C FFI takes a flat encoding
+/// — each short tuple is one `vec<int>` carrying alternating
+/// `[idx_0, val_0, idx_1, val_1, ...]` ints — so we materialise
+/// that here.
+unsafe fn read_short_tuple_list(
+    raw_constraint: *mut ffi::ProbSpec_ConstraintBlob,
+    short_tuples: &Vec<ShortTuple>,
+) -> Result<(), MinionError> {
+    let raw_outer = Scoped::new(ffi::vec_vec_int_new(), |x| ffi::vec_vec_int_free(x as _));
+    for short in short_tuples {
+        let raw_inner = Scoped::new(ffi::vec_int_new(), |x| ffi::vec_int_free(x as _));
+        for &(idx, ref constant) in short {
+            let val = match constant {
+                Constant::Integer(n) => Ok(*n),
+                Constant::Bool(true) => Ok(1),
+                Constant::Bool(false) => Ok(0),
+                #[allow(unreachable_patterns)]
+                x => Err(MinionError::NotImplemented(format!("{:?}", x))),
+            }?;
+            ffi::vec_int_push_back(raw_inner.ptr, idx as i32);
+            ffi::vec_int_push_back(raw_inner.ptr, val);
+        }
+        ffi::vec_vec_int_push_back_ptr(raw_outer.ptr, raw_inner.ptr);
+    }
+
+    // `constraint_setShortTuples` takes ownership via shared_ptr;
+    // do not wrap the result in `Scoped`.
+    let raw_short_list = ffi::shortTupleList_new(raw_outer.ptr);
+    ffi::constraint_setShortTuples(raw_constraint, raw_short_list);
 
     Ok(())
 }

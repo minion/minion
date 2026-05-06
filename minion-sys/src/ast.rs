@@ -2,12 +2,24 @@
 
 use std::{collections::HashMap, fmt::Display};
 
-use crate::print::{print_const_array, print_constraint_array, print_tuple_array, print_var_array};
+use crate::print::{
+    print_const_array, print_constraint_array, print_short_tuple_array, print_tuple_array,
+    print_var_array,
+};
 
 /// The name of a variable in a Minion model.
 pub type VarName = String;
 /// A tuple of constants, used in extensional (table) constraints.
 pub type Tuple = Vec<Constant>;
+/// A short tuple — used by short-tuple constraints (`shortstr2`,
+/// `haggisgac`, `haggisgac-stable`, `shortctuplestr2`). Each entry
+/// is a `(variable_index, value)` literal; the position refers to
+/// the constraint's variable list. For `shortstr2` /
+/// `haggisgac` / `haggisgac-stable` the indexes within one short
+/// tuple must be distinct (the propagators reject duplicates).
+/// `shortctuplestr2` allows multiple entries for the same index
+/// (OR semantics within that short tuple).
+pub type ShortTuple = Vec<(usize, Constant)>;
 /// A pair of variables, used by three-operand arithmetic constraints.
 pub type TwoVars = (Var, Var);
 
@@ -210,6 +222,24 @@ pub enum Constraint {
     /// `Var::NameRef` referencing a named tuple table registered with
     /// [`Model::add_tuple_table`].
     Str2Plus(Vec<Var>, Var),
+
+    // --- Short-tuple constraints ---
+    /// `shortstr2(vars, short_tuples)` — STR2+ over a short-tuple list.
+    /// Each short tuple is a partial assignment; an assignment satisfies
+    /// the constraint iff some short tuple's literals match. GAC.
+    /// Indexes within one short tuple must be distinct.
+    ShortStr2(Vec<Var>, Vec<ShortTuple>),
+    /// `haggisgac(vars, short_tuples)` — HaggisGAC over short tuples.
+    /// Same semantics as `ShortStr2`; different propagator. Discrete vars only.
+    HaggisGac(Vec<Var>, Vec<ShortTuple>),
+    /// `haggisgac-stable(vars, short_tuples)` — backtrack-stable HaggisGAC.
+    /// Same semantics as `HaggisGac`. Discrete vars only.
+    HaggisGacStable(Vec<Var>, Vec<ShortTuple>),
+    /// `shortctuplestr2(vars, short_tuples)` — STR2+ over short cTuples.
+    /// Like `ShortStr2` but allows multiple `(idx, val)` literals for the
+    /// same `idx` within one short tuple (OR semantics for that variable).
+    /// Discrete vars only.
+    ShortCTupleStr2(Vec<Var>, Vec<ShortTuple>),
 
     // --- Min/max / nvalue ---
     /// `max(vars, x)` — `x` equals the maximum value in `vars`.
@@ -484,6 +514,30 @@ impl Display for Constraint {
             Constraint::Str2Plus(vars, table_var) => {
                 write!(f, "str2plus({},{table_var})", print_var_array(vars))
             }
+            Constraint::ShortStr2(vars, short) => write!(
+                f,
+                "shortstr2({},{})",
+                print_var_array(vars),
+                print_short_tuple_array(short)
+            ),
+            Constraint::HaggisGac(vars, short) => write!(
+                f,
+                "haggisgac({},{})",
+                print_var_array(vars),
+                print_short_tuple_array(short)
+            ),
+            Constraint::HaggisGacStable(vars, short) => write!(
+                f,
+                "haggisgac-stable({},{})",
+                print_var_array(vars),
+                print_short_tuple_array(short)
+            ),
+            Constraint::ShortCTupleStr2(vars, short) => write!(
+                f,
+                "shortctuplestr2({},{})",
+                print_var_array(vars),
+                print_short_tuple_array(short)
+            ),
             Constraint::Max(vars, var) => write!(f, "max({},{var})", print_var_array(vars)),
             Constraint::Min(vars, var) => write!(f, "min({},{var})", print_var_array(vars)),
             Constraint::NvalueGeq(vars, var) => {
