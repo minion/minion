@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 lazy_static = "1.4.0"
-rand = "0.8.5"
+rand = "0.8.6"
 itertools = "0.12"
 atomic-counter = "1.0.1"
 serde = "1.0.197"
