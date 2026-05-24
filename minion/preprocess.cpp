@@ -240,15 +240,13 @@ void collectAMOs(vector<AnyVarRef>& vars) {
  * basic SAC and SSAC algorithms */
 void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, bool printInfo) {
   if(preprocessLevel.type == PropLevel_None) {
-    collectAMOs(vars);
     return;
   }
-  
+
   PropagateGAC propGAC(preprocessLevel);
   propGAC(vars);
 
   if(preprocessLevel.type == PropLevel_GAC) {
-    collectAMOs(vars);
     return;
   }
 
@@ -274,7 +272,6 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
   }
 
   if(preprocessLevel.type == PropLevel_SAC || preprocessLevel.type == PropLevel_SACBounds) {
-    collectAMOs(vars);
     return;
   }
 
@@ -290,5 +287,4 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
     cout << "SSAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }
-  collectAMOs(vars);
 }

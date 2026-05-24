@@ -13,6 +13,8 @@
 #include <unistd.h>
 #endif
 
+void collectAMOs(vector<AnyVarRef>& vars);
+
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   Controller::worldPush();

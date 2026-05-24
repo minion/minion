@@ -104,6 +104,13 @@ bool PreprocessCSP(CSPInstance& instance, SearchMethod args) {
     } catch(EndOfSearch eos) {
       return false;
     }
+
+    // This is for savile-row preprocessing
+    if(getOptions().gatherAMOs || getOptions().gatherAMOsExtra) {
+      collectAMOs(preprocess_anyvars);
+    }
+
+
     return true;
 }
 void SolveCSP(CSPInstance& instance, SearchMethod args) {
