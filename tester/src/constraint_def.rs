@@ -616,8 +616,25 @@ pub fn build_random_instance_with_children_sized(
                 Constraint => {
                     // Leave dummy empty vec in variables
                     variables.push(vec![]);
+                    let owned_child: ConstraintDef;
+                    let child_def: &ConstraintDef = if constraint_child < children.len() {
+                        children[constraint_child]
+                    } else {
+                        // Pick a random leaf constraint among types the
+                        // Rust solver supports as children of meta-constraints.
+                        const SUPPORTED: &[&str] = &[
+                            "w-literal", "w-notliteral", "eq", "diseq",
+                        ];
+                        let leafs: Vec<&ConstraintDef> = CONSTRAINT_LIST.iter()
+                            .filter(|d| SUPPORTED.contains(&d.name.as_str())
+                                && !d.arg.iter().any(|a| matches!(a, Arg::Constraint)))
+                            .collect();
+                        let idx = rand::random::<usize>() % leafs.len();
+                        owned_child = leafs[idx].clone();
+                        &owned_child
+                    };
                     constraints.push(build_random_instance_with_children_sized(
-                        children[constraint_child],
+                        child_def,
                         &[],
                         size_factor,
                     ));

@@ -218,6 +218,13 @@ struct Opt {
     /// optimisation through.
     #[arg(long)]
     optimisation_sweep: bool,
+
+    /// Compare two solver binaries: run the same random instance on
+    /// both, check node counts and solution sets match. Value is the
+    /// path to the second minion binary. Skips the usual metamorphic
+    /// sweeps and only runs the direct comparison.
+    #[arg(long, default_value = "")]
+    compare_with: String,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -302,11 +309,16 @@ fn main() -> Result<()> {
 
     let mut v;
     if opt.constraints.is_empty() {
-        v = constraint_def::CONSTRAINT_LIST.clone();
+        v = constraint_def::CONSTRAINT_LIST.iter()
+            .chain(constraint_def::NESTED_CONSTRAINT_LIST.iter())
+            .cloned()
+            .collect();
     } else {
         v = Vec::new();
         for c in opt.constraints.clone() {
-            let con = constraint_def::CONSTRAINT_LIST.iter().find(|x| x.name == c);
+            let con = constraint_def::CONSTRAINT_LIST.iter()
+                .chain(constraint_def::NESTED_CONSTRAINT_LIST.iter())
+                .find(|x| x.name == c);
             match con {
                 None => panic!("Unimplemented constraint: {}", c),
                 Some(con) => v.push(con.clone()),
@@ -389,6 +401,31 @@ fn main() -> Result<()> {
         }
     };
 
+    // ---- direct solver comparison mode ----
+    if !opt.compare_with.is_empty() {
+        let compare_path = std::sync::Arc::new(opt.compare_with.clone());
+        let comp_path = std::sync::Arc::clone(&compare_path);
+
+        println!("Comparing against {}\n", comp_path);
+
+        let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
+            let cmp = std::sync::Arc::clone(&comp_path);
+            (0..opt.count)
+                .into_par_iter()
+                .try_for_each(|_| test_types::test_compare_solvers(&config, &cmp, c))
+                .context(format!("failure in {}", c.name))?;
+            println!("Tested {}", c.name);
+            Ok(())
+        });
+
+        if let Err(e) = ret {
+            eprintln!("Comparison failed: {e:#}");
+            std::process::exit(1);
+        }
+        println!("All comparisons passed.");
+        return Ok(());
+    }
+
     if opt.midsearch {
         let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
             (0..opt.count)
@@ -426,7 +463,7 @@ fn main() -> Result<()> {
         if opt.midsearch_base_size == 0 {
             anyhow::bail!("--midsearch-base-size must be >= 1");
         }
-        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.clone();
+        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.iter().chain(constraint_def::NESTED_CONSTRAINT_LIST.iter()).cloned().collect();
         use std::sync::Mutex;
         let failures = std::sync::atomic::AtomicUsize::new(0);
         let first_error: Mutex<Option<String>> = Mutex::new(None);
@@ -482,7 +519,7 @@ fn main() -> Result<()> {
         // Draw bases from the full list of constraints — independent of
         // what the user selected for injection, so `--constraints eq`
         // still gets a non-trivial base problem to inject into.
-        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.clone();
+        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.iter().chain(constraint_def::NESTED_CONSTRAINT_LIST.iter()).cloned().collect();
         // Non-fatal: each trial that fails is recorded for the summary
         // but doesn't abort the sweep. The point of this test is to
         // surface minion bugs; aborting on the first one hides the rest.

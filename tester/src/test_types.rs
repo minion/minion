@@ -199,6 +199,38 @@ fn run_solve_inner(
     }
 }
 
+pub fn test_compare_solvers(
+    config: &MinionConfig,
+    compare_path: &str,
+    c: &constraint_def::ConstraintDef,
+) -> Result<()> {
+    assert!(config.backend == Backend::Exec);
+    let instance = constraint_def::build_random_instance_with_children_sized(c, &[], 1);
+    let r1 = run_solve(config, &["-findallsols"], &instance, "primary")?;
+    let r2 = run_minion::get_minion_solutions(
+        compare_path, &config.minionargs, &["-findallsols"],
+        &instance, "compare", config.max_solutions, false,
+    )?;
+    if r1.solutions != r2.solutions {
+        let debug_path = "/tmp/claude/mismatch.minion";
+        if let Ok(contents) = std::fs::read_to_string(&r1.filename) {
+            let _ = std::fs::write(debug_path, &contents);
+        }
+        anyhow::bail!(
+            "{}: solution mismatch! primary {:?} ({} sols), compare {:?} ({} sols). Instance saved to {debug_path}",
+            c.name, &r1.solutions.sample, r1.solutions.count,
+            &r2.solutions.sample, r2.solutions.count,
+        );
+    }
+    if r1.nodes != r2.nodes {
+        anyhow::bail!(
+            "{}: node count mismatch! primary {}, compare {}. Instance: {}",
+            c.name, r1.nodes, r2.nodes, r1.filename,
+        );
+    }
+    Ok(())
+}
+
 pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef) -> Result<()> {
     let mut instance;
     let tups;
