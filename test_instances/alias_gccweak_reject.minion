@@ -1,0 +1,14 @@
+MINION 3
+#FAIL
+#TEST SOLCOUNT 0
+# Regression: gccweak shares gcc's matching structures and the same aliasing
+# limitation, so it likewise refuses a counted/cardinality aliased variable.
+**VARIABLES**
+DISCRETE x {-10..9}
+BOOL b
+DISCRETE c {-7..2}
+**SEARCH**
+PRINT[[x],[b],[c]]
+**CONSTRAINTS**
+gccweak([x, x], [4, -9], [b, c])
+**EOF**

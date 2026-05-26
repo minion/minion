@@ -1,0 +1,13 @@
+MINION 3
+#FAIL
+#TEST SOLCOUNT 0
+# Regression: gcc must reject a variable that is both a counted variable and
+# a cardinality variable -- the incremental matching cannot stay consistent
+# under that aliasing, so the instance is refused at construction.
+**VARIABLES**
+DISCRETE x {-10..7}
+**SEARCH**
+PRINT[[x]]
+**CONSTRAINTS**
+gcc([x, 4], [-5, 2], [x, x])
+**EOF**
