@@ -597,14 +597,18 @@ fn generate_random_short_tuples_from_vars(
     // Number of short tuples in the list. Cap by the number of
     // assignments any short tuple could rule in (≤ 2^n_vars-ish), so
     // we don't generate redundant short tuples that all map to the
-    // same dense truth table.
+    // same dense truth table. 0 is allowed (an empty short-tuple list,
+    // a boundary case: the positive short constraints are then false
+    // everywhere).
     let upper = (2_usize).saturating_pow(n_vars as u32).min(20).max(2);
-    let num_short = rng.gen_range(1..=upper);
+    let num_short = rng.gen_range(0..=upper);
 
     let mut tuples: Vec<Vec<(usize, i64)>> = Vec::with_capacity(num_short);
     for _ in 0..num_short {
-        // Pick 1..=n_vars distinct positions for this short tuple.
-        let len = rng.gen_range(1..=n_vars);
+        // Pick 0..=n_vars distinct positions for this short tuple. A
+        // length-0 short tuple is the other boundary: it constrains no
+        // variable and so is trivially satisfied (matches everything).
+        let len = rng.gen_range(0..=n_vars);
         let mut positions: Vec<usize> = (0..n_vars).collect();
         positions.shuffle(&mut rng);
         positions.truncate(len);
@@ -955,17 +959,12 @@ fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
 /// Both are uninteresting for metamorphic testing and the second
 /// hides bugs in the literal-iteration logic.
 fn valid_short_tuples_instance(c: &ConstraintInstance) -> bool {
-    let st = match c.short_tuples.as_ref() {
-        Some(s) => s,
-        None => return false,
-    };
-    if st.data.is_empty() {
-        return false;
-    }
-    if st.data.iter().any(|t| t.is_empty()) {
-        return false;
-    }
-    true
+    // Accept any short-tuple list, including the boundaries: an empty list
+    // (constraint false everywhere) and a list containing an empty short
+    // tuple (trivially satisfied). These used to be rejected, leaving the
+    // short-tuple edge cases untested -- the same blind spot that hid the
+    // empty/full table bugs.
+    c.short_tuples.is_some()
 }
 
 fn check_frameupdate(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
