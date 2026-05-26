@@ -343,11 +343,19 @@ struct VecNeqDynamic : public AbstractConstraint {
 
     // There is only one possible pair allowed...
     if(index == size) {
-      propagate_from_var1(watchedIndex0);
-      propagate_from_var2(watchedIndex0);
+      // Attach the watch BEFORE propagating. propagate_from_var* prunes
+      // varArray1/2[watchedIndex0], and when those two are the same
+      // variable (an aliased pair, e.g. x<x) the pruning must re-invoke
+      // this constraint so propagation runs to its fixpoint (here, to a
+      // domain wipeout). Propagating first and adding the trigger after
+      // means the initial pruning is not seen by the not-yet-attached
+      // trigger, so the constraint stops one step short and leaves a
+      // non-solution looking satisfiable.
       propagate_mode = true;
       indexToPropagate = watchedIndex0;
       addTriggers(watchedIndex0, 0);
+      propagate_from_var1(watchedIndex0);
+      propagate_from_var2(watchedIndex0);
       return;
     }
 

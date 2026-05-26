@@ -61,6 +61,12 @@ pub struct MinionOutput {
     /// compares this across strategies; equal => everyone agrees on
     /// the optimum, mismatch => bug.
     pub optimum_value: Option<i64>,
+    /// True when Minion deliberately refused the instance as an
+    /// unsupported input (a `CHECK`/user-error exit, e.g. gcc/gccweak
+    /// rejecting an aliased variable). This is not a bug — the trial
+    /// can't be compared, so callers must skip it, exactly as for
+    /// `hit_solution_cap`.
+    pub rejected: bool,
 }
 
 impl MinionOutput {
@@ -73,6 +79,13 @@ impl MinionOutput {
         self.raw_solutions
             .as_deref()
             .expect("solutions Vec only available with keep_full_solutions=true")
+    }
+
+    /// True when this run can't be used for a solution-set comparison and
+    /// the trial must be skipped: either the search stopped at the solution
+    /// cap (partial prefix) or Minion refused the input as unsupported.
+    pub fn skip_comparison(&self) -> bool {
+        self.hit_solution_cap || self.rejected
     }
 }
 
@@ -249,6 +262,34 @@ fn get_minion_solutions_inner(
         .context(format!("failed to capture Minion output: {}", minioncmd))?;
 
     if !output.status.success() {
+        // Distinguish a deliberate input rejection (a CHECK / user-error
+        // exit, e.g. gcc/gccweak refusing an aliased variable) from a real
+        // crash. The former is not a bug: the constraint legitimately does
+        // not support this instance, so mark the run rejected and let the
+        // caller skip the trial. userErrorPrintingFunction prints this exact
+        // banner before FAIL_EXIT.
+        let combined = format!(
+            "{}{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        if combined.contains("An error occurred while solving your instance!") {
+            return Ok(MinionOutput {
+                solutions: SolutionDigest::new(),
+                raw_solutions: if keep_full_solutions { Some(Vec::new()) } else { None },
+                nodes: 0,
+                filename: minout.clone(),
+                cleanup: CleanupFiles {
+                    files: vec![minout, solsout, tableout],
+                },
+                work_steal_donations: None,
+                parallel_preprocess_rounds: None,
+                parallel_preprocess_prunings: None,
+                hit_solution_cap: false,
+                optimum_value: None,
+                rejected: true,
+            });
+        }
         print!(
             "Minion did not finish successfully (non-zero return value)\n{}\n{}\n",
             String::from_utf8_lossy(&output.stdout),
@@ -371,5 +412,6 @@ fn get_minion_solutions_inner(
         parallel_preprocess_prunings,
         hit_solution_cap,
         optimum_value,
+        rejected: false,
     })
 }

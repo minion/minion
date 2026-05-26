@@ -181,6 +181,16 @@ struct Opt {
     #[arg(long, default_value_t = 1)]
     size_factor: u32,
 
+    /// Probability (0.0..=1.0) that a non-constant variable slot reuses
+    /// a variable already generated elsewhere in the same instance,
+    /// rather than a fresh one. Reuse makes the same variable appear in
+    /// two argument positions of a constraint (e.g. the count of
+    /// `occurrence` aliased into its array), which is the only way to
+    /// exercise propagator aliasing bugs. `0` reproduces the historical
+    /// all-fresh behaviour. Constants are never reused.
+    #[arg(long, default_value_t = 0.1)]
+    var_reuse: f64,
+
     /// Cap for the per-constraint adaptive growth in the work-steal
     /// pass. Each constraint starts at `--size-factor` (or 1) and
     /// doubles until at least one trial reports a non-zero donation
@@ -218,6 +228,14 @@ struct Opt {
     /// optimisation through.
     #[arg(long)]
     optimisation_sweep: bool,
+
+    /// Run only the aliasing-relevant phases: the baseline-vs-tableised
+    /// sweep and its nested variant. Skips the parallel / work-steal /
+    /// parallel-preprocess sweeps, which are fork-heavy and not about
+    /// argument aliasing. Lets a variable-reuse sweep do far more trials
+    /// per constraint in the same wall-clock time.
+    #[arg(long)]
+    aliasing_sweep: bool,
 }
 
 #[derive(Clone, Copy, Debug, clap::ValueEnum)]
@@ -294,6 +312,13 @@ fn main() -> Result<()> {
     // Wire --size-factor into the global so build_random_instance
     // (called from many places without a config arg) picks it up.
     constraint_def::SIZE_FACTOR.store(opt.size_factor.max(1), std::sync::atomic::Ordering::Relaxed);
+
+    // Wire --var-reuse into the global variable-reuse probability
+    // (stored as per-mille). Same rationale as SIZE_FACTOR.
+    constraint_def::VAR_REUSE_PERMILLE.store(
+        (opt.var_reuse.clamp(0.0, 1.0) * 1000.0).round() as u32,
+        std::sync::atomic::Ordering::Relaxed,
+    );
 
     rayon::ThreadPoolBuilder::new()
         .num_threads(opt.numthreads)
@@ -607,6 +632,13 @@ fn main() -> Result<()> {
     });
 
     ret?;
+
+    // --aliasing-sweep stops after the baseline-vs-tableised and nested
+    // sweeps above; the remaining sweeps are about concurrency, not
+    // argument aliasing.
+    if opt.aliasing_sweep {
+        return Ok(());
+    }
 
     // -parallel is a fork-based exec-only flag, so the parallel test
     // sweep is exec-only. Work-stealing is available in both backends

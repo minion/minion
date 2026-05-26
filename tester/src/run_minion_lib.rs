@@ -327,6 +327,17 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
             if v.var_type == VarType::Constant {
                 continue;
             }
+            // A reused variable appears in several slots; declare it
+            // (and its domain holes) only once. Reuse always shares the
+            // same Arc, so a name already present carries an identical
+            // domain — no conflict to worry about.
+            if model
+                .named_variables
+                .get_vartype(v.name.clone())
+                .is_some()
+            {
+                continue;
+            }
             let tableised = instance.constraint.name == "str2plus";
             let domain = match v.var_type {
                 VarType::Bool => VarDomain::Bool,
@@ -992,6 +1003,7 @@ pub fn get_minion_solutions_in_process_work_steal(
         // In-process backend doesn't yet expose optimisation through
         // the FFI — the optimisation sweep is exec-only for now.
         optimum_value: None,
+        rejected: false,
     })
 }
 
@@ -1095,6 +1107,7 @@ pub fn get_minion_solutions_in_process(
         // The non-optimisation entry point never sets an optimisation
         // directive, so the FFI never reports OptimumValue.
         optimum_value: None,
+        rejected: false,
     })
 }
 
@@ -1207,5 +1220,6 @@ pub fn get_minion_solutions_in_process_optimisation(
         parallel_preprocess_prunings: None,
         hit_solution_cap: false,
         optimum_value,
+        rejected: false,
     })
 }

@@ -575,35 +575,57 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
     }
   }
 
-  void setupCounters() {
+  // Merge the initial counter snapshot with trigger setup. An array
+  // element that is ALREADY ASSIGNED at this point is counted here and
+  // gets NO Assigned trigger; an UNASSIGNED element gets an Assigned
+  // trigger and is counted later, when that trigger fires.
+  //
+  // Why an assigned element must not be watched: if valCount is aliased to
+  // a member of varArray, the [0,|varArray|] clamp in fullPropagate can
+  // assign that member. If the member is watched by any other constraint
+  // (e.g. the diseq constraints that punch domain holes), its Assigned
+  // trigger list is non-empty, so that clamp-assignment is already queued
+  // (the queue holds the *live* trigger list). An Assigned trigger of ours
+  // on that same list would then fire, when the queue drains, for an
+  // assignment we have already counted here — double-counting it and
+  // pruning away valid solutions. Watching only still-unassigned elements
+  // keeps every element counted exactly once: by here if assigned now, or
+  // by its trigger if assigned later.
+  //
+  // For an assigned element we *explicitly release* its trigger rather
+  // than merely not attaching one. fullPropagate also runs when a
+  // work-stealing worker resumes a stolen subtree, where a trigger left
+  // over from the donor's state can still be attached at this index; not
+  // re-attaching is not enough, the stale trigger must be removed.
+  // releaseTriggerInt is a no-op when nothing is attached, and
+  // moveTriggerInt relocates (never duplicates), so both branches are
+  // idempotent across re-entry.
+  void setupTriggersAndCounters() {
     SysInt occs = 0;
     SysInt not_occs = 0;
-    typename VarArray::iterator end_it(varArray.end());
-    for(typename VarArray::iterator it = varArray.begin(); it < end_it; ++it) {
-      if(it->isAssigned()) {
-        if(it->assignedValue() == value)
+    for(SysInt i = 0; i < (SysInt)varArray.size(); ++i) {
+      if(varArray[i].isAssigned()) {
+        if(varArray[i].assignedValue() == value)
           ++occs;
         else
           ++not_occs;
+        releaseTriggerInt(i);
+      } else {
+        moveTriggerInt(varArray[i], i, Assigned);
       }
     }
     occurrencesCount = occs;
     not_occurrencesCount = not_occs;
-  }
-
-  void triggerSetup() {
-    for(UnsignedSysInt i = 0; i < varArray.size(); ++i)
-      moveTriggerInt(varArray[i], i, Assigned);
     moveTriggerInt(valCount, varArray.size(), UpperBound);
     moveTriggerInt(valCount, varArray.size() + 1, LowerBound);
   }
 
   virtual void fullPropagate() {
-    triggerSetup();
-
     valCount.setMin(0);
     valCount.setMax(varArray.size());
-    setupCounters();
+
+    setupTriggersAndCounters();
+
     valCount.setMin((DomainInt)occurrencesCount);
     valCount.setMax((DomainInt)varArray.size() - not_occurrencesCount);
 

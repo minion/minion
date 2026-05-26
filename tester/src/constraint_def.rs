@@ -31,6 +31,43 @@ fn current_size_factor() -> u32 {
     SIZE_FACTOR.load(Ordering::Relaxed).max(1)
 }
 
+/// Probability, in per-mille (0..=1000), that a non-constant variable
+/// slot reuses a variable already generated elsewhere in the *same*
+/// instance instead of minting a fresh one. `0` reproduces the
+/// historical all-fresh behaviour; `main` sets it from `--var-reuse`.
+///
+/// Reuse makes the same variable appear in two argument positions of a
+/// constraint (e.g. the count slot of `occurrence` aliased into its
+/// counted array), which is the only way to exercise propagator
+/// aliasing bugs. Constants are never reused (they aren't shared state)
+/// and Constant slots are never filled by reuse.
+pub static VAR_REUSE_PERMILLE: AtomicU32 = AtomicU32::new(0);
+
+fn reuse_roll() -> bool {
+    let p = VAR_REUSE_PERMILLE.load(Ordering::Relaxed).min(1000);
+    p != 0 && rand::thread_rng().gen_range(0..1000) < p
+}
+
+/// Fill one non-list variable slot of kind `d`: with probability
+/// [`VAR_REUSE_PERMILLE`] reuse a previously-generated non-constant
+/// variable drawn from `pool`, otherwise mint a fresh one (and, if it
+/// is non-constant, add it to `pool` so later slots can reuse it).
+/// Constant slots (`d == Constant`) are always fresh.
+fn gen_var_for_slot(
+    pool: &mut Vec<Arc<MinionVariable>>,
+    d: VarType,
+    size_factor: u32,
+) -> Arc<MinionVariable> {
+    if d != Constant && !pool.is_empty() && reuse_roll() {
+        return pool.choose(&mut rand::thread_rng()).unwrap().clone();
+    }
+    let v = MinionVariable::random_sized(d, size_factor);
+    if v.var_type != Constant {
+        pool.push(v.clone());
+    }
+    v
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum VarType {
     Constant,
@@ -346,6 +383,26 @@ impl ConstraintInstance {
         &self.varlist
     }
 
+    /// True if some non-constant variable appears in more than one
+    /// position across the whole instance (i.e. variable reuse produced
+    /// an aliased scope). Constants are ignored — repeating a literal
+    /// is not aliasing. Used to relax the GAC node-count invariant:
+    /// a propagator that is GAC over distinct variables need not be GAC
+    /// over an aliased scope, so node counts may legitimately differ
+    /// from the tabulated form even when the solution sets agree.
+    pub fn has_repeated_variable(&self) -> bool {
+        let mut seen = HashSet::new();
+        for v in self.vars().iter().flatten() {
+            if v.var_type == VarType::Constant {
+                continue;
+            }
+            if !seen.insert(v.name.clone()) {
+                return true;
+            }
+        }
+        false
+    }
+
     fn check_tuple(&self, tup: &[i64]) -> bool {
         let mut slices: Vec<&[i64]> = Vec::with_capacity(self.total_var_slots());
         let mut place: usize = 0;
@@ -593,17 +650,20 @@ pub fn build_random_instance_with_children_sized(
         let mut constraint_child = 0;
         let mut generated_tuples: Option<Tuples> = None;
         let mut generated_short_tuples: Option<ShortTuples> = None;
+        // Pool of non-constant variables generated so far in this
+        // instance; later slots may reuse from it (see gen_var_for_slot).
+        let mut pool: Vec<Arc<MinionVariable>> = vec![];
 
         for i in 0..constraint.arg.len() {
             match constraint.arg[i] {
                 Var(d) => {
-                    variables.push(vec![MinionVariable::random_sized(d, size_factor)]);
+                    variables.push(vec![gen_var_for_slot(&mut pool, d, size_factor)]);
                 }
                 List(d) => {
                     let len = rand::random::<usize>() % (5 * f);
                     variables.push(
                         (0..len)
-                            .map(|_x| MinionVariable::random_sized(d, size_factor))
+                            .map(|_x| gen_var_for_slot(&mut pool, d, size_factor))
                             .collect(),
                     );
                 }
@@ -650,21 +710,27 @@ pub fn build_nested_instance(
     child_instances: &[ConstraintInstance],
 ) -> ConstraintInstance {
     let f = current_size_factor() as usize;
+    let size_factor = current_size_factor();
     loop {
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
         let mut constraint_child = 0;
         let mut generated_tuples: Option<Tuples> = None;
         let mut generated_short_tuples: Option<ShortTuples> = None;
+        let mut pool: Vec<Arc<MinionVariable>> = vec![];
 
         for i in 0..parent_def.arg.len() {
             match parent_def.arg[i] {
                 Var(d) => {
-                    variables.push(vec![MinionVariable::random(d)]);
+                    variables.push(vec![gen_var_for_slot(&mut pool, d, size_factor)]);
                 }
                 List(d) => {
                     let len = rand::random::<usize>() % (5 * f);
-                    variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
+                    variables.push(
+                        (0..len)
+                            .map(|_x| gen_var_for_slot(&mut pool, d, size_factor))
+                            .collect(),
+                    );
                 }
                 Tuples => {
                     generated_tuples = generate_random_tuples_from_vars(&variables);
@@ -1456,7 +1522,10 @@ fn constraint_list() -> Vec<ConstraintDef> {
                     return false;
                 }
 
-                v[0][0].pow(v[1][0] as u32) == v[2][0]
+                match v[0][0].checked_pow(v[1][0] as u32) {
+                    Some(p) => p == v[2][0],
+                    None => false,
+                }
             },
             false,
             false,

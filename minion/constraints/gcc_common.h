@@ -125,6 +125,32 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       }
     }
 
+    // The incremental matching and adjacency-list structures assume the counted
+    // variables and the cardinality variables are all distinct underlying
+    // variables. If the same variable appears in more than one of these slots
+    // (aliasing), pruning it in one role silently invalidates the cached state
+    // used in the other and gives wrong propagation. getBaseVar() sees through
+    // mappers (neg/not/shift/...); constants cannot alias so are skipped.
+    {
+      vector<Var> baseVars;
+      for(SysInt i = 0; i < (SysInt)varArray.size(); i++)
+        if(varArray[i].getBaseVar().type() != VAR_CONSTANT)
+          baseVars.push_back(varArray[i].getBaseVar());
+      for(SysInt i = 0; i < (SysInt)capacity_array.size(); i++)
+        if(capacity_array[i].getBaseVar().type() != VAR_CONSTANT)
+          baseVars.push_back(capacity_array[i].getBaseVar());
+      bool aliased = false;
+      for(SysInt i = 0; i < (SysInt)baseVars.size() && !aliased; i++)
+        for(SysInt j = i + 1; j < (SysInt)baseVars.size() && !aliased; j++)
+          if(baseVars[i] == baseVars[j])
+            aliased = true;
+      CHECK(!aliased,
+            "gcc/gccweak does not support the same variable appearing more than "
+            "once among its counted and cardinality variables. This limitation "
+            "can be removed -- please report to https://github.com/minion/minion "
+            ", so we are aware there are users who want this functionality.");
+    }
+
     usage.resize(numvals, 0);
 
     lower.resize(numvals, 0);

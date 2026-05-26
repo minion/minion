@@ -225,7 +225,7 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
     // If either side hit the solution cap, the random instance is too
     // big to compare reliably — solution lists are partial prefixes.
     // Skip the trial silently rather than report a spurious mismatch.
-    if ret.hit_solution_cap || ret2.hit_solution_cap {
+    if ret.skip_comparison() || ret2.skip_comparison() {
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
         return Ok(());
@@ -253,7 +253,11 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
     // ordering is state-free (Static + Ascend/Descend); state-dependent
     // heuristics explore different trees against the weaker tabulated
     // propagator even when the solution sets match.
-    if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
+    if instance.constraint.gac
+        && config.deterministic_ordering()
+        && !instance.has_repeated_variable()
+        && ret.nodes != ret2.nodes
+    {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -275,7 +279,7 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
         &instance,
         "parallel",
     )?;
-    if ret.hit_solution_cap || ret2.hit_solution_cap {
+    if ret.skip_comparison() || ret2.skip_comparison() {
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
         return Ok(());
@@ -352,7 +356,7 @@ pub fn test_constraint_workstal(
 ) -> Result<()> {
     let instance = constraint_def::build_random_instance_sized(c, size_factor);
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
-    if ret.hit_solution_cap {
+    if ret.skip_comparison() {
         // Sequential blew through the cap — the random instance has
         // more solutions than we're willing to materialise. Skip
         // comparison and record the trial as capped so the adaptive
@@ -368,7 +372,7 @@ pub fn test_constraint_workstal(
         &instance,
         "workstal",
     )?;
-    if ret2.hit_solution_cap {
+    if ret2.skip_comparison() {
         WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
@@ -418,7 +422,7 @@ pub fn test_constraint_workstal_portfolio(
 ) -> Result<()> {
     let instance = constraint_def::build_random_instance_sized(c, size_factor);
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
-    if ret.hit_solution_cap {
+    if ret.skip_comparison() {
         WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
         ret.cleanup.cleanup();
         return Ok(());
@@ -435,7 +439,7 @@ pub fn test_constraint_workstal_portfolio(
         &instance,
         "workstal_portfolio",
     )?;
-    if ret2.hit_solution_cap {
+    if ret2.skip_comparison() {
         WS_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
@@ -512,7 +516,7 @@ pub fn test_constraint_parallel_preprocess(
         &instance,
         "pp_seq",
     )?;
-    if ret.hit_solution_cap {
+    if ret.skip_comparison() {
         PP_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
         ret.cleanup.cleanup();
         return Ok(PPTrialOutcome {
@@ -533,7 +537,7 @@ pub fn test_constraint_parallel_preprocess(
         &instance,
         "pp_par",
     )?;
-    if ret2.hit_solution_cap {
+    if ret2.skip_comparison() {
         PP_TRIALS_CAPPED.fetch_add(1, Ordering::Relaxed);
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
@@ -611,7 +615,7 @@ pub fn test_constraint_restart(
     // its single-row Vec is stored regardless of digest mode.
     let baseline =
         run_solve_keep_full(config, &["-findallsols"], &instance, "restart_baseline")?;
-    if baseline.hit_solution_cap || baseline.solutions.count == 0 {
+    if baseline.skip_comparison() || baseline.solutions.count == 0 {
         baseline.cleanup.cleanup();
         return Ok(());
     }
@@ -690,7 +694,7 @@ pub fn test_constraint_variant_equivalence(config: &MinionConfig, variants: &[&s
         runs.push(ret);
     }
 
-    if runs.iter().any(|r| r.hit_solution_cap) {
+    if runs.iter().any(|r| r.skip_comparison()) {
         for r in runs {
             r.cleanup.cleanup();
         }
@@ -740,7 +744,7 @@ pub fn test_constraint_options(
     alloptions.push("-findallsols");
 
     let ret2 = run_solve(config, &alloptions[..], &instance, "options")?;
-    if ret.hit_solution_cap || ret2.hit_solution_cap {
+    if ret.skip_comparison() || ret2.skip_comparison() {
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
         return Ok(());
@@ -1636,7 +1640,7 @@ pub fn test_constraint_deep_nested(
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
-    if ret.hit_solution_cap || ret2.hit_solution_cap {
+    if ret.skip_comparison() || ret2.skip_comparison() {
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
         return Ok(());
@@ -1703,7 +1707,7 @@ pub fn test_constraint_nested(
 
     let ret = run_solve(config, &["-findallsols"], &instance, "original")?;
     let ret2 = run_solve(config, &["-findallsols"], &tups, "tuples")?;
-    if ret.hit_solution_cap || ret2.hit_solution_cap {
+    if ret.skip_comparison() || ret2.skip_comparison() {
         ret.cleanup.cleanup();
         ret2.cleanup.cleanup();
         return Ok(());
@@ -1722,7 +1726,11 @@ pub fn test_constraint_nested(
             &ret2.solutions.sample[..m],
         )));
     }
-    if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
+    if instance.constraint.gac
+        && config.deterministic_ordering()
+        && !instance.has_repeated_variable()
+        && ret.nodes != ret2.nodes
+    {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
