@@ -107,13 +107,20 @@ pub struct MinionVariable {
 #[derive(Clone)]
 pub struct Tuples {
     pub tupledata: Vec<Vec<i64>>,
+    pub arity: usize,
     pub name: String,
 }
 
 impl Tuples {
-    fn new(tupledata: Vec<Vec<i64>>) -> Tuples {
+    // `arity` is the number of columns the table is over. It must be passed
+    // explicitly because an empty table (0 tuples) carries no row to infer
+    // it from, yet the Minion **TUPLELIST** header still needs the arity to
+    // match the constraint's variable list.
+    fn new(tupledata: Vec<Vec<i64>>, arity: usize) -> Tuples {
+        debug_assert!(tupledata.iter().all(|t| t.len() == arity));
         Tuples {
             tupledata,
+            arity,
             name: get_unique_name("tuples", ""),
         }
     }
@@ -490,7 +497,7 @@ impl ConstraintInstance {
                     self.vars().iter().flatten().cloned().collect();
                 Arc::new(vec![vars])
             },
-            tuples: Some(Tuples::new(tuples)),
+            tuples: Some(Tuples::new(tuples, self.vars().iter().flatten().count())),
             short_tuples: None,
             child_constraints: vec![],
         })
@@ -513,16 +520,17 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
         .collect();
 
     if all_domains.is_empty() {
-        return Some(Tuples::new(vec![vec![]]));
+        return Some(Tuples::new(vec![vec![]], 0));
     }
 
     // Cap on the Cartesian product size we're willing to materialise.
-    // Below this we keep the original enumerate-shuffle-truncate path
-    // (preserves the "leave at least one out" property exactly). Above
-    // it we sample tuples directly from the per-variable domains —
-    // statistically sound for the tester (random non-empty subset)
-    // and avoids OOM on `--size-factor 4`-style wide-list instances
-    // where the product is 10^20+.
+    // Below this we enumerate, shuffle and truncate to a random count in
+    // [0, all] INCLUSIVE -- the empty table and the full table are kept
+    // in range on purpose: that's where table-family edge cases live
+    // (e.g. negativetable with 0 tuples must allow every assignment).
+    // Above the cap we sample tuples directly from the per-variable
+    // domains, which avoids OOM on `--size-factor 4`-style wide-list
+    // instances where the product is 10^20+.
     const ENUM_CAP: u128 = 1_000_000;
 
     let mut cart: u128 = 1;
@@ -540,20 +548,16 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
             .multi_cartesian_product()
             .collect();
         all_assignments.shuffle(&mut rng);
-        let take = if all_assignments.len() > 1 {
-            rng.gen_range(1..all_assignments.len())
-        } else {
-            1
-        };
+        let take = rng.gen_range(0..=all_assignments.len());
         all_assignments.truncate(take);
         all_assignments.sort();
-        Some(Tuples::new(all_assignments))
+        Some(Tuples::new(all_assignments, all_domains.len()))
     } else {
-        // Sample path: pick K random points directly. For huge
-        // products K ≪ cart so leaving "at least one out" is
-        // automatic with overwhelming probability.
+        // Sample path: pick K random points directly. K=0 (empty table)
+        // is allowed; the full table is unreachable here by construction
+        // (that's why we're on the sample path) and K ≪ cart anyway.
         const TUPLE_SAMPLE_CAP: usize = 10_000;
-        let take = rng.gen_range(1..=TUPLE_SAMPLE_CAP);
+        let take = rng.gen_range(0..=TUPLE_SAMPLE_CAP);
         let mut sampled: Vec<Vec<i64>> = (0..take)
             .map(|_| {
                 all_domains
@@ -564,7 +568,7 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
             .collect();
         sampled.sort();
         sampled.dedup();
-        Some(Tuples::new(sampled))
+        Some(Tuples::new(sampled, all_domains.len()))
     }
 }
 
@@ -910,18 +914,18 @@ fn check_negative_table(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     !c.tuples.as_ref().unwrap().tupledata.contains(&tup)
 }
 
-fn valid_positive_table(c: &ConstraintInstance) -> bool {
-    !c.tuples.as_ref().unwrap().tupledata.is_empty()
+// Accept any tuple count, including the boundaries. An empty table and a
+// full table (every assignment) are deliberately in scope: that is exactly
+// where table-family edge cases hide (e.g. negativetable with 0 tuples must
+// allow every assignment, with a full table it forbids everything). These
+// used to be rejected, which is why the negativetable 0-tuple bug was never
+// reached. The reference path (tableise) handles both ends correctly.
+fn valid_positive_table(_c: &ConstraintInstance) -> bool {
+    true
 }
 
-fn valid_negative_table(c: &ConstraintInstance) -> bool {
-    let tuples = c.tuples.as_ref().unwrap();
-    if tuples.tupledata.is_empty() {
-        return false;
-    }
-    let all_domains: Vec<Vec<i64>> = c.vars()[0].iter().map(|v| v.domain.clone()).collect();
-    let total: usize = all_domains.iter().map(|d| d.len()).product();
-    tuples.tupledata.len() < total
+fn valid_negative_table(_c: &ConstraintInstance) -> bool {
+    true
 }
 
 fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {

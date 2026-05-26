@@ -9,18 +9,17 @@ use crate::constraint_def::*;
 fn print_minion_tuples<F: Write>(f: &mut F, tuples: &Tuples) -> Result<()> {
     f.write_all(b"**TUPLELIST**\n")?;
     let tups = &tuples.tupledata;
-    if tups.is_empty() {
-        f.write_all(format!("{}  0 0\n", tuples.name).as_bytes())?;
-    } else {
-        f.write_all(format!("{}  {} {}\n", tuples.name, tups.len(), tups[0].len()).as_bytes())?;
-        for tup in tups {
-            for val in tup {
-                f.write_all(format!("{} ", val).as_bytes())?;
-            }
-            f.write_all(b"\n")?;
+    // Header is `name <numtuples> <arity>`. The arity comes from the
+    // stored value, not from tups[0], so an empty table still declares the
+    // correct number of columns to match its constraint's variable list.
+    f.write_all(format!("{}  {} {}\n", tuples.name, tups.len(), tuples.arity).as_bytes())?;
+    for tup in tups {
+        for val in tup {
+            f.write_all(format!("{} ", val).as_bytes())?;
         }
         f.write_all(b"\n")?;
     }
+    f.write_all(b"\n")?;
     Ok(())
 }
 
