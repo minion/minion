@@ -439,8 +439,36 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
 
   infile->checkSym(')');
 
+  // Tuple constraints are either positive (the table lists the ALLOWED
+  // assignments) or negative (it lists the FORBIDDEN ones). The degenerate
+  // empty-table and no-variable cases below collapse to CT_TRUE / CT_FALSE
+  // differently for the two, so the polarity must be known. Both sets are
+  // listed exhaustively on purpose: any tuple constraint that is in neither
+  // (e.g. a newly added one) is a programming error and fails loudly here,
+  // rather than being silently miscategorised.
+  bool negativeTable;
+  switch(def->type) {
+  case CT_WATCHED_TABLE:
+  case CT_GACSCHEMA:
+  case CT_HAGGISGAC:
+  case CT_HAGGISGAC_STABLE:
+  case CT_MDDC:
+  case CT_SHORTSTR:
+  case CT_STR:
+  case CT_SHORTSTR_CTUPLE:
+  case CT_LIGHTTABLE: negativeTable = false; break;
+  case CT_WATCHED_NEGATIVE_TABLE:
+  case CT_NEGATIVEMDDC: negativeTable = true; break;
+  default:
+    throw parse_exception("Internal error: tuple constraint '" + def->name +
+                          "' is not classified as positive or negative in "
+                          "readConstraintTable. Add it to one of the lists there.");
+  }
+
   if(def->read_types[1] == read_tuples && con.tuples->size() == 0) {
-    return ConstraintBlob(get_constraint(CT_FALSE));
+    // Empty table: a positive table allows nothing (FALSE); a negative
+    // table forbids nothing, so every assignment is allowed (TRUE).
+    return ConstraintBlob(get_constraint(negativeTable ? CT_TRUE : CT_FALSE));
   }
 
   if(def->read_types[1] == read_short_tuples && con.shortTuples->size() == 0) {
@@ -460,7 +488,10 @@ ConstraintBlob MinionThreeInputReader<FileReader>::readConstraintTable(FileReade
     if(def->read_types[1] == read_short_tuples && !(*con.shortTuples->tuplePtr())[0].empty())
       throw parse_exception("Not a valid list of short tuples for a "
                             "constraint with no variables!");
-    return ConstraintBlob(get_constraint(CT_TRUE));
+    // Zero variables: the only assignment is the empty tuple, which the
+    // (non-empty) table contains. A positive table accepts it (TRUE); a
+    // negative table forbids it (FALSE).
+    return ConstraintBlob(get_constraint(negativeTable ? CT_FALSE : CT_TRUE));
   }
 
   return con;

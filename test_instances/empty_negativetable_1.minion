@@ -1,0 +1,23 @@
+MINION 3
+#TEST SOLCOUNT 100
+# Regression: an empty negativetable forbids nothing, so every assignment
+# is allowed. The parser used to collapse all empty tuple tables to CT_FALSE,
+# which wrongly gave 0 solutions for the negative table family.
+
+**VARIABLES**
+
+DISCRETE d[2] {0..9}
+
+**TUPLELIST**
+
+Second 0 2
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+negativetable([d[0],d[1]],Second)
+
+**EOF**
