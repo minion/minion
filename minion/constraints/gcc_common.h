@@ -125,30 +125,33 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       }
     }
 
-    // The incremental matching and adjacency-list structures assume the counted
-    // variables and the cardinality variables are all distinct underlying
-    // variables. If the same variable appears in more than one of these slots
-    // (aliasing), pruning it in one role silently invalidates the cached state
-    // used in the other and gives wrong propagation. getBaseVar() sees through
+    // The incremental matching is over the counted variables while
+    // prop_capacity prunes the cardinality variables; if one variable plays
+    // BOTH roles, pruning it as a cardinality variable invalidates the
+    // matching cached for it as a counted variable, giving wrong propagation
+    // (or a debug assert in cardUpperbound). Repeats WITHIN a single vector
+    // are fine and supported: a repeated cardinality variable ("these values
+    // occur equally often") and a repeated counted variable. So we only
+    // forbid a variable appearing in both vectors. getBaseVar() sees through
     // mappers (neg/not/shift/...); constants cannot alias so are skipped.
     {
-      vector<Var> baseVars;
-      for(SysInt i = 0; i < (SysInt)varArray.size(); i++)
-        if(varArray[i].getBaseVar().type() != VAR_CONSTANT)
-          baseVars.push_back(varArray[i].getBaseVar());
-      for(SysInt i = 0; i < (SysInt)capacity_array.size(); i++)
-        if(capacity_array[i].getBaseVar().type() != VAR_CONSTANT)
-          baseVars.push_back(capacity_array[i].getBaseVar());
-      bool aliased = false;
-      for(SysInt i = 0; i < (SysInt)baseVars.size() && !aliased; i++)
-        for(SysInt j = i + 1; j < (SysInt)baseVars.size() && !aliased; j++)
-          if(baseVars[i] == baseVars[j])
-            aliased = true;
-      CHECK(!aliased,
-            "gcc/gccweak does not support the same variable appearing more than "
-            "once among its counted and cardinality variables. This limitation "
-            "can be removed -- please report to https://github.com/minion/minion "
-            ", so we are aware there are users who want this functionality.");
+      bool crossAliased = false;
+      for(SysInt i = 0; i < (SysInt)varArray.size() && !crossAliased; i++) {
+        Var cv = varArray[i].getBaseVar();
+        if(cv.type() == VAR_CONSTANT)
+          continue;
+        for(SysInt j = 0; j < (SysInt)capacity_array.size() && !crossAliased; j++) {
+          Var pv = capacity_array[j].getBaseVar();
+          if(pv.type() != VAR_CONSTANT && cv == pv)
+            crossAliased = true;
+        }
+      }
+      CHECK(!crossAliased,
+            "gcc/gccweak does not support the same variable appearing in both its "
+            "counted vector and its cardinality vector. (Repeats within either "
+            "vector are fine.) This limitation can be removed -- please report to "
+            "https://github.com/minion/minion , so we are aware there are users "
+            "who want this functionality.");
     }
 
     usage.resize(numvals, 0);

@@ -2,13 +2,13 @@ MINION 3
 #FAIL
 #TEST SOLCOUNT 0
 # Regression: gccweak shares gcc's matching structures and the same aliasing
-# limitation, so it likewise refuses a counted/cardinality aliased variable.
+# limitation, so it likewise refuses a variable that appears in BOTH the
+# counted vector and the cardinality vector (here x). Repeats within a single
+# vector are allowed; only this cross-vector case is rejected.
 **VARIABLES**
-DISCRETE x {-10..9}
-BOOL b
-DISCRETE c {-7..2}
+DISCRETE x {-10..7}
 **SEARCH**
-PRINT[[x],[b],[c]]
+PRINT[[x]]
 **CONSTRAINTS**
-gccweak([x, x], [4, -9], [b, c])
+gccweak([x, 4], [-5, 2], [x, x])
 **EOF**
