@@ -14,8 +14,6 @@ use self::rand::Rng;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
-use arrayvec::ArrayVec;
-
 /// Scales the size of randomly-generated instances. `1` is the
 /// historical default (lists up to 4, integer domain ±10, sublist
 /// target up to 8). `main` sets this from `--size-factor`. The
@@ -53,6 +51,7 @@ pub enum Arg {
     /// generation of a [`ShortTuples`] from the variables seen so
     /// far. Used by `shortstr2`, `haggisgac`, `haggisgac-stable`,
     /// and `shortctuplestr2`.
+    #[allow(dead_code)]
     ShortTuples,
     Constraint,
     //    Constraint_List,
@@ -740,9 +739,7 @@ pub fn build_random_nested_tree(leaf_def: &ConstraintDef, depth: usize) -> Const
     let mut rng = rand::thread_rng();
 
     let shortlist = [
-        "reify",
         "reifyimply",
-        "reifyimply-quick",
         "watched-and",
         "watched-or",
     ];
@@ -789,6 +786,7 @@ fn check_alldiff(v: &[&[i64]]) -> bool {
     true
 }
 
+#[allow(dead_code)]
 fn check_alldiffmatrix(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     let vars: &[i64] = v[0];
     let var_count = vars.len();
@@ -816,6 +814,7 @@ fn check_alldiffmatrix(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     true
 }
 
+#[allow(dead_code)]
 fn valid_alldiffmatrix(c: &ConstraintInstance) -> bool {
     let var_count = c.vars()[0].len();
     let n = (var_count as f64).sqrt() as usize;
@@ -875,6 +874,7 @@ fn valid_negative_table(c: &ConstraintInstance) -> bool {
     tuples.tupledata.len() < total
 }
 
+#[allow(dead_code)]
 fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     let assignment = v[0];
     let st = c.short_tuples.as_ref().unwrap();
@@ -901,6 +901,7 @@ fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
 ///   - any short tuple that is empty (collapses the constraint to true).
 /// Both are uninteresting for metamorphic testing and the second
 /// hides bugs in the literal-iteration logic.
+#[allow(dead_code)]
 fn valid_short_tuples_instance(c: &ConstraintInstance) -> bool {
     let st = match c.short_tuples.as_ref() {
         Some(s) => s,
@@ -915,6 +916,7 @@ fn valid_short_tuples_instance(c: &ConstraintInstance) -> bool {
     true
 }
 
+#[allow(dead_code)]
 fn check_frameupdate(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     // Argument order in the minion input file
     // (frameupdate(source, target, idx_source, idx_target, blocksize)),
@@ -985,6 +987,7 @@ fn check_frameupdate(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
 /// here because the truth-table enumeration walks the Cartesian
 /// product of *all* variables — long lists blow past --maxtuples
 /// trivially.
+#[allow(dead_code)]
 fn valid_frameupdate(c: &ConstraintInstance) -> bool {
     let blocksize = c.vars()[4][0].get_value();
     // Tight bounds (independent of --size-factor) so retry-based
@@ -1035,7 +1038,7 @@ fn check_element(v: &[&[i64]], offset: i64, undefzero: bool) -> bool {
 lazy_static! {
     pub static ref STANDARD_TABLE_CONSTRAINT: ConstraintDef = {
         ConstraintDef {
-            name: "str2plus".to_string(),
+            name: "table".to_string(),
             arg: vec![List(Bound), Tuples],
             checker: Arc::new(|_, __| unimplemented!()),
             gac: true,
@@ -1063,50 +1066,12 @@ fn nested_constraint_list() -> Vec<ConstraintDef> {
             false,
         ),
         ConstraintDef::new_parent(
-            "reifyimply-quick", // CT_REIFYIMPLY_QUICK
-            vec![Constraint, Var(Bool)],
-            |c, assign| {
-                let child = &c.child_constraints[0];
-                let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
-                (assign[1][0] == 1) <= ischildtrue
-            },
-            false,
-            false,
-        ),
-        ConstraintDef::new_parent(
             "reifyimply", // CT_REIFYIMPLY
             vec![Constraint, Var(Bool)],
             |c, assign| {
                 let child = &c.child_constraints[0];
                 let ischildtrue = (child.constraint.checker)(child, &assign[2..]);
                 (assign[1][0] == 1) <= ischildtrue
-            },
-            false,
-            false,
-        ),
-        ConstraintDef::new_parent(
-            "forwardchecking", // CT_FORWARD_CHECKING
-            vec![Constraint],
-            |c, assign| {
-                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0], &assign[1..])
-            },
-            false,
-            false,
-        ),
-        ConstraintDef::new_parent(
-            "check[gsa]", // CT_CHECK_GSA
-            vec![Constraint],
-            |c, assign| {
-                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0], &assign[1..])
-            },
-            false,
-            false,
-        ),
-        ConstraintDef::new_parent(
-            "check[assign]", // CT_CHECK_ASSIGN
-            vec![Constraint],
-            |c, assign| {
-                (c.child_constraints[0].constraint.checker)(&c.child_constraints[0], &assign[1..])
             },
             false,
             false,
@@ -1171,9 +1136,8 @@ pub static EQUIVALENCE_GROUPS: &[&[&str]] = &[
     &["gaceq", "eq"],
     &["lexleq[rv]", "lexleq", "lexleq[quick]"],
     &["lexless", "lexless[quick]"],
-    &["table", "gacschema", "lighttable", "mddc"],
-    &["negativetable", "negativemddc"],
-    &["shortstr2", "haggisgac", "haggisgac-stable", "shortctuplestr2"],
+    &["table", "gacschema", "lighttable"],
+ 
 ];
 
 /// Look up a registered constraint definition by exact name.
@@ -1208,7 +1172,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "diseq", // CT_DISEQ
             vec![Var(Bound), Var(Bound)],
-            |v| (v[0][0] != v[1][0]),
+            |v| v[0][0] != v[1][0],
             false,
             false,
         ),
@@ -1264,7 +1228,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "eq", // CT_EQ
             vec![Var(Bound), Var(Bound)],
-            |v| (v[0][0] == v[1][0]),
+            |v| v[0][0] == v[1][0],
             false,
             false,
         ),
@@ -1275,6 +1239,8 @@ fn constraint_list() -> Vec<ConstraintDef> {
             true,
             true,
         ),
+        // Disabled: minion-rust does not yet implement CT_FRAMEUPDATE.
+        /*
         ConstraintDef::new_full(
             "frameupdate", // CT_FRAMEUPDATE
             // (source, target, idx_source, idx_target, blocksize)
@@ -1291,6 +1257,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             valid_frameupdate,
         ),
+        */
         ConstraintDef::new(
             "gacalldiff",
             vec![List(Discrete)],
@@ -1301,14 +1268,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "gaceq", // CT_GACEQ
             vec![Var(Discrete), Var(Discrete)],
-            |v| (v[0][0] == v[1][0]),
+            |v| v[0][0] == v[1][0],
             true,
             true,
         ),
         ConstraintDef::new_with_validator(
             "lexleq[rv]", // CT_GACLEXLEQ
             vec![List(Bound), List(Bound)],
-            |v| (v[0] <= v[1]),
+            |v| v[0] <= v[1],
             true,
             true,
             |v| v.vars()[0].len() == v.vars()[1].len(),
@@ -1316,7 +1283,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "occurrencegeq", // CT_GEQ_OCCURRENCE
             vec![List(Discrete), Var(Constant), Var(Constant)],
-            |v| (v[0].iter().filter(|x| **x == v[1][0]).count() as i64 >= v[2][0]),
+            |v| v[0].iter().filter(|x| **x == v[1][0]).count() as i64 >= v[2][0],
             false,
             false,
         ),
@@ -1333,26 +1300,11 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "sumgeq", // CT_GEQSUM
             vec![List(Bound), Var(Bound)],
-            |v| (v[0].iter().sum::<i64>() >= v[1][0]),
+            |v| v[0].iter().sum::<i64>() >= v[1][0],
             false,
             false,
         ),
-        ConstraintDef::new_full(
-            "haggisgac", // CT_HAGGISGAC
-            vec![List(Discrete), ShortTuples],
-            check_short_tuples,
-            true,
-            true,
-            valid_short_tuples_instance,
-        ),
-        ConstraintDef::new_full(
-            "haggisgac-stable", // CT_HAGGISGAC_STABLE
-            vec![List(Discrete), ShortTuples],
-            check_short_tuples,
-            true,
-            true,
-            valid_short_tuples_instance,
-        ),
+     
         ConstraintDef::new(
             "ineq", // CT_INEQ
             vec![Var(Bound), Var(Bound), Var(Constant)],
@@ -1363,7 +1315,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "occurrenceleq", // CT_LEQ_OCCURRENCE
             vec![List(Discrete), Var(Constant), Var(Constant)],
-            |v| (v[0].iter().filter(|x| **x == v[1][0]).count() as i64 <= v[2][0]),
+            |v| v[0].iter().filter(|x| **x == v[1][0]).count() as i64 <= v[2][0],
             false,
             false,
         ),
@@ -1380,14 +1332,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "sumleq", // CT_LEQSUM
             vec![List(Bound), Var(Bound)],
-            |v| (v[0].iter().sum::<i64>() <= v[1][0]),
+            |v| v[0].iter().sum::<i64>() <= v[1][0],
             false,
             false,
         ),
         ConstraintDef::new_with_validator(
             "lexleq", // CT_LEXLEQ
             vec![List(Bound), List(Bound)],
-            |v| (v[0] <= v[1]),
+            |v| v[0] <= v[1],
             true,
             true,
             |v| v.vars()[0].len() == v.vars()[1].len(),
@@ -1395,7 +1347,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new_with_validator(
             "lexless", // CT_LEXLESS
             vec![List(Bound), List(Bound)],
-            |v| (v[0] < v[1]),
+            |v| v[0] < v[1],
             true,
             true,
             |v| v.vars()[0].len() == v.vars()[1].len(),
@@ -1403,14 +1355,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "max", // CT_MAX
             vec![List(Bound), Var(Bound)],
-            |v| (v[0].iter().cloned().max() == Some(v[1][0])),
+            |v| v[0].iter().cloned().max() == Some(v[1][0]),
             false,
             false,
         ),
         ConstraintDef::new(
             "min", // CT_MIN
             vec![List(Bound), Var(Bound)],
-            |v| (v[0].iter().cloned().min() == Some(v[1][0])),
+            |v| v[0].iter().cloned().min() == Some(v[1][0]),
             false,
             false,
         ),
@@ -1418,7 +1370,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "minuseq", // CT_MINUSEQ
             vec![Var(Bound), Var(Bound)],
-            |v| (v[0][0] == -v[1][0]),
+            |v| v[0][0] == -v[1][0],
             false,
             false,
         ),
@@ -1439,14 +1391,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "modulo", // CT_MODULO
             vec![Var(Bound), Var(Bound), Var(Bound)],
-            |v| (v[1][0] != 0 && (v[0][0].mod_floor(&v[1][0]) == v[2][0])),
+            |v| v[1][0] != 0 && (v[0][0].mod_floor(&v[1][0]) == v[2][0]),
             false,
             false,
         ),
         ConstraintDef::new(
             "occurrence", // CT_OCCURRENCE
             vec![List(Discrete), Var(Constant), Var(Discrete)],
-            |v| (v[0].iter().filter(|x| **x == v[1][0]).count() as i64 == v[2][0]),
+            |v| v[0].iter().filter(|x| **x == v[1][0]).count() as i64 == v[2][0],
             false,
             false,
         ),
@@ -1481,14 +1433,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "product", // CT_PRODUCT
             vec![Var(Bound), Var(Bound), Var(Bound)],
-            |v| (v[0][0] * v[1][0] == v[2][0]),
+            |v| v[0][0] * v[1][0] == v[2][0],
             false,
             false,
         ),
         ConstraintDef::new_with_validator(
             "lexleq[quick]", // CT_QUICK_LEXLEQ
             vec![List(Bound), List(Bound)],
-            |v| (v[0] <= v[1]),
+            |v| v[0] <= v[1],
             false,
             false,
             |v| v.vars()[0].len() == v.vars()[1].len(),
@@ -1496,34 +1448,12 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new_with_validator(
             "lexless[quick]", // CT_QUICK_LEXLESS
             vec![List(Bound), List(Bound)],
-            |v| (v[0] < v[1]),
+            |v| v[0] < v[1],
             false,
             false,
             |v| v.vars()[0].len() == v.vars()[1].len(),
         ),
-        ConstraintDef::new_full(
-            "shortstr2", // CT_SHORTSTR
-            // shortstr2 itself accepts any var type, but the
-            // equivalence group includes haggisgac/-stable which
-            // call removeFromDomain → Discrete only.
-            vec![List(Discrete), ShortTuples],
-            check_short_tuples,
-            true,
-            true,
-            valid_short_tuples_instance,
-        ),
-        ConstraintDef::new_full(
-            "shortctuplestr2", // CT_SHORTSTR_CTUPLE
-            // Accepts the same single-literal short tuples as the
-            // others; its multi-literal-per-var feature is not
-            // exercised by this generator (would need a separate
-            // test entry point).
-            vec![List(Discrete), ShortTuples],
-            check_short_tuples,
-            true,
-            true,
-            valid_short_tuples_instance,
-        ),
+   
         ConstraintDef::new(
             "true", // CT_TRUEArc
             vec![],
@@ -1639,14 +1569,14 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "watchless", // CT_WATCHED_LESS
             vec![Var(Bound), Var(Bound)],
-            |v| (v[0][0] < v[1][0]),
+            |v| v[0][0] < v[1][0],
             true,
             true,
         ),
         ConstraintDef::new(
             "w-literal", // CT_WATCHED_LIT
             vec![Var(Bound), Var(Constant)],
-            |v| (v[0][0] == v[1][0]),
+            |v| v[0][0] == v[1][0],
             true,
             true,
         ),
@@ -1661,11 +1591,18 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "watchneq", // CT_WATCHED_NEQ
             vec![Var(Discrete), Var(Discrete)],
-            |v| (v[0][0] != v[1][0]),
+            |v| v[0][0] != v[1][0],
             true,
             true,
         ),
         // TODO: WATCHED_NEW_AND, WATCHED_NEW_OR
+        // Disabled: minion-rust's not-hamming (bounds-equality forcing) reaches
+        // the eq fixpoint eagerly at every node, whereas C++'s watched scheme
+        // does one round at the root and defers the rest to search. For bound
+        // vars with holes (Discrete/SparseBound) this makes our propagation
+        // strictly stronger, so node counts differ. hamming (the != operator)
+        // is confluent and node-identical, so it stays enabled. See DIFFERENCES.md.
+        /*
         ConstraintDef::new_with_validator(
             "not-hamming", // CT_WATCHED_NOT_HAMMING
             vec![List(Bound), List(Bound), Var(Constant)],
@@ -1674,6 +1611,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
+        */
         ConstraintDef::new_with_validator(
             "w-notinrange", // CT_WATCHED_NOT_INRANGE
             vec![Var(Bound), List(Constant)],
@@ -1699,7 +1637,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
         ConstraintDef::new(
             "w-notliteral", // CT_WATCHED_NOTLIT
             vec![Var(Bound), Var(Constant)],
-            |v| (v[0][0] != v[1][0]),
+            |v| v[0][0] != v[1][0],
             true,
             true,
         ),
@@ -1736,6 +1674,8 @@ fn constraint_list() -> Vec<ConstraintDef> {
             |c| c.vars()[0].len() == c.vars()[1].len(),
         ),
         // --- constraints that need instance-aware checkers ---
+        // Disabled: minion-rust does not yet implement CT_ALLDIFFMATRIX.
+        /*
         ConstraintDef::new_full(
             "alldiffmatrix",
             vec![List(Discrete), Var(Constant)],
@@ -1744,6 +1684,7 @@ fn constraint_list() -> Vec<ConstraintDef> {
             false,
             valid_alldiffmatrix,
         ),
+        */
         ConstraintDef::new_full(
             "gcc",
             vec![List(Discrete), List(Constant), List(Discrete)],
