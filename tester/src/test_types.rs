@@ -1351,6 +1351,7 @@ pub fn test_constraint_midsearch_inject_constraints(
 
 /// Single-packet shim that delegates to the multi-packet test with N=1.
 /// Kept so existing callers don't have to construct slices.
+#[allow(dead_code)]
 pub fn test_constraint_midsearch_inject_constraint(
     config: &MinionConfig,
     base_defs: &[&constraint_def::ConstraintDef],
@@ -1709,11 +1710,23 @@ pub fn test_constraint_nested(
         .iter()
         .filter(|a| matches!(a, constraint_def::Arg::Constraint))
         .count();
+    // Meta-constraints in minion-rust (reify, reifyimply, watched-or,
+    // watched-and) rely on their children's `get_satisfying_assignment`
+    // method. Picking an unsupported leaf as an extra would panic at solve
+    // time. Match the same SUPPORTED list used in
+    // `constraint_def::build_random_instance_with_children_sized`.
+    const SUPPORTED_NESTED: &[&str] = &[
+        "w-literal", "w-notliteral", "eq", "diseq",
+    ];
     let mut children: Vec<&constraint_def::ConstraintDef> = vec![c];
     for _ in 1..n_children {
         let extra = constraint_def::CONSTRAINT_LIST
+            .iter()
+            .filter(|d| SUPPORTED_NESTED.contains(&d.name.as_str()))
+            .collect::<Vec<_>>()
             .choose(&mut rng)
-            .expect("CONSTRAINT_LIST empty");
+            .copied()
+            .expect("no supported leaf constraints");
         children.push(extra);
     }
 
