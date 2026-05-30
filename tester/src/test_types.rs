@@ -73,6 +73,7 @@ impl<'a> MinionConfig<'a> {
             val_order: self.val_order,
             preprocess: self.preprocess,
             prop_node: self.prop_node,
+            ..Default::default()
         }
     }
 
@@ -85,6 +86,7 @@ impl<'a> MinionConfig<'a> {
             val_order: self.val_order,
             preprocess: self.preprocess,
             prop_node: self.prop_node,
+            ..Default::default()
         }
     }
 }
@@ -139,12 +141,12 @@ fn run_solve_inner(
             keep_full_solutions,
         ),
         Backend::InProcess => {
-            // Tiny flag parser: -findallsols is recognised as before;
-            // -X-parallelWorkSteal <N> routes through the work-steal
-            // variant of the in-process entry. Other flags are
-            // exec-only and rejected.
+            // Flags recognised in-process. Anything else is exec-only and
+            // rejected so callers know to skip in InProcess mode.
             let mut find_all = false;
             let mut work_steal: Option<usize> = None;
+            let mut node_limit: u64 = 0;
+            let mut time_limit: Option<minion_sys::TimeLimit> = None;
             let mut i = 0;
             while i < extraargs.len() {
                 match extraargs[i] {
@@ -167,6 +169,32 @@ fn run_solve_inner(
                         work_steal = Some(n);
                         i += 2;
                     }
+                    "-nodelimit" => {
+                        if i + 1 >= extraargs.len() {
+                            return Err(anyhow!("-nodelimit needs an argument"));
+                        }
+                        node_limit = extraargs[i + 1].parse().map_err(|_| {
+                            anyhow!("-nodelimit: invalid count {:?}", extraargs[i + 1])
+                        })?;
+                        i += 2;
+                    }
+                    "-timelimit" | "-cpulimit" => {
+                        if i + 1 >= extraargs.len() {
+                            return Err(anyhow!("{} needs an argument", extraargs[i]));
+                        }
+                        let seconds: u32 = extraargs[i + 1].parse().map_err(|_| {
+                            anyhow!("{}: invalid seconds {:?}", extraargs[i], extraargs[i + 1])
+                        })?;
+                        time_limit = Some(minion_sys::TimeLimit {
+                            seconds,
+                            is_cpu_time: extraargs[i] == "-cpulimit",
+                        });
+                        i += 2;
+                    }
+                    // -cores N is a parallel knob with no in-process surface.
+                    // Accept silently (consume the argument) so the option
+                    // sweep can pass it through harmlessly.
+                    "-cores" => { i += 2; }
                     other => {
                         return Err(anyhow!(
                             "in-process backend does not support flag {:?}",
@@ -175,11 +203,15 @@ fn run_solve_inner(
                     }
                 }
             }
+            // Fold -nodelimit / -timelimit / -cpulimit into RunOptions.
+            let mut run_opts = config.run_options_no_seed();
+            if node_limit > 0 { run_opts.node_limit = node_limit; }
+            if let Some(tl) = time_limit { run_opts.time_limit = Some(tl); }
             if let Some(n) = work_steal {
                 let _ = find_all;
                 run_minion_lib::get_minion_solutions_in_process_work_steal(
                     instance,
-                    config.run_options_no_seed(),
+                    run_opts,
                     n,
                     testname,
                     config.max_solutions,
@@ -189,7 +221,7 @@ fn run_solve_inner(
                 run_minion_lib::get_minion_solutions_in_process(
                     instance,
                     find_all,
-                    config.run_options_no_seed(),
+                    run_opts,
                     testname,
                     config.max_solutions,
                     keep_full_solutions,
@@ -1920,6 +1952,7 @@ pub fn test_constraint_optimisation(
                     level: minion_sys::PropLevel::GAC,
                     limit: false,
                 },
+                ..Default::default()
             };
             let ret = run_minion_lib::get_minion_solutions_in_process_optimisation(
                 &instance,

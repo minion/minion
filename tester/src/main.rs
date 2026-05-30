@@ -1026,6 +1026,12 @@ fn main() -> Result<()> {
         // separately by test_constraint_restart, which uses
         // -sollimit 1 and verifies the found solution lies in the
         // baseline's solution set.
+        // Time / CPU limits and cores. Big enough never to trip on the
+        // tester's tiny instances — these exist to exercise the flag
+        // plumbing, not to verify timeout semantics.
+        vec!["-timelimit", "3600"],
+        vec!["-cpulimit", "3600"],
+        vec!["-cores", "4"],
     ];
 
     let mut testlist = vec![];

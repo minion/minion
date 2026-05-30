@@ -418,6 +418,24 @@ pub struct RunOptions {
     /// propagation on top at every node; weaker levels (None) are
     /// not meaningful here (a solver has to propagate *something*).
     pub prop_node: Propagation,
+
+    /// Abort search after this many nodes have been explored. `0` (default)
+    /// means unlimited. Mirrors `-nodelimit N`.
+    pub node_limit: u64,
+
+    /// Abort search after this many seconds of wall-clock or CPU time.
+    /// `None` (default) means unlimited. `is_cpu_time = true` mirrors
+    /// `-cpulimit`; `false` mirrors `-timelimit`. C++ exec mode rejects
+    /// setting both; in this struct we accept whichever is non-None.
+    pub time_limit: Option<TimeLimit>,
+}
+
+/// Time limit specification: a number of seconds and whether to measure
+/// CPU time (`-cpulimit`) or wall-clock time (`-timelimit`).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct TimeLimit {
+    pub seconds: u32,
+    pub is_cpu_time: bool,
 }
 
 impl Default for RunOptions {
@@ -434,6 +452,8 @@ impl Default for RunOptions {
                 level: PropLevel::GAC,
                 limit: false,
             },
+            node_limit: 0,
+            time_limit: None,
         }
     }
 }
@@ -654,6 +674,14 @@ pub fn run_minion_work_steal_with_options(
         }
         (*search_method).preprocess = options.preprocess.to_ffi();
         (*search_method).propMethod = options.prop_node.to_ffi();
+        if options.node_limit > 0 {
+            (*search_opts).nodelimit = options.node_limit as _;
+        }
+        if let Some(tl) = options.time_limit {
+            (*search_opts).timeoutActive = true;
+            (*search_opts).time_limit = tl.seconds as _;
+            (*search_opts).time_limit_is_CPUTime = tl.is_cpu_time;
+        }
 
         let mut print_vars: Vec<VarName> = vec![];
         let convert_result =
@@ -752,6 +780,14 @@ pub fn run_minion_parallel_with_options(
         }
         (*search_method).preprocess = options.preprocess.to_ffi();
         (*search_method).propMethod = options.prop_node.to_ffi();
+        if options.node_limit > 0 {
+            (*search_opts).nodelimit = options.node_limit as _;
+        }
+        if let Some(tl) = options.time_limit {
+            (*search_opts).timeoutActive = true;
+            (*search_opts).time_limit = tl.seconds as _;
+            (*search_opts).time_limit_is_CPUTime = tl.is_cpu_time;
+        }
 
         let mut print_vars: Vec<VarName> = vec![];
         let convert_result =
@@ -816,6 +852,14 @@ pub fn run_minion_midsearch_with_options(
         }
         (*search_method).preprocess = options.preprocess.to_ffi();
         (*search_method).propMethod = options.prop_node.to_ffi();
+        if options.node_limit > 0 {
+            (*search_opts).nodelimit = options.node_limit as _;
+        }
+        if let Some(tl) = options.time_limit {
+            (*search_opts).timeoutActive = true;
+            (*search_opts).time_limit = tl.seconds as _;
+            (*search_opts).time_limit_is_CPUTime = tl.is_cpu_time;
+        }
 
         let mut state = CallbackState {
             callback,
