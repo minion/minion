@@ -191,6 +191,16 @@ struct Opt {
     #[arg(long, default_value_t = 0.1)]
     var_reuse: f64,
 
+    /// Probability (0.0..=1.0) that the use of a Bool variable in a
+    /// constraint slot is wrapped as `!name` rather than emitted plain.
+    /// Exercises minion's `VAR_NOTBOOL` parser path and the propagators'
+    /// handling of negated bool references. `0` reproduces the
+    /// historical no-`!` behaviour. Forced to 0 under `--in-process`
+    /// because minion-sys has no negated-bool variant; the in-process
+    /// backend would otherwise silently drop the `!`.
+    #[arg(long, default_value_t = 0.25)]
+    negate_bool: f64,
+
     /// Cap for the per-constraint adaptive growth in the work-steal
     /// pass. Each constraint starts at `--size-factor` (or 1) and
     /// doubles until at least one trial reports a non-zero donation
@@ -319,6 +329,16 @@ fn main() -> Result<()> {
         (opt.var_reuse.clamp(0.0, 1.0) * 1000.0).round() as u32,
         std::sync::atomic::Ordering::Relaxed,
     );
+
+    // Wire --negate-bool into the global bool-negation probability
+    // (per-mille). Forced to 0 under --in-process because that backend
+    // would silently drop the `!` (minion-sys lacks NegatedBool).
+    let negate_pm = if opt.in_process {
+        0
+    } else {
+        (opt.negate_bool.clamp(0.0, 1.0) * 1000.0).round() as u32
+    };
+    constraint_def::NEGATION_PERMILLE.store(negate_pm, std::sync::atomic::Ordering::Relaxed);
 
     rayon::ThreadPoolBuilder::new()
         .num_threads(opt.numthreads)

@@ -48,11 +48,40 @@ fn reuse_roll() -> bool {
     p != 0 && rand::thread_rng().gen_range(0..1000) < p
 }
 
+/// Probability, in per-mille (0..=1000), that the use of a Bool
+/// variable in a constraint slot is wrapped as `!name` rather than
+/// emitted plain. `0` reproduces the historical no-`!` behaviour. The
+/// `--in-process` backend doesn't currently support negated bool refs
+/// (minion-sys has no `Var::NegatedBool`), so the entry-point in
+/// `main` keeps this at 0 under `--in-process` and lets it climb in
+/// exec mode.
+pub static NEGATION_PERMILLE: AtomicU32 = AtomicU32::new(0);
+
+fn negation_roll() -> bool {
+    let p = NEGATION_PERMILLE.load(Ordering::Relaxed).min(1000);
+    p != 0 && rand::thread_rng().gen_range(0..1000) < p
+}
+
 /// Fill one non-list variable slot of kind `d`: with probability
 /// [`VAR_REUSE_PERMILLE`] reuse a previously-generated non-constant
 /// variable drawn from `pool`, otherwise mint a fresh one (and, if it
 /// is non-constant, add it to `pool` so later slots can reuse it).
 /// Constant slots (`d == Constant`) are always fresh.
+/// Build a negation-flag mirror of `variables` by rolling
+/// [`negation_roll`] independently for each Bool position. Non-Bool
+/// positions (including Constants) are always false: minion's parser
+/// rejects `!` on anything other than a boolean.
+fn build_negated_slots(variables: &[Vec<Arc<MinionVariable>>]) -> Vec<Vec<bool>> {
+    variables
+        .iter()
+        .map(|slot| {
+            slot.iter()
+                .map(|v| v.var_type == VarType::Bool && negation_roll())
+                .collect()
+        })
+        .collect()
+}
+
 fn gen_var_for_slot(
     pool: &mut Vec<Arc<MinionVariable>>,
     d: VarType,
@@ -360,6 +389,13 @@ impl fmt::Debug for ConstraintDef {
 pub struct ConstraintInstance {
     pub constraint: ConstraintDef,
     varlist: Arc<Vec<Vec<Arc<MinionVariable>>>>,
+    // Parallel to `varlist` in shape: `negated_slots[s][i]` is true iff
+    // the *use* of `varlist[s][i]` should be emitted to minion as
+    // `!name`. Only valid for Bool var_type. Independent of variable
+    // identity, so the same pooled Arc can appear negated in one slot
+    // and plain in another -- which is the whole point of putting the
+    // flag on the use rather than on `MinionVariable`.
+    negated_slots: Arc<Vec<Vec<bool>>>,
     pub tuples: Option<Tuples>,
     pub short_tuples: Option<ShortTuples>,
     pub child_constraints: Vec<ConstraintInstance>,
@@ -372,6 +408,43 @@ impl ConstraintInstance {
             varlist.extend(child.vars().iter().cloned());
         }
         Arc::new(varlist)
+    }
+
+    /// Flattened negation flags mirroring [`vars`]: parent's slots
+    /// first, then each child's flattened slots, in the same order.
+    /// Used by [`check_tuple`] so the per-row transform aligns with
+    /// the per-slot values minion would see.
+    pub fn negated_for_vars(&self) -> Vec<Vec<bool>> {
+        let mut out = (*self.negated_slots).clone();
+        for child in &self.child_constraints {
+            out.extend(child.negated_for_vars());
+        }
+        out
+    }
+
+    /// True if the use of variable at position `idx` in this
+    /// instance's top-level slot `slot` is the negated form `!name`.
+    /// Returns false (the default) if the indices are out of range or
+    /// the slot was constructed without an explicit flag vector.
+    pub fn negated(&self, slot: usize, idx: usize) -> bool {
+        self.negated_slots
+            .get(slot)
+            .and_then(|v| v.get(idx))
+            .copied()
+            .unwrap_or(false)
+    }
+
+    /// True if any slot anywhere in this instance (including children)
+    /// has a negated variable use. The in-process backend uses this to
+    /// assert that no `!` flag slipped past the `--in-process` gate.
+    pub fn has_any_negated(&self) -> bool {
+        self.negated_slots
+            .iter()
+            .any(|s| s.iter().any(|&b| b))
+            || self
+                .child_constraints
+                .iter()
+                .any(|c| c.has_any_negated())
     }
 
     fn total_var_slots(&self) -> usize {
@@ -411,12 +484,38 @@ impl ConstraintInstance {
     }
 
     fn check_tuple(&self, tup: &[i64]) -> bool {
-        let mut slices: Vec<&[i64]> = Vec::with_capacity(self.total_var_slots());
+        // Apply the `!`-flip to every negated bool slot so the per-
+        // constraint checker (which knows nothing about negation) sees
+        // the same values minion would see internally for a
+        // `cons([!b, ...])` use. The flag is only set on Bool vars
+        // (domain {0,1}) so `1 - v` is the correct mapping.
+        let vars = self.vars();
+        let negated = self.negated_for_vars();
+        let mut flipped: Vec<i64> = Vec::with_capacity(tup.len());
+        let mut slice_lens: Vec<usize> = Vec::with_capacity(self.total_var_slots());
         let mut place: usize = 0;
-        for var in self.vars().iter() {
-            let i = var.len();
-            slices.push(&tup[place..place + i]);
-            place += i;
+        for (slot, var_list) in vars.iter().enumerate() {
+            let n = var_list.len();
+            let neg = negated.get(slot);
+            for i in 0..n {
+                let raw = tup[place + i];
+                let is_neg = neg.and_then(|s| s.get(i)).copied().unwrap_or(false);
+                if is_neg {
+                    debug_assert!(
+                        var_list[i].var_type == VarType::Bool,
+                        "negation flag set on non-Bool slot (slot {slot}, idx {i})"
+                    );
+                }
+                flipped.push(if is_neg { 1 - raw } else { raw });
+            }
+            slice_lens.push(n);
+            place += n;
+        }
+        let mut slices: Vec<&[i64]> = Vec::with_capacity(slice_lens.len());
+        let mut p = 0;
+        for &n in &slice_lens {
+            slices.push(&flipped[p..p + n]);
+            p += n;
         }
         (self.constraint.checker)(self, &slices)
     }
@@ -490,6 +589,11 @@ impl ConstraintInstance {
             return None;
         }
 
+        // Tableisation absorbs any `!` flags into the truth table T:
+        // `check_tuple` already flipped negated columns before deciding
+        // tuple membership, so T is in the underlying-var encoding and
+        // the table form needs no negation flags of its own.
+        let flat_len = self.vars().iter().flatten().count();
         Some(ConstraintInstance {
             constraint: STANDARD_TABLE_CONSTRAINT.clone(),
             varlist: {
@@ -497,7 +601,8 @@ impl ConstraintInstance {
                     self.vars().iter().flatten().cloned().collect();
                 Arc::new(vec![vars])
             },
-            tuples: Some(Tuples::new(tuples, self.vars().iter().flatten().count())),
+            negated_slots: Arc::new(vec![vec![false; flat_len]]),
+            tuples: Some(Tuples::new(tuples, flat_len)),
             short_tuples: None,
             child_constraints: vec![],
         })
@@ -693,9 +798,11 @@ pub fn build_random_instance_with_children_sized(
                 }
             }
         }
+        let negated_slots = build_negated_slots(&variables);
         let c = ConstraintInstance {
             constraint: constraint.clone(),
             varlist: Arc::new(variables),
+            negated_slots: Arc::new(negated_slots),
             tuples: generated_tuples,
             short_tuples: generated_short_tuples,
             child_constraints: constraints,
@@ -753,9 +860,11 @@ pub fn build_nested_instance(
                 }
             }
         }
+        let negated_slots = build_negated_slots(&variables);
         let c = ConstraintInstance {
             constraint: parent_def.clone(),
             varlist: Arc::new(variables),
+            negated_slots: Arc::new(negated_slots),
             tuples: generated_tuples,
             short_tuples: generated_short_tuples,
             child_constraints: constraints,
