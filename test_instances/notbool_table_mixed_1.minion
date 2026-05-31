@@ -1,0 +1,26 @@
+MINION 3
+#TEST CHECKONESOL 0
+# Negated-bool bootstrap: same `b` appears both plain and negated in the
+# same table constraint. The one tuple is `[0, 1]`, so `b = 0` and
+# `!b = 1`, both consistent. Dropping the `!` collapses the constraint to
+# `table([b, b], [[0, 1]])`, which is unsatisfiable (b cannot be both 0
+# and 1) -- the test fails because no solution is found.
+
+**VARIABLES**
+
+BOOL b
+
+**TUPLELIST**
+
+T 1 2
+0 1
+
+**SEARCH**
+
+PRINT [[b]]
+
+**CONSTRAINTS**
+
+table([b, !b], T)
+
+**EOF**
