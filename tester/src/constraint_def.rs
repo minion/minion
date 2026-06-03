@@ -31,6 +31,82 @@ fn current_size_factor() -> u32 {
     SIZE_FACTOR.load(Ordering::Relaxed).max(1)
 }
 
+/// Probability, in per-mille (0..=1000), that a non-constant variable
+/// slot reuses a variable already generated elsewhere in the *same*
+/// constraint tree -- meaning either an earlier slot of the same
+/// constraint, an ancestor's slot, or an earlier sibling subtree.
+/// `0` reproduces the historical all-fresh behaviour; `main` sets it
+/// from `--var-reuse`.
+///
+/// Sharing is what makes meta-constraints actually meta. With every
+/// child given its own disjoint variable universe (the pre-`pool`
+/// behaviour), `watched-and({eq(a, 1), eq(b, 1)})` is solver-
+/// equivalent to the two conjuncts run independently -- no
+/// propagation can flow between them, and the test is blind to bugs
+/// in the parent's child-state handling. Likewise within one
+/// constraint: aliasing-unsoundness bugs (occurrence's count vs
+/// counted, alldiff-on-the-same-var, etc.) only surface when the
+/// same `Arc<MinionVariable>` actually appears in multiple slots.
+pub static VAR_REUSE_PERMILLE: AtomicU32 = AtomicU32::new(0);
+
+fn reuse_roll() -> bool {
+    let p = VAR_REUSE_PERMILLE.load(Ordering::Relaxed).min(1000);
+    p != 0 && rand::thread_rng().gen_range(0..1000) < p
+}
+
+/// True if a freshly-minted variable of actual `var_type = actual`
+/// would have been an acceptable choice to fill a slot whose declared
+/// kind is `slot_kind`. Mirrors the per-kind acceptance map embedded
+/// in `MinionVariable::random_sized`: e.g. a `Bound` slot is allowed
+/// to be filled by Bound, SparseBound, Discrete, Bool, or Constant.
+/// Used when picking pool reuse candidates so we never substitute an
+/// incompatible type that the constraint's invariants don't expect.
+fn compatible_with_slot(slot_kind: VarType, actual: VarType) -> bool {
+    match slot_kind {
+        Constant => actual == Constant,
+        Bool => matches!(actual, Bool | Constant),
+        Discrete => matches!(actual, Discrete | Bool | Constant),
+        Bound | SparseBound => matches!(
+            actual,
+            Bound | SparseBound | Discrete | Bool | Constant
+        ),
+    }
+}
+
+/// Fill one variable slot of kind `d`: with probability
+/// [`VAR_REUSE_PERMILLE`] reuse a previously-generated non-constant
+/// variable from `pool` whose actual type satisfies
+/// [`compatible_with_slot`], otherwise mint a fresh one and (if it's
+/// non-constant) push it into `pool` so later slots can reuse it.
+///
+/// Constants are excluded from reuse: they're literal values, not
+/// shared state, so the only meaningful flavour of "reusing" a
+/// constant is using its value -- which a fresh Constant slot is
+/// equally happy to do, at the cost of nothing.
+fn pool_or_fresh(
+    pool: &mut Vec<Arc<MinionVariable>>,
+    d: VarType,
+    size_factor: u32,
+) -> Arc<MinionVariable> {
+    if d != Constant && reuse_roll() {
+        let mut rng = rand::thread_rng();
+        let compatible: Vec<usize> = pool
+            .iter()
+            .enumerate()
+            .filter(|(_, v)| v.var_type != Constant && compatible_with_slot(d, v.var_type))
+            .map(|(i, _)| i)
+            .collect();
+        if let Some(&idx) = compatible.choose(&mut rng) {
+            return pool[idx].clone();
+        }
+    }
+    let v = MinionVariable::random_sized(d, size_factor);
+    if v.var_type != Constant {
+        pool.push(v.clone());
+    }
+    v
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum VarType {
     Constant,
@@ -586,8 +662,29 @@ pub fn build_random_instance_with_children_sized(
     children: &[&ConstraintDef],
     size_factor: u32,
 ) -> ConstraintInstance {
+    // Public entry: each top-level call starts with an empty pool.
+    // Recursive child calls thread the same `&mut pool` through so a
+    // child can reuse vars the parent (or an earlier sibling subtree)
+    // already minted.
+    let mut pool: Vec<Arc<MinionVariable>> = Vec::new();
+    build_with_pool(constraint, children, size_factor, &mut pool)
+}
+
+/// Internal kernel for [`build_random_instance_with_children_sized`].
+/// Threads a single mutable variable pool through the parent's own
+/// slots and into all recursive child builds so that the resulting
+/// tree can have cross-slot and cross-child variable sharing.
+fn build_with_pool(
+    constraint: &ConstraintDef,
+    children: &[&ConstraintDef],
+    size_factor: u32,
+    pool: &mut Vec<Arc<MinionVariable>>,
+) -> ConstraintInstance {
     let f = size_factor.max(1) as usize;
     loop {
+        // Snapshot pool length so a `valid_instance`-rejected attempt
+        // doesn't leak its partial vars into the next attempt's pool.
+        let pool_checkpoint = pool.len();
         let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
         let mut constraints: Vec<ConstraintInstance> = vec![];
         let mut constraint_child = 0;
@@ -597,13 +694,13 @@ pub fn build_random_instance_with_children_sized(
         for i in 0..constraint.arg.len() {
             match constraint.arg[i] {
                 Var(d) => {
-                    variables.push(vec![MinionVariable::random_sized(d, size_factor)]);
+                    variables.push(vec![pool_or_fresh(pool, d, size_factor)]);
                 }
                 List(d) => {
                     let len = rand::random::<usize>() % (5 * f);
                     variables.push(
                         (0..len)
-                            .map(|_x| MinionVariable::random_sized(d, size_factor))
+                            .map(|_x| pool_or_fresh(pool, d, size_factor))
                             .collect(),
                     );
                 }
@@ -633,11 +730,10 @@ pub fn build_random_instance_with_children_sized(
                         owned_child = leafs[idx].clone();
                         &owned_child
                     };
-                    constraints.push(build_random_instance_with_children_sized(
-                        child_def,
-                        &[],
-                        size_factor,
-                    ));
+                    // Recurse with the SAME pool: the child can reuse
+                    // any variable the parent already minted, and any
+                    // earlier sibling's vars are visible too.
+                    constraints.push(build_with_pool(child_def, &[], size_factor, pool));
                     constraint_child += 1;
                 }
             }
@@ -652,60 +748,7 @@ pub fn build_random_instance_with_children_sized(
         if (constraint.valid_instance)(&c) {
             return c;
         }
-    }
-}
-
-/// Wrap a parent `ConstraintDef` around pre-built child instances.
-///
-/// Unlike `build_random_instance_with_children`, which takes child
-/// *defs* and always builds 1-level-deep subtrees for them, this
-/// version accepts full `ConstraintInstance` trees — the children
-/// can themselves be parents with grandchildren. Used by the
-/// depth-N nested random-tree generator below.
-pub fn build_nested_instance(
-    parent_def: &ConstraintDef,
-    child_instances: &[ConstraintInstance],
-) -> ConstraintInstance {
-    let f = current_size_factor() as usize;
-    loop {
-        let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
-        let mut constraints: Vec<ConstraintInstance> = vec![];
-        let mut constraint_child = 0;
-        let mut generated_tuples: Option<Tuples> = None;
-        let mut generated_short_tuples: Option<ShortTuples> = None;
-
-        for i in 0..parent_def.arg.len() {
-            match parent_def.arg[i] {
-                Var(d) => {
-                    variables.push(vec![MinionVariable::random(d)]);
-                }
-                List(d) => {
-                    let len = rand::random::<usize>() % (5 * f);
-                    variables.push((0..len).map(|_x| MinionVariable::random(d)).collect());
-                }
-                Tuples => {
-                    generated_tuples = generate_random_tuples_from_vars(&variables);
-                }
-                ShortTuples => {
-                    generated_short_tuples = generate_random_short_tuples_from_vars(&variables);
-                }
-                Constraint => {
-                    variables.push(vec![]);
-                    constraints.push(child_instances[constraint_child].clone());
-                    constraint_child += 1;
-                }
-            }
-        }
-        let c = ConstraintInstance {
-            constraint: parent_def.clone(),
-            varlist: Arc::new(variables),
-            tuples: generated_tuples,
-            short_tuples: generated_short_tuples,
-            child_constraints: constraints,
-        };
-        if (parent_def.valid_instance)(&c) {
-            return c;
-        }
+        pool.truncate(pool_checkpoint);
     }
 }
 
@@ -733,9 +776,28 @@ pub fn build_nested_instance(
 /// The shortlist excludes `forwardchecking` / `check[gsa]` /
 /// `check[assign]` — those are thin wrappers whose interactions
 /// with each other aren't structurally interesting for this test.
+///
+/// A single variable pool threads through the entire tree (parent
+/// slots and all descendant subtrees), so [`VAR_REUSE_PERMILLE`]
+/// controls how often a child slot draws a variable that an ancestor
+/// or earlier sibling has already minted. Without that, every child
+/// gets a disjoint variable universe and meta-constraints test
+/// nothing about interaction across their children.
 pub fn build_random_nested_tree(leaf_def: &ConstraintDef, depth: usize) -> ConstraintInstance {
+    let mut pool: Vec<Arc<MinionVariable>> = Vec::new();
+    nested_with_pool(leaf_def, depth, &mut pool)
+}
+
+/// Internal kernel for [`build_random_nested_tree`]. Threads `pool`
+/// through depth-N recursion so the entire tree shares one variable
+/// universe.
+fn nested_with_pool(
+    leaf_def: &ConstraintDef,
+    depth: usize,
+    pool: &mut Vec<Arc<MinionVariable>>,
+) -> ConstraintInstance {
     if depth == 0 {
-        return build_random_instance(leaf_def);
+        return build_with_pool(leaf_def, &[], current_size_factor(), pool);
     }
     let mut rng = rand::thread_rng();
 
@@ -752,29 +814,65 @@ pub fn build_random_nested_tree(leaf_def: &ConstraintDef, depth: usize) -> Const
         .find(|d| d.name == *name)
         .expect("shortlist name not in NESTED_CONSTRAINT_LIST");
 
-    let n_children = parent_def
-        .arg
-        .iter()
-        .filter(|a| matches!(a, Arg::Constraint))
-        .count();
+    let size_factor = current_size_factor();
+    let f = size_factor as usize;
+    loop {
+        let pool_checkpoint = pool.len();
+        let mut variables: Vec<Vec<Arc<MinionVariable>>> = vec![];
+        let mut constraints: Vec<ConstraintInstance> = vec![];
+        let mut constraint_child = 0;
+        let mut generated_tuples: Option<Tuples> = None;
+        let mut generated_short_tuples: Option<ShortTuples> = None;
 
-    let mut child_instances: Vec<ConstraintInstance> = Vec::with_capacity(n_children);
-    for i in 0..n_children {
-        // First child always carries the iterated leaf (via recursion).
-        // Sibling children use a random leaf from the top-level list,
-        // wrapped to the same depth so we actually get cross-type
-        // nesting at multiple levels rather than an asymmetric tree.
-        let inner = if i == 0 {
-            leaf_def
-        } else {
-            CONSTRAINT_LIST
-                .choose(&mut rng)
-                .expect("CONSTRAINT_LIST empty")
+        for i in 0..parent_def.arg.len() {
+            match parent_def.arg[i] {
+                Var(d) => {
+                    variables.push(vec![pool_or_fresh(pool, d, size_factor)]);
+                }
+                List(d) => {
+                    let len = rand::random::<usize>() % (5 * f);
+                    variables.push(
+                        (0..len)
+                            .map(|_x| pool_or_fresh(pool, d, size_factor))
+                            .collect(),
+                    );
+                }
+                Tuples => {
+                    generated_tuples = generate_random_tuples_from_vars(&variables);
+                }
+                ShortTuples => {
+                    generated_short_tuples = generate_random_short_tuples_from_vars(&variables);
+                }
+                Constraint => {
+                    variables.push(vec![]);
+                    // First child carries the iterated leaf (recursive).
+                    // Sibling slots pick a random leaf from the full
+                    // list, wrapped to the same depth so we get
+                    // symmetric cross-type nesting at every level.
+                    let inner = if constraint_child == 0 {
+                        leaf_def
+                    } else {
+                        CONSTRAINT_LIST
+                            .choose(&mut rng)
+                            .expect("CONSTRAINT_LIST empty")
+                    };
+                    constraints.push(nested_with_pool(inner, depth - 1, pool));
+                    constraint_child += 1;
+                }
+            }
+        }
+        let c = ConstraintInstance {
+            constraint: parent_def.clone(),
+            varlist: Arc::new(variables),
+            tuples: generated_tuples,
+            short_tuples: generated_short_tuples,
+            child_constraints: constraints,
         };
-        child_instances.push(build_random_nested_tree(inner, depth - 1));
+        if (parent_def.valid_instance)(&c) {
+            return c;
+        }
+        pool.truncate(pool_checkpoint);
     }
-
-    build_nested_instance(parent_def, &child_instances)
 }
 
 fn check_alldiff(v: &[&[i64]]) -> bool {
@@ -848,7 +946,25 @@ fn valid_gcc(c: &ConstraintInstance) -> bool {
     }
     let vals: Vec<i64> = c.vars()[1].iter().map(|v| v.get_value()).collect();
     let unique: HashSet<i64> = vals.iter().cloned().collect();
-    unique.len() == vals.len()
+    if unique.len() != vals.len() {
+        return false;
+    }
+    // gcc/gccweak refuse the same variable in both the counted vector
+    // (slot 0) and the cardinality vector (slot 2) -- the incremental
+    // matching cannot stay consistent with that aliasing, so minion
+    // rejects the instance at construction. Repeats within either
+    // vector alone are fine. Compare by name; constants don't count
+    // (they're not shared state).
+    let vars = c.vars();
+    let counted_names: HashSet<String> = vars[0]
+        .iter()
+        .filter(|v| v.var_type != VarType::Constant)
+        .map(|v| v.name.clone())
+        .collect();
+    !vars[2]
+        .iter()
+        .filter(|v| v.var_type != VarType::Constant)
+        .any(|v| counted_names.contains(&v.name))
 }
 
 fn check_table(c: &ConstraintInstance, v: &[&[i64]]) -> bool {

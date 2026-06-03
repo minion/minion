@@ -172,9 +172,17 @@ fn print_variable_def<F: Write>(f: &mut F, doms: &MinionVariable) -> Result<()> 
 }
 
 fn print_variables_def<F: Write>(f: &mut F, con: &ConstraintInstance) -> Result<()> {
+    // A reused variable appears in several slots but must be declared
+    // exactly once -- minion rejects a duplicate `BOUND x20 ...` even
+    // when both declarations would be byte-identical. Dedupe by name.
+    // Constants are emitted as literals rather than declared, so
+    // print_variable_def skips them regardless.
+    let mut seen = std::collections::HashSet::new();
     for list in con.vars().iter() {
         for item in list.iter() {
-            print_variable_def(f, item)?;
+            if seen.insert(item.name.clone()) {
+                print_variable_def(f, item)?;
+            }
         }
     }
 

@@ -181,6 +181,19 @@ struct Opt {
     #[arg(long, default_value_t = 1)]
     size_factor: u32,
 
+    /// Probability (0.0..=1.0) that a non-constant variable slot
+    /// reuses a variable already minted elsewhere in the same
+    /// constraint tree rather than minting a fresh one. Reuse spans
+    /// the parent's own slots and every descendant subtree: with
+    /// reuse off, `watched-and({eq(a, 1), eq(b, 1)})` is two
+    /// independent conjuncts the solver decomposes trivially, and
+    /// nothing about parent-child propagation is actually tested.
+    /// Reuse also surfaces aliasing-unsoundness bugs in propagators
+    /// that mishandle the same variable appearing in two argument
+    /// positions. `0` reproduces the historical all-fresh behaviour.
+    #[arg(long, default_value_t = 0.1)]
+    var_reuse: f64,
+
     /// Cap for the per-constraint adaptive growth in the work-steal
     /// pass. Each constraint starts at `--size-factor` (or 1) and
     /// doubles until at least one trial reports a non-zero donation
@@ -301,6 +314,13 @@ fn main() -> Result<()> {
     // Wire --size-factor into the global so build_random_instance
     // (called from many places without a config arg) picks it up.
     constraint_def::SIZE_FACTOR.store(opt.size_factor.max(1), std::sync::atomic::Ordering::Relaxed);
+
+    // Wire --var-reuse into the global variable-reuse probability
+    // (stored as per-mille). Same rationale as SIZE_FACTOR.
+    constraint_def::VAR_REUSE_PERMILLE.store(
+        (opt.var_reuse.clamp(0.0, 1.0) * 1000.0).round() as u32,
+        std::sync::atomic::Ordering::Relaxed,
+    );
 
     rayon::ThreadPoolBuilder::new()
         .num_threads(opt.numthreads)
