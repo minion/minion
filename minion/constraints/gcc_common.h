@@ -1894,7 +1894,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     //  First check for any invalid pairs in varvalmatching
     //  This can happen if there are variables shared between the cardinality and target arrays, and a cardinality variable is pruned, 
     //  removing the target array value in varvalmatching.  
-    for(SysInt i = 0; i < numvars; i++) {
+    for(SysInt varidx = 0; varidx < vars_in_scc.size(); varidx++) {
+      SysInt i=vars_in_scc[varidx];
       if(varvalmatching[i] != domMin-1 && !varArray[i].inDomain(varvalmatching[i])) {
         //  Wait for the propagator to be triggered again by the removal of varvalmatching[i], so that the matching (and GAC on the target variables) can be restored before doing cardinality variable pruning. 
         return existinglb;
@@ -2096,9 +2097,10 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     //  First check for any invalid pairs in varvalmatching
     //  This can happen if there are variables shared between the cardinality and target arrays, and a cardinality variable is pruned, 
     //  removing the target array value in varvalmatching.  
-    for(SysInt i = 0; i < numvars; i++) {
+    for(SysInt varidx = 0; varidx < vars_in_scc.size(); varidx++) {
+      SysInt i=vars_in_scc[varidx];
       if(varvalmatching[i] != domMin-1 && !varArray[i].inDomain(varvalmatching[i])) {
-        //  Wait for the propagator to be triggered again by the removal of varvalmatching[i], so that the matching (and GAC on the target variables) can be restored. 
+        //  Wait for the propagator to be triggered again by the removal of varvalmatching[i], so that the matching (and GAC on the target variables) can be restored before doing cardinality variable pruning. 
         return existingub;
       }
     }
