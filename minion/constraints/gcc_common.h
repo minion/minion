@@ -1890,7 +1890,17 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   inline SysInt bfsmatching_cardLowerbound(SysInt forbiddenval, SysInt existinglb) {
     // lower and upper are indexed by value-domMin and provide the capacities.
     // usage is the number of times a value is used in the matching.
-
+    
+    //  First check for any invalid pairs in varvalmatching
+    //  This can happen if there are variables shared between the cardinality and target arrays, and a cardinality variable is pruned, 
+    //  removing the target array value in varvalmatching.  
+    for(SysInt i = 0; i < numvars; i++) {
+      if(varvalmatching[i] != domMin-1 && !varArray[i].inDomain(varvalmatching[i])) {
+        //  Wait for the propagator to be triggered again by the removal of varvalmatching[i], so that the matching (and GAC on the target variables) can be restored before doing cardinality variable pruning. 
+        return existinglb;
+      }
+    }
+    
     if(existinglb == usage[forbiddenval - domMin]) {
       // bound already supported
       return existinglb;
@@ -2071,7 +2081,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 
   // By changing the flow in cardUpperbound and not restoring it,
   // might compromize the the worst-case analysis of the lowerbound thing...
-  // it requires the same flow so that it only looks for a mazimum of r paths.
+  // it requires the same flow so that it only looks for a maximum of r paths.
 
   // Actually might be better to not restore the matching here, because it calls
   // lowerbound then upperbound for value a, then moves onto next value b.
@@ -2082,7 +2092,17 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   inline SysInt cardUpperbound(SysInt value, SysInt existingub) {
     // lower and upper are indexed by value-domMin and provide the capacities.
     // usage is the number of times a value is used in the matching.
-
+    
+    //  First check for any invalid pairs in varvalmatching
+    //  This can happen if there are variables shared between the cardinality and target arrays, and a cardinality variable is pruned, 
+    //  removing the target array value in varvalmatching.  
+    for(SysInt i = 0; i < numvars; i++) {
+      if(varvalmatching[i] != domMin-1 && !varArray[i].inDomain(varvalmatching[i])) {
+        //  Wait for the propagator to be triggered again by the removal of varvalmatching[i], so that the matching (and GAC on the target variables) can be restored. 
+        return existingub;
+      }
+    }
+    
     if(existingub == usage[value - domMin]) {
       // bound is already supported
       return existingub;
@@ -2118,19 +2138,17 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
           // follow the matching edge, if there is one.
           SysInt valtoqueue = varvalmatching[curnode];
           if(valtoqueue != domMin - 1 && !visited.in(valtoqueue - domMin + numvars)) {
-            //D_ASSERT(varArray[curnode].inDomain(valtoqueue));   // Not true in very rare case where one variable occurs twice in cardinalities and also in target array. 
-            if(varArray[curnode].inDomain(valtoqueue)) {
-              SysInt validx = valtoqueue - domMin + numvars;
-              if(usage[valtoqueue - domMin] > lower[valtoqueue - domMin]) {
-                // can reduce the flow of valtoqueue to increase startval.
-                prev[validx] = curnode;
-                apply_augmenting_path(validx, startvalindex + numvars);
-                finished = true;
-              } else {
-                visited.insert(validx);
-                prev[validx] = curnode;
-                fifo.push_back(validx);
-              }
+            D_ASSERT(varArray[curnode].inDomain(valtoqueue));
+            SysInt validx = valtoqueue - domMin + numvars;
+            if(usage[valtoqueue - domMin] > lower[valtoqueue - domMin]) {
+              // can reduce the flow of valtoqueue to increase startval.
+              prev[validx] = curnode;
+              apply_augmenting_path(validx, startvalindex + numvars);
+              finished = true;
+            } else {
+              visited.insert(validx);
+              prev[validx] = curnode;
+              fifo.push_back(validx);
             }
           }
         } else { // popped a value from the stack.
