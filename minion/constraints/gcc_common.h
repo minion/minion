@@ -2118,17 +2118,19 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
           // follow the matching edge, if there is one.
           SysInt valtoqueue = varvalmatching[curnode];
           if(valtoqueue != domMin - 1 && !visited.in(valtoqueue - domMin + numvars)) {
-            D_ASSERT(varArray[curnode].inDomain(valtoqueue));
-            SysInt validx = valtoqueue - domMin + numvars;
-            if(usage[valtoqueue - domMin] > lower[valtoqueue - domMin]) {
-              // can reduce the flow of valtoqueue to increase startval.
-              prev[validx] = curnode;
-              apply_augmenting_path(validx, startvalindex + numvars);
-              finished = true;
-            } else {
-              visited.insert(validx);
-              prev[validx] = curnode;
-              fifo.push_back(validx);
+            //D_ASSERT(varArray[curnode].inDomain(valtoqueue));   // Not true in very rare case where one variable occurs twice in cardinalities and also in target array. 
+            if(varArray[curnode].inDomain(valtoqueue)) {
+              SysInt validx = valtoqueue - domMin + numvars;
+              if(usage[valtoqueue - domMin] > lower[valtoqueue - domMin]) {
+                // can reduce the flow of valtoqueue to increase startval.
+                prev[validx] = curnode;
+                apply_augmenting_path(validx, startvalindex + numvars);
+                finished = true;
+              } else {
+                visited.insert(validx);
+                prev[validx] = curnode;
+                fifo.push_back(validx);
+              }
             }
           }
         } else { // popped a value from the stack.
