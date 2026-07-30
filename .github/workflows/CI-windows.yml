@@ -47,9 +47,12 @@ jobs:
                 dir
                 .\build.bat
 
-      - uses: hecrj/setup-rust-action@v2
-
-      - name: "Rust tests"
+      # The Rust tester is not run here: it depends on minion-sys, whose
+      # build script builds libminion via bash/make and only knows how to
+      # link the C++ runtime on apple and linux targets. Windows coverage
+      # is the C++ binary plus the basic instance tests below.
+      - name: "Basic tests"
+        shell: bash
         run: |
-              cd tester
-              cargo run --release -- --minion ../bin-quick/minion.exe
+              cd test_instances
+              bash ./do_basic_tests.sh ../bin-quick/minion.exe
