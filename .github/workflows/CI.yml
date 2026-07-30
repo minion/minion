@@ -20,6 +20,11 @@ jobs:
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    # GitHub cancels a job at its 6 h default with no useful diagnostic —
+    # every scheduled run from at least 2026-07-12 died that way, stuck in
+    # the exec-mode tester step below. Fail loudly and early instead. The
+    # deliberately long soak lives in CI-long.yml.
+    timeout-minutes: 120
     defaults:
       run:
         shell: ${{ matrix.shell }}
@@ -52,24 +57,41 @@ jobs:
               cd test_instances
               bash ./run_tests.sh ../bin-quick/minion
       
+      # Bounded explicitly rather than run on the tester's defaults. One
+      # exec-mode invocation runs nine sweeps (baseline, nested, -parallel,
+      # work-steal, work-steal portfolio, parallel-preprocess, restarts,
+      # variant-equivalence, options) across every constraint, and the three
+      # adaptive sweeps double instance size per constraint until they see a
+      # donation or hit --ws-max-size. At the defaults (--count 30,
+      # --optioncount 1000, --ws-max-size 32) that does not finish inside a
+      # 6 h job. --ws-max-size 1 pins the adaptive sweeps to a single round;
+      # the sizes that actually exercise donation live in CI-long.yml.
       - name: "Rust tests"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --minion ../bin-quick/minion
+              cargo run --release -- --minion ../bin-quick/minion \
+                --count 5 --variant-count 5 --optioncount 200 \
+                --ws-max-size 1 --numthreads 4
 
-      # Exercises the deep-nested (cross-type parent trees) and
-      # size-factor=2 paths that the default Rust tests step doesn't
-      # touch. Counts kept small to fit the CI budget; this is a smoke
-      # test, not full coverage. Variant-equivalence and restart sweeps
-      # already run inside the default-args sweep above.
-      - name: "Rust tests: nested + size-factor smoke"
+      # Exercises the deep-nested (cross-type parent trees) path that the
+      # Rust tests step above doesn't touch. --variant-count 0 skips the
+      # variant-equivalence sweep, which the step above already ran and
+      # which doesn't depend on --nest-depth.
+      #
+      # Deliberately at --size-factor 1. At --size-factor 2 a *single*
+      # trial can run for tens of minutes, so bounding --count does not
+      # bound wall clock: --count 2 here was still inside the second of
+      # seven sweeps after 25 minutes, at 24% CPU (one trial grinding,
+      # not parallel work). The tester has no per-trial time limit, so
+      # scaled-up instances belong in CI-long.yml, not on every push.
+      - name: "Rust tests: nested smoke"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
               cargo run --release -- --minion ../bin-quick/minion \
-                --count 10 --variant-count 20 --optioncount 100 \
-                --nest-depth 2 --size-factor 2 --numthreads 4
+                --count 5 --variant-count 0 --optioncount 100 \
+                --nest-depth 2 --size-factor 1 --ws-max-size 1 --numthreads 4
 
       # minion-sys integration tests (test_work_steal, test_parallel_search,
       # test_seed_determinism, etc.). These exercise the FFI surface of
