@@ -45,7 +45,7 @@ for i in *.minion; do
   extraflags=`grep "#TEST EXTRAFLAGS" $i | awk '{print $3}'`
   if grep -q "#TEST SOLCOUNT" $i;
     then
-    numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | ../mini-scripts/get_info.sh solutions`
+    numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | ../mini-scripts/get_info.sh solutions | tr -d '\015'`
     testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
     if [[ "$numsols" != "$testnumsols" ]]; then
       testpass=0
@@ -55,7 +55,7 @@ for i in *.minion; do
     fi
   else
     if grep -q "#TEST CHECKONESOL" $i; then
-      sol=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/print_sol.sh`
+      sol=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/print_sol.sh | tr -d '\015'`
       # That "tr" is just to deal with line ending problems.
       testsol=`grep "#TEST CHECKONESOL" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015' `
 
@@ -72,7 +72,7 @@ for i in *.minion; do
     else
       if grep -q "#TEST NODECOUNT" $i;
         then
-        numnodes=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/get_info.sh nodes`
+        numnodes=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/get_info.sh nodes | tr -d '\015'`
         testnumnodes=`grep "#TEST NODECOUNT" $i  | awk '{print $3}' | tr -d '\015' `
         if [[ "$numnodes" != "$testnumnodes" ]]; then
           testpass=0
