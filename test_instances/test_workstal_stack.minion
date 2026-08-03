@@ -1,0 +1,34 @@
+MINION 3
+# Regression test: worker threads under -X-parallelWorkSteal were created
+# with std::thread, so they got the platform default stack (512 KB on
+# macOS) instead of the main thread's 8 MB. A worker running the solver
+# overflowed its stack and killed the whole process with SIGBUS. Reduced
+# by delta debugging from a random tester instance.
+#TEST SOLCOUNT 2
+#TEST EXTRAFLAGS -X-parallelWorkSteal 4
+**VARIABLES**
+DISCRETE v1 {-152..153}
+DISCRETE v2 {-151..157}
+DISCRETE v3 {-154..158}
+DISCRETE v4 {-159..155}
+DISCRETE v5 {-158..158}
+BOOL v6
+DISCRETE v7 {-160..156}
+DISCRETE v8 {144..145}
+DISCRETE v9 {-160..159}
+BOOL v10
+DISCRETE v11 {-119..159}
+DISCRETE v12 {-143..151}
+DISCRETE v13 {-160..159}
+DISCRETE v14 {-154..152}
+DISCRETE v15 {-155..159}
+BOOL v16
+DISCRETE v17 {119..121}
+**CONSTRAINTS**
+diseq(v17, 120)
+**TUPLELIST**
+tuples1941363 1 17
+33 -40 27 99 105 0 145 -142 1 118 94 83 -152 -135 36 -42 0
+**CONSTRAINTS**
+gacschema([v2, v1, v3, v4, v5, v6, v8, v9, v10, v11, v12, 83, v13, v14, v15, v7, v16], tuples1941363)
+**EOF**
