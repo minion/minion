@@ -42,7 +42,9 @@ for i in *.minion; do
     bug=0
   fi
 
-  extraflags=`grep "#TEST EXTRAFLAGS" $i | awk '{print $3}'`
+  # Everything after "#TEST EXTRAFLAGS", so a flag that takes an argument
+  # (e.g. -X-parallelWorkSteal 4) survives; $3 alone dropped the argument.
+  extraflags=`grep "#TEST EXTRAFLAGS" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015'`
   if grep -q "#TEST SOLCOUNT" $i;
     then
     numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | ../mini-scripts/get_info.sh solutions | tr -d '\015'`
