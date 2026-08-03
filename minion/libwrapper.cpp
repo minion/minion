@@ -20,6 +20,8 @@
 #include <limits>
 #include <memory>
 #include <cstdlib>
+#include <functional>
+#include <pthread.h>
 
 #ifdef LIBMINION
 
@@ -28,6 +30,67 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args);
 void finaliseModel(CSPInstance& instance);
 
 extern thread_local Globals* globals;
+
+// A worker thread runs the whole solver -- model copy, setup, propagation
+// and search -- exactly as the main thread does when running sequentially.
+// std::thread gives a new thread the platform default stack, which on macOS
+// is 512 KB against the main thread's 8 MB, so work that succeeds
+// sequentially runs a worker off the end of its stack and kills the whole
+// process with SIGBUS. Create workers with an explicit stack instead, so a
+// worker gets what the main thread gets on every platform.
+namespace {
+constexpr size_t workerStackBytes = 8u * 1024 * 1024;
+
+class WorkerThread {
+public:
+  explicit WorkerThread(std::function<void()> body) {
+    auto* payload = new std::function<void()>(std::move(body));
+    pthread_attr_t attr;
+    if(pthread_attr_init(&attr) != 0) {
+      delete payload;
+      throw parse_exception("cannot create worker thread attributes");
+    }
+    if(pthread_attr_setstacksize(&attr, workerStackBytes) != 0) {
+      pthread_attr_destroy(&attr);
+      delete payload;
+      throw parse_exception("cannot set worker thread stack size");
+    }
+    int err = pthread_create(&tid, &attr, &WorkerThread::trampoline, payload);
+    pthread_attr_destroy(&attr);
+    if(err != 0) {
+      delete payload;
+      throw parse_exception("cannot create worker thread");
+    }
+  }
+
+  WorkerThread(const WorkerThread&) = delete;
+  WorkerThread& operator=(const WorkerThread&) = delete;
+  WorkerThread(WorkerThread&& o) : tid(o.tid), joined(o.joined) {
+    o.joined = true;
+  }
+
+  void join() {
+    D_ASSERT(!joined);
+    pthread_join(tid, NULL);
+    joined = true;
+  }
+
+  ~WorkerThread() {
+    D_ASSERT(joined);
+  }
+
+private:
+  static void* trampoline(void* p) {
+    std::unique_ptr<std::function<void()>> body(
+        static_cast<std::function<void()>*>(p));
+    (*body)();
+    return NULL;
+  }
+
+  pthread_t tid;
+  bool joined = false;
+};
+} // namespace
 
 static thread_local std::string ffi_error_message;
 
@@ -417,7 +480,7 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
   // already pruning, and each worker's own lastOptimumValues
   // monotonically improves under its local lock.
   std::vector<std::vector<DomainInt>> perWorkerOptValues(N);
-  std::vector<std::thread> workers;
+  std::vector<WorkerThread> workers;
   workers.reserve(N);
 
   // Pre-finalise the shared instance ONCE (it mutates default searchOrder /
@@ -742,7 +805,7 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
   // before each worker frees its context, then aggregated by the
   // parent after join.
   std::vector<std::vector<DomainInt>> perWorkerOptValues(N);
-  std::vector<std::thread> workers;
+  std::vector<WorkerThread> workers;
   workers.reserve(N);
 
   for(int i = 0; i < N; ++i) {
