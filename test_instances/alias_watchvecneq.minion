@@ -1,0 +1,11 @@
+MINION 3
+#TEST SOLCOUNT 0
+# Regression (VecNeqDynamic family): the two vectors are literally identical
+# ([x,x] vs [x,x]) so they can never differ; must be unsatisfiable.
+**VARIABLES**
+DISCRETE x {0..3}
+**SEARCH**
+PRINT[[x]]
+**CONSTRAINTS**
+watchvecneq([x, x], [x, x])
+**EOF**

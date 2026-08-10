@@ -1,0 +1,12 @@
+MINION 3
+#TEST SOLCOUNT 0
+# Regression (VecNeqDynamic family): when both vector entries at the deciding
+# index are the same variable, the x<x pruning was not re-triggered because
+# the watch was attached after propagating. Should be unsatisfiable.
+**VARIABLES**
+DISCRETE y {-9..-7}
+**SEARCH**
+PRINT[[y]]
+**CONSTRAINTS**
+watchvecexists_less([-7, y], [y, y])
+**EOF**
