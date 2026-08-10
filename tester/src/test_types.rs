@@ -284,8 +284,14 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
     // Node-count equality is a GAC-propagator invariant only when the
     // ordering is state-free (Static + Ascend/Descend); state-dependent
     // heuristics explore different trees against the weaker tabulated
-    // propagator even when the solution sets match.
-    if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
+    // propagator even when the solution sets match. Repeated variables
+    // (from --var-reuse) also void the invariant: propagators must stay
+    // sound under aliasing but aren't expected to achieve GAC.
+    if instance.constraint.gac
+        && !instance.has_repeated_vars()
+        && config.deterministic_ordering()
+        && ret.nodes != ret2.nodes
+    {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -319,7 +325,7 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
         )));
     }
 
-    if instance.constraint.gac && ret.nodes != ret2.nodes {
+    if instance.constraint.gac && !instance.has_repeated_vars() && ret.nodes != ret2.nodes {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename
@@ -1754,7 +1760,11 @@ pub fn test_constraint_nested(
             &ret2.solutions.sample[..m],
         )));
     }
-    if instance.constraint.gac && config.deterministic_ordering() && ret.nodes != ret2.nodes {
+    if instance.constraint.gac
+        && !instance.has_repeated_vars()
+        && config.deterministic_ordering()
+        && ret.nodes != ret2.nodes
+    {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}",
             ret.filename, ret2.filename

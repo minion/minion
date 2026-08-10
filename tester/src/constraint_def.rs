@@ -406,6 +406,27 @@ impl ConstraintInstance {
         Arc::new(varlist)
     }
 
+    /// True if the same variable (by `Arc` identity) fills more than
+    /// one slot anywhere in this constraint tree. Constants don't
+    /// count: they're literal values, not shared state. Used to skip
+    /// the GAC node-count assertion — propagators aren't expected to
+    /// achieve GAC when a variable is repeated, only to stay sound.
+    pub fn has_repeated_vars(&self) -> bool {
+        let vars = self.vars();
+        let mut seen: Vec<*const MinionVariable> = Vec::new();
+        for v in vars.iter().flatten() {
+            if v.var_type == Constant {
+                continue;
+            }
+            let p = Arc::as_ptr(v);
+            if seen.contains(&p) {
+                return true;
+            }
+            seen.push(p);
+        }
+        false
+    }
+
     fn total_var_slots(&self) -> usize {
         self.varlist.len()
             + self
