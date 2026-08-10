@@ -343,11 +343,17 @@ struct VecNeqDynamic : public AbstractConstraint {
 
     // There is only one possible pair allowed...
     if(index == size) {
-      propagate_from_var1(watchedIndex0);
-      propagate_from_var2(watchedIndex0);
+      // Attach triggers before propagating: if the pair's variables
+      // alias each other, propagate_from_var1/var2 change the very
+      // variables we watch, and events on a variable with an empty
+      // trigger list are dropped rather than queued. Attaching first
+      // means those events re-fire propagateDynInt, which iterates
+      // to a fixpoint just as it does during search.
       propagate_mode = true;
       indexToPropagate = watchedIndex0;
       addTriggers(watchedIndex0, 0);
+      propagate_from_var1(watchedIndex0);
+      propagate_from_var2(watchedIndex0);
       return;
     }
 
