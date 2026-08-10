@@ -94,10 +94,19 @@ struct LiteralSumConstraintDynamic : public AbstractConstraint {
       return;
     } else if(triggers_wanted == 1) // Then we can propagate
     {                               // We never even set up triggers
+      // Exactly varSum literals are still satisfiable and all must be made
+      // true. Snapshot them first, then assign unconditionally: if two are
+      // the same variable needing different values (an aliased instance),
+      // the second assign hits an out-of-domain value and wipes out the
+      // domain, correctly failing. Re-checking inDomain per assign would
+      // instead silently skip the contradicted literal and undercount.
+      vector<SysInt> toAssign;
       for(SysInt i = 0; i < arraySize; ++i) {
-        if(varArray[i].inDomain(value_array[i])) {
-          varArray[i].assign(value_array[i]);
-        }
+        if(varArray[i].inDomain(value_array[i]))
+          toAssign.push_back(i);
+      }
+      for(SysInt k = 0; k < (SysInt)toAssign.size(); ++k) {
+        varArray[toAssign[k]].assign(value_array[toAssign[k]]);
       }
     } else // Now set up triggers
     {

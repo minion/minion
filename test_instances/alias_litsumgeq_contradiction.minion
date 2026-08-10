@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 0
+# Regression: litsumgeq with one variable in two literal positions needing
+# different values. x cannot equal both 4 and 2, so the count is < 2 always;
+# the watched-literal force-assign used to satisfy only one literal and
+# wrongly report x=4 as a solution.
+**VARIABLES**
+DISCRETE x {0..5}
+**SEARCH**
+PRINT[[x]]
+**CONSTRAINTS**
+litsumgeq([x, x], [4, 2], 2)
+**EOF**

@@ -1,0 +1,11 @@
+MINION 3
+#TEST SOLCOUNT 1
+# Companion to the contradiction case: both literals want the same value, so
+# x=3 satisfies both and is the unique solution.
+**VARIABLES**
+DISCRETE x {0..5}
+**SEARCH**
+PRINT[[x]]
+**CONSTRAINTS**
+litsumgeq([x, x], [3, 3], 2)
+**EOF**
