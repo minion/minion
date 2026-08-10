@@ -1,0 +1,14 @@
+MINION 3
+#TEST SOLCOUNT 4
+# Regression: occurrence with the count variable aliased into the counted
+# vector. The aliased element was double-counted (setupCounters + a queued
+# Assigned trigger), giving 0 solutions instead of 4.
+**VARIABLES**
+DISCRETE x0 {-2..0}
+DISCRETE x1 {-2..0}
+DISCRETE x2 {-2..0}
+**SEARCH**
+PRINT [[x0],[x1],[x2]]
+**CONSTRAINTS**
+occurrence([x0,x1,x2],-2,x1)
+**EOF**
