@@ -601,8 +601,10 @@ struct OccurrenceEqualConstraint : public AbstractConstraint {
   virtual void fullPropagate() {
     triggerSetup();
 
-    valCount.setMin(0);
-    valCount.setMax(varArray.size());
+    // Count before pruning valCount: if valCount aliases a variable in
+    // varArray, the setMin/setMax below can assign it, and its pending
+    // assignment trigger will increment the counters after fullPropagate
+    // returns. Counting it here as well would double-count it.
     setupCounters();
     valCount.setMin((DomainInt)occurrencesCount);
     valCount.setMax((DomainInt)varArray.size() - not_occurrencesCount);
