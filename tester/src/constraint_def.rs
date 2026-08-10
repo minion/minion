@@ -970,22 +970,7 @@ fn valid_gcc(c: &ConstraintInstance) -> bool {
     if unique.len() != vals.len() {
         return false;
     }
-    // gcc/gccweak refuse the same variable in both the counted vector
-    // (slot 0) and the cardinality vector (slot 2) -- the incremental
-    // matching cannot stay consistent with that aliasing, so minion
-    // rejects the instance at construction. Repeats within either
-    // vector alone are fine. Compare by name; constants don't count
-    // (they're not shared state).
-    let vars = c.vars();
-    let counted_names: HashSet<String> = vars[0]
-        .iter()
-        .filter(|v| v.var_type != VarType::Constant)
-        .map(|v| v.name.clone())
-        .collect();
-    !vars[2]
-        .iter()
-        .filter(|v| v.var_type != VarType::Constant)
-        .any(|v| counted_names.contains(&v.name))
+    true
 }
 
 fn check_table(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
@@ -1610,7 +1595,10 @@ fn constraint_list() -> Vec<ConstraintDef> {
                     return false;
                 }
 
-                v[0][0].pow(v[1][0] as u32) == v[2][0]
+                match v[0][0].checked_pow(v[1][0] as u32) {
+                    Some(p) => p == v[2][0],
+                    None => false,
+                }
             },
             false,
             false,
