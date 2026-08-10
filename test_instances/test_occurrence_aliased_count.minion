@@ -1,0 +1,16 @@
+MINION 3
+# Regression test: occurrence's count variable aliased to a list variable.
+# fullPropagate pruned valCount (= x) to {0} before setupCounters ran, so
+# setupCounters counted x as assigned and the still-pending assignment
+# trigger then incremented not_occurrencesCount a second time, driving
+# valCount.setMax to -1 and wiping out the only solution, x=0. Reduced by
+# delta debugging from a random tester instance.
+#TEST SOLCOUNT 1
+**VARIABLES**
+DISCRETE x {-10..8}
+**SEARCH**
+PRINT [[x]]
+**CONSTRAINTS**
+diseq(x, 1)
+occurrence([x], -5, x)
+**EOF**
