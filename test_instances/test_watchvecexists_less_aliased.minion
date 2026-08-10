@@ -1,0 +1,16 @@
+MINION 3
+# Regression test: watchvecexists_less with both vectors the same variable,
+# so the only pair is x < x, which is unsatisfiable. VecNeqDynamic's
+# fullPropagate ran propagate_from_var1/var2 before attaching its triggers;
+# with the pair aliased those calls prune the watched variable itself, the
+# resulting events found an empty trigger list and were dropped, and the
+# propagator never woke to notice 1 < 1 is false. Here setMin(0+1) and
+# setMax(2-1) leave x = 1, which was wrongly reported as a solution.
+#TEST SOLCOUNT 0
+**VARIABLES**
+DISCRETE x {0..2}
+**SEARCH**
+PRINT [[x]]
+**CONSTRAINTS**
+watchvecexists_less([x], [x])
+**EOF**
