@@ -333,11 +333,21 @@ fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
 /// and emit a `DisEq(x, val)` constraint for every value in a hole of x's
 /// domain — mirroring what `print_variable_def` does in text mode.
 fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> Result<()> {
+    // A reused variable fills several slots but must be added exactly
+    // once (mirroring print_variables_def's dedup in text mode). Dedupe
+    // by Arc identity so two *distinct* variables sharing a name still
+    // hit the duplicate-name bail below.
+    let mut seen: Vec<*const MinionVariable> = Vec::new();
     for varlist in instance.vars().iter() {
         for v in varlist.iter() {
             if v.var_type == VarType::Constant {
                 continue;
             }
+            let p = Arc::as_ptr(v);
+            if seen.contains(&p) {
+                continue;
+            }
+            seen.push(p);
             let tableised = instance.constraint.name == "str2plus";
             let domain = match v.var_type {
                 VarType::Bool => VarDomain::Bool,
