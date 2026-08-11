@@ -1,0 +1,24 @@
+MINION 3
+#TEST SOLCOUNT 0
+# Regression: a negativetable over zero variables whose table contains the
+# (only possible) empty tuple forbids that empty assignment, so the instance
+# is unsatisfiable. The parser used to collapse all zero-variable tuple
+# constraints to CT_TRUE, wrongly making this satisfiable.
+
+**VARIABLES**
+
+DISCRETE z {0..9}
+
+**TUPLELIST**
+
+One 1 0
+
+**SEARCH**
+
+PRINT [[z]]
+
+**CONSTRAINTS**
+
+negativetable([],One)
+
+**EOF**
