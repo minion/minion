@@ -1,0 +1,22 @@
+MINION 3
+#TEST CHECKONESOL 0 0
+# Negated-bool bootstrap: `!b` inside a watched-or child. `eq(a,0)` forces
+# `a = 0`, so the first disjunct `eq(a,1)` is false; the OR therefore
+# requires `eq(!b, 1)`, so `!b = 1`, so `b = 0`. Dropping the `!` would
+# force `b = 1`.
+
+**VARIABLES**
+
+BOOL a
+BOOL b
+
+**SEARCH**
+
+PRINT [[a, b]]
+
+**CONSTRAINTS**
+
+eq(a, 0)
+watched-or({eq(a, 1), eq(!b, 1)})
+
+**EOF**
