@@ -1,6 +1,7 @@
 sphinxdocs/_build
 sphinxdocs/venv-tmp/
 tester/target/
+tester/target-asan/
 tester/tempdir/
 bin-*/
 /bin/

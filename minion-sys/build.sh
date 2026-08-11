@@ -40,7 +40,16 @@ echo "Using Minion source at: $MINION_SRC"
 mkdir -p "$OUT_DIR/build"
 cd "$OUT_DIR/build"
 
-if [[ ${DEBUG_MINION-default} != "default" ]]; then
+if [[ -n "${MINION_SANITIZE-}" ]]; then
+  # AddressSanitizer build. The final Rust link must add the ASan
+  # runtime itself, e.g.:
+  #   RD=$(clang++ -print-resource-dir)/lib/darwin
+  #   cargo rustc --release --bin tester --target-dir target-asan -- \
+  #     -C link-arg=-fsanitize=address -C link-arg=-L$RD \
+  #     -C link-arg=-lclang_rt.asan_osx_dynamic -C link-arg=-Wl,-rpath,$RD
+  # (rustc links with -nodefaultlibs, so clang won't add it.)
+  python3 "$MINION_SRC/configure.py" --quick --unoptimised --sanitize --extraflags "-g -DDOM_ASSERT"
+elif [[ ${DEBUG_MINION-default} != "default" ]]; then
   python3 "$MINION_SRC/configure.py" --quick --debug
 else
   python3 "$MINION_SRC/configure.py" --quick --unoptimised --extraflags "-g -DDOM_ASSERT"

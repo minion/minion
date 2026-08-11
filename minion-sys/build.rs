@@ -20,6 +20,7 @@ fn main() {
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=build.sh");
     println!("cargo:rerun-if-env-changed=DEBUG_MINION");
+    println!("cargo:rerun-if-env-changed=MINION_SANITIZE");
     println!("cargo:rerun-if-env-changed=MINION_SRC");
     println!(
         "cargo:rerun-if-changed={}/configure.py",
