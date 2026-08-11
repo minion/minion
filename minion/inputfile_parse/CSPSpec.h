@@ -606,4 +606,83 @@ inline ConstraintDef* get_constraint(ConstraintType t) {
 
 using namespace ProbSpec;
 
+// A table constraint whose tuple list or variable list is degenerate (no
+// tuples, or no variables) collapses to CT_TRUE / CT_FALSE here, so the
+// table propagators never see an empty scope — several of them assume
+// vars.size() > 0. The parser funnels every table constraint it reads
+// through this; the library front end (libwrapper) applies the tree
+// version to blobs handed over the FFI, which bypass the parser entirely.
+inline ConstraintBlob normaliseTableConstraintBlob(ConstraintBlob con) {
+  ConstraintDef* def = con.constraint;
+  if(!(def->numberOfParams == 2 &&
+       (def->read_types[1] == read_tuples || def->read_types[1] == read_short_tuples)))
+    return con;
+
+  // Tuple constraints are either positive (the table lists the ALLOWED
+  // assignments) or negative (it lists the FORBIDDEN ones). The degenerate
+  // empty-table and no-variable cases below collapse to CT_TRUE / CT_FALSE
+  // differently for the two, so the polarity must be known. Both sets are
+  // listed exhaustively on purpose: any tuple constraint that is in neither
+  // (e.g. a newly added one) is a programming error and fails loudly here,
+  // rather than being silently miscategorised.
+  bool negativeTable;
+  switch(def->type) {
+  case CT_WATCHED_TABLE:
+  case CT_GACSCHEMA:
+  case CT_HAGGISGAC:
+  case CT_HAGGISGAC_STABLE:
+  case CT_MDDC:
+  case CT_SHORTSTR:
+  case CT_STR:
+  case CT_SHORTSTR_CTUPLE:
+  case CT_LIGHTTABLE: negativeTable = false; break;
+  case CT_WATCHED_NEGATIVE_TABLE:
+  case CT_NEGATIVEMDDC: negativeTable = true; break;
+  default:
+    throw parse_exception("Internal error: tuple constraint '" + def->name +
+                          "' is not classified as positive or negative in "
+                          "normaliseTableConstraintBlob. Add it to one of the lists there.");
+  }
+
+  if(def->read_types[1] == read_tuples && con.tuples->size() == 0) {
+    // Empty table: a positive table allows nothing (FALSE); a negative
+    // table forbids nothing, so every assignment is allowed (TRUE).
+    return ConstraintBlob(get_constraint(negativeTable ? CT_TRUE : CT_FALSE));
+  }
+
+  if(def->read_types[1] == read_short_tuples && con.shortTuples->size() == 0) {
+    return ConstraintBlob(get_constraint(CT_FALSE));
+  }
+
+  if(def->read_types[1] == read_tuples) {
+    if((SysInt)con.vars[0].size() != con.tuples->tupleSize()) {
+      throw parse_exception("Tuple constraint with " + tostring(con.vars[0].size()) +
+                            " variables cannot have tuples of length " +
+                            tostring(con.tuples->tupleSize()));
+    }
+  }
+
+  // We already know there is at least one tuple
+  if(con.vars[0].size() == 0) {
+    if(def->read_types[1] == read_short_tuples && !(*con.shortTuples->tuplePtr())[0].empty())
+      throw parse_exception("Not a valid list of short tuples for a "
+                            "constraint with no variables!");
+    // Zero variables: the only assignment is the empty tuple, which the
+    // (non-empty) table contains. A positive table accepts it (TRUE); a
+    // negative table forbids it (FALSE).
+    return ConstraintBlob(get_constraint(negativeTable ? CT_FALSE : CT_TRUE));
+  }
+
+  return con;
+}
+
+// In-place variant that also normalises table constraints nested inside
+// meta-constraints (reify, watched-or, ...), which the parser handles
+// naturally by parsing children through readConstraintTable.
+inline void normaliseTableConstraintBlobTree(ConstraintBlob& con) {
+  for(SysInt i = 0; i < (SysInt)con.internal_constraints.size(); ++i)
+    normaliseTableConstraintBlobTree(con.internal_constraints[i]);
+  con = normaliseTableConstraintBlob(con);
+}
+
 #endif

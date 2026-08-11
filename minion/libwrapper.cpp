@@ -1175,6 +1175,9 @@ void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint)
 {
   assertNotInSearch("instance_addConstraint");
   instance.constraints.push_back(constraint);
+  // FFI-built blobs bypass the parser, so apply the parser's collapse of
+  // degenerate (empty-table / zero-variable) table constraints here.
+  normaliseTableConstraintBlobTree(instance.constraints.back());
 }
 
 void instance_setOptimise(CSPInstance& instance, bool minimising, Var& var)
@@ -1201,6 +1204,7 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
     // Keep a stable copy of the blob alive for the lifetime of `instance`.
     // Some built constraints may retain references to blob-owned argument storage.
     instance.constraints.push_back(constraint);
+    normaliseTableConstraintBlobTree(instance.constraints.back());
 
     AbstractConstraint* c = build_constraint(instance.constraints.back());
     // addConstraintMidsearch returns false when the new constraint wipes
