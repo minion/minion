@@ -87,6 +87,7 @@ inline shared_ptr<HaggisGACTuples> ShortTupleList::getHaggisData(const Vars& var
   for(SysInt i = 0; i < (SysInt)vars.size(); ++i)
     doms.push_back(std::make_pair(vars[i].initialMin(), vars[i].initialMax()));
 
+  std::lock_guard<std::mutex> guard(hgt_mutex);
   if(hgt.count(doms) == 0) {
     hgt[doms] = std::make_shared<HaggisGACTuples>(vars, this);
   }
