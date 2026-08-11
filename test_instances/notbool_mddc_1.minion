@@ -1,0 +1,23 @@
+MINION 3
+#TEST CHECKONESOL 0
+# Negated-bool bootstrap: `!b` inside mddc. The one allowed tuple is `[1]`,
+# so `!b = 1`, so `b = 0`. Dropping the `!` would force `b = 1`.
+
+**VARIABLES**
+
+BOOL b
+
+**TUPLELIST**
+
+T 1 1
+1
+
+**SEARCH**
+
+PRINT [[b]]
+
+**CONSTRAINTS**
+
+mddc([!b], T)
+
+**EOF**

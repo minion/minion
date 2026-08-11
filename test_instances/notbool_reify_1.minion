@@ -1,0 +1,21 @@
+MINION 3
+#TEST CHECKONESOL 1 0
+# Negated-bool bootstrap: `!b` as the reification literal. `eq(a,1)` fixes
+# `a=1`, so the reified `eq(a,1)` is true, so `!b = 1`, so `b = 0`.
+# Dropping the `!` would force `b = 1` instead.
+
+**VARIABLES**
+
+BOOL a
+BOOL b
+
+**SEARCH**
+
+PRINT [[a, b]]
+
+**CONSTRAINTS**
+
+eq(a, 1)
+reify(eq(a, 1), !b)
+
+**EOF**

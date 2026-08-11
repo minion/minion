@@ -1,0 +1,21 @@
+MINION 3
+#TEST CHECKONESOL 0 1
+# Negated-bool bootstrap: `!b` as the reifyimply literal. `eq(a,0)` fixes
+# `a=0`, so `diseq(a,0)` is false. `reifyimply(false, !b)` means `!b=1` is
+# impossible, so `!b = 0`, so `b = 1`. Dropping the `!` would force `b = 0`.
+
+**VARIABLES**
+
+BOOL a
+BOOL b
+
+**SEARCH**
+
+PRINT [[a, b]]
+
+**CONSTRAINTS**
+
+eq(a, 0)
+reifyimply(diseq(a, 0), !b)
+
+**EOF**

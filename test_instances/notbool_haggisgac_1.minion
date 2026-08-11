@@ -1,0 +1,24 @@
+MINION 3
+#TEST CHECKONESOL 0
+# Negated-bool bootstrap: `!b` inside haggisgac. The one short tuple
+# requires the variable at index 0 to be 1, so `!b = 1`, so `b = 0`.
+# Dropping the `!` would force `b = 1`.
+
+**VARIABLES**
+
+BOOL b
+
+**SHORTTUPLELIST**
+
+S 1
+[(0,1)]
+
+**SEARCH**
+
+PRINT [[b]]
+
+**CONSTRAINTS**
+
+haggisgac([!b], S)
+
+**EOF**
