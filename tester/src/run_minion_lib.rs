@@ -75,6 +75,17 @@ fn convert_short_tuples(st: &crate::constraint_def::ShortTuples) -> Vec<MShort> 
 /// Build a minion-sys `Constraint` tree from a tester `ConstraintInstance`,
 /// dispatched on the constraint's registered `name`.
 fn build_constraint(instance: &ConstraintInstance) -> Result<MCon> {
+    // Negated bool slots have no minion-sys representation today
+    // (`Var` is `NameRef | ConstantAsVar`, no `NegatedBool` variant).
+    // The random generator is supposed to keep NEGATION_PERMILLE at 0
+    // under `--in-process`; if a `!`-flagged instance still reaches
+    // here something has bypassed that gate and silently dropping the
+    // `!` would give wrong answers.
+    assert!(
+        !instance.has_any_negated(),
+        "in-process backend received a ConstraintInstance with negated bool slots; \
+         the generator must keep NEGATION_PERMILLE at 0 in --in-process mode"
+    );
     let name = instance.constraint.name.as_str();
     let v = instance.top_level_vars();
     let children = &instance.child_constraints;

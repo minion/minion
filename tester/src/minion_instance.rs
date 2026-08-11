@@ -6,21 +6,32 @@ use std::io::Result;
 use self::itertools::Itertools;
 use crate::constraint_def::*;
 
+/// Format a single variable use in a constraint slot. Wraps the name
+/// in `!` iff the instance has the negation flag set at `(slot, idx)`
+/// -- mirroring minion's text-parser `!b` syntax which produces a
+/// `VAR_NOTBOOL` reference.
+fn emit_var_use(con: &ConstraintInstance, slot: usize, idx: usize, name: &str) -> String {
+    if con.negated(slot, idx) {
+        format!("!{}", name)
+    } else {
+        name.to_string()
+    }
+}
+
 fn print_minion_tuples<F: Write>(f: &mut F, tuples: &Tuples) -> Result<()> {
     f.write_all(b"**TUPLELIST**\n")?;
     let tups = &tuples.tupledata;
-    if tups.is_empty() {
-        f.write_all(format!("{}  0 0\n", tuples.name).as_bytes())?;
-    } else {
-        f.write_all(format!("{}  {} {}\n", tuples.name, tups.len(), tups[0].len()).as_bytes())?;
-        for tup in tups {
-            for val in tup {
-                f.write_all(format!("{} ", val).as_bytes())?;
-            }
-            f.write_all(b"\n")?;
+    // Header is `name <numtuples> <arity>`. The arity comes from the
+    // stored value, not from tups[0], so an empty table still declares the
+    // correct number of columns to match its constraint's variable list.
+    f.write_all(format!("{}  {} {}\n", tuples.name, tups.len(), tuples.arity).as_bytes())?;
+    for tup in tups {
+        for val in tup {
+            f.write_all(format!("{} ", val).as_bytes())?;
         }
         f.write_all(b"\n")?;
     }
+    f.write_all(b"\n")?;
     Ok(())
 }
 
@@ -68,9 +79,13 @@ fn print_minion_constraint_contents<F: Write>(f: &mut F, con: &ConstraintInstanc
 
     let varlist = (0..con.constraint.arg.len())
         .map(|list| match con.constraint.arg[list] {
-            Arg::Var(..) => con.vars()[list][0].name.clone(),
+            Arg::Var(..) => emit_var_use(con, list, 0, &con.vars()[list][0].name),
             Arg::List(..) /*| Arg::TwoVars(..)*/ => {
-                let commalist = con.vars()[list].iter().map(|x| &x.name).join(", ");
+                let commalist = con.vars()[list]
+                    .iter()
+                    .enumerate()
+                    .map(|(idx, x)| emit_var_use(con, list, idx, &x.name))
+                    .join(", ");
                 format!("[{}]", commalist)
             }
             Arg::Tuples => con.tuples.as_ref().unwrap().name.clone(),
@@ -257,4 +272,39 @@ pub fn print_minion_file_pair_optimisation<F: Write>(
     print_minion_postfix(fcon)?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::constraint_def::*;
+    use std::sync::atomic::Ordering;
+
+    /// Build a random `eq` instance with negation forced on (1000/1000)
+    /// and confirm the rendered text contains a `!`. Verifies the full
+    /// pipeline: NEGATION_PERMILLE -> negated_slots -> printer. `eq`
+    /// accepts a few var types; we retry until we get an instance whose
+    /// vars are bool, which the negation roll then flips at probability
+    /// 1.0.
+    #[test]
+    fn negation_appears_in_text_output_for_bool_eq() {
+        NEGATION_PERMILLE.store(1000, Ordering::Relaxed);
+        let eq_def = CONSTRAINT_LIST
+            .iter()
+            .find(|c| c.name == "eq")
+            .expect("eq constraint missing from CONSTRAINT_LIST")
+            .clone();
+        let mut found_bang = false;
+        for _ in 0..100 {
+            let inst = build_random_instance(&eq_def);
+            let mut buf: Vec<u8> = Vec::new();
+            print_minion_file_pair(&mut buf, &inst).unwrap();
+            if String::from_utf8(buf).unwrap().contains('!') {
+                found_bang = true;
+                break;
+            }
+        }
+        NEGATION_PERMILLE.store(0, Ordering::Relaxed);
+        assert!(found_bang, "expected `!` in some generated eq instance");
+    }
 }
