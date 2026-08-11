@@ -54,6 +54,35 @@ fn reuse_roll() -> bool {
     p != 0 && rand::thread_rng().gen_range(0..1000) < p
 }
 
+/// Probability, in per-mille (0..=1000), that the use of a Bool
+/// variable in a constraint slot is wrapped as `!name` rather than
+/// emitted plain. `0` reproduces the historical no-`!` behaviour. The
+/// `--in-process` backend doesn't currently support negated bool refs
+/// (minion-sys has no `Var::NegatedBool`), so the entry-point in
+/// `main` keeps this at 0 under `--in-process` and lets it climb in
+/// exec mode.
+pub static NEGATION_PERMILLE: AtomicU32 = AtomicU32::new(0);
+
+fn negation_roll() -> bool {
+    let p = NEGATION_PERMILLE.load(Ordering::Relaxed).min(1000);
+    p != 0 && rand::thread_rng().gen_range(0..1000) < p
+}
+
+/// Build a negation-flag mirror of `variables` by rolling
+/// [`negation_roll`] independently for each Bool position. Non-Bool
+/// positions (including Constants) are always false: minion's parser
+/// rejects `!` on anything other than a boolean.
+fn build_negated_slots(variables: &[Vec<Arc<MinionVariable>>]) -> Vec<Vec<bool>> {
+    variables
+        .iter()
+        .map(|slot| {
+            slot.iter()
+                .map(|v| v.var_type == VarType::Bool && negation_roll())
+                .collect()
+        })
+        .collect()
+}
+
 /// True if a freshly-minted variable of actual `var_type = actual`
 /// would have been an acceptable choice to fill a slot whose declared
 /// kind is `slot_kind`. Mirrors the per-kind acceptance map embedded
@@ -146,13 +175,20 @@ pub struct MinionVariable {
 #[derive(Clone)]
 pub struct Tuples {
     pub tupledata: Vec<Vec<i64>>,
+    pub arity: usize,
     pub name: String,
 }
 
 impl Tuples {
-    fn new(tupledata: Vec<Vec<i64>>) -> Tuples {
+    // `arity` is the number of columns the table is over. It must be passed
+    // explicitly because an empty table (0 tuples) carries no row to infer
+    // it from, yet the Minion **TUPLELIST** header still needs the arity to
+    // match the constraint's variable list.
+    fn new(tupledata: Vec<Vec<i64>>, arity: usize) -> Tuples {
+        debug_assert!(tupledata.iter().all(|t| t.len() == arity));
         Tuples {
             tupledata,
+            arity,
             name: get_unique_name("tuples", ""),
         }
     }
@@ -392,6 +428,13 @@ impl fmt::Debug for ConstraintDef {
 pub struct ConstraintInstance {
     pub constraint: ConstraintDef,
     varlist: Arc<Vec<Vec<Arc<MinionVariable>>>>,
+    // Parallel to `varlist` in shape: `negated_slots[s][i]` is true iff
+    // the *use* of `varlist[s][i]` should be emitted to minion as
+    // `!name`. Only valid for Bool var_type. Independent of variable
+    // identity, so the same pooled Arc can appear negated in one slot
+    // and plain in another -- which is the whole point of putting the
+    // flag on the use rather than on `MinionVariable`.
+    negated_slots: Arc<Vec<Vec<bool>>>,
     pub tuples: Option<Tuples>,
     pub short_tuples: Option<ShortTuples>,
     pub child_constraints: Vec<ConstraintInstance>,
@@ -427,6 +470,43 @@ impl ConstraintInstance {
         false
     }
 
+    /// Flattened negation flags mirroring [`vars`]: parent's slots
+    /// first, then each child's flattened slots, in the same order.
+    /// Used by [`check_tuple`] so the per-row transform aligns with
+    /// the per-slot values minion would see.
+    pub fn negated_for_vars(&self) -> Vec<Vec<bool>> {
+        let mut out = (*self.negated_slots).clone();
+        for child in &self.child_constraints {
+            out.extend(child.negated_for_vars());
+        }
+        out
+    }
+
+    /// True if the use of variable at position `idx` in this
+    /// instance's top-level slot `slot` is the negated form `!name`.
+    /// Returns false (the default) if the indices are out of range or
+    /// the slot was constructed without an explicit flag vector.
+    pub fn negated(&self, slot: usize, idx: usize) -> bool {
+        self.negated_slots
+            .get(slot)
+            .and_then(|v| v.get(idx))
+            .copied()
+            .unwrap_or(false)
+    }
+
+    /// True if any slot anywhere in this instance (including children)
+    /// has a negated variable use. The in-process backend uses this to
+    /// assert that no `!` flag slipped past the `--in-process` gate.
+    pub fn has_any_negated(&self) -> bool {
+        self.negated_slots
+            .iter()
+            .any(|s| s.iter().any(|&b| b))
+            || self
+                .child_constraints
+                .iter()
+                .any(|c| c.has_any_negated())
+    }
+
     fn total_var_slots(&self) -> usize {
         self.varlist.len()
             + self
@@ -444,12 +524,38 @@ impl ConstraintInstance {
     }
 
     fn check_tuple(&self, tup: &[i64]) -> bool {
-        let mut slices: Vec<&[i64]> = Vec::with_capacity(self.total_var_slots());
+        // Apply the `!`-flip to every negated bool slot so the per-
+        // constraint checker (which knows nothing about negation) sees
+        // the same values minion would see internally for a
+        // `cons([!b, ...])` use. The flag is only set on Bool vars
+        // (domain {0,1}) so `1 - v` is the correct mapping.
+        let vars = self.vars();
+        let negated = self.negated_for_vars();
+        let mut flipped: Vec<i64> = Vec::with_capacity(tup.len());
+        let mut slice_lens: Vec<usize> = Vec::with_capacity(self.total_var_slots());
         let mut place: usize = 0;
-        for var in self.vars().iter() {
-            let i = var.len();
-            slices.push(&tup[place..place + i]);
-            place += i;
+        for (slot, var_list) in vars.iter().enumerate() {
+            let n = var_list.len();
+            let neg = negated.get(slot);
+            for i in 0..n {
+                let raw = tup[place + i];
+                let is_neg = neg.and_then(|s| s.get(i)).copied().unwrap_or(false);
+                if is_neg {
+                    debug_assert!(
+                        var_list[i].var_type == VarType::Bool,
+                        "negation flag set on non-Bool slot (slot {slot}, idx {i})"
+                    );
+                }
+                flipped.push(if is_neg { 1 - raw } else { raw });
+            }
+            slice_lens.push(n);
+            place += n;
+        }
+        let mut slices: Vec<&[i64]> = Vec::with_capacity(slice_lens.len());
+        let mut p = 0;
+        for &n in &slice_lens {
+            slices.push(&flipped[p..p + n]);
+            p += n;
         }
         (self.constraint.checker)(self, &slices)
     }
@@ -523,6 +629,11 @@ impl ConstraintInstance {
             return None;
         }
 
+        // Tableisation absorbs any `!` flags into the truth table T:
+        // `check_tuple` already flipped negated columns before deciding
+        // tuple membership, so T is in the underlying-var encoding and
+        // the table form needs no negation flags of its own.
+        let flat_len = self.vars().iter().flatten().count();
         Some(ConstraintInstance {
             constraint: STANDARD_TABLE_CONSTRAINT.clone(),
             varlist: {
@@ -530,7 +641,8 @@ impl ConstraintInstance {
                     self.vars().iter().flatten().cloned().collect();
                 Arc::new(vec![vars])
             },
-            tuples: Some(Tuples::new(tuples)),
+            negated_slots: Arc::new(vec![vec![false; flat_len]]),
+            tuples: Some(Tuples::new(tuples, flat_len)),
             short_tuples: None,
             child_constraints: vec![],
         })
@@ -553,16 +665,17 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
         .collect();
 
     if all_domains.is_empty() {
-        return Some(Tuples::new(vec![vec![]]));
+        return Some(Tuples::new(vec![vec![]], 0));
     }
 
     // Cap on the Cartesian product size we're willing to materialise.
-    // Below this we keep the original enumerate-shuffle-truncate path
-    // (preserves the "leave at least one out" property exactly). Above
-    // it we sample tuples directly from the per-variable domains —
-    // statistically sound for the tester (random non-empty subset)
-    // and avoids OOM on `--size-factor 4`-style wide-list instances
-    // where the product is 10^20+.
+    // Below this we enumerate, shuffle and truncate to a random count in
+    // [0, all] INCLUSIVE -- the empty table and the full table are kept
+    // in range on purpose: that's where table-family edge cases live
+    // (e.g. negativetable with 0 tuples must allow every assignment).
+    // Above the cap we sample tuples directly from the per-variable
+    // domains, which avoids OOM on `--size-factor 4`-style wide-list
+    // instances where the product is 10^20+.
     const ENUM_CAP: u128 = 1_000_000;
 
     let mut cart: u128 = 1;
@@ -580,20 +693,16 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
             .multi_cartesian_product()
             .collect();
         all_assignments.shuffle(&mut rng);
-        let take = if all_assignments.len() > 1 {
-            rng.gen_range(1..all_assignments.len())
-        } else {
-            1
-        };
+        let take = rng.gen_range(0..=all_assignments.len());
         all_assignments.truncate(take);
         all_assignments.sort();
-        Some(Tuples::new(all_assignments))
+        Some(Tuples::new(all_assignments, all_domains.len()))
     } else {
-        // Sample path: pick K random points directly. For huge
-        // products K ≪ cart so leaving "at least one out" is
-        // automatic with overwhelming probability.
+        // Sample path: pick K random points directly. K=0 (empty table)
+        // is allowed; the full table is unreachable here by construction
+        // (that's why we're on the sample path) and K ≪ cart anyway.
         const TUPLE_SAMPLE_CAP: usize = 10_000;
-        let take = rng.gen_range(1..=TUPLE_SAMPLE_CAP);
+        let take = rng.gen_range(0..=TUPLE_SAMPLE_CAP);
         let mut sampled: Vec<Vec<i64>> = (0..take)
             .map(|_| {
                 all_domains
@@ -604,7 +713,7 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
             .collect();
         sampled.sort();
         sampled.dedup();
-        Some(Tuples::new(sampled))
+        Some(Tuples::new(sampled, all_domains.len()))
     }
 }
 
@@ -633,14 +742,18 @@ fn generate_random_short_tuples_from_vars(
     // Number of short tuples in the list. Cap by the number of
     // assignments any short tuple could rule in (≤ 2^n_vars-ish), so
     // we don't generate redundant short tuples that all map to the
-    // same dense truth table.
+    // same dense truth table. 0 is allowed (an empty short-tuple list,
+    // a boundary case: the positive short constraints are then false
+    // everywhere).
     let upper = (2_usize).saturating_pow(n_vars as u32).min(20).max(2);
-    let num_short = rng.gen_range(1..=upper);
+    let num_short = rng.gen_range(0..=upper);
 
     let mut tuples: Vec<Vec<(usize, i64)>> = Vec::with_capacity(num_short);
     for _ in 0..num_short {
-        // Pick 1..=n_vars distinct positions for this short tuple.
-        let len = rng.gen_range(1..=n_vars);
+        // Pick 0..=n_vars distinct positions for this short tuple. A
+        // length-0 short tuple is the other boundary: it constrains no
+        // variable and so is trivially satisfied (matches everything).
+        let len = rng.gen_range(0..=n_vars);
         let mut positions: Vec<usize> = (0..n_vars).collect();
         positions.shuffle(&mut rng);
         positions.truncate(len);
@@ -759,9 +872,11 @@ fn build_with_pool(
                 }
             }
         }
+        let negated_slots = build_negated_slots(&variables);
         let c = ConstraintInstance {
             constraint: constraint.clone(),
             varlist: Arc::new(variables),
+            negated_slots: Arc::new(negated_slots),
             tuples: generated_tuples,
             short_tuples: generated_short_tuples,
             child_constraints: constraints,
@@ -882,9 +997,11 @@ fn nested_with_pool(
                 }
             }
         }
+        let negated_slots = build_negated_slots(&variables);
         let c = ConstraintInstance {
             constraint: parent_def.clone(),
             varlist: Arc::new(variables),
+            negated_slots: Arc::new(negated_slots),
             tuples: generated_tuples,
             short_tuples: generated_short_tuples,
             child_constraints: constraints,
@@ -983,18 +1100,18 @@ fn check_negative_table(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     !c.tuples.as_ref().unwrap().tupledata.contains(&tup)
 }
 
-fn valid_positive_table(c: &ConstraintInstance) -> bool {
-    !c.tuples.as_ref().unwrap().tupledata.is_empty()
+// Accept any tuple count, including the boundaries. An empty table and a
+// full table (every assignment) are deliberately in scope: that is exactly
+// where table-family edge cases hide (e.g. negativetable with 0 tuples must
+// allow every assignment, with a full table it forbids everything). These
+// used to be rejected, which is why the negativetable 0-tuple bug was never
+// reached. The reference path (tableise) handles both ends correctly.
+fn valid_positive_table(_c: &ConstraintInstance) -> bool {
+    true
 }
 
-fn valid_negative_table(c: &ConstraintInstance) -> bool {
-    let tuples = c.tuples.as_ref().unwrap();
-    if tuples.tupledata.is_empty() {
-        return false;
-    }
-    let all_domains: Vec<Vec<i64>> = c.vars()[0].iter().map(|v| v.domain.clone()).collect();
-    let total: usize = all_domains.iter().map(|d| d.len()).product();
-    tuples.tupledata.len() < total
+fn valid_negative_table(_c: &ConstraintInstance) -> bool {
+    true
 }
 
 fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
@@ -1024,17 +1141,12 @@ fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
 /// Both are uninteresting for metamorphic testing and the second
 /// hides bugs in the literal-iteration logic.
 fn valid_short_tuples_instance(c: &ConstraintInstance) -> bool {
-    let st = match c.short_tuples.as_ref() {
-        Some(s) => s,
-        None => return false,
-    };
-    if st.data.is_empty() {
-        return false;
-    }
-    if st.data.iter().any(|t| t.is_empty()) {
-        return false;
-    }
-    true
+    // Accept any short-tuple list, including the boundaries: an empty list
+    // (constraint false everywhere) and a list containing an empty short
+    // tuple (trivially satisfied). These used to be rejected, leaving the
+    // short-tuple edge cases untested -- the same blind spot that hid the
+    // empty/full table bugs.
+    c.short_tuples.is_some()
 }
 
 fn check_frameupdate(_c: &ConstraintInstance, v: &[&[i64]]) -> bool {
