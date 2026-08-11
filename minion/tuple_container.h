@@ -105,7 +105,10 @@ public:
         tuplesLocked(false),
         hash_code(0) {
     numberOfTuples = tuple_list.size();
-    tupleLength = tuple_list[0].size();
+    // An empty list carries no arity; 0 is safe because every degenerate
+    // empty-table constraint is collapsed to CT_TRUE / CT_FALSE (see
+    // normaliseTableConstraintBlob) before the arity is ever consulted.
+    tupleLength = tuple_list.empty() ? 0 : tuple_list[0].size();
     tupleData = new DomainInt[numberOfTuples * tupleLength];
     for(SysInt i = 0; i < numberOfTuples; ++i)
       for(SysInt j = 0; j < tupleLength; ++j) {
