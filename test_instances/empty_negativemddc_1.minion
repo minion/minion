@@ -1,0 +1,22 @@
+MINION 3
+#TEST SOLCOUNT 100
+# Regression: negativemddc shares the empty-table parser path with
+# negativetable; an empty forbidden table must allow every assignment.
+
+**VARIABLES**
+
+DISCRETE d[2] {0..9}
+
+**TUPLELIST**
+
+Second 0 2
+
+**SEARCH**
+
+PRINT [d]
+
+**CONSTRAINTS**
+
+negativemddc([d[0],d[1]],Second)
+
+**EOF**
