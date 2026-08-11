@@ -65,6 +65,7 @@ public:
 };
 
 std::shared_ptr<TupleTrieArray> getTries(std::shared_ptr<TupleList> tl) {
+  std::lock_guard<std::mutex> guard(tl->lazy_init_mutex);
   if(tl->triearray == NULL)
     tl->triearray = std::make_shared<TupleTrieArray>(tl);
   return tl->triearray;

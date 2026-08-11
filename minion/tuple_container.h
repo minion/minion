@@ -13,6 +13,7 @@
 
 using namespace std;
 
+#include <mutex>
 #include <utility>
 #include <vector>
 
@@ -224,6 +225,11 @@ friend std::shared_ptr<TupleTrieArray> getTries(std::shared_ptr<TupleList>);
 //friend Regin* getRegin(std::shared_ptr<TupleList>);
 //friend EggShellData* getEggShellData(std::shared_ptr<TupleList>, size_t varcount);
 
+// Guards lazy construction of `triearray` in getTries: the threaded
+// parallel modes run BuildCSP concurrently in every worker against the
+// same shared TupleList.
+std::mutex lazy_init_mutex;
+
 };
 
 
@@ -282,6 +288,11 @@ class ShortTupleList {
   string tuple_name;
 
   std::map<std::vector<std::pair<DomainInt, DomainInt>>, std::shared_ptr<HaggisGACTuples>> hgt;
+
+  // Guards `hgt` in getHaggisData: the threaded parallel modes run
+  // BuildCSP concurrently in every worker against the same shared
+  // ShortTupleList.
+  std::mutex hgt_mutex;
 
 public:
   template <typename Vars>
