@@ -535,6 +535,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
     D_DATA(check_adjlists());
 
+    clearPendingPrunes();
+
 #ifdef QUIMPER
     do_gcc_prop_quimper();
     return;
@@ -585,6 +587,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
 
     prop_capacity();
+
+    applyPendingPrunes();
   }
 
   vector<SysInt> lbcmatching;
@@ -661,9 +665,51 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     tarjan_recursive(0, upper, augpath, varvalmatching, usage);
 
     prop_capacity();
+
+    applyPendingPrunes();
   }
 
   smallset sccsToProcess;
+
+  // All domain prunes computed during a propagation pass are recorded
+  // here and applied together at the end of the pass, so the pass's
+  // reasoning never observes its own deletions. This matters when a
+  // capacity variable aliases a target variable: an immediate capacity
+  // prune could delete target literals mid-pass, invalidating the
+  // matching and adjacency list while they are still in use (the cause
+  // of the aliased-gcc unsoundness). Deferring makes our own prunes
+  // look exactly like another constraint's: the solver dispatches the
+  // removal events against our triggers and re-invokes this
+  // constraint, which repairs its structures through the normal
+  // propagateDynInt path. The propagator never needs to know which
+  // variables are aliased. Prunes computed against the entry snapshot
+  // stay sound when applied late: supports and flows only shrink as
+  // domains shrink.
+  vector<pair<SysInt, DomainInt>> pendingRemovals; // (varArray index, value)
+  vector<pair<SysInt, DomainInt>> pendingCapMin;   // (capacity index, bound)
+  vector<pair<SysInt, DomainInt>> pendingCapMax;   // (capacity index, bound)
+
+  void clearPendingPrunes() {
+    pendingRemovals.clear();
+    pendingCapMin.clear();
+    pendingCapMax.clear();
+  }
+
+  void applyPendingPrunes() {
+    for(SysInt i = 0; i < (SysInt)pendingRemovals.size(); i++) {
+      // inDomain guard: the same removal can be recorded twice (e.g.
+      // once by Tarjan and once via a capacity bound on an aliased
+      // variable), and an earlier applied prune may already have
+      // removed it.
+      if(varArray[pendingRemovals[i].first].inDomain(pendingRemovals[i].second))
+        varArray[pendingRemovals[i].first].removeFromDomain(pendingRemovals[i].second);
+    }
+    for(SysInt i = 0; i < (SysInt)pendingCapMin.size(); i++)
+      capacity_array[pendingCapMin[i].first].setMin(pendingCapMin[i].second);
+    for(SysInt i = 0; i < (SysInt)pendingCapMax.size(); i++)
+      capacity_array[pendingCapMax[i].first].setMax(pendingCapMax[i].second);
+    clearPendingPrunes();
+  }
 
   void do_gcc_prop_scc() {
     if(Strongcards) {
@@ -673,6 +719,10 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
 
     D_DATA(check_adjlists());
+
+    // A failed earlier pass may have returned without applying; its
+    // prunes are moot after backtracking, so start clean.
+    clearPendingPrunes();
 
 // Assumes triggered on variables in to_process
 #ifndef INCREMENTALMATCH
@@ -823,6 +873,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 #ifndef SCCCARDS
     prop_capacity();
 #endif
+
+    applyPendingPrunes();
   }
 
   deque<SysInt> fifo;
@@ -1710,7 +1762,10 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
                   if(matching[curvar] != copynode + domMin - numvars) {
                     GCCPRINT("Removing var: " << curvar << " val:" << copynode + domMin - numvars);
                     if(varArray[curvar].inDomain(copynode + domMin - numvars)) {
-                      varArray[curvar].removeFromDomain(copynode + domMin - numvars);
+                      // Deferred: the internal graph is updated now,
+                      // the real domain at the end of the pass.
+                      pendingRemovals.push_back(
+                          make_pair(curvar, DomainInt(copynode + domMin - numvars)));
 #if UseIncGraph
                       adjlist_remove(curvar, copynode - numvars + domMin);
 #endif
@@ -1755,8 +1810,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     // Set bounds
     for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
       SysInt val = val_array[i];
-      capacity_array[i].setMin(augpath[val - domMin]);
-      capacity_array[i].setMax(adjlistlength[val - domMin + numvars]);
+      pendingCapMin.push_back(make_pair(i, DomainInt(augpath[val - domMin])));
+      pendingCapMax.push_back(make_pair(i, DomainInt(adjlistlength[val - domMin + numvars])));
     }
   }
 
@@ -1791,8 +1846,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     for(SysInt i = 0; i < (SysInt)valsInSCC.size(); i++) {
       SysInt val = valsInSCC[i];
       SysInt capidx = valToCapIndex[val - domMin];
-      capacity_array[capidx].setMin(augpath[val - domMin]);
-      capacity_array[capidx].setMax(adjlistlength[val - domMin + numvars]);
+      pendingCapMin.push_back(make_pair(capidx, DomainInt(augpath[val - domMin])));
+      pendingCapMax.push_back(make_pair(capidx, DomainInt(adjlistlength[val - domMin + numvars])));
     }
   }
 
@@ -1811,8 +1866,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
           mincap++;
       }
     }
-    capacity_array[i].setMin(mincap);
-    capacity_array[i].setMax(maxcap);
+    pendingCapMin.push_back(make_pair(i, DomainInt(mincap)));
+    pendingCapMax.push_back(make_pair(i, DomainInt(maxcap)));
 #else
     // This is a little odd because the adjacency list might be out of date
     // because of pruning done earlier on another cap var.
@@ -1828,8 +1883,8 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
         if(varArray[var].isAssigned() && varArray[var].assignedValue() == val)
           mincap++;
       }
-      capacity_array[i].setMin(mincap);
-      capacity_array[i].setMax(adjlistlength[val - domMin + numvars]);
+      pendingCapMin.push_back(make_pair(i, DomainInt(mincap)));
+      pendingCapMax.push_back(make_pair(i, DomainInt(adjlistlength[val - domMin + numvars])));
     } // else the cap will already have been set to 0.
 #endif
   }
@@ -1867,7 +1922,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     SysInt validx = valToCapIndex[value - domMin];
     if(newlb > capacity_array[validx].min()) {
       GCCPRINT("Improved lower bound " << newlb);
-      capacity_array[validx].setMin(newlb);
+      pendingCapMin.push_back(make_pair(validx, DomainInt(newlb)));
       lower[value - domMin] = newlb;
     }
 
@@ -1877,7 +1932,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
 
     if(newub < capacity_array[validx].max()) {
       GCCPRINT("Improved upper bound " << newub);
-      capacity_array[validx].setMax(newub);
+      pendingCapMax.push_back(make_pair(validx, DomainInt(newub)));
       upper[value - domMin] = newub;
     }
   }
