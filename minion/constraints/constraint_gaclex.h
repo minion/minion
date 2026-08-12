@@ -47,6 +47,28 @@ struct GacLexLeqConstraint : public AbstractConstraint {
   vector<pair<DomainInt, DomainInt>> earliest_occurrence_x;
   vector<pair<DomainInt, DomainInt>> earliest_occurrence_y;
 
+  // Two references alias, for the purposes of the earliest_occurrence
+  // machinery, only if they denote the same variable seen through the
+  // same mapping. getBaseVar() alone is not enough: !b and b share a
+  // base but take opposite values, so conflating them builds an
+  // inconsistent support witness in gacpass and prunes wrongly. A
+  // same-base different-view pair is instead left un-aliased, which
+  // gives it the plain optimistic witness value -- sound (optimism can
+  // only miss prunes), merely not GAC, which is not promised under
+  // aliasing anyway. Mapper value maps are affine, so two refs with
+  // the same base see the same view iff their domains coincide and the
+  // base images of both endpoints agree (getBaseVal only accepts
+  // in-domain values, so probe at each ref's own endpoints). For an
+  // assigned base (min == max) this degenerates to "both views are the
+  // same constant", which is all the witness machinery needs.
+  template <typename R1, typename R2>
+  static bool sameVarSameView(const R1& r1, const R2& r2) {
+    return r1.getBaseVar() == r2.getBaseVar() && r1.min() == r2.min() &&
+           r1.max() == r2.max() &&
+           r1.getBaseVal(r1.min()) == r2.getBaseVal(r2.min()) &&
+           r1.getBaseVal(r1.max()) == r2.getBaseVal(r2.max());
+  }
+
   GacLexLeqConstraint(const VarArray1& _x, const VarArray2& _y)
       : alpha(), beta(), F(), x(_x), y(_y) {
     CHECK(x.size() == y.size(), "gaclex only works on vectors of equal length");
@@ -62,14 +84,13 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     }
 
     for(SysInt i = 0; i < (SysInt)x.size(); ++i) {
-      Var base = x[i].getBaseVar();
       pair<DomainInt, DomainInt> pos = make_pair(0, i);
       for(SysInt j = 0; j < i; ++j) {
-        if(x[j].getBaseVar() == base) {
+        if(sameVarSameView(x[j], x[i])) {
           pos = make_pair(0, j);
           j = i;
         }
-        if(y[j].getBaseVar() == base) {
+        if(sameVarSameView(y[j], x[i])) {
           pos = make_pair(1, j);
           j = i;
         }
@@ -78,14 +99,13 @@ struct GacLexLeqConstraint : public AbstractConstraint {
     }
 
     for(SysInt i = 0; i < (SysInt)y.size(); ++i) {
-      Var base = y[i].getBaseVar();
       pair<DomainInt, DomainInt> pos = make_pair(1, i);
       for(SysInt j = 0; j < i; ++j) {
-        if(x[j].getBaseVar() == base) {
+        if(sameVarSameView(x[j], y[i])) {
           pos = make_pair(0, j);
           j = i;
         }
-        if(y[j].getBaseVar() == base) {
+        if(sameVarSameView(y[j], y[i])) {
           pos = make_pair(1, j);
           j = i;
         }
