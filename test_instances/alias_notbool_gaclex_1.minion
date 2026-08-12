@@ -1,0 +1,23 @@
+MINION 3
+#TEST SOLCOUNT 2
+# lexleq[rv] (GacLexLeq) with a variable aliased across the two vectors
+# both plain and negated: (x, !b, b) <=lex (b, x, -9). The solutions
+# are (x,b) = (0,1) and (1,1); the earliest_occurrence support
+# machinery used to conflate !b with b (getBaseVar sees through the
+# not-mapper), fabricate the witness (1,1,1) vs (1,1,-9) for x=1, and
+# wrongly prune x=1, losing the (1,1) solution.
+
+**VARIABLES**
+
+DISCRETE x {0..1}
+BOOL b
+
+**SEARCH**
+
+PRINT [[x],[b]]
+
+**CONSTRAINTS**
+
+lexleq[rv]([x, !b, b], [b, x, -9])
+
+**EOF**
