@@ -629,9 +629,17 @@ pub fn run_multi_injected(
     let mut model = build_multi_model(base, vars_only)?;
     // Register tuple tables on any injection instance too, so a
     // mid-search-injected `str2plus` can reference the right table.
+    // Skip the ones build_multi_model already covered: callers commonly
+    // pass the injection instances as `vars_only` as well, so that their
+    // variables are declared before the solve starts, and registering
+    // the same table a second time trips the name-clash check.
     for (_, pkt) in injections {
         if let InjectionPacket::ExistingVarsConstraint(inst) = pkt {
-            register_tuple_tables_for_instance(&mut model, inst)?;
+            let already = base.iter().any(|b| std::ptr::eq(*b, *inst))
+                || vars_only.iter().any(|v| std::ptr::eq(*v, *inst));
+            if !already {
+                register_tuple_tables_for_instance(&mut model, inst)?;
+            }
         }
     }
     let initial_variable_order = model.named_variables.get_variable_order();
