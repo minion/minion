@@ -1206,7 +1206,20 @@ MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& inst
     instance.constraints.push_back(constraint);
     normaliseTableConstraintBlobTree(instance.constraints.back());
 
+    // A propagator with backtrackable internal state (haggisgac,
+    // haggisgac-stable, gacschema) registers itself with the
+    // GenericBacktracker in its constructor. Built mid-search it has
+    // missed every worldPush so far, yet worldPop still calls pop() on
+    // it once per open level -- so it unwinds off the bottom of its own
+    // stack (a heap-buffer-overflow read, caught by ASan). Give each
+    // object that registered during construction one mark per open
+    // level. Must be before addConstraintMidsearch: fullPropagate
+    // pushes records belonging to the current level, which have to sit
+    // on top of these markers.
+    const int btBefore = getState().getGenericBacktracker().size();
     AbstractConstraint* c = build_constraint(instance.constraints.back());
+    getState().getGenericBacktracker().markFrom(btBefore,
+                                                (int)Controller::getWorldDepth());
     // addConstraintMidsearch returns false when the new constraint wipes
     // out a domain during its initial fullPropagate. That's a normal
     // search outcome: getState().isFailed() is already set, so when
