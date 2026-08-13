@@ -138,14 +138,17 @@ struct StandardSearchManager : public SearchManager {
 
     // We can no longer assert var.inDomain(val): a constraint added
     // mid-search and re-propagated by this worldPop may already have
-    // pruned `val`. The setMin/setMax/removeFromDomain calls below
-    // behave as no-ops in that case (val is neither min nor max, and
-    // removeFromDomain on an absent value is a no-op), so the right
-    // branch marker is still recorded and search progresses correctly.
+    // pruned `val`. There is then nothing left to remove, so skip the
+    // domain operation and just record the right branch marker; search
+    // progresses correctly. Falling through to removeFromDomain is NOT
+    // harmless: on a bound variable it is a hard USER_ERROR (the
+    // container cannot represent a hole), which exit(1)s the process.
 
     // special case the upper and lower bounds to make it work for bound
     // variables
-    if(var.min() == val) {
+    if(!var.inDomain(val)) {
+      // nothing to do
+    } else if(var.min() == val) {
       var.setMin(val + 1);
     } else if(var.max() == val) {
       var.setMax(val - 1);
