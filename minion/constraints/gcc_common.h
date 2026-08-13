@@ -239,6 +239,32 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
 #if UseIncGraph
     {
+      // Re-declare the complete graph before narrowing it. The loop below
+      // only walks the live prefix of each row, so it can shrink the graph
+      // but never grow it: it assumes the incoming adjacency lists are a
+      // superset of the current domains, which is what the constructor
+      // leaves behind. That assumption breaks for a constraint added
+      // mid-search. adjlist and adjlistpos are plain vectors and survive
+      // backtracking, but adjlistlength lives in backtrackable memory, and
+      // MemoryBlock zeroes bytes allocated after a snapshot when it pops
+      // back past it -- so the first backtrack past the depth the
+      // constraint was added at leaves every row length at 0, the loop
+      // below does nothing, and the graph stays empty while the domains are
+      // full.
+      //
+      // Restoring the lengths is enough: delfromlist only ever swaps an
+      // entry down to the end of the live prefix, so each row stays a
+      // permutation of the full set with adjlistpos its exact inverse, dead
+      // suffix included. Setting the lengths back to their maxima therefore
+      // reproduces the constructor's state exactly, and the narrowing below
+      // prunes it to the current domains. For a constraint present from the
+      // start, fullPropagate runs immediately after the constructor and
+      // this is a no-op.
+      for(SysInt i = 0; i < numvars; i++)
+        adjlistlength[i] = numvals;
+      for(SysInt i = numvars; i < numvars + numvals; i++)
+        adjlistlength[i] = numvars;
+
       // update the adjacency lists. and place dts
       for(SysInt i = domMin; i <= domMax; i++) {
         for(SysInt j = 0; j < adjlistlength[i - domMin + numvars]; j++) {
