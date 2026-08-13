@@ -1066,6 +1066,12 @@ fn main() -> Result<()> {
         // separately by test_constraint_restart, which uses
         // -sollimit 1 and verifies the found solution lies in the
         // baseline's solution set.
+        // Time / CPU limits and cores. Big enough never to trip on the
+        // tester's tiny instances — these exist to exercise the flag
+        // plumbing, not to verify timeout semantics.
+        vec!["-timelimit", "3600"],
+        vec!["-cpulimit", "3600"],
+        vec!["-cores", "4"],
     ];
 
     let mut testlist = vec![];
@@ -1074,12 +1080,20 @@ fn main() -> Result<()> {
 
     for _ in 0..opt.optioncount {
         let tests = rng.gen_range(0..options.len());
-        let testargs = (
-            v.choose(&mut rng).unwrap(),
-            options.choose_multiple(&mut rng, tests).collect::<Vec<_>>(),
-        );
+        let mut chosen: Vec<_> = options.choose_multiple(&mut rng, tests).collect();
 
-        testlist.push(testargs);
+        // Repeating most of these flags is last-wins, which is why the
+        // sweep can throw an arbitrary subset at minion. -timelimit and
+        // -cpulimit are the exception: commandline_parse rejects the pair
+        // outright ("Only one '-cpulimit', or '-timelimit' per instance").
+        // Keep whichever the shuffle put first.
+        let is_time_flag = |o: &&Vec<&str>| o[0] == "-timelimit" || o[0] == "-cpulimit";
+        if let Some(first) = chosen.iter().position(is_time_flag) {
+            let keep = chosen[first][0];
+            chosen.retain(|o| !is_time_flag(o) || o[0] == keep);
+        }
+
+        testlist.push((v.choose(&mut rng).unwrap(), chosen));
     }
 
     let ret3: Result<()> = testlist.into_par_iter().try_for_each(|(c, ref options)| {
