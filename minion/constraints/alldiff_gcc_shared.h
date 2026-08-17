@@ -29,6 +29,17 @@ struct smallset {
   vector<SysInt> list;
 
   void reserve(SysInt size) {
+    // Idempotent: calling it again at the same size empties the set
+    // rather than complaining, so a constraint can re-establish its
+    // structures at a new search level (AbstractConstraint::
+    // init_constraint) without reallocating them.
+    if((SysInt)membership.size() == size) {
+      list.clear();
+      cert = 1;
+      for(SysInt i = 0; i < size; i++)
+        membership[i] = 0;
+      return;
+    }
     // This must be called before anything is put in the set.
     D_ASSERT(membership.size() == 0);
     membership.resize(size, 0);
@@ -87,6 +98,13 @@ struct smallset_nolist {
   vector<UnsignedSysInt> membership;
 
   void reserve(SysInt size) {
+    // Idempotent, as above: re-reserving at the same size empties it.
+    if((SysInt)membership.size() == size) {
+      cert = 1;
+      for(SysInt i = 0; i < size; i++)
+        membership[i] = 0;
+      return;
+    }
     D_ASSERT(membership.size() == 0);
     // This must be called before anything is put in the set.
     membership.resize(size, 0);
