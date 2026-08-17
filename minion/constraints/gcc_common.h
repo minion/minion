@@ -125,43 +125,19 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       }
     }
 
-    usage.resize(numvals, 0);
-
-    lower.resize(numvals, 0);
-    if(SimulateAlldiff) { // Pretend to be a gacalldiff.
-      upper.resize(numvals, 1);
-      if(capacity_array.size() != 0) {
-        cout << "gcc+SimulateAlldiff requires 0 cap vars." << endl;
-        abort();
-      }
-    } else { // Normal case.
-      upper.resize(numvals, numvars);
+    if(SimulateAlldiff && capacity_array.size() != 0) {
+      cout << "gcc+SimulateAlldiff requires 0 cap vars." << endl;
+      abort();
     }
 
+    usage.resize(numvals);
+    lower.resize(numvals);
+    upper.resize(numvals);
     prev.resize(numvars + numvals);
-
-    initialize_hopcroft();
-    initialize_tarjan();
-
-    // SCC data structures
     SCCs.resize(numvars + numvals);
     varToSCCIndex.resize(numvars + numvals);
-    for(SysInt i = 0; i < numvars + numvals; i++) {
-      SCCs[i] = i;
-      varToSCCIndex[i] = i;
-    }
-
     vars_in_scc.reserve(numvars);
     valsInSCC.reserve(numvals);
-    // In case we are not using SCCs, fill the var and val arrays.
-    vars_in_scc.clear();
-    for(SysInt i = 0; i < numvars; i++) {
-      vars_in_scc.push_back(i);
-    }
-    valsInSCC.clear();
-    for(SysInt i = domMin; i <= domMax; i++) {
-      valsInSCC.push_back(i);
-    }
 
     to_process.reserve(numvars + numvals);
     sccsToProcess.reserve(numvars + numvals);
@@ -197,17 +173,76 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 // lost.
 #endif
 
-    for(SysInt i = 0; i < numvars; i++)
-      varvalmatching[i] = domMin - 1;
-
 #ifdef QUIMPER
     hopcroft2Setup();
-    lbcmatching.resize(numvars, domMin - 1);
-    lbcusage.resize(numvals, 0);
+    lbcmatching.resize(numvars);
+    lbcusage.resize(numvals);
 #endif
 
 #if DomainCounting || InternalDT
     changedVars_per_scc.resize(numvars + numvals);
+#endif
+
+    init_constraint();
+  }
+
+  /// Everything here is derived from initialMin()/initialMax() sizes, so
+  /// it reproduces the same state at any search depth, and it touches no
+  /// domain. See AbstractConstraint::init_constraint.
+  virtual void init_constraint() {
+#if UseIncGraph
+    // The bipartite graph, complete, with adjlistpos as its inverse.
+    // adjlistlength lives in backtrackable memory and is what a pop past
+    // the creation depth zeroes; adjlist/adjlistpos do not, so the two
+    // have to be re-paired together or the graph reads inconsistently in
+    // its two directions.
+    for(SysInt i = 0; i < numvars; i++) {
+      for(SysInt j = 0; j < numvals; j++) {
+        adjlist[i][j] = j + domMin;
+        adjlistpos[i][j] = j;
+      }
+      adjlistlength[i] = numvals;
+    }
+    for(SysInt i = numvars; i < numvars + numvals; i++) {
+      for(SysInt j = 0; j < numvars; j++) {
+        adjlist[i][j] = j;
+        adjlistpos[i][j] = j;
+      }
+      adjlistlength[i] = numvars;
+    }
+#endif
+
+    usage.assign(numvals, 0);
+    lower.assign(numvals, 0);
+    // SimulateAlldiff pretends to be a gacalldiff: every value used once.
+    upper.assign(numvals, SimulateAlldiff ? 1 : numvars);
+
+    initialize_hopcroft();
+    initialize_tarjan();
+
+    for(SysInt i = 0; i < numvars + numvals; i++) {
+      SCCs[i] = i;
+      varToSCCIndex[i] = i;
+    }
+
+    // In case we are not using SCCs, fill the var and val arrays.
+    vars_in_scc.clear();
+    for(SysInt i = 0; i < numvars; i++)
+      vars_in_scc.push_back(i);
+    valsInSCC.clear();
+    for(SysInt i = domMin; i <= domMax; i++)
+      valsInSCC.push_back(i);
+
+    for(SysInt i = 0; i < numvars; i++)
+      varvalmatching[i] = domMin - 1;
+
+#ifdef QUIMPER
+    lbcmatching.assign(numvars, domMin - 1);
+    lbcusage.assign(numvals, 0);
+#endif
+
+#ifdef CAPBOUNDSCACHE
+    boundsupported.assign(numvals * 2, -1);
 #endif
   }
 
