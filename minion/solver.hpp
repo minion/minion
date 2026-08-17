@@ -41,6 +41,13 @@ inline void worldPop() {
   if((SysInt)constraintList.size() > propagateDepth) {
     for(set<AbstractConstraint*>::iterator it = constraintList[propagateDepth].begin();
         it != constraintList[propagateDepth].end(); it++) {
+      // Re-establish the constraint's internal structures before
+      // propagating with them. A constraint added mid-search built them
+      // at the depth it was created at, and anything it keeps in
+      // backtrackable memory has just been zeroed by the pop above.
+      // init_constraint also reaches the children of a meta-constraint,
+      // which never get fullPropagate called on them directly.
+      (*it)->init_constraint();
       (*it)->fullPropagate();
     }
 

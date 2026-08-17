@@ -157,6 +157,26 @@ public:
     return constraintName();
   }
 
+  /// Builds the constraint's internal representation from scratch.
+  ///
+  /// Called when the constraint is created, and again from worldPop for
+  /// any constraint being re-established at a level shallower than the
+  /// one it was built at.
+  ///
+  /// A constraint that keeps incremental structures spanning several
+  /// search levels -- gcc's flow graph, say -- must set them up here
+  /// rather than in its constructor. Structures built in a constructor
+  /// that runs mid-search are only meaningful below the depth they were
+  /// created at: backtracking above it leaves them stale, or, if they
+  /// live in backtrackable memory, zeroed outright.
+  ///
+  /// Unlike fullPropagate this must NOT touch any domain. It can be
+  /// called on a constraint that is not known to hold -- a child of a
+  /// reify or a watched-or -- where pruning would lose solutions. It
+  /// must also be idempotent, and independent of the current domains:
+  /// size things from initialMin()/initialMax(), never min()/max().
+  virtual void init_constraint() {}
+
   /// Performs a full round of propagation and sets up any data needs by
   /// propagateDynInt().
   /** This function can be called during search if the function is reified */
@@ -339,6 +359,15 @@ public:
     } else {
       return _getTrigRef(trignum);
     }
+  }
+
+  /// Pass initialisation down the tree. A child of a meta-constraint is
+  /// never fullPropagated unless the parent has established it must
+  /// hold, so this is the only route by which a nested constraint gets
+  /// its structures rebuilt at a new level.
+  virtual void init_constraint() {
+    for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i)
+      child_constraints[i]->init_constraint();
   }
 
   ParentConstraint(const vector<AbstractConstraint*> _children) : child_constraints(_children) {
