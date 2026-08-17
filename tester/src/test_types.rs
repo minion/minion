@@ -332,8 +332,8 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
         && ret.nodes != ret2.nodes
     {
         return Err(anyhow!(format!(
-            "Propagator should be GAC, but node counts not equal in {} vs {}",
-            ret.filename, ret2.filename
+            "Propagator should be GAC, but node counts not equal in {} vs {}{}",
+            ret.filename, ret2.filename, rerun_hint(&ret, &ret2)
         )));
     }
 
@@ -359,8 +359,10 @@ pub fn test_constraint_par(config: &MinionConfig, c: &constraint_def::Constraint
     }
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
-            "Solutions not equal in {} vs {}",
-            ret.filename, ret2.filename
+            "Solutions not equal in {} vs {}{}",
+            ret.filename,
+            ret2.filename,
+            rerun_hint(&ret, &ret2)
         )));
     }
 
@@ -801,6 +803,17 @@ pub fn test_constraint_variant_equivalence(config: &MinionConfig, variants: &[&s
     Ok(())
 }
 
+/// Formatted "how to reproduce this exact run" block. The instance files
+/// of a failing trial are deliberately left on disk (only passing trials
+/// are cleaned up), so these commands can be pasted straight into a
+/// shell. Keep it in one place so every failure path reports the same way.
+fn rerun_hint(a: &MinionOutput, b: &MinionOutput) -> String {
+    format!(
+        "\n\nReproduce (files left in place):\n  {}\n  {}",
+        a.command, b.command
+    )
+}
+
 pub fn test_constraint_options(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
@@ -824,8 +837,10 @@ pub fn test_constraint_options(
     }
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
-            "Solutions not equal in {} vs {}",
-            ret.filename, ret2.filename
+            "Solutions not equal in {} vs {}{}",
+            ret.filename,
+            ret2.filename,
+            rerun_hint(&ret, &ret2)
         )));
     }
 

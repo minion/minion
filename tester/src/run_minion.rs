@@ -33,6 +33,10 @@ pub struct MinionOutput {
     pub raw_solutions: Option<Vec<Vec<i64>>>,
     pub nodes: i64,
     pub filename: String,
+    /// Exact command that produced this run, so a failing trial can be
+    /// replayed by hand. Set for exec-mode runs; the in-process backend
+    /// records an equivalent description instead.
+    pub command: String,
     pub cleanup: CleanupFiles,
     /// Number of work-stealing donations the run made (None if the
     /// run wasn't a work-steal run; Some(0) if work-steal was active
@@ -363,6 +367,7 @@ fn get_minion_solutions_inner(
         raw_solutions,
         nodes,
         filename: minout.clone(),
+        command: minioncmd.clone(),
         cleanup: CleanupFiles {
             files: vec![minout, solsout, tableout],
         },

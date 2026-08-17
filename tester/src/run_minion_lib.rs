@@ -1009,6 +1009,7 @@ pub fn get_minion_solutions_in_process_work_steal(
         raw_solutions,
         nodes: stats.total_nodes,
         filename: format!("<in-process-work-steal:{testname}>"),
+        command: format!("<in-process-work-steal:{testname}>"),
         cleanup: CleanupFiles::empty(),
         work_steal_donations: Some(stats.donations),
         // In-process backend doesn't currently surface the parallel-
@@ -1113,6 +1114,7 @@ pub fn get_minion_solutions_in_process(
         raw_solutions,
         nodes,
         filename: format!("<in-process:{testname}>"),
+        command: format!("<in-process:{testname}>"),
         cleanup: CleanupFiles::empty(),
         work_steal_donations: None,
         // In-process backend doesn't currently surface the parallel-
@@ -1230,6 +1232,7 @@ pub fn get_minion_solutions_in_process_optimisation(
         raw_solutions: None,
         nodes,
         filename: format!("<in-process-opt:{testname}>"),
+        command: format!("<in-process-opt:{testname}>"),
         cleanup: CleanupFiles::empty(),
         work_steal_donations: None,
         parallel_preprocess_rounds: None,
