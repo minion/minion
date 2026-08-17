@@ -15,7 +15,7 @@ namespace Controller {
 template <typename T>
 void inline maybe_print_search_assignment(T& var, DomainInt val, BOOL equal) {
   if(getOptions().dumptree) {
-    cout << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
+    getOutput() << "SearchAssign:" << var << (equal ? " = " : " != ") << val << endl;
   }
   if(getOptions().dumptreeobj) {
     getOptions().dumptreeobj->branch(getState().getNodeCount(), getBaseVarName(var), val, equal);

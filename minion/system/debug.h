@@ -48,7 +48,7 @@ inline void CheckNotBoundSingle(const T& t, std::string s, std::string s2 = "") 
 
 #define INPUT_ERROR(s)                                                                             \
   {                                                                                                \
-    cout << "There was a problem in your input file:\n" << s << endl;                              \
+    getOutput() << "There was a problem in your input file:\n" << s << endl;                              \
     exit(1);                                                                                       \
   }
 // These functions are defined in debug_functions.cpp

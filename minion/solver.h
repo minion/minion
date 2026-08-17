@@ -500,12 +500,12 @@ public:
 
   void print(string s) {
     if(!silent)
-      cout << s;
+      getOutput() << s;
   }
 
   void printLine(string s) {
     if(!silent)
-      cout << s << endl;
+      getOutput() << s << endl;
   }
 };
 

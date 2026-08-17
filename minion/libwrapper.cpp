@@ -156,7 +156,28 @@ static void resetContextState(MinionContext* ctx)
 
 MinionContext* minion_newContext()
 {
-  return new MinionContext();
+  MinionContext* ctx = new MinionContext();
+
+  // Settle this context's output destination once, here, and never
+  // touch it again. Doing it per run meant every entry and exit
+  // rewrote out_m, so concurrent runs on one context fought over it and
+  // a finishing run handed the terminal back to a run that was supposed
+  // to stay quiet.
+  //
+  // out_sink_m stays unopened unless LIBMINION_LOG asks for a file; an
+  // unopened ofstream discards what is written to it without buffering.
+  if(std::getenv("LIBMINION_LOG")) {
+    time_t rawtime;
+    time(&rawtime);
+    stringstream filenameStream;
+    filenameStream << "minion";
+    filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
+    filenameStream << ".log";
+    ctx->out_sink_m.open(filenameStream.str(), ios_base::app);
+  }
+  ctx->out_m = &ctx->out_sink_m;
+
+  return ctx;
 }
 
 void minion_freeContext(MinionContext* ctx)
@@ -213,37 +234,11 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
     globals->solsoutfile.open(options.solsoutFilename, ios::app);
   }
 
-  // Redirect cout
-  // https://stackoverflow.com/questions/49462524/controlling-output-from-external-libraries
-  // https://stackoverflow.com/questions/4810516/c-redirecting-stdout
-  //
-  // Skip cout redirection when running as a worker thread (installAlarms=
-  // false): cout is a process-global object and racing on rdbuf() across N
-  // workers produces garbled, unrecoverable output. The thread controller
-  // sets perThreadOptions.silent in worker copies so search-level chatter is
-  // suppressed; concurrent solution writes are protected by the broadened
-  // Parallel::lockSolsout predicate.
-
-  streambuf* oldCoutStreamBuf = cout.rdbuf();
-  ifstream logOutStream;
+  // Output destination is fixed when the context is created
+  // (minion_newContext) and deliberately not touched here: a per-run
+  // setup/restore is what made concurrent runs fight over it.
   time_t rawtime;
   time(&rawtime);
-
-  if(installAlarms) {
-    // enable logging if LIBMINION_LOG is set
-    if (std::getenv("LIBMINION_LOG")) {
-      stringstream filenameStream;
-      filenameStream << "minion";
-      filenameStream << put_time(gmtime(&rawtime), "%Y-%m-%d-%H:%M:%S");
-      filenameStream << ".log";
-
-      logOutStream.open(filenameStream.str(), ios_base::app);
-      cout.rdbuf(logOutStream.rdbuf());
-    } else {
-      // silence cout
-      cout.rdbuf(NULL);
-    }
-  }
 
   // Pass error codes across FFI boundaries, not exceptions.
   try {
@@ -263,8 +258,8 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
 
     GET_GLOBAL(global_random_gen).seed(args.randomSeed);
     if(!getOptions().silent) {
-      cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
-      cout << "# Input filename: " << getOptions().instance_name << endl;
+      getOutput() << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
+      getOutput() << "# Input filename: " << getOptions().instance_name << endl;
       getOptions().printLine("Using seed: " + tostring(args.randomSeed));
     }
 
@@ -293,7 +288,7 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
 
     getTableOut().set("MinionVersion", -1);
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-    getState().getOldTimer().maybePrintTimestepStore(cout, "Parsing Time: ", "ParsingTime",
+    getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);
 
     SetupCSPOrdering(instance, args);
@@ -309,7 +304,7 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
   }
 
   catch(const parse_exception& e) {
-    cout << "Invalid instance: " << e.what() << endl;
+    getOutput() << "Invalid instance: " << e.what() << endl;
     set_error(e.what());
     returnCode = MinionResult::MINION_INVALID_INSTANCE;
   } catch(const std::bad_alloc&) {
@@ -335,11 +330,6 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
 
   if(installAlarms) {
     Parallel::endParallelMinion();
-  }
-
-  // Restore old cout (only if we redirected it).
-  if(installAlarms) {
-    cout.rdbuf(oldCoutStreamBuf);
   }
 
   // Don't reset context here - caller may still query results via
@@ -608,7 +598,7 @@ MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options
   // single worker already prints "Solutions Found:" itself; printing
   // again would duplicate.
   if(N > 1 && !options.silent) {
-    cout << "Solutions Found: " << shared.totalSolutionsFound.load() << endl;
+    getOutput() << "Solutions Found: " << shared.totalSolutionsFound.load() << endl;
   }
 
   // Stash aggregated counters on the parent's TableOut so callers
@@ -959,8 +949,8 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
   }
 
   if(N > 1 && !options.silent) {
-    cout << "Solutions Found: " << ctrl.totalSolutionsFound.load() << endl;
-    cout << "WorkSteal donations: " << ctrl.donationsMade.load()
+    getOutput() << "Solutions Found: " << ctrl.totalSolutionsFound.load() << endl;
+    getOutput() << "WorkSteal donations: " << ctrl.donationsMade.load()
          << ", taken: " << ctrl.workItemsTaken.load()
          << ", replay-failures: " << ctrl.replayFailures.load() << endl;
     // Contention numbers: total wait time across all workers for each
@@ -968,7 +958,7 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     long long qNs = ctrl.queueLockWaitNanos.load();
     long long iNs = ctrl.idleWaitNanos.load();
     long long cNs = ctrl.callbackLockWaitNanos.load();
-    cout << "WorkSteal contention (cumulative across "
+    getOutput() << "WorkSteal contention (cumulative across "
          << N << " workers, ms): queue-lock="
          << (qNs / 1000000) << ", idle-wait="
          << (iNs / 1000000) << ", callback-lock="

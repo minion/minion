@@ -171,7 +171,7 @@ inline void check_sol_is_correct() {
       print_solution(oss, getState().getPrintMatrix());
       getState().storedSolution = oss.str();
     } else
-      print_solution(cout, getState().getPrintMatrix());
+      print_solution(getOutput(), getState().getPrintMatrix());
   }
 
   // For optimisation problems, also print the "Solution found with
@@ -201,10 +201,10 @@ inline void check_sol_is_correct() {
       // call. The non-dominated condition above ensures it only
       // gets overwritten with strictly-improving solutions.
     } else if(getOptions().print_solution) {
-      cout << "Solution found with Value: ";
+      getOutput() << "Solution found with Value: ";
       output_mapped_container(
-          cout, rawOptVals, [](DomainInt v) { return v; }, true);
-      cout << endl;
+          getOutput(), rawOptVals, [](DomainInt v) { return v; }, true);
+      getOutput() << endl;
     }
   }
 
@@ -302,7 +302,7 @@ inline void generateRestartFile(VarArray& varArray, BranchList& branches) {
       }
       string filename = basename + "-resume-" + tostring(time(NULL)) + "-" + tostring(getpid()) +
                         "-" + curvar + "-" + tostring(i++) + ".minion";
-      cout << "Output resume file to \"" << filename << "\"" << endl;
+      getOutput() << "Output resume file to \"" << filename << "\"" << endl;
       ofstream fileout(filename.c_str());
       fileout << "# original instance: " << getOptions().instance_name << endl;
       fileout << inst;
@@ -426,7 +426,7 @@ void inline standard_dealWith_solution() {
 
 void inline maybe_print_node(bool isSolution = false) {
   if(getOptions().dumptree)
-    cout << "Node: " << getState().getNodeCount() << "," << getDom_as_string(getVars().getAllVars())
+    getOutput() << "Node: " << getState().getNodeCount() << "," << getDom_as_string(getVars().getAllVars())
          << endl;
   if(getOptions().dumptreeobj) {
     getOptions().dumptreeobj->output_node(getState().getNodeCount(), getVars().getAllVars(),
@@ -437,7 +437,7 @@ void inline maybe_print_node(bool isSolution = false) {
 void inline maybe_print_backtrack() {
   // used to print "bt" usually
   if(getOptions().dumptree)
-    cout << "SearchAction: bt" << endl;
+    getOutput() << "SearchAction: bt" << endl;
   if(getOptions().dumptreeobj)
     getOptions().dumptreeobj->backtrack();
 }

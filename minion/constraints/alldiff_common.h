@@ -310,10 +310,10 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
       }
       if(!valout) {
         // none of the watches were disturbed.
-        cout << "None of the watches in the DS were disturbed. BT triggers "
+        getOutput() << "None of the watches in the DS were disturbed. BT triggers "
                 "must not match with watches DS."
              << endl;
-        cout << "Variable " << prop_var << ", val in matching: " << varvalmatching[prop_var]
+        getOutput() << "Variable " << prop_var << ", val in matching: " << varvalmatching[prop_var]
              << endl;
         D_ASSERT(false);
       }
@@ -391,29 +391,29 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     PROP_INFO_ADDONE(GacAlldiff);
 
 #ifdef PLONG
-    cout << "Entering do_prop." << endl;
-    cout << "Varvalmatching:" << varvalmatching << endl;
-    cout << "SCCs:" << SCCs << endl;
-    cout << "SCCSplit: ";
+    getOutput() << "Entering do_prop." << endl;
+    getOutput() << "Varvalmatching:" << varvalmatching << endl;
+    getOutput() << "SCCs:" << SCCs << endl;
+    getOutput() << "SCCSplit: ";
     for(SysInt i = 0; i < numvars; i++) {
-      cout << (SCCSplit.isMember(i) ? "1, " : "0, ");
+      getOutput() << (SCCSplit.isMember(i) ? "1, " : "0, ");
     }
-    cout << endl;
-    cout << "varToSCCIndex: " << varToSCCIndex << endl;
-    cout << "Domains (remember that varArray is reversed):" << endl;
+    getOutput() << endl;
+    getOutput() << "varToSCCIndex: " << varToSCCIndex << endl;
+    getOutput() << "Domains (remember that varArray is reversed):" << endl;
     for(SysInt i = 0; i < numvars; i++) {
-      cout << "var:" << i << " vals:";
+      getOutput() << "var:" << i << " vals:";
       for(SysInt j = domMin; j <= domMax; j++) {
         if(varArray[i].inDomain(j)) {
-          cout << j << ", ";
+          getOutput() << j << ", ";
         }
       }
-      cout << endl;
+      getOutput() << endl;
     }
     // Check the matching is valid.
     for(SysInt i = 0; i < numvars; i++) {
       if(!varArray[i].inDomain(varvalmatching[i])) {
-        cout << "val in matching removed: " << i << ", " << varvalmatching[i] << endl;
+        getOutput() << "val in matching removed: " << i << ", " << varvalmatching[i] << endl;
       }
       for(SysInt j = i + 1; j < numvars; j++) {
         D_ASSERT(varvalmatching[i] != varvalmatching[j]);
@@ -588,30 +588,30 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     PROP_INFO_ADDONE(GacAlldiff);
 
 #ifdef PLONG
-    cout << "Entering do_prop." << endl;
-    cout << "Varvalmatching:" << varvalmatching << endl;
-    cout << "SCCs:" << SCCs << endl;
-    cout << "SCCSplit: ";
+    getOutput() << "Entering do_prop." << endl;
+    getOutput() << "Varvalmatching:" << varvalmatching << endl;
+    getOutput() << "SCCs:" << SCCs << endl;
+    getOutput() << "SCCSplit: ";
     for(SysInt i = 0; i < numvars; i++) {
-      cout << (SCCSplit.isMember(i) ? "1, " : "0, ");
+      getOutput() << (SCCSplit.isMember(i) ? "1, " : "0, ");
     }
-    cout << endl;
-    cout << "varToSCCIndex: " << varToSCCIndex << endl;
-    cout << "Domains (remember that the var array is reversed):" << endl;
+    getOutput() << endl;
+    getOutput() << "varToSCCIndex: " << varToSCCIndex << endl;
+    getOutput() << "Domains (remember that the var array is reversed):" << endl;
     for(SysInt i = 0; i < numvars; i++) {
-      cout << "var:" << i << " vals:";
+      getOutput() << "var:" << i << " vals:";
       for(SysInt j = domMin; j <= domMax; j++) {
         if(varArray[i].inDomain(j)) {
-          cout << j << ", ";
+          getOutput() << j << ", ";
         }
       }
-      cout << endl;
+      getOutput() << endl;
     }
 
     // Check the matching is valid.
     for(SysInt i = 0; i < numvars; i++) {
       if(!varArray[i].inDomain(varvalmatching[i])) {
-        cout << "val in matching removed, var: " << i << ", val:" << varvalmatching[i] << endl;
+        getOutput() << "val in matching removed, var: " << i << ", val:" << varvalmatching[i] << endl;
       }
       for(SysInt j = i + 1; j < numvars; j++) {
         D_ASSERT(varvalmatching[i] != varvalmatching[j]);
@@ -1269,12 +1269,12 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
                   }
 
 #ifdef PLONG
-                  cout << "varvalmatching:";
+                  getOutput() << "varvalmatching:";
                   for(SysInt sccindex = sccstart; sccindex <= sccend; sccindex++) {
                     if(varArray[SCCs[sccindex]].inDomain(varvalmatching[SCCs[sccindex]]))
-                      cout << SCCs[sccindex] << "->" << varvalmatching[SCCs[sccindex]] << ", ";
+                      getOutput() << SCCs[sccindex] << "->" << varvalmatching[SCCs[sccindex]] << ", ";
                   }
-                  cout << endl;
+                  getOutput() << endl;
 #endif
 
                   invprevious.clear(); // THIS SHOULD BE CHANGED -- RECOMPUTING

@@ -1,12 +1,12 @@
 
 struct Backtrackable {
   virtual void mark() {
-    cout << "Call to mark on class that does not implement it." << endl;
+    getOutput() << "Call to mark on class that does not implement it." << endl;
     abort();
   }
 
   virtual void pop() {
-    cout << "Call to pop on class that does not implement it." << endl;
+    getOutput() << "Call to pop on class that does not implement it." << endl;
     abort();
   }
 };

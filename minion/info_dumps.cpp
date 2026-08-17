@@ -42,7 +42,7 @@ void infoDumps(CSPInstance& instance) {
   if(getOptions().redump) {
     MinionInstancePrinter printer(instance);
     printer.buildInstance();
-    cout << printer.getInstance();
+    getOutput() << printer.getInstance();
     exit(0);
   }
 }

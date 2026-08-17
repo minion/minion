@@ -254,7 +254,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
         // litsPerSupport[id].back().second==temp.val);
         if(!(litsPerSupport[id].back().first == temp.var &&
              litsPerSupport[id].back().second == temp.val)) {
-          cout << "Can't pop pair " << temp.var << "," << temp.val << "from litsPerSupport " << id
+          getOutput() << "Can't pop pair " << temp.var << "," << temp.val << "from litsPerSupport " << id
                << " " << litsPerSupport[id] << endl;
           abort();
         }
@@ -412,17 +412,17 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
   ////////////////////////////////////////////////////////////////////////////
   //
   void printStructures() {
-    cout << "PRINTING ALL DATA STRUCTURES" << endl;
+    getOutput() << "PRINTING ALL DATA STRUCTURES" << endl;
 
-    cout << "Supports for each literal:" << endl;
+    getOutput() << "Supports for each literal:" << endl;
     for(SysInt var = 0; var < (SysInt)vars.size(); var++) {
-      cout << "Variable: " << var << endl;
+      getOutput() << "Variable: " << var << endl;
       for(DomainInt val = domMin; val <= domMax; val++) {
         if(vars[var].inDomain(val)) {
-          cout << "Value: " << val << endl;
+          getOutput() << "Value: " << val << endl;
           Support* sup = supportListPerLit[var][checked_cast<SysInt>(val - domMin)].next[var];
           while(sup != 0) {
-            cout << *(sup) << endl;
+            getOutput() << *(sup) << endl;
             bool containsVarVal = false;
             for(SysInt i = 0; i < (SysInt)sup->literals.size(); i++) {
               if(sup->literals[i].first == var && sup->literals[i].second == val)
@@ -437,9 +437,9 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
       }
     }
 
-    cout << "Literals for each Support:" << endl;
+    getOutput() << "Literals for each Support:" << endl;
     for(SysInt i = 0; i < (SysInt)litsPerSupport.size(); i++) {
-      cout << i << ", " << litsPerSupport[i] << endl;
+      getOutput() << i << ", " << litsPerSupport[i] << endl;
     }
   }
 

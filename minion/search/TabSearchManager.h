@@ -41,7 +41,7 @@ struct TabSearchManager : public StandardSearchManager {
   //  Part of -X-tabulation
   double assignmentNumber(vector<DomainInt> assignment) {
     //  Convert an assignment into a number, interpreting each variable assignment as one digit (0..d-1). 
-    std::cout << "in assignmentNumber: " << assignment << std::endl;
+    getOutput() << "in assignmentNumber: " << assignment << std::endl;
     double tmp=checked_cast<SysInt>(tab_mapping[0][checked_cast<SysInt>(assignment[0]-min_domain[0])]);
     assert (tmp>-1);
     for(int i=1; i<assignment.size(); i++) {
@@ -116,10 +116,10 @@ struct TabSearchManager : public StandardSearchManager {
             double final_an=assignmentNumber(final_assign);
             
             double prop=(an*(getOptions().nodelimit))/(final_an*(getState().getNodeCount()));
-            std::cout << an << " final: " << final_an << " nodelim:" << getOptions().nodelimit <<  "  prop: "<< prop <<std::endl;
+            getOutput() << an << " final: " << final_an << " nodelim:" << getOptions().nodelimit <<  "  prop: "<< prop <<std::endl;
             if(prop<1.0) {
               //  Bail out with a message to SR, stopped by failed progress check. 
-              std::cout <<  "STOP-PC" << std::endl;
+              getOutput() <<  "STOP-PC" << std::endl;
               return;
             }
         }
@@ -129,11 +129,11 @@ struct TabSearchManager : public StandardSearchManager {
       //check_func(varArray, branches);
       
       if(getState().getNodeCount()>getOptions().nodelimit) {
-        std::cout << "STOP-NC" << std::endl;
+        getOutput() << "STOP-NC" << std::endl;
         return;
       }
       if(getOptions().sollimit>0 && getState().getSolutionCount()>getOptions().sollimit-2) {
-        std::cout << "STOP-SC" << std::endl;
+        getOutput() << "STOP-SC" << std::endl;
         return;
       }
       
@@ -171,7 +171,7 @@ struct TabSearchManager : public StandardSearchManager {
         if(!flag) { // No remaining left branches to branch right.
           //std::cout << "prop fails:" << fails <<std::endl;
           if(fails==0) {
-            std::cout << "STOP-BTFREE" << std::endl;
+            getOutput() << "STOP-BTFREE" << std::endl;
           }
           return;
         }

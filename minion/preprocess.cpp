@@ -35,14 +35,14 @@ void collectAMOs(vector<AnyVarRef>& vars) {
       
       std::vector<int> listallpairs;
       
-      std::cout << "BOOLNAMES ";
+      getOutput() << "BOOLNAMES ";
       for(int i = 0; i < listbools.size(); i++) {
-        std::cout << getNameFromVar(listbools[i]);
+        getOutput() << getNameFromVar(listbools[i]);
         if(i < listbools.size() - 1) {
-          std::cout << " ";
+          getOutput() << " ";
         }
       }
-      std::cout << std::endl;
+      getOutput() << std::endl;
       
       for(SysInt i = 0; i < (SysInt)listbools.size(); ++i) {
         AnyVarRef& var = listbools[i];
@@ -82,14 +82,14 @@ void collectAMOs(vector<AnyVarRef>& vars) {
         Controller::worldPop();
       }
       
-      std::cout << "AMO " << listallpairs.size() / 2 << " ";
+      getOutput() << "AMO " << listallpairs.size() / 2 << " ";
       for(int i = 0; i < listallpairs.size(); i++) {
-        std::cout << listallpairs[i];
+        getOutput() << listallpairs[i];
         if(i < listallpairs.size() - 1) {
-          std::cout << " ";
+          getOutput() << " ";
         }
       }
-      std::cout << std::endl;
+      getOutput() << std::endl;
     }
     else {
       //  Adjacency lists passed in. Do sparse version. 
@@ -106,14 +106,14 @@ void collectAMOs(vector<AnyVarRef>& vars) {
         }
       }
       
-      std::cout << "BOOLNAMES ";
+      getOutput() << "BOOLNAMES ";
       for(int i = 0; i < listbools.size(); i++) {
-        std::cout << getNameFromVar(listbools[i]);
+        getOutput() << getNameFromVar(listbools[i]);
         if(i < listbools.size() - 1) {
-          std::cout << " ";
+          getOutput() << " ";
         }
       }
-      std::cout << std::endl;
+      getOutput() << std::endl;
       
       //  Split the big adjacency list into multiple lists. 
       vector<vector<AnyVarRef>> adj;
@@ -182,14 +182,14 @@ void collectAMOs(vector<AnyVarRef>& vars) {
       }
       
       //  Output
-      std::cout << "AMO " << listallpairs.size() / 2 << " ";
+      getOutput() << "AMO " << listallpairs.size() / 2 << " ";
       for(int i = 0; i < listallpairs.size(); i++) {
-        std::cout << listallpairs[i];
+        getOutput() << listallpairs[i];
         if(i < listallpairs.size() - 1) {
-          std::cout << " ";
+          getOutput() << " ";
         }
       }
-      std::cout << std::endl;
+      getOutput() << std::endl;
     }
   }
   
@@ -201,7 +201,7 @@ void collectAMOs(vector<AnyVarRef>& vars) {
     
     // Different output format. Just returns 0 or 1 for each set of 4 entries in testMutexes. 
     
-    std::cout << "AMO ";
+    getOutput() << "AMO ";
     
     for(SysInt i = 0; i < (SysInt)testMutexes.size(); i=i+4) {
       AnyVarRef& var1 = testMutexes[i];
@@ -219,17 +219,17 @@ void collectAMOs(vector<AnyVarRef>& vars) {
 
       if(getState().isFailed()) {
         //  1 means mutex
-        std::cout << "1";
+        getOutput() << "1";
       }
       else {
-        std::cout << "0";
+        getOutput() << "0";
       }
       
       getState().setFailed(false);
       Controller::worldPop();
     }
     
-    std::cout << std::endl;
+    getOutput() << std::endl;
   }
 }
 
@@ -263,7 +263,7 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
   }
 
   if(printInfo) {
-    cout << "SAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
+    getOutput() << "SAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }
 
@@ -284,7 +284,7 @@ void PropogateCSP(PropagationLevel preprocessLevel, vector<AnyVarRef>& vars, boo
     prop_SSAC(vars);
   }
   if(printInfo) {
-    cout << "SSAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
+    getOutput() << "SSAC" << (boundsCheck ? "Bounds" : "") << " Removed " << (lits - litCount(vars))
          << " literals" << endl;
   }
 }

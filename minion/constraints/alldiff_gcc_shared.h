@@ -198,7 +198,7 @@ struct smallset_list_bt {
   }
 
   inline void clear() {
-    D_DATA(cout << "clearing list " << (list) << endl);
+    D_DATA(getOutput() << "clearing list " << (list) << endl);
     D_ASSERT(cert < 2000000000);
 
     if(cert > 2000000000) {
@@ -229,12 +229,12 @@ struct smallset_list_bt {
 
   void print() {
     short* l = (short*)list;
-    cout << "smallset_list_bt length:" << l[maxsize] << " at location " << (&l[maxsize]) << endl;
+    getOutput() << "smallset_list_bt length:" << l[maxsize] << " at location " << (&l[maxsize]) << endl;
     for(SysInt i = 0; i < maxsize; i++) {
-      cout << "smallset_list_bt item:" << l[i] << " at location " << (&l[i]) << endl;
+      getOutput() << "smallset_list_bt item:" << l[i] << " at location " << (&l[i]) << endl;
     }
-    cout << "certificate:" << cert << endl;
-    cout << membership << endl;
+    getOutput() << "certificate:" << cert << endl;
+    getOutput() << membership << endl;
   }
 };
 
@@ -537,10 +537,10 @@ protected:
         }
       }
 
-      /*cout<< "Uprevious:" <<endl;
+      /*getOutput()<< "Uprevious:" <<endl;
       for(SysInt i=0; i<localnumvars; ++i)
       {
-          cout<< "for variable "<<var_indices[i]<<" value "<<
+          getOutput()<< "for variable "<<var_indices[i]<<" value "<<
       uprevious[i]<<endl;
       }*/
 
@@ -594,14 +594,14 @@ protected:
 
         layer.clear();
 
-        /*cout<<"Local matching state:"<<endl;
+        /*getOutput()<<"Local matching state:"<<endl;
         {
         vector<SysInt>& toiterate = valinlocalmatching.getlist();
         for(SysInt i=0; i<(SysInt)toiterate.size(); ++i)
         {
             SysInt temp=toiterate[i];
             D_ASSERT(varinlocalmatching.in(localmatching[temp]));
-            cout << "mapping "<< localmatching[temp] << " to value " << temp
+            getOutput() << "mapping "<< localmatching[temp] << " to value " << temp
         <<endl;
         }
         }*/
@@ -1056,13 +1056,13 @@ struct InternalDynamicTriggers {
   }
 
   void printlist(SysInt var) {
-    cout << "Var: " << var << " values: ";
+    getOutput() << "Var: " << var << " values: ";
     SysInt idx = watches[var];
     while(idx != -1) {
-      cout << watches[idx] << " ";
+      getOutput() << watches[idx] << " ";
       idx = watches[idx + 1];
     }
-    cout << endl;
+    getOutput() << endl;
   }
 
   inline void clearwatches(SysInt var) {

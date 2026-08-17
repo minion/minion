@@ -110,7 +110,7 @@ static void printInitialBounds(const CSPInstance& instance, std::unique_ptr<Comm
 }
 
 void doCommandSearch(CSPInstance& instance, SearchMethod args) {
-  cout << "Switching to command mode" << endl;
+  getOutput() << "Switching to command mode" << endl;
 
   // Remember if we are supposed to be writing solsout, so we can
   // enable if we want to.
@@ -128,7 +128,7 @@ void doCommandSearch(CSPInstance& instance, SearchMethod args) {
     DP(c);
 
     if(c.type == "Q") {
-      std::cout << "Command mode: Goodbye" << endl;
+      getOutput() << "Command mode: Goodbye" << endl;
       exit(0);
     }
 

@@ -71,11 +71,11 @@ virtual ~CLASSNAME() {
 
   /*
   for(SysInt i=0; i<(SysInt)vars.size(); i++) {
-      cout << "     i " << i << " Initial Max " << vars[i].initialMax() <<
+      getOutput() << "     i " << i << " Initial Max " << vars[i].initialMax() <<
   endl ;
       SysInt numvals_i = vars[i].initialMax()-vars[i].initialMin()+1;
       for(SysInt j=0; j<numvals_i; j++) {
-        cout << "     i j SupportListPerLit[var][val].next = " << i << " " << j
+        getOutput() << "     i j SupportListPerLit[var][val].next = " << i << " " << j
   << " " << supportListPerLit[i][j].next << endl ;
       }
   }
@@ -306,21 +306,21 @@ void init() {
 }
 
 void printStructures() {
-  cout << "PRINTING ALL DATA STRUCTURES" << endl;
-  cout << "supports:" << supports << endl;
-  cout << "supportsPerVar:" << supportsPerVar << endl;
-  cout << "partition:" << endl;
+  getOutput() << "PRINTING ALL DATA STRUCTURES" << endl;
+  getOutput() << "supports:" << supports << endl;
+  getOutput() << "supportsPerVar:" << supportsPerVar << endl;
+  getOutput() << "partition:" << endl;
   for(SysInt i = 0; i < (SysInt)supportNumPtrs.size() - 1; i++) {
-    cout << "supports: " << i << "  vars: ";
+    getOutput() << "supports: " << i << "  vars: ";
     for(SysInt j = supportNumPtrs[i]; j < supportNumPtrs[i + 1]; j++) {
-      cout << varsPerSupport[j] << ", ";
+      getOutput() << varsPerSupport[j] << ", ";
     }
-    cout << endl;
+    getOutput() << endl;
     if(supportNumPtrs[i + 1] == vars.size())
       break;
   }
-  cout << "zeroLits:" << zeroLits << endl;
-  cout << "inZeroLits:" << inZeroLits << endl;
+  getOutput() << "zeroLits:" << zeroLits << endl;
+  getOutput() << "inZeroLits:" << inZeroLits << endl;
 }
 
 SysInt dynamicTriggerCount() {
