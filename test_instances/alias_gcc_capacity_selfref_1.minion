@@ -1,0 +1,32 @@
+MINION 3
+#TEST SOLCOUNT 1
+# gcc with a counted variable reused as one of its own capacity
+# variables. GAC is not promised under aliasing, but soundness is.
+#
+# gcc([x], [-1,2], [x,y]) says: the number of times -1 occurs in [x] is
+# x, and the number of times 2 occurs in [x] is y.
+#   x = -1 -> count(-1) = 1, but the capacity is x = -1.  No.
+#   x =  0 -> count(-1) = 0 = x, count(2) = 0, so y = 0.   Yes.
+#   x =  1 -> count(-1) = 0, but the capacity is x = 1.    No.
+#   x =  2 -> count(-1) = 0, but the capacity is x = 2.    No.
+# So (x,y) = (0,0) is the only solution.
+#
+# Before prunes were batched to the end of a propagation pass, search
+# also produced (0,1): a mid-pass capacity prune on the aliased variable
+# invalidated the matching the same pass was still using, and the
+# obligation to bound value 2 was dropped.
+
+**VARIABLES**
+
+DISCRETE x {-1..2}
+DISCRETE y {-1..2}
+
+**SEARCH**
+
+PRINT [[x],[y]]
+
+**CONSTRAINTS**
+
+gcc([x], [-1, 2], [x, y])
+
+**EOF**
