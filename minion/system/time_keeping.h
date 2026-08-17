@@ -9,7 +9,7 @@ class TimerClass {
 
 public:
   TimerClass() {
-    cout.setf(ios::fixed);
+    getOutput().setf(ios::fixed);
     startClock();
   }
 

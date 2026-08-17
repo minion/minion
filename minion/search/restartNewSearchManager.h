@@ -142,9 +142,9 @@ struct RestartNewSearchManager : public Controller::SearchManager {
       throw EndOfSearch();
     } else if(timeout) {
       if(getOptions().timeoutActive && get_cpuTime() > getOptions().time_limit)
-        cout << "Time limit is reached, stop the search" << endl;
+        getOutput() << "Time limit is reached, stop the search" << endl;
       else
-        cout << "Node limit is reached, stop the search" << endl;
+        getOutput() << "Node limit is reached, stop the search" << endl;
       throw EndOfSearch();
     }
 
@@ -175,7 +175,7 @@ struct RestartNewSearchManager : public Controller::SearchManager {
         i = 1LL << 60;
       }
       if(!getOptions().silent) {
-        cout << "Increasing backtrack limit to " << i << endl;
+        getOutput() << "Increasing backtrack limit to " << i << endl;
       }
       int bias = 0;
       if(useBias)

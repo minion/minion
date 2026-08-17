@@ -25,10 +25,10 @@
 void help();
 
 void print_default_help(char** argv) {
-  cout << "Type '" << argv[0] << " help' for usage." << endl;
-  cout << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
-  cout << endl;
-  cout << "This version of Minion was built with internal checking "
+  getOutput() << "Type '" << argv[0] << " help' for usage." << endl;
+  getOutput() << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
+  getOutput() << endl;
+  getOutput() << "This version of Minion was built with internal checking "
        <<
 #ifdef NO_DEBUG
       "off";
@@ -37,10 +37,10 @@ void print_default_help(char** argv) {
 #endif
 
 #ifdef WDEG
-  cout << " and wdeg on";
+  getOutput() << " and wdeg on";
 #endif
 
-  cout << endl;
+  getOutput() << endl;
 }
 
 void doStandardSearch(CSPInstance& instance, SearchMethod args) {
@@ -89,7 +89,7 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
 
   bool preprocess = PreprocessCSP(instance, args);
 
-  getState().getOldTimer().maybePrintTimestepStore(cout, "Preprocess Time: ", "PreprocessTime",
+  getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Preprocess Time: ", "PreprocessTime",
                                                    getTableOut(), !getOptions().silent);
 
   // Surface parallel-preprocess accounting so the random tester can
@@ -112,7 +112,7 @@ void doStandardSearch(CSPInstance& instance, SearchMethod args) {
 
   SolveCSP(instance, args);
 
-  getState().getOldTimer().maybePrintFinaltimestepStore(cout, "Solve Time: ", "SolveTime",
+  getState().getOldTimer().maybePrintFinaltimestepStore(getOutput(), "Solve Time: ", "SolveTime",
                                                         getTableOut(), !getOptions().silent);
   getOptions().printLine("Total Nodes: " + tostring(getState().getNodeCount()));
 
@@ -182,13 +182,13 @@ int minion_main(int argc, char** argv) {
     if(!getOptions().silent) {
       time_t rawtime;
       time(&rawtime);
-      cout << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
-      cout << "# Input filename: " << getOptions().instance_name << endl;
-      cout << "# Command line: ";
+      getOutput() << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
+      getOutput() << "# Input filename: " << getOptions().instance_name << endl;
+      getOutput() << "# Command line: ";
       for(SysInt i = 0; i < argc; ++i) {
-        cout << argv[i] << " ";
+        getOutput() << argv[i] << " ";
       }
-      cout << endl;
+      getOutput() << endl;
       getOptions().printLine("Using seed: " + tostring(args.randomSeed));
     }
 
@@ -208,7 +208,7 @@ int minion_main(int argc, char** argv) {
     // should be one for varorder as well.
     getTableOut().set("MinionVersion", -1);
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
-    getState().getOldTimer().maybePrintTimestepStore(cout, "Parsing Time: ", "ParsingTime",
+    getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);
 
     SetupCSPOrdering(instance, args);

@@ -61,7 +61,7 @@ struct LightTableConstraint : public AbstractConstraint {
       : vars(_vars), tuples(_tuples), data(new TableDataType(_tuples)) {
     CheckNotBound(vars, "table constraints", "");
     if(_tuples->tupleSize() != (SysInt)_vars.size()) {
-      cout << "Table constraint: Number of variables " << _vars.size()
+      getOutput() << "Table constraint: Number of variables " << _vars.size()
            << " does not match length of tuples " << _tuples->tupleSize() << "." << endl;
       FAIL_EXIT();
     }

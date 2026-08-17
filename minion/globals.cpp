@@ -37,6 +37,7 @@ Globals::Globals() {
     tableOut_m = NULL;
     callback = NULL;
     callbackUserdata = NULL;
+    out_m = &std::cout;
 }
 
 #ifdef LIBMINION

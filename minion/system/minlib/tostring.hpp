@@ -42,7 +42,7 @@ std::string tostring(const T1& t1, const T2& t2) {
 }
 
 template <typename T>
-decltype((std::cout << std::declval<T>(), std::true_type())) is_printable(const T& t);
+decltype((getOutput() << std::declval<T>(), std::true_type())) is_printable(const T& t);
 
 std::false_type is_printable(AnyGrab);
 

@@ -705,7 +705,7 @@ struct MDDC : public AbstractConstraint {
     }
   }
   void print_mdd_node(MDDNode* n) {
-    std::cout << "Node id:" << n->id << " type:" << ((int)n->type) << " links: " << n->links
+    getOutput() << "Node id:" << n->id << " type:" << ((int)n->type) << " links: " << n->links
               << endl;
   }
 };

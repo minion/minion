@@ -158,14 +158,14 @@ struct VecCountDynamic : public AbstractConstraint {
     printf("\n");
 
     for(SysInt i = 0; i < varArray1.size(); ++i)
-      cout << varArray1[i].min() << ":" << varArray1[i].max() << ",";
+      getOutput() << varArray1[i].min() << ":" << varArray1[i].max() << ",";
 
-    cout << endl;
+    getOutput() << endl;
 
     for(SysInt i = 0; i < varArray2.size(); ++i)
-      cout << varArray2[i].min() << ":" << varArray2[i].max() << ",";
+      getOutput() << varArray2[i].min() << ":" << varArray2[i].max() << ",";
 
-    cout << endl;*/
+    getOutput() << endl;*/
 
     if(propagate_mode) {
       if(indexTo_not_propagate == watchedValues[triggerpair])

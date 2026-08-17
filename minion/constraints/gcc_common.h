@@ -126,7 +126,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     }
 
     if(SimulateAlldiff && capacity_array.size() != 0) {
-      cout << "gcc+SimulateAlldiff requires 0 cap vars." << endl;
+      getOutput() << "gcc+SimulateAlldiff requires 0 cap vars." << endl;
       abort();
     }
 

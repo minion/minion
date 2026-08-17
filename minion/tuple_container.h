@@ -327,7 +327,7 @@ public:
         full_squeeze_tuples(tupleSet, initialDomainList, (method == MLTTS_Eager));
     shortTuples = makeShortTupleList(squashed);
 
-    cout << "# Squashed " + longTuples->getName() + " : " << longTuples->size() << " -> "
+    getOutput() << "# Squashed " + longTuples->getName() + " : " << longTuples->size() << " -> "
          << shortTuples.size() << "\n";
   }
 

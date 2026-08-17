@@ -267,7 +267,7 @@ void endParallelMinion() {
   }
 
   if(!checkIsAChildProcess) {
-    std::cout << "Waiting for all child processes to exit.." << std::endl;
+    getOutput() << "Waiting for all child processes to exit.." << std::endl;
     // Don't close until now, so all children have this pipe
     close(childTrackingPipe[1]);
 
@@ -294,7 +294,7 @@ void endParallelMinion() {
       exit(1);
     }
 
-    std::cout << "A total of " << getParallelData().children << " children were used" << std::endl;
+    getOutput() << "A total of " << getParallelData().children << " children were used" << std::endl;
 
     getState().incrementSolutionCount(getParallelData().solutions);
     getState().incrementNodeCount(getParallelData().nodes);

@@ -84,24 +84,24 @@ struct Graph {
   void output_graph() {
     for(map<string, set<string>>::iterator it = var_vertex_colour.begin();
         it != var_vertex_colour.end(); ++it) {
-      cout << it->first << " : ";
+      getOutput() << it->first << " : ";
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        cout << *it2 << " ";
-      cout << endl;
+        getOutput() << *it2 << " ";
+      getOutput() << endl;
     }
 
     for(map<string, set<string>>::iterator it = aux_vertex_colour.begin();
         it != aux_vertex_colour.end(); ++it) {
-      cout << it->first << " : ";
+      getOutput() << it->first << " : ";
       for(set<string>::iterator it2 = it->second.begin(); it2 != it->second.end(); it2++)
-        cout << *it2 << " ";
-      cout << endl;
+        getOutput() << *it2 << " ";
+      getOutput() << endl;
     }
 
-    cout << endl;
+    getOutput() << endl;
 
     for(set<pair<string, string>>::iterator it = graph.begin(); it != graph.end(); ++it) {
-      cout << it->first << ", " << it->second << endl;
+      getOutput() << it->first << ", " << it->second << endl;
     }
   }
 
@@ -120,14 +120,14 @@ struct Graph {
       aux_vertexCount += it->second.size();
 
     if(print_names)
-      cout << "varnames := [";
+      getOutput() << "varnames := [";
     for(SysInt i = 0; i < (SysInt)csp.symOrder.size(); ++i) {
       if(print_names)
-        cout << "\"" << name(csp.symOrder[i], csp) << "\", ";
+        getOutput() << "\"" << name(csp.symOrder[i], csp) << "\", ";
       vNum[name(csp.symOrder[i], csp)] = i + 1;
     }
     if(print_names)
-      cout << "];" << endl;
+      getOutput() << "];" << endl;
     SysInt vertexCounter = vNum.size() + 1;
 
     // Now output partitions
@@ -184,22 +184,22 @@ struct Graph {
     std::tie(var_vertexCount, edges, partitions) = build_graph_info(csp);
 #ifdef USE_NAUTY
     vector<vector<DomainInt>> perms = build_graph(edges, partitions);
-    cout << "generators := [()" << endl;
+    getOutput() << "generators := [()" << endl;
     for(SysInt i = 0; i < (SysInt)perms.size(); ++i) {
-      cout << ", PermList([";
+      getOutput() << ", PermList([";
       bool first_pass = true;
       D_ASSERT(perms[i][0] == 0);
       for(SysInt j = 1; j <= var_vertexCount; ++j) {
         D_ASSERT(perms[i][j] <= var_vertexCount);
         if(first_pass) {
           first_pass = false;
-          cout << perms[i][j];
+          getOutput() << perms[i][j];
         } else
-          cout << ", " << perms[i][j];
+          getOutput() << ", " << perms[i][j];
       }
-      cout << "])" << endl;
+      getOutput() << "])" << endl;
     }
-    cout << "];" << endl;
+    getOutput() << "];" << endl;
 #else
     cerr << "Need to compile Minion with nauty included!" << endl;
     exit(1);
@@ -766,8 +766,8 @@ struct InstanceStats {
 #define START_CLOCK() startTime = get_cpuTime()
 #define END_CLOCK()                                                                                \
   measuredTime = get_cpuTime() - startTime;                                                     \
-  cout << "TIME: " << measuredTime << endl;
-#define output_stat cout << measuredTime << " " << s
+  getOutput() << "TIME: " << measuredTime << endl;
+#define output_stat getOutput() << measuredTime << " " << s
 
   void output_stats() {
     string s("stats_"); // common prefix

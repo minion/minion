@@ -288,7 +288,7 @@ void dumpSolver(ostream& os, bool justDomains) {
 
 void dumpSolver(string filename, bool justDomains) {
   if(filename == "" || filename == "--") {
-    dumpSolver(cout, justDomains);
+    dumpSolver(getOutput(), justDomains);
   } else {
     ofstream ofs(filename.c_str());
     dumpSolver(ofs, justDomains);

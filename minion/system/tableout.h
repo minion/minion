@@ -48,9 +48,9 @@ public:
   void print_table_json() {
     ofstream f;
     if(jsonfilename == "-") {
-      f.copyfmt(std::cout);
-      f.clear(std::cout.rdstate());
-      f.basic_ios<char>::rdbuf(std::cout.rdbuf());
+      f.copyfmt(getOutput());
+      f.clear(getOutput().rdstate());
+      f.basic_ios<char>::rdbuf(getOutput().rdbuf());
     } else {
       f.open(jsonfilename.c_str(), ios::app | ios::out); // Open with append mode.
     }
@@ -82,9 +82,9 @@ public:
 
     ofstream f;
     if(tablefilename == "-") {
-      f.copyfmt(std::cout);
-      f.clear(std::cout.rdstate());
-      f.basic_ios<char>::rdbuf(std::cout.rdbuf());
+      f.copyfmt(getOutput());
+      f.clear(getOutput().rdstate());
+      f.basic_ios<char>::rdbuf(getOutput().rdbuf());
     } else {
       f.open(tablefilename.c_str(), ios::app | ios::out); // Open with append mode.
     }

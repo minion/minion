@@ -21,6 +21,21 @@ struct Globals {
   void* callbackUserdata;
   std::mt19937 global_random_gen;
   std::ofstream solsoutfile;
+  /// Where this context's output goes. Defaults to std::cout, which is
+  /// what the standalone binary wants (main.cpp builds a Globals
+  /// directly). Library contexts are pointed at out_sink_m by
+  /// minion_newContext instead, so nothing is written to the terminal
+  /// and, crucially, the process-global std::cout is never touched --
+  /// swapping cout's rdbuf races with every other thread that is
+  /// printing, which garbles output and can fault outright when one
+  /// thread writes while another has it null.
+  std::ostream* out_m;
+
+  /// Backing sink for a context that must not write to the terminal.
+  /// Left unopened, so writes to it just set failbit and are discarded:
+  /// nothing is buffered and nothing grows, unlike an ostringstream.
+  /// Opened as a real file when LIBMINION_LOG is set.
+  std::ofstream out_sink_m;
   /*
    * Pointer trickery as compiler doesnt like globals.x when there are still
    * incomplete types (such as SearchOptions, ...).

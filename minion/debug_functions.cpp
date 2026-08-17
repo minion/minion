@@ -49,8 +49,8 @@ void errorPrintingFunction(std::string a, std::string f, SysInt line) {
   cerr << "Test '" << a << "' failed." << endl;
   cerr << "In file " << f << ", line " << line << endl;
   cerr << "\n";
-  cout << "\n";
-  cout.flush();
+  getOutput() << "\n";
+  getOutput().flush();
   cerr.flush();
   FAIL_EXIT();
 }
@@ -58,7 +58,7 @@ void errorPrintingFunction(std::string a, std::string f, SysInt line) {
 void userErrorPrintingFunction(std::string a, std::string f, SysInt line) {
   cerr << "An error occurred while solving your instance!" << endl;
   cerr << a << endl;
-  cout.flush();
+  getOutput().flush();
   cerr.flush();
   FAIL_EXIT();
 }

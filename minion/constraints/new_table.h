@@ -140,7 +140,7 @@ struct NewTableConstraint : public AbstractConstraint {
       : vars(_vars), data(std::make_shared<TableDataType>(_tuples)), state(data), tuples(_tuples) {
     CheckNotBound(vars, "table constraint");
     if(_tuples->tupleSize() != (SysInt)_vars.size()) {
-      cout << "Table constraint: Number of variables " << _vars.size()
+      getOutput() << "Table constraint: Number of variables " << _vars.size()
            << " does not match length of tuples " << _tuples->tupleSize() << "." << endl;
       FAIL_EXIT();
     }

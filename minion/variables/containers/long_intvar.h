@@ -256,7 +256,7 @@ struct BigRangeVarContainer {
 
   void removeFromDomain(BigRangeVarRef_internal d, DomainInt i) {
 #ifdef DEBUG
-    cout << "Calling removeFromDomain: " << d.varNum << " " << i << " [" << lowerBound(d) << ":"
+    getOutput() << "Calling removeFromDomain: " << d.varNum << " " << i << " [" << lowerBound(d) << ":"
          << upperBound(d) << "] original [" << initialMin(d) << ":" << initialMax(d) << "]"
          << endl;
     // bms_pointer(d)->print_state();
@@ -266,7 +266,7 @@ struct BigRangeVarContainer {
     if((i < lowerBound(d)) || (i > upperBound(d)) ||
        !(bms_array->ifMember_remove(varOffset[d.varNum] + i))) {
 #ifdef DEBUG
-      cout << "Exiting removeFromDomain: " << d.varNum << " nothing to do" << endl;
+      getOutput() << "Exiting removeFromDomain: " << d.varNum << " nothing to do" << endl;
 #endif
       return;
     }
@@ -296,7 +296,7 @@ struct BigRangeVarContainer {
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
 
 #ifdef DEBUG
-    cout << "Exiting removeFromDomain: " << d.varNum << " " << i << " [" << lowerBound(d) << ":"
+    getOutput() << "Exiting removeFromDomain: " << d.varNum << " " << i << " [" << lowerBound(d) << ":"
          << upperBound(d) << "] original [" << initialMin(d) << ":" << initialMax(d) << "]"
          << endl;
     bms_array->print_state();
@@ -367,7 +367,7 @@ private:
 public:
   void setMax(BigRangeVarRef_internal d, DomainInt offset) {
 #ifdef DEBUG
-    cout << "Calling setMax: " << d.varNum << " " << offset << " [" << lowerBound(d) << ":"
+    getOutput() << "Calling setMax: " << d.varNum << " " << offset << " [" << lowerBound(d) << ":"
          << upperBound(d) << "] original [" << initialMin(d) << ":" << initialMax(d) << "]"
          << endl;
     bms_array->print_state();
@@ -408,7 +408,7 @@ public:
     }
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
 #ifdef DEBUG
-    cout << "Exiting setMax: " << d.varNum << " " << upperBound(d) << " [" << lowerBound(d)
+    getOutput() << "Exiting setMax: " << d.varNum << " " << upperBound(d) << " [" << lowerBound(d)
          << ":" << upperBound(d) << "] original [" << initialMin(d) << ":" << initialMax(d)
          << "]" << endl;
     bms_array->print_state();
@@ -417,7 +417,7 @@ public:
 
   void setMin(BigRangeVarRef_internal d, DomainInt offset) {
 #ifdef DEBUG
-    cout << "Calling setMin: " << d.varNum << " " << offset << " [" << lowerBound(d) << ":"
+    getOutput() << "Calling setMin: " << d.varNum << " " << offset << " [" << lowerBound(d) << ":"
          << upperBound(d) << "] original [" << initialMin(d) << ":" << initialMax(d) << "]"
          << endl;
     bms_array->print_state();
@@ -460,7 +460,7 @@ public:
     }
     D_ASSERT(getState().isFailed() || (inDomain(d, lowerBound(d)) && inDomain(d, upperBound(d))));
 #ifdef DEBUG
-    cout << "Exiting setMin: " << d.varNum << " " << lowerBound(d) << " [" << lowerBound(d)
+    getOutput() << "Exiting setMin: " << d.varNum << " " << lowerBound(d) << " [" << lowerBound(d)
          << ":" << upperBound(d) << "] original [" << initialMin(d) << ":" << initialMax(d)
          << "]" << endl;
     bms_array->print_state();

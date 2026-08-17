@@ -42,7 +42,7 @@ shared_ptr<VariableOrder> makeSearchOrder(SearchOrder order) {
                "domoverwdeg orderings (add -WDEG to build options)");
 #endif
 
-  default: cout << "Order not found in makeSearchOrder." << endl; abort();
+  default: getOutput() << "Order not found in makeSearchOrder." << endl; abort();
   }
   return shared_ptr<VariableOrder>(vo);
 }
@@ -55,7 +55,7 @@ shared_ptr<VariableOrder> makeSearchOrder_multiple(const vector<SearchOrder>& or
     if(order[i].findOneAssignment)
       hasAux = true;
     if(order[i].findOneAssignment && i != (SysInt)order.size() - 1) {
-      cout << "Only one VARORDER AUX is allowed, and it must be the final "
+      getOutput() << "Only one VARORDER AUX is allowed, and it must be the final "
               "VARORDER command."
            << endl;
       abort();
@@ -89,7 +89,7 @@ shared_ptr<Propagate> make_propagator(PropagationLevel propMethod) {
   case PropLevel_SSAC: p = shared_ptr<Propagate>(new PropSSAC(propMethod)); break;
   case PropLevel_SACBounds: p = shared_ptr<Propagate>(new PropSAC_Bounds(propMethod)); break;
   case PropLevel_SSACBounds: p = shared_ptr<Propagate>(new PropSSAC_Bounds(propMethod)); break;
-  default: cout << "Propagation method not found in makeSearch_manager." << endl; abort();
+  default: getOutput() << "Propagation method not found in makeSearch_manager." << endl; abort();
   }
   return p;
 }

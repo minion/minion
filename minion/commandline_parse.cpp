@@ -136,7 +136,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         if(getOptions().nodelimit < 0)
           throw "Invalid lower bound";
       } catch(...) {
-        cout << "Did not understand parameter to nodelimit:" << argv[i] << endl;
+        getOutput() << "Did not understand parameter to nodelimit:" << argv[i] << endl;
         exit(1);
       }
     }
@@ -148,7 +148,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         if(getOptions().sollimit <= 0)
           throw "Invalid lower bound";
       } catch(...) {
-        cout << "Did not understand the parameter to sollimit:" << argv[i] << endl;
+        getOutput() << "Did not understand the parameter to sollimit:" << argv[i] << endl;
         exit(1);
       }
     }
@@ -156,7 +156,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-timelimit")) {
       INCREMENT_i(-timelimit);
       if(getOptions().timeoutActive) {
-        cout << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
+        getOutput() << "Only one '-cpulimit' or '-timelimit' per instance" << endl;
         exit(1);
       }
       getOptions().timeoutActive = true;
@@ -164,15 +164,15 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
         getOptions().time_limit_is_CPUTime = false;
       } catch(...) {
-        cout << "Did not understand the parameter to timelimit:" << argv[i] << endl;
+        getOutput() << "Did not understand the parameter to timelimit:" << argv[i] << endl;
         exit(1);
       }
     }
 
     else if(command == string("-skipautoaux")) {
-      cout << "# WARNING: -skipautoaux can lead to incorrect solutions being "
+      getOutput() << "# WARNING: -skipautoaux can lead to incorrect solutions being "
               "produced\n";
-      cout << "# WARNING: This is by design, but use this option with extreme "
+      getOutput() << "# WARNING: This is by design, but use this option with extreme "
               "care\n";
       getOptions().ensureBranchOnAllVars = false;
     }
@@ -180,7 +180,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     else if(command == string("-cpulimit")) {
       INCREMENT_i(-cpulimit);
       if(getOptions().timeoutActive) {
-        cout << "Only one '-cpulimit', or '-timelimit' per instance" << endl;
+        getOutput() << "Only one '-cpulimit', or '-timelimit' per instance" << endl;
         exit(1);
       }
       getOptions().timeoutActive = true;
@@ -188,7 +188,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         getOptions().time_limit = fromstring<SysInt>(argv[i]);
         getOptions().time_limit_is_CPUTime = true;
       } catch(...) {
-        cout << "Did not understand the parameter to cpulimit:" << argv[i] << endl;
+        getOutput() << "Did not understand the parameter to cpulimit:" << argv[i] << endl;
         exit(1);
       }
     } // TODO : Should remove -varorder for beta orderings.
@@ -380,14 +380,14 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     } else if(command == string("-no-restarts-bias")) {
       getOptions().restart.bias = false;
     } else if(command[0] == '-' && command != string("--")) {
-      cout << "I don't understand '" << command << "'. Sorry. " << endl;
+      getOutput() << "I don't understand '" << command << "'. Sorry. " << endl;
       exit(1);
     } else {
       if(getOptions().instance_name == "")
         getOptions().instance_name = command;
       else {
-        cout << "I was confused by '" << command << "'. Sorry." << endl;
-        cout << "You can only give one instance file." << endl;
+        getOutput() << "I was confused by '" << command << "'. Sorry." << endl;
+        getOutput() << "You can only give one instance file." << endl;
         exit(1);
       }
     }

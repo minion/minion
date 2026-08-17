@@ -84,10 +84,10 @@ void BuildCSP(CSPInstance& instance) {
   }
 
   // Solve!
-  getState().getOldTimer().maybePrintTimestepStore(cout, "Setup Time: ", "SetupTime", getTableOut(),
+  getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Setup Time: ", "SetupTime", getTableOut(),
                                                    !getOptions().silent);
   Controller::initalise_search();
-  getState().getOldTimer().maybePrintTimestepStore(cout, "Initial Propagate: ", "InitialPropagate",
+  getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Initial Propagate: ", "InitialPropagate",
                                                    getTableOut(), !getOptions().silent);
 }
 
@@ -229,7 +229,7 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
   getState().setSearchManager(nullptr);
 
   if(getOptions().printonlyoptimal) {
-    cout << getState().storedSolution;
+    getOutput() << getState().storedSolution;
   }
 
   Parallel::endParallelMinion();

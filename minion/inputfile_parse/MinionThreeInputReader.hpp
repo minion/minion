@@ -230,7 +230,7 @@ nothing at all...)
 template <typename FileReader>
 void MinionThreeInputReader<FileReader>::parser_info(string s) {
   if(parserVerbose)
-    cout << s << endl;
+    getOutput() << s << endl;
 }
 
 // This function is called to finalise reading an instance that may have
