@@ -1,0 +1,37 @@
+MINION 3
+#TEST SOLCOUNT 14
+# gcc as a disjunct of watched-or, so its propagator is activated
+# part-way through search rather than at the root.
+#
+# Neither -9 nor -3 is in any variable's domain, so gcc forces both
+# capacity variables to 0: c = 0 and b = 0. It says nothing about a,
+# which stays free over {0,1}.
+#
+# Solutions are (gcc holds) or (d != 0):
+#   gcc:  b=0, c=0, a and d free      ->  4
+#   d=1:  a, b, c free                -> 12
+#   both: b=0, c=0, d=1, a free       ->  2
+#   total 4 + 12 - 2 = 14.
+#
+# A version of gcc that re-expanded its incremental graph at the top of
+# fullPropagate lost (a,b,c,d) = (1,0,0,0): re-expanding desynchronised
+# the graph from varvalmatching/usage, which are not backtracked, so the
+# repaired matching used value 0 twice and Tarjan then pruned 1 and 2
+# out of a's domain.
+
+**VARIABLES**
+
+DISCRETE a {0..1}
+DISCRETE b {0..2}
+BOOL c
+BOOL d
+
+**SEARCH**
+
+PRINT [[a],[b],[c],[d]]
+
+**CONSTRAINTS**
+
+watched-or({gcc([a,b],[-9,-3],[c,b]), diseq(d,0)})
+
+**EOF**
