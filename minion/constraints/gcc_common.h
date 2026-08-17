@@ -353,6 +353,13 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       SysInt var = diff / numvals;
       SysInt validx = diff % numvals;
 
+      // A DomainRemoval trigger on (var,val) must only fire because val
+      // has actually left var's domain. If it fires while val is still
+      // there the trigger is stale, and the adjlist_remove below would
+      // take a live edge out of the graph -- invisible to check_adjlists
+      // once the value is legitimately removed later.
+      D_ASSERT(!varArray[var].inDomain(validx + domMin));
+
       if(adjlistpos[validx + numvars][var] < adjlistlength[validx + numvars]) {
         adjlist_remove(var, validx + domMin);      // validx, adjlistpos[validx][var]);
         if(varvalmatching[var] == validx + domMin) // remove invalid value in the matching.
