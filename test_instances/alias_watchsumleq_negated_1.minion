@@ -1,0 +1,20 @@
+MINION 3
+#TEST SOLCOUNT 0
+# The watchsumleq half of the same propagator (BoolLessSumConstraintDynamic
+# with VarToCount = 1). x + !x is always 1, so requiring the sum to be at
+# most 0 is unsatisfiable; the same skipped force-assign reported a
+# solution.
+
+**VARIABLES**
+
+BOOL x
+
+**SEARCH**
+
+PRINT [[x]]
+
+**CONSTRAINTS**
+
+watchsumleq([x, !x], 0)
+
+**EOF**
