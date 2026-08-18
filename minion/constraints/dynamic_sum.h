@@ -115,13 +115,25 @@ struct BoolLessSumConstraintDynamic : public AbstractConstraint {
       return;
     } else if(triggers_wanted == 1) // Then we can propagate
     {                               // We never even set up triggers
+      // Exactly varSum literals can still be true, so every one of them
+      // has to be. Snapshot which ones first, then force them without
+      // re-checking: two entries can be backed by the same variable (a
+      // list holding both x and !x), and forcing the first makes the
+      // second's inDomain false. Re-testing as we go would silently skip
+      // it and leave the constraint believing it forced varSum literals
+      // when it forced fewer. Forcing unconditionally instead drives the
+      // second assignment out of domain, which fails correctly -- the
+      // same way the incremental path below already does it.
+      vector<SysInt> toForce;
       for(SysInt i = 0; i < arraySize; ++i) {
-        if(varArray[i].inDomain(1 - VarToCount)) {
-          if(VarToCount)
-            varArray[i].setMax(0);
-          else
-            varArray[i].setMin(1);
-        }
+        if(varArray[i].inDomain(1 - VarToCount))
+          toForce.push_back(i);
+      }
+      for(SysInt k = 0; k < (SysInt)toForce.size(); ++k) {
+        if(VarToCount)
+          varArray[toForce[k]].setMax(0);
+        else
+          varArray[toForce[k]].setMin(1);
       }
     } else // Now set up triggers
     {

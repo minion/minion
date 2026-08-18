@@ -1,0 +1,25 @@
+MINION 3
+#TEST SOLCOUNT 0
+# watchsumgeq over a list holding a bool and its own negation. x + !x is
+# 1 whatever x is, so a required sum of 2 is unsatisfiable.
+#
+# fullPropagate counts how many literals can still be true, and when
+# that count equals the required sum it forces them all. It used to
+# re-check inDomain as it assigned: forcing x = 1 makes !x unable to be
+# 1, so the second literal was skipped rather than failing, and the
+# constraint reported x = 1 as a solution. Reversing the list order
+# gave the mirror-image wrong answer, x = 0.
+
+**VARIABLES**
+
+BOOL x
+
+**SEARCH**
+
+PRINT [[x]]
+
+**CONSTRAINTS**
+
+watchsumgeq([x, !x], 2)
+
+**EOF**
