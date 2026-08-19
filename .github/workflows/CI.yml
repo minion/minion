@@ -23,7 +23,7 @@ jobs:
     # GitHub cancels a job at its 6 h default with no useful diagnostic —
     # every scheduled run from at least 2026-07-12 died that way, stuck in
     # the exec-mode tester step below. Fail loudly and early instead. The
-    # deliberately long soak lives in CI-long.yml.
+    # deliberately long soak lives in mini-scripts/, run locally.
     timeout-minutes: 120
     defaults:
       run:
@@ -35,7 +35,7 @@ jobs:
       # test a fixed selection instead -- the propagator families that have
       # actually produced bugs (flow/matching, counting, watched literals,
       # short tuples, tables, indexing, views, and a meta-constraint for the
-      # nested path). Exhaustive coverage lives in CI-long.yml.
+      # nested path). Exhaustive coverage lives in mini-scripts/.
       SMOKE: >-
         --constraints gcc --constraints gccweak --constraints occurrence
         --constraints watchsumgeq --constraints litsumgeq
@@ -80,7 +80,8 @@ jobs:
       # donation or hit --ws-max-size. At the defaults (--count 30,
       # --optioncount 1000, --ws-max-size 32) that does not finish inside a
       # 6 h job. --ws-max-size 1 pins the adaptive sweeps to a single round;
-      # the sizes that actually exercise donation live in CI-long.yml.
+      # the sizes that actually exercise donation live in
+      # mini-scripts/soak-parallel.sh.
       - name: "Rust tests"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
@@ -99,7 +100,7 @@ jobs:
       # bound wall clock: --count 2 here was still inside the second of
       # seven sweeps after 25 minutes, at 24% CPU (one trial grinding,
       # not parallel work). The tester has no per-trial time limit, so
-      # scaled-up instances belong in CI-long.yml, not on every push.
+      # scaled-up instances belong in mini-scripts/, not on every push.
       - name: "Rust tests: nested smoke"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
