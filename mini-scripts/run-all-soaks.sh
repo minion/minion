@@ -1,26 +1,22 @@
 #!/bin/bash
 # Run the whole release soak suite, one soak at a time.
 #
-# The soaks run sequentially, not concurrently: each one already fills
-# the machine with a job pool sized to the core count, so overlapping
-# them would just make every measurement contend with every other.
+# Sequentially, not concurrently: each soak already fills the machine
+# with a job pool sized to the core count.
 #
-# Default budgets total 138 hours (~5.75 days), each soak under the
-# two-day mark:
+# Defaults total 138 hours, none over two days:
 #
 #   soak-constraints    36h   breadth across every constraint
 #   soak-midsearch      36h   mid-search injection matrix
 #   soak-parallel       24h   work-stealing at sizes that engage it
 #   soak-optimisation   18h   metamorphic optimum agreement
-#   soak-debug          24h   all of the above with assertions live
+#   soak-debug          24h   all of the above with assertions on
 #
-# --budget-hours caps the TOTAL. Each soak gets the lesser of its own
-# default and whatever is left, so a short total still runs every soak
-# rather than spending everything on the first one.
+# --budget-hours caps the total. Each soak gets the lesser of its own
+# default and what is left, so a short total still reaches every soak.
 #
-# A failing soak does not stop the rest -- the whole point of running
-# these before a release is to find out everything that is wrong, not
-# the first thing. The final exit status is non-zero if any soak failed.
+# A failing soak does not stop the rest. Exit status is non-zero if any
+# soak failed.
 #
 # Usage: ./run-all-soaks.sh [--budget-hours N] [--jobs N] [--smoke]
 

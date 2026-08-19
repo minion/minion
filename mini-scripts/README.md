@@ -38,59 +38,47 @@ no single soak is meant to exceed two days.
 Common options: `--budget-hours N`, `--budget-minutes M`, `--jobs N`,
 `--numthreads N`, `--logdir DIR`, `--smoke`.
 
-### How they are built
+### Design notes
 
-Each soak builds whatever it needs (`bin-quick`, `bin-debug`, the Rust
-tester, and for `soak-debug` a second tester linked against a
-`DEBUG_MINION=1` libminion). Existing builds are reused, so re-running
-after a crash doesn't recompile from scratch.
+Each soak builds what it needs (`bin-quick`, `bin-debug`, the tester,
+and for `soak-debug` a second tester linked against a `DEBUG_MINION=1`
+libminion). Existing builds are reused.
 
 The constraint list is harvested from the tester at startup rather than
 kept here. A hardcoded list quietly stops covering anything added later
 — `tester/big-test-logs/run.sh` still names 64 constraints where the
 tester now registers 78.
 
-### Budgets, not trial counts
+Soaks run *rounds* of increasing difficulty until the budget is gone,
+rather than a fixed number of trials: a count tuned on one machine means
+nothing on another. Rounds the budget never reaches are reported as
+skipped, so the summary says how far the run got.
 
-Each soak runs *rounds* of increasing difficulty until its budget runs
-out, rather than a fixed number of trials. A trial count tuned on one
-machine is meaningless on another; a budget is not. Rounds that the
-budget doesn't reach are reported as skipped, so the summary always says
-how far the run actually got.
-
-### Parallelism
-
-Work is one tester process per item, run `--jobs` at a time. Items are
-per-constraint (and per-mode where a soak sweeps modes), which gives
-hundreds of independent items — enough to keep any core count busy.
-
-`--jobs` defaults to `nproc / --numthreads`, because each tester process
-itself runs `--numthreads` solves concurrently. The product is what
-lands on the cores.
-
-Process-per-item also buys crash isolation: these soaks mostly catch
-assertion aborts, and an abort in one constraint must not take the sweep
-with it.
+Work is one tester process per item, `--jobs` at a time, defaulting to
+`nproc / --numthreads` because each tester runs `--numthreads` solves
+itself. Items are per-constraint, and per-mode where modes are swept, so
+there are hundreds of them — enough to keep any core count busy, and
+enough isolation that an assertion abort in one constraint doesn't take
+the sweep with it.
 
 ### Reading the result
 
 Every item writes `<round>-<item>.log` and `<round>-<item>.exit` under
-the log directory, and each soak ends with a summary plus the tail of
-every failure. Exit status is zero only if nothing failed *and* nothing
-timed out.
+the log directory, and each soak ends with a summary and the tail of
+every failure.
 
-A timeout is deliberately not a pass. On these budgets it means the item
-never finished, which is a result worth looking at — particularly in
-`soak-parallel.sh`, where instance growth is unbounded by design and the
-per-item timeout is the only thing stopping it.
+Exit status is zero only if nothing failed and nothing timed out. A
+timeout is not a pass: it means the item never finished. That matters
+most in `soak-parallel.sh`, where instance growth is unbounded by design
+and the timeout is the only bound.
 
 ### Requirements
 
 GNU `timeout` (`brew install coreutils` on macOS, where it is
-`gtimeout`). The soaks refuse to start without it: an unattended
-multi-day run with no per-item timeout will eventually wedge on a single
-trial and waste the whole budget. `stdbuf` is used when present so logs
-stay readable mid-run.
+`gtimeout`). The soaks refuse to start without it — an unattended
+multi-day run with no per-item timeout eventually wedges on one trial
+and wastes the budget. `stdbuf` is used when present so logs stay
+readable mid-run.
 
 ## See also
 

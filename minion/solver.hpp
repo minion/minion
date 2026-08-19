@@ -49,12 +49,10 @@ inline void worldPop() {
       // which never get fullPropagate called on them directly.
       (*it)->init_constraint();
       (*it)->fullPropagate();
-      // Every other fullPropagate caller checks isFailed before going on;
-      // this loop must too. With more than one constraint in the set, a
-      // failure from the first would otherwise leave the second
-      // propagating on an empty domain. The whole set is migrated upward
-      // below regardless, so the ones skipped here are re-established on
-      // the next pop.
+      // With two constraints in the set, a failure from the first would
+      // leave the second propagating on an empty domain. The set is
+      // migrated upward below either way, so whatever is skipped here is
+      // re-established on the next pop.
       if(getState().isFailed())
         break;
     }

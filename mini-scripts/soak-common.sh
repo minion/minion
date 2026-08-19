@@ -1,9 +1,8 @@
 # Shared helpers for the release soak scripts. Sourced, not executed.
 #
-# The soaks are budget-driven rather than count-driven: each one runs
-# rounds of increasing difficulty until its budget runs out. That way a
-# soak fills the time it is given on whatever machine it is run on,
-# instead of depending on a trial count tuned for one particular box.
+# The soaks are budget-driven, not count-driven: each runs rounds of
+# increasing difficulty until its time is up. A trial count tuned on one
+# machine means nothing on another; a budget does.
 
 set -u
 set -o pipefail
@@ -50,9 +49,7 @@ soak_parse_args() {
       --jobs|-j)        SOAK_JOBS="$2"; shift 2 ;;
       --numthreads)     SOAK_NUMTHREADS="$2"; shift 2 ;;
       --logdir)         SOAK_LOGDIR="$2"; shift 2 ;;
-      # --smoke exists so the script can be verified end to end in a
-      # couple of minutes. It is not a test of minion, it is a test of
-      # the script: tiny budget, one round, minimal counts.
+      # Tests the script, not minion: one round, minimal counts.
       --smoke)          SOAK_SMOKE=1; SOAK_BUDGET_MINUTES=5; shift ;;
       -h|--help)
         sed -n '2,/^$/{ s/^# \{0,1\}//; p; }' "$0"
@@ -141,14 +138,13 @@ soak_harvest_constraints() {
 
 # --- job pool --------------------------------------------------------
 
-# Reads labels (one per line) on stdin and runs SOAK_JOBS of them at a
-# time. The command for a label comes from soak_cmd_for, which each soak
-# script defines and exports -- labels stay bare words so that constraint
-# names containing brackets (check[assign], lexleq[quick]) survive both
-# xargs item parsing and shell globbing.
+# Reads labels on stdin, runs SOAK_JOBS at a time. Each soak defines and
+# exports soak_cmd_for to turn a label into a command, so labels stay
+# bare words -- names with brackets (check[assign]) would otherwise be
+# mangled by xargs item parsing or shell globbing.
 #
-# Each item runs under a timeout clamped to the remaining budget; items
-# reached after the budget is gone are recorded SKIPPED, not started.
+# Timeouts are clamped to the remaining budget; items reached after the
+# budget is gone are recorded SKIPPED, not started.
 soak_run_pool() {
   local round="$1" item_timeout="$2"
   export SOAK_ROUND="$round"
@@ -195,11 +191,9 @@ export -f soak_worker
 
 # --- summary ---------------------------------------------------------
 
-# Exit status is what a release gate keys off, so be strict about what
-# counts as a pass. A timeout is NOT a pass: it means the item never
-# finished, and on these budgets that is a result worth looking at.
-# It is reported separately from an outright failure so the two can be
-# told apart.
+# A timeout is not a pass -- on these budgets it means the item never
+# finished. Reported separately from an outright failure so the two can
+# be told apart.
 soak_summary() {
   local ok=0 fail=0 tmo=0 skip=0
   {
