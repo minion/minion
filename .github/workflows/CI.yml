@@ -29,13 +29,12 @@ jobs:
       run:
         shell: ${{ matrix.shell }}
     env:
-      # The in-process sweeps run EVERY constraint by default, which is far
-      # too much for a per-push job: the mid-search injection step alone ran
-      # for 90 minutes and timed the whole job out. On normal CI they smoke
-      # test a fixed selection instead -- the propagator families that have
-      # actually produced bugs (flow/matching, counting, watched literals,
-      # short tuples, tables, indexing, views, and a meta-constraint for the
-      # nested path). Exhaustive coverage lives in mini-scripts/.
+      # The in-process sweeps run every constraint by default, which is
+      # far too much per push -- the injection step alone once ran for 90
+      # minutes and timed the job out. Smoke a fixed selection instead:
+      # the propagator families that have actually produced bugs, plus a
+      # meta-constraint for the nested path. Full coverage is in
+      # mini-scripts/.
       SMOKE: >-
         --constraints gcc --constraints gccweak --constraints occurrence
         --constraints watchsumgeq --constraints litsumgeq
@@ -146,14 +145,11 @@ jobs:
               cd test_instances
               bash ./run_tests.sh ../bin-debug/minion
 
-      # In-process tester exercises minion-sys (the Rust FFI library
-      # binding), the mid-search injection paths, and the constraint
-      # sweep. Restricted to $SMOKE (see env above) and small counts so the
-      # whole suite fits in the CI time budget. --maxtuples is the per-run
-      # solution cap in the mid-search modes -- NOT --max-solutions, which
-      # those paths never consult -- and also bounds per-thread memory to
-      # roughly 1.5 GB times --numthreads (the minion pre-reservation
-      # dominates).
+      # In-process runs go through minion-sys (the Rust FFI binding) and
+      # reach the mid-search injection paths. Note --maxtuples, not
+      # --max-solutions, is the per-run solution cap in the mid-search
+      # modes -- those never consult --max-solutions. It also bounds
+      # per-thread memory at roughly 1.5 GB times --numthreads.
       - name: "In-process tester: baseline sweep"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin

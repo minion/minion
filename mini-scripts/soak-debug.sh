@@ -1,33 +1,26 @@
 #!/bin/bash
-# Release soak: everything again, with the assertions turned on.
+# Release soak: the same ground again, with assertions on.
 #
-# Assertions are where this codebase's bugs actually surface. A stale
-# propagator structure or a constraint propagated on a failed state
-# usually still produces *an* answer under -O3; under D_ASSERT it aborts
-# at the point of the mistake instead of quietly returning a wrong
-# solution count somewhere else.
+# Assertions are where this codebase's bugs surface. A stale propagator
+# structure usually still yields an answer under -O3; under D_ASSERT it
+# aborts at the mistake instead of returning a wrong count elsewhere.
 #
-# Three layers, which cover different things:
+# Three layers, each reaching something the others do not:
 #
-#   exec    bin-debug, i.e. --quick --debug: D_ASSERT live, checked
-#           DomainInt arithmetic, _GLIBCXX_DEBUG containers. The stock
-#           bin-quick build has none of these, so the ordinary exec
-#           soaks cannot hit any of them.
+#   exec    bin-debug: D_ASSERT, checked DomainInt, _GLIBCXX_DEBUG.
+#           Stock bin-quick has none of these.
 #   inproc  the in-process default, which minion-sys already builds
-#           with -DDOM_ASSERT (see minion-sys/build.sh) -- assertions,
-#           but unoptimised rather than fully debug.
-#   dbgsys  in-process with DEBUG_MINION=1, which rebuilds libminion as
-#           --quick --debug and so adds the checked-integer and
-#           libstdc++ debug layers to the FFI path.
+#           with -DDOM_ASSERT (minion-sys/build.sh) -- assertions, but
+#           unoptimised rather than fully debug.
+#   dbgsys  in-process with DEBUG_MINION=1, adding the checked-integer
+#           and libstdc++ debug layers to the FFI path.
 #
-# dbgsys builds into its own cargo target dir. Flipping DEBUG_MINION on
-# a shared target dir forces a full rebuild of libminion every time it
-# changes, which would otherwise happen twice per round.
+# dbgsys uses its own cargo target dir: toggling DEBUG_MINION on a
+# shared one rebuilds libminion every time it changes.
 #
-# Everything here is slower than the equivalent optimised sweep, so
-# counts are deliberately lower than the other soaks. Breadth over
-# depth: the point is to run many different shapes through the
-# assertions, not to run any one shape for a long time.
+# Counts are lower than the other soaks because all of this is slower.
+# Breadth over depth -- many shapes through the assertions beats one
+# shape for a long time.
 #
 # Usage: ./soak-debug.sh [--budget-hours N] [--jobs N] [--smoke]
 

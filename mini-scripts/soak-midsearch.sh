@@ -1,21 +1,14 @@
 #!/bin/bash
-# Release soak: the mid-search injection matrix (in-process only).
+# Release soak: mid-search constraint injection. In-process only.
 #
-# Sweeps mode x constraint, where mode covers the axes that interact:
-# how many constraint packets are injected during one solve, whether
-# each injected constraint is wrapped in a random parent, and whether
-# fresh variables are added mid-search as well.
+# Sweeps mode x constraint. The modes vary how many constraint packets
+# are injected during one solve, whether each is wrapped in a random
+# parent, and whether variables are added mid-search too.
 #
-# The packet-count axis is why this is its own soak. Injecting a single
-# constraint exercises far less than injecting two: minion merges the
-# per-depth re-propagation sets on the way up, so only with two or more
-# constraints do several end up being re-established in the same
-# worldPop. A crash that needs N>=2 plus a nested wrapper sat unnoticed
-# in exactly that gap.
-#
-# Everything here needs --in-process, so it runs through minion-sys
-# (libminion via FFI), which is also the only way the mid-search entry
-# points are reachable at all.
+# Packet count is the axis worth the extra runtime. Minion merges the
+# per-depth re-propagation sets as it backtracks, so only with two or
+# more injected constraints do several get re-established in the same
+# worldPop -- a shape one packet never produces.
 #
 # Usage: ./soak-midsearch.sh [--budget-hours N] [--jobs N] [--smoke]
 

@@ -1,22 +1,16 @@
 #!/bin/bash
 # Release soak: correctness breadth across every constraint.
 #
-# One tester process per constraint, run in a job pool, over rounds of
-# increasing instance size. Each round re-runs the whole constraint set
-# with bigger instances and fewer trials, so early rounds go wide and
-# later rounds go deep. Rounds stop when the budget runs out.
+# One tester process per constraint, in a job pool, over rounds of
+# growing instance size. Early rounds go wide, later ones go deep.
 #
-# Process-per-constraint means an abort in one propagator doesn't take
-# the rest of the sweep with it -- which matters here, because the
-# failures this catches are usually assertion aborts, not clean exits.
+# --var-reuse and --negate-bool run well above their defaults. Both
+# produce aliasing -- the same variable, or a variable and its negation,
+# in two argument positions of one constraint -- which has been this
+# codebase's most productive bug class.
 #
-# --var-reuse and --negate-bool are turned up well above their defaults.
-# Those two knobs are what surface aliasing unsoundness (the same
-# variable, or a variable and its negation, in two argument positions of
-# one constraint), which has been the most productive bug class.
-#
-# Work-stealing is pinned to --ws-max-size 1 here so rounds stay
-# bounded; driving actual donations is soak-parallel.sh's job.
+# Work-stealing is pinned to --ws-max-size 1 to keep rounds bounded.
+# soak-parallel.sh is what drives donations.
 #
 # Usage: ./soak-constraints.sh [--budget-hours N] [--jobs N] [--smoke]
 

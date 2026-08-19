@@ -1,21 +1,15 @@
 #!/bin/bash
-# Release soak: parallel search at sizes where it actually engages.
+# Release soak: parallel search at sizes where it engages. Exec only.
 #
-# The work-stealing, portfolio and parallel-preprocess sweeps only test
-# anything once instances are big enough that a worker is still busy
-# when another goes idle. At the default instance size they finish
-# before any donation can happen, so this soak drives --ws-max-size and
-# --size-factor up until donations are observed.
+# The work-stealing, portfolio and parallel-preprocess sweeps test
+# nothing until instances are big enough that one worker is still busy
+# when another goes idle. This soak raises --ws-max-size and
+# --size-factor until donations happen.
 #
-# That growth is also why this is the one soak whose cost is genuinely
-# unbounded: the adaptive sweep doubles instance size per constraint
-# until it sees a donation or hits the cap, and that cost does not
-# shrink when you lower --count. Per-item timeouts are the only thing
-# bounding it -- treat a TIMEOUT here as "this constraint did not finish
-# at this size", which is information, not a pass.
-#
-# Exec backend only: the parallel sweeps spawn minion subprocesses and
-# are skipped entirely under --in-process.
+# Cost here is unbounded by design: the adaptive sweep doubles instance
+# size per constraint until it sees a donation or hits the cap, and
+# lowering --count does not shrink that. The per-item timeout is the
+# only bound, so a TIMEOUT means "did not finish at this size".
 #
 # Usage: ./soak-parallel.sh [--budget-hours N] [--jobs N] [--smoke]
 

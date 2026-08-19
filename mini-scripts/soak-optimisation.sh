@@ -1,22 +1,18 @@
 #!/bin/bash
 # Release soak: metamorphic optimisation sweep.
 #
-# Optimisation is the thinnest-covered area in the tester. The ordinary
-# sweeps compare solution *sets*, which says nothing about whether a
-# reported optimum is right; and the random tester generates no
-# MAXIMISING/MINIMISING instances outside this sweep, so all other
-# optimisation coverage comes from ~20 hand-written regression files.
+# Optimisation is the thinnest-covered area of the tester. The ordinary
+# sweeps compare solution sets, which says nothing about whether a
+# reported optimum is right, and no other sweep generates MAXIMISING or
+# MINIMISING instances at all.
 #
-# The sweep wraps each random instance with `aux = sum(vars)` and a
-# random MINIMISING/MAXIMISING, then solves under several (propagator,
-# heuristic, parallel) strategies and asserts every one reports the same
+# Each random instance gets `aux = sum(vars)` and a random direction,
+# then solves under several strategies that must all agree on the
 # optimum. Disagreement points at bound tracking, cross-worker bound
-# broadcast, or restart-with-optimisation interaction -- code that the
-# satisfaction sweeps never touch.
+# broadcast, or restarts interacting with optimisation.
 #
-# Both backends run: exec covers the full strategy set including
-# parallel and restarts, in-process covers the Model::optimise FFI
-# plumbing with a smaller strategy subset.
+# Exec covers the full strategy set; in-process covers the FFI plumbing
+# with a smaller subset.
 #
 # Usage: ./soak-optimisation.sh [--budget-hours N] [--jobs N] [--smoke]
 
