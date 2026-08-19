@@ -5,3 +5,7 @@ tester/target-asan/
 tester/tempdir/
 bin-*/
 /bin/
+
+# release soak suite output
+mini-scripts/soak-logs/
+tester/target-debugminion/

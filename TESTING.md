@@ -7,6 +7,8 @@ There is one entry point: `./test.sh` at the repo root.
 ./test.sh --heavy [--budget-hours N]        # default 24h, up to ~48h
 ```
 
+For pre-release soaking there is a heavier suite under `mini-scripts/`, budgeted at ~5.75 days in total with no single run over two days. See `mini-scripts/README.md`.
+
 `--light` is what you run before pushing. It mirrors `.github/workflows/CI.yml` exactly, so a green local run means CI will be green too. `--heavy` is the release-gate / overnight soak; it delegates to `test_instances/deep_test.sh`, which schedules ten phases of progressively bigger sweeps and gives up later phases gracefully if the budget runs out.
 
 Both modes will build any required binaries (`bin-quick`, plus `bin-debug` for `--light`). Existing builds are reused.
@@ -81,7 +83,7 @@ Shell driver that launches one `tester` process per constraint, capped at 5 conc
 | 9 | per-constraint isolation sweep | ~4–6 h |
 | 10 | tester `--size-factor 8 --ws-max-size 256` | ~4 h |
 
-Heavy is also where you'd run a longer `CI-long.yml` equivalent — that workflow runs weekly on GitHub Actions and exercises the same in-process / midsearch axes with much higher trial counts.
+Beyond heavy, `mini-scripts/` holds the release soak suite: five budgeted soaks (constraint breadth, mid-search injection matrix, parallel search at engaging sizes, optimisation agreement, and an assertions-live pass) that run for days rather than hours.
 
 ## Feature coverage
 
