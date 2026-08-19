@@ -44,3 +44,16 @@ slower but has a large amount of internal checks. It should be used if you are
 unsure / worried about the results Minion produces, or it crashes.
 
 To clean all generated files, simply delete the directory you did the build in.
+
+
+Testing
+-------
+
+TESTING.md describes the test infrastructure. The entry points are:
+
+  ./test.sh --light     ~30 min, mirrors CI; run this before pushing
+  ./test.sh --heavy     24-48h release gate
+
+For pre-release soaking there is a longer suite under mini-scripts/,
+budgeted at around 5.75 days in total with no single run over two days.
+See mini-scripts/README.md.
