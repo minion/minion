@@ -1,3 +1,23 @@
+- August 19, 2026 : Minion 2.1
+
+This release is almost entirely bug fixes. Nearly all of them were found by our own testing rather than reported by users, and most need unusual instances to trigger, so we do not expect them to affect many people. It is worth upgrading if you use the parallel search modes, or if your instances are produced by a modelling tool rather than written by hand.
+
+Minion's testing has grown a great deal since Minion 2. Alongside the hand-written `.minion` regression suite, a random instance generator now checks every constraint against an independently computed table of its solutions, and against other constraints that are supposed to mean the same thing. It re-solves each instance under different variable and value orderings, preprocessing levels, restart settings and parallel modes, and requires the answers to agree. A second layer drives Minion as a library rather than as a binary, which is the only way to reach the interfaces for adding variables and constraints part-way through a search. `mini-scripts/` holds soak tests that run all of this for days at a time before a release, and `TESTING.md` describes the whole arrangement.
+
+That testing found the bugs below. Most of them share a pattern: the same variable appearing in two argument positions of one constraint, as in `gcc([a,b], [1,2], [b,c])`, or a variable appearing both plain and negated, as in `lexleq[rv]([x, !b, b], [b, x, -9])`. Several propagators counted such a variable as two independent things, and could then remove values that were still valid. Hand-written instances rarely look like this; generated ones sometimes do.
+
+Longer notes:
+
+- Fixed wrong answers with a repeated variable in occurrence, watchvecneq, watchvecexists_less, litsumgeq, watchsumgeq, watchsumleq, gcc, gccweak and lexleq[rv]. gcc and gccweak now defer all their pruning to the end of a propagation pass, which is what made the shared-variable case correct.
+- Fixed empty and zero-variable negativetable and negativemddc constraints, which the parser collapsed to the wrong truth value regardless of polarity.
+- Fixed a worker-thread stack overflow in the threaded parallel modes.
+- Fixed data races in the lazy tuple-table caches under threaded parallel search.
+- Re-wrote -X-AMO and -X-AMO-Extra.
+- Library: fixed several crashes and wrong answers when search backtracks above a constraint that was added part-way through a search.
+- Library: added node and time limits, and routed solver output through a per-context stream so concurrent solves in one process no longer fight over std::cout.
+- Library: fixed table constraints built over the C interface with an empty or zero-variable table.
+- Added a MINION_SANITIZE build option for AddressSanitizer builds of the library.
+
 - March 19, 2024 : Minion 2
 
 While the major version number has increased due to significant internal changes, there are few user-visible updates in this release. The internal changes have both cleaned up a lot of old code, and made Minion usable as a library (but this work is not yet read for general usage). Some small issues were fixed which stopped Minion building on the latest versions of operating systems and compilers.
