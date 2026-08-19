@@ -28,6 +28,21 @@ jobs:
     defaults:
       run:
         shell: ${{ matrix.shell }}
+    env:
+      # The in-process sweeps run EVERY constraint by default, which is far
+      # too much for a per-push job: the mid-search injection step alone ran
+      # for 90 minutes and timed the whole job out. On normal CI they smoke
+      # test a fixed selection instead -- the propagator families that have
+      # actually produced bugs (flow/matching, counting, watched literals,
+      # short tuples, tables, indexing, views, and a meta-constraint for the
+      # nested path). Exhaustive coverage lives in CI-long.yml.
+      SMOKE: >-
+        --constraints gcc --constraints gccweak --constraints occurrence
+        --constraints watchsumgeq --constraints litsumgeq
+        --constraints haggisgac --constraints table --constraints element
+        --constraints gacalldiff --constraints lexleq
+        --constraints watchvecneq --constraints reify
+        --constraints watched-or
     strategy:
       fail-fast: false
       matrix:
@@ -132,45 +147,47 @@ jobs:
 
       # In-process tester exercises minion-sys (the Rust FFI library
       # binding), the mid-search injection paths, and the constraint
-      # sweep. Counts are kept small so the whole suite fits in the CI
-      # time budget; --maxtuples bounds the per-run solution cap so
-      # per-thread memory stays under ~1.5 GB (the minion pre-reservation
-      # dominates), times --numthreads.
+      # sweep. Restricted to $SMOKE (see env above) and small counts so the
+      # whole suite fits in the CI time budget. --maxtuples is the per-run
+      # solution cap in the mid-search modes -- NOT --max-solutions, which
+      # those paths never consult -- and also bounds per-thread memory to
+      # roughly 1.5 GB times --numthreads (the minion pre-reservation
+      # dominates).
       - name: "In-process tester: baseline sweep"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --in-process --count 3 --numthreads 4 --maxtuples 10000
+              cargo run --release -- --in-process $SMOKE --count 3 --numthreads 4 --maxtuples 2000 --max-solutions 50000
 
       - name: "In-process tester: mid-search add-vars (no constraint on new vars)"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --in-process --midsearch --count 5 --numthreads 4 --maxtuples 10000
+              cargo run --release -- --in-process $SMOKE --midsearch --count 5 --numthreads 4 --maxtuples 2000
 
       - name: "In-process tester: mid-search constraint injection (N=1)"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --in-process --midsearch-constraints --count 10 --numthreads 4 --maxtuples 10000
+              cargo run --release -- --in-process $SMOKE --midsearch-constraints --count 5 --numthreads 4 --maxtuples 2000
 
       - name: "In-process tester: mid-search constraint injection (N=2)"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --in-process --midsearch-constraints --midsearch-constraints-num-packets 2 --count 5 --numthreads 4 --maxtuples 10000
+              cargo run --release -- --in-process $SMOKE --midsearch-constraints --midsearch-constraints-num-packets 2 --count 3 --numthreads 4 --maxtuples 2000
 
       - name: "In-process tester: mid-search constraint injection wrapped in nested parent"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --in-process --midsearch-constraints --midsearch-wrap-nested --count 5 --numthreads 4 --maxtuples 10000
+              cargo run --release -- --in-process $SMOKE --midsearch-constraints --midsearch-wrap-nested --count 3 --numthreads 4 --maxtuples 2000
 
       - name: "In-process tester: mid-search add-vars + mixed-var constraint"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              cargo run --release -- --in-process --midsearch-add-vars --midsearch-constraints-num-packets 2 --count 30 --numthreads 4 --maxtuples 10000
+              cargo run --release -- --in-process $SMOKE --midsearch-add-vars --midsearch-constraints-num-packets 2 --count 15 --numthreads 4 --maxtuples 2000
 
       # Debug in-process test: rebuilds minion-sys with MINION_DEBUG so
       # the checked-integer DomainInt wrapper is exercised through the
@@ -180,10 +197,10 @@ jobs:
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              DEBUG_MINION=1 cargo run --release -- --in-process --count 2 --numthreads 4 --maxtuples 10000
+              DEBUG_MINION=1 cargo run --release -- --in-process $SMOKE --count 2 --numthreads 4 --maxtuples 2000 --max-solutions 50000
 
       - name: "In-process tester: debug mid-search constraint injection"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
-              DEBUG_MINION=1 cargo run --release -- --in-process --midsearch-constraints --count 3 --numthreads 4 --maxtuples 10000
+              DEBUG_MINION=1 cargo run --release -- --in-process $SMOKE --midsearch-constraints --count 2 --numthreads 4 --maxtuples 2000
