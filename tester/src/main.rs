@@ -349,14 +349,16 @@ fn main() -> Result<()> {
 
     let mut v;
     if opt.constraints.is_empty() {
-        v = constraint_def::CONSTRAINT_LIST.iter()
+        v = constraint_def::CONSTRAINT_LIST
+            .iter()
             .chain(constraint_def::NESTED_CONSTRAINT_LIST.iter())
             .cloned()
             .collect();
     } else {
         v = Vec::new();
         for c in opt.constraints.clone() {
-            let con = constraint_def::CONSTRAINT_LIST.iter()
+            let con = constraint_def::CONSTRAINT_LIST
+                .iter()
                 .chain(constraint_def::NESTED_CONSTRAINT_LIST.iter())
                 .find(|x| x.name == c);
             match con {
@@ -392,9 +394,7 @@ fn main() -> Result<()> {
     if opt.optimisation_sweep
         && (opt.midsearch || opt.midsearch_constraints || opt.midsearch_add_vars)
     {
-        anyhow::bail!(
-            "--optimisation-sweep is mutually exclusive with the midsearch sweeps"
-        );
+        anyhow::bail!("--optimisation-sweep is mutually exclusive with the midsearch sweeps");
     }
 
     let var_order = opt.var_order.into_minion();
@@ -503,7 +503,11 @@ fn main() -> Result<()> {
         if opt.midsearch_base_size == 0 {
             anyhow::bail!("--midsearch-base-size must be >= 1");
         }
-        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.iter().chain(constraint_def::NESTED_CONSTRAINT_LIST.iter()).cloned().collect();
+        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST
+            .iter()
+            .chain(constraint_def::NESTED_CONSTRAINT_LIST.iter())
+            .cloned()
+            .collect();
         use std::sync::Mutex;
         let failures = std::sync::atomic::AtomicUsize::new(0);
         let first_error: Mutex<Option<String>> = Mutex::new(None);
@@ -559,7 +563,11 @@ fn main() -> Result<()> {
         // Draw bases from the full list of constraints — independent of
         // what the user selected for injection, so `--constraints eq`
         // still gets a non-trivial base problem to inject into.
-        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST.iter().chain(constraint_def::NESTED_CONSTRAINT_LIST.iter()).cloned().collect();
+        let pool: Vec<constraint_def::ConstraintDef> = constraint_def::CONSTRAINT_LIST
+            .iter()
+            .chain(constraint_def::NESTED_CONSTRAINT_LIST.iter())
+            .cloned()
+            .collect();
         // Non-fatal: each trial that fails is recorded for the summary
         // but doesn't abort the sweep. The point of this test is to
         // surface minion bugs; aborting on the first one hides the rest.
@@ -779,8 +787,8 @@ fn main() -> Result<()> {
         let ret_wsp: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
             let mut size = ws_initial;
             loop {
-                let donated_before = test_types::WS_TRIALS_WITH_DONATIONS
-                    .load(std::sync::atomic::Ordering::Relaxed);
+                let donated_before =
+                    test_types::WS_TRIALS_WITH_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
                 let capped_before =
                     test_types::WS_TRIALS_CAPPED.load(std::sync::atomic::Ordering::Relaxed);
                 (0..opt.count)
@@ -793,8 +801,8 @@ fn main() -> Result<()> {
                          -X-parallelWorkStealPortfolio (size_factor={size})",
                         c.name
                     ))?;
-                let donated_after = test_types::WS_TRIALS_WITH_DONATIONS
-                    .load(std::sync::atomic::Ordering::Relaxed);
+                let donated_after =
+                    test_types::WS_TRIALS_WITH_DONATIONS.load(std::sync::atomic::Ordering::Relaxed);
                 let capped_after =
                     test_types::WS_TRIALS_CAPPED.load(std::sync::atomic::Ordering::Relaxed);
                 let saw_donation = donated_after > donated_before;
@@ -860,8 +868,7 @@ fn main() -> Result<()> {
                         let outcome =
                             test_types::test_constraint_parallel_preprocess(&config, c, 4, size)?;
                         if outcome.had_rounds_ge2 {
-                            local_with_rounds
-                                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                            local_with_rounds.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
                         }
                         if outcome.was_capped {
                             local_capped.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
@@ -872,10 +879,8 @@ fn main() -> Result<()> {
                         "failure in {} with -X-parallelPreprocess 4 (size_factor={size})",
                         c.name
                     ))?;
-                let saw_rounds =
-                    local_with_rounds.load(std::sync::atomic::Ordering::Relaxed) > 0;
-                let capped_this_round =
-                    local_capped.load(std::sync::atomic::Ordering::Relaxed);
+                let saw_rounds = local_with_rounds.load(std::sync::atomic::Ordering::Relaxed) > 0;
+                let capped_this_round = local_capped.load(std::sync::atomic::Ordering::Relaxed);
                 if saw_rounds {
                     println!(
                         "Tested {} (parallel-preprocess, size_factor={size}, \
@@ -927,8 +932,7 @@ fn main() -> Result<()> {
         let pp_trials = test_types::PP_TRIALS.load(std::sync::atomic::Ordering::Relaxed);
         let pp_with_rounds =
             test_types::PP_TRIALS_WITH_ROUNDS.load(std::sync::atomic::Ordering::Relaxed);
-        let pp_prunings =
-            test_types::PP_TOTAL_PRUNINGS.load(std::sync::atomic::Ordering::Relaxed);
+        let pp_prunings = test_types::PP_TOTAL_PRUNINGS.load(std::sync::atomic::Ordering::Relaxed);
         println!(
             "Parallel-preprocess coverage: {pp_trials} trials, \
              {pp_with_rounds} trials with rounds>=2, \

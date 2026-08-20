@@ -217,7 +217,7 @@ fn get_minion_solutions_inner(
     // `-restarts` rejects sollimit != 1 (BuildCSP.cpp:124), so the
     // dedicated restart sweep already passes `-sollimit 1` in
     // extraargs and we must not append a second one — detect and skip.
-    let has_sollimit = extraargs.iter().any(|&a| a == "-sollimit");
+    let has_sollimit = extraargs.contains(&"-sollimit");
     if max_solutions > 0 && !has_sollimit {
         args.push("-sollimit".to_string());
         args.push(max_solutions.to_string());
@@ -285,8 +285,11 @@ fn get_minion_solutions_inner(
             .context(format!("failed to open solution file: {}", minioncmd))?;
         let reader = BufReader::new(f);
         let mut digest = SolutionDigest::new();
-        let mut raw: Option<Vec<Vec<i64>>> =
-            if keep_full_solutions { Some(Vec::new()) } else { None };
+        let mut raw: Option<Vec<Vec<i64>>> = if keep_full_solutions {
+            Some(Vec::new())
+        } else {
+            None
+        };
         for tryline in reader.lines() {
             let line = tryline.context(format!("failure reading solutions: {}", minioncmd))?;
             let sol: Vec<i64> = line
@@ -324,8 +327,7 @@ fn get_minion_solutions_inner(
         if optimisation.is_none() && solcount != digest.count as i64 {
             return Err(anyhow!(format!(
                 "Solutions file contains {} solutions, but SolutionsFound is {}",
-                digest.count,
-                solcount
+                digest.count, solcount
             )));
         }
 
@@ -341,10 +343,7 @@ fn get_minion_solutions_inner(
             .ParallelPreprocessPrunings
             .as_ref()
             .and_then(|s| s.parse::<i64>().ok());
-        let opt_value = v
-            .OptimumValue
-            .as_ref()
-            .and_then(|s| s.parse::<i64>().ok());
+        let opt_value = v.OptimumValue.as_ref().and_then(|s| s.parse::<i64>().ok());
 
         (nodes, donations, pp_rounds, pp_prunings, opt_value)
     };
