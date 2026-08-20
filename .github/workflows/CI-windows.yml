@@ -47,6 +47,34 @@ jobs:
                 dir
                 .\build.bat
 
+      # Diagnostic only: run minion.exe directly, with nothing capturing
+      # or filtering its output, so the log shows whether the binary runs
+      # at all. The test harness below sends minion's stderr to
+      # /dev/null and reports every failure as "Got '' solutions", which
+      # cannot tell a crash apart from a parse problem.
+      #
+      # Runs under cmd rather than bash to keep git-bash out of the
+      # picture: if the binary cannot start (a missing runtime DLL, say)
+      # this shows the native Windows error.
+      #
+      # continue-on-error, because this step exists to produce evidence.
+      # The real tests below still gate the job.
+      - name: "Smoke: run minion.exe directly"
+        shell: cmd
+        continue-on-error: true
+        run: |
+              cd bin-quick
+              dir minion.exe
+              echo ----- no arguments: does it start at all -----
+              minion.exe
+              echo exit code: %ERRORLEVEL%
+              echo ----- minimal instance -----
+              minion.exe ..\test_instances\test_false_1.minion
+              echo exit code: %ERRORLEVEL%
+              echo ----- an instance the harness reports as failing -----
+              minion.exe -findallsols ..\test_instances\alias_litsumgeq_consistent.minion
+              echo exit code: %ERRORLEVEL%
+
       # The Rust tester is not run here: it depends on minion-sys, whose
       # build script builds libminion via bash/make and only knows how to
       # link the C++ runtime on apple and linux targets. Windows coverage
