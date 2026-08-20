@@ -45,9 +45,21 @@ for i in *.minion; do
   # Everything after "#TEST EXTRAFLAGS", so a flag that takes an argument
   # (e.g. -X-parallelWorkSteal 4) survives; $3 alone dropped the argument.
   extraflags=`grep "#TEST EXTRAFLAGS" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015'`
+  # TEMPORARY (windows CI): for the first few instances, show the exact
+  # invocation and minion's unfiltered output, stderr included. The
+  # normal path sends stderr to /dev/null and only reports a solution
+  # count, which cannot distinguish "minion failed" from "the grep
+  # failed". Remove once the windows harness is understood.
+  if [ -n "${MINION_TEST_VERBOSE-}" ] && [ "$j" -le 3 ]; then
+    echo
+    echo "--- DEBUG cmd: $exec $i $extraflags -findallsols"
+    $exec $i $extraflags -findallsols
+    echo "--- DEBUG exit: $?"
+  fi
+
   if grep -q "#TEST SOLCOUNT" $i;
     then
-    numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | ../mini-scripts/get_info.sh solutions | tr -d '\015'`
+    numsols=`$exec $i $extraflags -findallsols $* 2>/dev/null | bash ../mini-scripts/get_info.sh solutions | tr -d '\015'`
     testnumsols=`grep "#TEST SOLCOUNT" $i  | awk '{print $3}' | tr -d '\015' `
     if [[ "$numsols" != "$testnumsols" ]]; then
       testpass=0
@@ -57,7 +69,7 @@ for i in *.minion; do
     fi
   else
     if grep -q "#TEST CHECKONESOL" $i; then
-      sol=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/print_sol.sh | tr -d '\015'`
+      sol=`$exec $i $* $extraflags 2>/dev/null | bash ../mini-scripts/print_sol.sh | tr -d '\015'`
       # That "tr" is just to deal with line ending problems.
       testsol=`grep "#TEST CHECKONESOL" $i | awk '{$1 = ""; $2 = ""; print }' | tr -d '\015' `
 
@@ -74,7 +86,7 @@ for i in *.minion; do
     else
       if grep -q "#TEST NODECOUNT" $i;
         then
-        numnodes=`$exec $i $* $extraflags 2>/dev/null | ../mini-scripts/get_info.sh nodes | tr -d '\015'`
+        numnodes=`$exec $i $* $extraflags 2>/dev/null | bash ../mini-scripts/get_info.sh nodes | tr -d '\015'`
         testnumnodes=`grep "#TEST NODECOUNT" $i  | awk '{print $3}' | tr -d '\015' `
         if [[ "$numnodes" != "$testnumnodes" ]]; then
           testpass=0
