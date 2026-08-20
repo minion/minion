@@ -83,4 +83,4 @@ jobs:
         shell: bash
         run: |
               cd test_instances
-              bash ./do_basic_tests.sh ../bin-quick/minion.exe
+              MINION_TEST_VERBOSE=1 bash ./do_basic_tests.sh ../bin-quick/minion.exe
