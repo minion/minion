@@ -966,7 +966,11 @@ pub fn get_minion_solutions_in_process_work_steal(
     let shared: std::sync::Mutex<(SolutionDigest, Option<Vec<Vec<i64>>>)> =
         std::sync::Mutex::new((
             SolutionDigest::new(),
-            if keep_full_solutions { Some(Vec::new()) } else { None },
+            if keep_full_solutions {
+                Some(Vec::new())
+            } else {
+                None
+            },
         ));
 
     let cb: minion_sys::ParallelCallback<'_> = {
@@ -1046,8 +1050,11 @@ pub fn get_minion_solutions_in_process(
     // `keep_full_solutions` opts callers (mid-search tests) into Vec
     // storage when they need indexed access. See solution_digest.rs.
     let mut digest = SolutionDigest::new();
-    let mut raw_solutions: Option<Vec<Vec<i64>>> =
-        if keep_full_solutions { Some(Vec::new()) } else { None };
+    let mut raw_solutions: Option<Vec<Vec<i64>>> = if keep_full_solutions {
+        Some(Vec::new())
+    } else {
+        None
+    };
 
     let callback: minion_sys::Callback<'_> = {
         let variable_order = &variable_order;
@@ -1156,7 +1163,12 @@ pub fn get_minion_solutions_in_process_optimisation(
             optimisation.aux_name.to_string(),
             VarDomain::Bound(optimisation.aux_min as i32, optimisation.aux_max as i32),
         )
-        .ok_or_else(|| anyhow!("aux variable name {:?} already in use", optimisation.aux_name))?;
+        .ok_or_else(|| {
+            anyhow!(
+                "aux variable name {:?} already in use",
+                optimisation.aux_name
+            )
+        })?;
 
     let top = build_constraint(instance)
         .with_context(|| format!("building constraint for {testname}"))?;

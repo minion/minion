@@ -201,7 +201,9 @@ fn run_solve_inner(
                     // -cores N is a parallel knob with no in-process surface.
                     // Accept silently (consume the argument) so the option
                     // sweep can pass it through harmlessly.
-                    "-cores" => { i += 2; }
+                    "-cores" => {
+                        i += 2;
+                    }
                     other => {
                         return Err(anyhow!(
                             "in-process backend does not support flag {:?}",
@@ -212,8 +214,12 @@ fn run_solve_inner(
             }
             // Fold -nodelimit / -timelimit / -cpulimit into RunOptions.
             let mut run_opts = config.run_options_no_seed();
-            if node_limit > 0 { run_opts.node_limit = node_limit; }
-            if let Some(tl) = time_limit { run_opts.time_limit = Some(tl); }
+            if node_limit > 0 {
+                run_opts.node_limit = node_limit;
+            }
+            if let Some(tl) = time_limit {
+                run_opts.time_limit = Some(tl);
+            }
             if let Some(n) = work_steal {
                 let _ = find_all;
                 run_minion_lib::get_minion_solutions_in_process_work_steal(
@@ -247,8 +253,13 @@ pub fn test_compare_solvers(
     let instance = constraint_def::build_random_instance_with_children_sized(c, &[], 1);
     let r1 = run_solve(config, &["-findallsols"], &instance, "primary")?;
     let r2 = run_minion::get_minion_solutions(
-        compare_path, &config.minionargs, &["-findallsols"],
-        &instance, "compare", config.max_solutions, false,
+        compare_path,
+        &config.minionargs,
+        &["-findallsols"],
+        &instance,
+        "compare",
+        config.max_solutions,
+        false,
     )?;
     if r1.solutions != r2.solutions {
         let debug_path = "/tmp/claude/mismatch.minion";
@@ -264,7 +275,10 @@ pub fn test_compare_solvers(
     if r1.nodes != r2.nodes {
         anyhow::bail!(
             "{}: node count mismatch! primary {}, compare {}. Instance: {}",
-            c.name, r1.nodes, r2.nodes, r1.filename,
+            c.name,
+            r1.nodes,
+            r2.nodes,
+            r1.filename,
         );
     }
     Ok(())
@@ -333,7 +347,9 @@ pub fn test_constraint(config: &MinionConfig, c: &constraint_def::ConstraintDef)
     {
         return Err(anyhow!(format!(
             "Propagator should be GAC, but node counts not equal in {} vs {}{}",
-            ret.filename, ret2.filename, rerun_hint(&ret, &ret2)
+            ret.filename,
+            ret2.filename,
+            rerun_hint(&ret, &ret2)
         )));
     }
 
@@ -456,10 +472,7 @@ pub fn test_constraint_workstal(
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Work-stealing solutions not equal in {} vs {}: seq={} ws={}",
-            ret.filename,
-            ret2.filename,
-            ret.solutions.count,
-            ret2.solutions.count
+            ret.filename, ret2.filename, ret.solutions.count, ret2.solutions.count
         )));
     }
 
@@ -523,10 +536,7 @@ pub fn test_constraint_workstal_portfolio(
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Work-steal portfolio solutions not equal in {} vs {}: seq={} portfolio={}",
-            ret.filename,
-            ret2.filename,
-            ret.solutions.count,
-            ret2.solutions.count
+            ret.filename, ret2.filename, ret.solutions.count, ret2.solutions.count
         )));
     }
 
@@ -625,10 +635,7 @@ pub fn test_constraint_parallel_preprocess(
     if ret.solutions != ret2.solutions {
         return Err(anyhow!(format!(
             "Parallel-preprocess solutions not equal in {} vs {}: seq={} par={}",
-            ret.filename,
-            ret2.filename,
-            ret.solutions.count,
-            ret2.solutions.count
+            ret.filename, ret2.filename, ret.solutions.count, ret2.solutions.count
         )));
     }
 
@@ -688,8 +695,7 @@ pub fn test_constraint_restart(
     // solution lie in the baseline set?), so the baseline opts into
     // raw_solutions storage. The restart itself uses -sollimit 1 so
     // its single-row Vec is stored regardless of digest mode.
-    let baseline =
-        run_solve_keep_full(config, &["-findallsols"], &instance, "restart_baseline")?;
+    let baseline = run_solve_keep_full(config, &["-findallsols"], &instance, "restart_baseline")?;
     if baseline.hit_solution_cap || baseline.solutions.count == 0 {
         baseline.cleanup.cleanup();
         return Ok(());
@@ -720,10 +726,7 @@ pub fn test_constraint_restart(
     if !baseline_sols.iter().any(|s| s == found) {
         return Err(anyhow!(format!(
             "Restart solution {:?} not in baseline ({} sols) ({} vs {})",
-            found,
-            baseline.solutions.count,
-            baseline.filename,
-            restart.filename
+            found, baseline.solutions.count, baseline.filename, restart.filename
         )));
     }
 
@@ -1207,8 +1210,7 @@ pub fn test_constraint_midsearch_inject_constraints(
     for k in 0..n {
         let mut with_c: Vec<&constraint_def::ConstraintInstance> = base_refs.clone();
         with_c.extend(inject_refs[..=k].iter().copied());
-        let vars_only_k: Vec<&constraint_def::ConstraintInstance> =
-            inject_refs[k + 1..].iter().copied().collect();
+        let vars_only_k: Vec<&constraint_def::ConstraintInstance> = inject_refs[k + 1..].to_vec();
         let f_k = crate::run_minion_lib::run_multi(
             &with_c,
             &vars_only_k,
@@ -1923,25 +1925,44 @@ pub fn test_constraint_optimisation(
     let exec_strategies: [(&str, &[&str]); 6] = [
         ("baseline", &[]),
         ("preprocess-SAC", &["-preprocess", "SAC"]),
-        ("var-sdf-val-desc", &["-varorder", "sdf", "-valorder", "descend"]),
+        (
+            "var-sdf-val-desc",
+            &["-varorder", "sdf", "-valorder", "descend"],
+        ),
         ("worksteal-4", &["-X-parallelWorkSteal", "4"]),
         ("threads-4", &["-X-parallelThreads", "4"]),
         ("restarts", &["-restarts", "-restarts-multiplier", "1.5"]),
     ];
-    let in_process_strategies: [(&str, minion_sys::VarOrder, minion_sys::ValOrder,
-                                 minion_sys::PropLevel); 4] = [
-        ("baseline",
-         minion_sys::VarOrder::Static, minion_sys::ValOrder::Ascend,
-         minion_sys::PropLevel::None),
-        ("preprocess-SAC",
-         minion_sys::VarOrder::Static, minion_sys::ValOrder::Ascend,
-         minion_sys::PropLevel::SAC),
-        ("preprocess-SACBounds",
-         minion_sys::VarOrder::Static, minion_sys::ValOrder::Ascend,
-         minion_sys::PropLevel::SACBounds),
-        ("var-sdf-val-desc",
-         minion_sys::VarOrder::SDF, minion_sys::ValOrder::Descend,
-         minion_sys::PropLevel::None),
+    let in_process_strategies: [(
+        &str,
+        minion_sys::VarOrder,
+        minion_sys::ValOrder,
+        minion_sys::PropLevel,
+    ); 4] = [
+        (
+            "baseline",
+            minion_sys::VarOrder::Static,
+            minion_sys::ValOrder::Ascend,
+            minion_sys::PropLevel::None,
+        ),
+        (
+            "preprocess-SAC",
+            minion_sys::VarOrder::Static,
+            minion_sys::ValOrder::Ascend,
+            minion_sys::PropLevel::SAC,
+        ),
+        (
+            "preprocess-SACBounds",
+            minion_sys::VarOrder::Static,
+            minion_sys::ValOrder::Ascend,
+            minion_sys::PropLevel::SACBounds,
+        ),
+        (
+            "var-sdf-val-desc",
+            minion_sys::VarOrder::SDF,
+            minion_sys::ValOrder::Descend,
+            minion_sys::PropLevel::None,
+        ),
     ];
 
     let mut results: Vec<(String, MinionOutput)> = Vec::new();
@@ -1978,7 +1999,10 @@ pub fn test_constraint_optimisation(
                 seed: None,
                 var_order: *vo,
                 val_order: *valo,
-                preprocess: minion_sys::Propagation { level: *pp, limit: false },
+                preprocess: minion_sys::Propagation {
+                    level: *pp,
+                    limit: false,
+                },
                 prop_node: minion_sys::Propagation {
                     level: minion_sys::PropLevel::GAC,
                     limit: false,
@@ -2016,13 +2040,7 @@ pub fn test_constraint_optimisation(
             let msg = format!(
                 "optimisation disagreement on {} ({}): \
                  baseline ({}, {:?}) vs {} ({}, {:?})",
-                c.name,
-                dir,
-                results[0].1.filename,
-                baseline,
-                name,
-                r.filename,
-                r.optimum_value,
+                c.name, dir, results[0].1.filename, baseline, name, r.filename, r.optimum_value,
             );
             // Leave .minion files in place for post-mortem.
             return Err(anyhow!(msg));
