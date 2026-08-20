@@ -277,7 +277,6 @@ pub fn print_minion_file_pair_optimisation<F: Write>(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::constraint_def::*;
     use std::sync::atomic::Ordering;
 
     /// Build a random `eq` instance with negation forced on (1000/1000)

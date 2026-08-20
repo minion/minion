@@ -240,10 +240,6 @@ pub fn random_sublist_of_size(list: &[i64], target: i64) -> Vec<i64> {
 }
 
 impl MinionVariable {
-    fn random(in_d: VarType) -> Arc<MinionVariable> {
-        Self::random_sized(in_d, current_size_factor())
-    }
-
     fn random_sized(in_d: VarType, size_factor: u32) -> Arc<MinionVariable> {
         let f = size_factor.max(1) as i64;
         // Bool domain stays {0,1} regardless of size_factor — it's
@@ -327,11 +323,15 @@ impl MinionVariable {
     }
 }
 
+/// Decides whether an assignment satisfies a constraint. Takes the
+/// instance and one slice of values per argument slot.
+pub type CheckerFn = Arc<dyn Fn(&ConstraintInstance, &[&[i64]]) -> bool + Sync + Send>;
+
 #[derive(Clone)]
 pub struct ConstraintDef {
     pub name: String,
     pub arg: Vec<Arg>,
-    pub checker: Arc<dyn Fn(&ConstraintInstance, &[&[i64]]) -> bool + Sync + Send>,
+    pub checker: CheckerFn,
     pub gac: bool,
     pub reifygac: bool,
     pub valid_instance: fn(&ConstraintInstance) -> bool,
@@ -731,7 +731,7 @@ fn generate_random_short_tuples_from_vars(
     // same dense truth table. 0 is allowed (an empty short-tuple list,
     // a boundary case: the positive short constraints are then false
     // everywhere).
-    let upper = (2_usize).saturating_pow(n_vars as u32).min(20).max(2);
+    let upper = (2_usize).saturating_pow(n_vars as u32).clamp(2, 20);
     let num_short = rng.gen_range(0..=upper);
 
     let mut tuples: Vec<Vec<(usize, i64)>> = Vec::with_capacity(num_short);
@@ -1121,12 +1121,13 @@ fn check_short_tuples(c: &ConstraintInstance, v: &[&[i64]]) -> bool {
     false
 }
 
-/// Reject degenerate short-tuple instances:
-///   - an empty short-tuple list (constraint false everywhere — solvers
-///     differ in how they short-circuit, and the trial is uninteresting);
-///   - any short tuple that is empty (collapses the constraint to true).
-/// Both are uninteresting for metamorphic testing and the second
-/// hides bugs in the literal-iteration logic.
+/// Accept any short-tuple instance, including both degenerate shapes:
+/// an empty short-tuple list (constraint false everywhere) and a list
+/// holding an empty short tuple (trivially satisfied).
+///
+/// These used to be rejected as uninteresting. They are not: rejecting
+/// them left the short-tuple boundaries untested, which is the same
+/// blind spot that hid the empty and full table bugs.
 fn valid_short_tuples_instance(c: &ConstraintInstance) -> bool {
     // Accept any short-tuple list, including the boundaries: an empty list
     // (constraint false everywhere) and a list containing an empty short

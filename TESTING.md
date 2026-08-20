@@ -147,7 +147,7 @@ A per-trial `-nodelimit 100000` caps pathological rolls; if any strategy hits th
 
 The premise: we already trust constraint propagators for satisfaction (the existing tableisation sweep covers that broadly). Optimisation bugs therefore live mostly in optimisation-specific code — bound tracking, parallel bound broadcast, restart-with-optimisation interaction. Different (propagator, heuristic, parallel) combinations stress that surface differently, so disagreement is a strong signal of a bound-tracking bug.
 
-Plumbing: minion's `-jsontableout` reports `OptimumValue` and `OptimumDirection`; the tester's exec-mode runner reads them. Sequential, work-steal, and `-X-parallelThreads` all aggregate cross-worker. `-parallel` (fork-based) is not covered.
+Plumbing: minion's `-jsontableout` reports `OptimumValue` and `OptimumDirection`. The exec-mode runner compares `OptimumValue` across strategies, and asserts `OptimumDirection` matches the direction the instance asked for — minion only emits it once it has a solution, so its absence is not an error. Sequential, work-steal, and `-X-parallelThreads` all aggregate cross-worker. `-parallel` (fork-based) is not covered.
 
 The in-process backend is also covered, with a smaller four-strategy subset (no `-restarts`, no parallel modes, no `-nodelimit` — the FFI doesn't expose those). It exercises the `Model::optimise` plumbing under varying `varorder`/`valorder`/`preprocess` settings, which is enough to catch FFI-level regressions. `minion-sys/tests/test_optimise.rs` adds direct unit coverage of the `Optimise` field against an independent baseline.
 

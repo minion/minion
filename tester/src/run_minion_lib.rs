@@ -412,7 +412,6 @@ pub struct InjectOutput {
     /// Number of scheduled injections that actually fired (i.e. search
     /// produced ≥ their threshold number of solutions before ending).
     pub injections_fired: usize,
-    pub nodes: i64,
     /// True if the solution-count cap passed to the runner was reached
     /// and the callback returned false to stop search. When this is
     /// true, `solutions` is truncated and should not be trusted as a
@@ -528,7 +527,6 @@ fn build_multi_model(
 pub struct CappedOutput {
     pub solutions: Vec<Vec<i64>>,
     pub stopped_at_limit: bool,
-    pub nodes: i64,
 }
 
 pub fn run_multi(
@@ -586,19 +584,12 @@ pub fn run_multi(
         })
     };
 
-    let ctx = minion_sys::run_minion_with_options(model, options, callback)
+    minion_sys::run_minion_with_options(model, options, callback)
         .map_err(|e| anyhow!("minion ({testname}): {e}"))?;
-
-    let nodes = ctx
-        .get_from_table("Nodes".to_string())
-        .ok_or_else(|| anyhow!("Nodes missing"))?
-        .parse::<i64>()
-        .context("parsing Nodes")?;
 
     Ok(CappedOutput {
         solutions,
         stopped_at_limit,
-        nodes,
     })
 }
 
@@ -718,7 +709,6 @@ pub fn run_multi_injected(
         let cb_err_ref = &mut cb_err;
         let stopped_ref = &mut stopped_at_limit;
         let prebuilt = &prebuilt;
-        let injections = injections;
         Box::new(
             move |midctx: &mut minion_sys::MidSearchContext<'_>,
                   sol: HashMap<VarName, MC>|
@@ -778,23 +768,16 @@ pub fn run_multi_injected(
         )
     };
 
-    let ctx = minion_sys::run_minion_midsearch_with_options(model, options, callback)
+    minion_sys::run_minion_midsearch_with_options(model, options, callback)
         .map_err(|e| anyhow!("minion midsearch ({testname}): {e}"))?;
 
     if let Some(err) = cb_err {
         bail!("callback error ({testname}): {err}");
     }
 
-    let nodes = ctx
-        .get_from_table("Nodes".to_string())
-        .ok_or_else(|| anyhow!("Nodes missing"))?
-        .parse::<i64>()
-        .context("parsing Nodes")?;
-
     Ok(InjectOutput {
         solutions,
         injections_fired: fired,
-        nodes,
         stopped_at_limit,
         final_variable_order: live_var_order,
     })
@@ -811,12 +794,9 @@ pub struct MidsearchOutput {
     /// for the original vars first, then the newly-added vars in the
     /// order they were added.
     pub post_injection: Vec<Vec<i64>>,
-    /// Names of the variables that were added mid-search.
-    pub new_var_names: Vec<String>,
     /// True if the injection callback actually ran. False if baseline
     /// had fewer than `inject_after` solutions.
     pub injected: bool,
-    pub nodes: i64,
 }
 
 /// Run `instance`, and after `inject_after` solutions have been reported
@@ -906,25 +886,17 @@ pub fn run_inject_vars_after(
         )
     };
 
-    let ctx = minion_sys::run_minion_midsearch_with_options(model, options, callback)
+    minion_sys::run_minion_midsearch_with_options(model, options, callback)
         .map_err(|e| anyhow!("minion midsearch error ({testname}): {e}"))?;
 
     if let Some(err) = cb_err {
         bail!("callback error ({testname}): {err}");
     }
 
-    let nodes: i64 = ctx
-        .get_from_table("Nodes".to_string())
-        .ok_or_else(|| anyhow!("Nodes missing from minion stats"))?
-        .parse()
-        .context("parsing Nodes")?;
-
     Ok(MidsearchOutput {
         pre_injection,
         post_injection,
-        new_var_names,
         injected,
-        nodes,
     })
 }
 

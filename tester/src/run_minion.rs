@@ -181,6 +181,10 @@ pub fn get_minion_solutions_optimisation(
     )
 }
 
+// Eight parameters, one over clippy's limit. They are all independent
+// knobs of a single solver invocation; bundling them into a struct
+// would just move the argument list somewhere else.
+#[allow(clippy::too_many_arguments)]
 fn get_minion_solutions_inner(
     minionexec: &str,
     baseargs: &[String],
@@ -344,6 +348,22 @@ fn get_minion_solutions_inner(
             .as_ref()
             .and_then(|s| s.parse::<i64>().ok());
         let opt_value = v.OptimumValue.as_ref().and_then(|s| s.parse::<i64>().ok());
+
+        // Minion reports OptimumDirection as "min"/"max", but only once
+        // it has a solution, so its absence is not an error. When it is
+        // there it must match what we asked for: a mismatch means the
+        // objective got flipped somewhere between writing the instance
+        // and solving it, which every other check here would miss --
+        // the sweep only compares optimum *values*, and a consistently
+        // flipped direction agrees with itself.
+        if let (Some(opt), Some(dir)) = (optimisation, v.OptimumDirection.as_ref()) {
+            let want = if opt.minimise { "min" } else { "max" };
+            if dir != want {
+                return Err(anyhow!(
+                    "minion reported OptimumDirection={dir:?}, instance asked for {want:?}: {minioncmd}"
+                ));
+            }
+        }
 
         (nodes, donations, pp_rounds, pp_prunings, opt_value)
     };
