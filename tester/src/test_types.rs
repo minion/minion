@@ -1024,9 +1024,9 @@ pub fn test_constraint_midsearch_add_vars(
 /// Reference solves under seed `s`:
 ///   * baseline       — base only; packet vars free.
 ///   * full_k for k=1..N — base + P_1..P_k from the start; later packet
-///                         vars still declared as free.
+///     vars still declared as free.
 ///   * actual         — base only at start; packet `P_k` injected at
-///                      schedule index `k`.
+///     schedule index `k`.
 ///
 /// Invariants (STATIC variable order). Splitting the actual solution
 /// stream at the injection points into N+1 segments, with
@@ -1411,25 +1411,6 @@ pub fn test_constraint_midsearch_inject_constraints(
     Ok(())
 }
 
-/// Single-packet shim that delegates to the multi-packet test with N=1.
-/// Kept so existing callers don't have to construct slices.
-pub fn test_constraint_midsearch_inject_constraint(
-    config: &MinionConfig,
-    base_defs: &[&constraint_def::ConstraintDef],
-    inject_def: &constraint_def::ConstraintDef,
-    inject_after: usize,
-    seed: u32,
-) -> Result<()> {
-    test_constraint_midsearch_inject_constraints(
-        config,
-        base_defs,
-        &[inject_def],
-        &[inject_after],
-        false,
-        seed,
-    )
-}
-
 /// Mid-search test: each packet adds one Bool variable via
 /// `minion_newVarMidsearch` (aux-block) and a `DisEq(new_var, X)`
 /// constraint where `X` is a randomly-chosen non-constant base
@@ -1637,6 +1618,14 @@ pub fn test_midsearch_add_new_vars_with_constraint(
         }
 
         // All active DisEq packets hold.
+        //
+        // Indexed on purpose. clippy suggests `.iter().enumerate().take(active)`,
+        // but `active` is derived from n_packets, not from packet_pairs.len().
+        // The two are equal today; if they ever diverge, indexing panics
+        // whereas take() would silently check fewer packets than the row
+        // actually has -- a verification loop should fail loudly, not
+        // quietly check less.
+        #[allow(clippy::needless_range_loop)]
         for k in 0..active {
             let (new_var_name, paired_base_name) = &packet_pairs[k];
             let new_col = *col_of.get(new_var_name.as_str()).ok_or_else(|| {
