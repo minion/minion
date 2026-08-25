@@ -98,6 +98,9 @@ jobs:
         shell: bash
         continue-on-error: true
         run: |
+              # GitHub runs bash with -eo pipefail; without this the first
+              # crash aborts the step and the later cases never run.
+              set +e
               echo "----- bash, cwd=bin-quick, trivial instance -----"
               (cd bin-quick && ./minion.exe ../test_instances/test_false_1.minion); echo "exit: $?"
               echo "----- bash, cwd=test_instances, trivial instance -----"
@@ -120,6 +123,7 @@ jobs:
         shell: bash
         continue-on-error: true
         run: |
+              set +e
               cd test_instances
               echo "--- 1. launched directly by bash"
               ../bin-quick/minion.exe test_false_1.minion; echo "exit: $?"
