@@ -1,0 +1,6 @@
+# Shell scripts must stay LF even in a Windows checkout. GitHub's Windows
+# runners default to core.autocrlf=true, and the test harness pipes
+# through mini-scripts/*.sh: with a CRLF shebang the interpreter can't be
+# found, the pipeline stage produces nothing, and every test reports an
+# empty solution count rather than an error.
+*.sh text eol=lf
