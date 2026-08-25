@@ -74,6 +74,65 @@ jobs:
               echo ----- an instance the harness reports as failing -----
               minion.exe -findallsols ..\test_instances\alias_litsumgeq_consistent.minion
               echo exit code: %ERRORLEVEL%
+              cd ..\test_instances
+              echo ----- same command, same cwd, as the bash harness runs it -----
+              echo These crash under git-bash with exit 139. Running them here
+              echo under cmd says whether that is the shell or the solver.
+              ..\bin-quick\minion.exe alias_gcc_capacity_selfref_1.minion -findallsols
+              echo exit code: %ERRORLEVEL%
+              ..\bin-quick\minion.exe alias_litsumgeq_consistent.minion -findallsols
+              echo exit code: %ERRORLEVEL%
+              ..\bin-quick\minion.exe alias_litsumgeq_contradiction.minion -findallsols
+              echo exit code: %ERRORLEVEL%
+
+      # The other half of the 2x2. The cmd step above covers
+      # (cmd, bin-quick) and (cmd, test_instances); this covers the same
+      # two working directories under git-bash, which is where the
+      # harness sees exit 139. Between them they say whether the crash
+      # follows the shell or the working directory.
+      #
+      # test_false_1 is deliberately included: it is trivial and runs
+      # clean under cmd, so if it also crashes here the problem has
+      # nothing to do with which instance is being solved.
+      - name: "Smoke: run minion.exe from git-bash"
+        shell: bash
+        continue-on-error: true
+        run: |
+              echo "----- bash, cwd=bin-quick, trivial instance -----"
+              (cd bin-quick && ./minion.exe ../test_instances/test_false_1.minion); echo "exit: $?"
+              echo "----- bash, cwd=test_instances, trivial instance -----"
+              (cd test_instances && ../bin-quick/minion.exe test_false_1.minion); echo "exit: $?"
+              echo "----- bash, cwd=test_instances, the failing instance -----"
+              (cd test_instances && ../bin-quick/minion.exe alias_litsumgeq_consistent.minion -findallsols); echo "exit: $?"
+              echo "----- bash, cwd=bin-quick, the failing instance -----"
+              (cd bin-quick && ./minion.exe ../test_instances/alias_litsumgeq_consistent.minion -findallsols); echo "exit: $?"
+
+      # Is git-bash itself the problem? Every line below runs in the SAME
+      # step, shell, environment and working directory -- only the way
+      # the process is launched changes. If (1) crashes and (2) does not,
+      # the fault is in how git-bash starts the executable, not in
+      # minion, the instance, or the environment.
+      #
+      # (3) re-runs it with the environment stripped, which separates
+      # "git-bash launches it wrongly" from "git-bash exports something
+      # that breaks it".
+      - name: "Smoke: is it git-bash?"
+        shell: bash
+        continue-on-error: true
+        run: |
+              cd test_instances
+              echo "--- 1. launched directly by bash"
+              ../bin-quick/minion.exe test_false_1.minion; echo "exit: $?"
+              echo "--- 2. same command, same step, launched via cmd"
+              cmd //c "..\bin-quick\minion.exe test_false_1.minion"; echo "exit: $?"
+              echo "--- 3. launched by bash, environment stripped"
+              env -i PATH="$PATH" ../bin-quick/minion.exe test_false_1.minion; echo "exit: $?"
+              echo "--- 4. a different native exe, launched directly by bash"
+              cmd //c ver; echo "exit: $?"
+              echo "--- 5. what bash is actually looking at"
+              ls -la ../bin-quick/minion.exe
+              bash --version | head -1
+              uname -a
 
       # The Rust tester is not run here: it depends on minion-sys, whose
       # build script builds libminion via bash/make and only knows how to
