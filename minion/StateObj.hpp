@@ -26,19 +26,6 @@ inline BoolContainer& getBools() {
   return bools_m;
 #endif
 }
-inline std::ostream& getOutput() {
-#ifdef LIBMINION
-  // Fall back to std::cout when no context is active: command-line
-  // parsing, --help and the standalone tools all print before (and
-  // after) any Globals exists.
-  if(!globals || !globals->out_m)
-    return std::cout;
-  return *globals->out_m;
-#else
-  return std::cout;
-#endif
-}
-
 inline SearchOptions& getOptions() {
 #ifdef LIBMINION
   if(!globals->options_m) {

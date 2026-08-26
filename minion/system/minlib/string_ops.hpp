@@ -69,7 +69,7 @@ inline void writeFile(std::string fileName, std::string contents) {
 inline std::pair<int, std::string> executeProgram(std::string cmd) {
   std::string data;
   FILE* stream;
-  int MAX_BUFFER = 256;
+  const int MAX_BUFFER = 256;
   char buffer[MAX_BUFFER];
   cmd.append(" 2>&1");
   stream = popen(cmd.c_str(), "r");
