@@ -22,7 +22,7 @@ copyright = 'Chris Jefferson, Peter Nightingale, Lars Kotthoff, Saad Attieh, Nei
 author = 'The Minion Team' # This list is too long for Sphinx :( Chris Jefferson, Peter Nightingale, Lars Kotthoff, Saad Attieh, Neil Moore, Ian Gent, Özgür Akgün, Nguyen Dang'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0'
+release = '2.1'
 
 
 # -- General configuration ---------------------------------------------------
