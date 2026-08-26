@@ -260,10 +260,10 @@ void printConstraints() {
     getOutput() << "\n";
   }
 
-  getOutput() << "\nWhat each one means, and which to prefer:\n"
-              << "  " << DOCS << "usage/constraints.html\n"
-              << "For one constraint, add '#' and its name, for example:\n"
-              << "  " << DOCS << "usage/constraints.html#" << docAnchor("gacalldiff") << "\n";
+  getOutput() << "\nFor one constraint, name it:\n"
+              << "  minion --help gacalldiff\n"
+              << "\nWhat they all mean, and which to prefer:\n"
+              << "  " << DOCS << "usage/constraints.html\n";
 }
 
 void printVarOrders() {
@@ -279,8 +279,7 @@ void printVarOrders() {
 #else
               << "not.\n"
 #endif
-              << "\nThe value ordering is set separately with -valorder.\n"
-              << "  " << DOCS << "usage/commandline.html\n";
+              << "\nThe value ordering is set separately: minion --help valorder\n";
 }
 
 } // namespace
@@ -320,6 +319,17 @@ bool help(const std::string& topic) {
     printVarOrders();
     return true;
   }
+  if(topic == "valorder") {
+    getOutput() << "Orderings accepted by -valorder:\n\n"
+                << "  ascend        try the smallest value in the domain first\n"
+                << "  descend       try the largest value in the domain first\n"
+                << "  random        try the values in a random order\n"
+                << "\n-valorder overrides any VALORDER in the input file, and applies to\n"
+                << "every search variable.  With neither, values are tried in ascending\n"
+                << "order.\n"
+                << "\nThe variable ordering is set separately: minion --help varorder\n";
+    return true;
+  }
   if(topic == "variables") {
     getOutput() << "Minion has four variable types -- BOOL, DISCRETE, BOUND and SPARSEBOUND --\n"
                 << "and the choice between them affects both speed and the size of the search.\n"
@@ -350,7 +360,7 @@ bool help(const std::string& topic) {
 
   if(!topic.empty() && topic != "all" && topic != "switches") {
     std::cerr << "There is no help topic '" << topic << "'.\n"
-              << "Topics: constraints, varorder, variables, input, examples, all,\n"
+              << "Topics: constraints, varorder, valorder, variables, input, examples, all,\n"
               << "or the name of any constraint (see 'minion --help constraints').\n";
     return false;
   }
@@ -363,7 +373,9 @@ bool help(const std::string& topic) {
 
   getOutput() << "\nHelp topics\n"
               << "  minion --help constraints    the constraints this copy supports\n"
+              << "  minion --help <constraint>   one constraint, by name\n"
               << "  minion --help varorder       the variable orderings -varorder takes\n"
+              << "  minion --help valorder       the value orderings -valorder takes\n"
               << "  minion --help variables      the four variable types\n"
               << "  minion --help input          the .minion file format\n"
               << "  minion --help examples       worked models\n";

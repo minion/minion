@@ -79,10 +79,17 @@ The available orders are:
 -valorder <order>
 ~~~~~~~~~~~~~~~~~~~~~
 
-Choose the value ordering (overruling any selection in the input file).
+Choose the value ordering, overriding any ``VALORDER`` in the input file. It
+applies to every search variable.
 
-The orders are ``ascend``, ``descend`` and ``random``. Any other value is an
-error.
+The available orders are:
+
+-  ascend - try the smallest value in the domain first
+-  descend - try the largest value in the domain first
+-  random - try the values in a random order
+
+Any other value is an error. If neither this flag nor a ``VALORDER`` is given,
+values are tried in ascending order.
 
 -restarts
 ~~~~~~~~~
