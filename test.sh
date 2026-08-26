@@ -81,8 +81,8 @@ if [ "$MODE" = "light" ]; then
   run_phase "documentation sync check" \
     python3 "$REPO/sphinxdocs/check-docs-sync.py"
 
-  build_dir bin-quick --quick
-  build_dir bin-debug --quick --debug
+  run_phase "build bin-quick" build_dir bin-quick --quick
+  run_phase "build bin-debug" build_dir bin-debug --quick --debug
 
   run_phase "regression suite (bin-quick)" \
     bash -c "cd '$REPO/test_instances' && bash ./run_tests.sh '$REPO/bin-quick/minion'"
@@ -154,7 +154,7 @@ if [ "$MODE" = "light" ]; then
 fi
 
 if [ "$MODE" = "heavy" ]; then
-  build_dir bin-quick --quick
+  run_phase "build bin-quick" build_dir bin-quick --quick
   exec bash "$REPO/test_instances/deep_test.sh" \
     "$REPO/bin-quick/minion" \
     ${HEAVY_ARGS[@]+"${HEAVY_ARGS[@]}"}
