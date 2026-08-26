@@ -67,10 +67,17 @@ run_phase() {
   local name="$1"; shift
   echo
   echo "=== $name ==="
-  "$@"
+  if ! "$@"; then
+    echo
+    echo "FAILED: $name" >&2
+    exit 1
+  fi
 }
 
 if [ "$MODE" = "light" ]; then
+  run_phase "documentation sync check" \
+    python3 "$REPO/sphinxdocs/check-docs-sync.py"
+
   build_dir bin-quick --quick
   build_dir bin-debug --quick --debug
 

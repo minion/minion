@@ -286,7 +286,8 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
     getTableOut().set("RandomSeed", tostring(args.randomSeed));
     getTableOut().set("Preprocess", tostring(args.preprocess));
 
-    getTableOut().set("MinionVersion", -1);
+    getTableOut().set("MinionVersion", MinionVersion);
+    getTableOut().set("GitVersion", tostring(GIT_VER));
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
     getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);

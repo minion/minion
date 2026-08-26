@@ -1,12 +1,10 @@
 Variable Types
 ==============
 
-Minion’s input language is purposefully designed to align with Minion’s internals. Unlike most other constraint solvers, Minion does not add extra variables or decompose large complex constraints into smaller parts. This design provides complete control over how problem representation within Minion but requires a solid understanding
-how Minion works to achieve the best results.
+Minion’s input language is purposefully designed to align with Minion’s internals. Unlike most other constraint solvers, Minion does not add extra variables or decompose large complex constraints into smaller parts. This design provides complete control over how a problem is represented within Minion, but requires a solid understanding of how Minion works to achieve the best results.
 
 One of the most immediately confusing features of Minion is its variable types. Rather than try to provide a "one-size-fits-all" variable implementation, Minion provides four distinct ones; ``BOOL``,
-``DISCRETE``, ``BOUND`` and ``SPARSEBOUND``. All variables have a finite domain of integers. First we shall provide a brief discussion of both what these variables are, and a brief
-discussion of why their advantages and disadvantages.
+``DISCRETE``, ``BOUND`` and ``SPARSEBOUND``. All variables have a finite domain of integers. First we describe what these variables are, then their advantages and disadvantages.
 
 ``BOOL``
    Variables with domain :math:`\{0,1\}`. Uses special optimised data
@@ -23,15 +21,16 @@ discussion of why their advantages and disadvantages.
    domain can only be reduced by changing one of the bounds.
 
 ``SPARSEBOUND``
-   Variable whose domain is an arbitrary range of integers. Otherwise
-   identical to BOUND.
+   Variable whose domain is an arbitrary finite set of integers, which need
+   not be a contiguous range. Otherwise identical to ``BOUND``: only the
+   bounds are updated during search.
 
 
-It might seem that a ``SPARSEDISCRETE`` variable implementation, which is missing from the discussion, would be beneficial. However, this turns out not to be practical in most cases. This turns out not to be useful in practice.
+It might seem that a ``SPARSEDISCRETE`` variable implementation, which is missing from the discussion, would be beneficial. However, this turns out not to be useful in practice.
 
 Technically, there is a 5th type of variable -- ``CONSTANT``. Integer constants can be given wherever a variable can be used. These are represented internally as a special type of variable whose domain is a single value. 
 
-When you want a ``DISCRETE`` variable with domain that is not a complete range of integers, the extra values can be removed using the `w-inintervalset` constraint (discussed later, in the constraints).
+When you want a ``DISCRETE`` variable with domain that is not a complete range of integers, the extra values can be removed using the ``w-inintervalset`` constraint (discussed later, in the constraints).
 
 Some of the differences between the variable types only effect
 performance, whereas some others can impact search size. 

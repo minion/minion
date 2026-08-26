@@ -800,7 +800,7 @@ The Essence’ specification is as follows:
    $blue = colour[5]
    $Englishman = nationality[1]
    $Spaniard = nationality[2]
-   $Ukranian = nationality[3]
+   $Ukrainian = nationality[3]
    $Norwegian = nationality[4]
    $Japanese = nationality[5]
    $coffee = drink[1]
@@ -828,7 +828,7 @@ The Essence’ specification is as follows:
 
    $constraints needed as this is a logical problem where
    $the value allocated to each position of the matrix
-   $represents positon of house
+   $represents position of house
    alldiff(colour),
    alldiff(nationality),
    alldiff(drink),
@@ -847,7 +847,7 @@ The Essence’ specification is as follows:
    $Coffee is drunk in the green house.
    drink[1] = colour[2],
 
-   $The Ukranian drinks tea.
+   $The Ukrainian drinks tea.
    nationality[3] = drink[2],
 
    $The green house is immediately to the

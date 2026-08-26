@@ -949,7 +949,7 @@ void MinionThreeInputReader<FileReader>::readSearch(FileReader* infile) {
       if(!instance->symOrder.empty())
         throw parse_exception("Can't have two SYMORDERs!");
       instance->symOrder = readLiteralVector(infile);
-      MAYBE_PARSER_INFO("Read Symmetry Ordering, length " + tostring(instance->permutation.size()));
+      MAYBE_PARSER_INFO("Read Symmetry Ordering, length " + tostring(instance->symOrder.size()));
     } else if(varType == "VALORDER") {
       if(instance->searchOrder.empty())
         throw parse_exception("Must declare VARORDER first");

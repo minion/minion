@@ -24,6 +24,8 @@ Welcome to Minion's documentation!
 
    usage/commandline
 
+   usage/output
+
    usingminion
 
 Indices and tables

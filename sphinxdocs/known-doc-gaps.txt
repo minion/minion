@@ -1,0 +1,10 @@
+# Documentation gaps, checked by check-docs-sync.py.
+#
+# Format:  <check> <name> <reason>
+# <check> is one of commandline.rst, help.cpp, constraints.rst, output.rst.
+#
+# A line here that is no longer a gap fails the check, so the file can only
+# shrink. Delete the line when you close the gap.
+#
+# There are currently no recorded gaps: every flag and every constraint has
+# documentation. Add a line here only when that stops being true.

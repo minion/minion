@@ -59,7 +59,7 @@ N=6, O=2, R=7, T=0.
 Constraints are *declarative* — the statement of the problem and the
 algorithms used to solve it are separated. This is an attractive feature
 of constraints, since it can reduce the human effort required to solve a
-problem. Various general purpose and specialized algorithms exist for
+problem. Various general purpose and specialised algorithms exist for
 solving systems of constraints. A great variety of problems can be
 expressed with constraints. The following list of subject areas was
 taken from CSPLib :cite:`csplib`:
@@ -103,13 +103,9 @@ two or more simpler CSP instances, and by recursive application of
 splitting any CSP can be solved.
 
 Since splitting is an exponential-time solution method, it is important
-that splitting is minimized by effective propagation. Much effort has
+that splitting is minimised by effective propagation. Much effort has
 gone into developing propagation algorithms which are fast and effective
-in removing values. Most propagation algorithms are specialized to
+in removing values. Most propagation algorithms are specialised to
 particular types of constraint (e.g. a vector of variables take distinct
 values in any solution, the AllDifferent constraint). They typically run
 in polynomial time.
-
-
-```{bibliography}
-```

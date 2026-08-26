@@ -105,11 +105,16 @@ public:
       f << endl;
     }
 
-    // This doesn't work with strings that have spaces in them.
-
+    // Columns are separated by spaces, so a value containing one is quoted to
+    // keep the line splittable. Values without spaces are written bare, as
+    // they always have been.
     map<string, string>::iterator it;
     for(it = data.begin(); it != data.end(); it++) {
-      f << (*it).second << " ";
+      const string& value = (*it).second;
+      if(value.find(' ') != string::npos)
+        f << "\"" << value << "\" ";
+      else
+        f << value << " ";
     }
     f << endl;
 

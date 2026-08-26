@@ -1,9 +1,9 @@
 Input Format
 ------------
 
-This section describes the Minion file format. Usually, it is easier to look at an example, as the foramt is fairly self-explanatory, but this section contains full technical deails. This section only describes the file format, the full description of the different types of variables and constraints is given in earlier sections.
+This section describes the Minion file format. Usually, it is easier to look at an example, as the format is fairly self-explanatory, but this section contains full technical details. This section only describes the file format, the full description of the different types of variables and constraints is given in earlier sections.
 
-The Minion input format is expressed as a series of sections, each section starts with two starts (for example ``**VARIABLES**`` for variables). The format of each section is different.
+The Minion input format is expressed as a series of sections, each section starts with two stars (for example ``**VARIABLES**`` for variables). The format of each section is different.
 
 Files start with the string ``MINION 3``, and end with ``**EOF**``.
 
@@ -15,6 +15,11 @@ InputSection::= <VariablesSection>
    | <ConstraintsSection>
    | <TuplelistSection>
    | <ShortTuplelistSection>
+   | <GadgetSection>
+   | <MutexDetectSection>
+
+The last two are specialised and are described at the end of this section;
+almost every instance uses only the first five.
 
 
 All text from a '#' character to the end of the line is ignored.
@@ -345,7 +350,7 @@ Which represents the same constraint as:
    1 1 1 1
 
 Short tuples give us a way of shrinking some constraints. Short tuples
-consist of pairs (x,y), where x is a varible position, and y is a value
+consist of pairs (x,y), where x is a variable position, and y is a value
 for that variable. For example, `[(0,0),(3,0)]` represents "If the variable
 at index 0 is 0, and the variable at index 3 is 0, then the constraint is true".
 
@@ -356,7 +361,7 @@ index 3 is 0, then the constraint is true'.
 
 Note that some tuples are double-represented in the example 'mycon'. The
 first 3 short tuples all allow the assignment '0 0 0 0'. This is fine.
-The important thing for efficency is to try to give a small list of
+The important thing for efficiency is to try to give a small list of
 short tuples.
 
 
@@ -407,13 +412,13 @@ where:
    <ORDER>::= STATIC | SDF | SRF | LDF | ORIGINAL | WDEG | CONFLICT | DOMOVERWDEG
 
 The value ordering allows the user to specify an instantiation order for
-the variables involved in the variable order, either ascending (a) or
-descending (d) for each. When no value ordering is specified, the
-default is to use ascending order for every search variable.:
+the variables involved in the variable order: ascending (a), descending (d)
+or random (r) for each. When no value ordering is specified, the default is
+to use ascending order for every search variable.:
 
 ::
 
-   ValOrder::= VALORDER[ (a|d)+ ]
+   ValOrder::= VALORDER[ (a|d|r)+ ]
 
 To model an optimisation problem the user can specify to minimise or
 maximise a variable's value, or list of variables (under lexicographic
@@ -429,13 +434,31 @@ printed. By default (no PrintFormat specified) all the variables are
 printed in declaration order. Alternatively a custom vector, or ALL
 variables, or no (NONE) variables can be printed. If a matrix or, more
 generally, a tensor is given instead of a vector, it is automatically
-flattened into a vector as described in 'help variables vectors'.:
+flattened into a vector, as described under Vectors above.:
 
 ::
 
    PrintFormat::= PRINT <vector>
                 | PRINT ALL
                 | PRINT NONE
+
+The ``**SEARCH**`` section accepts three further statements, none of which
+affect the solutions Minion finds. They exist to control the output used for
+symmetry detection.
+
+::
+
+   SymOrder::= SYMORDER [ <varname>+ ]
+   Permutation::= PERMUTATION [ <varname>+ ]
+
+``SYMORDER`` fixes the order in which variables are written to the graph
+produced by ``-Xgraph``, and to the instance produced by ``-redump``. If it is
+absent, all variables are used in declaration order. It may be given at most
+once. ``PERMUTATION`` likewise records a variable order for use by symmetry
+tools. Neither changes how search is performed.
+
+``CONSTRUCTION`` is accepted only inside a ``**GADGET**`` section, and is an
+error anywhere else.
 
 Example
 ^^^^^^^
@@ -553,7 +576,7 @@ Below is a complete minion input file with commentary, as an example.:
 
    table([q], Fred)
 
-   # Can still list tuples explicitally in the constraint if you want at
+   # Can still list tuples explicitly in the constraint if you want at
    # the moment.
    # On the other hand, I might remove this altogether, as it's worse than giving
    # Tuplelists
@@ -566,3 +589,26 @@ Below is a complete minion input file with commentary, as an example.:
 
    Any text down here is ignored, so you can write whatever you like (or
    nothing at all...)
+
+Specialised sections
+====================
+
+These two sections are accepted by the parser but are not needed by ordinary
+instances.
+
+Gadgets
+~~~~~~~
+
+A ``**GADGET**`` section holds a nested sub-instance, with a
+``CONSTRUCTION`` statement in its ``**SEARCH**`` section naming the variables
+that connect it to the enclosing problem. No constraint in the current
+constraint list consumes a gadget, and no instance in ``test_instances/`` or
+``benchmarks/`` uses one, so this should be treated as a legacy feature.
+
+Mutex detection
+~~~~~~~~~~~~~~~
+
+``**MUTEXDETECT**`` and ``**MUTEXDETECT2**`` each take a list of variables
+among which at most one may be true. They supply the at-most-one groups used
+by the experimental ``-X-AMO`` and ``-X-AMO-extra`` flags, and have no effect
+unless one of those flags is given.
