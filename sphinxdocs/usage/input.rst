@@ -36,7 +36,7 @@ VariablesSection::= **VARIABLES**
    <VarDeclaration>\*
 
 Example
-^^^^^^^
+~~~~~~~
 
 .. code:: 
 
@@ -461,7 +461,7 @@ tools. Neither changes how search is performed.
 error anywhere else.
 
 Example
-^^^^^^^
+~~~~~~~
 
 Below is a complete minion input file with commentary, as an example.:
 

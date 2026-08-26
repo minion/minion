@@ -1,5 +1,4 @@
-.. container::
-   :name: Using Minion
+.. _using-minion:
 
 How to use Minion
 =================

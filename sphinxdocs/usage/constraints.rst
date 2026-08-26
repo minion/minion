@@ -1,5 +1,4 @@
-.. container::
-   :name: constraints
+.. _constraints:
 
 -----------
 Constraints

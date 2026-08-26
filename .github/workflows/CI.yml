@@ -32,6 +32,27 @@ jobs:
       - name: "Documentation sync check"
         run: python3 sphinxdocs/check-docs-sync.py
 
+  sphinx:
+    name: docs build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # Matches the Python in .readthedocs.yaml, so a build that passes here
+      # is a build Read the Docs can make.
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: "Install Sphinx"
+        run: pip install -r sphinxdocs/requirements.txt
+
+      # -W turns warnings into errors; the docs currently build clean.
+      - name: "Build the documentation"
+        run: python3 -m sphinx -W -b html sphinxdocs sphinxdocs/_build/html
+
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
