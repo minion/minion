@@ -451,9 +451,9 @@ symmetry detection.
    SymOrder::= SYMORDER [ <varname>+ ]
    Permutation::= PERMUTATION [ <varname>+ ]
 
-``SYMORDER`` fixes the order in which variables are written to the graph
-produced by ``-Xgraph``, and to the instance produced by ``-redump``. If it is
-absent, all variables are used in declaration order. It may be given at most
+``SYMORDER`` fixes the order in which variables are written to the instance
+produced by ``-redump``. If it is absent, all variables are used in
+declaration order. It may be given at most
 once. ``PERMUTATION`` likewise records a variable order for use by symmetry
 tools. Neither changes how search is performed.
 
@@ -514,7 +514,7 @@ Below is a complete minion input file with commentary, as an example.:
 
    # Print statement takes a vector of things to print
 
-   PRINT [bool, q]
+   PRINT [[bool], q]
 
    # You can also give:
    # PRINT ALL (the default)
@@ -525,7 +525,7 @@ Below is a complete minion input file with commentary, as an example.:
    **CONSTRAINTS**
 
    # Constraints are defined in exactly the same way as in MINION input
-   formats 1 & 2
+   # formats 1 & 2
    eq(bool, 0)
    eq(b,d)
 
