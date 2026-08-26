@@ -335,7 +335,7 @@ void digestTo_hex(const uint8_t digest[SHA1_DIGEST_SIZE], char* output) {
 
   for(i = 0; i < SHA1_DIGEST_SIZE / 4; i++) {
     for(j = 0; j < 4; j++) {
-      sprintf(c, "%02X", digest[i * 4 + j]);
+      snprintf(c, 3, "%02X", digest[i * 4 + j]); // two hex digits and a NUL
       c += 2;
     }
   }

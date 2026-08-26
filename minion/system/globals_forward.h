@@ -7,6 +7,10 @@ struct Globals;
 /// solver so a run can be silenced or redirected per context rather
 /// than by mutating the process-global std::cout. Declared here, the
 /// earliest header, so it is visible to the low-level utilities
-/// (tostring, tableout) as well. Defined in StateObj.hpp.
-inline std::ostream& getOutput();
+/// (tostring, tableout) as well.
+///
+/// Not inline: the definition needs Globals, which is not available this
+/// early, so the low-level users would see a declaration with no
+/// definition. Defined in globals.cpp.
+std::ostream& getOutput();
 #endif

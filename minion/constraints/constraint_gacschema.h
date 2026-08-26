@@ -429,6 +429,7 @@ struct GACSchema : public AbstractConstraint, Backtrackable {
                 containsVarVal = true;
             }
             D_ASSERT(containsVarVal);
+            (void)containsVarVal; // to block warning when D_ASSERT is empty
 
             D_ASSERT(sup->next[var] == 0 || sup->next[var]->prev[var] == sup);
             sup = sup->next[var];
