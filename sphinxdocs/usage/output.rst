@@ -20,7 +20,7 @@ Standard output
 A normal run prints a header of comment lines beginning with ``#``, then
 timings, then any solutions, then a summary::
 
-   # Minion Version 2
+   # Minion Version 2.1
    # Git version: "717f3cfb (2026-08-25 14:58:38 +0100)"
    #  Run at: UTC Tue Aug 25 21:39:47 2026
    # Input filename: myproblem.minion
@@ -97,7 +97,7 @@ Writes one JSON object describing the run::
    {"CommandLineArguments" : "-findallsols,-jsontableout,out.json,myproblem.minion" ,
     "Filename" : "myproblem.minion" ,
     "GitVersion" : "717f3cfb (2026-08-25 14:58:38 +0100)" ,
-    "MinionVersion" : "Minion Version 2" ,
+    "MinionVersion" : "Minion Version 2.1" ,
     "Nodes" : "21" ,
     "SolutionsFound" : "1" ,
     "Satisfiable" : "1" ,
