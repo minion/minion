@@ -53,6 +53,52 @@ jobs:
       - name: "Build the documentation"
         run: python3 -m sphinx -W -b html sphinxdocs sphinxdocs/_build/html
 
+  # Every other job configures with --quick, which defines QUICK_COMPILE and
+  # so compiles out the per-variable-type specialisations in
+  # BuildConstraintConstructs.h: each constraint is then built only through
+  # the generic AnyVarRef path. auto-release.yml builds the Linux and macOS
+  # binaries without --quick, so without this job the code a release ships
+  # is never compiled or run in CI.
+  full:
+    name: full build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: "Config"
+        run: |
+                mkdir bin-full
+                cd bin-full
+                python3 ../configure.py
+
+      - name: "Build"
+        run: |
+                cd bin-full
+                make -j2
+
+      # The regression instances between them declare BOOL, DISCRETE, BOUND
+      # and SPARSEBOUND variables, which is what selects between the
+      # specialisations this job exists to compile.
+      - name: "Regression suite"
+        run: |
+              cd test_instances
+              bash ./run_tests.sh ../bin-full/minion
+
+      - name: "Library tests"
+        run: |
+              cd bin-full
+              make test
+
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
