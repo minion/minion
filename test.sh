@@ -8,7 +8,7 @@
 #                     [--budget-minutes M]
 #                     [--logdir DIR]
 #
-# --light builds bin-quick if missing and runs the same set of phases as
+# --light brings bin-quick up to date and runs the same set of phases as
 # .github/workflows/CI.yml: regression suite, library tests, random
 # tester (default + nested smoke), minion-sys cargo tests, in-process
 # tester smoke. Use this as the local "have I broken anything obvious"
@@ -53,13 +53,16 @@ NPROC=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
 build_dir() {
   # build_dir <dir> <configure-flags...>
   local d="$1"; shift
-  if [ -x "$REPO/$d/minion" ]; then
-    echo "Reusing existing build at $d/"
-    return 0
+  if [ ! -f "$REPO/$d/Makefile" ]; then
+    echo "Configuring $d/ ($*)..."
+    mkdir -p "$REPO/$d"
+    (cd "$REPO/$d" && python3 ../configure.py "$@") || return 1
   fi
-  echo "Building $d/ ($*)..."
-  mkdir -p "$REPO/$d"
-  (cd "$REPO/$d" && python3 ../configure.py "$@" && make -j"$NPROC")
+  # Always make.  It is incremental, so it costs nothing when the tree has
+  # not changed, and skipping it tests a binary built from older sources
+  # while reporting a pass.
+  echo "Building $d/..."
+  (cd "$REPO/$d" && make -j"$NPROC")
 }
 
 run_phase() {
