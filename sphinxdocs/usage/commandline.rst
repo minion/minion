@@ -81,7 +81,8 @@ The available orders are:
 
 Choose the value ordering (overruling any selection in the input file).
 
-Current orders are, ascend, descend and random.
+The orders are ``ascend``, ``descend`` and ``random``. Any other value is an
+error.
 
 -restarts
 ~~~~~~~~~
