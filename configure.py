@@ -48,8 +48,12 @@ def progexists(prog):
     return True
 
 def getGitVersion():
+    # -C the source directory: the build directory is usually outside the
+    # repository, and running git there stamps the binary "<unknown>".
+    srcdir = os.path.dirname(os.path.realpath(__file__))
     try:
-        (out, err, code) = progout(["git", "log", "-1", '--pretty=format:"%h (%ai)"'])
+        (out, err, code) = progout(["git", "-C", srcdir, "log", "-1",
+                                    '--pretty=format:"%h (%ai)"'])
         if code != 0 and err != "":
             return "\"<unknown>\""
         else:
