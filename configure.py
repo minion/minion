@@ -379,7 +379,6 @@ minionlibsrclist = ['minion/BuildVariables.cpp',
 'minion/parallel/preprocess_parallel.cpp',
 'minion/parallel/work_steal.cpp',
 'minion/search_dump.cpp',
-'minion/search_dump_sql.cpp',
 'minion/command_search.cpp',
 'minion/libwrapper.cpp'
 ]

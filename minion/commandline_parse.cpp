@@ -45,9 +45,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().outputCompressed = argv[i];
     } else if(command == string("-instancestats") || command == string("-X-instancestats")) {
       getOptions().instance_stats = true;
-    } else if(command == string("-Xgraph")) {
-      getOptions().graph = true;
-      getOptions().silent = true;
     }
 
     else if(command == string("-printsols")) {
@@ -123,11 +120,6 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         outputFatalError("Could not open '" + std::string(argv[i]) + "' for writing");
       }
       getOptions().dumptreeobj = makeDumpTreeJson(outfile);
-    } else if(command == string("-dumptreesql")) {
-      if(getOptions().dumptree) {
-        outputFatalError("Only one tree dumper active at once");
-      }
-      getOptions().dumptreeobj = makeDumpTreeSQL();
     }
 
     else if(command == string("-nodelimit")) {
@@ -304,10 +296,7 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().noresumefile = true;
     }
 
-    else if(command == string("-gap")) {
-      INCREMENT_i(-gap);
-      getOptions().gapname = argv[i];
-    } else if(command == string("-parallel")) {
+    else if(command == string("-parallel")) {
       std::cerr << "Warning: parallel is beta\n";
       std::cerr << "Use -solsout to store the solutions";
       getOptions().parallel = true;
