@@ -30,7 +30,7 @@ close to the size of the input vector.
 
 Minion does not attempt to simplify constraints, so constraints such as
 ``sumgeq([a,a,a], 3)`` are not simplified to ``sumgeq([a],1)``. This
-kind of simplification will often significantly improve performance. Rather than perform such transformations (which do have trade-offs), Minion leaves this tuning to the user, or alternatively (and much more sensibly!) to specialised tools such `SavileRow <https://www-users.york.ac.uk/peter.nightingale/savilerow/>`_ or `Conjure <https://www.github.com/conjure-cp/conjure>`.
+kind of simplification will often significantly improve performance. Rather than perform such transformations (which do have trade-offs), Minion leaves this tuning to the user, or alternatively (and much more sensibly!) to specialised tools such `SavileRow <https://www-users.york.ac.uk/peter.nightingale/savilerow/>`_ or `Conjure <https://www.github.com/conjure-cp/conjure>`_.
 
 There are two main reasons there are multiple implementations of the same constraint:
 
@@ -532,8 +532,6 @@ A SAT clause {x,y,z} can be created using:
 
 Note also that this constraint is more efficient for smaller values of
 c. For large values consider using watchsumleq.
-
-This constraint is not reifiable.
 
 
 

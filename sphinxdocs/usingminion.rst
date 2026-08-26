@@ -19,7 +19,7 @@ although it does parse and run, it is an example which clearly shows all
 of the possible Minion input file constructs. If you are modelling a
 problem as minion than we recommend you take a copy of this file and
 edit it appropriately, as this will help to guide you through the
-modelling process. It can be found in the `summer_school` subdirectory of the `Minion git repository <https://www.github.com/minion/minion>`, and is called `format_example.minion`.
+modelling process. It can be found in the `summer_school` subdirectory of the `Minion git repository <https://www.github.com/minion/minion>`_, and is called `format_example.minion`.
 
 
 To begin, all minion input files begin `MINION 3` (the 3 refers to this being the 3rd version of Minion's input format. The earlier versions are no longer supported).
@@ -387,15 +387,11 @@ and
 The Eight Number Puzzle
 -----------------------
 
-The eight number puzzle asks you to label the nodes of the graph shown
-in Figure \ `3.1 <#fig:8puzzle>`__ with the values 1 to 8 such that no
-two connected nodes have consecutive values. These files can be found in
-/summer_school/examples the Essence’ file is EightPuzzleDiagram.eprime
-and the Minion file is EightPuzzleDiagram.minion. The Essence’
-specification is as follows:
-
-.. figure:: EightPuzzleDiagram.pdf
-   :alt: Graph which represents The Eight Number Puzzle
+The eight number puzzle asks you to label the nodes of a graph with the
+values 1 to 8 such that no two connected nodes have consecutive values.
+These files can be found in ``sphinxdocs/summer_school/examples``: the
+Essence’ file is ``EightNumberPuzzle.eprime`` and the Minion file is
+``EightNumberPuzzle.minion``. The Essence’ specification is as follows:
 
    Graph which represents The Eight Number Puzzle
 
@@ -595,14 +591,10 @@ a graph with :math:`q` edges is graceful if :math:`f` assigns each node
 a unique label from :math:`0,1,..., q` and when each edge :math:`xy` is
 labelled with :math:`|f(x) - f(y)|`, the edge labels are all different.
 (Hence, the edge labels are a permutation of :math:`1, 2, ..., q`.) Does
-the :math:`K_4 \times P_2` graph shown in Figure \ `3.2 <#fig:k4xp2>`__
-have a graceful library. These files can be found in
-``/summer_school/examples``, the Essence’ file is called
-``K4P2GracefulGraph.eprime`` and the Minion file is
+the :math:`K_4 \times P_2` graph have a graceful labelling? These files
+can be found in ``sphinxdocs/summer_school/examples``, the Essence’ file
+is called ``K4P2GracefulGraph.eprime`` and the Minion file is
 ``K4P2GracefulGraph.minion``. The Essence’ specification is as follows:
-
-.. figure:: k4xp2.pdf
-   :alt: A :math:`K_4 \times P_2` Graph
 
    A :math:`K_4 \times P_2` Graph
 
