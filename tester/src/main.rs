@@ -205,12 +205,17 @@ struct Opt {
     negate_bool: f64,
 
     /// Cap for the per-constraint adaptive growth in the work-steal
-    /// pass. Each constraint starts at `--size-factor` (or 1) and
-    /// doubles until at least one trial reports a non-zero donation
-    /// count, or this cap is hit. Larger caps give donation coverage
-    /// even for fast-to-solve constraints, at the cost of wall-clock
-    /// per trial.
-    #[arg(long, default_value_t = 32)]
+    /// and parallel-preprocess passes. Each constraint starts at
+    /// `--size-factor` (or 1) and doubles until a trial reports what
+    /// the pass is looking for, or this cap is hit.
+    ///
+    /// Both the variable domains (+-10*size) and the list lengths (up
+    /// to 5*size) scale with this, so the search space, and the time,
+    /// grow much faster than the size does. Correctness is checked at
+    /// every size; what a larger cap buys is the multi-round merge and
+    /// donation paths for constraints that only reach them on a big
+    /// instance.
+    #[arg(long, default_value_t = 3)]
     ws_max_size: u32,
 
     /// Hard cap on the number of solutions any single solver run
@@ -220,8 +225,10 @@ struct Opt {
     /// solutions and OOM the process. Trials whose sequential or
     /// comparison run hits this cap are abandoned silently (treated
     /// as "instance too large at this size"). Set to 0 to disable
-    /// the cap entirely.
-    #[arg(long, default_value_t = 10_000_000)]
+    /// the cap entirely. Since a trial that hits the cap is discarded,
+    /// the work it did first is wasted, so a high cap mostly buys a
+    /// longer wait for the same discarded trial.
+    #[arg(long, default_value_t = 100_000)]
     max_solutions: i64,
 
     /// Trials per equivalence group in the propagator-variant sweep.
