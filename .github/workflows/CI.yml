@@ -17,6 +17,21 @@ on:
 
 
 jobs:
+  docs:
+    name: docs sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: "Documentation sync check"
+        run: python3 sphinxdocs/check-docs-sync.py
+
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}

@@ -66,6 +66,18 @@ Rust unit tests (`cargo test --release`) that drive the C FFI surface directly w
 
 Shell driver that launches one `tester` process per constraint, capped at 5 concurrent + 90-min timeout per constraint. Used in heavy phase 9. Process isolation means a crash on constraint X doesn't kill the sweep for constraint Y. Default workload is roughly 6 hours wall-clock on a 10-core box.
 
+## Documentation sync check — `sphinxdocs/check-docs-sync.py`
+
+Runs first in `--light`, and as its own `docs` job in CI. Compares:
+
+- the flags `parseCommandLine()` accepts, against the `~~~` sections in `sphinxdocs/usage/commandline.rst`;
+- those same flags, against the flag table `minion --help` prints from (`minion/help/help.cpp`), which must match exactly;
+- the constraints in the `/* JSON */` blocks `configure.py` reads, against the `^^^` sections in `sphinxdocs/usage/constraints.rst`.
+
+It also checks that every `<#anchor>` link inside `constraints.rst` resolves, and that no two headings share an anchor — `minion --help <constraint>` builds a documentation URL from the constraint's name using the same rule Sphinx does, so a collision would send that link to the wrong section.
+
+In the code but not the docs is an error unless listed in `sphinxdocs/known-doc-gaps.txt`. In the docs but not the code is always an error. A line in `known-doc-gaps.txt` that is no longer a gap also fails, so that file can only shrink.
+
 ## What the heavy script does
 
 `test_instances/deep_test.sh` runs (in order, each phase honouring the remaining budget):

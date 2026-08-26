@@ -22,7 +22,7 @@ represents your problem, but also introduces challenges.
 
 One notable missing constraint is the “sum equals” constraint. Since the most efficient way to implement such a constraint would be by combining ``sumleq`` and ``sumgeq``, Minion doesn't offer a wrapper for it. However, if an efficient implementation of ``sumeq`` is discovered in the future, it may be added.
 
-The ``watchsumgeq`` and ``watchsumleq`` are varients on the algorithm
+The ``watchsumgeq`` and ``watchsumleq`` are variants on the algorithm
 used to implement SAT constraints. They are faster than ``sumleq`` and
 ``sumgeq``, but only work when summing a list of Booleans to a constant.
 Further, ``watchsumgeq`` performs best when the value being summed to is
@@ -33,7 +33,7 @@ Minion does not attempt to simplify constraints, so constraints such as
 ``sumgeq([a,a,a], 3)`` are not simplified to ``sumgeq([a],1)``. This
 kind of simplification will often significantly improve performance. Rather than perform such transformations (which do have trade-offs), Minion leaves this tuning to the user, or alternatively (and much more sensibly!) to specialised tools such `SavileRow <https://www-users.york.ac.uk/peter.nightingale/savilerow/>`_ or `Conjure <https://www.github.com/conjure-cp/conjure>`.
 
-There are two main reasons there are multiple implentations of the same constraint:
+There are two main reasons there are multiple implementations of the same constraint:
 
 * One version achieves more reasoning at the cost of speed.
 * One version does not work on ``BOUND`` and ``SPARSEBOUND`` variables (often, the version for ``BOUND`` and ``SPARSEBOUND`` achieves lower reasoning).
@@ -76,7 +76,7 @@ Suppose the input file had the following vector of variables defined:
 DISCRETE myVec[9] {1..9}
 
 Then ``gacalldiff(myVec)`` enforces all variables in ``myVec`` take different values.
-This constraint enforces generalized arc consistency.
+This constraint enforces generalised arc consistency.
 
 Related constraints
 """""""""""""""""""
@@ -286,7 +286,7 @@ specifies that, in any solution, either:
 - vec[i] = e and i is in the range [0 .. len(v)-1]
 - i is outside the index range of vec, and e = 0
 
-This is the non-watched variant; see `watchelement_undefzero <#watchelement_undefzero>`__ for a GAC-enforcing version.
+This is the non-watched variant; see `watchelement_undefzero <#watchelement-undefzero>`__ for a GAC-enforcing version.
 
 watchelement_one
 ^^^^^^^^^^^^^^^^
@@ -321,7 +321,7 @@ In general, use watchelement unless you have a special reason to use this constr
 watchelement_one_undefzero
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This constraint is identical to `watchelement_undefzero<#watchelement_undefzero>`__, except the vector is indexed from 1 rather than from 0.
+This constraint is identical to `watchelement_undefzero <#watchelement-undefzero>`__, except the vector is indexed from 1 rather than from 0.
 
 Arithmetic Constraints
 ----------------------
@@ -340,7 +340,7 @@ eq
 Related constraints
 """""""""""""""""""
 
-`minuseq <#minuseq-1>`__
+`minuseq <#minuseq>`__
 
 minuseq
 ^^^^^^^
@@ -350,7 +350,7 @@ minuseq
 Related constraints
 """""""""""""""""""
 
-`eq <#eq-1>`__
+`eq <#eq>`__
 
 gaceq
 ^^^^^
@@ -643,7 +643,7 @@ would look like:
 	1 1 1 1
 
 Short tuples give us a way of shrinking this list. Short tuples consist
-of pairs (x,y), where x is a varible position, and y is a value for that
+of pairs (x,y), where x is a variable position, and y is a value for that
 variable. For example, `[(0,0),(3,0)]` Represents "if the variable at index 0 is 0,
 and the variable at index 3 is 0, then the constraint is true".
 
@@ -660,7 +660,7 @@ This allows us to represent our constraint as follows:
 
 Note that some tuples are double-represented here. The first 3 short
 tuples all allow the assignment ``0 0 0 0``. This is fine. The important
-thing for efficency is to try to give a small list of short tuples.
+thing for efficiency is to try to give a small list of short tuples.
 
 We use this tuple by writing ``haggisgac([x1,x2,x3,x4], mycon)`` and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 
@@ -676,7 +676,7 @@ satisfying tuples. The constraint has the same syntax as 'table' and can
 function as a drop-in replacement.
 
 For examples on how to call it, see the help for 'table'. Substitute
-'mddc' for 'table'. This constraint enforces generalized arc consistency.
+'mddc' for 'table'. This constraint enforces generalised arc consistency.
 
 negativemddc
 ^^^^^^^^^^^^
@@ -688,7 +688,7 @@ diagram (MDD).
 The MDD required for the propagator is constructed from a set of
 unsatisfying (negative) tuples. The constraint has the same syntax as
 'negativetable' and can function as a drop-in replacement.
-This constraint enforces generalized arc consistency.
+This constraint enforces generalised arc consistency.
 
 
 lighttable
@@ -732,7 +732,7 @@ take any value. For example,
 	**CONSTRAINTS**
 	shortctuplestr2([x1,x2,x3,x4], mycon)
 
-This constraint enforces generalized arc consistency.
+This constraint enforces generalised arc consistency.
 
 shortstr2
 ^^^^^^^^^
@@ -744,7 +744,7 @@ Lecoutre, adapted f
 Input format is exactly the same as haggisgac. Refer to the haggisgac
 and shorttuplelist pages for more information.
 
-This constraint enforces generalized arc consistency.
+This constraint enforces generalised arc consistency.
 
 str2plus
 ^^^^^^^^
@@ -755,27 +755,102 @@ Lecoutre.
 str2plus is invoked in the same way as other table constraints, such
 as table and mddc.
 
-This constraint enforces generalized arc consistency.
+This constraint enforces generalised arc consistency.
 
 
 Lexicographic Ordering
 ----------------------
 
-Lexicographic ordering constraints all take two lists of variables and compare them lexicographically. They are often used in symmetry breaking.
+Lexicographic ordering constraints take two vectors of the same length and
+compare them lexicographically: the first position at which they differ
+decides the comparison. They are most often used to break symmetry between
+two rows or columns of a matrix.
 
-Minion supports both ``lexleq`` ($<=$ ordering) and ``lexless`` ($<$ ordering).
+All of these constraints accept the same arguments, and all are correct even
+if the same variable appears more than once, or appears in both vectors. They
+differ only in how much propagation they do.
 
-Each comes in up to three variants:
+If you are unsure which to use, start with ``lexleq[quick]``. It is the
+cheapest, and the extra pruning of the others rarely pays for itself; problems
+posting over 100,000 ``lexleq[quick]`` constraints are solved routinely.
 
-* standard (``lexleq`` and ``lexless``) : Achieves GAC propagation, assuming no variable is repeated.
-* repeated variables (``lexleq[rv]`` only) : Achieves GAC propagation even if some variables are repeated. The extra propagation this achieves is rarely worth the extra work. There is no ``lexless[rv]`` variant.
-* quick (``lexleq[quick]`` and ``lexless[quick]``) : A lower level of propagation that runs very quickly. This is usually the best choice, in particular if you have a very large number of constraints (problems using over 100,000 ``lexleq[quick]`` are regularly solved in Minion).
+lexleq
+^^^^^^
 
+``lexleq(A, B)`` ensures the vector ``A`` is lexicographically less than or
+equal to the vector ``B``.
+
+With ``DISCRETE p[3] {0..2}`` and ``DISCRETE q[3] {0..2}``,
+``lexleq([p[0],p[1],p[2]], [q[0],q[1],q[2]])`` allows ``p = <0,2,1>`` with
+``q = <1,0,0>``, and allows the two vectors to be equal, but forbids
+``p = <1,0,0>`` with ``q = <0,2,1>``.
+
+This constraint enforces generalised arc consistency when no variable is
+repeated.
 
 Related constraints
 """""""""""""""""""
 
-   `watchsumleq <#watchsumleq>`__ `watchsumgeq <#watchsumgeq>`__
+See `lexless <#lexless>`__ for the strict version, and
+`lexleq[quick] <#lexleq-quick>`__ for a cheaper one.
+
+lexless
+^^^^^^^
+
+``lexless(A, B)`` ensures the vector ``A`` is lexicographically strictly less
+than the vector ``B``. It is identical to ``lexleq`` except that the two
+vectors may not be equal.
+
+This constraint enforces generalised arc consistency when no variable is
+repeated.
+
+Related constraints
+"""""""""""""""""""
+
+See `lexleq <#lexleq>`__ for the non-strict version.
+
+lexleq[quick]
+^^^^^^^^^^^^^
+
+``lexleq[quick](A, B)`` is logically identical to ``lexleq``, but does less
+propagation in exchange for running considerably faster. It does not achieve
+generalised arc consistency.
+
+This is usually the best choice, especially when a model posts a large number
+of lexicographic constraints.
+
+Related constraints
+"""""""""""""""""""
+
+See `lexleq <#lexleq>`__ for the version which achieves GAC.
+
+lexless[quick]
+^^^^^^^^^^^^^^
+
+``lexless[quick](A, B)`` is logically identical to ``lexless``, but does less
+propagation in exchange for running considerably faster. It does not achieve
+generalised arc consistency.
+
+Related constraints
+"""""""""""""""""""
+
+See `lexless <#lexless>`__ for the version which achieves GAC.
+
+lexleq[rv]
+^^^^^^^^^^
+
+``lexleq[rv](A, B)`` is logically identical to ``lexleq``. It achieves
+generalised arc consistency even when a variable is repeated within or between
+the two vectors, which plain ``lexleq`` does not.
+
+Plain ``lexleq`` is still correct with repeated variables -- it simply prunes
+less -- so this variant is worth the extra work only when that extra pruning
+matters. There is no ``lexless[rv]``.
+
+Related constraints
+"""""""""""""""""""
+
+See `lexleq <#lexleq>`__ for the usual version.
 
 
 Constraints which operate on other Constraints
@@ -811,7 +886,7 @@ Related constraints
 
 
 
-Reification allows users to set a boolean to be true or false depending on if a constraint is true.  All constraints are reifyable and reifyimplyable, except where explictly stated.
+Reification allows users to set a boolean to be true or false depending on if a constraint is true.  All constraints are reifiable and reifyimplyable, except where explicitly stated.
 
 
 reify 
@@ -842,6 +917,72 @@ reifyimply-quick
 r is 0, ``constraint`` can be true or false.
 In ``reifyimply-quick``, r is never set to 0 by propagation, instead Minion waits until r is set to 1, and only then imposes that ``constraint`` is true.
 
+Changing how much a constraint propagates
+-----------------------------------------
+
+The three constraints in this section each wrap one other constraint and do
+not change what it means: the set of solutions is exactly the same as posting
+the child constraint on its own. What they change is how much work Minion does
+to enforce it, and therefore how many search nodes it explores.
+
+They are listed here weakest first. All three are specialist tools -- normally
+you should post the child constraint directly and let it use its own
+propagator, which will be stronger than any of these.
+
+check[assign]
+^^^^^^^^^^^^^
+
+``check[assign](constraint)`` waits until every variable of ``constraint`` is
+assigned, and then checks whether the assignment satisfies it. It never
+removes a value from any domain.
+
+This is the weakest possible treatment of a constraint: it can only reject a
+complete assignment, so search must guess its way to the bottom of the tree
+before anything is detected.
+
+Related constraints
+"""""""""""""""""""
+
+See `check[gsa] <#check-gsa>`__ and
+`forwardchecking <#forwardchecking>`__ for stronger treatments.
+
+check[gsa]
+^^^^^^^^^^
+
+``check[gsa](constraint)`` looks for one assignment satisfying ``constraint``
+within the current domains, and fails if there is none. When it finds one, it
+watches it, and looks for another only once that one is destroyed. Like
+``check[assign]`` it never removes a value from any domain, but unlike
+``check[assign]`` it can fail before the variables are all assigned.
+
+How early it fails depends on the child constraint, because the search for a
+satisfying assignment is the child's own. For example, with domains
+``{5..9}``, ``check[gsa](sumleq([z0,z1],3))`` fails immediately at the root,
+while ``check[assign]`` of the same constraint explores the whole tree first.
+
+Related constraints
+"""""""""""""""""""
+
+See `check[assign] <#check-assign>`__ for the weaker version, and
+`forwardchecking <#forwardchecking>`__ for one which prunes.
+
+forwardchecking
+^^^^^^^^^^^^^^^
+
+``forwardchecking(constraint)`` performs forward checking on ``constraint``:
+it waits until at most one variable of the constraint is unassigned, and then
+removes from that variable every value which cannot be extended to a
+satisfying assignment.
+
+This is the classical forward-checking algorithm. It prunes, so it is stronger
+than either ``check`` constraint, but it is still weaker than the dedicated
+propagator of essentially every constraint Minion implements.
+
+Related constraints
+"""""""""""""""""""
+
+See `check[assign] <#check-assign>`__ and `check[gsa] <#check-gsa>`__ for
+weaker treatments which never prune.
 
 
 Matrix Constraints
@@ -894,6 +1035,50 @@ The constraint watchvecneq(A, B)
 ensures that A and B are not the same vector, i.e., there exists some
 index i such that A[i] != B[i].
 
+Related constraints
+"""""""""""""""""""
+
+See `watchvecexists_less <#watchvecexists-less>`__ for the same shape of
+constraint with ``<`` in place of ``!=``.
+
+watchvecexists_less
+^^^^^^^^^^^^^^^^^^^
+
+The constraint ``watchvecexists_less(A, B)`` ensures that there is some index
+i at which ``A[i] < B[i]``.
+
+The two vectors must be the same length. Note that this is an existential
+condition on the pairs, not a lexicographic comparison: it asks only that
+``A`` is smaller than ``B`` somewhere, and says nothing about the other
+positions. For example, with ``A = <1,0>`` and ``B = <0,1>`` the constraint is
+satisfied, because ``A[1] < B[1]``, even though ``A`` is lexicographically
+greater than ``B``.
+
+Related constraints
+"""""""""""""""""""
+
+See `watchvecneq <#watchvecneq>`__ for the ``!=`` version, and
+`lexless <#lexless>`__ if you want a lexicographic comparison.
+
+frameupdate
+^^^^^^^^^^^
+
+``frameupdate(source, target, idx_source, idx_target, blocksize)`` relates two
+equal-length vectors which are each divided into consecutive blocks of
+``blocksize`` variables. It says that if you delete the blocks of ``source``
+listed in ``idx_source``, and delete the blocks of ``target`` listed in
+``idx_target``, the two sequences of blocks that remain are equal, block by
+block and in order.
+
+Block indices count from 1. The values in ``idx_source`` must be distinct, and
+so must the values in ``idx_target``. ``source`` and ``target`` must be the
+same length, and that length must be divisible by ``blocksize``; both are
+checked when the constraint is built.
+
+The intended use is to model one step of a planning problem, where ``source``
+and ``target`` are consecutive states, and the two index vectors say which
+blocks the step removes and which it adds. Everything else must be carried
+over unchanged -- the "frame" of the update.
 
 Constant constraints
 --------------------

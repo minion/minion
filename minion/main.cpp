@@ -21,5 +21,5 @@ int main(int argc, char** argv) {
     Globals g;
     globals = &g;
 #endif
-    minion_main(argc, argv);
+    return minion_main(argc, argv);
 }

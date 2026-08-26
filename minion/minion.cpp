@@ -8,6 +8,7 @@
 #include "BuildVariables.h"
 
 #include "commandline_parse.h"
+#include "help/help.h"
 #include "inputfile_parse/inputfile_parse.h"
 
 #include "info_dumps.h"
@@ -22,25 +23,25 @@
 // Entrance:
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-void help();
+/// Handles --help, --version and their spellings wherever they appear on the
+/// command line, and returns the exit code to use.  Returns -1 if neither was
+/// asked for and Minion should carry on and solve something.
+static int handleHelpAndVersion(SysInt argc, char** argv) {
+  for(SysInt i = 1; i < argc; ++i) {
+    const string arg(argv[i]);
 
-void print_default_help(char** argv) {
-  getOutput() << "Type '" << argv[0] << " help' for usage." << endl;
-  getOutput() << endl << "Usage: " << argv[0] << " {switch}* [input file]" << endl;
-  getOutput() << endl;
-  getOutput() << "This version of Minion was built with internal checking "
-       <<
-#ifdef NO_DEBUG
-      "off";
-#else
-      "on";
-#endif
+    if(arg == "--version" || arg == "-version") {
+      printVersion();
+      return EXIT_SUCCESS;
+    }
 
-#ifdef WDEG
-  getOutput() << " and wdeg on";
-#endif
-
-  getOutput() << endl;
+    if(arg == "--help" || arg == "-help" || arg == "-h" || (i == 1 && arg == "help")) {
+      // 'minion --help foo' asks about foo; anything after that is ignored.
+      const string topic = (i + 1 < argc && argv[i + 1][0] != '-') ? argv[i + 1] : "";
+      return help(topic) ? EXIT_SUCCESS : EXIT_FAILURE;
+    }
+  }
+  return -1;
 }
 
 void doStandardSearch(CSPInstance& instance, SearchMethod args) {
@@ -158,20 +159,23 @@ int minion_main(int argc, char** argv) {
 
     getState().getOldTimer().startClock();
 
+    // Before the '#' banner: help and version output is meant to be read, and
+    // sometimes piped, so it should not be preceded by a comment header.
+    if(argc == 1) {
+      printUsageBanner(argv[0]);
+      return EXIT_SUCCESS;
+    }
+
+    {
+      const int helpExit = handleHelpAndVersion(argc, argv);
+      if(helpExit != -1)
+        return helpExit;
+    }
+
     getOptions().printLine("# " + std::string(MinionVersion));
     getOptions().printLine("# Git version: \"" + tostring(GIT_VER) + "\"");
 
-    if(argc == 1) {
-      print_default_help(argv);
-      return EXIT_SUCCESS;
-    }
 
-    if(argv[1] == string("help") || argv[1] == string("--help") || argv[1] == string("-help") ||
-       argv[1] == string("-h")) {
-      help();
-      return EXIT_SUCCESS;
-    }
-  
     CSPInstance instance;
     SearchMethod args;
 
@@ -206,7 +210,8 @@ int minion_main(int argc, char** argv) {
     getTableOut().set("RandomSeed", tostring(args.randomSeed));
     getTableOut().set("Preprocess", tostring(args.preprocess));
     // should be one for varorder as well.
-    getTableOut().set("MinionVersion", -1);
+    getTableOut().set("MinionVersion", MinionVersion);
+    getTableOut().set("GitVersion", tostring(GIT_VER));
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
     getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);

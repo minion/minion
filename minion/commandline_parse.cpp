@@ -9,6 +9,7 @@ the available orderings) do:
 */
 
 #include "commandline_parse.h"
+#include "help/help.h"
 #include "search_dump.hpp"
 
 #define INCREMENT_i(flag)                                                                          \
@@ -380,7 +381,11 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
     } else if(command == string("-no-restarts-bias")) {
       getOptions().restart.bias = false;
     } else if(command[0] == '-' && command != string("--")) {
-      getOutput() << "I don't understand '" << command << "'. Sorry. " << endl;
+      cerr << "I don't understand '" << command << "'." << endl;
+      const string suggestion = suggestFlag(command);
+      if(!suggestion.empty())
+        cerr << "Did you mean '" << suggestion << "'?" << endl;
+      cerr << "Run 'minion --help' for the list of switches." << endl;
       exit(1);
     } else {
       if(getOptions().instance_name == "")

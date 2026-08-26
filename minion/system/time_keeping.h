@@ -56,5 +56,8 @@ public:
       sout << "Maximum RSS (kB): " << getMax_rss() << endl;
     }
     tableout.set(string("TotalTime"), end_cpuTime - _internal_cpuStartTime);
+    tableout.set(string("TotalSystemTime"), end_sysTime - _internal_sysStartTime);
+    tableout.set(string("TotalWallTime"), time_wallclock);
+    tableout.set(string("MaxRSSkB"), getMax_rss());
   }
 };
