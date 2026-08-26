@@ -239,6 +239,10 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
         args.valorder = VALORDER_DESCEND;
       } else if(order == "random") {
         args.valorder = VALORDER_RANDOM;
+      } else {
+        ostringstream oss;
+        oss << "I do not understand the value order:" << order;
+        outputFatalError(oss.str());
       }
     }
 
