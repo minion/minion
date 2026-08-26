@@ -137,12 +137,16 @@ See -preprocess for the allowed values for `<proplevel>`
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 This switch allows the user to choose what level of preprocess is
-applied to their model before search commences. The default level is "GAC"
+applied to their model before search commences. The default is ``None`` --
+no preprocessing beyond the initial propagation. (``GAC`` is the default for
+``-prop-node``, which is a different setting.)
 
 The choices are:
 
+-  None
+      - Default setting: no preprocessing is done
+
 -  GAC
-      - Default setting
       - All propagators are run to a fixed point
       - Incorrectly named (but kept for historical reasons), because some propagators do not achieve GAC.
       - Used as the basis for all other, better, levels below.
@@ -170,7 +174,7 @@ take a long time to complete, but may reduce search time enough to
 justify the cost.
 
 Each of the SAC variants can have '_limit' added (for example
-SACBound_limit). The '_limit' variants of these algorithm add checks
+``SACBounds_limit``). The '_limit' variants of these algorithm add checks
 which limit the algorithms if they are taking a very long time and not making progress.
 
 -randomseed
@@ -300,10 +304,6 @@ Print out the branching decisions and variable states at each node.
 
 Print out the branching decisions and variable states at each node as a JSON file to a filename.
 
--dumptreesql <filename>
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Print out the branching decisions and variable states at each node to an SQL database.
 
 -skipautoaux
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -342,10 +342,6 @@ Write a resume file on timeout or being killed.
 
 Do not write a resume file on timeout or being killed. (default)
 
--gap
-~~~~
-
-Give name of gap executable (defaults to gap.sh)
 
 -command-list <infile> <outfile>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -491,17 +487,6 @@ at-most-one structure.
 Replaces small constraints with equivalent table constraints, which are then
 propagated by Minion's table propagators.
 
--Xgraph
-~~~~~~~
-
-Prints the constraint graph of the instance in the format used by nauty, for
-symmetry detection, and exits without searching. Implies ``-printsolsonly``.
-
-Deprecated aliases
-------------------
-
-These are accepted for backwards compatibility and behave exactly as the flag
-they alias. New input should use the primary spelling.
 
 -X-instancestats
 ~~~~~~~~~~~~~~~~

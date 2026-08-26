@@ -44,8 +44,9 @@ timings, then any solutions, then a summary::
    Total Nodes: 21
    Solutions Found: 1
 
-``-printsolsonly`` reduces this to the ``Sol:`` lines alone, and ``-quiet``
-suppresses the parser's progress messages.
+``-printsolsonly`` drops the timings and the summary, keeping the ``#`` header
+lines and the solutions -- which are then printed bare, without the ``Sol: ``
+prefix. ``-quiet`` suppresses the parser's progress messages.
 
 Every whole-run figure shown above is also in the JSON statistics file, so
 there is no need to scrape the terminal for those.
@@ -205,7 +206,7 @@ Search tree as JSON -- ``-dumptreejson <file>``
 
 Writes the whole search tree as a single nested JSON object. Each node has::
 
-   {"Node": 0,
+   {"Node": 1,
     "branchVar": "q_0__",
     "branchVal": 2,
     "Domains": {"b": [[1,3]], "bool": [[0,0]], "q_0__": [[2,2]]},
@@ -214,11 +215,11 @@ Writes the whole search tree as a single nested JSON object. Each node has::
 
 ``Domains`` maps each variable to its domain at that node, as a list of
 inclusive ``[low, high]`` intervals. ``left`` and ``right`` are the child
-nodes, and are ``{}`` at a leaf. A node where a solution was found also has
-``"solution": 1``.
+nodes. They are **absent** at a leaf rather than empty, so test for the key
+before reading it. A node where a solution was found also has
+``"solution": 1``. Nodes are numbered from 1.
 
 This can be very large -- it records every variable's domain at every node --
 so use it on small instances.
 
-``-dumptree`` prints a human-readable version to standard output, and
-``-dumptreesql`` emits SQL insert statements instead.
+``-dumptree`` prints a human-readable version to standard output.

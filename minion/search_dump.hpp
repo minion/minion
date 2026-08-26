@@ -17,6 +17,5 @@ struct SearchDumper {
 };
 
 std::shared_ptr<SearchDumper> makeDumpTreeJson(std::ostream* o);
-std::shared_ptr<SearchDumper> makeDumpTreeSQL();
 
 #endif

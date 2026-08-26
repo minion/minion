@@ -11,13 +11,6 @@
 
 void infoDumps(CSPInstance& instance) {
 
-  if(getOptions().graph) {
-    GraphBuilder graph(instance);
-    // graph.g.output_graph();
-    graph.g.output_nauty_graph(instance);
-    exit(0);
-  }
-
   if(getOptions().instance_stats) {
     InstanceStats s(instance);
     s.output_stats();

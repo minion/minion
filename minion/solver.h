@@ -365,7 +365,6 @@ public:
   string instance_name;
 
   bool redump;
-  bool graph;
   bool instance_stats;
 
   // Do not write a resume file.
@@ -393,7 +392,6 @@ public:
   /// output a compressed list of domains
   bool outputCompressedDomains;
 
-  string gapname;
 
   bool parallel = false;
   int parallelcores = 0;
@@ -483,12 +481,10 @@ public:
         randomiseValvarorder(false),
         parserVerbose(false),
         redump(false),
-        graph(false),
         instance_stats(false),
         noresumefile(true),
         split(false),
         outputCompressedDomains(false),
-        gapname("gap.sh"),
         map_long_short(MLTTS_NoMap),
         ensureBranchOnAllVars(true) {
   }

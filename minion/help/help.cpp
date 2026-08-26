@@ -60,14 +60,11 @@ const FlagHelp flagTable[] = {
     {"Output", "-jsontableout", "<file>", "append run statistics to a file as JSON", false},
     {"Output", "-dumptree", "", "print the search tree as it is explored", false},
     {"Output", "-dumptreejson", "<file>", "write the search tree to a file as JSON", false},
-    {"Output", "-dumptreesql", "", "print the search tree as SQL inserts", false},
 
     {"Inspecting an instance (these exit without searching)", "-instancestats", "",
      "print statistics about the instance", false},
     {"Inspecting an instance (these exit without searching)", "-redump", "",
      "print the instance back out in Minion format", false},
-    {"Inspecting an instance (these exit without searching)", "-Xgraph", "",
-     "print the constraint graph in nauty format", false},
     {"Inspecting an instance (these exit without searching)", "-outputCompressed", "<name>",
      "print the instance with variables renamed", false},
     {"Inspecting an instance (these exit without searching)", "-outputCompressedDomains", "",
@@ -83,7 +80,6 @@ const FlagHelp flagTable[] = {
     {"Stopping and resuming", "-command-list", "<in> <out>", "drive search from a command file",
      false},
 
-    {"Other", "-gap", "<file>", "the GAP executable to call (default gap.sh)", false},
     {"Other", "-map-long-short", "<mode>", "map long/short tuples: none, keeplong,\n"
                                            "eager or lazy", false},
 

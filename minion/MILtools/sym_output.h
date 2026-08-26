@@ -6,9 +6,6 @@
 #include <set>
 #include <limits>
 
-std::vector<std::vector<DomainInt>> build_graph(std::vector<std::set<SysInt>> graph,
-                                                const std::vector<std::set<SysInt>>& partition);
-
 SysInt repartition(const std::vector<std::set<SysInt>>& graph, std::vector<SysInt> partitionNum) {
   std::vector<std::multiset<SysInt>> partition_loop(graph.size());
   for(SysInt i = 0; i < (SysInt)graph.size(); ++i)
@@ -174,36 +171,6 @@ struct Graph {
     }
 
     return std::make_tuple(var_vertexCount, edges, partitions);
-  }
-
-  void output_nauty_graph(CSPInstance& csp) {
-    SysInt var_vertexCount;
-    vector<set<SysInt>> edges;
-    vector<set<SysInt>> partitions;
-
-    std::tie(var_vertexCount, edges, partitions) = build_graph_info(csp);
-#ifdef USE_NAUTY
-    vector<vector<DomainInt>> perms = build_graph(edges, partitions);
-    getOutput() << "generators := [()" << endl;
-    for(SysInt i = 0; i < (SysInt)perms.size(); ++i) {
-      getOutput() << ", PermList([";
-      bool first_pass = true;
-      D_ASSERT(perms[i][0] == 0);
-      for(SysInt j = 1; j <= var_vertexCount; ++j) {
-        D_ASSERT(perms[i][j] <= var_vertexCount);
-        if(first_pass) {
-          first_pass = false;
-          getOutput() << perms[i][j];
-        } else
-          getOutput() << ", " << perms[i][j];
-      }
-      getOutput() << "])" << endl;
-    }
-    getOutput() << "];" << endl;
-#else
-    cerr << "Need to compile Minion with nauty included!" << endl;
-    exit(1);
-#endif
   }
 
   string name(Var v, CSPInstance& csp) {
