@@ -134,10 +134,19 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
     // other sollimit is meaningless for restarts — reject.
     bool isOpt = getState().isOptimisationProblem();
     if(!isOpt && getOptions().sollimit != 1) {
-      D_FATAL_ERROR("-restarts is not compatible with -sollimit unless optimising");
+      // A usage mistake, not a bug: say what to do rather than asking for a
+      // bug report.
+      std::cerr << "-restarts abandons the search and begins again, so it can only look for a\n"
+                << "single solution.  On a problem with no optimisation objective it cannot be\n"
+                << "combined with -findallsols or -sollimit.\n"
+                << "Drop -restarts, or ask for one solution.\n";
+      exit(1);
     }
     if(isOpt && getOptions().sollimit != -1) {
-      D_FATAL_ERROR("-restarts on an optimisation problem requires sollimit=-1 (findAllSolutions)");
+      std::cerr << "-restarts on an optimisation problem searches until it can prove the best\n"
+                << "value, so it cannot be combined with -sollimit.\n"
+                << "Drop one of the two.\n";
+      exit(1);
     }
     sm = Controller::make_restart_new_search_manager(args.propMethod, instance.searchOrder);
   } else {
