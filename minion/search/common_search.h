@@ -360,6 +360,10 @@ inline void standardTime_ctrlc_checks(const vector<AnyVarRef>& varArray,
                                       const vector<Controller::triple>& branches) {
   if(getState().getNodeCount() >= getOptions().nodelimit) {
     generateRestartFile(varArray, branches);
+    // TimeOut means "search was cut short", not specifically "ran out of
+    // time".  Without this a node-limited run is indistinguishable from a
+    // complete one in -tableout and -jsontableout.
+    getTableOut().set("TimeOut", 1);
     throw EndOfSearch();
   }
 

@@ -85,16 +85,25 @@ See `alldiff <#alldiff>`__ is faster but performs less reasoning.
 alldiffmatrix
 ^^^^^^^^^^^^^
 
-``alldiffmatrix(myVec, dim)``
+``alldiffmatrix(myVec, value)``
 
-This constraint takes a 2d matrix of size ``dim*dim``.
-This constraint impose that the matrix forms a latin-square, that is, the elements
-of the rows and columns are all different.
+``myVec`` is a square matrix flattened into a vector, and ``value`` is a
+single value -- not a dimension. The size is taken from the length of the
+vector, which must be a perfect square.
 
-It ensures there is a bipartite matching between rows
-and columns where the edges in the matching correspond to a pair (row,
-column) where the variable in position (row,column) in the matrix may be
-assigned to the given value.
+The constraint concerns one value at a time: it ensures that ``value`` appears
+exactly once in every row and exactly once in every column. Equivalently, it
+ensures there is a bipartite matching between rows and columns where the edges
+in the matching correspond to a pair (row, column) whose variable may be
+assigned ``value``.
+
+One such constraint therefore does not make a latin square on its own. You
+build one by posting it once for each value, which is what the name refers to.
+For a 3x3 matrix over ``{1..3}``, posting it for values 1, 2 and 3 gives
+exactly the 12 latin squares of order 3; posting it for value 1 alone leaves
+384 solutions.
+
+``BOUND`` and ``SPARSEBOUND`` variables are rejected.
 
 
 Notes
@@ -475,7 +484,7 @@ pow
 The constraint ``pow(x,y,z)``
 
 Ensures that x^y=z. This constraint is false when `y<0` except for `1^y=1` and
-`(-1)^y=z` (where z is 1 if `y` is odd and z is -1 if `y` is even).
+`(-1)^y=z` (where z is 1 if `y` is even and z is -1 if `y` is odd).
 
 This constraint is more efficient when x, y and z have positive domains.
 
@@ -924,9 +933,9 @@ not change what it means: the set of solutions is exactly the same as posting
 the child constraint on its own. What they change is how much work Minion does
 to enforce it, and therefore how many search nodes it explores.
 
-They are listed here weakest first. All three are specialist tools -- normally
-you should post the child constraint directly and let it use its own
-propagator, which will be stronger than any of these.
+All three are specialist tools -- normally you should post the child
+constraint directly and let it use its own propagator, which will be stronger
+than any of these.
 
 check[assign]
 ^^^^^^^^^^^^^
@@ -973,9 +982,12 @@ it waits until at most one variable of the constraint is unassigned, and then
 removes from that variable every value which cannot be extended to a
 satisfying assignment.
 
-This is the classical forward-checking algorithm. It prunes, so it is stronger
-than either ``check`` constraint, but it is still weaker than the dedicated
-propagator of essentially every constraint Minion implements.
+This is the classical forward-checking algorithm. Unlike the two ``check``
+constraints it removes values, but it is not simply stronger than them: it
+does nothing at all until one variable is left, so ``check[gsa]`` can fail at
+the root where ``forwardchecking`` has to search. Neither is weaker than the
+other in general, and both are weaker than the dedicated propagator of
+essentially every constraint Minion implements.
 
 Related constraints
 """""""""""""""""""
