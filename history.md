@@ -1,10 +1,14 @@
 - August 19, 2026 : Minion 2.1
 
-This release is almost entirely bug fixes. Nearly all of them were found by our own testing rather than reported by users, and most need unusual instances to trigger, so we do not expect them to affect many people. It is worth upgrading if you use the parallel search modes, or if your instances are produced by a modelling tool rather than written by hand.
+This release is bug fixes and documentation. Nearly all of the bugs were found by our own testing rather than reported by users, and most need unusual instances to trigger, so we do not expect them to affect many people. It is worth upgrading if you use the parallel search modes, or if your instances are produced by a modelling tool rather than written by hand.
 
 Minion's testing has grown a great deal since Minion 2. Alongside the hand-written `.minion` regression suite, a random instance generator now checks every constraint against an independently computed table of its solutions, and against other constraints that are supposed to mean the same thing. It re-solves each instance under different variable and value orderings, preprocessing levels, restart settings and parallel modes, and requires the answers to agree. A second layer drives Minion as a library rather than as a binary, which is the only way to reach the interfaces for adding variables and constraints part-way through a search. `mini-scripts/` holds soak tests that run all of this for days at a time before a release, and `TESTING.md` describes the whole arrangement.
 
 That testing found the bugs below. Most of them share a pattern: the same variable appearing in two argument positions of one constraint, as in `gcc([a,b], [1,2], [b,c])`, or a variable appearing both plain and negated, as in `lexleq[rv]([x, !b, b], [b, x, -9])`. Several propagators counted such a variable as two independent things, and could then remove values that were still valid. Hand-written instances rarely look like this; generated ones sometimes do.
+
+The documentation has been overhauled, and `minion --help` with it. `minion --help` now lists every switch Minion accepts, grouped by what it is for, and suggests a spelling if you mistype one. `minion --help constraints` lists the constraints the binary was actually built with, and naming one, as in `minion --help gacalldiff`, gives its arity and a link to its documentation. Every constraint Minion builds now has a section in the manual. Ten had none: five lexicographic variants shared a single paragraph that named them without saying what they did, and five were not mentioned anywhere.
+
+Checking the manual against the code found about forty statements that were wrong. A constraint whose second argument was documented as a dimension takes a value. A documented parity was the wrong way round. A flag could not work in any build we ship, because nothing defines the macro it needs. The complete example in the input format chapter did not parse. Those are fixed, and CI now compares the flags and constraints in the code against the ones the manual documents, so the two cannot drift apart again without the build failing.
 
 Longer notes:
 
@@ -17,6 +21,14 @@ Longer notes:
 - Library: added node and time limits, and routed solver output through a per-context stream so concurrent solves in one process no longer fight over std::cout.
 - Library: fixed table constraints built over the C interface with an empty or zero-variable table.
 - Added a MINION_SANITIZE build option for AddressSanitizer builds of the library.
+- Rewrote `minion --help`, which previously printed a fixed block of text that had drifted from the switches Minion accepts.
+- Documented the JSON output formats -- `-jsonsolsout`, `-jsontableout` and `-dumptreejson` -- and what is promised about them. Standard output is for reading, and is explicitly not promised to stay the same.
+- `-valorder` now rejects an ordering it does not recognise. It used to accept a misspelling and search in ascending order without saying anything.
+- `TimeOut` in `-tableout` and `-jsontableout` is now set when a node limit stops the search, not only when a time limit does. A truncated run was previously indistinguishable from a complete one.
+- `-restarts` combined with `-findallsols` or `-sollimit` now explains the restriction, rather than reporting it as an internal error and asking for a bug report.
+- Removed `-Xgraph`, `-dumptreesql` and `-gap`. The first needed a build option that does not exist, the second emitted no SQL and did not take the filename it documented, and the third was parsed and then never read.
+- Building outside the source tree now records the git revision, which is where the documentation tells you to build.
+- CI builds the documentation and checks it against the code, and builds and tests the full configuration that releases ship, which was previously never compiled outside the release job itself.
 
 - March 19, 2024 : Minion 2
 
