@@ -1,4 +1,4 @@
-- August 19, 2026 : Minion 2.1
+- August 27, 2026 : Minion 2.1
 
 This release is bug fixes and documentation. Nearly all of the bugs were found by our own testing rather than reported by users, and most need unusual instances to trigger, so we do not expect them to affect many people. It is worth upgrading if you use the parallel search modes, or if your instances are produced by a modelling tool rather than written by hand.
 
