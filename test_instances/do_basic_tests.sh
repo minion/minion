@@ -23,7 +23,15 @@ exec=$1
 #Remove exec from $*, so it only contains parameters
 shift
 
-for i in *.minion; do
+# tests-64domains/ needs values beyond a 32-bit domain, so it is only
+# meaningful against a --domains64 build.  Opt in with TEST_64DOMAINS=1
+# rather than keeping a second, drifting copy of this script.
+globs="*.minion"
+if [ "${TEST_64DOMAINS:-0}" = "1" ]; then
+  globs="*.minion tests-64domains/*.minion"
+fi
+
+for i in $globs; do
   printf "."
   j=$(($j + 1))
 
