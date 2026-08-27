@@ -1,12 +1,5 @@
-If you have downloaded a binary for your OS, the minion binary will be in the
-'bin' directory. 
-
-The "docs" directory contains a full manual for Minion. This 
-can also be found online at https://minion-solver.readthedocs.org/.
-The "benchmarks" directory contains a range of example programs.
-The "generators" directory contains a number of generators, these are
-in general poorly documented.
-
+Minion's manual is at https://minion-solver.readthedocs.io/, and the
+"benchmarks" directory here holds a range of example instances.
 
 If you want to build minion from source, read on!
 
@@ -39,7 +32,8 @@ and then type
 
 make minion
 
-again. This should produce the "minion-debug" binary. The debug version is much
+again. The binary is still called "minion"; build it in a separate
+directory if you want to keep both. The debug version is much
 slower but has a large amount of internal checks. It should be used if you are
 unsure / worried about the results Minion produces, or it crashes.
 
