@@ -32,8 +32,14 @@ if [[ "`$exec bibd.minion -preprocess SSAC | grep ^SSAC | awk '{print $3}'`" != 
   exit 1
 fi
 
+# Compare through a temporary file: process substitution is a bash extension
+# and needs /dev/fd, which is not available everywhere.
+amo_out=`mktemp`
+trap 'rm -f "$amo_out"' EXIT
 for file in bibd.minion; do
-  if ! diff <($exec $file -X-AMO -preprocess SACBounds_limit | grep -e '\(BOOLNAMES\)\|\(AMO\)' | grep -v Command) $file-amo; then
+  $exec $file -X-AMO -preprocess SACBounds_limit \
+    | grep -e '\(BOOLNAMES\)\|\(AMO\)' | grep -v Command > "$amo_out"
+  if ! diff "$amo_out" $file-amo; then
     echo AMO test $file failed
     exit 1
   fi

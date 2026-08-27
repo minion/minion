@@ -56,5 +56,8 @@ fi
   (cd special_tests; ./special_tests.sh ../$exec)
   failed=$(($failed + $?))
   if [ $failed -gt 0 ]; then
-    echo "Some non-critical tests failed."
+    echo "Special tests failed." >&2
+    exit $failed
   fi
+
+  exit 0
