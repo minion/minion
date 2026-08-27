@@ -11,6 +11,7 @@ jobs:
   build:
     name: Create cross-platform release build, tag and upload binaries
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
@@ -47,10 +48,16 @@ jobs:
         python3 ../configure.py
         make -j2
 
+    # shell: bash on both, because these use POSIX syntax and the default
+    # shell on windows-latest is pwsh, where $GITHUB_ENV is an undefined
+    # PowerShell variable rather than the environment variable.  Without it
+    # the Windows asset gets no version string.
     - name: Set version string to the commit hash
+      shell: bash
       run: echo "RELEASE_VERSION=${{ github.sha }}" >> "$GITHUB_ENV"
 
     - name: Set version string based on trigger (ref_name if on tag)
+      shell: bash
       run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> "$GITHUB_ENV"
       if: startsWith(github.ref, 'refs/tags/')
         
