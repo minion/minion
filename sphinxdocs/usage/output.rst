@@ -155,7 +155,14 @@ The keys are:
    * - ``Satisfiable``
      - ``1`` if at least one solution was found, ``0`` otherwise.
    * - ``TimeOut``
-     - ``1`` if a time or node limit stopped the search, ``0`` otherwise.
+     - ``1`` if the search was cut short rather than finishing, ``0``
+       otherwise.
+   * - ``NodeLimitReached``
+     - ``1`` if it was a node limit that stopped the search, ``0``
+       otherwise.
+   * - ``Interrupted``
+     - ``1`` if the search was interrupted, by Ctrl-C or a ``SIGINT``,
+       ``0`` otherwise.
    * - ``OptimumValue``
      - For a single-objective problem with at least one solution, the best
        objective value found. Absent otherwise.
@@ -182,6 +189,10 @@ The keys are:
    * - ``WorkStealCallbackLockWaitNs``
      - Work-stealing diagnostic: nanoseconds waiting on the callback lock,
        summed over workers.
+
+Between them these say why a run stopped. ``TimeOut`` is ``1`` whenever the
+search was cut short; if ``NodeLimitReached`` and ``Interrupted`` are both
+``0``, it ran out of time. A run that finished has all three at ``0``.
 
 The six ``WorkSteal`` keys are present only when ``-X-parallelWorkSteal`` is
 used. They are diagnostics for an experimental mode, and unlike the rest of

@@ -213,6 +213,8 @@ int minion_main(int argc, char** argv) {
     getTableOut().set("MinionVersion", MinionVersion);
     getTableOut().set("GitVersion", tostring(GIT_VER));
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
+    getTableOut().set("NodeLimitReached", 0);
+    getTableOut().set("Interrupted", 0);
     getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);
 
