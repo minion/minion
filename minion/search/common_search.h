@@ -360,11 +360,9 @@ inline void standardTime_ctrlc_checks(const vector<AnyVarRef>& varArray,
                                       const vector<Controller::triple>& branches) {
   if(getState().getNodeCount() >= getOptions().nodelimit) {
     generateRestartFile(varArray, branches);
-    // TimeOut means "search was cut short", not specifically "ran out of
-    // time".  Without this a node-limited run is indistinguishable from a
-    // complete one in -tableout and -jsontableout.  NodeLimitReached says
-    // which of the two it was, because the library reports a timeout as an
-    // error and a node limit is not one.
+    // TimeOut means "cut short", not "out of time"; the second key says
+    // which, as the library treats a timeout as an error and a node limit
+    // as an ordinary result.
     getTableOut().set("TimeOut", 1);
     getTableOut().set("NodeLimitReached", 1);
     throw EndOfSearch();
@@ -374,8 +372,7 @@ inline void standardTime_ctrlc_checks(const vector<AnyVarRef>& varArray,
                                      // ctrl+c has been pressed.
     generateRestartFile(varArray, branches);
     if(Parallel::isCtrlCPressed()) {
-      // Also cut short, so also TimeOut: without it an interrupted run looks
-      // complete.  Interrupted says which, as with NodeLimitReached above.
+      // Cut short, so TimeOut, with Interrupted to say which.
       getOptions().printLine("Search interrupted.");
       getTableOut().set("TimeOut", 1);
       getTableOut().set("Interrupted", 1);
