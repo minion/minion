@@ -1079,11 +1079,11 @@ listed in ``idx_source``, and delete the blocks of ``target`` listed in
 ``idx_target``, the two sequences of blocks that remain are equal, block by
 block and in order.
 
-Block indices count from 1. The values in ``idx_source`` must be distinct, and
-so must the values in ``idx_target``. Note that an index is currently checked
-against the *length of the vector* rather than the number of blocks, so with
-``source[4]`` and ``blocksize`` 2 an index of 3 or 4 is accepted even though
-only two blocks exist, and naming one has no effect. ``source`` and ``target`` must be the
+Block indices count from 1, and the values within each index vector must be
+distinct. An index is accepted up to the *length of the vector* rather than
+the number of blocks, so with ``source[4]`` and ``blocksize`` 2, indices 3 and
+4 are allowed even though there are only two blocks; an index past the last
+block names nothing and deletes nothing. ``source`` and ``target`` must be the
 same length, and that length must be divisible by ``blocksize``; both are
 checked when the constraint is built.
 
