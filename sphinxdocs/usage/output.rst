@@ -57,6 +57,34 @@ cumulative time and node count at the moment each solution was reached, and at
 present they have no JSON equivalent: ``-jsonsolsout`` records the solutions
 themselves but not the cost of reaching each one.
 
+Exit codes
+----------
+
+.. list-table::
+   :header-rows: 1
+   :widths: 12 88
+
+   * - Code
+     - Meaning
+   * - ``0``
+     - Minion ran. This covers a search that finished, a problem with no
+       solutions, and a run stopped by ``-nodelimit``, ``-timelimit`` or
+       ``-cpulimit``: those are stopping points you asked for, not failures.
+       Read ``TimeOut`` in the statistics file to tell a truncated run from a
+       complete one.
+   * - ``1``
+     - Minion would not run what it was asked to: an unrecognised switch or
+       switch value, two switches that conflict, an instance that does not
+       exist or does not parse, or a model using something Minion cannot do,
+       such as negating a constraint that has no negation.
+   * - ``130``
+     - The search was interrupted, by Ctrl-C or a ``SIGINT``. This is the
+       usual shell convention of 128 plus the signal number. Any solutions
+       already printed are still valid; the search simply did not finish.
+
+Other non-zero codes mean Minion stopped on an internal error, and are worth
+reporting as bugs.
+
 Solutions as JSON -- ``-jsonsolsout <file>``
 --------------------------------------------
 
