@@ -289,6 +289,8 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
     getTableOut().set("MinionVersion", MinionVersion);
     getTableOut().set("GitVersion", tostring(GIT_VER));
     getTableOut().set("TimeOut", 0); // will be set to 1 if a timeout occurs.
+    getTableOut().set("NodeLimitReached", 0);
+    getTableOut().set("Interrupted", 0);
     getState().getOldTimer().maybePrintTimestepStore(getOutput(), "Parsing Time: ", "ParsingTime",
                                                      getTableOut(), !getOptions().silent);
 
@@ -319,10 +321,14 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
     returnCode = MinionResult::MINION_UNKNOWN_ERROR;
   }
 
-  // Detect timeout: doStandardSearch sets TableOut "TimeOut" to 1
+  // Detect timeout: search sets TableOut "TimeOut" when it is cut short for
+  // any reason, so check why.  A node limit is a documented, ordinary way to
+  // stop -- RunOptions::node_limit promises a truncated run still returns
+  // normally -- and must not be reported as an error.
   if(returnCode == MinionResult::MINION_OK && ctx->tableOut_m) {
     try {
-      if(getTableOut().get("TimeOut") == "1") {
+      if(getTableOut().get("TimeOut") == "1" &&
+         getTableOut().get("NodeLimitReached") != "1") {
         set_error("solver timed out");
         returnCode = MinionResult::MINION_TIMEOUT;
       }
