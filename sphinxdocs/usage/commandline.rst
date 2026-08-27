@@ -274,6 +274,12 @@ Print the minion input instance file to standard out. No search is
 carried out when this switch is used. This can be used to update files
 in old versions of the Minion file format.
 
+Everything Minion prints ahead of the instance is a ``#`` comment, so the
+output can be fed straight back in::
+
+   minion -redump old.minion > new.minion
+   minion new.minion
+
 -instancestats
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

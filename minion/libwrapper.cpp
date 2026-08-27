@@ -260,7 +260,7 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
     if(!getOptions().silent) {
       getOutput() << "#  Run at: UTC " << asctime(gmtime(&rawtime)) << endl;
       getOutput() << "# Input filename: " << getOptions().instance_name << endl;
-      getOptions().printLine("Using seed: " + tostring(args.randomSeed));
+      getOptions().printLine("# Using seed: " + tostring(args.randomSeed));
     }
 
     if(installAlarms) {
