@@ -227,8 +227,20 @@ int minion_main(int argc, char** argv) {
       doStandardSearch(instance, args);
     }
 
+    // 128 + SIGINT, the code a shell reports for a child killed by an
+    // interrupt, so a script can tell a cut-short run from a finished one.
+    // A node limit is a stopping point the caller asked for rather than a
+    // failure, and still returns 0.
+    if(Parallel::isCtrlCPressed())
+      return 130;
+
     return 0;
 
+  } catch(const minion_user_error& e) {
+    // Something Minion was asked for and will not do.  outputFatalError
+    // throws so a library caller can recover; here it just means stop.
+    cerr << e.what() << endl;
+    return 1;
   } catch(...) {
     cerr << "Minion exited abnormally via an exception." << endl;
     exit(9);
