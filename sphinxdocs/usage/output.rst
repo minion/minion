@@ -149,7 +149,9 @@ The keys are:
    * - ``Nodes``
      - Search nodes explored.
    * - ``SolutionsFound``
-     - Number of solutions found.
+     - Number of solutions found. When optimising this counts every
+       improving solution, not the number of optimal ones: a problem with a
+       single optimum can report many.
    * - ``Satisfiable``
      - ``1`` if at least one solution was found, ``0`` otherwise.
    * - ``TimeOut``

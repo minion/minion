@@ -384,8 +384,10 @@ Inside the ``**SEARCH**`` section one can specify
 If no varval ordering is given then the variables are assigned in
 instantiation order and the values tried in ascending order.
 
-If a variable order is given as a command line argument it will override
-anything specified in the input file.
+A variable ordering given on the command line replaces the *heuristic* of
+each ``VARORDER`` block, but not the blocks themselves: the variables
+each block searches, and their order and ``AUX`` status, come from the
+input file either way.
 
 Multiple variable orders can be given, each with an optional value
 ordering:

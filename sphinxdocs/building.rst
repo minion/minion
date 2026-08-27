@@ -50,9 +50,31 @@ Once the ``minion`` executable is created, you can copy it anywhere
 you like.
 
 
-Run it with no arguments and it prints a usage message; ``minion --help``
-lists every switch, and ``minion --version`` reports the version and the
-git revision it was built from.
+Running Minion
+--------------
+
+Minion takes one instance file, and prints the solutions it finds::
+
+   minion benchmarks/small/donaldgeraldrobert.minion
+
+That is the DONALD + GERALD = ROBERT puzzle from the introduction, and it
+prints the digit each letter stands for. Minion stops at the first solution
+unless you ask for more::
+
+   minion -findallsols myproblem.minion
+
+The ``benchmarks`` directory in the source tree holds larger examples, and
+``test_instances`` holds several hundred small ones.
+
+Run Minion with no arguments and it prints a usage message. ``minion --help``
+lists every switch it accepts, ``minion --help constraints`` lists the
+constraints this copy was built with, and naming one, as in ``minion --help
+alldiff``, links to its documentation. ``minion --version`` reports the
+version and the git revision it was built from.
+
+If you have not written a ``.minion`` file before, the Input Format chapter
+describes the format section by section, and Extended Examples works through
+seven complete models.
 
 Rust interface (minion-sys)
 ---------------------------

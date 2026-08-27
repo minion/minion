@@ -44,7 +44,15 @@ Control search
 -parallel
 ~~~~~~~~~~~~~~~~~~~~~
 
-Make Minion run in parallel. When using this option, you should use `-solsout` to put the solutions in a file, as solutions may get mixed up on the terminal.
+Make Minion run in parallel by forking. When using this option, you should use
+``-solsout`` to put the solutions in a file, as solutions may get mixed up on
+the terminal.
+
+This is a beta feature, and Minion says so when you use it. It forks, so it is
+not available on Windows: a Windows build fails with "This Minion was built
+without parallelisation". ``-cores`` and ``-steallow`` control it and share
+that limitation. The thread-based modes under "Experimental flags" do run on
+Windows.
 
 -cores <N>
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -347,8 +355,27 @@ Do not write a resume file on timeout or being killed. (default)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Read a list of commands from ``infile`` and write the results to ``outfile``.
-This allows batch processing of multiple Minion commands without restarting
-the solver.
+This solves the same instance repeatedly under different assumptions without
+restarting the solver, which avoids re-parsing and re-building it each time.
+
+Each command is::
+
+   <type> <number of literals> (<variable> <value>)*
+
+The literals are assigned before the command runs, and undone afterwards, so
+each command sees the original instance. ``<type>`` is one of:
+
+-  ``C`` - just propagate, and report whether the assumptions are consistent
+-  ``P`` - propagate and report the values that were removed
+-  ``S`` - search for one solution and print it
+-  ``F`` - search for one solution and print how many were found
+-  ``A`` - search for all solutions and print how many were found
+-  ``I`` - print the initial bounds; takes no literals
+-  ``Q`` - quit
+
+For example, ``P 2 x 1 y 3`` assigns ``x = 1`` and ``y = 3``, propagates, and
+reports what was pruned. Each reply is written to ``outfile`` beginning with
+the command type.
 
 -split
 ~~~~~~~~~~~~~~~~~~
