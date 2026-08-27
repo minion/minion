@@ -4,8 +4,8 @@
 /** @help constraints;shortctuplestr2 Description
 
 This constraint extends the ShortSTR2 algorithm to support short c-tuples
-(that is, short tuples which contain can contain more than one domain value
-per constraint).
+(that is, short tuples which can contain more than one
+domain value per variable).
 
 */
 
