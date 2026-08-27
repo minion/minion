@@ -24,8 +24,8 @@ Hand-curated `.minion` instances with embedded expected results. Each file may c
 The runners are:
 - `run_tests.sh <minion-binary>` — full regression, run by both light and heavy.
 - `run_random_tests.sh` — solution-count-only subset, safe under randomised orderings or parallel exploration. Used when checking parallel modes.
-- `run_big_tests.sh` — same as `run_tests.sh` but pulls in `tests-64domains/` for 64-bit-domain coverage.
-- `do_basic_tests.sh`, `do_random_tests.sh`, `big_do_basic_tests.sh`, `big_do_random_tests.sh` — building blocks invoked by the above; not normally run directly.
+- `do_basic_tests.sh`, `do_random_tests.sh` — building blocks invoked by the above; not normally run directly.
+  `TEST_64DOMAINS=1 ./do_basic_tests.sh <binary>` adds `tests-64domains/`, which needs a `--domains64` build; CI runs this in the `domains64` job.
 - `do_valgrind_tests.sh`, `fullprop_test.sh` — specialised, not in the default flows.
 
 ### 2. Random constraint tester — `tester/`

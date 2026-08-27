@@ -99,6 +99,39 @@ jobs:
               cd bin-full
               make test
 
+  # --domains64 makes SysInt 64-bit, which nothing else in CI compiles, and
+  # tests-64domains/ needs values past a 32-bit domain so it is the only place
+  # those instances mean anything. The Rust tester is deliberately not run
+  # here: it does not generate domains that large, so it would test the same
+  # ground as the other jobs at twice the width.
+  domains64:
+    name: 64-bit domains
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.9
+
+      - name: "Config"
+        run: |
+                mkdir bin-d64
+                cd bin-d64
+                python3 ../configure.py --domains64 --quick
+
+      - name: "Build"
+        run: |
+                cd bin-d64
+                make -j2
+
+      - name: "Basic tests, including tests-64domains"
+        run: |
+              cd test_instances
+              TEST_64DOMAINS=1 bash ./do_basic_tests.sh ../bin-d64/minion
+
   test:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
