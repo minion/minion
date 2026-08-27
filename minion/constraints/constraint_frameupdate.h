@@ -1,14 +1,14 @@
 // Minion https://github.com/minion/minion
 // SPDX-License-Identifier: MPL-2.0
 
-/** @help constraints;alldiffmatrix Description
-For a latin square this constraint is placed on the whole matrix once for each
-value.
-It ensures there is a bipartite matching between rows and columns where the
-edges
-in the matching correspond to a pair (row, column) where the variable in
-position
-(row,column) in the matrix may be assigned to the given value.
+/** @help constraints;frameupdate Description
+frameupdate(source, target, idx_source, idx_target, blocksize) relates two
+equal-length vectors, each divided into consecutive blocks of blocksize
+variables. Deleting the source blocks listed in idx_source and the target
+blocks listed in idx_target must leave two sequences of blocks that agree
+pairwise, for as far as the shorter of the two runs.
+
+Block indices count from 1, and must be distinct within each index vector.
 */
 
 

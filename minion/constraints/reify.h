@@ -18,9 +18,9 @@ then r must be 0.
    reifyimply(constraint, r)
 
 only checks that if r is set to 1 then constraint must be satisfied. If r is not
-1, constraint may be either satisfied or unsatisfied. Furthermore r is never set
-by propagation, only by search; that is, satisfaction of constraint does not
-affect the value of r.
+1, constraint may be either satisfied or unsatisfied. Minion does check whether
+constraint can still be satisfied, and sets r to 0 if it cannot; use
+reifyimply-quick for the variant that never sets r by propagation.
 */
 
 
