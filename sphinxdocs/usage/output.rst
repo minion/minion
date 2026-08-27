@@ -25,7 +25,7 @@ timings, then any solutions, then a summary::
    #  Run at: UTC Tue Aug 25 21:39:47 2026
    # Input filename: myproblem.minion
    # Command line: minion -findallsols myproblem.minion
-   Using seed: 3634443012
+   # Using seed: 3634443012
    Parsing Time: 0.000151
    Setup Time: 0.000035
    Initial Propagate: 0.000002

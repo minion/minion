@@ -193,7 +193,7 @@ int minion_main(int argc, char** argv) {
         getOutput() << argv[i] << " ";
       }
       getOutput() << endl;
-      getOptions().printLine("Using seed: " + tostring(args.randomSeed));
+      getOptions().printLine("# Using seed: " + tostring(args.randomSeed));
     }
 
     Parallel::setupAlarm(getOptions().timeoutActive, getOptions().time_limit,
