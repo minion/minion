@@ -465,6 +465,7 @@ with open(outname, "w") as out:
         'test_multithread',
         'test_midsearch_basic',
         'test_reify_midsearch',
+        'test_bad_model',
     ]
 
     if arg.buildsystem == "make":

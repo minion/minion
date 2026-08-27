@@ -310,6 +310,12 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
     getOutput() << "Invalid instance: " << e.what() << endl;
     set_error(e.what());
     returnCode = MinionResult::MINION_INVALID_INSTANCE;
+  } catch(const minion_user_error& e) {
+    // A model Minion will not run.  Before this was reported by exiting the
+    // process, which is no way for a library to behave.
+    getOutput() << "Invalid instance: " << e.what() << endl;
+    set_error(e.what());
+    returnCode = MinionResult::MINION_INVALID_INSTANCE;
   } catch(const std::bad_alloc&) {
     set_error("out of memory");
     returnCode = MinionResult::MINION_MEMORY_ERROR;

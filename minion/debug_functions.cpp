@@ -5,9 +5,13 @@
 
 using namespace std;
 
+// A problem with what Minion was asked to do -- a switch it does not accept,
+// a model it cannot handle -- so report it and stop.  Not abort(): that gives
+// the shell a signal death and, on some systems, a core dump, for what is
+// usually a typo.  Genuine internal errors go through
+// FATAL_REPORTABLE_ERROR, which still aborts.
 void outputFatalError(string s) {
-  std::cerr << s << "\n";
-  abort();
+  throw minion_user_error(s);
 }
 
 void FATAL_REPORTABLE_ERROR() {
@@ -18,7 +22,11 @@ void FATAL_REPORTABLE_ERROR() {
          "instance which"
       << endl;
   oss << "caused the problem to us. Thank you." << endl;
-  outputFatalError(oss.str());
+  // abort() rather than exit: this one is a bug in Minion, and a core dump
+  // is worth having.
+  std::cerr << oss.str() << "\n";
+  std::cerr.flush();
+  abort();
 }
 
 void D_FATAL_ERROR2(string s, string file, string line) {
