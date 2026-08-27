@@ -65,10 +65,12 @@ const FlagHelp flagTable[] = {
      "print statistics about the instance", false},
     {"Inspecting an instance (these exit without searching)", "-redump", "",
      "print the instance back out in Minion format", false},
-    {"Inspecting an instance (these exit without searching)", "-outputCompressed", "<name>",
-     "print the instance with variables renamed", false},
+    {"Inspecting an instance (these exit without searching)", "-outputCompressed", "<file>",
+     "write the instance back out with domains shrunk\n"
+     "and assigned variables removed", false},
     {"Inspecting an instance (these exit without searching)", "-outputCompressedDomains", "",
-     "as -outputCompressed, also shrinking domains", false},
+     "print the shrunk domains as Essence' find\n"
+     "declarations, not as an instance", false},
 
     {"Stopping and resuming", "-makeresume", "", "on hitting a limit, write a resume instance",
      false},
