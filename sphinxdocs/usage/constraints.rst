@@ -710,8 +710,8 @@ shortctuplestr2
 ^^^^^^^^^^^^^^^
 
 This constraint extends the ShortSTR2 algorithm to support short
-c-tuples (that is, short tuples which contain can contain more than one
-domain value per constraint).
+c-tuples (that is, short tuples which can contain more than one
+domain value per variable).
 
 .. _example-7:
 
@@ -1080,7 +1080,10 @@ listed in ``idx_source``, and delete the blocks of ``target`` listed in
 block and in order.
 
 Block indices count from 1. The values in ``idx_source`` must be distinct, and
-so must the values in ``idx_target``. ``source`` and ``target`` must be the
+so must the values in ``idx_target``. Note that an index is currently checked
+against the *length of the vector* rather than the number of blocks, so with
+``source[4]`` and ``blocksize`` 2 an index of 3 or 4 is accepted even though
+only two blocks exist, and naming one has no effect. ``source`` and ``target`` must be the
 same length, and that length must be divisible by ``blocksize``; both are
 checked when the constraint is built.
 

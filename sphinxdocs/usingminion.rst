@@ -111,10 +111,12 @@ bo=0 and b=d.
    eq(bo, 0)
    eq(b,d)
 
-Note that except in special cases (the ``reify`` and ``reifyimply``
-constraints), Minion constraints cannot be nested. For example
-``eq(eq(bo,0), d)`` is not valid. Such constraints must be written by
-manually adding extra variables.
+Note that most Minion constraints cannot be nested: ``eq(eq(bo,0), d)``
+is not valid, and such constraints must be written by manually adding
+extra variables. The exceptions are the constraints that take another
+constraint as an argument -- ``reify``, ``reifyimply``,
+``reifyimply-quick``, ``watched-and``, ``watched-or``, ``check[assign]``,
+``check[gsa]`` and ``forwardchecking``.
 
 To get a single variable from a matrix, you index it with square
 brackets using commas to separate the dimensions of the matrix. The
@@ -179,21 +181,21 @@ that will only consider the variable given in the ``VARORDER``.
 
    VARORDER [bo,b,d,q[_]]
 
-You give the value order for each variable as either ``a`` for ascending
-or ``d`` for descending. The value orderings are given in the same order
-as the variable ordering. For example, to make the variable b by
-searched in descending order you make the second term into a ``d`` as
-the above variable ordering shows it to be the second variable to be
-searched. The default variable order is ascending order for all
-variables.
+You give the value order for each variable as ``a`` for ascending, ``d``
+for descending or ``r`` for random. The value orderings are given in the
+same order as the variable ordering. For example, to search the variable
+b in descending order you make the second term a ``d``, as the variable
+ordering above shows b to be the second variable searched. If no value
+ordering is given, every variable is searched in ascending order.
 
 ::
 
    VALORDER [a,a,d,a]
 
-You can have one objective function which can be either to maximise or
-minimise any single variable. To minimise a constraint, you should
-assign it equal to a new variable.
+You can have one objective function, which maximises or minimises either
+a single variable or a list of them, a list being compared
+lexicographically. To optimise something that is not already a variable,
+constrain it equal to a new variable and optimise that.
 
 ::
 
@@ -494,8 +496,8 @@ The first of these such constraints is
 :math:`|circles[1] - circles[2]| > 1` this type of constraint is
 represented by a series of 4 constraints in Minion. The constraints are
 reversed in the Minion specification so that the last 4 constraints
-represent this first expression. The constraints are indexed from 1 in
-Essence’ and 1 in Minion, so the above constraint becomes
+represent this first expression. Matrices are indexed from 1 in
+Essence’ and from 0 in Minion, so the above constraint becomes
 :math:`|circles[0] - circles[1]| > 1`. Then
 :math:`|circles[0] - circles[1]| > 1` is decomposed to
 :math:`circles[1] - circles[2] = aux0` and :math:`|aux0| = aux1` and
@@ -636,7 +638,7 @@ The Minion model is then:
 There are two 1d arrays of variables one representing all the node
 variables and one representing all the edge variables. The 8 node
 variables have domain 0 to 16 and the edge variables have domain 1 to
-1.  There are also 16 auxiliary variables introduced called aux0 to
+16.  There are also 16 auxiliary variables introduced called aux0 to
 aux15 there is one of these for each constraint and there is one
 constraint to represent each edge.
 
