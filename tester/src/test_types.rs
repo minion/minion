@@ -902,6 +902,14 @@ pub fn test_constraint_midsearch_add_vars(
         return Ok(());
     }
 
+    if baseline.hit_solution_cap {
+        // The baseline stopped at the cap, so it is a prefix of the leaves
+        // rather than all of them, while run_inject_vars_after enumerates to
+        // the end. The row counts below would compare a partial run against a
+        // complete one.
+        return Ok(());
+    }
+
     let new_vars: Vec<(String, minion_sys::ast::VarDomain)> = (0..new_var_count)
         .map(|_| {
             (
