@@ -683,7 +683,12 @@ pub fn run_minion_work_steal_with_options(
         (*search_opts).sollimit = -1;
 
         if let Some(seed) = options.seed {
-            (*search_method).randomSeed = seed;
+            // Identity at the default width; a widening conversion under the
+            // domains64 feature, where UnsignedSysInt is 64 bits.
+            #[allow(clippy::useless_conversion)]
+            {
+                (*search_method).randomSeed = seed.into();
+            }
         }
         (*search_method).preprocess = options.preprocess.to_ffi();
         (*search_method).propMethod = options.prop_node.to_ffi();
@@ -789,7 +794,12 @@ pub fn run_minion_parallel_with_options(
         (*search_opts).sollimit = -1;
 
         if let Some(seed) = options.seed {
-            (*search_method).randomSeed = seed;
+            // Identity at the default width; a widening conversion under the
+            // domains64 feature, where UnsignedSysInt is 64 bits.
+            #[allow(clippy::useless_conversion)]
+            {
+                (*search_method).randomSeed = seed.into();
+            }
         }
         (*search_method).preprocess = options.preprocess.to_ffi();
         (*search_method).propMethod = options.prop_node.to_ffi();
@@ -861,7 +871,12 @@ pub fn run_minion_midsearch_with_options(
         (*search_opts).print_solution = false;
 
         if let Some(seed) = options.seed {
-            (*search_method).randomSeed = seed;
+            // Identity at the default width; a widening conversion under the
+            // domains64 feature, where UnsignedSysInt is 64 bits.
+            #[allow(clippy::useless_conversion)]
+            {
+                (*search_method).randomSeed = seed.into();
+            }
         }
         (*search_method).preprocess = options.preprocess.to_ffi();
         (*search_method).propMethod = options.prop_node.to_ffi();

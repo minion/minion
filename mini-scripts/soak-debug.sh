@@ -9,14 +9,16 @@
 #
 #   exec    bin-debug: D_ASSERT, checked DomainInt, _GLIBCXX_DEBUG.
 #           Stock bin-quick has none of these.
-#   inproc  the in-process default, which minion-sys already builds
-#           with -DDOM_ASSERT (minion-sys/build.sh) -- assertions, but
-#           unoptimised rather than fully debug.
+#   inproc  in-process with minion-sys's dom-assert feature -- D_ASSERT
+#           on top of an optimised build. minion-sys's default is
+#           optimised with assertions off, so the feature is what makes
+#           this layer worth running.
 #   dbgsys  in-process with DEBUG_MINION=1, adding the checked-integer
 #           and libstdc++ debug layers to the FFI path.
 #
-# dbgsys uses its own cargo target dir: toggling DEBUG_MINION on a
-# shared one rebuilds libminion every time it changes.
+# inproc and dbgsys each use their own cargo target dir: changing a
+# minion-sys feature or DEBUG_MINION on a shared one rebuilds libminion
+# every time it changes.
 #
 # Counts are lower than the other soaks because all of this is slower.
 # Breadth over depth -- many shapes through the assertions beats one
@@ -34,6 +36,17 @@ soak_build_minion bin-debug --quick --debug
 soak_build_tester
 export SOAK_MINION="$SOAK_REPO/bin-quick/minion"
 export SOAK_MINION_DEBUG="$SOAK_REPO/bin-debug/minion"
+
+# Assertions on an otherwise optimised libminion. This is the layer that
+# catches a stale propagator structure at the mistake rather than as a wrong
+# count somewhere later, without paying for a full debug build.
+export SOAK_ASSERT_TARGET="$SOAK_TESTER_DIR/target-domassert"
+export SOAK_TESTER_ASSERT="$SOAK_ASSERT_TARGET/release/tester"
+echo "  building tester with minion-sys/dom-assert"
+( cd "$SOAK_TESTER_DIR" && CARGO_TARGET_DIR="$SOAK_ASSERT_TARGET" \
+    cargo build --release --features minion-sys/dom-assert ) \
+  >"$SOAK_LOGDIR/build-tester-domassert.log" 2>&1 \
+  || { echo "dom-assert tester build failed, see $SOAK_LOGDIR/build-tester-domassert.log" >&2; exit 1; }
 
 # Separate target dir so toggling DEBUG_MINION doesn't invalidate the
 # normal tester build on every round.
@@ -63,7 +76,7 @@ soak_cmd_for() {
         --size-factor $R_SIZE --ws-max-size 1 --nest-depth 2 \
         --var-reuse 0.6 --negate-bool 0.6 --numthreads $SOAK_NUMTHREADS" ;;
     inproc)
-      echo "'$SOAK_TESTER' --in-process --constraints '$c' \
+      echo "'$SOAK_TESTER_ASSERT' --in-process --constraints '$c' \
         --midsearch-constraints --midsearch-wrap-nested \
         --midsearch-constraints-num-packets 2 \
         --count $R_COUNT --variant-count 0 --ws-max-size 1 \

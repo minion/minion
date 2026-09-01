@@ -1,9 +1,42 @@
 [package]
 name = "minion-sys"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2024"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+rust-version = "1.85"
+links = "minion"
+description = "Rust bindings to the Minion constraint solver, with Minion's source embedded"
+# Written in conjure-oxide, where it began in October 2023 as `minion_rs`.
+# Original authors first, then further contributors alphabetically, then the
+# current maintainer.
+authors = [
+    "Niklas Dewally <niklas@dewally.com>",
+    "Vlad Tronciu <vt29@st-andrews.ac.uk>",
+    "Özgür Akgün <ozgurakgun@gmail.com>",
+    "Felix Leitner <felix@felixleitner.com>",
+    "Georgii Skorokhod <skorokhod.g@gmail.com>",
+    "The conjure-oxide contributors",
+    "Chris Jefferson <caj21@st-andrews.ac.uk>",
+]
+license = "MPL-2.0"
+repository = "https://github.com/minion/minion"
+homepage = "https://minion.readthedocs.io"
+readme = "README.md"
+keywords = ["constraint", "solver", "csp", "minion"]
+categories = ["api-bindings", "mathematics"]
+# `include` also decides what a gitignored path can contribute: cargo skips
+# .gitignore rules entirely when include is set, which is how vendor/ -- never
+# committed -- reaches the published crate.
+include = [
+    "/src",
+    "/tests",
+    "/build.rs",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENCE",
+    "/vendor/minion/**",
+    "/vendor/GIT_VERSION",
+    "/vendor/LICENSE.txt",
+]
 
 [dependencies]
 anyhow = "1.0.102"
@@ -12,6 +45,28 @@ thiserror = "2.0.18"
 
 [build-dependencies]
 bindgen = "0.72.1"
+cc = { version = "1.2", features = ["parallel"] }
+serde_json = "1"
+
+[features]
+default = []
+# Drop -DQUICK_COMPILE, restoring Minion's per-variable-type specialisations.
+# Solves faster; the static library grows from ~7MB to ~98MB.
+full-specialisation = []
+# 64-bit domains (-DDOMAINS64). Widens DomainInt, which crosses the FFI.
+domains64 = []
+# Turn D_ASSERT into a real check (-DDOM_ASSERT).
+dom-assert = []
+# A full debug build: assertions, checked libstdc++ containers, search info.
+debug-minion = []
+# -DMORE_SEARCH_INFO on its own.
+search-info = []
+# -DMINION_DEBUG_PRINT.
+debug-print = []
+# Build Minion under AddressSanitizer.
+sanitize = []
+# Drop -DWDEG, disabling the wdeg heuristics.
+no-wdeg = []
 
 [lints.clippy]
 unwrap_used = "deny"

@@ -1,7 +1,8 @@
 debug/
 target/
-# vendor/ holds a packaged copy of Minion for release tarballs.
-# During development minion-sys reads Minion from ../, so vendor/
-# is never populated in the minion-private working tree.
+# vendor/ holds the copy of Minion that gets published with the crate,
+# written by mini-scripts/vendor-minion.sh at release time. During
+# development minion-sys reads Minion from ../, so vendor/ is normally
+# absent -- when it is present, build.rs prefers it.
 vendor/
 *.log

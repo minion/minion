@@ -1,0 +1,63 @@
+name: Publish minion-sys
+
+# minion-sys embeds Minion's C++ source, so the crate's content changes
+# whenever the solver does -- not only when minion-sys/ changes. Releases are
+# therefore driven by an explicit tag rather than by watching the crate
+# directory, and the version in minion-sys/Cargo.toml must match the tag.
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Package and verify without publishing"
+        type: boolean
+        default: true
+  push:
+    tags:
+      - "minion-sys-v*"
+
+jobs:
+  publish:
+    name: Package and publish to crates.io
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        # The vendoring script stamps the library with HEAD's revision, so it
+        # needs real history rather than a shallow clone.
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install libclang for bindgen
+        run: sudo apt-get update && sudo apt-get install -y libclang-dev
+
+      - name: Copy Minion's source into minion-sys/vendor
+        run: ./mini-scripts/vendor-minion.sh
+
+      - name: Check the tag matches the crate version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          version=$(grep -m1 '^version' minion-sys/Cargo.toml | cut -d'"' -f2)
+          expected="minion-sys-v$version"
+          if [ "${{ github.ref_name }}" != "$expected" ]; then
+            echo "tag ${{ github.ref_name }} does not match Cargo.toml version $version" >&2
+            echo "expected tag $expected" >&2
+            exit 1
+          fi
+
+      # `cargo package` extracts the crate and builds it, which is the only
+      # real check that `include` covers everything the build needs. The
+      # extracted copy has no Minion checkout above it, so a build that
+      # succeeds here is one that succeeded from vendor/ alone.
+      #
+      # --allow-dirty is required, and safe: `include` overrides gitignore, so
+      # cargo counts the deliberately-gitignored vendor/ as uncommitted. The
+      # tracked tree is not dirty -- vendor-minion.sh refuses to run if it is.
+      - name: Package and verify
+        run: cd minion-sys && cargo package --allow-dirty
+
+      - name: Publish
+        if: startsWith(github.ref, 'refs/tags/') && !inputs.dry_run
+        run: cd minion-sys && cargo publish --no-verify --allow-dirty
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

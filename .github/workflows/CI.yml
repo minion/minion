@@ -232,6 +232,24 @@ jobs:
               cd minion-sys
               cargo test --release
 
+      # minion-sys builds Minion itself rather than shelling out to
+      # configure.py, so the crate needs only a C++ compiler. That means two
+      # implementations of one generator, and a drift between them is not a
+      # build failure -- it is a library that disagrees with the minion binary
+      # about which constraints exist. This runs both and diffs them.
+      - name: "minion-sys generator parity"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              ./mini-scripts/check-generator-parity.sh
+
+      # Assertions are off in minion-sys's default build, so cover the feature
+      # that turns them back on -- mini-scripts/soak-debug.sh relies on it.
+      - name: "minion-sys cargo test, assertions on"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd minion-sys
+              cargo test --release --features dom-assert
+
       - name: "Library tests"
         run: |
                 cd bin-quick

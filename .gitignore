@@ -9,4 +9,5 @@ bin-*/
 # release soak suite output
 mini-scripts/soak-logs/
 tester/target-debugminion/
+tester/target-domassert/
 sphinxdocs/.venv/
