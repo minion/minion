@@ -341,6 +341,7 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
 
   if(installAlarms) {
     Parallel::endParallelMinion();
+    Parallel::setupAlarm(false, 0, false);
   }
 
   // Don't reset context here - caller may still query results via

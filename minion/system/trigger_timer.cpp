@@ -29,6 +29,8 @@ void CALLBACK ReallyStop(void*, BOOLEAN) {
   exit(1);
 }
 
+static HANDLE mTimerHandle = NULL;
+
 void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout, bool CPUTime) {
   if(CPUTime)
     cerr << "CPU-time timing not available on windows, falling back on clock" << endl;
@@ -36,13 +38,18 @@ void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout, bool
   trig = b;
   *trig = false;
 
-  HANDLE mTimerHandle;
+  if(mTimerHandle != NULL) {
+    ::DeleteTimerQueueTimer(NULL, mTimerHandle, INVALID_HANDLE_VALUE);
+    mTimerHandle = NULL;
+  }
 
   if(timeoutActive) {
-    if(timeout <= 0)
+    if(timeout <= 0) {
       *trig = true;
-    BOOL success = ::CreateTimerQueueTimer(&mTimerHandle, NULL, TimerProc, NULL, timeout * 1000, 0,
-                                           WT_EXECUTEINTIMERTHREAD);
+    } else {
+      ::CreateTimerQueueTimer(&mTimerHandle, NULL, TimerProc, NULL, timeout * 1000, 0,
+                              WT_EXECUTEINTIMERTHREAD);
+    }
   }
 }
 
@@ -71,6 +78,7 @@ void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int timeout,
 
   signal(SIGXCPU, triggerFunction);
   signal(SIGALRM, triggerFunction);
+  alarm(0);
   if(timeoutActive) {
     if(timeout <= 0)
       *trig = true;
