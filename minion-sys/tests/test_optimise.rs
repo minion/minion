@@ -8,16 +8,20 @@
 use std::collections::HashMap;
 
 use minion_sys::ast::{Constant, Constraint, Model, Optimise, Var, VarDomain, VarName};
-use minion_sys::{run_minion_with_options, RunOptions};
+use minion_sys::{RunOptions, run_minion_with_options};
 
 /// Three integer vars in 1..=3 with a sum cap. Leaves enough slack
 /// that minimising or maximising the sum is non-trivial.
 fn build_model() -> Model {
     let mut m = Model::new();
-    m.named_variables.add_var("x".into(), VarDomain::Discrete(1, 3));
-    m.named_variables.add_var("y".into(), VarDomain::Discrete(1, 3));
-    m.named_variables.add_var("z".into(), VarDomain::Discrete(1, 3));
-    m.named_variables.add_var("s".into(), VarDomain::Bound(3, 9));
+    m.named_variables
+        .add_var("x".into(), VarDomain::Discrete(1, 3));
+    m.named_variables
+        .add_var("y".into(), VarDomain::Discrete(1, 3));
+    m.named_variables
+        .add_var("z".into(), VarDomain::Discrete(1, 3));
+    m.named_variables
+        .add_var("s".into(), VarDomain::Bound(3, 9));
 
     let xyz = vec![
         Var::NameRef("x".into()),
@@ -49,8 +53,8 @@ fn baseline_solutions() -> Vec<i32> {
             true
         })
     };
-    let _ = run_minion_with_options(model, RunOptions::default(), callback)
-        .expect("baseline solve");
+    let _ =
+        run_minion_with_options(model, RunOptions::default(), callback).expect("baseline solve");
     s_values
 }
 

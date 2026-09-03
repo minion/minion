@@ -116,7 +116,10 @@ fn main() {
     // exist, and cargo treats a declared path that is missing as dirty, which
     // would rebuild the world on every single `cargo build`.
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rerun-if-changed={}", minion_src.join("minion").display());
+    println!(
+        "cargo:rerun-if-changed={}",
+        minion_src.join("minion").display()
+    );
     for var in [
         "MINION_SRC",
         "DEBUG_MINION",
@@ -170,7 +173,10 @@ fn find_minion_src() -> PathBuf {
         return vendor;
     }
 
-    let parent = crate_dir.parent().expect("crate dir has a parent").to_path_buf();
+    let parent = crate_dir
+        .parent()
+        .expect("crate dir has a parent")
+        .to_path_buf();
     if is_minion_src(&parent) {
         return parent;
     }
@@ -199,7 +205,11 @@ fn collect_constraints(minion_src: &Path) -> Vec<Constraint> {
     let minion_dir = minion_src.join("minion");
     let mut headers = Vec::new();
     collect_headers(&minion_dir, &mut headers);
-    assert!(!headers.is_empty(), "no headers found under {}", minion_dir.display());
+    assert!(
+        !headers.is_empty(),
+        "no headers found under {}",
+        minion_dir.display()
+    );
 
     let mut constraints = Vec::new();
     for header in headers {
@@ -263,9 +273,8 @@ fn json_blocks(text: &str, path: &Path) -> Vec<String> {
 }
 
 fn parse_constraint(block: &str, relative: &str, path: &Path) -> Constraint {
-    let value: serde_json::Value = serde_json::from_str(block).unwrap_or_else(|e| {
-        panic!("invalid JSON in {}: {e}\n{block}", path.display())
-    });
+    let value: serde_json::Value = serde_json::from_str(block)
+        .unwrap_or_else(|e| panic!("invalid JSON in {}: {e}\n{block}", path.display()));
     let object = value
         .as_object()
         .unwrap_or_else(|| panic!("JSON block in {} is not an object", path.display()));
@@ -282,9 +291,7 @@ fn parse_constraint(block: &str, relative: &str, path: &Path) -> Constraint {
         object
             .get(key)
             .and_then(|v| v.as_str())
-            .unwrap_or_else(|| {
-                panic!("JSON block in {} has no string {key:?}", path.display())
-            })
+            .unwrap_or_else(|| panic!("JSON block in {} has no string {key:?}", path.display()))
             .to_string()
     };
 
@@ -328,7 +335,10 @@ fn parse_constraint(block: &str, relative: &str, path: &Path) -> Constraint {
 /// constraints sharing an `internal_name` would collide in `ConstraintType`;
 /// two sharing a `name` would make one of them unreachable from the parser.
 fn validate(constraints: &[Constraint]) {
-    assert!(!constraints.is_empty(), "found no constraints in the Minion source");
+    assert!(
+        !constraints.is_empty(),
+        "found no constraints in the Minion source"
+    );
 
     let mut names = BTreeSet::new();
     let mut internal_names = BTreeSet::new();
@@ -367,11 +377,7 @@ fn validate(constraints: &[Constraint]) {
 ///
 /// Faithful to `configure.py` lines 304-366. The one intentional difference is
 /// the `#include` of the declaring header -- see `Constraint::include_path`.
-fn generate_sources(
-    constraints: &[Constraint],
-    minion_src: &Path,
-    gen_dir: &Path,
-) -> Vec<PathBuf> {
+fn generate_sources(constraints: &[Constraint], minion_src: &Path, gen_dir: &Path) -> Vec<PathBuf> {
     fs::create_dir_all(gen_dir)
         .unwrap_or_else(|e| panic!("cannot create {}: {e}", gen_dir.display()));
 
@@ -390,7 +396,11 @@ fn generate_sources(
                 c.var_count()
             ));
         }
-        sources.push(write(gen_dir, &format!("build_constraint_{}.cpp", index + 1), &body));
+        sources.push(write(
+            gen_dir,
+            &format!("build_constraint_{}.cpp", index + 1),
+            &body,
+        ));
     }
 
     // The dispatch from a parsed constraint back to its builder.
@@ -430,7 +440,9 @@ fn generate_sources(
 
     // The enum, included by libwrapper.h -- and so read by bindgen, which is
     // why generation has to happen before both cc and bindgen.
-    let mut enumeration = String::from("#ifndef CONSTRAINT_ENUM_QWE\n#define CONSTRAINT_ENUM_QWE\nenum ConstraintType {\n");
+    let mut enumeration = String::from(
+        "#ifndef CONSTRAINT_ENUM_QWE\n#define CONSTRAINT_ENUM_QWE\nenum ConstraintType {\n",
+    );
     for c in constraints {
         enumeration.push_str(&format!("{},\n", c.internal_name));
     }
@@ -448,8 +460,7 @@ fn generate_sources(
 
 fn write(dir: &Path, name: &str, contents: &str) -> PathBuf {
     let path = dir.join(name);
-    fs::write(&path, contents)
-        .unwrap_or_else(|e| panic!("cannot write {}: {e}", path.display()));
+    fs::write(&path, contents).unwrap_or_else(|e| panic!("cannot write {}: {e}", path.display()));
     path
 }
 
@@ -547,7 +558,11 @@ impl Config {
 
         defines.sort();
         defines.dedup();
-        Config { defines, sanitize, debug }
+        Config {
+            defines,
+            sanitize,
+            debug,
+        }
     }
 }
 
@@ -593,7 +608,11 @@ fn compile(minion_src: &Path, gen_dir: &Path, generated: &[PathBuf], config: &Co
 
     for source in LIB_SOURCES {
         let path = minion_src.join(source);
-        assert!(path.is_file(), "missing Minion source file: {}", path.display());
+        assert!(
+            path.is_file(),
+            "missing Minion source file: {}",
+            path.display()
+        );
         build.file(path);
     }
     for source in generated {
@@ -608,7 +627,10 @@ fn compile(minion_src: &Path, gen_dir: &Path, generated: &[PathBuf], config: &Co
         //     -C link-arg=-fsanitize=address -C link-arg=-L$RD \
         //     -C link-arg=-lclang_rt.asan_osx_dynamic -C link-arg=-Wl,-rpath,$RD
         // (rustc links with -nodefaultlibs, so clang won't add it.)
-        build.compiler("clang++").opt_level(0).flag("-fsanitize=address");
+        build
+            .compiler("clang++")
+            .opt_level(0)
+            .flag("-fsanitize=address");
     } else {
         let level = env::var("MINION_OPT_LEVEL").unwrap_or_else(|_| "3".to_string());
         build.opt_level_str(&level);
