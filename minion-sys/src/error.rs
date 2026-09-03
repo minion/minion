@@ -27,7 +27,7 @@ pub enum MinionError {
 ///
 /// Invalid usage of this library should throw an error before Minion is even run. Therefore, these
 /// should be quite rare. Consider creating an issue on
-/// [Github](https://github.com/conjure-cp/conjure-oxide) if these occur regularly!
+/// [GitHub](https://github.com/conjure-cp/conjure-oxide) if these occur regularly!
 #[derive(Debug, Error, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum RuntimeError {
