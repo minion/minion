@@ -9,13 +9,13 @@ use std::{
 use anyhow::anyhow;
 
 use crate::{
-    ast::{ShortTuple, Tuple},
-    ffi::{self},
-};
-use crate::{
     ast::{Constant, Constraint, Model, Var, VarDomain, VarName},
     error::{MinionError, check_minion_result},
     scoped_ptr::Scoped,
+};
+use crate::{
+    ast::{ShortTuple, Tuple},
+    ffi::{self},
 };
 
 /// The callback type used by [`run_minion`].
