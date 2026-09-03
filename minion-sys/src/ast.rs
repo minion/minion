@@ -711,7 +711,11 @@ impl SymbolTable {
 
     /// Creates a new auxiliary variable and adds it to the symbol table.
     ///
-    /// This variable will excluded from Minions search and printing order.
+    /// The variable is excluded from Minion's primary search order, but is
+    /// still branched on: the runner appends every auxiliary variable to a
+    /// trailing find-one-assignment search block, mirroring what Minion's
+    /// text parser does with variables omitted from `VARORDER`. Auxiliary
+    /// variables appear in the print order, and so in solutions.
     ///
     /// # Returns
     ///

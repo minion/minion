@@ -1023,6 +1023,11 @@ unsafe fn convert_model_to_raw(
     }
 
     // only add search variables to search order
+    let primary_search_var_names: std::collections::HashSet<VarName> = model
+        .named_variables
+        .get_search_variable_order()
+        .into_iter()
+        .collect();
     for search_var_name in model.named_variables.get_search_variable_order() {
         let c_str = CString::new(search_var_name.clone()).map_err(|_| {
             anyhow!(
@@ -1046,6 +1051,40 @@ unsafe fn convert_model_to_raw(
     ffi::searchOrder_setValOrder(search_order.ptr, options.val_order.to_ffi());
 
     ffi::instance_addSearchOrder(instance, search_order.ptr);
+
+    // Minion's text parser appends every variable omitted from VARORDER as a
+    // find-one-assignment auxiliary search block. Models built through this
+    // library bypass that finalisation step, so reproduce it here. Without
+    // this block Minion reports a solution while auxiliary variables are
+    // still unassigned -- in practice it reports no solutions at all -- and
+    // the callback observes their lower bounds even where those violate
+    // constraints.
+    let auxiliary_search_vars = Scoped::new(ffi::vec_var_new(), |x| ffi::vec_var_free(x as _));
+    let mut has_auxiliary_search_vars = false;
+    for auxiliary_name in model
+        .named_variables
+        .get_variable_order()
+        .into_iter()
+        .filter(|name| !primary_search_var_names.contains(name))
+    {
+        let c_str = CString::new(auxiliary_name.clone())
+            .map_err(|_| anyhow!("Variable name {auxiliary_name:?} contains a null character"))?;
+        let var_result = ffi::minion_getVarByName(instance, c_str.as_ptr() as _);
+        check_minion_result(var_result.result)?;
+        ffi::vec_var_push_back(auxiliary_search_vars.ptr, var_result.var);
+        has_auxiliary_search_vars = true;
+    }
+    if has_auxiliary_search_vars {
+        let auxiliary_search_order = Scoped::new(
+            ffi::searchOrder_new(
+                auxiliary_search_vars.ptr,
+                ffi::VarOrderEnum_ORDER_STATIC,
+                true,
+            ),
+            |x| ffi::searchOrder_free(x as _),
+        );
+        ffi::instance_addSearchOrder(instance, auxiliary_search_order.ptr);
+    }
 
     /*********************************/
     /*        Add tuple tables       */
