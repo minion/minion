@@ -407,6 +407,15 @@ pub struct RunOptions {
     /// Value-ordering heuristic. Defaults to [`ValOrder::Ascend`].
     pub val_order: ValOrder,
 
+    /// Shuffle the variable order and force a random value order, on top
+    /// of `var_order`/`val_order`. Mirrors `-randomiseorder`, and is what
+    /// exec mode's `-varorder random` / `-varorder sdf-random` (etc.) set.
+    ///
+    /// This is orthogonal to `var_order`: minion shuffles the search order
+    /// once, when the instance is built, and overwrites every value order
+    /// with `VALORDER_RANDOM`. Set `seed` too if you want it reproducible.
+    pub randomise_order: bool,
+
     /// One-shot propagation level applied before search begins.
     /// Default is `None + no limit` — no preprocessing beyond each
     /// constraint's own `fullPropagate`.
@@ -457,6 +466,7 @@ impl Default for RunOptions {
             seed: None,
             var_order: VarOrder::default(),
             val_order: ValOrder::default(),
+            randomise_order: false,
             preprocess: Propagation {
                 level: PropLevel::None,
                 limit: false,
@@ -678,6 +688,7 @@ pub fn run_minion_work_steal_with_options(
         let search_method = ffi::searchMethod_new();
         let search_instance = ffi::instance_new();
 
+        (*search_opts).randomiseValvarorder = options.randomise_order;
         (*search_opts).silent = true;
         (*search_opts).print_solution = false;
         (*search_opts).sollimit = -1;
@@ -786,6 +797,7 @@ pub fn run_minion_parallel_with_options(
         // Quiet by default: workers don't print to cout under runMinionParallel
         // (they observe getOptions().silent = true via the per-thread copy).
         // The user receives results via the callback.
+        (*search_opts).randomiseValvarorder = options.randomise_order;
         (*search_opts).silent = true;
         (*search_opts).print_solution = false;
         // Library convention: enumerate all solutions and let the caller's
@@ -867,6 +879,7 @@ pub fn run_minion_midsearch_with_options(
         // Use Minion as a quiet library by default. Low-level FFI callers that
         // want native solver output can opt out by configuring SearchOptions
         // themselves instead of going through this wrapper.
+        (*search_opts).randomiseValvarorder = options.randomise_order;
         (*search_opts).silent = true;
         (*search_opts).print_solution = false;
 
