@@ -3,7 +3,7 @@
 
 use std::io::Write;
 
-use crate::ast::{Constant, Constraint, Model, ShortTuple, Tuple, Var, VarName};
+use crate::ast::{Constant, Constraint, Model, Optimise, ShortTuple, Tuple, Var, VarName};
 
 /// Writes a complete Minion file for this model to `writer`.
 pub fn write_minion_file(writer: &mut impl Write, model: &Model) -> Result<(), std::io::Error> {
@@ -34,8 +34,6 @@ pub fn write_variables_section(
 
 /// Writes the `SEARCH` section of the Minion file to `writer`.
 pub fn write_search_section(writer: &mut impl Write, model: &Model) -> Result<(), std::io::Error> {
-    // TODO: print maximising and minimising once we get it
-
     let symtab = &model.named_variables;
 
     writeln!(writer, "**SEARCH**")?;
@@ -43,7 +41,17 @@ pub fn write_search_section(writer: &mut impl Write, model: &Model) -> Result<()
     // no aux vars
     let varorder = symtab.get_search_variable_order();
 
-    writeln!(writer, "VARORDER STATIC [{}]", varorder.join(","))
+    writeln!(writer, "VARORDER STATIC [{}]", varorder.join(","))?;
+
+    if let Some(Optimise { minimise, var }) = &model.optimise {
+        if *minimise {
+            writeln!(writer, "MINIMISING {var}")?;
+        } else {
+            writeln!(writer, "MAXIMISING {var}")?;
+        }
+    }
+
+    Ok(())
 }
 
 /// Writes the `CONSTRAINTS` section of the Minion file to `writer`.
