@@ -318,13 +318,15 @@ pub enum Constraint {
 impl Display for Constraint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Constraint::Difference(_, var) => write!(f, "difference({var}"),
-            Constraint::Div(_, var) => write!(f, "div({var}"),
-            Constraint::DivUndefZero(_, var) => write!(f, "div_undefzero({var})"),
-            Constraint::Modulo(_, var) => write!(f, "modulo({var})"),
-            Constraint::ModuloUndefZero(_, var) => write!(f, "modulo_undefzero({var})"),
-            Constraint::Pow(_, var) => write!(f, "pow({var})"),
-            Constraint::Product(_, var) => write!(f, "product({var})"),
+            Constraint::Difference((a, b), var) => write!(f, "difference({a},{b},{var})"),
+            Constraint::Div((a, b), var) => write!(f, "div({a},{b},{var})"),
+            Constraint::DivUndefZero((a, b), var) => write!(f, "div_undefzero({a},{b},{var})"),
+            Constraint::Modulo((a, b), var) => write!(f, "modulo({a},{b},{var})"),
+            Constraint::ModuloUndefZero((a, b), var) => {
+                write!(f, "modulo_undefzero({a},{b},{var})")
+            }
+            Constraint::Pow((a, b), var) => write!(f, "pow({a},{b},{var})"),
+            Constraint::Product((a, b), var) => write!(f, "product({a},{b},{var})"),
             Constraint::WeightedSumGeq(constants, vars, var) => {
                 write!(
                     f,
