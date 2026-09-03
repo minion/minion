@@ -306,22 +306,22 @@ unsafe extern "C" fn run_callback(ctx: *mut ffi::MinionContext, userdata: *mut c
 pub enum PropLevel {
     #[default]
     None,
-    GAC,
-    SACBounds,
-    SAC,
-    SSACBounds,
-    SSAC,
+    Gac,
+    SacBounds,
+    Sac,
+    SsacBounds,
+    Ssac,
 }
 
 impl PropLevel {
     fn to_ffi(self) -> ffi::PropagationType {
         match self {
             PropLevel::None => ffi::PropagationType_PropLevel_None,
-            PropLevel::GAC => ffi::PropagationType_PropLevel_GAC,
-            PropLevel::SACBounds => ffi::PropagationType_PropLevel_SACBounds,
-            PropLevel::SAC => ffi::PropagationType_PropLevel_SAC,
-            PropLevel::SSACBounds => ffi::PropagationType_PropLevel_SSACBounds,
-            PropLevel::SSAC => ffi::PropagationType_PropLevel_SSAC,
+            PropLevel::Gac => ffi::PropagationType_PropLevel_GAC,
+            PropLevel::SacBounds => ffi::PropagationType_PropLevel_SACBounds,
+            PropLevel::Sac => ffi::PropagationType_PropLevel_SAC,
+            PropLevel::SsacBounds => ffi::PropagationType_PropLevel_SSACBounds,
+            PropLevel::Ssac => ffi::PropagationType_PropLevel_SSAC,
         }
     }
 }
@@ -351,14 +351,14 @@ impl Propagation {
     }
 
     pub fn is_default_prop_node(self) -> bool {
-        self.level == PropLevel::GAC && !self.limit
+        self.level == PropLevel::Gac && !self.limit
     }
 }
 
 /// Variable-ordering heuristic (maps to Minion's `VarOrderEnum`).
 ///
 /// `Static` follows the variable declaration order and is state-free;
-/// the rest (SDF, SRF, LDF, WDeg, DOMOverWDeg, Conflict) depend on the
+/// the rest (Sdf, Srf, Ldf, Wdeg, DomOverWdeg, Conflict) depend on the
 /// current domain sizes / weight counters at each decision, so their
 /// solution order is sensitive to mid-search mutations. `Original`
 /// is a (non-state-dependent) alias minion uses internally.
@@ -366,12 +366,12 @@ impl Propagation {
 pub enum VarOrder {
     #[default]
     Static,
-    SDF,
-    SRF,
-    LDF,
+    Sdf,
+    Srf,
+    Ldf,
     Original,
-    WDeg,
-    DOMOverWDeg,
+    Wdeg,
+    DomOverWdeg,
     Conflict,
 }
 
@@ -472,7 +472,7 @@ impl Default for RunOptions {
                 limit: false,
             },
             prop_node: Propagation {
-                level: PropLevel::GAC,
+                level: PropLevel::Gac,
                 limit: false,
             },
             node_limit: 0,
@@ -485,12 +485,12 @@ impl VarOrder {
     fn to_ffi(self) -> ffi::VarOrderEnum {
         match self {
             VarOrder::Static => ffi::VarOrderEnum_ORDER_STATIC,
-            VarOrder::SDF => ffi::VarOrderEnum_ORDER_SDF,
-            VarOrder::SRF => ffi::VarOrderEnum_ORDER_SRF,
-            VarOrder::LDF => ffi::VarOrderEnum_ORDER_LDF,
+            VarOrder::Sdf => ffi::VarOrderEnum_ORDER_SDF,
+            VarOrder::Srf => ffi::VarOrderEnum_ORDER_SRF,
+            VarOrder::Ldf => ffi::VarOrderEnum_ORDER_LDF,
             VarOrder::Original => ffi::VarOrderEnum_ORDER_ORIGINAL,
-            VarOrder::WDeg => ffi::VarOrderEnum_ORDER_WDEG,
-            VarOrder::DOMOverWDeg => ffi::VarOrderEnum_ORDER_DOMOVERWDEG,
+            VarOrder::Wdeg => ffi::VarOrderEnum_ORDER_WDEG,
+            VarOrder::DomOverWdeg => ffi::VarOrderEnum_ORDER_DOMOVERWDEG,
             VarOrder::Conflict => ffi::VarOrderEnum_ORDER_CONFLICT,
         }
     }
