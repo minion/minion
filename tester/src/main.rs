@@ -273,12 +273,12 @@ impl VarOrderArg {
     fn into_minion(self) -> minion_sys::VarOrder {
         match self {
             VarOrderArg::Static => minion_sys::VarOrder::Static,
-            VarOrderArg::Sdf => minion_sys::VarOrder::SDF,
-            VarOrderArg::Srf => minion_sys::VarOrder::SRF,
-            VarOrderArg::Ldf => minion_sys::VarOrder::LDF,
+            VarOrderArg::Sdf => minion_sys::VarOrder::Sdf,
+            VarOrderArg::Srf => minion_sys::VarOrder::Srf,
+            VarOrderArg::Ldf => minion_sys::VarOrder::Ldf,
             VarOrderArg::Original => minion_sys::VarOrder::Original,
-            VarOrderArg::Wdeg => minion_sys::VarOrder::WDeg,
-            VarOrderArg::Domoverwdeg => minion_sys::VarOrder::DOMOverWDeg,
+            VarOrderArg::Wdeg => minion_sys::VarOrder::Wdeg,
+            VarOrderArg::Domoverwdeg => minion_sys::VarOrder::DomOverWdeg,
             VarOrderArg::Conflict => minion_sys::VarOrder::Conflict,
         }
     }
@@ -315,11 +315,11 @@ impl PropLevelArg {
     fn into_minion(self) -> minion_sys::PropLevel {
         match self {
             PropLevelArg::None => minion_sys::PropLevel::None,
-            PropLevelArg::Gac => minion_sys::PropLevel::GAC,
-            PropLevelArg::Sacbounds => minion_sys::PropLevel::SACBounds,
-            PropLevelArg::Sac => minion_sys::PropLevel::SAC,
-            PropLevelArg::Ssacbounds => minion_sys::PropLevel::SSACBounds,
-            PropLevelArg::Ssac => minion_sys::PropLevel::SSAC,
+            PropLevelArg::Gac => minion_sys::PropLevel::Gac,
+            PropLevelArg::Sacbounds => minion_sys::PropLevel::SacBounds,
+            PropLevelArg::Sac => minion_sys::PropLevel::Sac,
+            PropLevelArg::Ssacbounds => minion_sys::PropLevel::SsacBounds,
+            PropLevelArg::Ssac => minion_sys::PropLevel::Ssac,
         }
     }
 }
