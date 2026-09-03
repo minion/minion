@@ -111,7 +111,7 @@
 //! # let callback = Box::new(|_: HashMap<VarName, Constant>| true);
 //! let opts = RunOptions {
 //!     seed: Some(42),
-//!     var_order: VarOrder::WDeg,
+//!     var_order: VarOrder::Wdeg,
 //!     val_order: ValOrder::Random,
 //!     ..Default::default()
 //! };
