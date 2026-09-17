@@ -40,6 +40,68 @@ You need a C++14 compiler and `libclang` (for
 Compilation goes through the [`cc`](https://docs.rs/cc) crate, so `CXX`,
 `CXXFLAGS` and the usual cross-compilation variables all apply.
 
+### Emscripten WebAssembly
+
+`wasm32-unknown-emscripten` is detected automatically. This supports one
+sequential solver per Web Worker with unshared memory, without pthread pools
+or cross-origin isolation. It is not a `wasm32-unknown-unknown` port.
+The supported/tested toolchain is Rust **1.98.0**, Emscripten **6.0.9**, and
+Node **24 or newer**. Install that Rust target and activate the SDK so `em++`,
+`em-config` and `emar` are on PATH; bindgen still needs host libclang.
+
+Bindgen discovers the SDK with `em-config CACHE` and uses its sysroot, libc++
+and compatibility headers automatically. `MINION_EM_CONFIG` can name an
+alternative executable; `MINION_EMSCRIPTEN_SYSROOT` can override the sysroot.
+The build tracks these and the SDK environment variables. The C++ defines,
+including `domains64`, are shared with bindgen; missing functions or constraint
+enum variants fail the build.
+
+The final executable must select libc++ and native Wasm exception handling:
+
+```sh
+export CARGO_TARGET_WASM32_UNKNOWN_EMSCRIPTEN_RUSTFLAGS="-C link-arg=-sDEFAULT_TO_CXX=1 -C link-arg=-fwasm-exceptions -C link-arg=-sALLOW_MEMORY_GROWTH=1 -C link-arg=-sSTACK_SIZE=8388608"
+cargo +1.98.0 build --target wasm32-unknown-emscripten
+```
+
+These are application link settings: Cargo does not propagate a dependency's
+`rustc-link-arg` to its consumers. C++ compilation uses `-fwasm-exceptions`
+automatically. Do not add `-fexceptions` or `-sDISABLE_EXCEPTION_CATCHING=0`:
+those select the incompatible JavaScript exception mode. See
+[Emscripten's exception documentation](https://emscripten.org/docs/porting/exceptions.html).
+
+Backtracking initially allocates **64 MiB**; enable memory growth as above or
+provide enough initial memory for that block plus the model and runtime.
+The tested stack size is **8 MiB**. Ordinary backtracking blocks are unchanged.
+Extendable variable-storage blocks reserve **16 MiB each** on Emscripten instead
+of the native 512 MiB: Wasm commits these reservations rather than reserving
+virtual address space. Exceeding this fixed capacity returns a memory error;
+blocks never move, preserving propagators' pointers.
+
+Portfolio/thread/work-stealing APIs (even with one worker), process-based
+preprocessing, and CPU/wall time limits return recoverable errors. Node limits
+and callback early stop work. Cancel or enforce deadlines by terminating the
+host Web Worker. CPU and RSS table fields (`PreprocessTime`, `SolveTime`,
+`TotalTime`, `TotalSystemTime`, `MaxRSSkB`) report `unavailable`; `TotalWallTime`
+remains numeric. Consumers must not parse unavailable statistics as numbers.
+Sanitizer builds are not supported for this target.
+
+From the Minion checkout, run the linked Node regression suite with:
+
+```sh
+bash mini-scripts/test-emscripten.sh --features dom-assert
+bash mini-scripts/test-emscripten.sh --features dom-assert,domains64
+```
+
+This checks unshared memory, GCC enumeration, unsatisfiable models, C++ exception
+recovery, early stop, repeated context destruction, unsupported modes, node
+limits, and the existing mid-search backtracking regressions. Browser execution
+is not covered by this suite.
+
+Conjure Oxide's experimental Minion build can use this checkout by setting
+`MINION_SYS_PATH=/path/to/minion/minion-sys` and `CONJURE_WEB_SOLVER=minion`
+when running its `tools/build-essence-web.sh`; no bindgen header overrides or
+local minion-sys patch are needed.
+
 ### Features
 
 | Feature | Effect |

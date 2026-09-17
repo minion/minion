@@ -24,6 +24,12 @@ the available orderings) do:
 void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
   for(SysInt i = 1; i < argc; ++i) {
     const string command(argv[i]);
+#ifdef __EMSCRIPTEN__
+    if(command == "-parallel" || command == "-X-parallelThreads" ||
+       command == "-X-parallelWorkSteal" || command == "-X-parallelWorkStealPortfolio" ||
+       command == "-X-parallelPreprocess" || command == "-timelimit" || command == "-cpulimit")
+      throw minion_user_error(command + " is unavailable on Emscripten");
+#endif
     if(command == string("-findallsols")) {
       getOptions().findAllSolutions();
     }

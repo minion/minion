@@ -6,13 +6,13 @@
 
 #include <algorithm>
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 #include <sys/mman.h>
 #endif
 
 namespace ParallelSAC {
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 
 WorkerSlotHeader* allocateSlot(uint32_t capacity) {
   size_t sz = sizeof(WorkerSlotHeader) + (size_t)capacity * sizeof(PruneEntry);

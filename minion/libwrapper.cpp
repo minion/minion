@@ -21,7 +21,9 @@
 #include <memory>
 #include <cstdlib>
 #include <functional>
+#ifndef __EMSCRIPTEN__
 #include <pthread.h>
+#endif
 
 #ifdef LIBMINION
 
@@ -38,6 +40,7 @@ extern thread_local Globals* globals;
 // sequentially runs a worker off the end of its stack and kills the whole
 // process with SIGBUS. Create workers with an explicit stack instead, so a
 // worker gets what the main thread gets on every platform.
+#ifndef __EMSCRIPTEN__
 namespace {
 constexpr size_t workerStackBytes = 8u * 1024 * 1024;
 
@@ -91,6 +94,8 @@ private:
   bool joined = false;
 };
 } // namespace
+
+#endif
 
 static thread_local std::string ffi_error_message;
 
@@ -212,6 +217,18 @@ static MinionResult runMinionImpl(MinionContext* ctx, SearchOptions& options,
                                   bool (*callback)(MinionContext* ctx, void* userdata),
                                   void* userdata, bool installAlarms)
 {
+#ifdef __EMSCRIPTEN__
+  if(options.parallel || options.parallelPreprocessCores != 0 ||
+     options.numParallelThreads != 0 || options.numWorkStealThreads != 0 ||
+     options.parallelWorkStealPortfolio) {
+    set_error("Parallel search and process preprocessing are unavailable on Emscripten");
+    return MinionResult::MINION_INVALID_ARGUMENT;
+  }
+  if(options.timeoutActive) {
+    set_error("Time limits are unavailable on Emscripten; terminate the host worker instead");
+    return MinionResult::MINION_INVALID_ARGUMENT;
+  }
+#endif
   ContextGuard guard(ctx);
   MinionResult returnCode = MinionResult::MINION_OK;
 
@@ -362,6 +379,7 @@ MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod&
 /*                  Thread-based portfolio search                    */
 /*********************************************************************/
 
+#ifndef __EMSCRIPTEN__
 #include "system/trigger_timer.h"
 #include <thread>
 #include <mutex>
@@ -990,6 +1008,24 @@ MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& option
     set_error("solver timed out");
   return finalResult;
 }
+
+#else
+MinionResult runMinionParallel(MinionThreadConfig, SearchOptions&, SearchMethod&,
+                               ProbSpec::CSPInstance&,
+                               bool (*)(MinionContext*, void*), void*) {
+  set_error("Threaded portfolio search is unavailable on Emscripten");
+  return MinionResult::MINION_INVALID_ARGUMENT;
+}
+
+MinionResult runMinionWorkSteal(MinionThreadConfig, SearchOptions&, SearchMethod&,
+                                ProbSpec::CSPInstance&,
+                                bool (*)(MinionContext*, void*), void*,
+                                MinionWorkStealStats* stats) {
+  if(stats) *stats = MinionWorkStealStats{};
+  set_error("Work-stealing search is unavailable on Emscripten");
+  return MinionResult::MINION_INVALID_ARGUMENT;
+}
+#endif
 
 /*********************************************************************/
 /*                    Instance building functions                    */
