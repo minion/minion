@@ -445,6 +445,9 @@ pub struct RunOptions {
     pub time_limit: Option<TimeLimit>,
 }
 
+/// Time limits return `RuntimeError::InvalidArgument` on Emscripten; the host
+/// must terminate the Web Worker to enforce a deadline.
+///
 /// Time limit specification: a number of seconds and whether to measure
 /// CPU time (`-cpulimit`) or wall-clock time (`-timelimit`).
 ///
@@ -580,6 +583,9 @@ unsafe extern "C" fn parallel_callback_thunk(
 
 /// Run Minion as a portfolio search across `num_threads` worker threads.
 ///
+/// Unavailable on Emscripten (including one worker): returns
+/// `RuntimeError::InvalidArgument`.
+///
 /// Each thread builds its own solver from a shared `Model`, with a derived
 /// random seed; the first thread to find `sollimit` solutions (or to prove
 /// unsat) signals the others to stop. The callback is invoked at most once
@@ -610,6 +616,9 @@ pub fn run_minion_parallel(
     run_minion_parallel_with_options(num_threads, model, RunOptions::default(), callback)
 }
 
+/// Unavailable on Emscripten (including one worker): returns
+/// `RuntimeError::InvalidArgument`.
+///
 /// Run Minion with thread-based work-stealing: N workers cooperatively
 /// split the search tree. Worker 0 starts at the root; idle workers wait
 /// on a shared queue. Busy workers, on each search node, donate one

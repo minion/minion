@@ -302,9 +302,17 @@ public:
   }
 
   ExtendableBlock requestBytesExtendable(UnsignedSysInt baseSize) {
+#ifdef __EMSCRIPTEN__
+    // Unlike native virtual memory, Wasm memory commits the reservation.
+    // Pointers must remain stable, so retain a fixed capacity and fail before
+    // exceeding it rather than reallocating storage referenced by propagators.
+    const SysInt maxSize = 16 * 1024 * 1024;
+    if(baseSize > maxSize) throw std::bad_alloc();
+#else
     const SysInt maxSize = 512 * 1024 * 1024;
+#endif
     char* block = (char*)checked_zeroed_malloc(maxSize);
-    extendable_blocks.push_back(BlockDef{block, baseSize, maxSize});
+    extendable_blocks.push_back(BlockDef{block, checked_cast<size_t>(baseSize), checked_cast<size_t>(maxSize)});
     allocated_extendable_bytes += baseSize;
     return ExtendableBlock{block, (SysInt)extendable_blocks.size() - 1};
   }
@@ -313,6 +321,9 @@ public:
     UnsignedSysInt oldSize = extendable_blocks[block.getPos()].size;
     D_ASSERT(block() == extendable_blocks[block.getPos()].base);
     D_ASSERT(newSize >= oldSize);
+#ifdef __EMSCRIPTEN__
+    if(newSize > extendable_blocks[block.getPos()].capacity) throw std::bad_alloc();
+#endif
     D_CHECK(newSize <= extendable_blocks[block.getPos()].capacity);
     D_ASSERT(checkAllZero(block() + oldSize, block() + newSize));
 

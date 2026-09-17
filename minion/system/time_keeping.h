@@ -26,18 +26,27 @@ public:
 
   template <typename Stream>
   void printTimestepWithoutReset(Stream& sout, const char* time_name) {
+#ifdef __EMSCRIPTEN__
+    sout << time_name << "unavailable" << endl;
+#else
     sout << time_name << get_cpuTime() - _last_checkTime << endl;
+#endif
   }
 
   template <typename Stream>
   void maybePrintTimestepStore(Stream& sout, const char* time_name, const char* store_name,
                                TableOut& tableout, bool toprint) {
+#ifdef __EMSCRIPTEN__
+    if(toprint) sout << time_name << "unavailable" << endl;
+    tableout.set(string(store_name), string("unavailable"));
+#else
     double tempTime = get_cpuTime();
     double diff = tempTime - _last_checkTime;
     if(toprint)
       sout << time_name << diff << endl;
     _last_checkTime = tempTime;
     tableout.set(string(store_name), tostring(diff));
+#endif
   }
 
   template <typename Stream>
@@ -45,10 +54,22 @@ public:
                                     TableOut& tableout, bool toprint) {
     double time_wallclock = getRaw_wallTime() - start_wallclock;
 
+#ifndef __EMSCRIPTEN__
     double end_cpuTime = get_cpuTime();
     double end_sysTime = get_sysTime();
+#endif
 
     maybePrintTimestepStore(sout, time_name, store_name, tableout, toprint);
+#ifdef __EMSCRIPTEN__
+    if(toprint) {
+      sout << "CPU time / system time / maximum RSS: unavailable" << endl;
+      sout << "Total Wall Time: " << time_wallclock << endl;
+    }
+    tableout.set(string("TotalTime"), string("unavailable"));
+    tableout.set(string("TotalSystemTime"), string("unavailable"));
+    tableout.set(string("MaxRSSkB"), string("unavailable"));
+    tableout.set(string("TotalWallTime"), time_wallclock);
+#else
     if(toprint) {
       sout << "Total Time: " << end_cpuTime - _internal_cpuStartTime << endl;
       sout << "Total System Time: " << end_sysTime - _internal_sysStartTime << endl;
@@ -59,5 +80,6 @@ public:
     tableout.set(string("TotalSystemTime"), end_sysTime - _internal_sysStartTime);
     tableout.set(string("TotalWallTime"), time_wallclock);
     tableout.set(string("MaxRSSkB"), getMax_rss());
+#endif
   }
 };

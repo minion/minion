@@ -29,6 +29,7 @@ categories = ["api-bindings", "mathematics"]
 include = [
     "/src",
     "/tests",
+    "/tools",
     "/build.rs",
     "/README.md",
     "/CHANGELOG.md",

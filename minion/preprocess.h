@@ -9,7 +9,7 @@
 #include "parallel/parallel.h"
 #include "parallel/preprocess_parallel.h"
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 #include <unistd.h>
 #endif
 
@@ -204,7 +204,7 @@ bool runValueLoopSlice(vector<Var>& vararray, Prop prop, const vector<SysInt>& o
 // state, which is reachable from the parent's state, so applying them in the
 // parent is correct. The final fixpoint equals the sequential SAC fixpoint
 // (which is unique); only the number of rounds and wall-clock time differ.
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
 template <typename Var, typename Prop>
 void runParallelSACFixpoint(vector<Var>& vararray, Prop prop, bool onlyCheckBounds, bool limit) {
   using namespace ParallelSAC;
@@ -427,7 +427,7 @@ void propagateSAC_internal(vector<Var>& vararray, Prop prop, bool onlyCheckBound
   if(getState().isFailed())
     return;
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__EMSCRIPTEN__)
   if(allowParallel && getOptions().parallelPreprocessCores > 0) {
     runParallelSACFixpoint(vararray, prop, onlyCheckBounds, limit);
     if(getState().isFailed())

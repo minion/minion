@@ -67,6 +67,7 @@ inline long getMax_rss() {
 #else
 
 #include <assert.h>
+#include <limits>
 #include <sys/resource.h>
 #include <sys/time.h>
 #include <time.h>
@@ -108,31 +109,41 @@ inline long double getRaw_wallTime() {
   return currentTime;
 }
 
+#ifdef __EMSCRIPTEN__
+// CPU accounting and process RSS do not exist in the browser runtime.
+inline long double get_cpuTime() { return std::numeric_limits<long double>::quiet_NaN(); }
+inline long double get_sysTime() { return std::numeric_limits<long double>::quiet_NaN(); }
+inline long getMax_rss() { return -1; }
+#else
 inline long double get_cpuTime() {
-  rusage r;
-  getrusage(RUSAGE_SELF, &r);
+  rusage r{};
+  if(getrusage(RUSAGE_SELF, &r) != 0)
+    return std::numeric_limits<long double>::quiet_NaN();
   long double cpuTime = r.ru_utime.tv_sec;
   cpuTime += static_cast<long double>(r.ru_utime.tv_usec) / 1000000.0;
   return cpuTime;
 }
 
 inline long double get_sysTime() {
-  rusage r;
-  getrusage(RUSAGE_SELF, &r);
+  rusage r{};
+  if(getrusage(RUSAGE_SELF, &r) != 0)
+    return std::numeric_limits<long double>::quiet_NaN();
   long double cpuTime = r.ru_stime.tv_sec;
   cpuTime += static_cast<long double>(r.ru_stime.tv_usec) / 1000000.0;
   return cpuTime;
 }
 
 inline long getMax_rss() {
-  rusage r;
-  getrusage(RUSAGE_SELF, &r);
+  rusage r{};
+  if(getrusage(RUSAGE_SELF, &r) != 0)
+    return -1;
 #if __APPLE__ & __MACH__
   return r.ru_maxrss / 1024;
 #else
   return r.ru_maxrss;
 #endif
 }
+#endif
 #endif
 #endif
 

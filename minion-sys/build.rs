@@ -513,15 +513,21 @@ struct Config {
     defines: Vec<String>,
     sanitize: bool,
     debug: bool,
+    emscripten: bool,
 }
 
 impl Config {
     fn detect() -> Config {
         // The env vars predate the cargo features and are still used by
         // test.sh, CI.yml and mini-scripts/soak-debug.sh. Keep both working.
+        let emscripten = env::var("TARGET").as_deref() == Ok("wasm32-unknown-emscripten");
         let sanitize = feature("SANITIZE") || env::var_os("MINION_SANITIZE").is_some();
         let debug = feature("DEBUG_MINION") || env::var_os("DEBUG_MINION").is_some();
 
+        assert!(
+            !emscripten || !sanitize,
+            "minion-sys: sanitize is not supported on Emscripten"
+        );
         let mut defines = vec!["LIBMINION".to_string()];
 
         if !feature("NO_WDEG") {
@@ -562,6 +568,7 @@ impl Config {
             defines,
             sanitize,
             debug,
+            emscripten,
         }
     }
 }
@@ -602,8 +609,12 @@ fn compile(minion_src: &Path, gen_dir: &Path, generated: &[PathBuf], config: &Co
             .warnings(true)
             .extra_warnings(true)
             .flag("-Wno-unused-parameter")
-            .flag("-Wno-sign-compare")
-            .flag("-pthread");
+            .flag("-Wno-sign-compare");
+        if config.emscripten {
+            build.flag("-fwasm-exceptions");
+        } else {
+            build.flag("-pthread");
+        }
     }
 
     for source in LIB_SOURCES {
@@ -665,6 +676,11 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
     let header = minion_inc.join("libwrapper.h");
 
     let mut builder = bindgen::Builder::default()
+        // Source changes are tracked above. Track bindgen's target-specific
+        // environment overrides without tracking generated headers in OUT_DIR.
+        .parse_callbacks(Box::new(
+            bindgen::CargoCallbacks::new().rerun_on_header_files(false),
+        ))
         .header(header.to_str().expect("minion src path must be UTF-8"))
         // Make all templates opaque, as recommended by bindgen.
         .opaque_type("std::.*")
@@ -674,6 +690,17 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
         .clang_arg(format!("-I{}", minion_inc.display()))
         .clang_arg("-std=gnu++14")
         .clang_arg("-xc++");
+
+    if config.emscripten {
+        let sysroot = emscripten_sysroot();
+        builder = builder
+            .clang_arg(format!("--sysroot={}", sysroot.display()))
+            .clang_arg("-isystem")
+            .clang_arg(sysroot.join("include/c++/v1").to_string_lossy())
+            .clang_arg("-isystem")
+            .clang_arg(sysroot.join("include/compat").to_string_lossy())
+            .clang_arg("-fvisibility=default");
+    }
 
     for define in &config.defines {
         builder = builder.clang_arg(format!("-D{define}"));
@@ -688,11 +715,70 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
         builder = builder.allowlist_type(ty);
     }
 
-    builder
+    let bindings = builder
         .generate()
         .expect("unable to generate bindings")
-        .write_to_file(out_dir.join("bindings.rs"))
-        .expect("couldn't write bindings to file");
+        .to_string();
+    for function in ALLOWED_FUNCTIONS {
+        assert!(
+            bindings.contains(&format!("pub fn {function}(")),
+            "minion-sys: bindgen omitted {function}; check target SDK headers and visibility"
+        );
+    }
+    // Check every generated variant, not just the type alias.
+    let enumeration = fs::read_to_string(gen_dir.join("ConstraintEnum.h")).unwrap();
+    for variant in enumeration
+        .lines()
+        .filter_map(|line| line.strip_suffix(','))
+    {
+        assert!(
+            bindings.contains(&format!("pub const ConstraintType_{variant}:")),
+            "minion-sys: bindgen omitted ConstraintType::{variant}"
+        );
+    }
+    fs::write(out_dir.join("bindings.rs"), bindings).expect("couldn't write bindings to file");
+}
+
+/// `em-config` resolves EM_CACHE/EM_CONFIG and the active SDK, including SDKs
+/// installed outside standard locations. An override is useful for cross hosts.
+fn emscripten_sysroot() -> PathBuf {
+    for var in [
+        "EM_CONFIG",
+        "EM_CACHE",
+        "EMSDK",
+        "EMSDK_PYTHON",
+        "PATH",
+        "MINION_EM_CONFIG",
+        "MINION_EMSCRIPTEN_SYSROOT",
+    ] {
+        println!("cargo:rerun-if-env-changed={var}");
+    }
+    let sysroot = if let Some(path) = env::var_os("MINION_EMSCRIPTEN_SYSROOT") {
+        PathBuf::from(path)
+    } else {
+        let command = env::var_os("MINION_EM_CONFIG").unwrap_or_else(|| "em-config".into());
+        let output = std::process::Command::new(command)
+            .arg("CACHE")
+            .output()
+            .expect("minion-sys: cannot run em-config CACHE; activate the Emscripten SDK");
+        assert!(
+            output.status.success(),
+            "em-config CACHE failed: {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        PathBuf::from(
+            String::from_utf8(output.stdout)
+                .expect("SDK path must be UTF-8")
+                .trim(),
+        )
+        .join("sysroot")
+    };
+    assert!(
+        sysroot.join("include/c++/v1").is_dir() && sysroot.join("include/compat").is_dir(),
+        "minion-sys: invalid Emscripten sysroot: {}",
+        sysroot.display()
+    );
+    sysroot
 }
 
 const ALLOWED_FUNCTIONS: &[&str] = &[

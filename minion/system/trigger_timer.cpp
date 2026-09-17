@@ -16,7 +16,18 @@ bool checkDoubleCtrlc;
 
 #include <stdio.h>
 
-#ifdef _WIN32
+#if defined(__EMSCRIPTEN__)
+#include "minlib/exceptions.hpp"
+
+void activateTrigger(std::atomic<bool>* b, bool timeoutActive, int, bool) {
+  if(timeoutActive)
+    throw minion_user_error("Time limits are unavailable on Emscripten; terminate the host worker instead");
+  *b = false;
+}
+
+void install_ctrlcTrigger(std::atomic<bool>*) {}
+
+#elif defined(_WIN32)
 
 #define _WIN32_WINNT 0x0500
 #include <windows.h>
