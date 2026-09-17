@@ -47,7 +47,13 @@ sequential solver per Web Worker with unshared memory, without pthread pools
 or cross-origin isolation. It is not a `wasm32-unknown-unknown` port.
 The supported/tested toolchain is Rust **1.98.0**, Emscripten **6.0.9**, and
 Node **24 or newer**. Install that Rust target and activate the SDK so `em++`,
-`em-config` and `emar` are on PATH; bindgen still needs host libclang.
+`em-config` and `emar` are on PATH. Bindgen needs **host libclang 20 or newer**
+to parse this SDK's libc++ headers; Ubuntu 24.04's default `libclang-dev` is
+version 18 and is too old. CI installs Clang 22 from
+[LLVM's apt repository](https://apt.llvm.org/) and sets
+`LIBCLANG_PATH=/usr/lib/llvm-22/lib` and `CLANG_PATH=/usr/bin/clang-22` so bindgen
+uses the matching library and header-discovery driver. Installing Emscripten
+alone does not upgrade the host libclang used by bindgen.
 
 Bindgen discovers the SDK with `em-config CACHE` and uses its sysroot, libc++
 and compatibility headers automatically. `MINION_EM_CONFIG` can name an
