@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   wasm:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -23,8 +23,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Install libclang
-        run: sudo apt-get update && sudo apt-get install -y libclang-dev
+      # Ubuntu 24.04's default libclang is 18; the SDK's libc++ needs >=20.
+      # Pin both the library bindgen loads and the driver it uses for headers.
+      - name: Install Clang 22 for bindgen
+        run: |
+          curl --fail --silent --show-error https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc > /dev/null
+          echo 'deb https://apt.llvm.org/noble/ llvm-toolchain-noble-22 main' | sudo tee /etc/apt/sources.list.d/llvm-22.list
+          sudo apt-get update
+          sudo apt-get install -y clang-22 libclang-22-dev
+          echo 'LIBCLANG_PATH=/usr/lib/llvm-22/lib' >> "$GITHUB_ENV"
+          echo 'CLANG_PATH=/usr/bin/clang-22' >> "$GITHUB_ENV"
+          /usr/bin/clang-22 --version
       - name: Execute Wasm regressions and check unshared memory
         run: bash mini-scripts/test-emscripten.sh --features '${{ matrix.features }}'
       - name: Native ABI and regression tests

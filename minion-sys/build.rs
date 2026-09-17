@@ -676,6 +676,8 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
     let header = minion_inc.join("libwrapper.h");
 
     let mut builder = bindgen::Builder::default()
+        // Generated bindings do not need rustfmt installed on the build host.
+        .formatter(bindgen::Formatter::None)
         // Source changes are tracked above. Track bindgen's target-specific
         // environment overrides without tracking generated headers in OUT_DIR.
         .parse_callbacks(Box::new(
@@ -692,6 +694,17 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
         .clang_arg("-xc++");
 
     if config.emscripten {
+        for var in ["LIBCLANG_PATH", "CLANG_PATH"] {
+            println!("cargo:rerun-if-env-changed={var}");
+        }
+        let clang = bindgen::clang_version();
+        assert!(
+            clang.parsed.is_some_and(|(major, _)| major >= 20),
+            "minion-sys: Emscripten 6.0.9 headers require host libclang >=20; found {}. \
+             Install a recent libclang and set LIBCLANG_PATH and CLANG_PATH to that installation",
+            clang.full
+        );
+        println!("minion-sys: bindgen uses {}", clang.full);
         let sysroot = emscripten_sysroot();
         builder = builder
             .clang_arg(format!("--sysroot={}", sysroot.display()))
@@ -719,9 +732,12 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
         .generate()
         .expect("unable to generate bindings")
         .to_string();
+    // TokenStream output has different spacing from rustfmt output. Validate
+    // symbols independently of formatting, including whitespace before `(` / `:`.
+    let compact_bindings: String = bindings.chars().filter(|c| !c.is_whitespace()).collect();
     for function in ALLOWED_FUNCTIONS {
         assert!(
-            bindings.contains(&format!("pub fn {function}(")),
+            compact_bindings.contains(&format!("pubfn{function}(")),
             "minion-sys: bindgen omitted {function}; check target SDK headers and visibility"
         );
     }
@@ -732,7 +748,7 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
         .filter_map(|line| line.strip_suffix(','))
     {
         assert!(
-            bindings.contains(&format!("pub const ConstraintType_{variant}:")),
+            compact_bindings.contains(&format!("pubconstConstraintType_{variant}:")),
             "minion-sys: bindgen omitted ConstraintType::{variant}"
         );
     }
