@@ -4,14 +4,17 @@ Minion's own release notes are in [`history.md`](https://github.com/minion/minio
 at the top of the repository. This file covers the Rust crate, which is
 versioned separately from the solver.
 
-## Unreleased
+## 0.1.1 — 2026-09-18
 
 - Support sequential `wasm32-unknown-emscripten` builds with automatic SDK
   discovery, Wasm exceptions, and checked binding generation. Reject unsupported
   parallel modes and time limits; mark unavailable CPU/RSS statistics explicitly.
+- Reduce Wasm extendable storage reservations to avoid exhausting linear memory.
+- Require a compatible host libclang for Emscripten bindings, with an early
+  diagnostic for unsupported versions.
 - Execute Wasm regression tests under Node in CI, including domains64 builds.
 
-- Unreleased : 0.1.0
+## 0.1.0
 
 The first published release. `minion-sys` was written in
 [conjure-oxide](https://github.com/conjure-cp/conjure-oxide), where it began in
