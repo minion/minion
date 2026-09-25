@@ -14,6 +14,7 @@ Supports the same directives as do_basic_tests.sh:
   #TEST CHECKONESOL ...  compare the first solution
   #TEST NODECOUNT n      compare "Total Nodes:"
   #TEST EXITCODE1        minion must exit 1
+  #TEST EXITCODE0        minion must exit 0
   #TEST EXTRAFLAGS ...   extra flags for this instance
   #FAIL                  the test is expected to fail
   #BUG                   known-broken: failing is expected, passing is not
@@ -82,6 +83,10 @@ def check(exe, path):
     if "#TEST EXITCODE1" in text:
         _, rc = run(exe, cwd, [name, *extra])
         return rc == 1, f"Got return code of {rc}, expected 1 in {name}"
+
+    if "#TEST EXITCODE0" in text:
+        _, rc = run(exe, cwd, [name, *extra])
+        return rc == 0, f"Got return code of {rc}, expected 0 in {name}"
 
     print(f"Test {name} is not well-formed.")
     sys.exit(1)

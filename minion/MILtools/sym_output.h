@@ -189,9 +189,6 @@ struct GraphBuilder {
 
   GraphBuilder(CSPInstance& _csp) : csp(_csp) {
     csp.add_variable_names();
-    if(csp.symOrder.empty())
-      D_FATAL_ERROR("Symmetry detection doesn't work with input formats 1 and 2. Upgrade!");
-
     build_graph();
   }
 
@@ -736,6 +733,25 @@ struct InstanceStats {
   getOutput() << "TIME: " << measuredTime << endl;
 #define output_stat getOutput() << measuredTime << " " << s
 
+  // Quartiles of a sorted vector. These are undefined for an empty vector
+  // (e.g. an instance with no variables or no constraints), so print nan.
+  template <typename T>
+  void output_quartiles(double measuredTime, const string& s, const string& name,
+                        const vector<T>& sorted) {
+    D_ASSERT(std::is_sorted(sorted.begin(), sorted.end()));
+    if(sorted.empty()) {
+      for(const char* q : {"_0:", "_25:", "_50:", "_75:", "_100:"}) {
+        output_stat << name << q << "nan" << endl;
+      }
+      return;
+    }
+    output_stat << name << "_0:" << sorted[0] << endl;
+    output_stat << name << "_25:" << sorted[sorted.size() / 4] << endl;
+    output_stat << name << "_50:" << sorted[sorted.size() / 2] << endl;
+    output_stat << name << "_75:" << sorted[(sorted.size() * 3) / 4] << endl;
+    output_stat << name << "_100:" << sorted.back() << endl;
+  }
+
   void output_stats() {
     string s("stats_"); // common prefix
     // Variables statistics
@@ -783,11 +799,7 @@ struct InstanceStats {
     output_stat << "DomainProductLog: " << domain_product << endl;
     std::sort(domsizes.begin(), domsizes.end());
     // Some rubbish which does not give you the real medians, quartiles
-    output_stat << "dom_0:" << domsizes[0] << endl;
-    output_stat << "dom_25:" << domsizes[domsizes.size() / 4] << endl;
-    output_stat << "dom_50:" << domsizes[domsizes.size() / 2] << endl;
-    output_stat << "dom_75:" << domsizes[(domsizes.size() * 3) / 4] << endl;
-    output_stat << "dom_100:" << domsizes.back() << endl;
+    output_quartiles(measuredTime, s, "dom", domsizes);
 
     SysInt totaldom =
         checked_cast<SysInt>(std::accumulate(domsizes.begin(), domsizes.end(), (DomainInt)0));
@@ -826,11 +838,7 @@ struct InstanceStats {
     }
     std::sort(arities.begin(), arities.end());
     END_CLOCK();
-    output_stat << "arity_0:" << arities[0] << endl;
-    output_stat << "arity_25:" << arities[arities.size() / 4] << endl;
-    output_stat << "arity_50:" << arities[arities.size() / 2] << endl;
-    output_stat << "arity_75:" << arities[(arities.size() * 3) / 4] << endl;
-    output_stat << "arity_100:" << arities.back() << endl;
+    output_quartiles(measuredTime, s, "arity", arities);
 
     const SysInt totalarity =
         checked_cast<SysInt>(std::accumulate(arities.begin(), arities.end(), (DomainInt)0));
@@ -981,11 +989,7 @@ struct InstanceStats {
       }
       std::sort(tightness.begin(), tightness.end());
       END_CLOCK();
-      output_stat << "tightness_0:" << tightness[0] << endl;
-      output_stat << "tightness_25:" << tightness[tightness.size() / 4] << endl;
-      output_stat << "tightness_50:" << tightness[tightness.size() / 2] << endl;
-      output_stat << "tightness_75:" << tightness[(tightness.size() * 3) / 4] << endl;
-      output_stat << "tightness_100:" << tightness.back() << endl;
+      output_quartiles(measuredTime, s, "tightness", tightness);
 
       const SysInt totaltightness =
           checked_cast<SysInt>(std::accumulate(tightness.begin(), tightness.end(), (DomainInt)0));
@@ -1021,11 +1025,7 @@ struct InstanceStats {
 
     std::sort(lit_tightness.begin(), lit_tightness.end());
     END_CLOCK();
-    output_stat << "literal_tightness_0:" << lit_tightness[0] << endl;
-    output_stat << "literal_tightness_25:" << lit_tightness[lit_tightness.size() / 4] << endl;
-    output_stat << "literal_tightness_50:" << lit_tightness[lit_tightness.size() / 2] << endl;
-    output_stat << "literal_tightness_75:" << lit_tightness[(lit_tightness.size() * 3) / 4] << endl;
-    output_stat << "literal_tightness_100:" << lit_tightness.back() << endl;
+    output_quartiles(measuredTime, s, "literal_tightness", lit_tightness);
 
     double newTotaltightness = std::accumulate(lit_tightness.begin(), lit_tightness.end(), 0.0);
     double lt_mean = (double)newTotaltightness / (double)lit_tightness.size();

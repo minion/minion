@@ -19,7 +19,7 @@ Minion has four layers of test infrastructure. Both `--light` and `--heavy` exer
 
 ### 1. `.minion` regression suite — `test_instances/`
 
-Hand-curated `.minion` instances with embedded expected results. Each file may contain `#TEST SOLCOUNT n`, `#TEST CHECKONESOL ...`, `#TEST NODECOUNT n`, `#TEST EXITCODE1`, `#FAIL` (expected failure), or `#BUG` (known bug). Counts: ~287 files in `test_instances/`, 4 in `tests-32domains/`, 21 in `tests-64domains/`. About 20 files exercise optimisation (`MAXIMISING` / `MINIMISING`).
+Hand-curated `.minion` instances with embedded expected results. Each file may contain `#TEST SOLCOUNT n`, `#TEST CHECKONESOL ...`, `#TEST NODECOUNT n`, `#TEST EXITCODE1`, `#TEST EXITCODE0` (exit status must be 1 or 0 respectively), `#FAIL` (expected failure), or `#BUG` (known bug). Counts: ~287 files in `test_instances/`, 4 in `tests-32domains/`, 21 in `tests-64domains/`. About 20 files exercise optimisation (`MAXIMISING` / `MINIMISING`).
 
 The runners are:
 - `run_tests.sh <minion-binary>` — full regression, run by both light and heavy.

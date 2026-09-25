@@ -99,6 +99,15 @@ for i in $globs; do
           testpass=0
           errormess="Got return code of $return_code, expected 1 in $i"
         fi
+      elif grep -q '#TEST EXITCODE0' $i
+        then
+        return_code=`$exec $i $* $extraflags 2>/dev/null >/dev/null; echo $?`
+        if [[ $return_code -eq  0 ]]; then
+          testpass=1
+        else
+          testpass=0
+          errormess="Got return code of $return_code, expected 0 in $i"
+        fi
       else
         echo Test $i is not well-formed.
         exit 1
