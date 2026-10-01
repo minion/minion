@@ -242,6 +242,11 @@ jobs:
               export PATH=$PATH:$HOME/.cargo/bin
               ./mini-scripts/check-generator-parity.sh
 
+      - name: "minion-sys no-op build stays fresh"
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              python3 minion-sys/tools/check-build-freshness.py
+
       # Assertions are off in minion-sys's default build, so cover the feature
       # that turns them back on -- mini-scripts/soak-debug.sh relies on it.
       - name: "minion-sys cargo test, assertions on"

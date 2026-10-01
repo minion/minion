@@ -662,6 +662,34 @@ fn compile(minion_src: &Path, gen_dir: &Path, generated: &[PathBuf], config: &Co
     }
 }
 
+/// Keep bindgen's input and environment tracking, excluding our own outputs.
+/// `rerun_on_header_files(false)` only affects the top-level header; bindgen
+/// still reports included headers, including the ones we just generated.
+#[derive(Debug)]
+struct BindgenCallbacks {
+    generated_dir: PathBuf,
+    cargo: bindgen::CargoCallbacks,
+}
+
+impl bindgen::callbacks::ParseCallbacks for BindgenCallbacks {
+    fn header_file(&self, filename: &str) {
+        self.cargo.header_file(filename);
+    }
+
+    fn include_file(&self, filename: &str) {
+        // Canonicalise to handle symlinked target directories and differences
+        // between the paths passed to clang and the paths it reports.
+        let path = fs::canonicalize(filename).unwrap_or_else(|_| PathBuf::from(filename));
+        if !path.starts_with(&self.generated_dir) {
+            self.cargo.include_file(filename);
+        }
+    }
+
+    fn read_env_var(&self, key: &str) {
+        self.cargo.read_env_var(key);
+    }
+}
+
 /// Generate the Rust declarations for Minion's C interface.
 ///
 /// This runs against the freshly generated `ConstraintEnum.h` (included by
@@ -678,11 +706,10 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
     let mut builder = bindgen::Builder::default()
         // Generated bindings do not need rustfmt installed on the build host.
         .formatter(bindgen::Formatter::None)
-        // Source changes are tracked above. Track bindgen's target-specific
-        // environment overrides without tracking generated headers in OUT_DIR.
-        .parse_callbacks(Box::new(
-            bindgen::CargoCallbacks::new().rerun_on_header_files(false),
-        ))
+        .parse_callbacks(Box::new(BindgenCallbacks {
+            generated_dir: fs::canonicalize(gen_dir).expect("generated header directory exists"),
+            cargo: bindgen::CargoCallbacks::new(),
+        }))
         .header(header.to_str().expect("minion src path must be UTF-8"))
         // Make all templates opaque, as recommended by bindgen.
         .opaque_type("std::.*")

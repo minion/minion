@@ -4,6 +4,11 @@ Minion's own release notes are in [`history.md`](https://github.com/minion/minio
 at the top of the repository. This file covers the Rust crate, which is
 versioned separately from the solver.
 
+## Unreleased
+
+- Stop generated headers from triggering repeated C++ rebuilds. Continue
+  tracking source and system headers and bindgen environment overrides.
+
 ## 0.1.1 — 2026-09-18
 
 - Support sequential `wasm32-unknown-emscripten` builds with automatic SDK
