@@ -2,6 +2,8 @@ extern crate itertools;
 extern crate rand;
 
 use num_integer::Integer;
+use rand::seq::IndexedRandom;
+use rand::RngExt;
 
 use crate::counter::{get_unique_name, get_unique_value};
 use std::collections::HashSet;
@@ -9,7 +11,6 @@ use std::fmt;
 use std::iter::FromIterator;
 
 use self::rand::seq::SliceRandom;
-use self::rand::Rng;
 
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
@@ -49,7 +50,7 @@ pub static VAR_REUSE_PERMILLE: AtomicU32 = AtomicU32::new(0);
 
 fn reuse_roll() -> bool {
     let p = VAR_REUSE_PERMILLE.load(Ordering::Relaxed).min(1000);
-    p != 0 && rand::thread_rng().gen_range(0..1000) < p
+    p != 0 && rand::rng().random_range(0..1000) < p
 }
 
 /// Probability, in per-mille (0..=1000), that the use of a Bool
@@ -63,7 +64,7 @@ pub static NEGATION_PERMILLE: AtomicU32 = AtomicU32::new(0);
 
 fn negation_roll() -> bool {
     let p = NEGATION_PERMILLE.load(Ordering::Relaxed).min(1000);
-    p != 0 && rand::thread_rng().gen_range(0..1000) < p
+    p != 0 && rand::rng().random_range(0..1000) < p
 }
 
 /// Build a negation-flag mirror of `variables` by rolling
@@ -113,7 +114,7 @@ fn pool_or_fresh(
     size_factor: u32,
 ) -> Arc<MinionVariable> {
     if d != Constant && reuse_roll() {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let compatible: Vec<usize> = pool
             .iter()
             .enumerate()
@@ -212,8 +213,8 @@ impl ShortTuples {
 }
 
 fn random_in_range(low: i64, high: i64) -> i64 {
-    let mut rng = rand::thread_rng();
-    rng.gen_range(low..=high)
+    let mut rng = rand::rng();
+    rng.random_range(low..=high)
 }
 
 pub fn random_sublist(list: &[i64]) -> Vec<i64> {
@@ -229,7 +230,7 @@ pub fn random_sublist(list: &[i64]) -> Vec<i64> {
 }
 
 pub fn random_sublist_of_size(list: &[i64], target: i64) -> Vec<i64> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let mut vec = list.to_vec();
     vec.shuffle(&mut rng);
     while vec.len() as i64 > target {
@@ -282,7 +283,7 @@ impl MinionVariable {
                 Constant,
             ],
         }
-        .choose(&mut rand::thread_rng())
+        .choose(&mut rand::rng())
         .unwrap();
 
         let domain = match d {
@@ -670,7 +671,7 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
         cart = cart.saturating_mul(d.len() as u128);
     }
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     if cart <= ENUM_CAP {
         use self::itertools::Itertools;
@@ -680,7 +681,7 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
             .multi_cartesian_product()
             .collect();
         all_assignments.shuffle(&mut rng);
-        let take = rng.gen_range(0..=all_assignments.len());
+        let take = rng.random_range(0..=all_assignments.len());
         all_assignments.truncate(take);
         all_assignments.sort();
         Some(Tuples::new(all_assignments, all_domains.len()))
@@ -689,12 +690,12 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
         // is allowed; the full table is unreachable here by construction
         // (that's why we're on the sample path) and K ≪ cart anyway.
         const TUPLE_SAMPLE_CAP: usize = 10_000;
-        let take = rng.gen_range(0..=TUPLE_SAMPLE_CAP);
+        let take = rng.random_range(0..=TUPLE_SAMPLE_CAP);
         let mut sampled: Vec<Vec<i64>> = (0..take)
             .map(|_| {
                 all_domains
                     .iter()
-                    .map(|d| *d.choose(&mut rand::thread_rng()).unwrap())
+                    .map(|d| *d.choose(&mut rand::rng()).unwrap())
                     .collect()
             })
             .collect();
@@ -715,7 +716,7 @@ fn generate_random_tuples_from_vars(variables: &[Vec<Arc<MinionVariable>>]) -> O
 fn generate_random_short_tuples_from_vars(
     variables: &[Vec<Arc<MinionVariable>>],
 ) -> Option<ShortTuples> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let all_vars: Vec<Arc<MinionVariable>> = variables.iter().flatten().cloned().collect();
     let n_vars = all_vars.len();
     if n_vars == 0 {
@@ -732,14 +733,14 @@ fn generate_random_short_tuples_from_vars(
     // a boundary case: the positive short constraints are then false
     // everywhere).
     let upper = (2_usize).saturating_pow(n_vars as u32).clamp(2, 20);
-    let num_short = rng.gen_range(0..=upper);
+    let num_short = rng.random_range(0..=upper);
 
     let mut tuples: Vec<Vec<(usize, i64)>> = Vec::with_capacity(num_short);
     for _ in 0..num_short {
         // Pick 0..=n_vars distinct positions for this short tuple. A
         // length-0 short tuple is the other boundary: it constrains no
         // variable and so is trivially satisfied (matches everything).
-        let len = rng.gen_range(0..=n_vars);
+        let len = rng.random_range(0..=n_vars);
         let mut positions: Vec<usize> = (0..n_vars).collect();
         positions.shuffle(&mut rng);
         positions.truncate(len);
@@ -817,7 +818,7 @@ fn build_with_pool(
                     variables.push(vec![pool_or_fresh(pool, d, size_factor)]);
                 }
                 List(d) => {
-                    let len = rand::random::<usize>() % (5 * f);
+                    let len = rand::rng().random_range(0..(5 * f));
                     variables.push(
                         (0..len)
                             .map(|_x| pool_or_fresh(pool, d, size_factor))
@@ -847,7 +848,7 @@ fn build_with_pool(
                                     && !d.arg.iter().any(|a| matches!(a, Arg::Constraint))
                             })
                             .collect();
-                        let idx = rand::random::<usize>() % leafs.len();
+                        let idx = rand::rng().random_range(0..leafs.len());
                         owned_child = leafs[idx].clone();
                         &owned_child
                     };
@@ -922,7 +923,7 @@ fn nested_with_pool(
     if depth == 0 {
         return build_with_pool(leaf_def, &[], current_size_factor(), pool);
     }
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     let shortlist = [
         "reify",
@@ -953,7 +954,7 @@ fn nested_with_pool(
                     variables.push(vec![pool_or_fresh(pool, d, size_factor)]);
                 }
                 List(d) => {
-                    let len = rand::random::<usize>() % (5 * f);
+                    let len = rand::rng().random_range(0..(5 * f));
                     variables.push(
                         (0..len)
                             .map(|_x| pool_or_fresh(pool, d, size_factor))

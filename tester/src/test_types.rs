@@ -5,8 +5,7 @@ use crate::run_minion::MinionOutput;
 use crate::run_minion_lib;
 extern crate rand;
 
-use self::rand::seq::SliceRandom;
-use self::rand::Rng;
+use self::rand::seq::IndexedRandom;
 
 use anyhow::{anyhow, Result};
 
@@ -1063,7 +1062,7 @@ pub fn test_constraint_midsearch_add_vars(
 fn wrap_in_random_nested(
     inner_def: &constraint_def::ConstraintDef,
 ) -> constraint_def::ConstraintInstance {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     // Fixed shortlist of parents we want to exercise here. Picked
     // explicitly (not from NESTED_CONSTRAINT_LIST) so we don't
     // accidentally pull in forwardchecking / check[gsa] / check[assign]
@@ -1494,7 +1493,7 @@ pub fn test_midsearch_add_new_vars_with_constraint(
     };
 
     // Build packets: each one adds 1 bool var and DisEq(new_var, base_var).
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     // Remember each packet's (new_var_name, paired_base_var_name) for
     // constraint checking.
     let mut packet_pairs: Vec<(String, String)> = Vec::with_capacity(n_packets);
@@ -1755,7 +1754,7 @@ pub fn test_constraint_nested(
     config: &MinionConfig,
     c: &constraint_def::ConstraintDef,
 ) -> Result<()> {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     let nest_type = constraint_def::NESTED_CONSTRAINT_LIST
         .choose(&mut rng)
         .unwrap();
@@ -1884,8 +1883,7 @@ pub fn test_constraint_optimisation(
         return Ok(());
     }
 
-    let mut rng = rand::thread_rng();
-    let minimise: bool = rng.gen();
+    let minimise: bool = rand::random();
 
     // Aux name uses a `__opt_` prefix that can't collide with any
     // generated variable name (those use `var_*`, `tup_*`, etc. via

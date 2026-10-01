@@ -6,8 +6,8 @@ edition = "2021"
 
 [dependencies]
 lazy_static = "1.4.0"
-rand = "0.8.5"
-itertools = "0.12"
+rand = { version = "0.10", features = ["thread_rng"] }
+itertools = "0.15"
 atomic-counter = "1.0.1"
 serde = "1.0.197"
 serde_json = "1.0.107"

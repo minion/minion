@@ -5,13 +5,13 @@ extern crate lazy_static;
 extern crate serde_derive;
 
 use clap::Parser;
+use rand::seq::IndexedRandom;
 use rayon::prelude::*;
 
 use anyhow::Context;
 use anyhow::Result;
 
-use rand::seq::SliceRandom;
-use rand::{thread_rng, Rng};
+use rand::{rng, RngExt};
 
 mod constraint_def;
 mod counter;
@@ -522,10 +522,9 @@ fn main() -> Result<()> {
         // Flat sweep of `count` trials (not per-constraint, since the
         // injected-constraint shape is fixed to DisEq(new, base)).
         (0..opt.count).into_par_iter().for_each(|_| {
-            let mut rng = thread_rng();
-            let base_defs: Vec<&constraint_def::ConstraintDef> = pool
-                .choose_multiple(&mut rng, opt.midsearch_base_size)
-                .collect();
+            let mut rng = rng();
+            let base_defs: Vec<&constraint_def::ConstraintDef> =
+                pool.sample(&mut rng, opt.midsearch_base_size).collect();
             let seed: u32 = rand::random();
             if trace {
                 let names: Vec<&str> = base_defs.iter().map(|d| d.name.as_str()).collect();
@@ -600,12 +599,12 @@ fn main() -> Result<()> {
         let trace = std::env::var("TESTER_TRACE").is_ok();
         v.clone().into_par_iter().for_each(|ref c| {
             (0..opt.count).into_par_iter().for_each(|_| {
-                let mut rng = thread_rng();
+                let mut rng = rng();
                 let base_defs: Vec<&constraint_def::ConstraintDef> = pool
                     .iter()
                     .filter(|d| d.name != c.name)
                     .collect::<Vec<_>>()
-                    .choose_multiple(&mut rng, opt.midsearch_base_size)
+                    .sample(&mut rng, opt.midsearch_base_size)
                     .copied()
                     .collect();
                 let seed: u32 = rand::random();
@@ -1087,11 +1086,11 @@ fn main() -> Result<()> {
 
     let mut testlist = vec![];
 
-    let mut rng = thread_rng();
+    let mut rng = rng();
 
     for _ in 0..opt.optioncount {
-        let tests = rng.gen_range(0..options.len());
-        let mut chosen: Vec<_> = options.choose_multiple(&mut rng, tests).collect();
+        let tests = rng.random_range(0..options.len());
+        let mut chosen: Vec<_> = options.sample(&mut rng, tests).collect();
 
         // Repeating most of these flags is last-wins, which is why the
         // sweep can throw an arbitrary subset at minion. -timelimit and
