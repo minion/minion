@@ -4,10 +4,13 @@ Minion's own release notes are in [`history.md`](https://github.com/minion/minio
 at the top of the repository. This file covers the Rust crate, which is
 versioned separately from the solver.
 
-## Unreleased
+## 0.1.2 — 2026-10-05
 
+- Reset Minion's wall-clock timers between runs, so a time limit from one run
+  no longer fires during a later run in the same process.
 - Stop generated headers from triggering repeated C++ rebuilds. Continue
   tracking source and system headers and bindgen environment overrides.
+- Update `bindgen` to 0.73.
 
 ## 0.1.1 — 2026-09-18
 
