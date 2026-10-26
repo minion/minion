@@ -56,6 +56,10 @@ struct Opt {
     #[arg(long)]
     in_process: bool,
 
+    /// Compare minion-sys printed models with the independent tester printer.
+    #[arg(long, conflicts_with_all = ["in_process", "valgrind", "compare_with", "optimisation_sweep"])]
+    printing_sweep: bool,
+
     /// Run the mid-search variable-injection test instead of the usual
     /// baseline-vs-tableised sweep. Requires --in-process. Each constraint
     /// is solved once, then re-solved with a callback that injects
@@ -198,7 +202,7 @@ struct Opt {
     /// constraint slot is wrapped as `!name` rather than emitted plain.
     /// Exercises minion's `VAR_NOTBOOL` parser path and the propagators'
     /// handling of negated bool references. `0` reproduces the
-    /// historical no-`!` behaviour. Forced to 0 under `--in-process`
+    /// historical no-`!` behaviour. Forced to 0 under `--in-process` or `--printing-sweep`
     /// because minion-sys has no negated-bool variant; the in-process
     /// backend would otherwise silently drop the `!`.
     #[arg(long, default_value_t = 0.25)]
@@ -340,9 +344,9 @@ fn main() -> Result<()> {
     );
 
     // Wire --negate-bool into the global bool-negation probability
-    // (per-mille). Forced to 0 under --in-process because that backend
+    // (per-mille). Forced to 0 under --in-process and --printing-sweep because minion-sys
     // would silently drop the `!` (minion-sys lacks NegatedBool).
-    let negate_pm = if opt.in_process {
+    let negate_pm = if opt.in_process || opt.printing_sweep {
         0
     } else {
         (opt.negate_bool.clamp(0.0, 1.0) * 1000.0).round() as u32
@@ -447,6 +451,18 @@ fn main() -> Result<()> {
             max_solutions: opt.max_solutions,
         }
     };
+
+    if opt.printing_sweep {
+        v.par_iter().try_for_each(|c| -> Result<()> {
+            for _ in 0..opt.count {
+                test_types::test_printing(&config, c, opt.nest_depth)
+                    .with_context(|| format!("printing {}", c.name))?;
+            }
+            println!("Tested printing {}", c.name);
+            Ok(())
+        })?;
+        return Ok(());
+    }
 
     // ---- direct solver comparison mode ----
     if !opt.compare_with.is_empty() {

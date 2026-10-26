@@ -283,6 +283,14 @@ jobs:
               cd test_instances
               bash ./run_tests.sh ../bin-debug/minion
 
+      - name: "minion-sys printer comparison"
+        timeout-minutes: 5
+        run: |
+              export PATH=$PATH:$HOME/.cargo/bin
+              cd tester
+              cargo run --release -- --printing-sweep --minion ../bin-quick/minion --count 3 --numthreads 4
+              cargo run --release -- --printing-sweep --minion ../bin-quick/minion --count 3 --nest-depth 2 --numthreads 4
+
       # In-process runs go through minion-sys (the Rust FFI binding) and
       # reach the mid-search injection paths. Note --maxtuples, not
       # --max-solutions, is the per-run solution cap in the mid-search

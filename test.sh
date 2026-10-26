@@ -104,6 +104,14 @@ if [ "$MODE" = "light" ]; then
       --count 10 --variant-count 20 --optioncount 100 \
       --nest-depth 2 --size-factor 2 --numthreads 4"
 
+  run_phase "minion-sys printer comparison" \
+    bash -c "cd '$REPO/tester' && cargo run --release -- --printing-sweep \
+      --minion '$REPO/bin-quick/minion' --count 3 --numthreads 4"
+
+  run_phase "minion-sys printer comparison: nested" \
+    bash -c "cd '$REPO/tester' && cargo run --release -- --printing-sweep \
+      --minion '$REPO/bin-quick/minion' --count 3 --nest-depth 2 --numthreads 4"
+
   run_phase "minion-sys cargo test" \
     bash -c "cd '$REPO/minion-sys' && cargo test --release"
 
