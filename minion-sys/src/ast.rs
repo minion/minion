@@ -2,10 +2,7 @@
 
 use std::{collections::HashMap, fmt::Display};
 
-use crate::print::{
-    print_const_array, print_constraint_array, print_short_tuple_array, print_tuple_array,
-    print_var_array,
-};
+use crate::print::{collect_short_tables, print_const_array, print_tuple_array, print_var_array};
 
 /// The name of a variable in a Minion model.
 pub type VarName = String;
@@ -314,10 +311,33 @@ pub enum Constraint {
     True,
 }
 
-#[allow(clippy::todo, unused_variables)]
+// Short-tuple references in a fragment use local table names. Use
+// write_minion_file to emit their definitions and share names across constraints.
 impl Display for Constraint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
+        let mut short_tables = Vec::new();
+        collect_short_tables(self, &mut short_tables);
+        ConstraintDisplay {
+            constraint: self,
+            short_tables: &short_tables,
+        }
+        .fmt(f)
+    }
+}
+
+pub(crate) struct ConstraintDisplay<'a> {
+    pub constraint: &'a Constraint,
+    pub short_tables: &'a [&'a [ShortTuple]],
+}
+
+#[allow(clippy::expect_used)]
+impl Display for ConstraintDisplay<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let display = |constraint| ConstraintDisplay {
+            constraint,
+            short_tables: self.short_tables,
+        };
+        match self.constraint {
             Constraint::Difference((a, b), var) => write!(f, "difference({a},{b},{var})"),
             Constraint::Div((a, b), var) => write!(f, "div({a},{b},{var})"),
             Constraint::DivUndefZero((a, b), var) => write!(f, "div_undefzero({a},{b},{var})"),
@@ -343,21 +363,34 @@ impl Display for Constraint {
                     print_var_array(vars)
                 )
             }
-            Constraint::CheckAssign(constraint) => write!(f, "check[assign]({constraint})"),
-            Constraint::CheckGsa(constraint) => write!(f, "check[gsa]({constraint})"),
+            Constraint::CheckAssign(constraint) => {
+                write!(f, "check[assign]({})", display(constraint))
+            }
+            Constraint::CheckGsa(constraint) => write!(f, "check[gsa]({})", display(constraint)),
             Constraint::ForwardChecking(constraint) => {
-                write!(f, "forwardchecking({constraint})")
+                write!(f, "forwardchecking({})", display(constraint))
             }
-            Constraint::Reify(constraint, var) => write!(f, "reify({constraint},{var})"),
-            Constraint::ReifyImply(constraint, var) => write!(f, "reifyimply({constraint},{var})"),
+            Constraint::Reify(constraint, var) => write!(f, "reify({},{var})", display(constraint)),
+            Constraint::ReifyImply(constraint, var) => {
+                write!(f, "reifyimply({},{var})", display(constraint))
+            }
             Constraint::ReifyImplyQuick(constraint, var) => {
-                write!(f, "reifyimply-quick({constraint},{var})")
+                write!(f, "reifyimply-quick({},{var})", display(constraint))
             }
-            Constraint::WatchedAnd(constraints) => {
-                write!(f, "watched-and({})", print_constraint_array(constraints))
-            }
-            Constraint::WatchedOr(constraints) => {
-                write!(f, "watched-or({})", print_constraint_array(constraints))
+            Constraint::WatchedAnd(constraints) | Constraint::WatchedOr(constraints) => {
+                let name = if matches!(self.constraint, Constraint::WatchedAnd(_)) {
+                    "watched-and"
+                } else {
+                    "watched-or"
+                };
+                write!(f, "{name}({{")?;
+                for (index, constraint) in constraints.iter().enumerate() {
+                    if index > 0 {
+                        write!(f, ",")?;
+                    }
+                    write!(f, "{}", display(constraint))?;
+                }
+                write!(f, "}})")
             }
             Constraint::GacAllDiff(vars) => write!(f, "gacalldiff({})", print_var_array(vars)),
             Constraint::AllDiff(vars) => write!(f, "alldiff({})", print_var_array(vars)),
@@ -516,30 +549,28 @@ impl Display for Constraint {
             Constraint::Str2Plus(vars, table_var) => {
                 write!(f, "str2plus({},{table_var})", print_var_array(vars))
             }
-            Constraint::ShortStr2(vars, short) => write!(
-                f,
-                "shortstr2({},{})",
-                print_var_array(vars),
-                print_short_tuple_array(short)
-            ),
-            Constraint::HaggisGac(vars, short) => write!(
-                f,
-                "haggisgac({},{})",
-                print_var_array(vars),
-                print_short_tuple_array(short)
-            ),
-            Constraint::HaggisGacStable(vars, short) => write!(
-                f,
-                "haggisgac-stable({},{})",
-                print_var_array(vars),
-                print_short_tuple_array(short)
-            ),
-            Constraint::ShortCTupleStr2(vars, short) => write!(
-                f,
-                "shortctuplestr2({},{})",
-                print_var_array(vars),
-                print_short_tuple_array(short)
-            ),
+            Constraint::ShortStr2(vars, short)
+            | Constraint::HaggisGac(vars, short)
+            | Constraint::HaggisGacStable(vars, short)
+            | Constraint::ShortCTupleStr2(vars, short) => {
+                let name = match self.constraint {
+                    Constraint::ShortStr2(..) => "shortstr2",
+                    Constraint::HaggisGac(..) => "haggisgac",
+                    Constraint::HaggisGacStable(..) => "haggisgac-stable",
+                    Constraint::ShortCTupleStr2(..) => "shortctuplestr2",
+                    _ => unreachable!(),
+                };
+                let index = self
+                    .short_tables
+                    .iter()
+                    .position(|table| *table == short.as_slice())
+                    .expect("short tuple table must be registered");
+                write!(
+                    f,
+                    "{name}({},_minion_sys_short_{index})",
+                    print_var_array(vars)
+                )
+            }
             Constraint::Max(vars, var) => write!(f, "max({},{var})", print_var_array(vars)),
             Constraint::Min(vars, var) => write!(f, "min({},{var})", print_var_array(vars)),
             Constraint::NvalueGeq(vars, var) => {
@@ -604,8 +635,8 @@ impl Display for Constraint {
             Constraint::WatchLess(var, var1) => write!(f, "watchless({var},{var1})"),
             Constraint::WatchNeq(var, var1) => write!(f, "watchneq({var},{var1})"),
             Constraint::Ineq(var, var1, constant) => write!(f, "ineq({var},{var1},{constant})"),
-            Constraint::False => write!(f, "false"),
-            Constraint::True => write!(f, "true"),
+            Constraint::False => write!(f, "false()"),
+            Constraint::True => write!(f, "true()"),
         }
     }
 }

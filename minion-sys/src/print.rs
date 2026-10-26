@@ -3,7 +3,9 @@
 
 use std::io::Write;
 
-use crate::ast::{Constant, Constraint, Model, Optimise, ShortTuple, Tuple, Var, VarName};
+use crate::ast::{
+    Constant, Constraint, ConstraintDisplay, Model, Optimise, ShortTuple, Tuple, Var, VarName,
+};
 
 /// Writes a complete Minion file for this model to `writer`.
 pub fn write_minion_file(writer: &mut impl Write, model: &Model) -> Result<(), std::io::Error> {
@@ -38,10 +40,14 @@ pub fn write_search_section(writer: &mut impl Write, model: &Model) -> Result<()
 
     writeln!(writer, "**SEARCH**")?;
 
-    // no aux vars
     let varorder = symtab.get_search_variable_order();
 
     writeln!(writer, "VARORDER STATIC [{}]", varorder.join(","))?;
+    writeln!(
+        writer,
+        "PRINT [[{}]]",
+        symtab.get_variable_order().join(",")
+    )?;
 
     if let Some(Optimise { minimise, var }) = &model.optimise {
         if *minimise {
@@ -54,16 +60,63 @@ pub fn write_search_section(writer: &mut impl Write, model: &Model) -> Result<()
     Ok(())
 }
 
-/// Writes the `CONSTRAINTS` section of the Minion file to `writer`.
+/// Writes tuple definitions and the `CONSTRAINTS` section to `writer`.
+///
+/// # Panics
+///
+/// If a named tuple table has rows of different lengths.
+#[allow(clippy::panic_in_result_fn)]
 pub fn write_constraints_section(
     writer: &mut impl Write,
     model: &Model,
 ) -> Result<(), std::io::Error> {
     let constraints = &model.constraints;
+    if !model.tuple_tables.is_empty() {
+        writeln!(writer, "**TUPLELIST**")?;
+        for (name, tuples) in &model.tuple_tables {
+            let arity = tuples.first().map_or(0, Vec::len);
+            assert!(
+                tuples.iter().all(|tuple| tuple.len() == arity),
+                "ragged tuple table"
+            );
+            writeln!(writer, "{name} {} {arity}", tuples.len())?;
+            for tuple in tuples {
+                writeln!(
+                    writer,
+                    "{}",
+                    tuple
+                        .iter()
+                        .map(ToString::to_string)
+                        .collect::<Vec<_>>()
+                        .join(" ")
+                )?;
+            }
+        }
+    }
+    let mut short_tables = Vec::new();
+    for constraint in constraints {
+        collect_short_tables(constraint, &mut short_tables);
+    }
+    if !short_tables.is_empty() {
+        writeln!(writer, "**SHORTTUPLELIST**")?;
+        for (index, tuples) in short_tables.iter().enumerate() {
+            writeln!(writer, "_minion_sys_short_{index} {}", tuples.len())?;
+            for tuple in *tuples {
+                writeln!(writer, "{}", print_short_tuple(tuple))?;
+            }
+        }
+    }
     writeln!(writer, "**CONSTRAINTS**")?;
 
     for constraint in constraints {
-        writeln!(writer, "{constraint}")?;
+        writeln!(
+            writer,
+            "{}",
+            ConstraintDisplay {
+                constraint,
+                short_tables: &short_tables
+            }
+        )?;
     }
 
     Ok(())
@@ -84,7 +137,7 @@ pub fn write_variable_declaration(
     #[allow(clippy::expect_used)]
     match symtab.get_vartype(name.clone()).expect("name should exist") {
         crate::ast::VarDomain::Bound(i, j) => writeln!(writer, "BOUND {name} {{{i}..{j}}}")?,
-        crate::ast::VarDomain::Discrete(i, j) => writeln!(writer, "DISCRETE {name}, {{{i}..{j}}}")?,
+        crate::ast::VarDomain::Discrete(i, j) => writeln!(writer, "DISCRETE {name} {{{i}..{j}}}")?,
         crate::ast::VarDomain::Bool => writeln!(writer, "BOOL {name}")?,
         crate::ast::VarDomain::SparseBound(vals) => {
             let vals_str: Vec<String> = vals.iter().map(|n| n.to_string()).collect();
@@ -110,28 +163,52 @@ pub(crate) fn print_var_array(array: &[Var]) -> String {
 pub(crate) fn print_tuple_array(array: &[Tuple]) -> String {
     let string_array: Vec<String> = array
         .iter()
-        .map(|tup| format!("[{}]", print_const_array(tup)))
-        .collect();
-    let string = string_array.join(",");
-    format!("[{string}]")
-}
-
-pub(crate) fn print_short_tuple_array(array: &[ShortTuple]) -> String {
-    let string_array: Vec<String> = array
-        .iter()
-        .map(|short| {
-            let pairs: Vec<String> = short
-                .iter()
-                .map(|(idx, val)| format!("({idx},{val})"))
-                .collect();
-            format!("[{}]", pairs.join(","))
+        .map(|tup| {
+            format!(
+                "<{}>",
+                tup.iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(",")
+            )
         })
         .collect();
-    format!("[{}]", string_array.join(","))
+    let string = string_array.join(",");
+    format!("{{{string}}}")
 }
 
-pub(crate) fn print_constraint_array(array: &[Constraint]) -> String {
-    let string_array: Vec<String> = array.iter().map(|x| format!("{x}")).collect();
-    let string = string_array.join(",");
-    format!("[{string}]")
+fn print_short_tuple(tuple: &ShortTuple) -> String {
+    let pairs: Vec<String> = tuple
+        .iter()
+        .map(|(idx, val)| format!("({idx},{val})"))
+        .collect();
+    format!("[{}]", pairs.join(","))
+}
+
+pub(crate) fn collect_short_tables<'a>(
+    constraint: &'a Constraint,
+    tables: &mut Vec<&'a [ShortTuple]>,
+) {
+    match constraint {
+        Constraint::ShortStr2(_, tuples)
+        | Constraint::HaggisGac(_, tuples)
+        | Constraint::HaggisGacStable(_, tuples)
+        | Constraint::ShortCTupleStr2(_, tuples) => {
+            if !tables.contains(&tuples.as_slice()) {
+                tables.push(tuples);
+            }
+        }
+        Constraint::CheckAssign(child)
+        | Constraint::CheckGsa(child)
+        | Constraint::ForwardChecking(child)
+        | Constraint::Reify(child, _)
+        | Constraint::ReifyImply(child, _)
+        | Constraint::ReifyImplyQuick(child, _) => collect_short_tables(child, tables),
+        Constraint::WatchedAnd(children) | Constraint::WatchedOr(children) => {
+            for child in children {
+                collect_short_tables(child, tables);
+            }
+        }
+        _ => {}
+    }
 }
