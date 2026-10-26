@@ -1,0 +1,8 @@
+#TEST SOLCOUNT 2
+MINION 3
+**VARIABLES**
+BOOL x
+**CONSTRAINTS**
+watched-and({})
+watched-or({watched-or({}),true()})
+**EOF**
