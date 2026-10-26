@@ -406,6 +406,14 @@ fn add_variables_and_holes(model: &mut Model, instance: &ConstraintInstance) -> 
     Ok(())
 }
 
+pub fn model_for_printing(instance: &ConstraintInstance) -> Result<Model> {
+    let mut model = Model::new();
+    register_tuple_tables_for_instance(&mut model, instance)?;
+    add_variables_and_holes(&mut model, instance)?;
+    model.constraints.push(build_constraint(instance)?);
+    Ok(model)
+}
+
 /// Output of a constraint-injection run.
 pub struct InjectOutput {
     pub solutions: Vec<Vec<i64>>,

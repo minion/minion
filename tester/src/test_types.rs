@@ -243,6 +243,75 @@ fn run_solve_inner(
     }
 }
 
+pub fn test_printing(
+    config: &MinionConfig,
+    c: &constraint_def::ConstraintDef,
+    depth: usize,
+) -> Result<()> {
+    assert_eq!(config.backend, Backend::Exec);
+    let limit = if config.max_solutions > 0 {
+        config.maxtuples.min((config.max_solutions - 1) as usize)
+    } else {
+        config.maxtuples
+    };
+    let instance = (0..100)
+        .map(|_| constraint_def::build_random_nested_tree(c, depth))
+        .find(|instance| {
+            instance
+                .vars()
+                .iter()
+                .flatten()
+                .fold(1usize, |n, var| n.saturating_mul(var.domain.len()))
+                <= limit
+        })
+        .ok_or_else(|| anyhow!("could not generate a bounded printing trial for {}", c.name))?;
+    let model = run_minion_lib::model_for_printing(&instance)?;
+    let reference = run_minion::get_printing_solutions(
+        config.minionexec,
+        &instance,
+        None,
+        config.max_solutions,
+    )?;
+    let printed = run_minion::get_printing_solutions(
+        config.minionexec,
+        &instance,
+        Some(&model),
+        config.max_solutions,
+    )?;
+    anyhow::ensure!(
+        !reference.hit_solution_cap && !printed.hit_solution_cap,
+        "printing comparison incomplete: {} / {}",
+        reference.filename,
+        printed.filename,
+    );
+    anyhow::ensure!(
+        reference.solutions == printed.solutions,
+        "printer solution mismatch: {} / {}",
+        reference.filename,
+        printed.filename,
+    );
+    let tableised = instance
+        .tableise(config.maxtuples)
+        .ok_or_else(|| anyhow!("bounded printing instance could not be tableised"))?;
+    let table_model = run_minion_lib::model_for_printing(&tableised)?;
+    let table_printed = run_minion::get_printing_solutions(
+        config.minionexec,
+        &tableised,
+        Some(&table_model),
+        config.max_solutions,
+    )?;
+    anyhow::ensure!(
+        !table_printed.hit_solution_cap && reference.solutions == table_printed.solutions,
+        "named-table printer mismatch or incomplete search: {} / {}",
+        reference.filename,
+        table_printed.filename,
+    );
+    table_printed.cleanup.cleanup();
+    reference.cleanup.cleanup();
+    printed.cleanup.cleanup();
+    Ok(())
+}
+
 pub fn test_compare_solvers(
     config: &MinionConfig,
     compare_path: &str,

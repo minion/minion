@@ -53,6 +53,8 @@ Important flags (full list: `cargo run -- --help` from `tester/`):
 - `--maxtuples N` — cap on solution count when solving a tableised reference.
 - `--max-solutions N` — abandon a trial whose solution set exceeds N (default 10M).
 
+`--printing-sweep --minion <path>` compares the same random instance through the tester's independent printer and `minion_sys::print::write_minion_file`, requiring identical solution multisets. The tableised version also goes through minion-sys, exercising named tuple tables. It covers every registered constraint, including named tables, short tuples and nested constraints (`--nest-depth 2`). Trials are restricted to small domain products; timeouts and solution caps fail the comparison. Boolean negation is disabled because the minion-sys AST cannot represent it. Flat and nested sweeps run in CI and `--light`.
+
 ### 3. minion-sys integration tests — `minion-sys/tests/`
 
 Rust unit tests (`cargo test --release`) that drive the C FFI surface directly without going through the random tester. These cover features the random tester can't easily express:

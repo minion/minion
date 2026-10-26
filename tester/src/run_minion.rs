@@ -102,6 +102,7 @@ impl CleanupFiles {
 struct MinionJsonOut {
     Nodes: String,
     SolutionsFound: String,
+    TimeOut: String,
     /// Present only when the run used -X-parallelWorkSteal. Reports
     /// how many donate() calls fired; the tester accumulates these
     /// so we can assert that work-steal actually exercised the
@@ -152,6 +153,8 @@ pub fn get_minion_solutions(
         max_solutions,
         keep_full_solutions,
         None,
+        None,
+        false,
     )
 }
 
@@ -178,12 +181,35 @@ pub fn get_minion_solutions_optimisation(
         max_solutions,
         false,
         Some(optimisation),
+        None,
+        false,
     )
 }
 
-// Eight parameters, one over clippy's limit. They are all independent
-// knobs of a single solver invocation; bundling them into a struct
-// would just move the argument list somewhere else.
+pub fn get_printing_solutions(
+    minionexec: &str,
+    instance: &ConstraintInstance,
+    model: Option<&minion_sys::ast::Model>,
+    max_solutions: i64,
+) -> Result<MinionOutput> {
+    get_minion_solutions_inner(
+        minionexec,
+        &[],
+        &["-findallsols", "-timelimit", "10"],
+        instance,
+        if model.is_some() {
+            "minion-sys-print"
+        } else {
+            "print-reference"
+        },
+        max_solutions,
+        false,
+        None,
+        model,
+        true,
+    )
+}
+
 #[allow(clippy::too_many_arguments)]
 fn get_minion_solutions_inner(
     minionexec: &str,
@@ -194,6 +220,8 @@ fn get_minion_solutions_inner(
     max_solutions: i64,
     keep_full_solutions: bool,
     optimisation: Option<&OptimisationWrapper>,
+    printed_model: Option<&minion_sys::ast::Model>,
+    require_complete: bool,
 ) -> Result<MinionOutput> {
     let nameid = format!(
         "{:?}_{}_{}",
@@ -236,11 +264,15 @@ fn get_minion_solutions_inner(
     {
         let mut outfile =
             fs::File::create(&minout).context("Could not open output file for writing")?;
-        match optimisation {
-            None => print_minion_file_pair(&mut outfile, instance),
-            Some(opt) => print_minion_file_pair_optimisation(&mut outfile, instance, opt),
+        if let Some(model) = printed_model {
+            minion_sys::print::write_minion_file(&mut outfile, model)?;
+        } else {
+            match optimisation {
+                None => print_minion_file_pair(&mut outfile, instance),
+                Some(opt) => print_minion_file_pair_optimisation(&mut outfile, instance, opt),
+            }
+            .context("failed writing Minion output")?;
         }
-        .context("failed writing Minion output")?;
     }
 
     let minioncmd = format!("{} {}", minionexec, args.iter().join(" "));
@@ -317,6 +349,12 @@ fn get_minion_solutions_inner(
         let v: MinionJsonOut = serde_json::from_reader(reader)
             .context(format!("jsontableout not valid json!: {}", minioncmd))?;
 
+        if require_complete {
+            anyhow::ensure!(
+                v.TimeOut == "0",
+                "printing comparison timed out: {minioncmd}"
+            );
+        }
         let nodes = v
             .Nodes
             .parse::<i64>()
