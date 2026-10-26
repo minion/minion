@@ -513,6 +513,8 @@ std::shared_ptr<TupleList> MinionThreeInputReader<FileReader>::readConstraintTup
     vector<vector<DomainInt>> tuples;
     infile->checkSym('{');
     char delim = infile->peekChar();
+    if(delim == '}')
+      infile->checkSym('}');
 
     SysInt tupleSize = 0;
 
@@ -522,7 +524,7 @@ std::shared_ptr<TupleList> MinionThreeInputReader<FileReader>::readConstraintTup
       // Optimisation
       tuple.reserve(tupleSize);
 
-      char nextChar = ',';
+      char nextChar = infile->peekChar() == '>' ? infile->getChar() : ',';
       while(nextChar == ',') {
         tuple.push_back(infile->readNum());
         nextChar = infile->getChar();
@@ -530,7 +532,7 @@ std::shared_ptr<TupleList> MinionThreeInputReader<FileReader>::readConstraintTup
       if(nextChar != '>')
         throw parse_exception("Expected ',' or '>'");
 
-      if(tupleSize == 0)
+      if(tuples.empty())
         tupleSize = tuple.size();
       if(tupleSize != (SysInt)tuple.size())
         throw parse_exception("All tuples in each constraint must be the same size!");
@@ -671,6 +673,10 @@ vector<ConstraintBlob> MinionThreeInputReader<FileReader>::readConstraintList(Fi
   vector<ConstraintBlob> conlist;
 
   infile->checkSym('{');
+  if(infile->peekChar() == '}') {
+    infile->checkSym('}');
+    return conlist;
+  }
   conlist.push_back(readConstraint(infile));
 
   char delim = infile->getChar();

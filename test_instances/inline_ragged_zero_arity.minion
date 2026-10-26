@@ -1,0 +1,7 @@
+#TEST EXITCODE1
+MINION 3
+**VARIABLES**
+BOOL x
+**CONSTRAINTS**
+table([x],{<>,<1>})
+**EOF**

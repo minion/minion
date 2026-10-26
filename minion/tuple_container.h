@@ -252,7 +252,8 @@ public:
         equal = false;
       else {
         std::shared_ptr<TupleList> ptr = InternalTupleList[i];
-        if((SysInt)tuples.size() != ptr->size() || (SysInt)tuples[0].size() != ptr->tupleSize()) {
+        if((SysInt)tuples.size() != ptr->size() ||
+           (tuples.empty() ? 0 : (SysInt)tuples[0].size()) != ptr->tupleSize()) {
           equal = false;
         } else {
           for(SysInt j = 0; j < (SysInt)tuples.size() && equal; ++j) {
