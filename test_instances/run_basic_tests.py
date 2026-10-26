@@ -29,8 +29,14 @@ from pathlib import Path
 
 
 def run(exe, cwd, args):
-    p = subprocess.run([exe, *args], capture_output=True, text=True, cwd=cwd)
-    return p.stdout, p.returncode
+    return subprocess.run([exe, *args], capture_output=True, text=True, cwd=cwd)
+
+
+def result(p, passed, message):
+    if not passed:
+        message += f"\nCommand: {p.args!r}\nExit code: {p.returncode}"
+        message += f"\nstdout:\n{p.stdout}\nstderr:\n{p.stderr}"
+    return passed, message
 
 
 def field(out, label):
@@ -64,29 +70,34 @@ def check(exe, path):
 
     m = re.search(r"^#TEST SOLCOUNT\s+(\S+)", text, re.M)
     if m:
-        out, _ = run(exe, cwd, [name, *extra, "-findallsols"])
-        got, want = field(out, "Solutions Found:"), m.group(1)
-        return got == want, f"Got '{got}' instead of '{want}' solutions in {name}"
+        p = run(exe, cwd, [name, *extra, "-findallsols"])
+        got, want = field(p.stdout, "Solutions Found:"), m.group(1)
+        return result(p, p.returncode == 0 and got == want,
+                      f"Got '{got}' instead of '{want}' solutions in {name}")
 
     m = re.search(r"^#TEST CHECKONESOL(.*)$", text, re.M)
     if m:
-        out, _ = run(exe, cwd, [name, *extra])
-        got, want = first_solution(out), norm(m.group(1))
-        return got == want, f"Got '{got}' instead of '{want}' as solution in {name}"
+        p = run(exe, cwd, [name, *extra])
+        got, want = first_solution(p.stdout), norm(m.group(1))
+        return result(p, p.returncode == 0 and got == want,
+                      f"Got '{got}' instead of '{want}' as solution in {name}")
 
     m = re.search(r"^#TEST NODECOUNT\s+(\S+)", text, re.M)
     if m:
-        out, _ = run(exe, cwd, [name, *extra])
-        got, want = field(out, "Total Nodes:"), m.group(1)
-        return got == want, f"Got '{got}' instead of '{want}' search nodes in {name}"
+        p = run(exe, cwd, [name, *extra])
+        got, want = field(p.stdout, "Total Nodes:"), m.group(1)
+        return result(p, p.returncode == 0 and got == want,
+                      f"Got '{got}' instead of '{want}' search nodes in {name}")
 
     if "#TEST EXITCODE1" in text:
-        _, rc = run(exe, cwd, [name, *extra])
-        return rc == 1, f"Got return code of {rc}, expected 1 in {name}"
+        p = run(exe, cwd, [name, *extra])
+        return result(p, p.returncode == 1,
+                      f"Got return code of {p.returncode}, expected 1 in {name}")
 
     if "#TEST EXITCODE0" in text:
-        _, rc = run(exe, cwd, [name, *extra])
-        return rc == 0, f"Got return code of {rc}, expected 0 in {name}"
+        p = run(exe, cwd, [name, *extra])
+        return result(p, p.returncode == 0,
+                      f"Got return code of {p.returncode}, expected 0 in {name}")
 
     print(f"Test {name} is not well-formed.")
     sys.exit(1)
@@ -121,7 +132,7 @@ def main():
             elif not want_pass:
                 print(f"\nExpected {path.name} to fail.")
             else:
-                print(f"\n{message}")
+                print(f"\n{message}", flush=True)
         else:
             if passed == want_pass:
                 print(f"\n{path.name} passed, but is supposed to be buggy!")
