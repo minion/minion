@@ -19,14 +19,21 @@ Minion has four layers of test infrastructure. Both `--light` and `--heavy` exer
 
 ### 1. `.minion` regression suite — `test_instances/`
 
-Hand-curated `.minion` instances with embedded expected results. Each file may contain `#TEST SOLCOUNT n`, `#TEST CHECKONESOL ...`, `#TEST NODECOUNT n`, `#TEST EXITCODE1`, `#TEST EXITCODE0` (exit status must be 1 or 0 respectively), `#FAIL` (expected failure), or `#BUG` (known bug). Counts: ~287 files in `test_instances/`, 4 in `tests-32domains/`, 21 in `tests-64domains/`. About 20 files exercise optimisation (`MAXIMISING` / `MINIMISING`).
+Hand-curated `.minion` instances with embedded expected results. Each file may contain `#TEST SOLCOUNT n`, `#TEST CHECKONESOL ...`, `#TEST NODECOUNT n`, `#TEST EXITCODE1`, `#TEST EXITCODE0`, `#TEST EXITCODE9` (expected exit status), `#FAIL` (expected failure), or `#BUG` (known bug). Optimisation instances use `MAXIMISING` or `MINIMISING`.
 
-The runners are:
-- `run_tests.sh <minion-binary>` — full regression, run by both light and heavy.
-- `run_random_tests.sh` — solution-count-only subset, safe under randomised orderings or parallel exploration. Used when checking parallel modes.
-- `do_basic_tests.sh`, `do_random_tests.sh` — building blocks invoked by the above; not normally run directly.
-  `TEST_64DOMAINS=1 ./do_basic_tests.sh <binary>` adds `tests-64domains/`, which needs a `--domains64` build; CI runs this in the `domains64` job.
-- `do_valgrind_tests.sh`, `fullprop_test.sh` — specialised, not in the default flows.
+Use `python3 test_instances/run_tests.py <minion-binary> [options] [extra minion flags]`:
+
+- No options runs basic checks, randomised heuristic sweeps, and the SAC/SSAC/AMO checks. Every failure makes the suite exit non-zero.
+- `--basic-only` runs only per-instance checks.
+- `--random-only` checks solution counts under different orderings, excluding optimisation, known failures and bugs. This is the subset suitable for parallel search.
+- `--big` also includes `tests-64domains/` and requires a `--domains64` binary. CI uses `--basic-only --big` for that build.
+- `--timeout N` bounds each solver invocation (default 60 seconds); `--budget-seconds N` bounds the whole suite (default 900 seconds). Output is flushed as tests complete.
+
+The same Python runner is used on Linux, macOS and Windows. On Windows, invoke `python` from cmd to avoid the git-bash launch failures. Solver failures report the command, exit status, stdout and stderr. Random sweeps preserve each instance's `EXTRAFLAGS`.
+
+`run_basic_tests.py <binary> [directory]` can run per-instance checks alone. `#TEST EXITCODE9` explicitly expects Minion's exception-handler exit for malformed input; a crash is never accepted by `#FAIL` or `#BUG`.
+
+Run harness regression tests with `python3 -m unittest discover -s test_instances -p test_runners.py`; CI runs them on Linux, macOS and Windows. `do_valgrind_tests.sh` and `fullprop_test.sh` remain specialised shell runners outside the default flows.
 
 ### 2. Random constraint tester — `tester/`
 
@@ -125,7 +132,7 @@ The four short-tuple constraints (`shortstr2`, `haggisgac`, `haggisgac-stable`, 
 **Gap to flag:** the random tester does not generate optimisation instances (`MAXIMISING` / `MINIMISING`). All optimisation correctness comes from the ~20 hand-written regression files. If you change anything in the optimisation path, lean on the `.minion` suite.
 
 ### Search heuristics
-All `-varorder` choices (`static`, `sdf`, `sdf-random`, `srf`, `srf-random`, `ldf`, `ldf-random`, `random`, `conflict`, `wdeg`, `domoverwdeg`) are covered by the option-sweep, and additionally by `run_random_tests.sh` for solution-count agreement under each ordering. All `-valorder` choices (`ascend`, `descend`, `random`) and `-randomiseorder` / `-randomseed` are covered.
+The option-sweep covers all `-varorder` choices. `run_tests.py --random-only` additionally checks solution-count agreement under static, random, sdf/srf/ldf (including their randomised variants), and wdeg/domoverwdeg when the binary supports them. All `-valorder` choices (`ascend`, `descend`, `random`) and `-randomiseorder` / `-randomseed` are covered.
 
 ### Parallel modes
 | Mode | Coverage |

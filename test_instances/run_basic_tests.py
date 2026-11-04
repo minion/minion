@@ -1,42 +1,71 @@
 #!/usr/bin/env python3
-"""Run the .minion regression suite without a POSIX shell.
+"""Per-instance checks for run_tests.py, also runnable on their own.
 
-do_basic_tests.sh is the reference implementation and remains the one
-used on Linux and macOS. This exists because minion.exe cannot be run
-from git-bash on the Windows CI runners: every invocation dies with exit
-139 before producing output, whatever the working directory or instance,
-and whether bash starts it directly or by way of `cmd /c`. The same
-binary run from cmd solves everything correctly. So the Windows job
-drives this from cmd instead, keeping MSYS out of the chain entirely.
-
-Supports the same directives as do_basic_tests.sh:
+Directives:
   #TEST SOLCOUNT n       -findallsols, compare "Solutions Found:"
   #TEST CHECKONESOL ...  compare the first solution
   #TEST NODECOUNT n      compare "Total Nodes:"
   #TEST EXITCODE1        minion must exit 1
   #TEST EXITCODE0        minion must exit 0
+  #TEST EXITCODE9        minion must reject input via its exception handler
   #TEST EXTRAFLAGS ...   extra flags for this instance
   #FAIL                  the test is expected to fail
   #BUG                   known-broken: failing is expected, passing is not
 
-Exit status is the number of unexpected failures, as in the shell
-version.
+Exit status is non-zero if any test fails unexpectedly.
 """
+import argparse
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 
+HERE = Path(__file__).resolve().parent
 
-def run(exe, cwd, args):
-    return subprocess.run([exe, *args], capture_output=True, text=True, cwd=cwd)
+
+def diagnostics(p):
+    return (f"Command: {p.args!r}\nExit code: {p.returncode}"
+            f"\nstdout:\n{p.stdout}\nstderr:\n{p.stderr}")
+
+
+class Solver:
+    def __init__(self, exe, timeout=60, budget_seconds=900):
+        self.exe = str(Path(exe).resolve())
+        if not Path(self.exe).is_file():
+            raise ValueError(f"{self.exe} does not exist")
+        if timeout <= 0 or budget_seconds <= 0:
+            raise ValueError("Timeout and suite budget must be positive")
+        self.timeout = timeout
+        self.deadline = time.monotonic() + budget_seconds
+
+    def run(self, cwd, args, expected_exit=0):
+        command = [self.exe, *args]
+        remaining = self.deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError(f"Suite budget exhausted before command: {command!r}")
+        try:
+            p = subprocess.run(command, capture_output=True, text=True, cwd=cwd,
+                               timeout=min(self.timeout, remaining))
+        except subprocess.TimeoutExpired as error:
+            stdout = error.stdout or b""
+            stderr = error.stderr or b""
+            if isinstance(stdout, bytes):
+                stdout = stdout.decode(errors="replace")
+            if isinstance(stderr, bytes):
+                stderr = stderr.decode(errors="replace")
+            raise RuntimeError(f"Command: {command!r}\nTimed out after {error.timeout}s"
+                               f"\nstdout:\n{stdout}\nstderr:\n{stderr}") from error
+        # Exit 1 is Minion's normal input-error status, explicitly expected
+        # by negative tests. Signals and other statuses must never be
+        # accepted by #FAIL or #BUG.
+        if p.returncode not in (0, 1, expected_exit):
+            raise RuntimeError(diagnostics(p))
+        return p
 
 
 def result(p, passed, message):
-    if not passed:
-        message += f"\nCommand: {p.args!r}\nExit code: {p.returncode}"
-        message += f"\nstdout:\n{p.stdout}\nstderr:\n{p.stderr}"
-    return passed, message
+    return passed, message + "\n" + diagnostics(p)
 
 
 def field(out, label):
@@ -58,64 +87,55 @@ def norm(s):
     return ",".join(s.split())
 
 
-def check(exe, path):
+def extra_flags(text):
+    m = re.search(r"^#TEST EXTRAFLAGS(.*)$", text, re.M)
+    return m.group(1).split() if m else []
+
+
+def check(solver, path, extra_args=()):
     """(passed, message) for one instance. #FAIL/#BUG are the caller's."""
     text = path.read_text(errors="replace")
     cwd = str(path.parent)
     name = path.name
-    extra = []
-    m = re.search(r"^#TEST EXTRAFLAGS(.*)$", text, re.M)
-    if m:
-        extra = m.group(1).split()
+    extra = [*extra_flags(text), *extra_args]
 
     m = re.search(r"^#TEST SOLCOUNT\s+(\S+)", text, re.M)
     if m:
-        p = run(exe, cwd, [name, *extra, "-findallsols"])
+        p = solver.run(cwd, [name, *extra, "-findallsols"])
         got, want = field(p.stdout, "Solutions Found:"), m.group(1)
         return result(p, p.returncode == 0 and got == want,
                       f"Got '{got}' instead of '{want}' solutions in {name}")
 
     m = re.search(r"^#TEST CHECKONESOL(.*)$", text, re.M)
     if m:
-        p = run(exe, cwd, [name, *extra])
+        p = solver.run(cwd, [name, *extra])
         got, want = first_solution(p.stdout), norm(m.group(1))
         return result(p, p.returncode == 0 and got == want,
                       f"Got '{got}' instead of '{want}' as solution in {name}")
 
     m = re.search(r"^#TEST NODECOUNT\s+(\S+)", text, re.M)
     if m:
-        p = run(exe, cwd, [name, *extra])
+        p = solver.run(cwd, [name, *extra])
         got, want = field(p.stdout, "Total Nodes:"), m.group(1)
         return result(p, p.returncode == 0 and got == want,
                       f"Got '{got}' instead of '{want}' search nodes in {name}")
 
-    if "#TEST EXITCODE1" in text:
-        p = run(exe, cwd, [name, *extra])
-        return result(p, p.returncode == 1,
-                      f"Got return code of {p.returncode}, expected 1 in {name}")
-
-    if "#TEST EXITCODE0" in text:
-        p = run(exe, cwd, [name, *extra])
-        return result(p, p.returncode == 0,
-                      f"Got return code of {p.returncode}, expected 0 in {name}")
+    m = re.search(r"^#TEST EXITCODE([019])\s*$", text, re.M)
+    if m:
+        expected = int(m.group(1))
+        p = solver.run(cwd, [name, *extra], expected_exit=expected)
+        return result(p, p.returncode == expected,
+                      f"Got return code of {p.returncode}, expected {expected} in {name}")
 
     print(f"Test {name} is not well-formed.")
     sys.exit(1)
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Must give a minion binary to test.")
-        return 2
-    exe = Path(sys.argv[1]).resolve()
-    if not exe.is_file():
-        print(f"{exe} does not exist.")
-        return 2
-
-    # Directory of instances; defaults to this script's own, which is
-    # what CI uses. Overridable so the runner itself can be tested.
-    here = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else Path(__file__).resolve().parent
+def run_suite(solver, directory=HERE, extra_args=()):
+    here = Path(directory).resolve()
     instances = sorted(here.glob("*.minion"))
+    if not instances:
+        raise ValueError(f"No .minion instances in {here}")
 
     npass = expected_fail = unexpected_pass = 0
     for path in instances:
@@ -124,18 +144,18 @@ def main():
         want_pass = "#FAIL" not in text
         buggy = "#BUG" in text
 
-        passed, message = check(str(exe), path)
+        passed, message = check(solver, path, extra_args)
 
         if not buggy:
             if passed == want_pass:
                 npass += 1
             elif not want_pass:
-                print(f"\nExpected {path.name} to fail.")
+                print(f"\nExpected {path.name} to fail.\n{message}", flush=True)
             else:
                 print(f"\n{message}", flush=True)
         else:
             if passed == want_pass:
-                print(f"\n{path.name} passed, but is supposed to be buggy!")
+                print(f"\n{path.name} passed, but is supposed to be buggy!\n{message}", flush=True)
                 unexpected_pass += 1
             else:
                 expected_fail += 1
@@ -148,6 +168,17 @@ def main():
     print(f"{expected_fail} tests failed due to expected errors.")
     print(f"{unexpected_pass} tests passed unexpectedly.")
     return failed
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
+    parser.add_argument("binary")
+    parser.add_argument("directory", nargs="?", default=HERE)
+    parser.add_argument("--timeout", type=float, default=60)
+    parser.add_argument("--budget-seconds", type=float, default=900)
+    options = parser.parse_args()
+    solver = Solver(options.binary, options.timeout, options.budget_seconds)
+    return int(run_suite(solver, options.directory) != 0)
 
 
 if __name__ == "__main__":

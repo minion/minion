@@ -177,7 +177,7 @@ echo "  rev:      $(cd "$REPO_DIR" && git rev-parse --short HEAD 2>/dev/null || 
 # Phase 1: .minion regression suite (~5-15 min depending on machine).
 if skip_if_no_budget 5; then
   run_phase 1 "minion-regression-suite" \
-    bash -c "cd '$REPO_DIR/test_instances' && ./run_tests.sh '$MINION'"
+    bash -c "cd '$REPO_DIR/test_instances' && python3 ./run_tests.py '$MINION'"
 fi
 
 # Phase 2: minion-sys FFI integration tests (~5 min).
@@ -311,7 +311,7 @@ if skip_if_no_budget 30 && command -v clang++ >/dev/null 2>&1; then
   fi
   if [ -x "$ASAN_DIR/minion" ]; then
     run_phase 13 "asan-regression-suite" \
-      bash -c "cd '$REPO_DIR/test_instances' && ./run_tests.sh '$ASAN_DIR/minion'"
+      bash -c "cd '$REPO_DIR/test_instances' && python3 ./run_tests.py '$ASAN_DIR/minion'"
     run_phase 14 "asan-tester-baseline" \
       bash -c "cd '$TESTER_DIR' && cargo run --release -- \
         --minion '$ASAN_DIR/minion' \

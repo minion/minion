@@ -92,7 +92,7 @@ jobs:
       - name: "Regression suite"
         run: |
               cd test_instances
-              bash ./run_tests.sh ../bin-full/minion
+              python3 ./run_tests.py ../bin-full/minion
 
       - name: "Library tests"
         run: |
@@ -130,7 +130,7 @@ jobs:
       - name: "Basic tests, including tests-64domains"
         run: |
               cd test_instances
-              TEST_64DOMAINS=1 bash ./do_basic_tests.sh ../bin-d64/minion
+              python3 ./run_tests.py ../bin-d64/minion --basic-only --big
 
   test:
     name: ${{ matrix.os }}
@@ -184,7 +184,8 @@ jobs:
       - name: "First test"
         run: |
               cd test_instances
-              bash ./run_tests.sh ../bin-quick/minion
+              python3 -m unittest test_runners
+              python3 ./run_tests.py ../bin-quick/minion
       
       # Bounded explicitly rather than run on the tester's defaults. One
       # exec-mode invocation runs nine sweeps (baseline, nested, -parallel,
@@ -281,7 +282,7 @@ jobs:
       - name: "Debug basic tests"
         run: |
               cd test_instances
-              bash ./run_tests.sh ../bin-debug/minion
+              python3 ./run_tests.py ../bin-debug/minion
 
       - name: "minion-sys printer comparison"
         timeout-minutes: 5

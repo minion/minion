@@ -47,18 +47,7 @@ jobs:
                 dir
                 .\build.bat
 
-      # Diagnostic only: run minion.exe directly, with nothing capturing
-      # or filtering its output, so the log shows whether the binary runs
-      # at all. The test harness below sends minion's stderr to
-      # /dev/null and reports every failure as "Got '' solutions", which
-      # cannot tell a crash apart from a parse problem.
-      #
-      # Runs under cmd rather than bash to keep git-bash out of the
-      # picture: if the binary cannot start (a missing runtime DLL, say)
-      # this shows the native Windows error.
-      #
-      # continue-on-error, because this step exists to produce evidence.
-      # The real tests below still gate the job.
+      # Keep a direct native invocation to diagnose Windows startup failures.
       - name: "Smoke: run minion.exe directly"
         shell: cmd
         continue-on-error: true
@@ -85,18 +74,10 @@ jobs:
               ..\bin-quick\minion.exe alias_litsumgeq_contradiction.minion -findallsols
               echo exit code: %ERRORLEVEL%
 
-      # The Rust tester is not run here: it depends on minion-sys, whose
-      # build script builds libminion via bash/make and only knows how to
-      # link the C++ runtime on apple and linux targets. Windows coverage
-      # is the C++ binary plus the basic instance tests below.
-      # Driven from cmd, through Python, with no POSIX shell anywhere in
-      # the chain. minion.exe cannot be launched from git-bash on these
-      # runners -- it dies with exit 139 before printing anything,
-      # regardless of working directory or instance, and whether bash
-      # starts it directly or via cmd /c. The same binary run from cmd
-      # solves every instance correctly, so the suite runs that way.
-      # do_basic_tests.sh stays the runner on Linux and macOS.
-      - name: "Basic tests"
+      # Use Python directly from cmd so no POSIX shell launches minion.exe.
+      - name: "Regression suite"
         shell: cmd
         run: |
-              python test_instances\run_basic_tests.py bin-quick\minion.exe
+              python -m unittest discover -s test_instances -p test_runners.py
+              if errorlevel 1 exit /b 1
+              python test_instances\run_tests.py bin-quick\minion.exe
