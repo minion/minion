@@ -78,6 +78,9 @@ run_phase() {
 }
 
 if [ "$MODE" = "light" ]; then
+  run_phase "regression runner tests" \
+    python3 -m unittest discover -s "$REPO/test_instances" -p test_runners.py
+
   run_phase "documentation sync check" \
     python3 "$REPO/sphinxdocs/check-docs-sync.py"
 
@@ -85,10 +88,10 @@ if [ "$MODE" = "light" ]; then
   run_phase "build bin-debug" build_dir bin-debug --quick --debug
 
   run_phase "regression suite (bin-quick)" \
-    bash -c "cd '$REPO/test_instances' && bash ./run_tests.sh '$REPO/bin-quick/minion'"
+    bash -c "cd '$REPO/test_instances' && python3 ./run_tests.py '$REPO/bin-quick/minion'"
 
   run_phase "regression suite (bin-debug)" \
-    bash -c "cd '$REPO/test_instances' && bash ./run_tests.sh '$REPO/bin-debug/minion'"
+    bash -c "cd '$REPO/test_instances' && python3 ./run_tests.py '$REPO/bin-debug/minion'"
 
   run_phase "libminion library tests (bin-quick)" \
     bash -c "cd '$REPO/bin-quick' && make test"

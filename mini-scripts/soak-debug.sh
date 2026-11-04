@@ -62,7 +62,7 @@ CONSTRAINTS=$(soak_harvest_constraints "$SOAK_MINION")
 # The regression suite under the debug binary is cheap and catches
 # things the random tester's instance shapes never generate.
 echo "=== .minion regression suite (bin-debug)"
-( cd "$SOAK_REPO/test_instances" && bash ./run_tests.sh "$SOAK_MINION_DEBUG" ) \
+( cd "$SOAK_REPO/test_instances" && python3 ./run_tests.py "$SOAK_MINION_DEBUG" ) \
   >"$SOAK_LOGDIR/regression-debug.log" 2>&1
 echo "$?" > "$SOAK_LOGDIR/regression-debug.exit"
 
