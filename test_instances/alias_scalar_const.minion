@@ -1,0 +1,11 @@
+#TEST SOLCOUNT 2
+# Test: ALIAS of a constant. k aliases 2, so diseq(x,k) means x\!=2.
+MINION 3
+**VARIABLES**
+DISCRETE x {1..3}
+ALIAS k = 2
+**SEARCH**
+VARORDER [x]
+**CONSTRAINTS**
+diseq(x, k)
+**EOF**

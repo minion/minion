@@ -1,0 +1,21 @@
+MINION 3
+#TEST SOLCOUNT 3
+# A variable repeated WITHIN the counted vector must be supported. [x,x]
+# makes value v occur twice iff x=v, so p=#0=(2 if x=0 else 0) and
+# q=#1=(2 if x=1 else 0): (x,p,q) in {(0,2,0),(1,0,2),(2,0,0)} = 3.
+
+**VARIABLES**
+
+DISCRETE x {0..2}
+DISCRETE p {0..2}
+DISCRETE q {0..2}
+
+**SEARCH**
+
+PRINT [[x],[p],[q]]
+
+**CONSTRAINTS**
+
+gcc([x,x], [0,1], [p,q])
+
+**EOF**

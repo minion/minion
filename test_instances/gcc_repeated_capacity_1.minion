@@ -1,0 +1,24 @@
+MINION 3
+#TEST SOLCOUNT 6
+# A repeated cardinality variable expresses "these values occur equally
+# often" -- a common, useful pattern. Here all of 0,1,2 must occur k times
+# in [a,b,c], forcing k=1 and a permutation (3\! = 6). gcc must allow a
+# variable repeated WITHIN the cardinality vector (only a variable in BOTH
+# the counted and cardinality vectors is rejected).
+
+**VARIABLES**
+
+DISCRETE a {0..2}
+DISCRETE b {0..2}
+DISCRETE c {0..2}
+DISCRETE k {0..3}
+
+**SEARCH**
+
+PRINT [[a],[b],[c],[k]]
+
+**CONSTRAINTS**
+
+gcc([a,b,c], [0,1,2], [k,k,k])
+
+**EOF**
