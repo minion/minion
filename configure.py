@@ -69,7 +69,7 @@ def readjson(instr, outname):
         return data
     except ValueError as err:
         print(err)
-        m = re.search("line (\d+) column (\d+)", str(err))
+        m = re.search(r"line (\d+) column (\d+)", str(err))
         print("Invalid JSON in %s:\nError: '%s'\n"%(outname, err), file=sys.stderr)
         if (m == None) or (m.group(2) == None) or (m.group(1) == None):
             print(instr, file=sys.stderr)
