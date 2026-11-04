@@ -1,0 +1,14 @@
+#TEST SOLCOUNT 3
+# Optimisation: minimise y over gacalldiff([a,b,y]) and a<b, all in 1..4.
+MINION 3
+**VARIABLES**
+DISCRETE a {1..4}
+DISCRETE b {1..4}
+DISCRETE y {1..4}
+**SEARCH**
+VARORDER [a,b,y]
+MINIMISING y
+**CONSTRAINTS**
+gacalldiff([a,b,y])
+ineq(a, b, -1)
+**EOF**

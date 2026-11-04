@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 5
+# Optimisation: maximise x subject to x+y <= 8, x,y in 1..5. Optimum x=5.
+MINION 3
+**VARIABLES**
+DISCRETE x {1..5}
+DISCRETE y {1..5}
+**SEARCH**
+VARORDER [y,x]
+MAXIMISING x
+**CONSTRAINTS**
+sumleq([x,y], 8)
+**EOF**

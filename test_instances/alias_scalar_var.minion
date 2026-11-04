@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 3
+# Test: ALIAS of a scalar variable. a is an alias for x, so eq(a,y) means x==y.
+MINION 3
+**VARIABLES**
+DISCRETE x {1..3}
+DISCRETE y {1..3}
+ALIAS a = x
+**SEARCH**
+VARORDER [x,y]
+**CONSTRAINTS**
+eq(a, y)
+**EOF**

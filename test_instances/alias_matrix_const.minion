@@ -1,0 +1,12 @@
+#TEST SOLCOUNT 3
+# Test: ALIAS matrix of constants, indexed by a variable via element.
+MINION 3
+**VARIABLES**
+DISCRETE idx {0..2}
+DISCRETE res {0..9}
+ALIAS arr[3] = [5, 7, 9]
+**SEARCH**
+VARORDER [idx,res]
+**CONSTRAINTS**
+element([arr], idx, res)
+**EOF**

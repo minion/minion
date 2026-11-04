@@ -1,0 +1,13 @@
+#TEST SOLCOUNT 5
+# Optimisation: minimise y subject to x+y >= 6, x,y in 1..5.
+# Branch-and-bound finds 5 strictly-improving solutions; optimum y=1.
+MINION 3
+**VARIABLES**
+DISCRETE x {1..5}
+DISCRETE y {1..5}
+**SEARCH**
+VARORDER [x,y]
+MINIMISING y
+**CONSTRAINTS**
+sumgeq([x,y], 6)
+**EOF**
