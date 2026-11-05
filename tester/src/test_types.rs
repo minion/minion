@@ -316,9 +316,14 @@ pub fn test_compare_solvers(
     config: &MinionConfig,
     compare_path: &str,
     c: &constraint_def::ConstraintDef,
+    depth: usize,
 ) -> Result<()> {
     assert!(config.backend == Backend::Exec);
-    let instance = constraint_def::build_random_instance_with_children_sized(c, &[], 1);
+    let instance = if depth == 0 {
+        constraint_def::build_random_instance(c)
+    } else {
+        constraint_def::build_random_nested_tree(c, depth)
+    };
     let r1 = run_solve(config, &["-findallsols"], &instance, "primary")?;
     let r2 = run_minion::get_minion_solutions(
         compare_path,
@@ -329,26 +334,30 @@ pub fn test_compare_solvers(
         config.max_solutions,
         false,
     )?;
+    anyhow::ensure!(
+        !r1.hit_solution_cap && !r2.hit_solution_cap,
+        "{} (depth {depth}): solver comparison incomplete at solution cap: {} / {}",
+        c.name, r1.filename, r2.filename,
+    );
     if r1.solutions != r2.solutions {
-        let debug_path = "/tmp/claude/mismatch.minion";
-        if let Ok(contents) = std::fs::read_to_string(&r1.filename) {
-            let _ = std::fs::write(debug_path, &contents);
-        }
         anyhow::bail!(
-            "{}: solution mismatch! primary {:?} ({} sols), compare {:?} ({} sols). Instance saved to {debug_path}",
+            "{} (depth {depth}): solution mismatch! primary {:?} ({} sols), compare {:?} ({} sols). Instances: {} / {}",
             c.name, &r1.solutions.sample, r1.solutions.count,
             &r2.solutions.sample, r2.solutions.count,
+            r1.filename, r2.filename,
         );
     }
     if r1.nodes != r2.nodes {
         anyhow::bail!(
-            "{}: node count mismatch! primary {}, compare {}. Instance: {}",
+            "{} (depth {depth}): node count mismatch! primary {}, compare {}. Instance: {}",
             c.name,
             r1.nodes,
             r2.nodes,
             r1.filename,
         );
     }
+    r1.cleanup.cleanup();
+    r2.cleanup.cleanup();
     Ok(())
 }
 

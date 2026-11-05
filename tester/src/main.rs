@@ -169,6 +169,8 @@ struct Opt {
     /// Z)))`). Trees whose tableisation exceeds `--maxtuples` are
     /// discarded and re-rolled, so larger depths just mean more
     /// rejected rolls rather than OOMs.
+    /// With --compare-with, also compare random trees at each depth
+    /// from 1 through this value (in addition to flat instances).
     #[arg(long, default_value_t = 0)]
     nest_depth: usize,
 
@@ -256,7 +258,9 @@ struct Opt {
     /// Compare two solver binaries: run the same random instance on
     /// both, check node counts and solution sets match. Value is the
     /// path to the second minion binary. Skips the usual metamorphic
-    /// sweeps and only runs the direct comparison.
+    /// sweeps and only runs the direct comparison. Honors --size-factor
+    /// and --nest-depth; a solution cap makes the comparison incomplete
+    /// and is reported as a failure.
     #[arg(long, default_value = "")]
     compare_with: String,
 }
@@ -473,11 +477,13 @@ fn main() -> Result<()> {
 
         let ret: Result<()> = v.clone().into_par_iter().try_for_each(|ref c| {
             let cmp = std::sync::Arc::clone(&comp_path);
-            (0..opt.count)
-                .into_par_iter()
-                .try_for_each(|_| test_types::test_compare_solvers(&config, &cmp, c))
-                .context(format!("failure in {}", c.name))?;
-            println!("Tested {}", c.name);
+            for depth in 0..=opt.nest_depth {
+                (0..opt.count)
+                    .into_par_iter()
+                    .try_for_each(|_| test_types::test_compare_solvers(&config, &cmp, c, depth))
+                    .context(format!("failure in {} at depth {depth}", c.name))?;
+                println!("Tested {} (comparison depth {depth})", c.name);
+            }
             Ok(())
         });
 
