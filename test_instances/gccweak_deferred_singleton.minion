@@ -1,0 +1,12 @@
+MINION 3
+#TEST SOLCOUNT 2
+# Deferred pruning fixes z=2 after its SCC has become a singleton.
+# The weak capacity propagation must still force n=1.
+**VARIABLES**
+DISCRETE x {0..1}
+DISCRETE y {0..1}
+DISCRETE z {0..2}
+DISCRETE n {0..3}
+**CONSTRAINTS**
+gccweak([x,y,z],[0,1,2],[1,1,n])
+**EOF**

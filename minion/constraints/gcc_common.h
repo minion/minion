@@ -914,6 +914,12 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
 #ifndef SCCCARDS
     prop_capacity();
+#else
+    // A deferred target deletion can assign a variable after Tarjan has split
+    // its component into singletons. Such a component is skipped above, but
+    // its assignment must still tighten the weak occurrence capacities.
+    if(!Strongcards)
+      prop_capacity_simple();
 #endif
 
     applyPendingPrunes();
@@ -1865,7 +1871,7 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
     // which is linear in r.
     for(SysInt i = 0; i < (SysInt)val_array.size(); i++) {
       SysInt val = val_array[i];
-      if(lower[val - domMin] != upper[val - domMin]) {
+      if(val >= domMin && val <= domMax) {
         prop_capacity_simple(val);
       }
     }
@@ -1896,7 +1902,6 @@ for(SysInt i=0; i<vars_in_scc.size(); i++)
   void prop_capacity_simple(SysInt val) {
     SysInt i = valToCapIndex[val - domMin];
     D_ASSERT(i != -1);
-    D_ASSERT(lower[val - domMin] < upper[val - domMin]);
 // called above or directly from do_gcc_prop_scc when using SCCCARDS
 #if !UseIncGraph
     SysInt mincap = 0;
