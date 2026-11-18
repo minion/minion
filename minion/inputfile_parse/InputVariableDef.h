@@ -2,18 +2,7 @@
 #define DOG
 
 #include <ostream>
-/// The currently accepted types of Variables.
-enum VariableType {
-  VAR_BOOL,
-  VAR_NOTBOOL,
-  VAR_BOUND,
-  VAR_SPARSEBOUND,
-  VAR_DISCRETE,
-  VAR_SPARSEDISCRETE,
-  VAR_CONSTANT,
-  VAR_MATRIX,
-  VAR_INVALID
-};
+#include "Var.h"
 
 enum MapperType { MAP_NEG, MAP_NOT, MAP_MULT, MAP_SHIFT, MAP_SWITCH_NEG, MAP_INVALID };
 
@@ -48,70 +37,60 @@ public:
 namespace ProbSpec {
 struct CSPInstance;
 
-class Var {
-  VariableType type_m;
-  SysInt pos_m;
+inline bool Var::isValid() const {
+  return type_m != VAR_INVALID;
+}
 
-public:
-  bool isValid() const {
-    return type_m != VAR_INVALID;
+inline SysInt Var::pos() const {
+  D_ASSERT(isValid());
+  return pos_m;
+}
+
+inline VariableType Var::type() const {
+  D_ASSERT(isValid());
+  return type_m;
+}
+
+inline void Var::setType(VariableType v) {
+  type_m = v;
+}
+
+inline Var::Var(VariableType _type, DomainInt _pos) : type_m(_type), pos_m(checked_cast<SysInt>(_pos)) {}
+
+inline Var::Var() : type_m(VAR_INVALID), pos_m(-1) {}
+
+inline std::ostream& operator<<(std::ostream& o, const Var& v) {
+  return o << "Var. Type:" << v.type_m << " Pos:" << v.pos_m << ".";
+}
+
+inline std::string Var::get_name() const {
+  ostringstream o;
+  switch(type_m) {
+  case VAR_BOOL: o << "bool"; break;
+  case VAR_NOTBOOL: o << "!bool"; break;
+  case VAR_BOUND: o << "bound"; break;
+  case VAR_SPARSEBOUND: o << "sparsebound"; break;
+  case VAR_DISCRETE: o << "discrete"; break;
+  case VAR_SPARSEDISCRETE: o << "sparsedis"; break;
+  case VAR_CONSTANT: break; // No need for name, just the number!
+  default: abort();
   }
 
-  SysInt pos() const {
-    D_ASSERT(isValid());
-    return pos_m;
-  }
+  o << pos_m;
+  return o.str();
+}
 
-  VariableType type() const {
-    D_ASSERT(isValid());
-    return type_m;
-  }
-  void setType(VariableType v) {
-    type_m = v;
-  }
+inline bool Var::operator==(const Var& var) const {
+  return type_m == var.type_m && pos_m == var.pos_m;
+}
 
-  Var(VariableType _type, DomainInt _pos) : type_m(_type), pos_m(checked_cast<SysInt>(_pos)) {}
+inline bool Var::operator!=(const Var& var) const {
+  return !(*this == var);
+}
 
-  Var(const Var& v) = default;
-  Var& operator=(const Var& v) = default;
-
-  Var() : type_m(VAR_INVALID), pos_m(-1) {}
-
-  
-
-  friend std::ostream& operator<<(std::ostream& o, const Var& v) {
-    return o << "Var. Type:" << v.type_m << " Pos:" << v.pos_m << ".";
-  }
-
-  string get_name() const {
-    ostringstream o;
-    switch(type_m) {
-    case VAR_BOOL: o << "bool"; break;
-    case VAR_NOTBOOL: o << "!bool"; break;
-    case VAR_BOUND: o << "bound"; break;
-    case VAR_SPARSEBOUND: o << "sparsebound"; break;
-    case VAR_DISCRETE: o << "discrete"; break;
-    case VAR_SPARSEDISCRETE: o << "sparsedis"; break;
-    case VAR_CONSTANT: break; // No need for name, just the number!
-    default: abort();
-    }
-
-    o << pos_m;
-    return o.str();
-  }
-
-  bool operator==(const Var& var) const {
-    return type_m == var.type_m && pos_m == var.pos_m;
-  }
-
-  bool operator!=(const Var& var) const {
-    return !(*this == var);
-  }
-
-  bool operator<(const Var& var) const {
-    return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m);
-  }
-};
+inline bool Var::operator<(const Var& var) const {
+  return (type_m < var.type_m) || (type_m == var.type_m && pos_m < var.pos_m);
+}
 
 } // namespace ProbSpec
 

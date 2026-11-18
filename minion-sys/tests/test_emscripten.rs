@@ -114,13 +114,14 @@ fn raw_process_and_thread_options_are_rejected() {
             let options = raw::searchOptions_new();
             let method = raw::searchMethod_new();
             let instance = raw::instance_new();
-            match mode {
-                0 => (*options).parallel = true,
-                1 => (*options).parallelPreprocessCores = 2,
-                2 => (*options).numParallelThreads = 1,
-                3 => (*options).numWorkStealThreads = 1,
-                _ => (*options).parallelWorkStealPortfolio = true,
-            }
+            raw::searchOptions_setParallel(
+                options,
+                mode == 0,
+                if mode == 1 { 2 } else { 0 },
+                if mode == 2 { 1 } else { 0 },
+                if mode == 3 { 1 } else { 0 },
+                mode == 4,
+            );
             assert_eq!(
                 raw::runMinion(ctx, options, method, instance, None, std::ptr::null_mut()),
                 raw::MinionResult_MINION_INVALID_ARGUMENT

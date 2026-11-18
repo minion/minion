@@ -3,6 +3,9 @@
 #include <iosfwd>
 struct Globals;
 
+// Opaque context handle shared by the implementation and the library interface.
+typedef Globals MinionContext;
+
 /// This context's output stream; use instead of std::cout inside the
 /// solver so a run can be silenced or redirected per context rather
 /// than by mutating the process-global std::cout. Declared here, the

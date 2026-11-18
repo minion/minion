@@ -40,6 +40,12 @@ You need a C++14 compiler and `libclang` (for
 Compilation goes through the [`cc`](https://docs.rs/cc) crate, so `CXX`,
 `CXXFLAGS` and the usual cross-compilation variables all apply.
 
+Bindings are generated from `minion/libwrapper_api.h`, which is also included by
+Minion's C++ library interface. Shared headers define the actual variable layout,
+domain-width aliases, and search enums; solver objects remain opaque. Search
+options and methods are configured through setters, so Rust does not depend on
+the layout of C++ objects containing standard-library containers.
+
 ### Emscripten WebAssembly
 
 `wasm32-unknown-emscripten` is detected automatically. This supports one

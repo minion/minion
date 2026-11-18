@@ -22,24 +22,7 @@
 #endif
 #endif
 
-#ifdef DOMAINS64
-
-typedef Wrapper<int64_t> BigInt;
-typedef int64_t SysInt;
-typedef uint64_t UnsignedSysInt;
-#else
-
-typedef int64_t BigInt;
-typedef int32_t SysInt;
-typedef unsigned int UnsignedSysInt;
-
-#endif
-
-#ifdef MINION_DEBUG
-typedef Wrapper<SysInt> DomainInt;
-#else
-typedef SysInt DomainInt;
-#endif
+#include "sys_types.h"
 
 // Put a ' -1, +1 ' just to have some slack
 const DomainInt DomainInt_Max = std::numeric_limits<SysInt>::max() / 2 - 1;

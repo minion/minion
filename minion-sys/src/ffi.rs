@@ -392,8 +392,7 @@ mod tests {
         let args = searchMethod_new();
         let instance = instance_new();
 
-        (*options).silent = true;
-        (*options).print_solution = false;
+        searchOptions_setOutput(options, true, false);
 
         build_two_var_instance(instance);
 
@@ -432,8 +431,7 @@ mod tests {
         let args = searchMethod_new();
         let instance = instance_new();
 
-        (*options).silent = true;
-        (*options).print_solution = false;
+        searchOptions_setOutput(options, true, false);
 
         build_issue_instance(instance);
 

@@ -40,8 +40,24 @@ for line in directives:
     elif line.startswith("cargo:rerun-if-env-changed="):
         environment.add(line.split("=", 1)[1])
 
-assert any(path.name == "libwrapper.h" for path in headers), headers
-assert any(path.name == "minion.h" for path in headers), headers
+# The binding generator must see the shared interface without pulling solver
+# implementations (and their standard-library internals) back into its input.
+interface = next(path for path in headers if path.name == "libwrapper_api.h")
+source = interface.parent
+allowed = {
+    Path("libwrapper_api.h"),
+    Path("inputfile_parse/Var.h"),
+    Path("search_types.h"),
+    Path("system/sys_types.h"),
+    Path("system/globals_forward.h"),
+}
+actual = {
+    path.relative_to(source)
+    for path in headers
+    if path.is_relative_to(source) and path.suffix in {".h", ".hpp"}
+}
+assert actual == allowed, f"bindgen interface dependencies changed: {actual}"
+assert source in headers, "C++ source changes must still trigger rebuilding"
 assert "MINION_SRC" in environment, environment
 assert "BINDGEN_EXTRA_CLANG_ARGS" in environment, environment
 
