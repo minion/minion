@@ -76,29 +76,11 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 5
     steps:
-      - name: Reproduce C++ thread-local destructor ordering
+      - uses: actions/checkout@v4
+      - name: Verify Minion thread-local destructor ordering
         shell: pwsh
         run: |
-          @'
-          #include <vector>
-          #include <pthread.h>
-          struct TriggerList {
-            std::vector<int> elements;
-            std::vector<int> slack;
-          };
-          thread_local TriggerList nullList;
-          void* worker(void*) {
-            nullList.elements.push_back(123);
-            nullList.slack.push_back(456);
-            return nullptr;
-          }
-          int main() {
-            pthread_t thread;
-            pthread_create(&thread, nullptr, worker, nullptr);
-            pthread_join(thread, nullptr);
-          }
-          '@ | Set-Content tls.cpp
-          c++ -g -O2 -pthread tls.cpp -o minion.exe
+          c++ -g -O2 -pthread -I minion test_instances/test_thread_cleanup.cpp -o minion.exe
           if ($LASTEXITCODE -ne 0) { throw 'Could not compile TLS reproducer' }
           $gflags = Get-ChildItem 'C:\Program Files (x86)\Windows Kits' -Filter gflags.exe -Recurse -ErrorAction SilentlyContinue | Where-Object FullName -Match '\\x64\\' | Select-Object -First 1
           if (-not $gflags) { throw 'gflags unavailable' }
