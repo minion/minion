@@ -45,12 +45,11 @@ jobs:
           import sys
           binary = str(Path('bin-diagnostic/minion.exe').resolve())
           instance = str(Path('test_instances/test_workstal_stack.minion').resolve())
+          Path('diagnostic.gdb').write_text('set pagination off\nset confirm off\nrun\nthread apply all bt full\ninfo sharedlibrary\n')
           with open('windows-heap-debugger.log', 'w', encoding='utf-8') as log:
               for attempt in range(200):
                   command = ['gdb', '--batch', '--return-child-result',
-                             '-ex', 'set pagination off', '-ex', 'set confirm off',
-                             '-ex', 'run', '-ex', 'thread apply all bt full',
-                             '-ex', 'info sharedlibrary', '--args', binary, instance,
+                             '-x', 'diagnostic.gdb', '--args', binary, instance,
                              '-X-parallelWorkSteal', '4', '-randomseed', str(attempt % 3),
                              '-findallsols', '-varorder', 'ldf-random']
                   result = subprocess.run(command, capture_output=True, text=True,
@@ -68,3 +67,54 @@ jobs:
         with:
           name: windows-heap-debugger
           path: windows-heap-debugger.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-debug-binary
+          path: bin-diagnostic/minion.exe
+  tls-reproducer:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - name: Reproduce C++ thread-local destructor ordering
+        shell: pwsh
+        run: |
+          @'
+          #include <vector>
+          #include <pthread.h>
+          struct TriggerList {
+            std::vector<int> elements;
+            std::vector<int> slack;
+          };
+          thread_local TriggerList nullList;
+          void* worker(void*) {
+            nullList.elements.push_back(123);
+            nullList.slack.push_back(456);
+            return nullptr;
+          }
+          int main() {
+            pthread_t thread;
+            pthread_create(&thread, nullptr, worker, nullptr);
+            pthread_join(thread, nullptr);
+          }
+          '@ | Set-Content tls.cpp
+          c++ -g -O2 -pthread tls.cpp -o minion.exe
+          if ($LASTEXITCODE -ne 0) { throw 'Could not compile TLS reproducer' }
+          $gflags = Get-ChildItem 'C:\Program Files (x86)\Windows Kits' -Filter gflags.exe -Recurse -ErrorAction SilentlyContinue | Where-Object FullName -Match '\\x64\\' | Select-Object -First 1
+          if (-not $gflags) { throw 'gflags unavailable' }
+          & $gflags.FullName /p /enable minion.exe /full
+          @'
+          set pagination off
+          set confirm off
+          run
+          thread apply all bt full
+          info sharedlibrary
+          '@ | Set-Content tls.gdb
+          gdb --batch --return-child-result -x tls.gdb --args ./minion.exe 2>&1 | Tee-Object tls-debugger.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-tls-reproducer
+          path: |
+            tls-debugger.log
+            minion.exe
