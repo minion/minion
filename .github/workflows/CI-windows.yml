@@ -48,6 +48,13 @@ jobs:
                 dir
                 .\build.bat
 
+      - name: "Thread-local cleanup"
+        shell: cmd
+        run: |
+              c++ -std=gnu++14 -Wall -Wextra -I minion test_instances\test_thread_cleanup.cpp -pthread -o bin-quick\test_thread_cleanup.exe
+              if errorlevel 1 exit /b 1
+              bin-quick\test_thread_cleanup.exe
+
       # Keep a direct native invocation to diagnose Windows startup failures.
       - name: "Smoke: run minion.exe directly"
         shell: cmd

@@ -462,6 +462,7 @@ with open(outname, "w") as out:
     # Library-backed tests. Each is a single .cpp in test_instances/ that
     # links against libminion.a. Add new tests here.
     library_tests = [
+        'test_thread_cleanup',
         'test_multithread',
         'test_midsearch_basic',
         'test_reify_midsearch',
