@@ -6,15 +6,14 @@
 
 #include "solver.h"
 #include "system/system.h"
+#include "system/thread_local_storage.h"
 #include "triggering/constraint_abstract.h"
 #include "triggering/triggers.h"
 
 #include "memory_management/MemoryBlock.h"
 #include "memory_management/nonbacktrack_memory.h"
 
-#ifdef LIBMINION
-extern thread_local DynamicTriggerList globalNullTriggerList;
-#else
+#ifndef LIBMINION
 extern DynamicTriggerList globalNullTriggerList;
 #endif
 
@@ -153,7 +152,11 @@ public:
 };
 
 inline DynamicTriggerList& getNullTriggerList() {
+#ifdef LIBMINION
+  return Minion::threadLocalValue<DynamicTriggerList>();
+#else
   return globalNullTriggerList;
+#endif
 }
 
 inline void attachTriggerToNullList(Trig_ConRef t, TrigOp op) {

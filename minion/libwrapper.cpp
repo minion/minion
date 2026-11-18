@@ -14,6 +14,7 @@
 #include "search/SearchManager.h"
 #include "solver.h"
 #include "system/minlib/exceptions.hpp"
+#include "system/thread_local_storage.h"
 #include "triggering/trigger_list.h"
 #include "tuple_container.h"
 #include <iomanip>
@@ -97,14 +98,12 @@ private:
 
 #endif
 
-static thread_local std::string ffi_error_message;
-
 static void set_error(const std::string& msg) {
-  ffi_error_message = msg;
+  Minion::threadLocalValue<std::string>() = msg;
 }
 
 const char* minion_error_message() {
-  return ffi_error_message.c_str();
+  return Minion::threadLocalValue<std::string>().c_str();
 }
 
 // Abort if called while search is active (globals != nullptr).
