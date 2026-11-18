@@ -18,6 +18,7 @@ mod counter;
 mod minion_instance;
 mod run_minion;
 mod run_minion_lib;
+mod semantics_export;
 mod solution_digest;
 mod test_types;
 
@@ -59,6 +60,19 @@ struct Opt {
     /// Compare minion-sys printed models with the independent tester printer.
     #[arg(long, conflicts_with_all = ["in_process", "valgrind", "compare_with", "optimisation_sweep"])]
     printing_sweep: bool,
+
+    /// Export variables, constraint trees and all solutions as minion-solutions-v1 JSON.
+    /// Runs a dedicated semantics sweep, at depths 0 through --nest-depth.
+    #[arg(long, conflicts_with_all = ["printing_sweep", "compare_with", "optimisation_sweep", "midsearch", "midsearch_constraints", "midsearch_add_vars"])]
+    export_solutions: Option<std::path::PathBuf>,
+
+    /// Bound exhaustive Lean checking by the product of the unique variable domains.
+    #[arg(long, default_value_t = 10000)]
+    semantics_max_assignments: usize,
+
+    /// Run this Lean checker executable on every exported solution file.
+    #[arg(long, requires = "export_solutions")]
+    check_solutions_with: Option<std::path::PathBuf>,
 
     /// Run the mid-search variable-injection test instead of the usual
     /// baseline-vs-tableised sweep. Requires --in-process. Each constraint
@@ -455,6 +469,18 @@ fn main() -> Result<()> {
             max_solutions: opt.max_solutions,
         }
     };
+
+    if let Some(directory) = &opt.export_solutions {
+        return semantics_export::export_sweep(
+            &config,
+            &v,
+            opt.count,
+            opt.nest_depth,
+            directory,
+            opt.semantics_max_assignments,
+            opt.check_solutions_with.as_deref(),
+        );
+    }
 
     if opt.printing_sweep {
         v.par_iter().try_for_each(|c| -> Result<()> {

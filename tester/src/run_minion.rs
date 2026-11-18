@@ -158,6 +158,28 @@ pub fn get_minion_solutions(
     )
 }
 
+/// Full enumeration for semantic certificates. Unlike ordinary comparison runs,
+/// a timeout must never be exported as a claim that the solution set is complete.
+pub fn get_semantics_solutions(
+    minionexec: &str,
+    baseargs: &[String],
+    instance: &ConstraintInstance,
+    max_solutions: i64,
+) -> Result<MinionOutput> {
+    get_minion_solutions_inner(
+        minionexec,
+        baseargs,
+        &["-findallsols"],
+        instance,
+        "semantics",
+        max_solutions,
+        true,
+        None,
+        None,
+        true,
+    )
+}
+
 /// Optimisation variant. Writes the .minion file with an aux objective
 /// var equal to `sum(real_vars)` and a `MINIMISING`/`MAXIMISING`
 /// directive. The caller compares `MinionOutput::optimum_value` across
@@ -352,7 +374,7 @@ fn get_minion_solutions_inner(
         if require_complete {
             anyhow::ensure!(
                 v.TimeOut == "0",
-                "printing comparison timed out: {minioncmd}"
+                "complete enumeration timed out: {minioncmd}"
             );
         }
         let nodes = v

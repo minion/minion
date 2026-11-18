@@ -1017,6 +1017,42 @@ pub fn get_minion_solutions_in_process(
     max_solutions: i64,
     keep_full_solutions: bool,
 ) -> Result<MinionOutput> {
+    get_minion_solutions_in_process_inner(
+        instance,
+        find_all_sols,
+        options,
+        testname,
+        max_solutions,
+        keep_full_solutions,
+        false,
+    )
+}
+
+pub fn get_semantics_solutions_in_process(
+    instance: &ConstraintInstance,
+    options: minion_sys::RunOptions,
+    max_solutions: i64,
+) -> Result<MinionOutput> {
+    get_minion_solutions_in_process_inner(
+        instance,
+        true,
+        options,
+        "semantics",
+        max_solutions,
+        true,
+        true,
+    )
+}
+
+fn get_minion_solutions_in_process_inner(
+    instance: &ConstraintInstance,
+    find_all_sols: bool,
+    options: minion_sys::RunOptions,
+    testname: &str,
+    max_solutions: i64,
+    keep_full_solutions: bool,
+    require_complete: bool,
+) -> Result<MinionOutput> {
     let mut model = Model::new();
     register_tuple_tables_for_instance(&mut model, instance)?;
     add_variables_and_holes(&mut model, instance)?;
@@ -1086,6 +1122,13 @@ pub fn get_minion_solutions_in_process(
 
     let ctx = minion_sys::run_minion_with_options(model, options, callback)
         .map_err(|e| anyhow!("minion in-process error ({testname}): {e}"))?;
+
+    if require_complete {
+        anyhow::ensure!(
+            ctx.get_from_table("TimeOut".to_owned()).as_deref() == Some("0"),
+            "complete in-process enumeration timed out or omitted completion status"
+        );
+    }
 
     let nodes_str = ctx
         .get_from_table("Nodes".to_string())
