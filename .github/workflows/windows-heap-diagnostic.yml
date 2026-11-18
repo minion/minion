@@ -1,0 +1,70 @@
+name: Windows heap diagnostic
+on:
+  push:
+    branches: [codex/windows-heap-diagnostic]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Inspect native toolchain
+        shell: pwsh
+        run: |
+          Get-Command c++, gdb | Format-List Source
+          c++ --version
+          gdb --version
+      - name: Build with symbols
+        shell: cmd
+        run: |
+          mkdir bin-diagnostic
+          cd bin-diagnostic
+          python ..\configure.py --quick --buildsystem bat --extraflags=-g
+          if errorlevel 1 exit /b 1
+          call build.bat
+      - name: Enable Windows full page heap
+        shell: pwsh
+        run: |
+          $gflags = Get-ChildItem 'C:\Program Files (x86)\Windows Kits' -Filter gflags.exe -Recurse -ErrorAction SilentlyContinue | Where-Object FullName -Match '\\x64\\' | Select-Object -First 1
+          if ($gflags) {
+            & $gflags.FullName /p /enable minion.exe /full
+            if ($LASTEXITCODE -ne 0) { throw 'Could not enable page heap' }
+          } else {
+            Write-Host 'gflags unavailable; using native debugger without page heap'
+          }
+      - name: Repeat failing command under debugger
+        shell: python
+        run: |
+          from pathlib import Path
+          import subprocess
+          import sys
+          binary = str(Path('bin-diagnostic/minion.exe').resolve())
+          instance = str(Path('test_instances/test_workstal_stack.minion').resolve())
+          with open('windows-heap-debugger.log', 'w', encoding='utf-8') as log:
+              for attempt in range(200):
+                  command = ['gdb', '--batch', '--return-child-result',
+                             '-ex', 'set pagination off', '-ex', 'set confirm off',
+                             '-ex', 'run', '-ex', 'thread apply all bt full',
+                             '-ex', 'info sharedlibrary', '--args', binary, instance,
+                             '-X-parallelWorkSteal', '4', '-randomseed', str(attempt % 3),
+                             '-findallsols', '-varorder', 'ldf-random']
+                  result = subprocess.run(command, capture_output=True, text=True,
+                                          errors='replace', timeout=60)
+                  output = result.stdout + result.stderr
+                  log.write(f'Attempt {attempt}: exit {result.returncode}\n{output}\n')
+                  log.flush()
+                  if result.returncode or 'Solutions Found: 2' not in result.stdout:
+                      print(output)
+                      sys.exit(1)
+                  if attempt % 20 == 19:
+                      print(f'{attempt + 1} debugger runs passed', flush=True)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-heap-debugger
+          path: windows-heap-debugger.log
