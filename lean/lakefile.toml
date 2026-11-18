@@ -1,0 +1,14 @@
+name = "minion-semantics"
+version = "0.1.0"
+defaultTargets = ["minion-semantics", "minion-certify"]
+
+[[lean_lib]]
+name = "Minion"
+
+[[lean_exe]]
+name = "minion-semantics"
+root = "Main"
+
+[[lean_exe]]
+name = "minion-certify"
+root = "CertifyMain"

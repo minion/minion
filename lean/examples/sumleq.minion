@@ -1,0 +1,7 @@
+MINION 3
+**VARIABLES**
+DISCRETE x {0..5}
+DISCRETE y {2..4}
+**CONSTRAINTS**
+sumleq([x,y],3)
+**EOF**

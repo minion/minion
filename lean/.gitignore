@@ -1,0 +1,6 @@
+.lake
+lake-manifest.json
+__pycache__/
+
+# Generated execution traces; keep large corpora outside the source tree.
+*.jsonl

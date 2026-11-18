@@ -1,0 +1,10 @@
+MINION 3
+**VARIABLES**
+BOOL x
+BOOL y
+BOOL z
+**CONSTRAINTS**
+diseq(x,y)
+diseq(y,z)
+diseq(z,x)
+**EOF**

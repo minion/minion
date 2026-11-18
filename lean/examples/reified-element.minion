@@ -1,0 +1,8 @@
+MINION 3
+**VARIABLES**
+DISCRETE index {0..1}
+DISCRETE result {1..3}
+BOOL b
+**CONSTRAINTS**
+reify(watchelement([1,3],index,result),b)
+**EOF**

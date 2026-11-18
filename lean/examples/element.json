@@ -1,0 +1,19 @@
+{
+  "format": "minion-solutions-v1",
+  "variables": [
+    {"name": "index", "domain": [0, 1]},
+    {"name": "result", "domain": [1, 2, 3]}
+  ],
+  "constraints": [
+    {
+      "name": "element",
+      "args": [
+        [{"kind": "constant", "value": 1}, {"kind": "constant", "value": 3}],
+        [{"kind": "var", "index": 0}],
+        [{"kind": "var", "index": 1}]
+      ],
+      "children": []
+    }
+  ],
+  "solutions": [[0, 1], [1, 3]]
+}

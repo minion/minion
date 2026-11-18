@@ -1,0 +1,6 @@
+MINION 3
+**VARIABLES**
+DISCRETE x[3] {0..1}
+**CONSTRAINTS**
+gacalldiff(x)
+**EOF**

@@ -1,0 +1,13 @@
+MINION 3
+**VARIABLES**
+DISCRETE x {0..8}
+**CONSTRAINTS**
+diseq(x,0)
+diseq(x,1)
+diseq(x,2)
+diseq(x,3)
+diseq(x,4)
+diseq(x,5)
+diseq(x,6)
+diseq(x,7)
+**EOF**
