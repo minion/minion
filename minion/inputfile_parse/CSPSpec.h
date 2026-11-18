@@ -14,6 +14,7 @@ using namespace std;
 #include "../system/system.h"
 
 #include "../constants.h"
+#include "../search_types.h"
 
 #include "InputVariableDef.h"
 
@@ -45,19 +46,6 @@ enum ReadTypes {
   read_nothing
 };
 
-enum VarOrderEnum {
-  ORDER_NONE,
-
-  ORDER_STATIC,
-  ORDER_SDF,
-  ORDER_SRF,
-  ORDER_LDF,
-  ORDER_ORIGINAL,
-  ORDER_WDEG,
-  ORDER_DOMOVERWDEG,
-  ORDER_CONFLICT,
-};
-
 inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
   switch(voe) {
   case ORDER_NONE: return o << "NONE";
@@ -72,8 +60,6 @@ inline std::ostream& operator<<(std::ostream& o, VarOrderEnum voe) {
   }
   abort();
 }
-
-enum ValOrderEnum { VALORDER_NONE, VALORDER_ASCEND, VALORDER_DESCEND, VALORDER_RANDOM };
 
 struct ValOrder {
   ValOrderEnum type;

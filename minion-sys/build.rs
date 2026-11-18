@@ -163,7 +163,7 @@ fn find_minion_src() -> PathBuf {
         assert!(
             is_minion_src(&p),
             "minion-sys: MINION_SRC={explicit} does not look like a Minion source tree \
-             (no minion/libwrapper.h underneath it)"
+             (no minion/libwrapper_api.h underneath it)"
         );
         return p;
     }
@@ -191,7 +191,7 @@ fn find_minion_src() -> PathBuf {
 }
 
 fn is_minion_src(p: &Path) -> bool {
-    p.join("minion").join("libwrapper.h").is_file()
+    p.join("minion").join("libwrapper_api.h").is_file()
 }
 
 /// Read every constraint declaration out of the Minion headers.
@@ -438,7 +438,7 @@ fn generate_sources(constraints: &[Constraint], minion_src: &Path, gen_dir: &Pat
     defs.push_str("};\n");
     write(gen_dir, "constraint_defs.h", &defs);
 
-    // The enum, included by libwrapper.h -- and so read by bindgen, which is
+    // The enum, included by libwrapper_api.h -- and so read by bindgen, which is
     // why generation has to happen before both cc and bindgen.
     let mut enumeration = String::from(
         "#ifndef CONSTRAINT_ENUM_QWE\n#define CONSTRAINT_ENUM_QWE\nenum ConstraintType {\n",
@@ -692,16 +692,16 @@ impl bindgen::callbacks::ParseCallbacks for BindgenCallbacks {
 
 /// Generate the Rust declarations for Minion's C interface.
 ///
-/// This runs against the freshly generated `ConstraintEnum.h` (included by
-/// `libwrapper.h`) and `BuildDefines.h` (included by `minion.h`). Checking
-/// `bindings.rs` into the repository instead would let the Rust view of
-/// `ConstraintType` drift from the C++ one, and a constraint built under the
+/// This runs against `libwrapper_api.h`, its shared value-type headers, and
+/// the freshly generated `ConstraintEnum.h`. Solver implementation headers
+/// stay outside bindgen's input. Checking `bindings.rs` into the repository
+/// instead would let the Rust view of `ConstraintType` drift from the C++ one, and a constraint built under the
 /// wrong enum value is a wrong answer with no error -- so the bindings are
 /// always generated from the sources we are about to compile.
 fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
     let out_dir = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR is set by cargo"));
     let minion_inc = minion_src.join("minion");
-    let header = minion_inc.join("libwrapper.h");
+    let header = minion_inc.join("libwrapper_api.h");
 
     let mut builder = bindgen::Builder::default()
         // Generated bindings do not need rustfmt installed on the build host.
@@ -746,8 +746,8 @@ fn generate_bindings(minion_src: &Path, gen_dir: &Path, config: &Config) {
         builder = builder.clang_arg(format!("-D{define}"));
     }
 
-    // Named explicitly, rather than by pattern, to stop bindgen wandering into
-    // the C++ headers libwrapper.h pulls in.
+    // Keep the exported function set explicit. Solver object definitions stay
+    // outside the interface, and standard-library container types are opaque.
     for function in ALLOWED_FUNCTIONS {
         builder = builder.allowlist_function(function);
     }
@@ -870,6 +870,14 @@ const ALLOWED_FUNCTIONS: &[&str] = &[
     "constraint_setTuplesByName",
     "constraint_setShortTuples",
     "constraint_setShortTuplesByName",
+    "searchOptions_setOutput",
+    "searchOptions_setRandomiseOrder",
+    "searchOptions_setSolutionLimit",
+    "searchOptions_setNodeLimit",
+    "searchOptions_setTimeLimit",
+    "searchOptions_setParallel",
+    "searchMethod_setSeed",
+    "searchMethod_setPropagation",
     "searchOptions_new",
     "searchOptions_free",
     "searchMethod_new",

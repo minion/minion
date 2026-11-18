@@ -4,6 +4,22 @@ Minion's own release notes are in [`history.md`](https://github.com/minion/minio
 at the top of the repository. This file covers the Rust crate, which is
 versioned separately from the solver.
 
+## 0.1.3 — 2026-11-18
+
+- Fix printed variable declarations, true/false syntax, inline tuples, and
+  watched constraint lists. Emit named tuple and short-tuple definitions across
+  nested constraints, and print solution columns in declaration order.
+- Fix parsing of empty inline tables and constraint lists, accept zero-arity
+  tuples, and reject ragged tables whose first row is empty.
+- Generate bindings from a lightweight library interface shared with Minion,
+  keeping solver implementations out of bindgen's input. Move variable layouts,
+  domain-width aliases, and search enums into canonical shared headers.
+- Configure opaque search options and methods through setters instead of writing
+  C++ object fields from Rust. This avoids the libc++ recursive-union panic with
+  Emscripten 7 while continuing to use released bindgen 0.73.
+- Include `<iterator>` explicitly for `std::insert_iterator`, fixing compilation
+  with newer standard-library headers.
+
 ## 0.1.2 — 2026-10-05
 
 - Reset Minion's wall-clock timers between runs, so a time limit from one run

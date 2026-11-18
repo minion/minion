@@ -697,28 +697,23 @@ pub fn run_minion_work_steal_with_options(
         let search_method = ffi::searchMethod_new();
         let search_instance = ffi::instance_new();
 
-        (*search_opts).randomiseValvarorder = options.randomise_order;
-        (*search_opts).silent = true;
-        (*search_opts).print_solution = false;
-        (*search_opts).sollimit = -1;
+        ffi::searchOptions_setRandomiseOrder(search_opts, options.randomise_order);
+        ffi::searchOptions_setOutput(search_opts, true, false);
+        ffi::searchOptions_setSolutionLimit(search_opts, -1);
 
         if let Some(seed) = options.seed {
-            // Identity at the default width; a widening conversion under the
-            // domains64 feature, where UnsignedSysInt is 64 bits.
-            #[allow(clippy::useless_conversion)]
-            {
-                (*search_method).randomSeed = seed.into();
-            }
+            ffi::searchMethod_setSeed(search_method, seed);
         }
-        (*search_method).preprocess = options.preprocess.to_ffi();
-        (*search_method).propMethod = options.prop_node.to_ffi();
+        ffi::searchMethod_setPropagation(
+            search_method,
+            options.preprocess.to_ffi(),
+            options.prop_node.to_ffi(),
+        );
         if options.node_limit > 0 {
-            (*search_opts).nodelimit = options.node_limit as _;
+            ffi::searchOptions_setNodeLimit(search_opts, options.node_limit as _);
         }
         if let Some(tl) = options.time_limit {
-            (*search_opts).timeoutActive = true;
-            (*search_opts).time_limit = tl.seconds as _;
-            (*search_opts).time_limit_is_CPUTime = tl.is_cpu_time;
+            ffi::searchOptions_setTimeLimit(search_opts, tl.seconds, tl.is_cpu_time);
         }
 
         let mut print_vars: Vec<VarName> = vec![];
@@ -806,31 +801,26 @@ pub fn run_minion_parallel_with_options(
         // Quiet by default: workers don't print to cout under runMinionParallel
         // (they observe getOptions().silent = true via the per-thread copy).
         // The user receives results via the callback.
-        (*search_opts).randomiseValvarorder = options.randomise_order;
-        (*search_opts).silent = true;
-        (*search_opts).print_solution = false;
+        ffi::searchOptions_setRandomiseOrder(search_opts, options.randomise_order);
+        ffi::searchOptions_setOutput(search_opts, true, false);
         // Library convention: enumerate all solutions and let the caller's
         // callback decide when to stop by returning false. The C-side
         // controller enforces this `sollimit = -1` shared value.
-        (*search_opts).sollimit = -1;
+        ffi::searchOptions_setSolutionLimit(search_opts, -1);
 
         if let Some(seed) = options.seed {
-            // Identity at the default width; a widening conversion under the
-            // domains64 feature, where UnsignedSysInt is 64 bits.
-            #[allow(clippy::useless_conversion)]
-            {
-                (*search_method).randomSeed = seed.into();
-            }
+            ffi::searchMethod_setSeed(search_method, seed);
         }
-        (*search_method).preprocess = options.preprocess.to_ffi();
-        (*search_method).propMethod = options.prop_node.to_ffi();
+        ffi::searchMethod_setPropagation(
+            search_method,
+            options.preprocess.to_ffi(),
+            options.prop_node.to_ffi(),
+        );
         if options.node_limit > 0 {
-            (*search_opts).nodelimit = options.node_limit as _;
+            ffi::searchOptions_setNodeLimit(search_opts, options.node_limit as _);
         }
         if let Some(tl) = options.time_limit {
-            (*search_opts).timeoutActive = true;
-            (*search_opts).time_limit = tl.seconds as _;
-            (*search_opts).time_limit_is_CPUTime = tl.is_cpu_time;
+            ffi::searchOptions_setTimeLimit(search_opts, tl.seconds, tl.is_cpu_time);
         }
 
         let mut print_vars: Vec<VarName> = vec![];
@@ -888,27 +878,22 @@ pub fn run_minion_midsearch_with_options(
         // Use Minion as a quiet library by default. Low-level FFI callers that
         // want native solver output can opt out by configuring SearchOptions
         // themselves instead of going through this wrapper.
-        (*search_opts).randomiseValvarorder = options.randomise_order;
-        (*search_opts).silent = true;
-        (*search_opts).print_solution = false;
+        ffi::searchOptions_setRandomiseOrder(search_opts, options.randomise_order);
+        ffi::searchOptions_setOutput(search_opts, true, false);
 
         if let Some(seed) = options.seed {
-            // Identity at the default width; a widening conversion under the
-            // domains64 feature, where UnsignedSysInt is 64 bits.
-            #[allow(clippy::useless_conversion)]
-            {
-                (*search_method).randomSeed = seed.into();
-            }
+            ffi::searchMethod_setSeed(search_method, seed);
         }
-        (*search_method).preprocess = options.preprocess.to_ffi();
-        (*search_method).propMethod = options.prop_node.to_ffi();
+        ffi::searchMethod_setPropagation(
+            search_method,
+            options.preprocess.to_ffi(),
+            options.prop_node.to_ffi(),
+        );
         if options.node_limit > 0 {
-            (*search_opts).nodelimit = options.node_limit as _;
+            ffi::searchOptions_setNodeLimit(search_opts, options.node_limit as _);
         }
         if let Some(tl) = options.time_limit {
-            (*search_opts).timeoutActive = true;
-            (*search_opts).time_limit = tl.seconds as _;
-            (*search_opts).time_limit_is_CPUTime = tl.is_cpu_time;
+            ffi::searchOptions_setTimeLimit(search_opts, tl.seconds, tl.is_cpu_time);
         }
 
         let mut state = CallbackState {

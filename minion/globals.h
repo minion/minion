@@ -51,8 +51,6 @@ public:
 #ifdef LIBMINION
 // Thread-local to allow multiple concurrent Minion instances on different threads.
 // Each thread sets this pointer to its own Globals before calling internal functions.
-// MinionContext is an opaque handle exposed in the public API.
-typedef Globals MinionContext;
 extern thread_local Globals* globals;
 #endif
 

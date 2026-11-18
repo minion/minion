@@ -54,7 +54,7 @@ echo >> "$VENDOR/GIT_VERSION"
 
 # A missing source file here becomes a compile error for whoever installs the
 # crate, so check now rather than at `cargo publish --dry-run`.
-for required in minion/libwrapper.h minion/libwrapper.cpp minion/minion.cpp; do
+for required in minion/libwrapper.h minion/libwrapper_api.h minion/libwrapper.cpp minion/minion.cpp; do
   if [[ ! -f "$VENDOR/$required" ]]; then
     echo "vendor-minion: $required is missing from the vendored copy" >&2
     exit 1

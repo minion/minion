@@ -1463,6 +1463,48 @@ void searchMethod_free(SearchMethod* searchMethod)
   delete searchMethod;
 }
 
+void searchOptions_setOutput(SearchOptions& options, bool silent, bool printSolution) {
+  options.silent = silent;
+  options.print_solution = printSolution;
+}
+
+void searchOptions_setRandomiseOrder(SearchOptions& options, bool randomise) {
+  options.randomiseValvarorder = randomise;
+}
+
+void searchOptions_setSolutionLimit(SearchOptions& options, long long limit) {
+  options.sollimit = limit;
+}
+
+void searchOptions_setNodeLimit(SearchOptions& options, long long limit) {
+  options.nodelimit = limit;
+}
+
+void searchOptions_setTimeLimit(SearchOptions& options, unsigned int seconds, bool cpuTime) {
+  options.timeoutActive = true;
+  options.time_limit = static_cast<clock_t>(seconds);
+  options.time_limit_is_CPUTime = cpuTime;
+}
+
+void searchOptions_setParallel(SearchOptions& options, bool processes, int preprocessCores,
+                               int threads, int workStealThreads, bool portfolio) {
+  options.parallel = processes;
+  options.parallelPreprocessCores = preprocessCores;
+  options.numParallelThreads = threads;
+  options.numWorkStealThreads = workStealThreads;
+  options.parallelWorkStealPortfolio = portfolio;
+}
+
+void searchMethod_setSeed(SearchMethod& method, unsigned int seed) {
+  method.randomSeed = seed;
+}
+
+void searchMethod_setPropagation(SearchMethod& method, PropagationLevel preprocess,
+                                 PropagationLevel propagation) {
+  method.preprocess = preprocess;
+  method.propMethod = propagation;
+}
+
 /***** SearchOrder *****/
 
 SearchOrder* searchOrder_new(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol)

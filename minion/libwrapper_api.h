@@ -1,0 +1,787 @@
+// Minion https://github.com/minion/minion
+// SPDX-License-Identifier: MPL-2.0
+
+#ifndef MINION_LIBWRAPPER_API_H
+#define MINION_LIBWRAPPER_API_H
+
+// Bindgen and the C++ implementation consume these same declarations. This
+// interface deliberately does not include minion.h or any solver internals.
+#include "ConstraintEnum.h"
+#include "inputfile_parse/Var.h"
+#include "search_types.h"
+#include "system/globals_forward.h"
+#include <vector>
+
+class SearchOptions;
+struct SearchMethod;
+class TupleList;
+class ShortTupleList;
+struct ConstraintDef;
+namespace ProbSpec {
+struct CSPInstance;
+struct ConstraintBlob;
+struct SearchOrder;
+}
+using ProbSpec::CSPInstance;
+using ProbSpec::ConstraintBlob;
+using ProbSpec::SearchOrder;
+using ProbSpec::Var;
+
+/*
+ * Functions for using minion as a library.
+ *
+ * Primarily for use by the Rust bindings - the library abstractions provided
+ * here are neither complete nor safe.
+ *
+ * The Rust bindings (https://github.com/conjure-cp/conjure-oxide/tree/main/solvers/minion)
+ * should provide a safe but low-level way to use Minion as a library.
+ */
+
+/* MODEL BUILDING - AN EXAMPLE
+ * ===========================
+ *
+ * This encodes the following minion file into a C++ minion model:
+ *
+ * MINION 3
+ * **VARIABLES**
+ * DISCRETE x #
+ * {1..3}
+ * DISCRETE y #
+ * {2..4}
+ * DISCRETE z #
+ * {1..5}
+ * **SEARCH**
+ * PRINT[[x],[y],[z]]
+ * VARORDER STATIC [x, y, z]
+ * **CONSTRAINTS**
+ * sumleq([x,y,z],4)
+ * ineq(x, y, -1)
+ * **EOF**
+ *
+ *
+ * CSPInstance instance;
+ *
+ * std::vector<int> domainx = {1,3};
+ * std::vector<int> domainy = {2,4};
+ * std::vector<int> domainz = {1,5};
+ *
+ * // **VARIABLES**
+ * newVar(instance,"x",VAR_DISCRETE,domainx);
+ * newVar(instance,"y",VAR_DISCRETE,domainy);
+ * newVar(instance,"z",VAR_DISCRETE,domainz);
+ *
+ * Var x = instance.vars.getSymbol("x");
+ * Var y = instance.vars.getSymbol("y");
+ * Var z = instance.vars.getSymbol("z");
+ *
+ * // **SEARCH**
+ *
+ * // PRINT
+ * instance.print_matrix.push_back({x});
+ * instance.print_matrix.push_back({y});
+ * instance.print_matrix.push_back({z});
+ *
+ *
+ * // VARORDER STATIC [x,y,z]
+ * bool find_one_sol = false;
+ * SearchOrder searchOrder({x,y,z}, VarOrderEnum::ORDER_STATIC,find_one_sol);
+ * instance.searchOrder.push_back(searchOrder);
+
+
+ * // **CONSTRAINTS**
+ *
+ * ConstraintBlob leq(lib_getConstraint(ConstraintType::CT_LEQSUM));
+ * ConstraintBlob geq(lib_getConstraint(ConstraintType::CT_GEQSUM));
+ * ConstraintBlob ineq(lib_getConstraint(ConstraintType::CT_INEQ));
+
+ *
+ * // leq: [var] var
+ * leq.vars.push_back({x,y,z});
+ * leq.vars.push_back({constantAsVar(4)});
+ *
+ * geq.vars.push_back({x,y,z});
+ * geq.vars.push_back({constantAsVar(4)});
+
+ * // ineq: var var const
+ * ineq.vars.push_back({x});
+ * ineq.vars.push_back({y});
+ * ineq.constants.push_back({-1});
+
+ * instance.constraints.push_back(geq);
+ * instance.constraints.push_back(leq);
+ * instance.constraints.push_back(ineq);
+ */
+
+/* ADDING CONSTRAINTS
+ * ==================
+ *
+ * You need to know the types of the arguments to the constraints being used
+ * and add things to the right vectors, or Minion will segfault.
+ *
+ * (types can be found in bin/src/build_constraints.h).
+
+ * Note the different vectors used to add different arguments based on type in
+ * the above example.
+ *
+ * Also note that a constant can be used in place of a variable by using
+ * constantAsVar.
+ */
+
+/* ADDING VARIABLES
+ * ===============
+ *
+ * Use newVar provided by this header file.
+ * Variables added this way are in the symbol table and can be referred to by
+ * using: instance.vars.getSymbol("x");
+ */
+
+
+/*
+ * MinionResult: error codes returned by fallible library functions.
+ *
+ * Functions that return MinionResult can fail; all other functions cannot.
+ * On failure, call minion_error_message() for a human-readable detail string
+ * (thread-local, valid until the next MinionResult-returning call).
+ */
+enum MinionResult
+{
+  MINION_OK = 0,
+  MINION_INVALID_INSTANCE = 1,
+  MINION_TIMEOUT = 2,
+  MINION_MEMORY_ERROR = 3,
+  MINION_PARSE_ERROR = 4,
+  MINION_INVALID_ARGUMENT = 5,
+  MINION_UNKNOWN_ERROR = 255
+};
+
+/*
+ * VarResult: returned by functions that produce a Var and can fail.
+ * Check .result before using .var.
+ */
+struct VarResult
+{
+  MinionResult result;
+  Var var;
+};
+
+/// Returns the error message for the most recent non-OK MinionResult
+/// on the current thread. The returned pointer is valid until the next
+/// MinionResult-returning call on the same thread.
+const char* minion_error_message();
+
+#ifdef LIBMINION
+
+/*
+ * MinionContext:
+ *
+ *   Opaque handle to a Minion solver instance. Each context holds its own
+ *   solver state, allowing multiple Minion instances to run concurrently
+ *   on different threads.
+ *
+ *   Create with minion_newContext(), free with minion_freeContext().
+ *   Pass to runMinion() and other functions that access solver state.
+ */
+
+/// Creates a new MinionContext.
+///
+/// Memory Management:
+///   The caller owns the returned pointer. Free with minion_freeContext().
+MinionContext* minion_newContext();
+
+/// Frees the given MinionContext.
+void minion_freeContext(MinionContext* ctx);
+
+/// Activates the given context on the current thread.
+/// After calling this, all internal minion functions (getState(), etc.)
+/// will operate on this context's state.
+/// Asserts if another context is already active on this thread.
+void minion_activateContext(MinionContext* ctx);
+
+/// Deactivates the current context on this thread.
+/// Must be called after minion_activateContext when done.
+void minion_deactivateContext();
+
+/*
+ * int runMinion:
+ *
+ *   Run Minion with the given context.
+ *
+ *   Multiple instances can run concurrently on different threads by using
+ *   separate MinionContext handles.
+ *
+ *   The context's state is reset on each invocation, so it is safe to
+ *   reuse a context for multiple sequential runs.
+ *
+ *   The callback is invoked each time a solution is found. It receives
+ *   the active MinionContext (for querying variable values via
+ *   printMatrix_getValue, etc.) and the caller-supplied userdata pointer.
+ *   Return true to continue searching, false to stop.
+ *   Pass NULL for callback to find all solutions without a callback.
+ *
+ *   A MinionResult error code is returned.
+ */
+MinionResult runMinion(MinionContext* ctx, SearchOptions& options, SearchMethod& args,
+                       ProbSpec::CSPInstance& instance,
+                       bool (*callback)(MinionContext* ctx, void* userdata),
+                       void* userdata);
+
+/*
+ * MinionThreadConfig: configuration for runMinionParallel.
+ *
+ * numThreads: number of OS threads to spawn (must be >= 1).
+ * baseSeed:   per-thread random seed is `baseSeed XOR threadIndex`. Pass
+ *             args.randomSeed (or any 32-bit value) to make runs reproducible.
+ *
+ * Reserved fields may be added in future without breaking the ABI for
+ * callers that initialise the struct via aggregate-zero or designated
+ * initialisers.
+ */
+struct MinionThreadConfig {
+  int numThreads;
+  unsigned int baseSeed;
+};
+
+/*
+ * runMinionParallel:
+ *
+ *   Run a portfolio search across `config.numThreads` worker threads on a
+ *   shared CSPInstance. Each thread gets its own MinionContext (created and
+ *   freed internally), a derived random seed, and randomised value/variable
+ *   ordering. The first thread to find `options.sollimit` solutions (or to
+ *   prove unsat) signals the others to stop via shared atomic flags.
+ *
+ *   The callback is invoked at most once per solution found by any worker,
+ *   serialised by an internal mutex (so the callback never re-enters
+ *   itself). The MinionContext passed to the callback belongs to the worker
+ *   that found the solution; query it with printMatrix_getValue etc.
+ *   Returning false stops the entire portfolio.
+ *
+ *   Mid-search mutation (minion_newVarMidsearch / minion_addConstraintMidsearch)
+ *   is NOT supported in this mode and will trigger a runtime error.
+ *
+ *   Returns MINION_OK on normal completion, MINION_TIMEOUT if the alarm
+ *   fired, or another MinionResult on error.
+ */
+MinionResult runMinionParallel(MinionThreadConfig config, SearchOptions& options,
+                               SearchMethod& args, ProbSpec::CSPInstance& instance,
+                               bool (*callback)(MinionContext* ctx, void* userdata),
+                               void* userdata);
+
+/*
+ * MinionWorkStealStats: aggregate diagnostics from a single
+ * runMinionWorkSteal invocation. Filled in by the runtime when the
+ * caller passes a non-null pointer to runMinionWorkSteal.
+ *
+ *   donations:      number of donate() calls that fired (a busy worker
+ *                   handed off a sub-tree to an idle worker).
+ *   itemsTaken:     number of work items popped and replayed by idle
+ *                   workers. donations - itemsTaken is the count
+ *                   currently in flight at termination (always 0 for
+ *                   completed runs).
+ *   replayFailures: number of replays that found infeasibility before
+ *                   beginning sub-tree search — a sound prune the
+ *                   donor's propagation hadn't yet reached.
+ *   totalNodes:     sum of per-worker getNodeCount() across all
+ *                   workers. Same value the runtime stashes on
+ *                   getTableOut() under "Nodes".
+ *
+ * Contention counters (nanoseconds, cumulative across all workers):
+ *   queueLockWaitNanos:    total time spent acquiring queue_mutex
+ *                          (donate + popOrFinish entry).
+ *   idleWaitNanos:         total time blocked in queue_cv.wait
+ *                          inside popOrFinish — i.e. workers idle
+ *                          because no work was available. The
+ *                          headline "is supply meeting demand?"
+ *                          number.
+ *   callbackLockWaitNanos: total time spent acquiring callbackMutex
+ *                          (per-solution serialisation). High on
+ *                          enumeration-heavy SAT runs.
+ *
+ * All fields are zero on entry and only meaningful for the run that
+ * just completed; no values from prior runs persist.
+ */
+struct MinionWorkStealStats {
+  long long donations;
+  long long itemsTaken;
+  long long replayFailures;
+  long long totalNodes;
+  long long queueLockWaitNanos;
+  long long idleWaitNanos;
+  long long callbackLockWaitNanos;
+};
+
+/*
+ * runMinionWorkSteal: experimental work-stealing parallel search.
+ *
+ *   Spawns config.numThreads worker threads. Worker 0 starts at the
+ *   search root; others wait on a shared work queue. When any worker
+ *   becomes idle, busy workers (polling at every node) hand off their
+ *   topmost unstolen left-branch by encoding a path-from-root and
+ *   pushing it to the queue. Idle workers fast-forward via worldPush
+ *   + propagate replay and search the resulting sub-tree.
+ *
+ *   Unlike runMinionParallel (pure portfolio), this divides the search
+ *   tree across workers and so speeds up UNSAT proving roughly with
+ *   1/N. Wdeg / domoverwdeg counters drift between workers — this is
+ *   intended as a diversity source rather than a soundness concern.
+ *
+ *   Mid-search mutation is not supported. Restart-based search is not
+ *   supported in this mode.
+ *
+ *   `outStats`, if non-null, receives aggregate work-stealing
+ *   counters on return (donations, items taken, replay failures,
+ *   total nodes). Pass nullptr to discard them.
+ */
+MinionResult runMinionWorkSteal(MinionThreadConfig config, SearchOptions& options,
+                                SearchMethod& args, ProbSpec::CSPInstance& instance,
+                                bool (*callback)(MinionContext* ctx, void* userdata),
+                                void* userdata,
+                                MinionWorkStealStats* outStats);
+
+#endif // LIBMINION
+
+/*
+ * void newVar:
+ *
+ *  Add a named variable to `instance`.
+ *
+ *  Once created, the variable can be accessed by calling
+ *  `instance.vars.getSymbol(name)`.
+ *
+ * Throws parse_exception if the variable is invalid, or the name is already
+ * used.
+ */
+void newVar(CSPInstance& instance, std::string name, VariableType type, std::vector<int> bounds);
+
+/*
+ * Var constantAsVar(int constant):
+ *
+ *   Returns a constant as an anomynous variable, for use in constraints which
+ *   take variables as arguments.
+ *
+ *   For example, the SUMLEQ constraint has arguments of types [Var],Var.
+ *
+ *   Despite this, we can encode SUMLEQ([x,y,z],4] using constantAsVar.
+ *
+ *   ```c++
+ *    ...
+ *
+ *    ConstraintBlob leq(lib_getConstraint(ConstraintType::CT_LEQSUM));
+ *
+ *    Var x = instance.vars.getSymbol("x");
+ *    Var y = instance.vars.getSymbol("y");
+ *    Var z = instance.vars.getSymbol("z");
+ *
+ *    leq.vars.push_back({x,y,z});
+ *    leq.vars.push_back(constantAsVar(4));
+ *
+ *    ....
+ *
+ *    Unlike variables created using newVar, these do not appear anywhere else
+ *    in the instance (such as the symbol table, or allVars).
+ */
+Var constantAsVar(int n);
+
+/*******************************************************/
+/*                    FFI FUNCTIONS                    */
+/*******************************************************/
+
+/*
+ * The below functions are primarily for use by FFI wrappers of Minion.
+ *
+ * This means that:
+ *   - Complex structures that other languages do not understand are returned as
+ *     opaque pointers.
+ *
+ *   - Use of char* instead of string.
+ *
+ *   - Various inline functions are re-exported so they can be seen.
+ *
+ *   - Manual constructors and deconstructors are provided for languages that
+ *     do not use them.
+ */
+
+/*
+ * ConstraintDef* lib_getConstraint:
+ *
+ *  Get the constraint definition for the given ConstraintType.
+ *  This is mainly required to define a ConstraintBlob for a model.
+ *
+ *  Example:
+ *    for the constraint: x + y <= z:
+ *
+ *    ```
+ *    ConstraintBlob leq(lib_getConstraint(ConstraintType::CT_GEQSUM));
+
+ *    geq.vars.push_back({instance.vars.getSymbol("x"),instance.vars.getSymbol("y")});
+ *    geq.vars.push_back({instance.vars.getSymbol("z")});
+ *    instance.constraints.push_back(leq);
+ *    ```
+ */
+
+/***** Variable *****/
+VarResult minion_getVarByName(CSPInstance& instance, char* name);
+MinionResult minion_newVar(CSPInstance& instance, char* name, VariableType type, int bound1, int bound2);
+MinionResult minion_newSparseBoundVar(CSPInstance& instance, char* name, std::vector<int>* domain);
+
+/***** Tuple *****/
+TupleList* tupleList_new(std::vector<std::vector<int>>& tupleList);
+void tupleList_free(TupleList* tupleList);
+
+/***** Short tuples *****/
+
+/// Build a `ShortTupleList` from a flat encoding. Each inner
+/// vector is one short tuple expressed as alternating
+/// `[var_idx_0, value_0, var_idx_1, value_1, ...]` ints (so each
+/// inner vector must have even length). The caller owns the
+/// returned pointer; either pass it to `constraint_setShortTuples`
+/// or `instance_addShortTupleTableSymbol` (both transfer ownership
+/// via shared_ptr) or call `shortTupleList_free`.
+ShortTupleList* shortTupleList_new(std::vector<std::vector<int>>& flat_short_tuples);
+void shortTupleList_free(ShortTupleList* shortTupleList);
+
+/***** Instance *****/
+
+/// Creates a new `CSPInstance`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+CSPInstance* instance_new();
+void instance_free(CSPInstance* instance);
+
+/// Adds a search order to a model instance.
+///
+/// Memory Management:
+///   * `searchOrder` is copied into `instance`.
+void instance_addSearchOrder(CSPInstance& instance, SearchOrder& searchOrder);
+
+/// Adds a constraint to a model instance.
+///
+/// Memory Management:
+///   * `constraint` is copied into `instance`.
+void instance_addConstraint(CSPInstance& instance, ConstraintBlob& constraint);
+
+/// Marks `instance` as a single-objective optimisation problem.
+/// `minimising = true` means MINIMISING, false means MAXIMISING.
+/// `var` is copied into the instance. Internally calls
+/// `CSPInstance::set_optimise`. Must be called before search starts.
+void instance_setOptimise(CSPInstance& instance, bool minimising, Var& var);
+
+/// Adds a constraint to the currently running search and propagates it.
+///
+/// Returns MINION_OK on success, or an error code if adding the constraint
+/// causes immediate failure (e.g. propagation wipeout).
+///
+/// This must only be called while Minion is actively searching.
+/// The context must be the one that is currently running the search.
+#ifdef LIBMINION
+MinionResult minion_addConstraintMidsearch(MinionContext* ctx, CSPInstance& instance, ConstraintBlob& constraint);
+
+/// Adds a named variable to the instance and registers it in the live
+/// runtime solver containers so that subsequent mid-search constraints
+/// can reference it.
+///
+/// Supported types: VAR_BOUND, VAR_DISCRETE, VAR_SPARSEBOUND, VAR_BOOL.
+/// VAR_CONSTANT does not need this function — use constantAsVar() instead.
+///
+/// This must only be called while Minion is actively searching.
+/// The context must be the one that is currently running the search.
+MinionResult minion_newVarMidsearch(MinionContext* ctx, CSPInstance& instance,
+                                    char* name, VariableType type,
+                                    int bound1, int bound2);
+MinionResult minion_newSparseBoundVarMidsearch(MinionContext* ctx, CSPInstance& instance,
+                                               char* name, std::vector<int>* domain);
+
+/// Returns the assigned value of any named variable during a callback.
+///
+/// Unlike `printMatrix_getValueByName`, this works for any variable in
+/// the symbol table — including variables added via
+/// `minion_newVarMidsearch`, which are not added to the print matrix.
+///
+/// Throws `parse_exception` if the name is not in the symbol table.
+///
+/// This must only be called while Minion is actively searching (i.e.
+/// from inside a solution callback).
+int minion_getVarValue(MinionContext* ctx, CSPInstance& instance, const char* varname);
+#endif
+
+
+/// Adds a named tuple-table to a model instance.
+///
+/// Memory Management:
+///   * `tuplelist` and `name` are copied into `instance`.
+void instance_addTupleTableSymbol(CSPInstance& instance, char* name, TupleList* tuplelist);
+
+/// Gets a tuple table by name.
+///
+/// Memory Management:
+///   * The returned pointer is callee owned.
+TupleList* instance_getTupleTableSymbol(CSPInstance& instance, char* name);
+
+/// Adds a named short-tuple table to a model instance.
+///
+/// Memory Management:
+///   * `shorttuplelist` is taken into the instance via `shared_ptr`.
+///   * `name` is copied into `instance`.
+void instance_addShortTupleTableSymbol(CSPInstance& instance, char* name,
+                                       ShortTupleList* shorttuplelist);
+
+/// Gets a short-tuple table by name.
+///
+/// Memory Management:
+///   * The returned pointer is callee owned.
+ShortTupleList* instance_getShortTupleTableSymbol(CSPInstance& instance, char* name);
+
+/*
+ * printMatrix_* functions assume the print matrix is of the form
+ * [[x],[y],[z],...].
+ */
+void printMatrix_addVar(CSPInstance& instance, Var var);
+
+// Should be called only when minion has results in a callback.
+// The context must be the one currently running the search.
+#ifdef LIBMINION
+int printMatrix_getValue(MinionContext* ctx, int idx);
+
+/// Returns the assigned value of a print-matrix variable by name.
+///
+/// Looks up `varname` in the instance's symbol table and finds its
+/// position in the print matrix. Returns the assigned value, or
+/// throws parse_exception if the name is not found in the print matrix.
+///
+/// This is a convenience wrapper around printMatrix_getValue for
+/// consumers that don't want to maintain a name-to-index mapping.
+int printMatrix_getValueByName(MinionContext* ctx, CSPInstance& instance, const char* varname);
+#endif
+
+/***** Constraint argument parse types ****/
+
+// as per MinionThreeInput.h and build/src/Constraintdefs.h.
+
+/// Creates a new `ConstraintBlob`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+ConstraintBlob* constraint_new(ConstraintType contraint_type);
+
+/// Frees the given `ConstraintBlob`.
+void constraint_free(ConstraintBlob* constraint);
+
+/// Gets the `ConstraintDef` associated with the given constraint.
+///
+/// Memory Management:
+///   The callee owns the returned pointer.
+ConstraintDef* lib_getConstraint(ConstraintType t);
+
+/// Adds a list of variables argument to the constraint.
+///
+/// Memory Management:
+///   `vars` is copied into `constraint`.
+void constraint_addList(ConstraintBlob& constraint, std::vector<Var>& vars);
+
+/// Adds a variable argument to the constraint.
+///
+/// Memory Management:
+///   `var` is copied into `constraint`.
+void constraint_addVar(ConstraintBlob& constraint, Var& var);
+
+/// Adds a two variables argument to the constraint.
+///
+/// Memory Management:
+///   `var1` and `var2` are copied into `constraint`.
+void constraint_addTwoVars(ConstraintBlob& constraint, Var& var1, Var& var2);
+
+/// Adds a constant to the constraint.
+void constraint_addConstant(ConstraintBlob& constraint, int constant);
+
+/// Adds a list of constants to the constraint.
+///
+/// Memory Management:
+///   `constants` is copied into `constraint`.
+void constraint_addConstantList(ConstraintBlob& constraint, std::vector<int>& constants);
+
+/// Adds an internal constraint argument to the constraint.
+///
+/// Memory Management:
+///   `internal_constraint` is copied into `constraint`.
+void constraint_addConstraint(ConstraintBlob& constraint, ConstraintBlob& internal_constraint);
+
+/// Adds a list of internal constraint argument to the constraint.
+///
+/// Memory Management:
+///   `internal_constraints` is copied into `constraint`.
+void constraint_addConstraintList(ConstraintBlob& constraint,
+                                  std::vector<ConstraintBlob>& internal_constraints);
+
+// Note that adding tuples to the symbol table is optional, but useful!
+// A constraint only has one tuple list.
+void constraint_setTuples(ConstraintBlob& constraint, TupleList* tupleList);
+
+/// Attach a named tuple table to the constraint. The table must have
+/// already been registered on the instance via
+/// `instance_addTupleTableSymbol`. Unlike `constraint_setTuples`, this
+/// increments the existing `shared_ptr<TupleList>`'s refcount rather
+/// than wrapping a raw pointer, so registering the same table on
+/// multiple constraints (or keeping it available on the instance while
+/// a constraint also references it) is safe.
+void constraint_setTuplesByName(ConstraintBlob& constraint, CSPInstance& instance, const char* name);
+
+/// Attach a short-tuple list to the constraint. Ownership of
+/// `shortTupleList` is taken via shared_ptr, so do not free it
+/// after this call.
+void constraint_setShortTuples(ConstraintBlob& constraint, ShortTupleList* shortTupleList);
+
+/// Attach a named short-tuple table (previously registered via
+/// `instance_addShortTupleTableSymbol`) to the constraint. Reuses
+/// the existing shared_ptr so multiple constraints can share one
+/// table safely.
+void constraint_setShortTuplesByName(ConstraintBlob& constraint, CSPInstance& instance,
+                                     const char* name);
+
+/***** Small misc useful types *****/
+
+/// Creates a new `SearchOptions` object.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+SearchOptions* searchOptions_new();
+
+/// Creates a new `SearchMethod` object.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+SearchMethod* searchMethod_new();
+
+/// Creates a new `SearchOrder` object.
+///
+/// Memory Management:
+///   * The caller owns the returned pointer.
+///   * The given `vars` is copied into the returned `SearchOrder`.
+SearchOrder* searchOrder_new(std::vector<Var>& vars, VarOrderEnum orderEnum, bool findOneSol);
+
+/// Overwrite the per-variable value ordering on `searchOrder` so every
+/// variable uses `valOrder`. Minion's `SearchOrder::setupValueOrder`
+/// defaults any empty valOrder vector to ASCEND; this function lets
+/// callers pick a different uniform value order (e.g. DESCEND, RANDOM)
+/// from outside the text parser.
+void searchOrder_setValOrder(SearchOrder& searchOrder, ValOrderEnum valOrder);
+
+/// Frees the given `SearchOptions`.
+void searchOptions_free(SearchOptions* searchOptions);
+
+/// Frees the given `SearchMethod`.
+void searchMethod_free(SearchMethod* searchMethod);
+
+/// Frees the given `SearchOrder`.
+void searchOrder_free(SearchOrder* searchOrder);
+
+
+/// Configure a search without depending on the solver's object layouts.
+void searchOptions_setOutput(SearchOptions& options, bool silent, bool printSolution);
+void searchOptions_setRandomiseOrder(SearchOptions& options, bool randomise);
+void searchOptions_setSolutionLimit(SearchOptions& options, long long limit);
+void searchOptions_setNodeLimit(SearchOptions& options, long long limit);
+void searchOptions_setTimeLimit(SearchOptions& options, unsigned int seconds, bool cpuTime);
+/// Configure the process/thread modes (unsupported on Emscripten).
+void searchOptions_setParallel(SearchOptions& options, bool processes, int preprocessCores,
+                               int threads, int workStealThreads, bool portfolio);
+void searchMethod_setSeed(SearchMethod& method, unsigned int seed);
+void searchMethod_setPropagation(SearchMethod& method, PropagationLevel preprocess,
+                                 PropagationLevel propagation);
+
+/***** std::vector Wrappers *****/
+
+/// Creates a new `std::vector<Var>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+std::vector<Var>* vec_var_new();
+
+/// Adds a `Var` to the end of the given vector.
+///
+/// Memory Management:
+///   `var` is copied into `vec`.
+void vec_var_push_back(std::vector<Var>* vec, Var var);
+
+/// Frees the given `std::vector<Var>`.
+void vec_var_free(std::vector<Var>* vec);
+
+/// Creates a new `std::vector<int>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+std::vector<int>* vec_int_new();
+
+/// Adds an `int` to the end of the given vector.
+///
+/// Memory Management:
+///   `n` is copied into `vec`.
+void vec_int_push_back(std::vector<int>* vec, int n);
+
+/// Frees the given `std::vector<int>`.
+void vec_int_free(std::vector<int>* vec);
+
+/// Creates a new `std::vector<ConstraintBlob>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+std::vector<ConstraintBlob>* vec_constraints_new();
+
+/// Adds a `ConstraintBlob` to the end of the given vector.
+///
+/// Memory Management:
+///   `constraint` is copied into `vec`.
+void vec_constraints_push_back(std::vector<ConstraintBlob>* vec, ConstraintBlob& constraint);
+
+/// Frees the given `std::vector<ConstraintBlob>`.
+void vec_constraints_free(std::vector<ConstraintBlob>* vec);
+
+/// Creates a new `std::vector<std::vector<int>>`.
+///
+/// Memory Management:
+///   The caller owns the returned pointer.
+std::vector<std::vector<int>>* vec_vec_int_new();
+
+/// Adds a `std::vector<int>` to the end of the given vector.
+///
+/// Memory Management:
+///   `new_elem` is copied into `vec`.
+void vec_vec_int_push_back(std::vector<std::vector<int>>* vec,
+                           std::vector<int> new_elem);
+void vec_vec_int_push_back_ptr(std::vector<std::vector<int>>* vec,
+                               std::vector<int>* new_elem);
+
+/// Frees the given `std::vector<std::vector<int>>`.
+void vec_vec_int_free(std::vector<std::vector<int>>* vec);
+
+/***** TableOut *****/
+
+/* These functions access the TableOut: a logging class used to store
+ * run statistics about Minion.
+ *
+ * TableOut is a global singleton.
+ *
+ *
+ * Useful Values
+ * =============
+ * Here are some values stored in the table.
+ * This is not an exhaustive list.
+ *
+ * "Nodes" - the number of nodes used.
+ * "Satisfiable" - was the model satisfiable or not?
+ * "SolutionsFound" - number of solutions found
+ * "RandomSeed" - the random seed used.
+ */
+
+/// Gets the value for key from the table.
+///
+/// Memory Management:
+///   Returns a freshly malloc'd string. Caller must free() the result.
+///   Returns NULL if the key is not found.
+#ifdef LIBMINION
+char* TableOut_get(MinionContext* ctx, char* key);
+#endif
+
+// vim: cc=80 tw=80
+
+#endif

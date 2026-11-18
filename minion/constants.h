@@ -5,6 +5,7 @@
 #define _CONSTANTS_H
 
 #include <string>
+#include "search_types.h"
 
 enum TrigType { UpperBound, LowerBound, Assigned, DomainChanged, DomainRemoval };
 
@@ -14,15 +15,6 @@ static const SysInt NoDomainValue = -98765;
 #define BAD_POINTER (void*)(-1)
 
 enum BoundType { Bound_Yes, Bound_No, Bound_Maybe };
-
-enum PropagationType {
-  PropLevel_None,
-  PropLevel_GAC,
-  PropLevel_SACBounds,
-  PropLevel_SAC,
-  PropLevel_SSACBounds,
-  PropLevel_SSAC
-};
 
 inline std::ostream& operator<<(std::ostream& o, PropagationType p) {
   switch(p) {
@@ -35,13 +27,6 @@ inline std::ostream& operator<<(std::ostream& o, PropagationType p) {
   }
   return o;
 }
-
-struct PropagationLevel {
-  PropagationType type;
-  bool limit;
-
-  PropagationLevel(PropagationType _t = PropLevel_GAC, bool _l = false) : type(_t), limit(_l) {}
-};
 
 inline std::ostream& operator<<(std::ostream& o, PropagationLevel pl) {
   o << pl.type;
