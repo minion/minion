@@ -19,7 +19,6 @@
 
 #ifdef LIBMINION
 thread_local Globals* globals = nullptr;
-thread_local DynamicTriggerList globalNullTriggerList;
 #else
 DynamicTriggerList globalNullTriggerList;
 #endif
