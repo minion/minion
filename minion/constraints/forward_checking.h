@@ -17,6 +17,7 @@
 #define P(x)
 
 struct Forward_Checking : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "wrapper.support"; }
   ReversibleMonotonicSet FCPruning; // need one bit to support bound vars
   SysInt pruningvar;
 
@@ -48,7 +49,7 @@ struct Forward_Checking : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    return child->getSatisfyingAssignment(assignment);
+    return child->getSatisfyingAssignmentAnnotated(assignment);
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {

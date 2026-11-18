@@ -76,7 +76,7 @@ struct reify_true : public ParentConstraint {
       return true;
     } else {
       D_ASSERT(rar_var.inDomain(1));
-      bool ret = child_constraints[0]->getSatisfyingAssignment(assignment);
+      bool ret = child_constraints[0]->getSatisfyingAssignmentAnnotated(assignment);
       if(ret) {
         assignment.push_back(make_pair(child_constraints[0]->getVarsSingleton()->size(), 1));
         return true;
@@ -104,7 +104,7 @@ struct reify_true : public ParentConstraint {
     D_ASSERT(constraintLocked);
     P("Special Check!");
     constraintLocked = false;
-    child_constraints[0]->fullPropagate();
+    child_constraints[0]->fullPropagateAnnotated();
     fullPropagate_called = true;
   }
 
@@ -206,7 +206,7 @@ struct reify_true : public ParentConstraint {
     moveTriggerInt(rar_var, reify_varTrigger(), LowerBound);
 
     if(rar_var.isAssigned() && rar_var.assignedValue() == 1) {
-      child_constraints[0]->fullPropagate();
+      child_constraints[0]->fullPropagateAnnotated();
       fullPropagate_called = true;
       return;
     }

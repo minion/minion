@@ -283,6 +283,7 @@ struct BothNonZeroIterated {
  */
 template <typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
 struct VecNeqDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "count.bounds"; }
   virtual string constraintName() {
     return "watchvecneq";
   }

@@ -64,6 +64,8 @@ struct FrameUpdateConstraint : public AbstractConstraint {
     targetToSource_map.assign(target.size(), -1);
   }
 
+  const char* annotationPropagationRule() const { return "frame.blocks"; }
+
   virtual string constraintName() {
     return "frameupdate";
   }

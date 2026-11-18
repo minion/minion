@@ -13,6 +13,8 @@
 // X = abs(Y)
 template <typename AbsVarRef1, typename AbsVarRef2>
 struct AbsConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "abs";
   }

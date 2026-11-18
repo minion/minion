@@ -6,6 +6,8 @@
 
 template <bool truth>
 struct ConstantConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
 
   virtual string constraintName() {
     if(truth)

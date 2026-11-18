@@ -11,4 +11,4 @@
   box<pair<SysInt, DomainInt>> c(                                                                  \
       (pair<SysInt, DomainInt>*)(alloca(sizeof(pair<SysInt, DomainInt>) * num_vars##c * 2)),       \
       num_vars##c * 2);                                                                            \
-  flag = constraint->getSatisfyingAssignment(c);
+  flag = constraint->getSatisfyingAssignmentAnnotated(c);

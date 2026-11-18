@@ -9,6 +9,7 @@ inline SysInt getWorldDepth() {
 
 /// Pushes the state of the whole world.
 inline void worldPush() {
+  if(annotationTrace()) annotationTrace()->push();
   D_ASSERT(!getState().isFailed());
   getQueue().getTbq().worldPush();
   getMemory().monotonicSet().before_branch_left();
@@ -21,6 +22,7 @@ inline void worldPush() {
 
 /// Pops the state of the whole world.
 inline void worldPop() {
+  if(annotationTrace()) annotationTrace()->pop();
   getState()._unsafeClearFailed();
   getQueue().clearQueues();
   getState().getGenericBacktracker().worldPop();
@@ -48,7 +50,7 @@ inline void worldPop() {
       // init_constraint also reaches the children of a meta-constraint,
       // which never get fullPropagate called on them directly.
       (*it)->init_constraint();
-      (*it)->fullPropagate();
+      (*it)->fullPropagateAnnotated();
       // With two constraints in the set, a failure from the first would
       // leave the second propagating on an empty domain. The set is
       // migrated upward below either way, so whatever is skipped here is
@@ -97,7 +99,7 @@ inline bool SearchState::addConstraint(AbstractConstraint* c) {
     (*vars)[i].addConstraint(c);
 
   c->setup();
-  c->fullPropagate();
+  c->fullPropagateAnnotated();
   c->fullPropagateDone = true;
   if(getState().isFailed()) {
     return false;

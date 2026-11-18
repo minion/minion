@@ -15,6 +15,8 @@
 template <typename VarArray>
 struct GACSchema : public AbstractConstraint, Backtrackable {
 
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "gacschema";
   }

@@ -86,29 +86,39 @@ struct SwitchNeg {
       return -data.initialMax();
   }
 
-  void setMax(DomainInt i) {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(multiplier == 1)
       data.setMax(i);
     else
       data.setMin(-i);
   }
 
-  void setMin(DomainInt i) {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(multiplier == 1)
       data.setMin(i);
     else
       data.setMax(-i);
   }
 
-  void uncheckedAssign(DomainInt b) {
+  void uncheckedAssign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.uncheckedAssign(b * multiplier);
   }
 
-  void assign(DomainInt b) {
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.assign(b * multiplier);
   }
 
-  void removeFromDomain(DomainInt b) {
+  void removeFromDomain(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.removeFromDomain(b * multiplier);
   }
 

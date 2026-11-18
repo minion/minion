@@ -68,6 +68,8 @@ struct AlldiffMatrixConstraint : public AbstractConstraint {
   vector<SysInt> rowcolmatching; // For each row, the matching column.
   vector<SysInt> colrowmatching; // For each column, the matching row.
 
+  const char* annotationPropagationRule() const { return "matrix.hall"; }
+
   virtual string constraintName() {
     return "alldiffmatrix";
   }

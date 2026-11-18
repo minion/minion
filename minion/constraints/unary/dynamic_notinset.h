@@ -13,6 +13,8 @@
 // Checks if a variable is not in a fixed set.
 template <typename Var>
 struct WatchNotInSetConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "w-notinset";
   }

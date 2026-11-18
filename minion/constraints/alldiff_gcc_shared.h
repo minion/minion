@@ -240,6 +240,18 @@ struct smallset_list_bt {
 
 template <typename VarArray, bool UseIncGraph>
 struct FlowConstraint : public AbstractConstraint {
+  std::string annotationPositions(const vector<SysInt>& positions) const {
+    std::string result = ",\"positions\":[";
+    for(size_t i = 0; i < positions.size(); ++i) {
+#ifdef REVERSELIST
+      SysInt position = numvars - 1 - positions[i];
+#else
+      SysInt position = positions[i];
+#endif
+      result += (i ? "," : "") + tostring(position);
+    }
+    return result + "]";
+  }
 protected:
   // Base class for GAC alldiff and GCC
   FlowConstraint(const VarArray& _varArray)

@@ -18,6 +18,7 @@
 
 template <typename VarArray1, typename VarArray2, BOOL Less = false>
 struct LexLeqConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "lex.support"; }
   virtual string constraintName() {
     if(Less)
       return "lexless";

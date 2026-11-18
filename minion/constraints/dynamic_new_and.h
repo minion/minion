@@ -55,7 +55,7 @@ struct Dynamic_AND : public ParentConstraint {
     P("GetSat for And");
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       localassignment.clear();
-      bool flag = child_constraints[i]->getSatisfyingAssignment(localassignment);
+      bool flag = child_constraints[i]->getSatisfyingAssignmentAnnotated(localassignment);
       if(!flag) {
         assignment.clear();
         return false;
@@ -98,7 +98,7 @@ struct Dynamic_AND : public ParentConstraint {
       return;
     }
 
-    child_constraints[propagatedTo]->fullPropagate();
+    child_constraints[propagatedTo]->fullPropagateAnnotated();
     propagatedTo++;
     if(propagatedTo != (SysInt)child_constraints.size())
       getQueue().pushSpecialTrigger(this);

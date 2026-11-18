@@ -212,6 +212,8 @@ struct CTupleSTRData {
 
 template <typename VarArray, bool UseShort>
 struct CTupleSTR : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "shortctuplestr2";
   }

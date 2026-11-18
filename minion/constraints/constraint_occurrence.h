@@ -25,6 +25,8 @@
 // Negated occurrence; used in reverseConstraint for OccurrenceEqualConstraint
 template <typename VarArray, typename Val, typename ValCount>
 struct NotOccurrenceEqualConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "count.bounds"; }
+
   virtual string constraintName() {
     return "NotOccurrenceEqual";
   }
@@ -280,6 +282,8 @@ struct NotOccurrenceEqualConstraint : public AbstractConstraint {
 
 template <typename VarArray, typename Val>
 struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "count.bounds"; }
+
   virtual string constraintName() {
     return "OccurrenceLeq/Geq";
   }
@@ -492,6 +496,8 @@ struct ConstantOccurrenceEqualConstraint : public AbstractConstraint {
 
 template <typename VarArray, typename Val, typename ValCount>
 struct OccurrenceEqualConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "count.bounds"; }
+
   virtual string constraintName() {
     return "occurrence";
   }

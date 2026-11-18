@@ -617,6 +617,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
       GCCPRINT("matching:" << flag);
 
       if(!flag) {
+        AnnotationWitness witness(this, annotationFailureKind.c_str(), [&]() { return annotationFailure(); });
         getState().setFailed();
         return;
       }
@@ -737,19 +738,209 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
     pendingCapMax.clear();
   }
 
+  // ---- Annotation witnesses for deferred prunes -------------------------
+  // Each witness is a cut derived by local search from the current total
+  // assignment varvalmatching, using the current domains and capacity
+  // bounds. Upper cut: a set of variables whose domains only contain values
+  // that are full. Lower cut: a set of values at or below their demand which
+  // no further variable can take. The checker validates the cut; when the
+  // search finds neither, no witness is supplied.
+  struct AnnotationFlow {
+    vector<SysInt> match, usage, up, lo, parentVal, parentVar;
+    vector<char> seenVar, seenVal;
+  };
+
+  bool annotationFlowInit(AnnotationFlow& f) {
+    f.match.resize(numvars);
+    f.usage.assign(numvals, 0);
+    f.up.assign(numvals, numvars);
+    f.lo.assign(numvals, 0);
+    f.parentVal.assign(numvals, -1);
+    f.parentVar.assign(numvars, -1);
+    for(SysInt i = 0; i < numvars; ++i) {
+      SysInt v = varvalmatching[i] - domMin;
+      if(v < 0 || v >= numvals) return false;
+      f.match[i] = v;
+      f.usage[v]++;
+    }
+    for(SysInt v = 0; v < numvals; ++v) {
+      SysInt c = valToCapIndex[v];
+      if(c != -1) {
+        f.up[v] = std::max<SysInt>(0, checked_cast<SysInt>(capacity_array[c].max()));
+        f.lo[v] = std::max<SysInt>(0, checked_cast<SysInt>(capacity_array[c].min()));
+      }
+    }
+    return true;
+  }
+
+  // Move one variable off value w along a chain ending at a value with spare
+  // capacity. On failure seenVar and seenVal hold the saturated closure.
+  bool annotationPushOff(AnnotationFlow& f, SysInt w, SysInt frozen) {
+    f.seenVar.assign(numvars, 0);
+    f.seenVal.assign(numvals, 0);
+    vector<SysInt> queue(1, w);
+    f.seenVal[w] = 1;
+    for(size_t head = 0; head < queue.size(); ++head) {
+      SysInt u = queue[head];
+      for(SysInt z = 0; z < numvars; ++z) {
+        if(z == frozen || f.match[z] != u || f.seenVar[z]) continue;
+        f.seenVar[z] = 1;
+        for(DomainInt val = varArray[z].min(); val <= varArray[z].max(); ++val) {
+          if(!varArray[z].inDomain(val)) continue;
+          SysInt u2 = checked_cast<SysInt>(val) - domMin;
+          if(f.seenVal[u2]) continue;
+          f.seenVal[u2] = 1;
+          f.parentVal[u2] = z;
+          if(f.usage[u2] < f.up[u2]) {
+            for(SysInt target = u2;;) {
+              SysInt var = f.parentVal[target];
+              SysInt old = f.match[var];
+              f.match[var] = target;
+              f.usage[target]++;
+              f.usage[old]--;
+              if(old == w) return true;
+              target = old;
+            }
+          }
+          queue.push_back(u2);
+        }
+      }
+    }
+    return false;
+  }
+
+  // Give value u0 one more variable along a chain ending at a value above
+  // its demand. On failure seenVal holds the closure of deficient values.
+  bool annotationPullIn(AnnotationFlow& f, SysInt u0, SysInt frozen) {
+    f.seenVar.assign(numvars, 0);
+    f.seenVal.assign(numvals, 0);
+    vector<SysInt> queue(1, u0);
+    f.seenVal[u0] = 1;
+    for(size_t head = 0; head < queue.size(); ++head) {
+      SysInt u = queue[head];
+      for(SysInt z = 0; z < numvars; ++z) {
+        if(z == frozen || f.seenVar[z] || f.match[z] == u || !varArray[z].inDomain(u + domMin)) continue;
+        f.seenVar[z] = 1;
+        f.parentVar[z] = u;
+        SysInt u2 = f.match[z];
+        if(f.seenVal[u2]) continue;
+        f.seenVal[u2] = 1;
+        f.parentVal[u2] = z;
+        if(f.usage[u2] > f.lo[u2]) {
+          for(SysInt source = u2;;) {
+            SysInt var = f.parentVal[source];
+            SysInt target = f.parentVar[var];
+            f.match[var] = target;
+            f.usage[source]--;
+            f.usage[target]++;
+            if(target == u0) return true;
+            source = target;
+          }
+        }
+        queue.push_back(u2);
+      }
+    }
+    return false;
+  }
+
+  typedef pair<std::string, std::string> AnnotationCut; // (kind, fields); empty kind: none
+
+  AnnotationCut annotationUpperCut(const AnnotationFlow& f) {
+    vector<SysInt> positions;
+    for(SysInt i = 0; i < numvars; ++i)
+      if(f.seenVar[i]) positions.push_back(i);
+    return AnnotationCut("gcc_upper", this->annotationPositions(positions));
+  }
+
+  AnnotationCut annotationLowerCut(const AnnotationFlow& f) {
+    std::string result = ",\"values\":[";
+    bool first = true;
+    for(SysInt v = 0; v < numvals; ++v) {
+      if(f.seenVal[v]) {
+        result += (first ? "" : ",") + tostring(v + domMin);
+        first = false;
+      }
+    }
+    return AnnotationCut("gcc_lower", result + "]");
+  }
+
+  // A cut treats each counted variable and each capacity as a separate
+  // variable. When a capacity shares its variable with another argument, one
+  // restriction changes several roles at once and no witness is supplied.
+  SysInt annotationSharedCapacity = -1;
+
+  bool annotationWanted() {
+    if(!annotationTrace() || !annotationTrace()->active()) return false;
+    if(annotationSharedCapacity == -1) {
+      annotationSharedCapacity = 0;
+      for(SysInt i = 0; i < (SysInt)capacity_array.size(); ++i) {
+        Var cap = capacity_array[i].getBaseVar();
+        if(cap.type() == VAR_CONSTANT) continue;
+        for(SysInt j = 0; j < numvars; ++j)
+          if(varArray[j].getBaseVar() == cap) annotationSharedCapacity = 1;
+        for(SysInt j = 0; j < i; ++j)
+          if(capacity_array[j].getBaseVar() == cap) annotationSharedCapacity = 1;
+      }
+    }
+    return annotationSharedCapacity == 0;
+  }
+
+  AnnotationCut annotationRemovalCut(SysInt var, DomainInt val) {
+    AnnotationFlow f;
+    SysInt w = checked_cast<SysInt>(val) - domMin;
+    if(!annotationWanted() || !annotationFlowInit(f) || f.match[var] == w) return AnnotationCut();
+    SysInt old = f.match[var];
+    f.match[var] = w;
+    f.usage[w]++;
+    f.usage[old]--;
+    while(f.usage[w] > f.up[w])
+      if(!annotationPushOff(f, w, var)) return annotationUpperCut(f);
+    while(f.usage[old] < f.lo[old])
+      if(!annotationPullIn(f, old, var)) return annotationLowerCut(f);
+    return AnnotationCut();
+  }
+
+  // The count of the capacity's value is at least (atLeast) or at most bound.
+  AnnotationCut annotationCapacityCut(SysInt capidx, DomainInt bound, bool atLeast) {
+    AnnotationFlow f;
+    SysInt v = val_array[capidx] - domMin;
+    if(!annotationWanted() || v < 0 || v >= numvals || !annotationFlowInit(f)) return AnnotationCut();
+    if(atLeast) {
+      while(f.usage[v] >= bound)
+        if(!annotationPushOff(f, v, -1)) return annotationUpperCut(f);
+    } else {
+      while(f.usage[v] <= bound)
+        if(!annotationPullIn(f, v, -1)) return annotationLowerCut(f);
+    }
+    return AnnotationCut();
+  }
+
   void applyPendingPrunes() {
     for(SysInt i = 0; i < (SysInt)pendingRemovals.size(); i++) {
       // inDomain guard: the same removal can be recorded twice (e.g.
       // once by Tarjan and once via a capacity bound on an aliased
       // variable), and an earlier applied prune may already have
       // removed it.
-      if(varArray[pendingRemovals[i].first].inDomain(pendingRemovals[i].second))
+      if(varArray[pendingRemovals[i].first].inDomain(pendingRemovals[i].second)) {
+        AnnotationCut cut = annotationRemovalCut(pendingRemovals[i].first, pendingRemovals[i].second);
+        AnnotationWitness witness(this, cut.first.c_str(), [&]() { return cut.second; });
         varArray[pendingRemovals[i].first].removeFromDomain(pendingRemovals[i].second);
+      }
     }
-    for(SysInt i = 0; i < (SysInt)pendingCapMin.size(); i++)
+    for(SysInt i = 0; i < (SysInt)pendingCapMin.size(); i++) {
+      AnnotationCut cut;
+      if(capacity_array[pendingCapMin[i].first].min() < pendingCapMin[i].second)
+        cut = annotationCapacityCut(pendingCapMin[i].first, pendingCapMin[i].second, true);
+      AnnotationWitness witness(this, cut.first.c_str(), [&]() { return cut.second; });
       capacity_array[pendingCapMin[i].first].setMin(pendingCapMin[i].second);
-    for(SysInt i = 0; i < (SysInt)pendingCapMax.size(); i++)
+    }
+    for(SysInt i = 0; i < (SysInt)pendingCapMax.size(); i++) {
+      AnnotationCut cut;
+      if(capacity_array[pendingCapMax[i].first].max() > pendingCapMax[i].second)
+        cut = annotationCapacityCut(pendingCapMax[i].first, pendingCapMax[i].second, false);
+      AnnotationWitness witness(this, cut.first.c_str(), [&]() { return cut.second; });
       capacity_array[pendingCapMax[i].first].setMax(pendingCapMax[i].second);
+    }
     clearPendingPrunes();
   }
 
@@ -884,6 +1075,7 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           bool flag = bfsmatching_gcc();
           if(!flag) {
             GCCPRINT("Failing because no matching");
+            AnnotationWitness witness(this, annotationFailureKind.c_str(), [&]() { return annotationFailure(); });
             getState().setFailed();
             return;
           }
@@ -945,7 +1137,20 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
   smallset to_process;
 
+  std::string annotationFailureKind;
+  vector<SysInt> annotationFailureSet;
+
+  std::string annotationFailure() const {
+    if(annotationFailureKind == "gcc_upper") return this->annotationPositions(annotationFailureSet);
+    std::string result = ",\"values\":[";
+    for(size_t i = 0; i < annotationFailureSet.size(); ++i)
+      result += (i ? "," : "") + tostring(annotationFailureSet[i]);
+    return result + "]";
+  }
+
   inline bool bfsmatching_gcc() {
+    annotationFailureKind.clear();
+    annotationFailureSet.clear();
 // lower and upper are indexed by value-domMin and provide the capacities.
 // usage is the number of times a value is used in the matching.
 
@@ -1068,6 +1273,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
           }             // end value
         }               // end while
         if(!finished) { // no augmenting path found
+          if(annotationTrace() && annotationTrace()->active()) {
+            annotationFailureKind = "gcc_lower";
+            for(SysInt i = 0; i < numvals; ++i)
+              if(visited.in(i + numvars)) annotationFailureSet.push_back(i + domMin);
+          }
           GCCPRINT("No augmenting path found.");
           // restore the matching to its state before the algo was called.
           // varvalmatching=matchbac;
@@ -1163,6 +1373,11 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
             }             // end value
           }               // end while
           if(!finished) { // no augmenting path found
+            if(annotationTrace() && annotationTrace()->active()) {
+              annotationFailureKind = "gcc_upper";
+              for(SysInt i = 0; i < numvars; ++i)
+                if(visited.in(i)) annotationFailureSet.push_back(i);
+            }
             GCCPRINT("No augmenting path found.");
             // restore the matching to its state before the algo was called.
             // varvalmatching=matchbac;   // no need for this.
@@ -1340,6 +1555,8 @@ struct GCC : public FlowConstraint<VarArray, UseIncGraph> {
 
     GCCPRINT("varvalmatching:" << varvalmatching);
   }
+
+  const char* annotationPropagationRule() const { return "gcc.capacity"; }
 
   virtual string constraintName() {
     if(Strongcards)

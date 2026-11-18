@@ -14,6 +14,7 @@
 
 template <typename VarArray, typename VarResult>
 struct LessEqualNvalueConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "nvalue.bounds"; }
   virtual string constraintName() {
     return "nvalueleq";
   }
@@ -118,6 +119,7 @@ struct LessEqualNvalueConstraint : public AbstractConstraint {
 
 template <typename VarArray, typename VarResult>
 struct GreaterEqualNvalueConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "nvalue.bounds"; }
   virtual string constraintName() {
     return "nvaluegeq";
   }

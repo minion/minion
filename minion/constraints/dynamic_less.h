@@ -11,6 +11,8 @@
 // var1 < var2
 template <typename Var1, typename Var2, bool Negated = false>
 struct WatchLessConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "watchless";
   }

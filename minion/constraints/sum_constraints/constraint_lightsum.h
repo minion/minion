@@ -85,12 +85,20 @@ struct LightLessEqualSumConstraint : public AbstractConstraint {
       min_sum += varArray[i].min();
 
     if(propVal != varArray.size()) {
+      AnnotationContext reason(this, "sum.bounds.result", [&]() {
+        return "{\"min_sum\":" + tostring(min_sum) + "}";
+      }, AnnotationContext::LazyInfo{});
       varSum.setMin(min_sum);
     }
 
     DomainInt slack = varSum.max() - min_sum;
-    for(UnsignedSysInt i = 0; i < size; ++i)
+    for(UnsignedSysInt i = 0; i < size; ++i) {
+      AnnotationContext reason(this, "sum.bounds.term", [&]() {
+        return "{\"index\":" + tostring(i) + ",\"min_sum\":" + tostring(min_sum) +
+               ",\"slack\":" + tostring(slack) + "}";
+      }, AnnotationContext::LazyInfo{});
       varArray[i].setMax(varArray[i].min() + slack);
+    }
   }
 
   virtual void fullPropagate() {

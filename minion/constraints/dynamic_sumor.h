@@ -11,6 +11,8 @@
 
 template <typename VarArray1, typename VarArray2, typename Operator = NeqIterated>
 struct VecCountDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "count.bounds"; }
+
   virtual string constraintName() {
     return Operator::constraintName();
   }

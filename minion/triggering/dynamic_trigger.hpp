@@ -2,7 +2,7 @@
 
 inline void Trig_ConRef::propagate(DomainDelta d) {
   D_ASSERT(con);
-  con->propagateDynInt(conListPos, d);
+  con->propagateDynIntAnnotated(conListPos, d);
 }
 
 inline void DynamicTriggerList::add(Trig_ConRef t) {

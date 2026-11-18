@@ -294,6 +294,8 @@ struct ReifiedEqualConstraint : public AbstractConstraint {
 
 template <typename VarRef1, typename VarRef2>
 struct NeqConstraintBinary : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "diseq";
   }
@@ -465,6 +467,8 @@ struct NeqConstraintBinary : public AbstractConstraint {
 
 template <typename EqualVarRef1, typename EqualVarRef2>
 struct EqualConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "eq";
   }

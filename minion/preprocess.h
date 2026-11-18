@@ -18,10 +18,17 @@ void collectAMOs(vector<AnyVarRef>& vars);
 template <typename Var, typename Vars, typename Prop>
 bool inline check_fail(Var& var, DomainInt val, Vars& vars, Prop prop) {
   Controller::worldPush();
-  var.assign(val);
+  std::uint64_t probe = 0;
+  {
+    AnnotationAssumption assumption;
+    if(annotationTrace()) annotationTrace()->beginProbe();
+    var.assign(val);
+    if(annotationTrace()) probe = annotationTrace()->endProbe();
+  }
   prop(vars);
 
   bool checkFailed = getState().isFailed();
+  if(annotationTrace()) annotationTrace()->probeResult(probe, checkFailed);
 
   Controller::worldPop();
 
@@ -38,11 +45,18 @@ template <typename Var, typename Vars, typename Prop>
 bool inline check_fail_range(Var& var, DomainInt lowval, DomainInt highval, Vars& vars, Prop prop) {
   Controller::worldPush();
 
-  var.setMin(lowval);
-  var.setMax(highval);
+  std::uint64_t probe = 0;
+  {
+    AnnotationAssumption assumption;
+    if(annotationTrace()) annotationTrace()->beginProbe();
+    var.setMin(lowval);
+    var.setMax(highval);
+    if(annotationTrace()) probe = annotationTrace()->endProbe();
+  }
   prop(vars);
 
   bool checkFailed = getState().isFailed();
+  if(annotationTrace()) annotationTrace()->probeResult(probe, checkFailed);
   Controller::worldPop();
 
   return checkFailed;
@@ -78,7 +92,12 @@ bool pruneDomainTop(Var& var, vector<Var>& vararray, Prop prop, bool limit) {
     bool check = check_fail_range(var, step + 1, maxval, vararray, prop);
     if(check) {
       pruned = true;
-      var.setMax(step);
+      {
+        AnnotationContext proof(nullptr, "probe.refutation", [&]() {
+          return "{\"probe\":" + tostring(annotationTrace()->completedProbe) + "}";
+        }, AnnotationContext::LazyInfo{});
+        var.setMax(step);
+      }
       prop(vararray);
       if(getState().isFailed())
         return pruned;
@@ -117,7 +136,12 @@ bool pruneDomain_bottom(Var& var, vector<Var>& vararray, Prop prop, bool limit) 
     bool check = check_fail_range(var, minval, step - 1, vararray, prop);
     if(check) {
       pruned = true;
-      var.setMin(step);
+      {
+        AnnotationContext proof(nullptr, "probe.refutation", [&]() {
+          return "{\"probe\":" + tostring(annotationTrace()->completedProbe) + "}";
+        }, AnnotationContext::LazyInfo{});
+        var.setMin(step);
+      }
       prop(vararray);
       if(getState().isFailed())
         return pruned;
@@ -181,7 +205,12 @@ bool runValueLoopSlice(vector<Var>& vararray, Prop prop, const vector<SysInt>& o
           throw EndOfSearch();
         if(var.inDomain(val) && check_fail(var, val, vararray, prop)) {
           reduced = true;
-          var.removeFromDomain(val);
+          {
+            AnnotationContext proof(nullptr, "probe.refutation", [&]() {
+              return "{\"probe\":" + tostring(annotationTrace()->completedProbe) + "}";
+            }, AnnotationContext::LazyInfo{});
+            var.removeFromDomain(val);
+          }
           prop(vararray);
           if(getState().isFailed())
             return reduced;

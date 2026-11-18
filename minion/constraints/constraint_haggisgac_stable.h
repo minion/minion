@@ -47,6 +47,8 @@
 
 template <typename VarArray>
 struct HaggisGACStable : public AbstractConstraint, Backtrackable {
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "haggisgac-stable";
   }

@@ -72,6 +72,7 @@ using namespace std;
 
 template <typename VarArray>
 struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
+  const char* annotationPropagationRule() const { return "alldiff.hall"; }
   using FlowConstraint<VarArray, UseIncGraph>::constraintLocked;
   using FlowConstraint<VarArray, UseIncGraph>::adjlist;
   using FlowConstraint<VarArray, UseIncGraph>::adjlistlength;
@@ -240,6 +241,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 #ifdef STAGED
     if(varArray[prop_var].isAssigned()) {
       DomainInt assignedval = varArray[prop_var].assignedValue();
+      AnnotationWitness witness(this, "hall", [&]() { return this->annotationPositions({prop_var}); });
       for(SysInt i = 0; i < numvars; i++) {
         if(i != prop_var && varArray[i].inDomain(assignedval)) {
           varArray[i].removeFromDomain(assignedval);
@@ -337,6 +339,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 #ifdef STAGED
     if(varArray[prop_var].isAssigned()) {
       DomainInt assignedval = varArray[prop_var].assignedValue();
+      AnnotationWitness witness(this, "hall", [&]() { return this->annotationPositions({prop_var}); });
       for(SysInt i = 0; i < numvars; i++) {
         if(i != prop_var && varArray[i].inDomain(assignedval)) {
           varArray[i].removeFromDomain(assignedval);
@@ -505,6 +508,7 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
 
             sccindexStart++;
             DomainInt tempval = varArray[tempvar].assignedValue();
+            AnnotationWitness witness(this, "hall", [&]() { return this->annotationPositions({tempvar}); });
 
             // Now remove the value from the reduced SCC
             for(SysInt i = sccindexStart; i <= sccindexEnd; i++) {
@@ -691,6 +695,11 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     // Is this guaranteed to be called before do_prop is ever called??
     // I hope so, because the following test has to be done first.
     if(numvars > numvals) {
+      AnnotationWitness witness(this, "hall", [&]() {
+        vector<SysInt> positions;
+        for(SysInt i = 0; i < numvars; ++i) positions.push_back(i);
+        return this->annotationPositions(positions);
+      });
       getState().setFailed();
       return;
     }
@@ -1120,6 +1129,9 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
           // D_ASSERT(copynode==curnode || copynode>=numvars ||
           // SCCSplit.isMember(sccindex-1));
         }
+        AnnotationWitness witness(this, "hall", [&]() {
+          return this->annotationPositions(annotationHallSet(curnode));
+        });
         // Just print more stuff here.
 
         // For each value, iterate through the current
@@ -1169,6 +1181,42 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     }
   }
 
+  // The values of the SCC rooted at sccroot can only be used by variables
+  // which reach that SCC: each such variable's matched value reaches it, and
+  // every other value in its domain has an edge to the variable. Those
+  // variables therefore form a Hall set. varinlocalmatching holds the SCC's
+  // variables; a lone value contributes the variable matched to it.
+  vector<SysInt> annotationHallSet(SysInt sccroot) {
+    vector<char> reached(numvars, 0);
+    vector<SysInt> pending;
+    auto reach = [&](SysInt var) {
+      if(!reached[var]) {
+        reached[var] = 1;
+        pending.push_back(var);
+      }
+    };
+    vector<SysInt> owner(numvals, -1);
+    for(SysInt i = 0; i < numvars; ++i)
+      if(varArray[i].inDomain(varvalmatching[i])) owner[varvalmatching[i] - domMin] = i;
+    auto reachOwner = [&](DomainInt val) {
+      SysInt var = owner[checked_cast<SysInt>(val - domMin)];
+      if(var >= 0) reach(var);
+    };
+    for(SysInt i = 0; i < numvars; ++i)
+      if(varinlocalmatching.in(i)) reach(i);
+    if(sccroot >= numvars && sccroot < numvars + numvals) reachOwner(sccroot - numvars + domMin);
+    while(!pending.empty()) {
+      SysInt var = pending.back();
+      pending.pop_back();
+      for(DomainInt val = varArray[var].min(); val <= varArray[var].max(); ++val)
+        if(val != varvalmatching[var] && varArray[var].inDomain(val)) reachOwner(val);
+    }
+    vector<SysInt> positions;
+    for(SysInt i = 0; i < numvars; ++i)
+      if(reached[i]) positions.push_back(i);
+    return positions;
+  }
+
   inline bool matching_wrapper(SysInt sccstart, SysInt sccend, bool allowedToFail) {
 #ifdef BFSMATCHING
     return bfs_wrapper(sccstart, sccend, allowedToFail);
@@ -1184,8 +1232,14 @@ struct GacAlldiffConstraint : public FlowConstraint<VarArray, UseIncGraph> {
     if(!bfsmatching(sccstart, sccend)) {
       // The constraint is unsatisfiable (no matching).
       P("No complete matching found. Changed varvalmatching: " << varvalmatching);
-      if(allowedToFail)
+      if(allowedToFail) {
+        AnnotationWitness witness(this, "hall", [&]() {
+          vector<SysInt> positions;
+          for(SysInt i = 0; i < numvars; ++i) if(visited.in(i)) positions.push_back(i);
+          return this->annotationPositions(positions);
+        });
         getState().setFailed();
+      }
       return false;
     }
 

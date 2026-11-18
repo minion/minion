@@ -36,6 +36,12 @@ inline SearchOptions& getOptions() {
   return GET_GLOBAL(options_m);
 #endif
 }
+
+#ifdef MINION_ANNOTATIONS
+inline AnnotationTrace* annotationTrace() {
+  return getOptions().annotations.get();
+}
+#endif
 inline SearchState& getState() {
 #ifdef LIBMINION
   if(!globals->state_m) {

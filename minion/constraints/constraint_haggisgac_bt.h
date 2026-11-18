@@ -96,6 +96,8 @@ and now the variables [x1,x2,x3,x4] will satisfy the constraint mycon.
 template <typename VarArray>
 struct HaggisGAC : public AbstractConstraint, Backtrackable {
 
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "haggisgac";
   }

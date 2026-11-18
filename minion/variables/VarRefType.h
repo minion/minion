@@ -74,23 +74,33 @@ struct VarRefType {
     return GET_CONTAINER().initialMin(data);
   }
 
-  void setMax(DomainInt i) {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "upper_bound", i, annotationFile, annotationLine);
     GET_CONTAINER().setMax(data, i);
   }
 
-  void setMin(DomainInt i) {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "lower_bound", i, annotationFile, annotationLine);
     GET_CONTAINER().setMin(data, i);
   }
 
-  void uncheckedAssign(DomainInt b) {
+  void uncheckedAssign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "assign", b, annotationFile, annotationLine);
     GET_CONTAINER().uncheckedAssign(data, b);
   }
 
-  void assign(DomainInt b) {
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "assign", b, annotationFile, annotationLine);
     GET_CONTAINER().assign(data, b);
   }
 
-  void removeFromDomain(DomainInt b) {
+  void removeFromDomain(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "remove", b, annotationFile, annotationLine);
     GET_CONTAINER().removeFromDomain(data, b);
   }
 
@@ -201,23 +211,33 @@ struct QuickVarRefType {
     return data.initialMin();
   }
 
-  void setMax(DomainInt i) {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "upper_bound", i, annotationFile, annotationLine);
     GET_CONTAINER().setMax(data, i);
   }
 
-  void setMin(DomainInt i) {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "lower_bound", i, annotationFile, annotationLine);
     GET_CONTAINER().setMin(data, i);
   }
 
-  void uncheckedAssign(DomainInt b) {
+  void uncheckedAssign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "assign", b, annotationFile, annotationLine);
     GET_CONTAINER().uncheckedAssign(data, b);
   }
 
-  void assign(DomainInt b) {
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "assign", b, annotationFile, annotationLine);
     GET_CONTAINER().assign(data, b);
   }
 
-  void removeFromDomain(DomainInt b) {
+  void removeFromDomain(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    annotateDomain(*this, "remove", b, annotationFile, annotationLine);
     GET_CONTAINER().removeFromDomain(data, b);
   }
 

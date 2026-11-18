@@ -56,6 +56,7 @@ void BuildCSP(CSPInstance& instance) {
   // Set up variables
   BuildCon::buildVariables(instance.vars);
   getState().setInstance(&instance);
+  if(annotationTrace()) annotationTrace()->begin(instance);
 
   // Set up optimisation
   if(instance.is_optimisation_problem) {
@@ -229,11 +230,16 @@ void SolveCSP(CSPInstance& instance, SearchMethod args) {
       WorkSteal::markIdle(*ctrl);
     }
   } else {
+    bool exhausted = false;
     try {
       if(!getState().isFailed()) {
         sm->search();
       }
+      exhausted = true;
     } catch(EndOfSearch) {}
+    if(annotationTrace()) {
+      annotationTrace()->finish(exhausted && getTableOut().get("TimeOut") == "0");
+    }
   }
   getState().setSearchManager(nullptr);
 

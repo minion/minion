@@ -203,6 +203,20 @@ int minion_main(int argc, char** argv) {
     readInputFromFiles(instance, files, getOptions().parserVerbose, getOptions().map_long_short,
                        getOptions().ensureBranchOnAllVars);
 
+    if(!getOptions().annotationsFile.empty()) {
+#ifndef MINION_ANNOTATIONS
+      throw minion_user_error("-annotations needs a Minion configured with --annotations");
+#endif
+      if(getOptions().parallel || getOptions().numParallelThreads || getOptions().numWorkStealThreads ||
+         getOptions().parallelPreprocessCores || getOptions().restart.active ||
+         getOptions().tabulationMode || !getOptions().commandlistIn.empty())
+        throw minion_user_error("-annotations currently supports sequential search");
+      if(instance.is_optimisation_problem && instance.optimiseVariables.size() != 1)
+        throw minion_user_error("-annotations currently supports a single optimisation variable");
+      getOptions().annotations = std::make_shared<AnnotationTrace>(
+          getOptions().annotationsFile, getOptions().annotationsAllContexts);
+    }
+
     // Output graphs, stats, or redump (will not return in these cases)
     infoDumps(instance);
 

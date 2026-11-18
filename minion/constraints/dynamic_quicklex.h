@@ -13,6 +13,7 @@
 
 template <typename VarArray1, typename VarArray2, bool Less = false>
 struct QuickLexDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "lex.support"; }
   virtual string constraintName() {
     if(Less)
       return "lexless[quick]";

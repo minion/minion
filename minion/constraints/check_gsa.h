@@ -17,6 +17,7 @@
 #define P(x)
 
 struct Check_GSA : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "wrapper.support"; }
   virtual string extendedName() {
     return constraintName() + ":" + child->extendedName();
   }
@@ -44,7 +45,7 @@ struct Check_GSA : public AbstractConstraint {
   }
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
-    return child->getSatisfyingAssignment(assignment);
+    return child->getSatisfyingAssignmentAnnotated(assignment);
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {

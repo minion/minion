@@ -8,6 +8,8 @@
 
 template <typename Var1, typename Var2>
 struct WatchNeqConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "watchneq";
   }

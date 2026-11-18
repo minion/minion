@@ -26,6 +26,8 @@
 
 template <typename EqualVarRef1, typename EqualVarRef2>
 struct GACEqualConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "gaceq";
   }

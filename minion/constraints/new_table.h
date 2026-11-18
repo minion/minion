@@ -121,6 +121,8 @@ struct NewTableConstraint : public AbstractConstraint {
     return "table(new)";
   }
 
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "table";
   }

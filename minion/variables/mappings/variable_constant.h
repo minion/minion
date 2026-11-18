@@ -74,12 +74,16 @@ struct ConstantVar {
     return val;
   }
 
-  void setMax(DomainInt i) {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(i < val)
       getState().setFailed();
   }
 
-  void setMin(DomainInt i) {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(i > val)
       getState().setFailed();
   }
@@ -88,12 +92,16 @@ struct ConstantVar {
     FAIL_EXIT();
   }
 
-  void assign(DomainInt b) {
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(b != val)
       getState().setFailed();
   }
 
-  void removeFromDomain(DomainInt b) {
+  void removeFromDomain(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(b == val)
       getState().setFailed();
   }

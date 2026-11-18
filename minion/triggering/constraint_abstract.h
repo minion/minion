@@ -38,6 +38,43 @@ protected:
   vector<SysInt> Trigger_info;
 
 public:
+  std::uint64_t annotationId = 0;
+
+  // A family can select a fixed proof rule for the propagation entry points.
+  // The individual deletion still carries its original source call site.
+  virtual const char* annotationPropagationRule() const { return nullptr; }
+
+  const char* annotationRuleOr(const char* fallback) const {
+    auto* trace = annotationTrace();
+    if(trace && trace->active()) {
+      const char* rule = annotationPropagationRule();
+      if(rule) return rule;
+    }
+    return fallback;
+  }
+
+  virtual const vector<AbstractConstraint*>& annotationChildren() const {
+    static const vector<AbstractConstraint*> empty;
+    return empty;
+  }
+
+  void fullPropagateAnnotated() {
+    AnnotationContext context(this, annotationRuleOr("full_propagate"));
+    fullPropagate();
+  }
+
+  void propagateDynIntAnnotated(SysInt trigger, DomainDelta delta) {
+    AnnotationContext context(this, annotationRuleOr("propagate"), [&]() {
+      return "{\"trigger\":" + tostring(trigger) + "}";
+    }, AnnotationContext::LazyInfo{});
+    propagateDynInt(trigger, delta);
+  }
+
+  bool getSatisfyingAssignmentAnnotated(box<pair<SysInt, DomainInt>>& assignment) {
+    AnnotationContext context(this, "find_support");
+    return getSatisfyingAssignment(assignment);
+  }
+
   void _setParent(AbstractConstraint* _parent, SysInt _childpos) {
     D_ASSERT(parent == (AbstractConstraint*)BAD_POINTER);
     parent = _parent;
@@ -330,6 +367,9 @@ protected:
   vector<DomainInt> startOf_constraint;
 
 public:
+  const vector<AbstractConstraint*>& annotationChildren() const {
+    return child_constraints;
+  }
   SysInt getChildDynamicTrigger(DomainInt p) {
     return _dynamicTriggerToConstraint[checked_cast<SysInt>(p)];
   }
@@ -338,7 +378,7 @@ public:
     SysInt child = getChildDynamicTrigger(trig);
     SysInt offset = _dynamicTriggerChildOffset[child];
     D_ASSERT(trig >= offset);
-    child_constraints[child]->propagateDynInt(trig - offset, dd);
+    child_constraints[child]->propagateDynIntAnnotated(trig - offset, dd);
   }
 
   Trig_ConRef _parent_map_Trig_ConRef(SysInt child, SysInt trigger) {

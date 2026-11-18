@@ -122,6 +122,8 @@ struct MDDNode {
 
 template <typename VarArray, bool isNegative = false>
 struct MDDC : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "mddc";
   }

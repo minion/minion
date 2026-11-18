@@ -6,6 +6,7 @@
 
 template <typename VarArray>
 struct BoolSATConstraintDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "sum.bounds.watched"; }
   virtual string constraintName() {
     return "watchsumgeq";
   }

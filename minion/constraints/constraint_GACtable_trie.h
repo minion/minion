@@ -48,6 +48,8 @@ struct GACTableConstraint : public AbstractConstraint {
     return "table(trie)";
   }
 
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     if(negative)
       return "negativetable";

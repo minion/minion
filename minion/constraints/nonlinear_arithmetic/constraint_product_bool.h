@@ -8,6 +8,8 @@
 
 template <typename ProdVarRef1, typename ProdVarRef2, typename ProdVarRef3>
 struct BoolProdConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "product";
   }

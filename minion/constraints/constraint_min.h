@@ -16,6 +16,7 @@
 
 template <typename VarArray, typename MinVarRef>
 struct MinConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "extremum.support"; }
   virtual string constraintName() {
     return "min";
   }

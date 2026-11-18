@@ -153,30 +153,34 @@ template<typename VarRef, typename DataMap = TrivialDataMap>
       return data.initialMax() * dataMap.multiply() + dataMap.shift();
   }
 
-  void setMax(DomainInt i)
-  {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(dataMap.multiply() >= 0)
       data.setMax(MapHelp::round_down(i, dataMap.multiply()));
     else
       data.setMin(MapHelp::roundUp(-i, -dataMap.multiply()));
   }
 
-  void setMin(DomainInt i)
-  {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(Multiply >= 0)
       data.setMin(MapHelp::roundUp(i, dataMap.multiply()));
     else
       data.setMax(MapHelp::round_down(-i, dataMap.multiply()));
   }
 
-  void uncheckedAssign(DomainInt b)
-  {
+  void uncheckedAssign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     D_ASSERT(b % dataMap.multiply() == 0);
     data.uncheckedAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
-  void assign(DomainInt b)
-  { data.assign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine); data.assign(MultiplyHelp<VarRef>::divide_exact(b, Multiply)); }
 
   void removeFromDomain(DomainInt)
   { FAIL_EXIT(); }
@@ -301,26 +305,34 @@ struct MultiplyVar {
       return data.initialMax() * Multiply;
   }
 
-  void setMax(DomainInt i) {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(Multiply >= 0)
       data.setMax(MultiplyHelp<VarRef>::round_down(i, Multiply));
     else
       data.setMin(MultiplyHelp<VarRef>::roundUp(-i, -Multiply));
   }
 
-  void setMin(DomainInt i) {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     if(Multiply >= 0)
       data.setMin(MultiplyHelp<VarRef>::roundUp(i, Multiply));
     else
       data.setMax(MultiplyHelp<VarRef>::round_down(-i, -Multiply));
   }
 
-  void uncheckedAssign(DomainInt b) {
+  void uncheckedAssign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     D_ASSERT(b % Multiply == 0);
     data.uncheckedAssign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 
-  void assign(DomainInt b) {
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.assign(MultiplyHelp<VarRef>::divide_exact(b, Multiply));
   }
 

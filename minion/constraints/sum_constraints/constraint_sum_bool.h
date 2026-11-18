@@ -72,12 +72,15 @@ struct BoolLessSumConstraint : public AbstractConstraint {
         if(it->assignedValue() == VarToCount)
           ++oneVars;
       } else {
+        AnnotationContext reason(this, "sum.bounds.boolean_force");
         it->uncheckedAssign(1 - VarToCount);
       }
     }
     // D_ASSERT(oneVars >= occCount());
-    if(oneVars > occCount())
+    if(oneVars > occCount()) {
+      AnnotationContext reason(this, "sum.bounds.conflict");
       getState().setFailed();
+    }
   }
 
   virtual void propagateDynInt(SysInt i, DomainDelta) {
@@ -98,8 +101,10 @@ struct BoolLessSumConstraint : public AbstractConstraint {
       if(varArray[i].isAssignedValue(VarToCount))
         occs++;
     count = occs;
-    if(occs > occCount())
+    if(occs > occCount()) {
+      AnnotationContext reason(this, "sum.bounds.conflict");
       getState().setFailed();
+    }
     if(occs == occCount())
       limit_reached();
   }

@@ -106,9 +106,19 @@ struct StandardSearchManager : public SearchManager {
 
     worldPush();
     AnyVarRef var = picked.var;
-    var.assign(picked.val);
+    std::uint64_t split = 0;
+    if(annotationTrace()) {
+      auto base = var.getBaseVar();
+      split = annotationTrace()->branch(base.type(), base.pos(),
+                                        checked_cast<SysInt>(var.getBaseVal(picked.val)), true);
+    }
+    {
+      AnnotationAssumption assumption;
+      var.assign(picked.val);
+    }
     maybe_print_search_assignment(var, picked.val, true);
     branches.push_back(Controller::triple(true, var, picked.val, picked.isAux));
+    branches.back().annotationSplit = split;
   }
 
   inline bool branch_right() {
@@ -116,6 +126,7 @@ struct StandardSearchManager : public SearchManager {
                                                           // RBs
       maybe_print_right_backtrack();
       D_ASSERT(!branches.back().stolen);
+      if(annotationTrace()) annotationTrace()->closeBranch(branches.back().annotationSplit);
       branches.pop_back();
     }
 
@@ -131,10 +142,17 @@ struct StandardSearchManager : public SearchManager {
     (void)isLeft;
 
     bool stolen = branches.back().stolen;
+    auto split = branches.back().annotationSplit;
 
     D_ASSERT(isLeft);
     // remove the left branch.
     branches.pop_back();
+
+    if(annotationTrace()) {
+      auto base = var.getBaseVar();
+      annotationTrace()->branch(base.type(), base.pos(), checked_cast<SysInt>(var.getBaseVal(val)), false,
+                                split);
+    }
 
     // We can no longer assert var.inDomain(val): a constraint added
     // mid-search and re-propagated by this worldPop may already have
@@ -146,17 +164,21 @@ struct StandardSearchManager : public SearchManager {
 
     // special case the upper and lower bounds to make it work for bound
     // variables
-    if(!var.inDomain(val)) {
-      // nothing to do
-    } else if(var.min() == val) {
-      var.setMin(val + 1);
-    } else if(var.max() == val) {
-      var.setMax(val - 1);
-    } else {
-      var.removeFromDomain(val);
+    {
+      AnnotationAssumption assumption;
+      if(!var.inDomain(val)) {
+        // nothing to do
+      } else if(var.min() == val) {
+        var.setMin(val + 1);
+      } else if(var.max() == val) {
+        var.setMax(val - 1);
+      } else {
+        var.removeFromDomain(val);
+      }
     }
     maybe_print_search_assignment(var, val, false);
     branches.push_back(Controller::triple(false, var, val, isAux));
+    branches.back().annotationSplit = split;
 
     // If this branch was stolen, then we want to carry on
     // backtracking
@@ -175,6 +197,9 @@ struct StandardSearchManager : public SearchManager {
       if(branches.back().isLeft) {
         worldPop();
         maybe_print_right_backtrack();
+        if(annotationTrace()) annotationTrace()->skipBranch(branches.back().annotationSplit);
+      } else if(annotationTrace()) {
+        annotationTrace()->closeBranch(branches.back().annotationSplit);
       }
 
       branches.pop_back();
@@ -288,7 +313,7 @@ struct StandardSearchManager : public SearchManager {
         }
 
         // If we are not finished, then go into the loop below.
-        getState().setFailed();
+        getState().setFailedForBacktrack();
       } else {
         maybe_print_node();
         branch_left(varval);

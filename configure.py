@@ -123,6 +123,8 @@ parser.add_argument('--quick', action='store_const', const=['-DQUICK_COMPILE'],
                     help='Quick build')
 parser.add_argument('--static', action='store_const', const=["-static"],
                     help='Enable static build')
+parser.add_argument('--annotations', action='store_const', const=["-DMINION_ANNOTATIONS"],
+                    help='Enable -annotations proof traces (slows search even when unused)')
 
 parser.add_argument('--compiler', help="Set compiler")
 
@@ -192,7 +194,7 @@ verbose_print(1, "Minion base dir: " + scriptdir)
 commandargs = ["-std=gnu++14", "-Wall", "-Wextra", "-Wno-unused-parameter", "-Wno-sign-compare",
                "-I", scriptdir + "/minion", "-I", outsrcdir]
 
-for c in ['domains64', 'quick', 'debug', 'assertions', 'print', 'info', 'profile', 'static']:
+for c in ['domains64', 'quick', 'debug', 'assertions', 'print', 'info', 'profile', 'static', 'annotations']:
     if getattr(arg, c) != None:
         commandargs = commandargs + getattr(arg, c)
 
@@ -383,6 +385,7 @@ minionlibsrclist = ['minion/BuildVariables.cpp',
 'minion/parallel/preprocess_parallel.cpp',
 'minion/parallel/work_steal.cpp',
 'minion/search_dump.cpp',
+'minion/annotations.cpp',
 'minion/command_search.cpp',
 'minion/libwrapper.cpp'
 ]

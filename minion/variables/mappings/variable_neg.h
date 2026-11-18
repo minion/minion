@@ -76,23 +76,33 @@ struct VarNeg {
     return -data.initialMax();
   }
 
-  void setMax(DomainInt i) {
+  void setMax(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.setMin(-i);
   }
 
-  void setMin(DomainInt i) {
+  void setMin(DomainInt i, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.setMax(-i);
   }
 
-  void uncheckedAssign(DomainInt b) {
+  void uncheckedAssign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.uncheckedAssign(-b);
   }
 
-  void assign(DomainInt b) {
+  void assign(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.assign(-b);
   }
 
-  void removeFromDomain(DomainInt b) {
+  void removeFromDomain(DomainInt b, const char* annotationFile = MINION_ANNOTATION_FILE,
+               unsigned annotationLine = MINION_ANNOTATION_LINE) {
+    AnnotationSite annotationSite(annotationFile, annotationLine);
     data.removeFromDomain(-b);
   }
 

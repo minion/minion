@@ -112,6 +112,15 @@ void parseCommandLine(SearchMethod& args, SysInt argc, char** argv) {
       getOptions().nocheck = false;
     }
 
+    else if(command == "-annotations") {
+      INCREMENT_i(-annotations);
+      if(!getOptions().annotationsFile.empty()) outputFatalError("Only one -annotations file is allowed");
+      getOptions().annotationsFile = argv[i];
+    }
+    else if(command == "-annotations-all-contexts") {
+      getOptions().annotationsAllContexts = true;
+    }
+
     else if(command == string("-dumptree")) {
       getOptions().dumptree = true;
     }

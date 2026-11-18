@@ -74,5 +74,7 @@ using namespace BuildCon;
 #define BUILD_CT(CT_NAME, COUNT)                                                                   \
   MERGE(TERMINATE_BUILDCON, COUNT)                                                                 \
   (CT_NAME) AbstractConstraint* build_constraint_##CT_NAME(ConstraintBlob& b) {                    \
-    return BuildConObj<CT_NAME, COUNT>::build(EmptyType(), b, 0);                                  \
+    auto* result = BuildConObj<CT_NAME, COUNT>::build(EmptyType(), b, 0);                          \
+    if(annotationTrace()) annotationTrace()->constraint(result, &b);                            \
+    return result;                                                                               \
   }

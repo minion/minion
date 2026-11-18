@@ -28,6 +28,7 @@
 // VarToCount = 1 means leq, = 0 means geq.
 template <typename VarArray, typename VarSum, SysInt VarToCount = 1, BOOL is_reversed = false>
 struct BoolLessSumConstraintDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "sum.bounds.watched"; }
   virtual string constraintName() {
     if(VarToCount)
       return "watchsumleq";

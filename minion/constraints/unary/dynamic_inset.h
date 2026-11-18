@@ -14,6 +14,8 @@ The constraint w-inset(x, [a1,...,an]) ensures that x belongs to the set
 // Checks if a variable is in a fixed set.
 template <typename Var>
 struct WatchInSetConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "w-inset";
   }

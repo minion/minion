@@ -60,7 +60,7 @@ struct Dynamic_OR : public ParentConstraint {
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     for(SysInt i = 0; i < (SysInt)child_constraints.size(); ++i) {
       assignment.clear();
-      bool flag = child_constraints[i]->getSatisfyingAssignment(assignment);
+      bool flag = child_constraints[i]->getSatisfyingAssignmentAnnotated(assignment);
       if(flag) {
         // Fix up assignment
         for(SysInt j = 0; j < (SysInt)assignment.size(); ++j) {
@@ -96,7 +96,7 @@ struct Dynamic_OR : public ParentConstraint {
     D_ASSERT(constraintLocked);
     constraintLocked = false;
     P("Full propagating: " << propagated_constraint);
-    child_constraints[propagated_constraint]->fullPropagate();
+    child_constraints[propagated_constraint]->fullPropagateAnnotated();
     fullPropagate_called = true;
   }
 

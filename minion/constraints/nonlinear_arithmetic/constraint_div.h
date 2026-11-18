@@ -38,6 +38,8 @@ The constraint is always false when y = 0
 /// var1 * var2 = var3
 template <typename VarRef1, typename VarRef2, typename VarRef3, bool undef>
 struct DivConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     if(undef)
       return "div_undefzero";

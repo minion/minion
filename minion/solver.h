@@ -13,6 +13,7 @@
 #include "memory_management/GenericBacktracker.h"
 
 #include "search_dump.hpp"
+#include "annotations.h"
 
 // Some advanced definitions, we don't actually need to know anything about
 // these
@@ -242,6 +243,13 @@ public:
   }
 
   void setFailed() {
+    if(!failed && annotationTrace()) annotationTrace()->conflict();
+    failed = true;
+  }
+
+  // Enumeration control after a solution is not a logical contradiction.
+  void setFailedForBacktrack() {
+    if(annotationTrace()) annotationTrace()->backtrack();
     failed = true;
   }
 
@@ -252,6 +260,7 @@ public:
   }
 
   void setFailed(bool f) {
+    if(f && !failed && annotationTrace()) annotationTrace()->conflict();
     failed = f;
   }
   // This function is here because a number of pieces of code want a raw
@@ -324,6 +333,9 @@ public:
   bool dumptree;
   /// Store the current search tree (if a non-zero pointer)
   std::shared_ptr<SearchDumper> dumptreeobj;
+  std::string annotationsFile;
+  bool annotationsAllContexts = false;
+  std::shared_ptr<AnnotationTrace> annotations;
   /// Gives the solutions which should be found.
   /// -1 denotes finding all solutions.
   long long sollimit;

@@ -11,6 +11,8 @@
 // x <= y + offset
 template <typename VarRef1, typename VarRef2, typename Offset>
 struct LeqConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "ineq";
   }

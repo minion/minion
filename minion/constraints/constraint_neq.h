@@ -16,6 +16,7 @@
 
 template <typename VarArray>
 struct NeqConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "alldiff.hall"; }
   virtual string constraintName() {
     return "alldiff";
   }
@@ -25,6 +26,10 @@ struct NeqConstraint : public AbstractConstraint {
   typedef typename VarArray::value_type VarRef;
 
   VarArray varArray;
+
+  std::string annotationPair(SysInt source, SysInt target) const {
+    return ",\"positions\":[" + tostring(source) + "," + tostring(target) + "]";
+  }
 
   CONSTRAINT_ARG_LIST1(varArray);
 
@@ -50,6 +55,7 @@ struct NeqConstraint : public AbstractConstraint {
     SysInt arraySize = varArray.size();
     for(SysInt i = 0; i < arraySize; ++i) {
       if(i != propVal) {
+        AnnotationWitness witness(this, "hall", [&]() { return annotationPair(propVal, i); });
         if(varArray[i].isBound()) {
           if(varArray[i].min() == removeVal)
             varArray[i].setMin(removeVal + 1);
@@ -70,6 +76,7 @@ struct NeqConstraint : public AbstractConstraint {
         DomainInt removeVal = varArray[i].assignedValue();
         for(SysInt j = 0; j < arraySize; ++j) {
           if(i != j) {
+            AnnotationWitness witness(this, "hall", [&]() { return annotationPair(i, j); });
             if(varArray[j].isBound()) {
               if(varArray[j].min() == removeVal)
                 varArray[j].setMin(removeVal + 1);

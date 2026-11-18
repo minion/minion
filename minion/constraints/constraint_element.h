@@ -68,6 +68,7 @@ to the end of the list.
 
 template <typename VarArray, typename Index, typename Result, bool undefMapsZero = false>
 struct ElementConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "element.support"; }
   virtual string constraintName() {
     return "element";
   }

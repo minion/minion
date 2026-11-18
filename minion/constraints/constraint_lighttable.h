@@ -41,6 +41,8 @@ struct LightTableConstraint : public AbstractConstraint {
     return false;
   }
 
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     return "lighttable";
   }

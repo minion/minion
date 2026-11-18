@@ -9,6 +9,8 @@
 // Checks if a variable is in a fixed set.
 template <typename Var>
 struct WatchInIntervalSetConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "w-inintervalset";
   }

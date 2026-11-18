@@ -42,6 +42,7 @@ const LIB_SOURCES: &[&str] = &[
     "minion/parallel/preprocess_parallel.cpp",
     "minion/parallel/work_steal.cpp",
     "minion/search_dump.cpp",
+    "minion/annotations.cpp",
     "minion/command_search.cpp",
     "minion/libwrapper.cpp",
 ];

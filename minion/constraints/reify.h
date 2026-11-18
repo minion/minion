@@ -122,7 +122,7 @@ struct reify : public ParentConstraint {
 
   virtual bool getSatisfyingAssignment(box<pair<SysInt, DomainInt>>& assignment) {
     if(reify_var.inDomain(1)) {
-      bool flag = child_constraints[0]->getSatisfyingAssignment(assignment);
+      bool flag = child_constraints[0]->getSatisfyingAssignmentAnnotated(assignment);
       if(flag) {
         assignment.push_back(make_pair(reify_varNum, 1));
         return true;
@@ -130,7 +130,7 @@ struct reify : public ParentConstraint {
     }
     assignment.clear();
     if(reify_var.inDomain(0)) {
-      bool flag = child_constraints[1]->getSatisfyingAssignment(assignment);
+      bool flag = child_constraints[1]->getSatisfyingAssignmentAnnotated(assignment);
       if(flag) {
         for(SysInt i = 0; i < (SysInt)assignment.size(); ++i)
           assignment[i].first += c0vars;
@@ -173,9 +173,9 @@ struct reify : public ParentConstraint {
     D_ASSERT(reify_var.isAssigned() &&
              (reify_var.assignedValue() == 0 || reify_var.assignedValue() == 1));
     if(reify_var.inDomain(0)) {
-      child_constraints[1]->fullPropagate();
+      child_constraints[1]->fullPropagateAnnotated();
     } else {
-      child_constraints[0]->fullPropagate();
+      child_constraints[0]->fullPropagateAnnotated();
     }
     fullPropagate_called = true;
   }
@@ -334,9 +334,9 @@ struct reify : public ParentConstraint {
 
     if(reify_var.isAssigned()) {
       if(reify_var.assignedValue() == 1) {
-        child_constraints[0]->fullPropagate();
+        child_constraints[0]->fullPropagateAnnotated();
       } else {
-        child_constraints[1]->fullPropagate();
+        child_constraints[1]->fullPropagateAnnotated();
       }
       fullPropagate_called = true;
       return;

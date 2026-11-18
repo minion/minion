@@ -119,6 +119,7 @@ public:
       specialTriggers.queuePop();
 
       CON_INFO_ADDONE(SpecialTrigger);
+      AnnotationContext context(trig, trig->annotationRuleOr("special_check"));
       trig->specialCheck();
 #ifdef WDEG
       if(getState().isFailed())

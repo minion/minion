@@ -47,6 +47,7 @@ specifies that, in any solution, vec[i] = e and i is in the range
 
 template <typename VarArray, typename Index, typename Result, bool undefMapsZero = false>
 struct ElementConstraintDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "element.support"; }
 
   virtual string constraintName() {
     return "watchelement";

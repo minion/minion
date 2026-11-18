@@ -112,6 +112,8 @@ shared_ptr<SearchManager> makeSearch_manager(PropagationLevel propMethod,
       // vals.size == 0 before an optimisation value found
       D_ASSERT(vals.size() == 0 || vals.size() == vars.size());
       for(int i = 0; i < vals.size(); ++i) {
+        // The bound from the best solution so far is not any constraint's deduction.
+        AnnotationContext bound(nullptr, "optimise.bound");
         vars[i].setMin(vals[i]);
         if(!(vars[i].isAssigned() && vars[i].assignedValue() == vals[i])) {
           return;

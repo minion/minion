@@ -13,6 +13,8 @@
 // Checks if a variable is in a fixed Range.
 template <typename Var>
 struct WatchNotInRangeConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "w-notinrange";
   }

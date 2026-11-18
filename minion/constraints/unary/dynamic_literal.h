@@ -13,6 +13,8 @@
 // Checks if a variable is equal to a value.
 template <typename Var>
 struct WatchLiteralConstraint : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "local.support"; }
+
   virtual string constraintName() {
     return "w-literal";
   }

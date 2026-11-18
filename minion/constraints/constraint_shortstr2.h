@@ -121,6 +121,8 @@ struct STRData {
 
 template <typename VarArray, bool UseShort>
 struct STR : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "table.support"; }
+
   virtual string constraintName() {
     if(UseShort)
       return "shortstr2";

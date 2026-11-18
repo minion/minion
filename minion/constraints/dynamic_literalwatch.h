@@ -16,6 +16,8 @@
 
 template <typename VarArray, typename ValueArray, typename VarSum>
 struct LiteralSumConstraintDynamic : public AbstractConstraint {
+  const char* annotationPropagationRule() const { return "count.bounds"; }
+
   virtual string constraintName() {
     return "litsumgeq";
   }

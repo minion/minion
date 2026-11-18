@@ -89,20 +89,32 @@ struct LessEqualSumConstraint : public AbstractConstraint {
       varArrayMinSum = sum;
     }
 
-    varSum.setMin(sum);
+    {
+      AnnotationContext reason(this, "sum.bounds.result", [&]() {
+        return "{\"cached_min_sum\":" + tostring(sum) + "}";
+      }, AnnotationContext::LazyInfo{});
+      varSum.setMin(sum);
+    }
     if(getState().isFailed())
       return;
     D_ASSERT(sum <= getRealMinSum());
 
     DomainInt looseness = varSum.max() - sum;
     if(looseness < 0) {
+      AnnotationContext reason(this, "sum.bounds.conflict");
       getState().setFailed();
       return;
     }
 
     if(looseness < max_looseness) {
-      for(typename VarArray::iterator it = varArray.begin(); it != varArray.end(); ++it)
+      SysInt index = 0;
+      for(typename VarArray::iterator it = varArray.begin(); it != varArray.end(); ++it, ++index) {
+        AnnotationContext reason(this, "sum.bounds.term", [&]() {
+          return "{\"index\":" + tostring(index) + ",\"cached_min_sum\":" + tostring(sum) +
+                 ",\"slack\":" + tostring(looseness) + "}";
+        }, AnnotationContext::LazyInfo{});
         it->setMax(it->min() + looseness);
+      }
     }
   }
 
@@ -121,8 +133,10 @@ struct LessEqualSumConstraint : public AbstractConstraint {
     max_looseness = maxDiff;
     if(!varArray.empty())
       propagateDynInt(0, DomainDelta::empty());
-    else
+    else {
+      AnnotationContext reason(this, "sum.bounds.result");
       varSum.setMin(0);
+    }
   }
 
   virtual BOOL checkAssignment(DomainInt* v, SysInt vSize) {
