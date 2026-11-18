@@ -247,7 +247,9 @@ jobs:
               export PATH=$PATH:$HOME/.cargo/bin
               ./mini-scripts/check-generator-parity.sh
 
-      - name: "minion-sys no-op build stays fresh"
+      # Generated headers once caused the C++ library to rebuild even when
+      # no sources changed. Build twice and check that Cargo reuses it.
+      - name: "minion-sys unchanged sources do not rebuild"
         run: |
               export PATH=$PATH:$HOME/.cargo/bin
               python3 minion-sys/tools/check-build-freshness.py

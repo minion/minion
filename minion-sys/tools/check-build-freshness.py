@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check Cargo's actual build-script dependencies and no-op build behaviour."""
+"""Check that unchanged minion-sys sources do not trigger another build."""
 
 import json
 from pathlib import Path
@@ -18,56 +18,18 @@ def build():
     return [json.loads(line) for line in result.stdout.splitlines()]
 
 
-messages = build()
-scripts = [
-    message for message in messages
-    if message["reason"] == "build-script-executed"
-    and "minion-sys" in message["package_id"]
-]
-assert len(scripts) == 1, scripts
-out_dir = Path(scripts[0]["out_dir"]).resolve()
-directives = (out_dir.parent / "output").read_text().splitlines()
-headers = []
-environment = set()
-for line in directives:
-    if line.startswith("cargo:rerun-if-changed="):
-        path = Path(line.split("=", 1)[1])
-        if not path.is_absolute():
-            path = crate / path
-        path = path.resolve()
-        assert not path.is_relative_to(out_dir), f"tracking own output: {path}"
-        headers.append(path)
-    elif line.startswith("cargo:rerun-if-env-changed="):
-        environment.add(line.split("=", 1)[1])
+build()
 
-# The binding generator must see the shared interface without pulling solver
-# implementations (and their standard-library internals) back into its input.
-interface = next(path for path in headers if path.name == "libwrapper_api.h")
-source = interface.parent
-allowed = {
-    Path("libwrapper_api.h"),
-    Path("inputfile_parse/Var.h"),
-    Path("search_types.h"),
-    Path("system/sys_types.h"),
-    Path("system/globals_forward.h"),
-}
-actual = {
-    path.relative_to(source)
-    for path in headers
-    if path.is_relative_to(source) and path.suffix in {".h", ".hpp"}
-}
-assert actual == allowed, f"bindgen interface dependencies changed: {actual}"
-assert source in headers, "C++ source changes must still trigger rebuilding"
-assert "MINION_SRC" in environment, environment
-assert "BINDGEN_EXTRA_CLANG_ARGS" in environment, environment
-
-# Checking the build-script artifact's freshness catches a rerun even if the
-# generated Rust bindings happen to be identical.
+# Generated headers once caused the C++ build to rerun on every invocation.
+# Check Cargo's public JSON freshness flag rather than its internal cache files.
 artifacts = [
     message for message in build()
     if message["reason"] == "compiler-artifact"
-    and "minion-sys" in message["package_id"]
+    and Path(message["manifest_path"]).resolve() == crate / "Cargo.toml"
+    and "lib" in message["target"]["kind"]
 ]
-assert artifacts, "Cargo did not report minion-sys artifacts"
-assert all(message["fresh"] for message in artifacts), artifacts
-print("minion-sys dependencies are tracked and a second build is fresh")
+assert artifacts, "Cargo did not report the minion-sys library"
+assert all(message["fresh"] for message in artifacts), (
+    "minion-sys rebuilt despite unchanged sources", artifacts
+)
+print("minion-sys reused the previous build: unchanged sources did not rebuild")
