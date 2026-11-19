@@ -354,3 +354,84 @@ jobs:
               export PATH=$PATH:$HOME/.cargo/bin
               cd tester
               DEBUG_MINION=1 cargo run --release -- --in-process $SMOKE --midsearch-constraints --count 2 --numthreads 4 --maxtuples 2000
+
+  # Minion built with tracing, and the Lean checker for its traces. lean/README.md
+  # describes each of the test steps.
+  certificates:
+    name: Lean-checked certificates ${{ matrix.build }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        # The debug build runs Minion's assertions while it traces.
+        build: ["", "--debug"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          check-latest: true
+
+      - name: "Build Minion with annotations"
+        run: |
+                mkdir bin-annotations
+                cd bin-annotations
+                python3 ../configure.py --annotations --quick ${{ matrix.build }}
+                make -j2
+
+      # The hooks must not change what Minion does.
+      - name: "Basic tests on the annotated build"
+        run: |
+              cd test_instances
+              python3 ./run_tests.py ../bin-annotations/minion --basic-only
+
+      - name: "Install Lean"
+        run: |
+              curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+              echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: "Cache the Lean build"
+        uses: actions/cache@v4
+        with:
+          path: lean/.lake
+          key: lean-${{ runner.os }}-${{ hashFiles('lean/lean-toolchain', 'lean/lakefile.toml', 'lean/**/*.lean') }}
+          restore-keys: lean-${{ runner.os }}-
+
+      - name: "Build the checker"
+        run: |
+              cd lean
+              lake build
+
+      - name: "Lean examples and kernel-checked certificates"
+        run: |
+              cd lean
+              for f in *Tests.lean examples/Certified*.lean; do
+                echo "$f"
+                lake env lean "$f" > /dev/null
+              done
+
+      - name: "Constraint inventory"
+        run: python3 lean/tests/constraint_inventory.py --check
+
+      - name: "Trace and certify the test models"
+        run: |
+              MINION_ANNOTATIONS_BINARY="$PWD/bin-annotations/minion" \
+                python3 -m unittest discover -s lean/tests -p 'test_*.py'
+
+      - name: "Tester export tests"
+        run: cargo test --manifest-path tester/Cargo.toml --test semantics_export --test compare_mode
+
+      # Random models for every constraint: Lean checks each complete solution
+      # set by enumeration, then each search is traced, certified, and its
+      # solutions compared with that set.
+      - name: "Random models: solution sets, traces and certificates"
+        run: |
+              tester/target/debug/tester --minion "$PWD/bin-annotations/minion" \
+                --export-solutions "$RUNNER_TEMP/claims" \
+                --check-solutions-with "$PWD/lean/.lake/build/bin/minion-semantics" \
+                --count 5 --nest-depth 2
+              python3 lean/tests/check_corpus.py "$RUNNER_TEMP/claims" "$RUNNER_TEMP/traces" \
+                --minion "$PWD/bin-annotations/minion"
