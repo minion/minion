@@ -294,6 +294,16 @@ struct MDDC : public AbstractConstraint {
       vector<DomainInt> tup(tupdata + (tuplelen * tupid),
                             tupdata + (tuplelen * (tupid + 1))); // inefficient.
 
+      // A tuple with a value outside a variable's initial bounds forbids
+      // nothing, and the trie only has links for values inside them.
+      bool reachable = true;
+      for(int i = 0; i < tuplelen; i++) {
+        if(tup[i] < vars[i].initialMin() || tup[i] > vars[i].initialMax())
+          reachable = false;
+      }
+      if(!reachable)
+        continue;
+
       MDDNode* curnode = top;
 
       for(int i = 0; i < tuplelen; i++) {

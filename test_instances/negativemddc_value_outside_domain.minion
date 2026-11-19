@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 5
+# The tuple (0,0) has a value outside the domain of x.
+**VARIABLES**
+DISCRETE x {1..2}
+DISCRETE y {0..2}
+**TUPLELIST**
+t 2 2
+0 0
+1 1
+**CONSTRAINTS**
+negativemddc([x,y],t)
+**EOF**

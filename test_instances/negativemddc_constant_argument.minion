@@ -1,0 +1,13 @@
+MINION 3
+#TEST SOLCOUNT 2
+# The tuple (0,0) can never match the constant first argument.
+**VARIABLES**
+DISCRETE x {0..2}
+**TUPLELIST**
+t 3 2
+0 0
+1 1
+2 1
+**CONSTRAINTS**
+negativemddc([1,x],t)
+**EOF**
